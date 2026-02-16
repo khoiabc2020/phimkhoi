@@ -3,8 +3,9 @@ import { useLocalSearchParams, Stack, Link } from 'expo-router';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getMovieDetail, getImageUrl, Movie } from '@/services/api';
+import { addFavorite, removeFavorite, isFavorite } from '@/lib/favorites';
 import { StatusBar } from 'expo-status-bar';
 
 const { width } = Dimensions.get('window');
@@ -12,9 +13,30 @@ const { width } = Dimensions.get('window');
 export default function MovieDetailScreen() {
     const { slug } = useLocalSearchParams();
     const [movie, setMovie] = useState<Movie | null>(null);
-    // Response from API wraps movie in a 'movie' field and episodes in 'episodes'
     const [episodes, setEpisodes] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [fav, setFav] = useState(false);
+
+    useEffect(() => {
+        if (movie) isFavorite(movie._id).then(setFav);
+    }, [movie?._id]);
+
+    const toggleFavorite = useCallback(async () => {
+        if (!movie) return;
+        if (fav) {
+            await removeFavorite(movie._id);
+            setFav(false);
+        } else {
+            await addFavorite({
+                _id: movie._id,
+                slug: movie.slug,
+                name: movie.name,
+                poster_url: movie.poster_url,
+                thumb_url: movie.thumb_url,
+            });
+            setFav(true);
+        }
+    }, [movie, fav]);
 
     useEffect(() => {
         const fetchDetail = async () => {
@@ -105,9 +127,9 @@ export default function MovieDetailScreen() {
                     </Link>
 
                     <View className="flex-row gap-4 mb-6">
-                        <Pressable className="flex-1 bg-gray-800 py-3 rounded-lg flex-col items-center">
-                            <Ionicons name="add" size={24} color="white" />
-                            <Text className="text-gray-300 text-xs mt-1">Danh sách</Text>
+                        <Pressable onPress={toggleFavorite} className="flex-1 bg-gray-800 py-3 rounded-lg flex-col items-center">
+                            <Ionicons name={fav ? 'heart' : 'heart-outline'} size={24} color={fav ? '#ef4444' : 'white'} />
+                            <Text className="text-gray-300 text-xs mt-1">{fav ? 'Đã thích' : 'Yêu thích'}</Text>
                         </Pressable>
                         <Pressable className="flex-1 bg-gray-800 py-3 rounded-lg flex-col items-center">
                             <Ionicons name="download-outline" size={24} color="white" />

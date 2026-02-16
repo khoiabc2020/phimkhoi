@@ -33,10 +33,11 @@ export interface Movie {
     episodes: { server_name: string; server_data: { name: string; slug: string; filename: string; link_embed: string; link_m3u8: string }[] }[];
 }
 
-// Helper to normalize response
+// Helper to normalize response - PhimAPI returns { data: { items: [...] } }
 const getItems = (data: any): Movie[] => {
-    if (data.items) return data.items;
-    if (data.data && data.data.items) return data.data.items;
+    if (!data) return [];
+    if (Array.isArray(data.items)) return data.items;
+    if (data.data?.items && Array.isArray(data.data.items)) return data.data.items;
     return [];
 };
 
@@ -92,5 +93,56 @@ export const searchMovies = async (keyword: string) => {
 export const getImageUrl = (url?: string) => {
     if (!url) return 'https://via.placeholder.com/300x450?text=No+Image';
     if (url.startsWith('http')) return url;
-    return `${CONFIG.PHIM_API_URL}/${url}`; // Adjust if PhimAPI serves images relative
+    return `${CONFIG.PHIM_API_URL}/${url}`;
+};
+
+export const getMenuData = async () => {
+    try {
+        const [categoriesRes, countriesRes] = await Promise.all([
+            fetch(`${API_URL}/the-loai`),
+            fetch(`${API_URL}/quoc-gia`),
+        ]);
+        const categories = await categoriesRes.json();
+        const countries = await countriesRes.json();
+        return {
+            categories: Array.isArray(categories) ? categories : [],
+            countries: Array.isArray(countries) ? countries : [],
+        };
+    } catch (error) {
+        console.error('Error fetching menu:', error);
+        return { categories: [], countries: [] };
+    }
+};
+
+export const getMoviesList = async (type: string, page = 1, limit = 24) => {
+    try {
+        const res = await fetch(`${API_URL}/v1/api/danh-sach/${type}?page=${page}&limit=${limit}`);
+        const data = await res.json();
+        return { items: getItems(data), pagination: data.data?.params?.pagination || { currentPage: 1, totalPages: 1 } };
+    } catch (error) {
+        console.error(`Error fetching list [${type}]:`, error);
+        return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
+    }
+};
+
+export const getMoviesByCategory = async (slug: string, page = 1, limit = 24) => {
+    try {
+        const res = await fetch(`${API_URL}/v1/api/the-loai/${slug}?page=${page}&limit=${limit}`);
+        const data = await res.json();
+        return { items: getItems(data), pagination: data.data?.params?.pagination || { currentPage: 1, totalPages: 1 } };
+    } catch (error) {
+        console.error(`Error fetching category [${slug}]:`, error);
+        return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
+    }
+};
+
+export const getMoviesByCountry = async (slug: string, page = 1, limit = 24) => {
+    try {
+        const res = await fetch(`${API_URL}/v1/api/quoc-gia/${slug}?page=${page}&limit=${limit}`);
+        const data = await res.json();
+        return { items: getItems(data), pagination: data.data?.params?.pagination || { currentPage: 1, totalPages: 1 } };
+    } catch (error) {
+        console.error(`Error fetching country [${slug}]:`, error);
+        return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
+    }
 };

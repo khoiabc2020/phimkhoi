@@ -1,50 +1,44 @@
-# Welcome to your Expo app 👋
+# PhimKhoi Mobile - App Android
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Ứng dụng xem phim React Native (Expo) cho Android.
 
-## Get started
+## Tính năng
 
-1. Install dependencies
+- **Trang chủ**: Hero carousel, Phim lẻ, Phim bộ, Hoạt hình, TV Shows
+- **Khám phá**: Tìm kiếm phim, danh mục (Phim lẻ, Phim bộ...), Thể loại, Quốc gia
+- **Yêu thích**: Lưu phim yêu thích (AsyncStorage)
+- **Chi tiết phim**: Thông tin, danh sách tập, nút xem phim
+- **Xem phim**: WebView fullscreen, tự xoay ngang
+- **Cá nhân**: Liên kết phiên bản web
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Chạy development
 
 ```bash
-npm run reset-project
+cd mobile
+npm install
+npm start
+# Nhấn 'a' để mở Android emulator
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Build APK (EAS Build)
 
-## Learn more
+1. Cài EAS CLI: `npm i -g eas-cli`
+2. Đăng nhập: `eas login`
+3. Build: `npm run build:android`
 
-To learn more about developing your project with Expo, look at the following resources:
+APK sẽ được tải từ Expo dashboard sau khi build xong.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Build local (Android)
 
-## Join the community
+```bash
+cd mobile
+npx expo prebuild
+cd android
+./gradlew assembleRelease
+# APK: android/app/build/outputs/apk/release/app-release.apk
+```
 
-Join our community of developers creating universal apps.
+## Cấu hình
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- API: Sửa `constants/config.ts` nếu cần đổi PhimAPI URL
+- Phiên bản web: Sửa URL trong `app/(tabs)/profile.tsx`
