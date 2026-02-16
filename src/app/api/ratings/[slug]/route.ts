@@ -4,9 +4,9 @@ import dbConnect from "@/lib/db";
 import Rating from "@/models/Rating";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-export async function GET(req: Request, { params }: { params: { slug: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ slug: string }> }) {
     try {
-        const { slug } = params;
+        const { slug } = await params;
         await dbConnect();
 
         // Calculate average rating
@@ -20,13 +20,14 @@ export async function GET(req: Request, { params }: { params: { slug: string } }
     }
 }
 
-export async function POST(req: Request, { params }: { params: { slug: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ slug: string }> }) {
     try {
         const session = await getServerSession(authOptions);
         if (!session || !session.user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
+        const { slug } = await params;
         const { value } = await req.json();
         if (!value || value < 1 || value > 10) {
             return NextResponse.json({ error: "Invalid rating value" }, { status: 400 });
@@ -36,7 +37,7 @@ export async function POST(req: Request, { params }: { params: { slug: string } 
 
         // Upsert rating (update if exists, insert if new)
         const rating = await Rating.findOneAndUpdate(
-            { userId: session.user.id, movieSlug: params.slug },
+            { userId: session.user.id, movieSlug: slug },
             { value },
             { upsert: true, new: true }
         );
