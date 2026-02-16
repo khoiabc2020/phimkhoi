@@ -11,6 +11,34 @@
 - **Xem phim**: WebView fullscreen, tự xoay ngang
 - **Cá nhân**: Liên kết phiên bản web
 
+## Tạo file APK (3 cách)
+
+### Cách 1: EAS Build (Khuyên dùng - không cần cài Android SDK)
+
+```bash
+cd mobile
+npm install
+npx eas-cli login          # Đăng nhập Expo (tạo tài khoản miễn phí)
+npm run build:android
+```
+
+Sau 10–15 phút, APK sẽ có tại [expo.dev](https://expo.dev) → dự án → Builds → tải về.
+
+### Cách 2: Chạy script
+
+```bash
+cd mobile/scripts
+build-apk.bat              # Windows
+# hoặc
+./build-apk.sh             # Mac/Linux
+```
+
+### Cách 3: GitHub Actions (tự động)
+
+1. Tạo token: [expo.dev/settings/access-tokens](https://expo.dev/settings/access-tokens)
+2. Thêm secret `EXPO_TOKEN` vào GitHub repo: Settings → Secrets → Actions
+3. Push code → Workflow chạy → APK tạo trên Expo cloud
+
 ## Chạy development
 
 ```bash
@@ -20,21 +48,14 @@ npm start
 # Nhấn 'a' để mở Android emulator
 ```
 
-## Build APK (EAS Build)
-
-1. Cài EAS CLI: `npm i -g eas-cli`
-2. Đăng nhập: `eas login`
-3. Build: `npm run build:android`
-
-APK sẽ được tải từ Expo dashboard sau khi build xong.
-
-## Build local (Android)
+## Build local (cần Android SDK)
 
 ```bash
 cd mobile
-npx expo prebuild
+# Cài Android Studio và set ANDROID_HOME
+npx expo prebuild --platform android
 cd android
-./gradlew assembleRelease
+gradlew.bat assembleRelease    # Windows
 # APK: android/app/build/outputs/apk/release/app-release.apk
 ```
 
