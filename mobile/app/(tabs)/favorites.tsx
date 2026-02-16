@@ -1,4 +1,4 @@
-import { View, Text, FlatList, Pressable, RefreshControl } from 'react-native';
+import { View, Text, FlatList, Pressable, RefreshControl, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,6 +7,8 @@ import { getFavorites, removeFavorite, FavoriteMovie } from '@/lib/favorites';
 import MovieCard from '@/components/MovieCard';
 import { StatusBar } from 'expo-status-bar';
 import { Dimensions } from 'react-native';
+import { useAuth } from '@/context/auth';
+import { CONFIG } from '@/constants/config';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 16 * 3) / 2;
@@ -14,11 +16,31 @@ const CARD_WIDTH = (width - 16 * 3) / 2;
 export default function FavoritesScreen() {
   const [favorites, setFavorites] = useState<FavoriteMovie[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const { user, token, syncFavorites } = useAuth();
+  const [loading, setLoading] = useState(false);
 
   const load = useCallback(async () => {
-    const list = await getFavorites();
-    setFavorites(list);
-  }, []);
+    if (user && token) {
+      // Load from API
+      try {
+        const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/favorites`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setFavorites(data.favorites);
+          // Also sync context
+          syncFavorites();
+        }
+      } catch (e) {
+        console.error("Failed to load favorites from API", e);
+      }
+    } else {
+      // Load local
+      const list = await getFavorites();
+      setFavorites(list);
+    }
+  }, [user, token]);
 
   useFocusEffect(
     useCallback(() => {
@@ -32,9 +54,28 @@ export default function FavoritesScreen() {
     setRefreshing(false);
   }, [load]);
 
-  const handleRemove = async (movieId: string) => {
-    await removeFavorite(movieId);
-    setFavorites((prev) => prev.filter((m) => m._id !== movieId));
+  const handleRemove = async (movieId: string, slug: string) => {
+    if (user && token) {
+      // Remove from API
+      try {
+        await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/favorites`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ slug })
+        });
+        setFavorites((prev) => prev.filter((m) => m.slug !== slug));
+        syncFavorites();
+      } catch (e) {
+        console.error(e);
+      }
+    } else {
+      // Remove local
+      await removeFavorite(movieId);
+      setFavorites((prev) => prev.filter((m) => m._id !== movieId));
+    }
   };
 
   if (favorites.length === 0) {
@@ -45,7 +86,7 @@ export default function FavoritesScreen() {
           <Ionicons name="heart-outline" size={64} color="#444" />
           <Text className="text-white text-xl font-bold mt-4 text-center">Chưa có phim yêu thích</Text>
           <Text className="text-gray-400 mt-2 text-center">Thêm phim từ trang chi tiết phim</Text>
-          <Link href="/explore" asChild>
+          <Link href="/(tabs)/explore" asChild>
             <Pressable className="mt-6 bg-yellow-500 px-6 py-3 rounded-full">
               <Text className="text-black font-bold">Khám phá phim</Text>
             </Pressable>
@@ -102,7 +143,7 @@ export default function FavoritesScreen() {
                   height={CARD_WIDTH * 1.4}
                 />
                 <Pressable
-                  onPress={() => handleRemove(item._id)}
+                  onPress={() => handleRemove(item._id, item.slug)}
                   className="absolute top-1 left-1 w-8 h-8 rounded-full bg-black/60 items-center justify-center"
                 >
                   <Ionicons name="heart" size={18} color="#ef4444" />

@@ -6,12 +6,15 @@ import { useState, useEffect } from 'react';
 import { getMovieDetail, Movie } from '@/services/api';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '@/context/auth';
+import { CONFIG } from '@/constants/config';
 
 export default function PlayerScreen() {
     const { slug, ep } = useLocalSearchParams();
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [videoUrl, setVideoUrl] = useState<string | null>(null);
+    const { user, token, syncHistory } = useAuth();
 
     useEffect(() => {
         // Lock to Landscape
@@ -41,6 +44,29 @@ export default function PlayerScreen() {
 
                 if (episode) {
                     setVideoUrl(episode.link_embed);
+
+                    // Add to history if logged in
+                    if (user && token) {
+                        try {
+                            // Delay slightly to ensure valid view
+                            setTimeout(() => {
+                                fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/history`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        Authorization: `Bearer ${token}`
+                                    },
+                                    body: JSON.stringify({
+                                        slug,
+                                        episode: episode.slug,
+                                        progress: 0
+                                    })
+                                }).then(() => syncHistory());
+                            }, 5000); // Record after 5 seconds
+                        } catch (e) {
+                            console.error("Failed to sync history", e);
+                        }
+                    }
                 }
             }
             setLoading(false);
@@ -84,6 +110,7 @@ export default function PlayerScreen() {
                 javaScriptEnabled={true}
                 domStorageEnabled={true}
                 allowsFullscreenVideo={true}
+                userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
             />
 
             {/* Close Button (Overlay) */}

@@ -79,9 +79,9 @@ export const getMovieDetail = async (slug: string) => {
     }
 };
 
-export const searchMovies = async (keyword: string) => {
+export const searchMovies = async (keyword: string, limit = 20) => {
     try {
-        const res = await fetch(`${API_URL}/v1/api/tim-kiem?keyword=${keyword}&limit=20`);
+        const res = await fetch(`${API_URL}/v1/api/tim-kiem?keyword=${keyword}&limit=${limit}`);
         const data = await res.json();
         return getItems(data);
     } catch (error) {

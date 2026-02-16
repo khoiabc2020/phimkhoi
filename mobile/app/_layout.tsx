@@ -5,6 +5,7 @@ import 'react-native-reanimated';
 import '../global.css';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { AuthProvider } from '@/context/auth';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -14,17 +15,21 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="movie/[slug]" options={{ headerShown: false }} />
-        <Stack.Screen name="player/[slug]" options={{ headerShown: false }} />
-        <Stack.Screen name="list/[type]" options={{ headerShown: false }} />
-        <Stack.Screen name="category/[slug]" options={{ headerShown: false }} />
-        <Stack.Screen name="country/[slug]" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="light" />
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)/login" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)/register" options={{ headerShown: false }} />
+          <Stack.Screen name="movie/[slug]" options={{ headerShown: false }} />
+          <Stack.Screen name="player/[slug]" options={{ headerShown: false }} />
+          <Stack.Screen name="list/[type]" options={{ headerShown: false }} />
+          <Stack.Screen name="category/[slug]" options={{ headerShown: false }} />
+          <Stack.Screen name="country/[slug]" options={{ headerShown: false }} />
+          <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+        </Stack>
+        <StatusBar style="light" />
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
