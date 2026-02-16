@@ -7,7 +7,9 @@ import { getMovieDetail, Movie } from "@/services/api";
 import { getImageUrl, cn } from "@/lib/utils";
 import VideoPlayer from "@/components/VideoPlayer";
 import CommentSection from "@/components/CommentSection";
-import { Star, Share2, Flag, List, Info, Users, Calendar, Clock, Globe } from "lucide-react";
+import WatchEngagementBar from "@/components/WatchEngagementBar";
+import WatchEpisodeSection from "@/components/WatchEpisodeSection";
+import { Star, List, Info, Users, Clock, Globe } from "lucide-react";
 import { getWatchHistoryForEpisode } from "@/app/actions/watchHistory";
 import { getMovieCast } from "@/app/actions/tmdb";
 import { getServerSession } from "next-auth";
@@ -46,7 +48,8 @@ export default async function WatchPage({ params }: PageProps) {
     if (!data?.movie) return notFound();
 
     const movie = data.movie as Movie;
-    const episodes = data.episodes?.[0]?.server_data || [];
+    const servers = data.episodes || [];
+    const episodes = servers[0]?.server_data || [];
     const currentEpisode = episodes.find((ep: any) => ep.slug === episode);
 
     // Fetch extra data in parallel
@@ -77,10 +80,10 @@ export default async function WatchPage({ params }: PageProps) {
     };
 
     return (
-        <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-12">
-            <div className="container mx-auto px-4 md:px-8">
-                {/* Breadcrumb */}
-                <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 overflow-x-auto whitespace-nowrap pb-2 scrollbar-hide">
+        <div className="min-h-screen bg-[#0a0a0a] pt-16 md:pt-24 pb-12">
+            <div className="container mx-auto px-0 md:px-8">
+                {/* Breadcrumb - desktop only */}
+                <div className="hidden md:flex items-center gap-2 text-sm text-gray-400 mb-6 px-4 md:px-0 overflow-x-auto whitespace-nowrap pb-2 scrollbar-hide">
                     <Link href="/" className="hover:text-[#fbbf24] transition-colors">Trang chủ</Link>
                     <span>/</span>
                     <Link href={`/phim/${movie.slug}`} className="hover:text-[#fbbf24] transition-colors">{movie.name}</Link>
@@ -89,10 +92,10 @@ export default async function WatchPage({ params }: PageProps) {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                    {/* Main Content (Player & Episodes) */}
-                    <div className="lg:col-span-3 space-y-8">
-                        {/* Video Player */}
-                        <div className="bg-black rounded-xl overflow-hidden shadow-2xl shadow-black/50 border border-white/5 aspect-video relative group z-20">
+                    {/* Main Content - RoPhim style layout */}
+                    <div className="lg:col-span-3">
+                        {/* Video Player - edge-to-edge on mobile */}
+                        <div className="bg-black md:rounded-xl overflow-hidden shadow-2xl shadow-black/50 md:border md:border-white/5 aspect-video relative group z-20 mx-0 md:mx-0">
                             {currentEpisode ? (
                                 <VideoPlayer
                                     url={currentEpisode.link_embed}
@@ -109,84 +112,53 @@ export default async function WatchPage({ params }: PageProps) {
                             )}
                         </div>
 
-                        {/* Title & Actions */}
-                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                            <div>
-                                <h1 className="text-lg md:text-xl font-bold text-white mb-1.5 leading-tight uppercase">
-                                    {movie.name}
-                                </h1>
-                                <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400 mb-3">
-                                    <span>{movie.origin_name}</span>
-                                    <span>({movie.year})</span>
-                                </div>
+                        {/* Engagement Bar - RoPhim style */}
+                        {currentEpisode && (
+                            <WatchEngagementBar movie={movie} />
+                        )}
 
-                                <div className="flex flex-wrap items-center gap-2 text-[9px] font-bold tracking-wider uppercase">
-                                    <span className="bg-[#fbbf24] text-black px-1.5 py-0.5 rounded-[2px] flex items-center gap-1">
-                                        <Star className="w-3 h-3 fill-black" /> {movie.vote_average?.toFixed(1) || "N/A"}
-                                    </span>
-                                    <span className="bg-white/10 text-gray-300 px-1.5 py-0.5 rounded-[2px] border border-white/10">
-                                        {movie.quality}
-                                    </span>
-                                    <span className="bg-white/10 text-gray-300 px-1.5 py-0.5 rounded-[2px] border border-white/10">
-                                        {movie.country?.[0]?.name}
-                                    </span>
-                                    <span className="bg-white/10 text-gray-300 px-1.5 py-0.5 rounded-[2px] border border-white/10">
-                                        {movie.time}
-                                    </span>
-                                    {currentEpisode && (
-                                        <span className="bg-[#fbbf24]/10 text-[#fbbf24] px-1.5 py-0.5 rounded-[2px] border border-[#fbbf24]/20">
-                                            {displayEpisodeName(currentEpisode.name || episode)}
-                                        </span>
-                                    )}
-                                </div>
+                        {/* Episode Section - RoPhim style */}
+                        {servers.length > 0 && (
+                            <WatchEpisodeSection
+                                movieSlug={movie.slug}
+                                movieName={movie.name}
+                                servers={servers}
+                                currentEpisodeSlug={episode}
+                            />
+                        )}
+
+                        {/* Title & Meta */}
+                        <div className="px-4 md:px-0 mt-6">
+                            <h1 className="text-lg md:text-xl font-bold text-white mb-1.5 leading-tight uppercase">
+                                {movie.name}
+                            </h1>
+                            <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400 mb-3">
+                                <span>{movie.origin_name}</span>
+                                <span>({movie.year})</span>
                             </div>
-
-                            <div className="flex items-center gap-2 w-full md:w-auto">
-                                <button className="flex-1 md:flex-none flex items-center justify-center gap-1.5 bg-[#1a1a1a] hover:bg-[#252525] text-white h-8 px-3 rounded text-xs font-medium transition-colors border border-white/10">
-                                    <Share2 className="w-3.5 h-3.5" /> Chia sẻ
-                                </button>
-                                <button className="flex-1 md:flex-none flex items-center justify-center gap-1.5 bg-[#1a1a1a] hover:bg-[#252525] text-white h-8 px-3 rounded text-xs font-medium transition-colors border border-white/10">
-                                    <Flag className="w-3.5 h-3.5" /> Báo lỗi
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Episode List (RoPhim Style) */}
-                        <div className="bg-[#121212] rounded border border-white/5 overflow-hidden">
-                            <div className="bg-[#1a1a1a] px-3 py-2 border-b border-white/5 flex items-center justify-between">
-                                <h3 className="text-xs font-bold text-white flex items-center gap-2 uppercase tracking-wide">
-                                    <List className="w-3.5 h-3.5 text-[#fbbf24]" /> Danh sách tập
-                                </h3>
-                                <span className="text-[9px] font-mono text-gray-400 bg-white/5 px-2 py-0.5 rounded">
-                                    VIP #1
+                            <div className="flex flex-wrap items-center gap-2 text-[9px] font-bold tracking-wider uppercase">
+                                <span className="bg-[#fbbf24] text-black px-1.5 py-0.5 rounded-[2px] flex items-center gap-1">
+                                    <Star className="w-3 h-3 fill-black" /> {movie.vote_average?.toFixed(1) || "N/A"}
                                 </span>
-                            </div>
-
-                            <div className="p-4">
-                                <div className="flex flex-wrap gap-1.5 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
-                                    {episodes.map((ep: any) => {
-                                        const isActive = ep.slug === episode;
-                                        return (
-                                            <Link
-                                                key={ep.slug}
-                                                href={`/xem-phim/${movie.slug}/${ep.slug}`}
-                                                className={cn(
-                                                    "min-w-[40px] h-6 px-1.5 rounded-[3px] text-[10px] font-bold flex items-center justify-center transition-all duration-200",
-                                                    isActive
-                                                        ? "bg-[#fbbf24] text-black shadow-[0_0_10px_rgba(251,191,36,0.3)] scale-105"
-                                                        : "bg-[#252525] text-gray-400 hover:bg-[#333] hover:text-white border border-white/5"
-                                                )}
-                                            >
-                                                {ep.name}
-                                            </Link>
-                                        );
-                                    })}
-                                </div>
+                                <span className="bg-white/10 text-gray-300 px-1.5 py-0.5 rounded-[2px] border border-white/10">
+                                    {movie.quality}
+                                </span>
+                                <span className="bg-white/10 text-gray-300 px-1.5 py-0.5 rounded-[2px] border border-white/10">
+                                    {movie.country?.[0]?.name}
+                                </span>
+                                <span className="bg-white/10 text-gray-300 px-1.5 py-0.5 rounded-[2px] border border-white/10">
+                                    {movie.time}
+                                </span>
+                                {currentEpisode && (
+                                    <span className="bg-[#fbbf24]/10 text-[#fbbf24] px-1.5 py-0.5 rounded-[2px] border border-[#fbbf24]/20">
+                                        {displayEpisodeName(currentEpisode.name || episode)}
+                                    </span>
+                                )}
                             </div>
                         </div>
 
                         {/* Comments */}
-                        <div className="mt-8">
+                        <div className="mt-8 px-4 md:px-0">
                             <CommentSection movieId={movie._id} movieSlug={movie.slug} />
                         </div>
                     </div>

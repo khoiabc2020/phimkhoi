@@ -68,7 +68,7 @@ export default function VideoPlayer({
     }, [movieData, session, saved, initialProgress]);
 
     return (
-        <div ref={containerRef} className="relative aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-white/10 group">
+        <div ref={containerRef} className="relative aspect-video bg-black md:rounded-xl overflow-hidden shadow-2xl border-0 md:border border-white/10 group">
             <iframe
                 src={url}
                 className="w-full h-full"
@@ -80,11 +80,11 @@ export default function VideoPlayer({
             <button
                 type="button"
                 onClick={toggleFullscreen}
-                className="absolute top-2 right-2 z-20 w-10 h-10 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg bg-black/60 hover:bg-black/80 text-white border border-white/20 transition-colors backdrop-blur-sm active:scale-95"
+                className="absolute top-2 right-2 z-20 w-9 h-9 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-md bg-black/50 hover:bg-black/70 text-white/90 hover:text-white border border-white/20 transition-all backdrop-blur-sm active:scale-95"
                 title={isFullscreen ? "Thoát toàn màn hình" : "Toàn màn hình"}
                 aria-label={isFullscreen ? "Thoát toàn màn hình" : "Toàn màn hình"}
             >
-                {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+                {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
             </button>
         </div>
     );
