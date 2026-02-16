@@ -18,10 +18,10 @@ export default function CategoryCard({ title, slug, colors, width = 160, height 
                     colors={colors}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
-                    style={{ width, height, borderRadius: 16, justifyContent: 'center', alignItems: 'center' }}
-                    className="shadow-lg"
+                    style={{ width, height, borderRadius: 12, justifyContent: 'flex-end', alignItems: 'flex-start', padding: 12 }}
+                    className="shadow-md"
                 >
-                    <Text className="text-white font-bold text-lg text-center px-2">{title}</Text>
+                    <Text className="text-white font-bold text-lg leading-tight">{title}</Text>
                 </LinearGradient>
             </Pressable>
         </Link>

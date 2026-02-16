@@ -12,6 +12,7 @@ import WatchEpisodeSection from "@/components/WatchEpisodeSection";
 import { Star, Clock, Globe, Info, Users, PlayCircle, Calendar, List as ListIcon } from "lucide-react";
 import { getWatchHistoryForEpisode } from "@/app/actions/watchHistory";
 import { getMovieCast } from "@/app/actions/tmdb";
+import RelatedMovies from "@/components/RelatedMovies";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
@@ -148,6 +149,11 @@ export default async function WatchPage({ params }: PageProps) {
                                 </h3>
                                 <CommentSection movieId={movie._id} movieSlug={movie.slug} />
                             </div>
+
+                            {/* Related Movies */}
+                            {movie.category?.[0]?.slug && (
+                                <RelatedMovies categorySlug={movie.category[0].slug} currentMovieId={movie._id} />
+                            )}
                         </div>
 
                         {/* Sidebar Column (Right - 3 cols) */}

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "PhimKhoi",
-    "slug": "phimkhoi-mobile",
+    "name": "MovieBox",
+    "slug": "moviebox-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -40,7 +40,15 @@
           }
         }
       ],
-      ["expo-build-properties",{"android":{"compileSdkVersion":35,"targetSdkVersion":35}}]
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

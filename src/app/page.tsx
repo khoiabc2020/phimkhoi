@@ -3,6 +3,7 @@ import HeroSection from "@/components/HeroSection";
 import MovieRow from "@/components/MovieRow";
 import TopTrending from "@/components/TopTrending";
 import QuickNav from "@/components/QuickNav";
+import ContinueWatchingRow from "@/components/ContinueWatchingRow";
 import { getMoviesList, getTrendMovies } from "@/services/api";
 
 // Revalidate every 60 seconds for real-time updates
@@ -80,14 +81,16 @@ export default async function Home() {
 
       <div className="space-y-12 relative z-20 pb-20 container mx-auto px-4 md:px-12 mt-12 md:mt-24">
 
+        {/* Quick Navigation (Categories) */}
+        <div className="relative z-30 -mt-10 md:-mt-20 mb-8">
+          <QuickNav />
+        </div>
+
+        {/* Continue Watching */}
+        <ContinueWatchingRow />
+
         {/* Top 10 Trending Series */}
         <TopTrending title="Top 10 Phim Bộ Hôm Nay" movies={finalTrendTv} slug="/danh-sach/phim-bo" />
-
-        {/* Top 10 Trending Movies */}
-        <TopTrending title="Top 10 Phim Lẻ Hôm Nay" movies={finalTrendMovies} slug="/danh-sach/phim-le" />
-
-        {/* Quick Navigation */}
-        <QuickNav />
 
         {/* Categories */}
         <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>

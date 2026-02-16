@@ -215,8 +215,8 @@ export default function MovieDetailScreen() {
 
                     {/* Primary Buttons */}
                     <View className="flex-row gap-4 mb-8">
-                        <Link href={firstEpisode ? `/player/${movie.slug}?ep=${firstEpisode.slug}` : '#'} asChild>
-                            <Pressable className="flex-1 bg-yellow-500 py-3.5 rounded-xl flex-row justify-center items-center shadow-lg shadow-yellow-500/20 active:scale-95 transition-transform">
+                        <Link href={firstEpisode ? `/player/${movie.slug}?ep=${firstEpisode.slug}` as any : '/'} asChild>
+                            <Pressable className="flex-1 bg-yellow-500 py-3.5 rounded-xl flex-row justify-center items-center shadow-lg shadow-yellow-500/20 active:scale-95 transition-transform" disabled={!firstEpisode}>
                                 <Ionicons name="play" size={22} color="black" />
                                 <Text className="text-black font-extrabold text-lg ml-2">Xem phim</Text>
                             </Pressable>
@@ -280,18 +280,27 @@ export default function MovieDetailScreen() {
                     </View>
 
                     {/* Tabs */}
-                    <View className="flex-row border-b border-gray-800 mb-6">
-                        {['episodes', 'actors', 'related'].map((tab) => (
-                            <Pressable
-                                key={tab}
-                                onPress={() => setSelectedTab(tab as any)}
-                                className={`mr-6 pb-2 ${selectedTab === tab ? 'border-b-2 border-yellow-500' : ''}`}
-                            >
-                                <Text className={`${selectedTab === tab ? 'text-yellow-500 font-bold' : 'text-gray-400 font-medium'} capitalize text-base`}>
-                                    {tab === 'episodes' ? 'Tập phim' : tab === 'actors' ? 'Diễn viên' : 'Đề xuất'}
-                                </Text>
-                            </Pressable>
-                        ))}
+                    <View className="flex-row border-b border-gray-800 mb-6 px-2">
+                        {['episodes', 'actors', 'related'].map((tab) => {
+                            const isSelected = selectedTab === tab;
+                            return (
+                                <Pressable
+                                    key={tab}
+                                    onPress={() => setSelectedTab(tab as any)}
+                                    className={`mr-6 pb-2 border-b-2 items-center flex-row ${isSelected ? 'border-yellow-500' : 'border-transparent'}`}
+                                >
+                                    <Ionicons
+                                        name={tab === 'episodes' ? 'list' : tab === 'actors' ? 'people' : 'grid'}
+                                        size={18}
+                                        color={isSelected ? '#fbbf24' : '#6b7280'}
+                                        style={{ marginBottom: -2, marginRight: 6 }}
+                                    />
+                                    <Text className={`${isSelected ? 'text-white font-bold' : 'text-gray-400 font-medium'} capitalize text-base`}>
+                                        {tab === 'episodes' ? 'Tập phim' : tab === 'actors' ? 'Diễn viên' : 'Đề xuất'}
+                                    </Text>
+                                </Pressable>
+                            );
+                        })}
                     </View>
 
                     {/* Tab Content */}

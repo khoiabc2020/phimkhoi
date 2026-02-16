@@ -13,49 +13,63 @@ export default function TabLayout() {
         tabBarActiveTintColor: '#fbbf24',
         tabBarInactiveTintColor: '#9ca3af',
         headerShown: false,
-        tabBarStyle: Platform.select({
-          ios: {
-            position: 'absolute',
-            backgroundColor: 'rgba(0,0,0,0.8)',
-            borderTopWidth: 0,
-          },
-          default: {
-            backgroundColor: '#000',
-            borderTopColor: '#333',
-            height: 60,
-            paddingBottom: 8,
-            paddingTop: 8,
-          },
-        }),
+        tabBarStyle: {
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: 'rgba(10, 10, 10, 0.95)', // Glass effect dark background
+          borderTopWidth: 0,
+          elevation: 0,
+          height: 65,
+          paddingBottom: 10,
+          paddingTop: 10,
+        },
+        tabBarLabelStyle: {
+          fontSize: 10,
+          fontWeight: '600',
+          marginTop: 2
+        }
       }}>
       <Tabs.Screen
         name="index"
         options={{
           title: 'Trang chủ',
-          tabBarIcon: ({ color }) => <Ionicons size={24} name="home" color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons size={24} name={focused ? "home" : "home-outline"} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Khám phá',
-          tabBarIcon: ({ color }) => <Ionicons size={24} name="compass" color={color} />,
+          title: 'Duyệt tìm',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons size={24} name={focused ? "search" : "search-outline"} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="favorites"
+        name="schedule"
         options={{
-          title: 'Yêu thích',
-          tabBarIcon: ({ color }) => <Ionicons size={24} name="heart" color={color} />,
+          title: 'Lịch chiếu',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons size={24} name={focused ? "calendar" : "calendar-outline"} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Cá nhân',
-          tabBarIcon: ({ color }) => <Ionicons size={24} name="person" color={color} />,
+          title: 'Tài khoản',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons size={24} name={focused ? "person" : "person-outline"} color={color} />
+          ),
         }}
       />
+
+      {/* Hidden Tabs */}
+      <Tabs.Screen name="favorites" options={{ href: null }} />
     </Tabs>
   );
 }

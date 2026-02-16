@@ -1,7 +1,7 @@
 import { CONFIG } from '@/constants/config';
 
 export const API_URL = CONFIG.PHIM_API_URL;
-export const BACKEND_URL = CONFIG.API_BASE_URL;
+export const BACKEND_URL = CONFIG.BACKEND_URL;
 
 export interface Movie {
     _id: string;
@@ -92,8 +92,9 @@ export const searchMovies = async (keyword: string, limit = 20) => {
 
 export const getImageUrl = (url?: string) => {
     if (!url) return 'https://via.placeholder.com/300x450?text=No+Image';
+    if (url.includes("tmdb.org")) return url;
     if (url.startsWith('http')) return url;
-    return `${CONFIG.PHIM_API_URL}/${url}`;
+    return `https://phimimg.com/${url}`;
 };
 
 export const getMenuData = async () => {
@@ -146,3 +147,14 @@ export const getMoviesByCountry = async (slug: string, page = 1, limit = 24) => 
         return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
     }
 };
+
+export const checkAppVersion = async () => {
+    try {
+        const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/version`);
+        return await res.json();
+    } catch (error) {
+        console.error("Check version error:", error);
+        return null;
+    }
+};
+

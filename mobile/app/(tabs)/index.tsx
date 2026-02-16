@@ -66,18 +66,21 @@ export default function HomeScreen() {
       {/* Floating Header (Absolute) */}
       <SafeAreaView className="absolute top-0 left-0 right-0 z-50 px-4 pt-2">
         <View className="flex-row justify-between items-center">
-          <View className="flex-row items-center bg-black/50 rounded-full px-3 py-1 border border-white/10 backdrop-blur-md">
+          <View className="flex-row items-center bg-black/50 rounded-full px-4 py-1.5 border border-white/10 backdrop-blur-md">
             <Image
               source={require('../../assets/images/icon.png')}
-              style={{ width: 24, height: 24, borderRadius: 12 }}
+              style={{ width: 28, height: 28, borderRadius: 14 }}
             />
-            <Text className="text-white font-bold ml-2 text-base">PhimKhoi</Text>
+            <View className="ml-2">
+              <Text className="text-white font-bold text-lg leading-5">MovieBox</Text>
+              <Text className="text-gray-400 text-[10px] leading-3">Phim hay cả rổ</Text>
+            </View>
           </View>
           <View className="flex-row gap-3">
-            <Pressable className="bg-black/50 p-2 rounded-full border border-white/10 backdrop-blur-md">
+            <Pressable onPress={() => router.push('/notifications')} className="bg-black/50 p-2 rounded-full border border-white/10 backdrop-blur-md">
               <Ionicons name="notifications-outline" size={20} color="white" />
             </Pressable>
-            <Pressable className="bg-black/50 p-2 rounded-full border border-white/10 backdrop-blur-md">
+            <Pressable onPress={() => router.push('/settings')} className="bg-black/50 p-2 rounded-full border border-white/10 backdrop-blur-md">
               <Ionicons name="settings-outline" size={20} color="white" />
             </Pressable>
           </View>

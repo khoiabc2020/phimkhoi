@@ -119,7 +119,7 @@ export default function HLSPlayer({ url, poster, initialProgress = 0, movieData,
             {/* @ts-ignore */}
             <ReactPlayer
                 ref={playerRef}
-                url={url}
+                url={`/api/hls-proxy?url=${encodeURIComponent(url)}`}
                 width="100%"
                 height="100%"
                 playing={playing}
@@ -131,6 +131,7 @@ export default function HLSPlayer({ url, poster, initialProgress = 0, movieData,
                 onEnded={() => setShowControls(true)}
                 config={{
                     file: {
+                        forceHLS: true,
                         attributes: {
                             poster: poster
                         }
