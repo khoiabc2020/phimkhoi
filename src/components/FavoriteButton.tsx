@@ -18,9 +18,10 @@ interface FavoriteButtonProps {
     };
     initialIsFavorite: boolean;
     size?: "sm" | "md" | "lg";
+    className?: string;
 }
 
-export default function FavoriteButton({ movieData, initialIsFavorite, size = "md" }: FavoriteButtonProps) {
+export default function FavoriteButton({ movieData, initialIsFavorite, size = "md", className = "" }: FavoriteButtonProps) {
     const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
@@ -62,7 +63,7 @@ export default function FavoriteButton({ movieData, initialIsFavorite, size = "m
         <button
             onClick={handleToggle}
             disabled={isPending}
-            className={`${sizeClasses[size]} rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-all group disabled:opacity-50 disabled:cursor-not-allowed`}
+            className={`${sizeClasses[size]} rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-all group disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
             title={isFavorite ? "Bỏ yêu thích" : "Thêm vào yêu thích"}
         >
             <Heart

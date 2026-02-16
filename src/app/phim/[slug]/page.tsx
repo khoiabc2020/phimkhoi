@@ -60,6 +60,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
 
     const tmdbSearch = await searchTMDBMovie(movie.origin_name || movie.name, movie.year, type);
     const tmdbDetails = tmdbSearch ? await getTMDBDetails(tmdbSearch.id, type) : null;
+    const { isFavorite: isFav } = await isFavorite(movie._id);
 
     // Fallback images and rating
     const posterUrl = tmdbDetails?.poster_path ? getTMDBImage(tmdbDetails.poster_path, "original") : getImageUrl(movie?.poster_url || movie?.thumb_url);
@@ -152,7 +153,22 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                     </Link>
                                 )}
                                 <div className="flex gap-2">
-                                    <FavoriteButton movie={movie} className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md" />
+                                    {movie && (
+                                        <FavoriteButton
+                                            movieData={{
+                                                movieId: movie._id,
+                                                movieSlug: movie.slug,
+                                                movieName: movie.name,
+                                                movieOriginName: movie.origin_name || "",
+                                                moviePoster: movie.poster_url || movie.thumb_url,
+                                                movieYear: movie.year,
+                                                movieQuality: movie.quality,
+                                                movieCategories: movie.category?.map((c: any) => c.slug) || [],
+                                            }}
+                                            initialIsFavorite={isFav}
+                                            className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md"
+                                        />
+                                    )}
                                     <button className="flex items-center justify-center w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md transition-all group" title="Chia sẻ">
                                         <Share2 className="w-5 h-5 text-gray-400 group-hover:text-blue-400 transition-colors" />
                                     </button>
