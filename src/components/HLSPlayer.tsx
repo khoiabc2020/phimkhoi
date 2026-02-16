@@ -1,7 +1,8 @@
-"use client";
-
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import ReactPlayer from "react-player";
+// import ReactPlayer from "react-player"; // Causes SSR Error
+import dynamic from "next/dynamic";
+const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
+
 import { Maximize2, Minimize2, Play, Pause, Volume2, VolumeX, Settings, SkipForward, SkipBack } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { addWatchHistory } from "@/app/actions/watchHistory";
