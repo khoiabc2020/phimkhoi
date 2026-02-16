@@ -116,6 +116,7 @@ export default function HLSPlayer({ url, poster, initialProgress = 0, movieData,
                 if (!showControls) togglePlay();
             }}
         >
+            {/* @ts-ignore */}
             <ReactPlayer
                 ref={playerRef}
                 url={url}
