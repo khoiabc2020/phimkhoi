@@ -63,7 +63,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                 if (movie.type === 'phim-bo' || movie.type === 'tv-shows' || movie.type === 'hoat-hinh') type = 'tv';
 
                 const data = await getTMDBDataForCard(
-                    movie.original_name || movie.name,
+                    movie.origin_name || movie.name,
                     isNaN(year!) ? undefined : year,
                     type,
                     { originalName: movie.origin_name, countrySlug: movie.country?.[0]?.slug }
