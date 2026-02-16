@@ -45,7 +45,7 @@ export default async function WatchHistoryPage() {
     ]);
 
     const continueWatching = continueWatchingResult.success ? continueWatchingResult.data : [];
-    const history = historyResult.success ? historyResult.data : [];
+    const history = historyResult.success && historyResult.data ? historyResult.data : [];
 
     return (
         <div className="min-h-screen bg-[#0a0a0a] pt-28 pb-12">
