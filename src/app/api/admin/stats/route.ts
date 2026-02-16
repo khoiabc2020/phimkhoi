@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
 import Comment from "@/models/Comment";
+import Movie from "@/models/Movie";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function GET() {
@@ -14,9 +15,10 @@ export async function GET() {
 
         await dbConnect();
 
-        const [userCount, commentCount] = await Promise.all([
+        const [userCount, commentCount, movieCount] = await Promise.all([
             User.countDocuments(),
             Comment.countDocuments(),
+            Movie.countDocuments(),
         ]);
         // Aggregate users by month (Last 6 months)
         const sixMonthsAgo = new Date();
