@@ -35,7 +35,7 @@ git commit -m "%commit_msg%"
 git push origin main
 echo.
 echo 2. Deploying to VPS...
-ssh -i "C:\Users\LE HUY KHOI\Downloads\huykhoi1.pem" -o StrictHostKeyChecking=no ubuntu@ec2-18-141-25-244.ap-southeast-1.compute.amazonaws.com "bash /home/ubuntu/phimkhoi/deploy_vps.sh"
+ssh -i "C:\Users\LE HUY KHOI\Downloads\huykhoi1.pem" -o StrictHostKeyChecking=no ubuntu@ec2-18-141-25-244.ap-southeast-1.compute.amazonaws.com "cd /home/ubuntu/phimkhoi && git pull origin main && bash deploy_vps.sh"
 pause
 goto main_menu
 
@@ -73,5 +73,5 @@ goto main_menu
 git add .
 git commit -m "full deployment update"
 git push origin main
-ssh -i "C:\Users\LE HUY KHOI\Downloads\huykhoi1.pem" -o StrictHostKeyChecking=no ubuntu@ec2-18-141-25-244.ap-southeast-1.compute.amazonaws.com "bash /home/ubuntu/phimkhoi/deploy_vps.sh"
+ssh -i "C:\Users\LE HUY KHOI\Downloads\huykhoi1.pem" -o StrictHostKeyChecking=no ubuntu@ec2-18-141-25-244.ap-southeast-1.compute.amazonaws.com "cd /home/ubuntu/phimkhoi && git pull origin main && bash deploy_vps.sh"
 exit /b
