@@ -266,7 +266,21 @@ function PortalHoverCard({ movie, position, tmdbData, displayPoster, orientation
                                 <Play size={11} fill="currentColor" /> Xem
                             </Link>
                             <div className="w-7 h-7 flex items-center justify-center rounded-full border border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/40 cursor-pointer backdrop-blur-md transition-all duration-300 ease-out hover:scale-110 active:scale-95">
-                                <FavoriteButton movie={movie} className="w-full h-full text-white hover:text-red-500" iconSize={12} />
+                                <FavoriteButton
+                                    movieData={{
+                                        movieId: movie._id,
+                                        movieSlug: movie.slug,
+                                        movieName: movie.name,
+                                        movieOriginName: movie.origin_name,
+                                        moviePoster: movie.poster_url || movie.thumb_url,
+                                        movieYear: movie.year,
+                                        movieQuality: movie.quality,
+                                        movieCategories: movie.category?.map((c) => c.name) || [],
+                                    }}
+                                    initialIsFavorite={false}
+                                    size="sm"
+                                    className="w-full h-full text-white hover:text-red-500"
+                                />
                             </div>
                             <Link
                                 href={`/phim/${movie.slug}`}
