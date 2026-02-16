@@ -26,7 +26,7 @@ export default function HLSPlayer({ url, poster, initialProgress = 0, movieData,
     const [showControls, setShowControls] = useState(true);
     const [isReady, setIsReady] = useState(false);
 
-    const playerRef = useRef<ReactPlayer>(null);
+    const playerRef = useRef<ReactPlayerType>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const lastSyncTime = useRef<number>(0);
