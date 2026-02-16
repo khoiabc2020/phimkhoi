@@ -13,6 +13,8 @@ export interface IUser extends Document {
         timestamp: number;
         progress: number; // Seconds watched
     }[];
+    resetPasswordToken?: string;
+    resetPasswordExpires?: number;
     createdAt: Date;
     updatedAt: Date;
 }
