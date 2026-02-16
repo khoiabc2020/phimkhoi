@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 // import ReactPlayer from "react-player"; // Causes SSR Error
 import dynamic from "next/dynamic";
-import type BaseReactPlayer from "react-player";
+
 
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
@@ -28,7 +28,7 @@ export default function HLSPlayer({ url, poster, initialProgress = 0, movieData,
     const [showControls, setShowControls] = useState(true);
     const [isReady, setIsReady] = useState(false);
 
-    const playerRef = useRef<BaseReactPlayer>(null);
+    const playerRef = useRef<any>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const lastSyncTime = useRef<number>(0);
