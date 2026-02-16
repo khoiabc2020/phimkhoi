@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { addWatchHistory } from "@/app/actions/watchHistory";
 import { useSession } from "next-auth/react";
 import { Maximize2, Minimize2 } from "lucide-react";
+import HLSPlayer from "./HLSPlayer";
 
 interface VideoPlayerProps {
     url: string;
@@ -50,7 +51,21 @@ export default function VideoPlayer({
         return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
     }, []);
 
-    // Auto-save watch history after 10 seconds
+    // 1. Priority: Use HLS Player if m3u8 is available
+    if (m3u8) {
+        return (
+            <HLSPlayer
+                url={m3u8}
+                poster={movieData?.moviePoster}
+                initialProgress={initialProgress}
+                movieData={movieData}
+                autoPlay={true}
+            />
+        );
+    }
+
+    // 2. Fallback: Use Iframe for basic embed URLs
+    // Auto-save watch history after 10 seconds (Approximate sync)
     useEffect(() => {
         if (!movieData || !session || saved) return;
 
