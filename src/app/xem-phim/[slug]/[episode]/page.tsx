@@ -130,7 +130,7 @@ export default async function WatchPage({ params }: PageProps) {
                             {servers.length > 0 && (
                                 <div className="bg-[#1a1a1a] rounded-xl p-6 border border-white/5">
                                     <h3 className="text-white font-bold text-base mb-4 flex items-center gap-2 uppercase tracking-wide">
-                                        <List className="w-4 h-4 text-yellow-500" /> Danh sách tập
+                                        <ListIcon className="w-4 h-4 text-yellow-500" /> Danh sách tập
                                     </h3>
                                     <WatchEpisodeSection
                                         movieSlug={movie.slug}
