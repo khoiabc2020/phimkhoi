@@ -44,7 +44,7 @@ export default async function WatchHistoryPage() {
         getWatchHistory(),
     ]);
 
-    const continueWatching = continueWatchingResult.success ? continueWatchingResult.data : [];
+    const continueWatching = continueWatchingResult.success && continueWatchingResult.data ? continueWatchingResult.data : [];
     const history = historyResult.success && historyResult.data ? historyResult.data : [];
 
     return (
