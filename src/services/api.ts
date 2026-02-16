@@ -23,6 +23,7 @@ export interface Movie {
     showtimes: string;
     year: number;
     view: number;
+    vote_average?: number;
     actor: string[];
     director: string[];
     category: { id: string; name: string; slug: string }[];
