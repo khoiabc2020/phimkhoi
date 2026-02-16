@@ -40,7 +40,7 @@ export default async function FavoritesPage() {
     }
 
     const favoritesResult = await getFavorites();
-    const favorites = favoritesResult.success ? favoritesResult.data : [];
+    const favorites = favoritesResult.success && favoritesResult.data ? favoritesResult.data : [];
 
     return (
         <div className="min-h-screen bg-[#0a0a0a] pt-28 pb-12">
