@@ -9,7 +9,7 @@ import VideoPlayer from "@/components/VideoPlayer";
 import CommentSection from "@/components/CommentSection";
 import WatchEngagementBar from "@/components/WatchEngagementBar";
 import WatchEpisodeSection from "@/components/WatchEpisodeSection";
-import { Star, Clock, Globe, Info, Users, PlayCircle, Calendar } from "lucide-react";
+import { Star, Clock, Globe, Info, Users, PlayCircle, Calendar, List as ListIcon } from "lucide-react";
 import { getWatchHistoryForEpisode } from "@/app/actions/watchHistory";
 import { getMovieCast } from "@/app/actions/tmdb";
 import { getServerSession } from "next-auth";
