@@ -1,9 +1,9 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { addWatchHistory } from "@/app/actions/watchHistory";
 import { useSession } from "next-auth/react";
+import { Maximize2, Minimize2 } from "lucide-react";
 
 interface VideoPlayerProps {
     url: string;
@@ -31,7 +31,24 @@ export default function VideoPlayer({
     initialProgress = 0
 }: VideoPlayerProps) {
     const [saved, setSaved] = useState(false);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
     const { data: session } = useSession();
+
+    const toggleFullscreen = useCallback(() => {
+        if (!containerRef.current) return;
+        if (!document.fullscreenElement) {
+            containerRef.current.requestFullscreen().then(() => setIsFullscreen(true));
+        } else {
+            document.exitFullscreen().then(() => setIsFullscreen(false));
+        }
+    }, []);
+
+    useEffect(() => {
+        const handleFullscreenChange = () => setIsFullscreen(!!document.fullscreenElement);
+        document.addEventListener("fullscreenchange", handleFullscreenChange);
+        return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    }, []);
 
     // Auto-save watch history after 10 seconds
     useEffect(() => {
@@ -51,7 +68,7 @@ export default function VideoPlayer({
     }, [movieData, session, saved, initialProgress]);
 
     return (
-        <div className="relative aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-white/10 group">
+        <div ref={containerRef} className="relative aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-white/10 group">
             <iframe
                 src={url}
                 className="w-full h-full"
@@ -59,6 +76,16 @@ export default function VideoPlayer({
                 allow="autoplay; encrypted-media; gyroscope; picture-in-picture"
                 title={`${slug} - ${episode}`}
             />
+            {/* Custom fullscreen button - visible on mobile where embed often hides it */}
+            <button
+                type="button"
+                onClick={toggleFullscreen}
+                className="absolute top-2 right-2 z-20 w-10 h-10 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg bg-black/60 hover:bg-black/80 text-white border border-white/20 transition-colors backdrop-blur-sm active:scale-95"
+                title={isFullscreen ? "Thoát toàn màn hình" : "Toàn màn hình"}
+                aria-label={isFullscreen ? "Thoát toàn màn hình" : "Toàn màn hình"}
+            >
+                {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+            </button>
         </div>
     );
 }
