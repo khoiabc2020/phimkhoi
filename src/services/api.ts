@@ -24,6 +24,7 @@ export interface Movie {
     year: number;
     view: number;
     vote_average?: number;
+    duration?: string;
     actor: string[];
     director: string[];
     category: { id: string; name: string; slug: string }[];
