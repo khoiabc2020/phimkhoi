@@ -30,7 +30,7 @@ export async function addComment(data: {
             movieSlug: data.movieSlug,
             content: data.content.trim(),
             rating: data.rating,
-            parentId: data.parentId || null,
+            parentId: data.parentId || undefined,
             likes: 0,
             dislikes: 0,
             likedBy: [],
