@@ -113,7 +113,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         <div className="relative w-10 h-10 rounded-full bg-gradient-to-br from-primary to-yellow-600 flex items-center justify-center shadow-lg shadow-primary/30 group-hover:scale-110 transition-transform">
                             <Play className="w-5 h-5 text-black fill-black ml-1" />
                         </div>
-                        <span className="text-2xl font-black text-white tracking-tighter hidden sm:inline-block">MOVIE<span className="text-primary">BOX</span></span>
+                        <span className="text-xl font-black text-white tracking-tighter hidden sm:inline-block">MOVIE<span className="text-primary">BOX</span> - Xem phim là mê</span>
                     </Link>
 
                     {/* Desktop Nav */}
