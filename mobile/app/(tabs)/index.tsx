@@ -66,22 +66,22 @@ export default function HomeScreen() {
       {/* Floating Header (Absolute) */}
       <SafeAreaView className="absolute top-0 left-0 right-0 z-50 px-4 pt-2">
         <View className="flex-row justify-between items-center">
-          <View className="flex-row items-center bg-black/50 rounded-full px-4 py-1.5 border border-white/10 backdrop-blur-md">
-            <Image
-              source={require('../../assets/images/icon.png')}
-              style={{ width: 28, height: 28, borderRadius: 14 }}
-            />
-            <View className="ml-2">
-              <Text className="text-white font-bold text-lg leading-5">MovieBox</Text>
-              <Text className="text-gray-400 text-[10px] leading-3">Phim hay cả rổ</Text>
+          <View className="flex-row items-center">
+            {/* Logo Circle */}
+            <View className="w-10 h-10 rounded-full border-2 border-[#fbbf24] justify-center items-center bg-black/50 backdrop-blur-md">
+              <Ionicons name="play" size={20} color="#fbbf24" style={{ marginLeft: 2 }} />
+            </View>
+            <View className="ml-3">
+              <Text className="text-white font-extrabold text-xl leading-6 tracking-tight">RoPhim</Text>
+              <Text className="text-gray-400 text-[10px] leading-3 font-medium">Phim hay cả rổ</Text>
             </View>
           </View>
-          <View className="flex-row gap-3">
-            <Pressable onPress={() => router.push('/notifications')} className="bg-black/50 p-2 rounded-full border border-white/10 backdrop-blur-md">
-              <Ionicons name="notifications-outline" size={20} color="white" />
+          <View className="flex-row gap-4">
+            <Pressable onPress={() => router.push('/notifications' as any)} className="">
+              <Ionicons name="notifications-outline" size={26} color="white" />
             </Pressable>
-            <Pressable onPress={() => router.push('/settings')} className="bg-black/50 p-2 rounded-full border border-white/10 backdrop-blur-md">
-              <Ionicons name="settings-outline" size={20} color="white" />
+            <Pressable onPress={() => router.push('/settings' as any)} className="">
+              <Ionicons name="settings-outline" size={26} color="white" />
             </Pressable>
           </View>
         </View>
@@ -95,17 +95,21 @@ export default function HomeScreen() {
 
         {/* Navigation Pills */}
         <View className="mt-6 pl-4">
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 16, gap: 8 }}>
-            {NAV_PILLS.map((item, index) => (
-              <Link key={item.slug + index} href={`/list/${item.slug}`} asChild>
-                <Pressable className="flex-row items-center bg-gray-900 border border-gray-800 px-4 py-2 rounded-full active:bg-gray-800">
-                  {/* <Ionicons name={item.icon as any} size={16} color="#fbbf24" style={{ marginRight: 6 }} /> */}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 16, gap: 10 }}>
+            <Link href="/explore" asChild>
+              <Pressable className="flex-row items-center bg-[#fff] px-5 py-2.5 rounded-full active:bg-gray-200">
+                <Text className="text-black font-bold">Đề xuất</Text>
+              </Pressable>
+            </Link>
+            {NAV_PILLS.slice(1).map((item, index) => (
+              <Link key={item.slug + index} href={`/list/${item.slug}` as any} asChild>
+                <Pressable className="flex-row items-center bg-transparent border border-gray-600 px-5 py-2.5 rounded-full active:bg-gray-800">
                   <Text className="text-white font-medium">{item.label}</Text>
                 </Pressable>
               </Link>
             ))}
             <Link href="/explore" asChild>
-              <Pressable className="flex-row items-center bg-gray-900 border border-gray-800 px-4 py-2 rounded-full active:bg-gray-800">
+              <Pressable className="flex-row items-center bg-transparent border border-gray-600 px-5 py-2.5 rounded-full active:bg-gray-800">
                 <Text className="text-white font-medium">Thể loại</Text>
                 <Ionicons name="chevron-down" size={16} color="white" style={{ marginLeft: 4 }} />
               </Pressable>
@@ -125,11 +129,11 @@ export default function HomeScreen() {
           </View>
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 16 }}>
-            <CategoryCard title="Hành Động" slug="hanh-dong" colors={CATEGORY_GRADIENTS[0]} />
-            <CategoryCard title="Tình Cảm" slug="tinh-cam" colors={CATEGORY_GRADIENTS[1]} />
-            <CategoryCard title="Kinh Dị" slug="kinh-di" colors={CATEGORY_GRADIENTS[2]} />
-            <CategoryCard title="Hài Hước" slug="hai-huoc" colors={CATEGORY_GRADIENTS[3]} />
-            <CategoryCard title="Viễn Tưởng" slug="vien-tuong" colors={CATEGORY_GRADIENTS[4]} />
+            <CategoryCard title="Hành Động" slug="hanh-dong" colors={CATEGORY_GRADIENTS[0] as [string, string, ...string[]]} />
+            <CategoryCard title="Tình Cảm" slug="tinh-cam" colors={CATEGORY_GRADIENTS[1] as [string, string, ...string[]]} />
+            <CategoryCard title="Kinh Dị" slug="kinh-di" colors={CATEGORY_GRADIENTS[2] as [string, string, ...string[]]} />
+            <CategoryCard title="Hài Hước" slug="hai-huoc" colors={CATEGORY_GRADIENTS[3] as [string, string, ...string[]]} />
+            <CategoryCard title="Viễn Tưởng" slug="vien-tuong" colors={CATEGORY_GRADIENTS[4] as [string, string, ...string[]]} />
           </ScrollView>
         </View>
 

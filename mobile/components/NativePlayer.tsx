@@ -133,7 +133,13 @@ export default function NativePlayer({ url, title, episode, onClose, onNext }: N
             <Video
                 ref={video}
                 style={styles.video}
-                source={{ uri: url }}
+                source={{
+                    uri: url,
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                        'Referer': 'https://phimkhoi.com'
+                    }
+                }}
                 useNativeControls={false}
                 resizeMode={resizeMode}
                 onPlaybackStatusUpdate={status => setStatus(status)}

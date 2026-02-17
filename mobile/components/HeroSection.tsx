@@ -4,84 +4,144 @@ import { Ionicons } from '@expo/vector-icons';
 import { Link } from 'expo-router';
 import Carousel from 'react-native-reanimated-carousel';
 import { Movie, getImageUrl } from '@/services/api';
+import { BlurView } from 'expo-blur';
+import { useState } from 'react';
 
-const { width } = Dimensions.get('window');
-const HEIGHT = width * 1.35; // Taller hero for more impact
+const { width, height } = Dimensions.get('window');
+const ITEM_WIDTH = width * 0.72;
+const ITEM_HEIGHT = ITEM_WIDTH * 1.5;
+const SPACER = (width - ITEM_WIDTH) / 2;
 
 interface HeroSectionProps {
     movies: Movie[];
 }
 
 export default function HeroSection({ movies }: HeroSectionProps) {
+    const [activeIndex, setActiveIndex] = useState(0);
+
     if (!movies.length) return null;
 
+    const activeMovie = movies[activeIndex];
+
     return (
-        <View style={{ height: HEIGHT }}>
-            <Carousel
-                loop
-                width={width}
-                height={HEIGHT}
-                autoPlay={true}
-                data={movies}
-                scrollAnimationDuration={1000}
-                renderItem={({ item }) => (
-                    <Link href={`/movie/${item.slug}`} asChild>
-                        <Pressable style={{ flex: 1, position: 'relative' }}>
-                            <Image
-                                source={{ uri: getImageUrl(item.poster_url || item.thumb_url) }}
-                                style={StyleSheet.absoluteFillObject}
-                                resizeMode="cover"
-                            />
+        <View style={{ height: height * 0.85, position: 'relative' }}>
+            {/* Background Blur */}
+            <View style={StyleSheet.absoluteFill}>
+                <Image
+                    source={{ uri: getImageUrl(activeMovie?.poster_url || activeMovie?.thumb_url) }}
+                    style={StyleSheet.absoluteFill}
+                    blurRadius={30}
+                />
+                <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.5)' }} />
+                <LinearGradient
+                    colors={['transparent', '#000']}
+                    style={StyleSheet.absoluteFill}
+                    locations={[0.4, 1]}
+                />
+            </View>
 
-                            {/* Gradient Overlay */}
-                            <LinearGradient
-                                colors={['transparent', 'rgba(0,0,0,0.1)', 'rgba(0,0,0,0.6)', 'rgba(0,0,0,0.95)']}
-                                locations={[0, 0.3, 0.6, 1]}
-                                style={StyleSheet.absoluteFillObject}
-                            />
-
-                            {/* Content */}
-                            <View className="absolute bottom-0 left-0 right-0 px-4 pb-8 z-10 items-center">
-                                {/* Title */}
-                                <Text className="text-white text-3xl font-extrabold mb-2 text-center shadow-md leading-tight tracking-tight">
-                                    {item.name}
-                                </Text>
-                                <Text className="text-gray-300 text-sm font-medium mb-4 text-center">
-                                    {item.origin_name}
-                                </Text>
-
-                                {/* Metadata Tags */}
-                                <View className="flex-row items-center gap-3 mb-6">
-                                    <View className="bg-yellow-500/20 border border-yellow-500/50 px-2 py-0.5 rounded">
-                                        <Text className="text-yellow-500 font-bold text-[10px]">IMDb 8.5</Text>
-                                    </View>
-                                    <View className="bg-gray-800/80 px-2 py-0.5 rounded border border-gray-700">
-                                        <Text className="text-gray-300 font-bold text-[10px]">4K</Text>
-                                    </View>
-                                    <View className="bg-gray-800/80 px-2 py-0.5 rounded border border-gray-700">
-                                        <Text className="text-gray-300 font-bold text-[10px]">{item.quality || 'HD'}</Text>
-                                    </View>
-                                    <View className="bg-gray-800/80 px-2 py-0.5 rounded border border-gray-700">
-                                        <Text className="text-gray-300 font-bold text-[10px]">{item.year}</Text>
-                                    </View>
+            {/* Vertical Carousel */}
+            <View style={{ marginTop: 100 }}>
+                <Carousel
+                    loop={true}
+                    width={width}
+                    height={ITEM_HEIGHT}
+                    autoPlay={false} // Disable autoplay for better UX on vertical focus
+                    data={movies}
+                    mode="parallax"
+                    modeConfig={{
+                        parallaxScrollingScale: 0.9,
+                        parallaxScrollingOffset: 50,
+                    }}
+                    onSnapToItem={(index) => setActiveIndex(index)}
+                    renderItem={({ item }) => (
+                        <Link href={`/movie/${item.slug}`} asChild>
+                            <Pressable style={{ flex: 1, width: ITEM_WIDTH, alignSelf: 'center', borderRadius: 16, overflow: 'hidden', elevation: 10, shadowColor: '#000', shadowOpacity: 0.5, shadowRadius: 10, shadowOffset: { width: 0, height: 5 } }}>
+                                <Image
+                                    source={{ uri: getImageUrl(item.poster_url || item.thumb_url) }}
+                                    style={{ width: '100%', height: '100%' }}
+                                    resizeMode="cover"
+                                />
+                                <LinearGradient
+                                    colors={['transparent', 'rgba(0,0,0,0.8)']}
+                                    style={StyleSheet.absoluteFill}
+                                />
+                                <View style={{ position: 'absolute', bottom: 20, width: '100%', alignItems: 'center' }}>
+                                    <Text style={{ color: '#fff', fontSize: 24, fontWeight: 'bold', textAlign: 'center', fontFamily: 'serif' }}>
+                                        {item.name}
+                                    </Text>
+                                    <Text style={{ color: '#ccc', fontSize: 14, marginTop: 4, fontFamily: 'serif' }}>
+                                        {item.origin_name}
+                                    </Text>
                                 </View>
+                            </Pressable>
+                        </Link>
+                    )}
+                />
+            </View>
 
-                                {/* Buttons Row */}
-                                <View className="flex-row gap-4 w-full px-2">
-                                    <View className="flex-1 bg-[#fbbf24] py-3.5 rounded-xl flex-row justify-center items-center shadow-lg shadow-yellow-500/20 active:scale-95 transition-transform">
-                                        <Ionicons name="play" size={22} color="black" />
-                                        <Text className="text-black font-extrabold text-lg ml-2">Xem Phim</Text>
-                                    </View>
-                                    <View className="flex-1 bg-white/20 backdrop-blur-md py-3.5 rounded-xl flex-row justify-center items-center border border-white/10 active:scale-95 transition-transform">
-                                        <Ionicons name="information-circle-outline" size={24} color="white" />
-                                        <Text className="text-white font-bold text-lg ml-2">Thông tin</Text>
-                                    </View>
-                                </View>
-                            </View>
+            {/* Metadata & Actions (Below Carousel) */}
+            <View style={{ alignItems: 'center', paddingHorizontal: 20, marginTop: 20 }}>
+                {/* Title (Large) */}
+                <Text style={{ color: '#fff', fontSize: 28, fontWeight: '800', textAlign: 'center', marginBottom: 5 }}>
+                    {activeMovie?.name}
+                </Text>
+                <Text style={{ color: '#9ca3af', fontSize: 16, textAlign: 'center', marginBottom: 20 }}>
+                    {activeMovie?.origin_name}
+                </Text>
+
+                {/* Buttons */}
+                <View style={{ flexDirection: 'row', gap: 15, marginBottom: 20, width: '100%' }}>
+                    <Link href={`/movie/${activeMovie?.slug}`} asChild>
+                        <Pressable style={{ flex: 1, backgroundColor: '#fbbf24', borderRadius: 12, paddingVertical: 14, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                            <Ionicons name="play" size={20} color="black" />
+                            <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 16, marginLeft: 8 }}>Xem Phim</Text>
                         </Pressable>
                     </Link>
-                )}
-            />
+                    <Link href={`/movie/${activeMovie?.slug}`} asChild>
+                        <Pressable style={{ flex: 1, backgroundColor: '#fff', borderRadius: 12, paddingVertical: 14, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                            <Ionicons name="information-circle" size={20} color="black" />
+                            <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 16, marginLeft: 8 }}>Thông tin</Text>
+                        </Pressable>
+                    </Link>
+                </View>
+
+                {/* Tags Row */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center', gap: 8 }}>
+                    <View style={{ backgroundColor: '#1f2937', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, borderWidth: 1, borderColor: '#fbbf24' }}>
+                        <Text style={{ color: '#fbbf24', fontWeight: 'bold', fontSize: 12 }}>IMDb 8.4</Text>
+                    </View>
+                    <View style={{ backgroundColor: '#fff', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 }}>
+                        <Text style={{ color: '#000', fontWeight: 'bold', fontSize: 12 }}>T16</Text>
+                    </View>
+                    <View style={{ backgroundColor: '#1f2937', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, borderWidth: 1, borderColor: '#374151' }}>
+                        <Text style={{ color: '#fff', fontSize: 12 }}>{activeMovie?.year}</Text>
+                    </View>
+                    <View style={{ backgroundColor: '#1f2937', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, borderWidth: 1, borderColor: '#374151' }}>
+                        <Text style={{ color: '#fff', fontSize: 12 }}>{activeMovie?.quality || 'Full HD'}</Text>
+                    </View>
+                </View>
+
+                {/* Description Preview */}
+                <Text style={{ color: '#9ca3af', fontSize: 13, textAlign: 'center', marginTop: 20, lineHeight: 20 }} numberOfLines={2}>
+                    {activeMovie?.content?.replace(/<[^>]*>/g, '')}
+                </Text>
+
+                {/* Dots Indicator */}
+                <View style={{ flexDirection: 'row', gap: 6, marginTop: 20 }}>
+                    {movies.map((_, i) => (
+                        <View
+                            key={i}
+                            style={{
+                                width: 8,
+                                height: 8,
+                                borderRadius: 4,
+                                backgroundColor: i === activeIndex ? '#fff' : 'rgba(255,255,255,0.3)'
+                            }}
+                        />
+                    ))}
+                </View>
+            </View>
         </View>
     );
 }
