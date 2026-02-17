@@ -125,7 +125,8 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
             return `https://image.tmdb.org/t/p/original${tmdbData.backdrop_path}`;
         }
         if (type === 'poster' && tmdbData?.poster_path) {
-            return `https://image.tmdb.org/t/p/w780${tmdbData.poster_path}`;
+            // Use original for best quality vertical image
+            return `https://image.tmdb.org/t/p/original${tmdbData.poster_path}`;
         }
         return getImageUrl(movie.poster_url || movie.thumb_url);
     };
@@ -134,12 +135,12 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
         <div className="relative w-full h-auto md:h-screen bg-black overflow-hidden flex flex-col">
 
             {/* ================= MOBILE LAYOUT (Vertical Card Style) ================= */}
-            <div className="md:hidden relative w-full h-[60vh] min-h-[500px] flex flex-col pt-20">
+            <div className="md:hidden relative w-full h-[80vh] min-h-[500px] flex flex-col pt-20">
 
-                {/* 1. Background - High Quality & Clear */}
+                {/* 1. Background - High Quality Vertical Poster */}
                 <div className="absolute inset-0 z-0">
                     <Image
-                        src={getHeroImage(activeMovie, 'backdrop')}
+                        src={getHeroImage(activeMovie, 'poster')}
                         alt={activeMovie.name}
                         fill
                         className="object-cover transition-all duration-700"

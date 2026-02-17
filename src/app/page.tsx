@@ -56,6 +56,21 @@ export default async function Home() {
     if (phimLeData.items?.[i]) heroMovies.push(phimLeData.items[i]);
   }
 
+  // Create a Set of Trending Titles for Boost
+  const trendingTitles = new Set([
+    ...trendTv.map((m: any) => m.name || m.original_name),
+    ...trendMovies.map((m: any) => m.title || m.original_title)
+  ].map(t => t?.toLowerCase().trim()));
+
+  // Boost trending items to the top
+  heroMovies.sort((a, b) => {
+    const aTrend = trendingTitles.has(a.name?.toLowerCase().trim()) || trendingTitles.has(a.origin_name?.toLowerCase().trim());
+    const bTrend = trendingTitles.has(b.name?.toLowerCase().trim()) || trendingTitles.has(b.origin_name?.toLowerCase().trim());
+    if (aTrend && !bTrend) return -1;
+    if (!aTrend && bTrend) return 1;
+    return 0;
+  });
+
   // Top 20 for Hero
   const finalHeroData = heroMovies.slice(0, 20);
 
