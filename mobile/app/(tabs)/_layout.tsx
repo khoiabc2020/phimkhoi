@@ -8,32 +8,40 @@ import Animated, { useAnimatedStyle, withSpring, withTiming } from 'react-native
 
 const LiquidTabIcon = ({ name, color, focused, label }: { name: any, color: string, focused: boolean, label: string }) => {
   return (
-    <View style={{ alignItems: 'center', justifyContent: 'center', width: 50 }}>
+    <View style={{ alignItems: 'center', justifyContent: 'center', width: 60 }}>
       {focused && (
         <View style={{
           position: 'absolute',
-          top: -6,
-          width: 42,
-          height: 42,
-          borderRadius: 21,
-          backgroundColor: '#fbbf24', // Yellow active circle
-          opacity: 0.15,
-          transform: [{ scale: 1.1 }]
+          width: 50,
+          height: 50,
+          borderRadius: 25,
+          backgroundColor: 'rgba(251, 191, 36, 0.15)', // Yellow tint
         }} />
       )}
-      <Ionicons
-        size={24}
-        name={focused ? name : `${name}-outline`}
-        color={focused ? '#fbbf24' : '#9ca3af'} // Yellow active, Gray inactive
-      />
-      <Text style={{
-        fontSize: 10,
-        fontWeight: focused ? '700' : '500',
-        color: focused ? '#fbbf24' : '#9ca3af',
-        marginTop: 4
+      <View style={{
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: focused ? '#fbbf24' : 'transparent', // Solid yellow pill for icon? No, usually icon is colored.
+        width: focused ? 40 : 24,
+        height: focused ? 24 : 24,
+        borderRadius: 12,
+        marginBottom: 2
       }}>
-        {label}
-      </Text>
+        <Ionicons
+          size={22}
+          name={focused ? name : `${name}-outline`}
+          color={focused ? '#000000' : '#9ca3af'}
+        />
+      </View>
+      {focused && (
+        <Text style={{
+          fontSize: 10,
+          fontWeight: '700',
+          color: '#fbbf24',
+        }}>
+          {label}
+        </Text>
+      )}
     </View>
   );
 };

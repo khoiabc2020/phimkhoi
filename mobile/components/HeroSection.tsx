@@ -59,7 +59,7 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                     parallaxScrollingOffset: 60,
                 }}
                 onSnapToItem={(index) => setActiveIndex(index)}
-                renderItem={({ item }) => (
+                renderItem={({ item, index }) => (
                     <Link href={`/movie/${item.slug}`} asChild>
                         <Pressable style={styles.posterWrapper}>
                             <Image
@@ -68,6 +68,20 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                                 contentFit="cover"
                                 transition={300}
                             />
+                            {/* Top 3 Rank Badge */}
+                            {index < 3 && (
+                                <View style={styles.rankBadge}>
+                                    <Text style={[
+                                        styles.rankText,
+                                        index === 0 ? { color: '#fbbf24' } : // Top 1 Gold
+                                            index === 1 ? { color: '#94a3b8' } : // Top 2 Silver
+                                                { color: '#b45309' } // Top 3 Bronze
+                                    ]}>
+                                        {index + 1}
+                                    </Text>
+                                    <Text style={styles.topText}>TOP</Text>
+                                </View>
+                            )}
                         </Pressable>
                     </Link>
                 )}
@@ -293,5 +307,28 @@ const styles = StyleSheet.create({
     dot: {
         height: 6,
         borderRadius: 3,
+    },
+    rankBadge: {
+        position: 'absolute',
+        bottom: -15, // Hanging off the bottom-left
+        left: -10,
+        width: 60,
+        height: 60,
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 10,
+    },
+    rankText: {
+        fontSize: 70, // HUGE Number
+        fontWeight: '900',
+        fontStyle: 'italic',
+        includeFontPadding: false,
+        textShadowColor: 'rgba(0, 0, 0, 0.8)',
+        textShadowOffset: { width: 2, height: 2 },
+        textShadowRadius: 4,
+        fontFamily: 'System', // Or a custom robust font if available
+    },
+    topText: {
+        display: 'none', // Hide "TOP" text, just show the Big Number like RoPhim
     },
 });
