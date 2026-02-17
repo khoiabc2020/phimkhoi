@@ -8,7 +8,6 @@ import { Movie, getImageUrl } from '@/services/api';
 import { useState } from 'react';
 
 const { width, height } = Dimensions.get('window');
-const { width, height } = Dimensions.get('window');
 const ITEM_WIDTH = width * 0.55; // Reduced to 55% for "Small Vertical" look (RoPhim style)
 const ITEM_HEIGHT = ITEM_WIDTH * 1.5; // Standard 2:3 Ratio
 

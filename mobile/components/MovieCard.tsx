@@ -30,7 +30,10 @@ const MovieCard = memo(({ movie, width = 115, height = 172 }: MovieCardProps) =>
                 {/* Left Badge: PD/TM + Episode */}
                 {/* Logic: If lang contains 'Thuyết Minh' -> TM, 'Vietsub' -> PD, else 'VS' */}
                 {/* Number: episode_current */}
-                <View className="absolute top-1 left-1 flex-row gap-1">
+                {/* Left Badge: PD/TM + Episode */}
+                {/* Logic: If lang contains 'Thuyết Minh' -> TM, 'Vietsub' -> PD, else 'VS' */}
+                {/* Number: episode_current */}
+                <View className="absolute bottom-1 left-1 flex-row gap-1">
                     <View className="bg-black/60 backdrop-blur-md px-1.5 py-0.5 rounded-md border border-white/10">
                         <Text className="text-[9px] font-bold text-white">
                             {movie.lang?.includes('Thuyết') ? 'TM' : 'PD'}

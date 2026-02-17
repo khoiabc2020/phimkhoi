@@ -1,43 +1,43 @@
 #!/bin/bash
 
-# PhimKhoi VPS Deployment Script
-# Usage: bash deploy_vps.sh
+# Configuration
+APP_DIR="/home/ubuntu/phimkhoi" # UPDATED PATH
+REPO_URL="https://github.com/khoiabc2020/phimkhoi.git"
 
-APP_DIR="/home/ubuntu/phimkhoi"
-LOG_FILE="/home/ubuntu/deploy.log"
+echo "Deploying PhimKhoi to VPS..."
 
-log() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
-}
-
-log "Starting deployment..."
-
-# Navigate to project directory
+# Check if directory exists
 if [ -d "$APP_DIR" ]; then
-    cd "$APP_DIR" || exit
-    log "Pulling latest changes..."
-    git reset --hard
+    echo "Updating existing application..."
+    cd "$APP_DIR"
     git pull origin main
 else
-    log "Directory $APP_DIR not found!"
-    exit 1
+    echo "Cloning repository..."
+    git clone "$REPO_URL" "$APP_DIR"
+    cd "$APP_DIR"
 fi
 
 # Install dependencies
-log "Installing dependencies (npm ci)..."
-rm -rf node_modules
-npm install --legacy-peer-deps
+echo "Installing dependencies..."
+npm install
 
 # Build Next.js app
-log "Building Next.js application..."
+echo "Building application..."
+# Clean old build to prevent caching issues
+rm -rf .next
 npm run build
 
-# Restart PM2
-log "Restarting PM2 process..."
+# FIX: Copy static assets to standalone directory (Critical for CSS/JS/Images to work)
+echo "Copying static assets to standalone..."
+cp -r public .next/standalone/public
+cp -r .next/static .next/standalone/.next/static
+
+# Restart PM2 process
+echo "Restarting PM2..."
 if pm2 show phimkhoi > /dev/null; then
     pm2 restart phimkhoi
 else
     pm2 start npm --name "phimkhoi" -- start
 fi
 
-log "Deployment Success!"
+echo "Deployment complete!"
