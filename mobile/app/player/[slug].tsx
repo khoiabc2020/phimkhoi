@@ -74,28 +74,6 @@ export default function PlayerScreen() {
                     } else {
                         setNextEpisodeSlug(null);
                     }
-
-                    // Add to history
-                    if (user && token) {
-                        try {
-                            setTimeout(() => {
-                                fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/history`, {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        Authorization: `Bearer ${token}`
-                                    },
-                                    body: JSON.stringify({
-                                        slug,
-                                        episode: episode.slug,
-                                        progress: 0
-                                    })
-                                }).then(() => syncHistory());
-                            }, 5000);
-                        } catch (e) {
-                            console.error("Failed to sync history", e);
-                        }
-                    }
                 }
             }
             setLoading(false);
@@ -103,11 +81,41 @@ export default function PlayerScreen() {
         fetchVideo();
     }, [slug, ep]);
 
+    const handleProgress = async (currentTime: number, duration: number) => {
+        if (!user || !token || !slug || !ep) return;
+
+        try {
+            // Convert to seconds for backend
+            const progressSeconds = Math.floor(currentTime / 1000);
+            const durationSeconds = Math.floor(duration / 1000);
+
+            await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/history`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    slug,
+                    episode: ep,
+                    progress: progressSeconds, // Backend expects seconds or percentage? API Analysis needed.
+                    duration: durationSeconds
+                })
+            });
+            // Don't call syncHistory() every 5s, it might be too heavy. 
+            // Maybe only on unmount or pause? For now, we rely on backend having truth.
+        } catch (e) {
+            console.error("Failed to sync history", e);
+        }
+    };
+
     const handleClose = () => {
+        syncHistory(); // Sync when closing player
         router.back();
     };
 
     const handleNextEpisode = () => {
+        syncHistory();
         if (nextEpisodeSlug) {
             router.replace(`/player/${slug}?ep=${nextEpisodeSlug}`);
         }
@@ -146,6 +154,7 @@ export default function PlayerScreen() {
                     episode={episodeTitle}
                     onClose={handleClose}
                     onNext={nextEpisodeSlug ? handleNextEpisode : undefined}
+                    onProgress={handleProgress}
                 />
             ) : (
                 <>

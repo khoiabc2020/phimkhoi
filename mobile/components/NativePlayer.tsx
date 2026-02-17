@@ -17,9 +17,10 @@ interface NativePlayerProps {
     episode?: string;
     onClose: () => void;
     onNext?: () => void;
+    onProgress?: (position: number, duration: number) => void;
 }
 
-export default function NativePlayer({ url, title, episode, onClose, onNext }: NativePlayerProps) {
+export default function NativePlayer({ url, title, episode, onClose, onNext, onProgress }: NativePlayerProps) {
     useKeepAwake();
     const video = useRef<Video>(null);
     const [status, setStatus] = useState<AVPlaybackStatus>({} as AVPlaybackStatus);
@@ -28,11 +29,10 @@ export default function NativePlayer({ url, title, episode, onClose, onNext }: N
     const controlTimeout = useRef<any>(null);
     const [settingsVisible, setSettingsVisible] = useState(false);
     const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
+    const lastProgressUpdate = useRef(0);
 
     // Gesture State
-    const [volume, setVolume] = useState(1.0); // For tracking ONLY (Video component doesn't separate volume well on Android w/o expo-av sound obj)
-    // Note: expo-av Video `volume` prop controls player volume relative to system. 
-    // Ideally we assume system volume, but here we can control player volume.
+    const [volume, setVolume] = useState(1.0);
     const [brightness, setBrightness] = useState(0.5);
     const [showVolumeSlider, setShowVolumeSlider] = useState(false);
     const [showBrightnessSlider, setShowBrightnessSlider] = useState(false);
@@ -60,6 +60,20 @@ export default function NativePlayer({ url, title, episode, onClose, onNext }: N
             controlTimeout.current = setTimeout(() => {
                 setShowControls(false);
             }, 4000);
+        }
+    };
+
+    const onPlaybackStatusUpdate = (status: AVPlaybackStatus) => {
+        setStatus(status);
+        if (status.isLoaded && status.isPlaying) {
+            const currentTime = status.positionMillis;
+            const duration = status.durationMillis || 0;
+
+            // Emit progress every 5 seconds (5000ms)
+            if (onProgress && currentTime - lastProgressUpdate.current > 5000) {
+                lastProgressUpdate.current = currentTime;
+                onProgress(currentTime, duration);
+            }
         }
     };
 
@@ -210,7 +224,7 @@ export default function NativePlayer({ url, title, episode, onClose, onNext }: N
                         volume={volume}
                         useNativeControls={false}
                         resizeMode={resizeMode}
-                        onPlaybackStatusUpdate={status => setStatus(status)}
+                        onPlaybackStatusUpdate={onPlaybackStatusUpdate}
                         shouldPlay
                     />
 
