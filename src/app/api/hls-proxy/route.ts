@@ -36,10 +36,20 @@ export async function GET(request: NextRequest) {
         // Resolve base URL
         const baseUrl = url.substring(0, url.lastIndexOf('/') + 1);
 
-        // Rewrite lines not starting with # and not starting with http
-        const params = m3u8Content.split('\n').map(line => {
-            if (line.trim() && !line.startsWith('#') && !line.startsWith('http')) {
-                return baseUrl + line;
+        // Rewrite lines not starting with # (URLs) to go through proxy
+        const lines = m3u8Content.split('\n');
+        const params = lines.map(line => {
+            const trimmed = line.trim();
+            if (trimmed && !trimmed.startsWith('#')) {
+                // Determine absolute URL of the resource
+                const absoluteUrl = trimmed.startsWith('http')
+                    ? trimmed
+                    : baseUrl + trimmed;
+
+                // Recursively proxy this URL
+                // Get the current protocol and host from the request to construct full proxy URL
+                // Or just use relative path since we are on the same domain
+                return `/api/hls-proxy?url=${encodeURIComponent(absoluteUrl)}`;
             }
             return line;
         }).join('\n');
