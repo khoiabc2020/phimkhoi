@@ -227,9 +227,4 @@ export default async function WatchPage({ params }: PageProps) {
         </div>
     );
 }
-                    </div >
-                </div >
-            </div >
-        </div >
-    );
-}
+

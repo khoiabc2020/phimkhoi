@@ -41,7 +41,20 @@ export default function HeroSection({ movies }: HeroSectionProps) {
             </View>
 
             {/* Vertical Carousel - Centered Poster */}
-            <View style={{ marginTop: 80, alignItems: 'center' }}>
+            <View style={{ marginTop: 60, alignItems: 'center' }}>
+                <Text style={{
+                    color: '#fbbf24',
+                    fontSize: 14,
+                    fontWeight: 'bold',
+                    textTransform: 'uppercase',
+                    letterSpacing: 2,
+                    marginBottom: 10,
+                    textShadowColor: 'rgba(0,0,0,0.8)',
+                    textShadowOffset: { width: 0, height: 1 },
+                    textShadowRadius: 2
+                }}>
+                    Phim Hot Hôm Nay
+                </Text>
                 <Carousel
                     loop={true}
                     width={width}

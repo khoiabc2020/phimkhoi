@@ -212,6 +212,25 @@ export default function NativePlayer({ url, title, episode, onClose, onNext, onP
                         <View style={styles.overlay} pointerEvents="box-none">
                             <Pressable style={StyleSheet.absoluteFill} onPress={toggleControls} />
 
+                            {/* Volume/Brightness Sliders */}
+                            {showBrightnessSlider && (
+                                <View style={styles.gestureFeedbackLeft}>
+                                    <Ionicons name="sunny" size={24} color="white" />
+                                    <View style={styles.gestureBarContainer}>
+                                        <View style={[styles.gestureBarFill, { height: `${brightness * 100}%` }]} />
+                                    </View>
+                                </View>
+                            )}
+
+                            {showVolumeSlider && (
+                                <View style={styles.gestureFeedbackRight}>
+                                    <Ionicons name="volume-high" size={24} color="white" />
+                                    <View style={styles.gestureBarContainer}>
+                                        <View style={[styles.gestureBarFill, { height: `${volume * 100}%` }]} />
+                                    </View>
+                                </View>
+                            )}
+
                             {/* Header */}
                             <LinearGradient colors={['rgba(0,0,0,0.8)', 'transparent']} style={styles.header}>
                                 <TouchableOpacity onPress={onClose} style={styles.backBtn}>
@@ -282,7 +301,7 @@ export default function NativePlayer({ url, title, episode, onClose, onNext, onP
                                 <View style={styles.bottomActions}>
                                     <TouchableOpacity style={styles.actionItem}>
                                         <Ionicons name="albums-outline" size={24} color="white" />
-                                        <Text style={styles.actionText}>Episodes</Text>
+                                        <Text style={styles.actionText}>DS Tập</Text>
                                     </TouchableOpacity>
 
                                     <TouchableOpacity style={styles.actionItem} onPress={() => {
@@ -292,17 +311,17 @@ export default function NativePlayer({ url, title, episode, onClose, onNext, onP
                                         handleSpeedChange(nextSpeed);
                                     }}>
                                         <Ionicons name="speedometer-outline" size={24} color="white" />
-                                        <Text style={styles.actionText}>Speed ({playbackSpeed}x)</Text>
+                                        <Text style={styles.actionText}>Tốc độ ({playbackSpeed}x)</Text>
                                     </TouchableOpacity>
 
                                     <TouchableOpacity style={styles.actionItem} onPress={handleResizeMode}>
                                         <Ionicons name={resizeMode === ResizeMode.COVER ? "contract-outline" : "expand-outline"} size={24} color="white" />
-                                        <Text style={styles.actionText}>{resizeMode === ResizeMode.COVER ? "Fit" : "Fill"}</Text>
+                                        <Text style={styles.actionText}>{resizeMode === ResizeMode.COVER ? "Vừa màn" : "Tràn màn"}</Text>
                                     </TouchableOpacity>
 
                                     {onNext && (
                                         <TouchableOpacity onPress={onNext} style={styles.nextEpBtn}>
-                                            <Text style={styles.nextEpText}>Next Ep</Text>
+                                            <Text style={styles.nextEpText}>Tập tiếp</Text>
                                             <Ionicons name="play-skip-forward-outline" size={20} color="black" />
                                         </TouchableOpacity>
                                     )}
