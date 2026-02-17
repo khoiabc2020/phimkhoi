@@ -115,11 +115,11 @@ export default function MovieRow({ title, movies, slug, variant = 'default' }: M
                 {/* Scroll Container */}
                 <div
                     ref={rowRef}
-                    className="flex gap-5 overflow-x-auto px-4 md:px-12 pb-10 pt-2 no-scrollbar snap-x scroll-smooth"
+                    className="flex gap-3 overflow-x-auto px-4 md:px-12 pb-10 pt-2 no-scrollbar snap-x scroll-smooth"
                     style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
                     {movies.map((movie) => (
-                        <div key={movie._id} className="min-w-[180px] md:min-w-[220px] snap-center">
+                        <div key={movie._id} className="min-w-[140px] md:min-w-[160px] snap-center">
                             <MovieCard movie={movie} />
                         </div>
                     ))}

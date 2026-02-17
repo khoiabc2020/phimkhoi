@@ -155,11 +155,11 @@ export default function MovieCard({ movie, orientation = 'portrait' }: { movie: 
                 </div>
 
                 <div className="mt-2 space-y-0.5">
-                    <h3 className="text-white font-bold text-[13px] truncate group-hover:text-primary transition-colors leading-tight">
+                    <h3 className="text-white font-bold text-[11px] truncate group-hover:text-primary transition-colors leading-tight">
                         {movie.name}
                     </h3>
                     {movie.origin_name && (
-                        <p className="text-gray-400 text-[11px] truncate font-medium group-hover:text-white/80 transition-colors">
+                        <p className="text-gray-400 text-[10px] truncate font-medium group-hover:text-white/80 transition-colors">
                             {movie.origin_name}
                         </p>
                     )}
