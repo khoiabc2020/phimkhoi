@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
-import { Maximize2, Minimize2, Play, Pause, Volume2, VolumeX, Settings, SkipForward, SkipBack } from "lucide-react";
+import { Maximize2, Minimize2, Play, Pause, Volume2, VolumeX, Settings, RotateCcw, RotateCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { addWatchHistory } from "@/app/actions/watchHistory";
 
@@ -186,10 +186,26 @@ export default function HLSPlayer({ url, poster, initialProgress = 0, movieData,
                 </div>
 
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <button onClick={togglePlay} className="text-white hover:text-primary transition-colors">
-                            {playing ? <Pause className="w-6 h-6 fill-current" /> : <Play className="w-6 h-6 fill-current" />}
+                    <div className="flex items-center gap-6">
+                        <button onClick={togglePlay} className="text-white hover:text-primary transition-colors hover:scale-110 transform duration-200">
+                            {playing ? <Pause className="w-8 h-8 fill-current" /> : <Play className="w-8 h-8 fill-current" />}
                         </button>
+
+                        <div className="flex items-center gap-4">
+                            <button onClick={() => {
+                                if (playerRef.current) playerRef.current.seekTo(playerRef.current.getCurrentTime() - 10);
+                            }} className="group/skip flex items-center justify-center text-white/80 hover:text-white transition-all hover:bg-white/10 rounded-full p-2" title="-10s">
+                                <RotateCcw className="w-5 h-5" />
+                                <span className="text-[10px] font-medium ml-1 opacity-0 group-hover/skip:opacity-100 transition-opacity absolute -bottom-4">10s</span>
+                            </button>
+
+                            <button onClick={() => {
+                                if (playerRef.current) playerRef.current.seekTo(playerRef.current.getCurrentTime() + 10);
+                            }} className="group/skip flex items-center justify-center text-white/80 hover:text-white transition-all hover:bg-white/10 rounded-full p-2" title="+10s">
+                                <RotateCw className="w-5 h-5" />
+                                <span className="text-[10px] font-medium ml-1 opacity-0 group-hover/skip:opacity-100 transition-opacity absolute -bottom-4">10s</span>
+                            </button>
+                        </div>
 
                         <div className="flex items-center gap-2 group/volume">
                             <button onClick={toggleMute} className="text-white hover:text-primary transition-colors">
@@ -209,7 +225,7 @@ export default function HLSPlayer({ url, poster, initialProgress = 0, movieData,
                             />
                         </div>
 
-                        <span className="text-xs font-medium text-gray-300">
+                        <span className="text-xs font-medium text-gray-300 tracking-wider">
                             {formatTime(played * duration)} / {formatTime(duration)}
                         </span>
                     </div>

@@ -7,6 +7,7 @@ import * as ScreenOrientation from 'expo-screen-orientation';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useKeepAwake } from 'expo-keep-awake';
 import * as Brightness from 'expo-brightness';
+import { PanGestureHandler, State, GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const { width, height } = Dimensions.get('window');
 
@@ -27,6 +28,24 @@ export default function NativePlayer({ url, title, episode, onClose, onNext }: N
     const controlTimeout = useRef<any>(null);
     const [settingsVisible, setSettingsVisible] = useState(false);
     const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
+
+    // Gesture State
+    const [volume, setVolume] = useState(1.0); // For tracking ONLY (Video component doesn't separate volume well on Android w/o expo-av sound obj)
+    // Note: expo-av Video `volume` prop controls player volume relative to system. 
+    // Ideally we assume system volume, but here we can control player volume.
+    const [brightness, setBrightness] = useState(0.5);
+    const [showVolumeSlider, setShowVolumeSlider] = useState(false);
+    const [showBrightnessSlider, setShowBrightnessSlider] = useState(false);
+
+    useEffect(() => {
+        (async () => {
+            const { status } = await Brightness.requestPermissionsAsync();
+            if (status === 'granted') {
+                const cur = await Brightness.getBrightnessAsync();
+                setBrightness(cur);
+            }
+        })();
+    }, []);
 
     useEffect(() => {
         resetControlsTimer();
@@ -76,6 +95,40 @@ export default function NativePlayer({ url, title, episode, onClose, onNext }: N
     const handleResizeMode = () => {
         setResizeMode(prev => prev === ResizeMode.CONTAIN ? ResizeMode.COVER : ResizeMode.CONTAIN);
     };
+
+    // Pan Gesture for Brightness (Left) and Volume (Right)
+    const onPanGestureEvent = async (event: any) => {
+        const { translationY, x, state } = event.nativeEvent;
+        // Check active area
+        // Left side (< width/2): Brightness
+        // Right side (> width/2): Volume (Player Volume)
+
+        if (state !== State.ACTIVE) return;
+
+        const delta = -translationY / 10000; // sensitivity
+
+        if (x < width / 2) {
+            // Brightness
+            let newBrightness = brightness + delta;
+            newBrightness = Math.max(0, Math.min(1, newBrightness));
+            setBrightness(newBrightness);
+            setShowBrightnessSlider(true);
+            await Brightness.setBrightnessAsync(newBrightness);
+
+            // Hide slider after delay
+            setTimeout(() => setShowBrightnessSlider(false), 1000);
+        } else {
+            // Volume
+            let newVolume = volume + delta;
+            newVolume = Math.max(0, Math.min(1, newVolume));
+            setVolume(newVolume);
+            setShowVolumeSlider(true);
+            // video.current?.setVolumeAsync(newVolume); // This sets player volume
+
+            setTimeout(() => setShowVolumeSlider(false), 1000);
+        }
+    };
+
 
     const formatTime = (millis: number) => {
         if (!millis) return "00:00";
@@ -140,124 +193,149 @@ export default function NativePlayer({ url, title, episode, onClose, onNext }: N
         (status.durationMillis - status.positionMillis < 60000) && onNext;
 
     return (
-        <View style={styles.container}>
-            <StatusBar hidden />
-            <Video
-                ref={video}
-                style={styles.video}
-                source={{
-                    uri: url,
-                    headers: {
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-                        'Referer': 'https://phimkhoi.com'
-                    }
-                }}
-                useNativeControls={false}
-                resizeMode={resizeMode}
-                onPlaybackStatusUpdate={status => setStatus(status)}
-                shouldPlay
-            />
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <PanGestureHandler onGestureEvent={onPanGestureEvent}>
+                <View style={styles.container}>
+                    <StatusBar hidden />
+                    <Video
+                        ref={video}
+                        style={styles.video}
+                        source={{
+                            uri: url,
+                            headers: {
+                                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                                'Referer': 'https://phimkhoi.com'
+                            }
+                        }}
+                        volume={volume}
+                        useNativeControls={false}
+                        resizeMode={resizeMode}
+                        onPlaybackStatusUpdate={status => setStatus(status)}
+                        shouldPlay
+                    />
 
-            {/* Next Episode Overlay (Auto-appears near end) */}
-            {showNextButton && !settingsVisible && (
-                <View style={styles.nextEpOverlay}>
-                    <TouchableOpacity onPress={onNext} style={styles.autoNextBtn}>
-                        <Text style={styles.autoNextText}>Tập tiếp theo</Text>
-                        <Ionicons name="play-skip-forward" size={20} color="black" />
-                    </TouchableOpacity>
-                </View>
-            )}
-
-            {/* Skip Intro Overlay (First 5 mins) */}
-            {status.isLoaded && status.positionMillis < 300000 && showControls && (
-                <View style={styles.skipIntroOverlay}>
-                    <TouchableOpacity onPress={handleSkipIntro} style={styles.skipIntroBtn}>
-                        <Text style={styles.skipIntroText}>Bỏ qua mở đầu</Text>
-                        <Ionicons name="play-forward" size={16} color="black" />
-                    </TouchableOpacity>
-                </View>
-            )}
-
-            {/* Clickable Overlay to Toggle Controls */}
-            <Pressable style={styles.overlay} onPress={toggleControls}>
-                {showControls && (
-                    <View style={styles.controlsContainer}>
-                        {/* Header */}
-                        <LinearGradient colors={['rgba(0,0,0,0.8)', 'transparent']} style={styles.header}>
-                            <TouchableOpacity onPress={onClose} style={styles.backBtn}>
-                                <Ionicons name="arrow-back" size={28} color="white" />
-                            </TouchableOpacity>
-                            <View style={{ flex: 1 }}>
-                                <Text style={styles.videoTitle} numberOfLines={1}>{title}</Text>
-                                {episode && <Text style={styles.subTitle}>{episode}</Text>}
+                    {/* Gesture Feedback Sliders */}
+                    {showBrightnessSlider && (
+                        <View style={styles.gestureFeedbackLeft}>
+                            <Ionicons name="sunny" size={24} color="#fbbf24" />
+                            <View style={styles.gestureBarContainer}>
+                                <View style={[styles.gestureBarFill, { height: `${brightness * 100}%` }]} />
                             </View>
-                            <TouchableOpacity onPress={() => setSettingsVisible(true)} style={styles.settingsBtn}>
-                                <Ionicons name="settings-outline" size={24} color="white" />
-                            </TouchableOpacity>
-                        </LinearGradient>
+                        </View>
+                    )}
 
-                        {/* Center Play/Pause */}
-                        <View style={styles.centerControls}>
-                            {/* Rewind */}
-                            <TouchableOpacity onPress={async () => video.current?.setPositionAsync((status as any).positionMillis - 10000)} style={styles.skipBtn}>
-                                <Ionicons name="play-back" size={30} color="white" />
-                                <Text style={styles.skipText}>-10s</Text>
-                            </TouchableOpacity>
+                    {showVolumeSlider && (
+                        <View style={styles.gestureFeedbackRight}>
+                            <Ionicons name="volume-high" size={24} color="#fbbf24" />
+                            <View style={styles.gestureBarContainer}>
+                                <View style={[styles.gestureBarFill, { height: `${volume * 100}%` }]} />
+                            </View>
+                        </View>
+                    )}
 
-                            <TouchableOpacity onPress={handlePlayPause} style={styles.playPauseBtn}>
-                                {status.isLoaded && status.isPlaying ? (
-                                    <Ionicons name="pause" size={40} color="black" />
-                                ) : (
-                                    <Ionicons name="play" size={40} color="black" />
-                                )}
-                            </TouchableOpacity>
 
-                            {/* Forward */}
-                            <TouchableOpacity onPress={async () => video.current?.setPositionAsync((status as any).positionMillis + 10000)} style={styles.skipBtn}>
-                                <Ionicons name="play-forward" size={30} color="white" />
-                                <Text style={styles.skipText}>+10s</Text>
+                    {/* Next Episode Overlay (Auto-appears near end) */}
+                    {showNextButton && !settingsVisible && (
+                        <View style={styles.nextEpOverlay}>
+                            <TouchableOpacity onPress={onNext} style={styles.autoNextBtn}>
+                                <Text style={styles.autoNextText}>Tập tiếp theo</Text>
+                                <Ionicons name="play-skip-forward" size={20} color="black" />
                             </TouchableOpacity>
                         </View>
+                    )}
 
-                        {/* Footer */}
-                        <LinearGradient colors={['transparent', 'rgba(0,0,0,0.9)']} style={styles.footer}>
-                            <View style={styles.sliderContainer}>
-                                <Text style={styles.timeText}>
-                                    {status.isLoaded ? formatTime(status.positionMillis) : "00:00"}
-                                </Text>
-                                <Slider
-                                    style={styles.slider}
-                                    minimumValue={0}
-                                    maximumValue={status.isLoaded ? status.durationMillis : 1}
-                                    value={status.isLoaded ? status.positionMillis : 0}
-                                    onSlidingComplete={handleSeek}
-                                    minimumTrackTintColor="#fbbf24"
-                                    maximumTrackTintColor="#9ca3af"
-                                    thumbTintColor="#fbbf24"
-                                />
-                                <Text style={styles.timeText}>
-                                    {status.isLoaded ? formatTime(status.durationMillis || 0) : "00:00"}
-                                </Text>
-                            </View>
+                    {/* Skip Intro Overlay (First 5 mins) */}
+                    {status.isLoaded && status.positionMillis < 300000 && showControls && (
+                        <View style={styles.skipIntroOverlay}>
+                            <TouchableOpacity onPress={handleSkipIntro} style={styles.skipIntroBtn}>
+                                <Text style={styles.skipIntroText}>Bỏ qua mở đầu</Text>
+                                <Ionicons name="play-forward" size={16} color="black" />
+                            </TouchableOpacity>
+                        </View>
+                    )}
 
-                            <View style={styles.bottomActions}>
-                                <TouchableOpacity style={styles.bottomActionBtn}>
-                                    <Ionicons name="albums-outline" size={20} color="white" />
-                                    <Text style={styles.bottomActionText}>Danh sách</Text>
-                                </TouchableOpacity>
-                                {onNext && (
-                                    <TouchableOpacity onPress={onNext} style={styles.nextBtn}>
-                                        <Text style={styles.nextBtnText}>Tập tiếp theo</Text>
-                                        <Ionicons name="play-skip-forward" size={16} color="black" />
+                    {/* Clickable Overlay to Toggle Controls */}
+                    <Pressable style={styles.overlay} onPress={toggleControls}>
+                        {showControls && (
+                            <View style={styles.controlsContainer}>
+                                {/* Header */}
+                                <LinearGradient colors={['rgba(0,0,0,0.8)', 'transparent']} style={styles.header}>
+                                    <TouchableOpacity onPress={onClose} style={styles.backBtn}>
+                                        <Ionicons name="arrow-back" size={28} color="white" />
                                     </TouchableOpacity>
-                                )}
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={styles.videoTitle} numberOfLines={1}>{title}</Text>
+                                        {episode && <Text style={styles.subTitle}>{episode}</Text>}
+                                    </View>
+                                    <TouchableOpacity onPress={() => setSettingsVisible(true)} style={styles.settingsBtn}>
+                                        <Ionicons name="settings-outline" size={24} color="white" />
+                                    </TouchableOpacity>
+                                </LinearGradient>
+
+                                {/* Center Play/Pause */}
+                                <View style={styles.centerControls}>
+                                    {/* Rewind */}
+                                    <TouchableOpacity onPress={async () => video.current?.setPositionAsync((status as any).positionMillis - 10000)} style={styles.skipBtn}>
+                                        <Ionicons name="play-back" size={30} color="white" />
+                                        <Text style={styles.skipText}>-10s</Text>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity onPress={handlePlayPause} style={styles.playPauseBtn}>
+                                        {status.isLoaded && status.isPlaying ? (
+                                            <Ionicons name="pause" size={40} color="black" />
+                                        ) : (
+                                            <Ionicons name="play" size={40} color="black" />
+                                        )}
+                                    </TouchableOpacity>
+
+                                    {/* Forward */}
+                                    <TouchableOpacity onPress={async () => video.current?.setPositionAsync((status as any).positionMillis + 10000)} style={styles.skipBtn}>
+                                        <Ionicons name="play-forward" size={30} color="white" />
+                                        <Text style={styles.skipText}>+10s</Text>
+                                    </TouchableOpacity>
+                                </View>
+
+                                {/* Footer */}
+                                <LinearGradient colors={['transparent', 'rgba(0,0,0,0.9)']} style={styles.footer}>
+                                    <View style={styles.sliderContainer}>
+                                        <Text style={styles.timeText}>
+                                            {status.isLoaded ? formatTime(status.positionMillis) : "00:00"}
+                                        </Text>
+                                        <Slider
+                                            style={styles.slider}
+                                            minimumValue={0}
+                                            maximumValue={status.isLoaded ? status.durationMillis : 1}
+                                            value={status.isLoaded ? status.positionMillis : 0}
+                                            onSlidingComplete={handleSeek}
+                                            minimumTrackTintColor="#fbbf24"
+                                            maximumTrackTintColor="#9ca3af"
+                                            thumbTintColor="#fbbf24"
+                                        />
+                                        <Text style={styles.timeText}>
+                                            {status.isLoaded ? formatTime(status.durationMillis || 0) : "00:00"}
+                                        </Text>
+                                    </View>
+
+                                    <View style={styles.bottomActions}>
+                                        <TouchableOpacity style={styles.bottomActionBtn}>
+                                            <Ionicons name="albums-outline" size={20} color="white" />
+                                            <Text style={styles.bottomActionText}>Danh sách</Text>
+                                        </TouchableOpacity>
+                                        {onNext && (
+                                            <TouchableOpacity onPress={onNext} style={styles.nextBtn}>
+                                                <Text style={styles.nextBtnText}>Tập tiếp theo</Text>
+                                                <Ionicons name="play-skip-forward" size={16} color="black" />
+                                            </TouchableOpacity>
+                                        )}
+                                    </View>
+                                </LinearGradient>
                             </View>
-                        </LinearGradient>
-                    </View>
-                )}
-            </Pressable>
-            {renderSettings()}
-        </View>
+                        )}
+                    </Pressable>
+                    {renderSettings()}
+                </View>
+            </PanGestureHandler>
+        </GestureHandlerRootView>
     );
 }
 
@@ -290,6 +368,12 @@ const styles = StyleSheet.create({
     bottomActionText: { color: 'white', marginLeft: 8, fontWeight: '600' },
     nextBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'white', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20 },
     nextBtnText: { color: 'black', marginRight: 8, fontWeight: 'bold' },
+
+    // Gesture Feedback
+    gestureFeedbackLeft: { position: 'absolute', left: 40, top: '30%', height: 150, width: 40, backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 20, alignItems: 'center', justifyContent: 'center', zIndex: 20, paddingVertical: 10 },
+    gestureFeedbackRight: { position: 'absolute', right: 40, top: '30%', height: 150, width: 40, backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 20, alignItems: 'center', justifyContent: 'center', zIndex: 20, paddingVertical: 10 },
+    gestureBarContainer: { flex: 1, width: 6, backgroundColor: 'rgba(255,255,255,0.3)', borderRadius: 3, marginTop: 10, overflow: 'hidden', alignItems: 'center', justifyContent: 'flex-end' },
+    gestureBarFill: { width: '100%', backgroundColor: '#fbbf24', borderRadius: 3 },
 
     // Settings Modal
     modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end', flexDirection: 'row' },
