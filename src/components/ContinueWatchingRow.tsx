@@ -13,6 +13,8 @@ import { cn } from "@/lib/utils";
 const getImageUrl = (url: string) => {
     if (!url) return "/placeholder.jpg";
     if (url.startsWith("http")) return url;
+    // OPhim images usually start with http in the API data, but if they are relative, they might need a specific domain.
+    // However, KKPhim data usually has relative paths.
     return `https://phimimg.com/${url}`;
 };
 

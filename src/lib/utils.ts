@@ -7,12 +7,21 @@ export function cn(...inputs: ClassValue[]) {
 
 export function getImageUrl(url: string) {
     if (!url) return "";
-    if (url.includes("tmdb.org")) return url;
 
-    // Check if it's already a full URL that is NOT tmdb (e.g. some other external source) -> still proxy it potentially? 
-    // But for now, just bypass TMDB specific ones.
-    const rawUrl = url.startsWith("http") ? url : `https://phimimg.com/${url}`;
-    return `https://phimapi.com/image.php?url=${encodeURIComponent(rawUrl)}`;
+    // Return direct URL for these known domains to let Next.js optimize them
+    if (url.includes("tmdb.org") || url.includes("img.ophim") || url.includes("phimimg.com")) {
+        return url;
+    }
+
+    // Handle relative paths (presumed to be from KKPhim/phimimg)
+    if (!url.startsWith("http")) {
+        return `https://phimimg.com/${url}`;
+    }
+
+    // For other full URLs, return as is.
+    // Previously we wrapped in phimapi.com/image.php which is returning 403.
+    // We trust Next.js Image component or standard img tag to handle them if domains are allowed.
+    return url;
 }
 
 export function decodeHtml(html: string) {

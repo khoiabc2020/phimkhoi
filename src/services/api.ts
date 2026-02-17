@@ -97,7 +97,10 @@ export const getMovieDetail = async (slug: string) => {
 
         // Fallback to OPhim
         console.log(`[MultiSource] KPPhim missing ${slug}, trying OPhim...`);
-        const ophimRes = await fetch(`${OPHIM_API}/phim/${slug}`, { next: { revalidate: 60 } });
+        // Fallback to OPhim
+        console.log(`[MultiSource] KPPhim missing ${slug}, trying OPhim...`);
+        const ophimRes = await fetch(`https://ophim1.com/phim/${slug}`, { next: { revalidate: 60 } });
+
         if (ophimRes.ok) {
             const data = await ophimRes.json();
             return data; // OPhim detail structure is usually compatible
