@@ -3,8 +3,10 @@
 import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Play, ChevronLeft, ChevronRight, Clock } from "lucide-react";
-import { getContinueWatching } from "@/app/actions/watchHistory";
+import { Play, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { getContinueWatching, removeFromHistory } from "@/app/actions/watchHistory";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 // Helper to get image URL
@@ -15,11 +17,18 @@ const getImageUrl = (url: string) => {
 };
 
 export default function ContinueWatchingRow() {
+    const { data: session } = useSession();
     const [movies, setMovies] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const rowRef = useRef<HTMLDivElement>(null);
+    const router = useRouter();
 
     useEffect(() => {
+        if (!session) {
+            setLoading(false);
+            return;
+        }
+
         const fetchData = async () => {
             try {
                 const res = await getContinueWatching();
@@ -33,7 +42,23 @@ export default function ContinueWatchingRow() {
             }
         };
         fetchData();
-    }, []);
+    }, [session]);
+
+    const handleRemove = async (e: React.MouseEvent, movieId: string) => {
+        e.preventDefault(); // Prevent link navigation
+        e.stopPropagation();
+
+        // Optimistic update
+        setMovies(prev => prev.filter(m => m.movieId !== movieId));
+
+        try {
+            await removeFromHistory(movieId);
+            router.refresh();
+        } catch (error) {
+            console.error("Failed to remove item", error);
+            // Revert if failed (optional, but good UX)
+        }
+    };
 
     const scroll = (direction: "left" | "right") => {
         if (rowRef.current) {
@@ -46,14 +71,13 @@ export default function ContinueWatchingRow() {
         }
     };
 
-    if (loading) return null; // Or skeleton
-    if (!movies || movies.length === 0) return null;
+    if (loading) return null;
+    if (!session || !movies || movies.length === 0) return null;
 
     return (
         <div className="space-y-4 group relative py-4 container mx-auto px-4 md:px-12">
             <div className="flex items-center justify-between">
                 <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
-                    <span className="w-1 h-6 bg-[#fbbf24] rounded-full shadow-[0_0_10px_#fbbf24]"></span>
                     Xem tiếp của bạn
                     <ChevronRight className="w-5 h-5 text-gray-500" />
                 </h2>
@@ -75,53 +99,56 @@ export default function ContinueWatchingRow() {
                     style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
                     {movies.map((item) => (
-                        <Link
-                            key={item._id}
-                            href={`/xem-phim/${item.movieSlug}/${item.episodeSlug}`}
-                            className="flex-[0_0_200px] md:flex-[0_0_240px] relative group/card snap-start"
-                        >
-                            {/* Card Image */}
-                            <div className="relative aspect-video rounded-lg overflow-hidden bg-white/5 border border-white/10 shadow-lg group-hover/card:border-[#fbbf24]/50 transition-all duration-300">
-                                <Image
-                                    src={getImageUrl(item.moviePoster)}
-                                    alt={item.movieName}
-                                    fill
-                                    className="object-cover group-hover/card:scale-105 transition-transform duration-500"
-                                />
+                        <div key={item._id} className="relative group/card flex-[0_0_200px] md:flex-[0_0_240px] snap-start">
+                            <Link
+                                href={`/xem-phim/${item.movieSlug}/${item.episodeSlug}`}
+                                className="block w-full h-full"
+                            >
+                                {/* Card Image */}
+                                <div className="relative aspect-video rounded-lg overflow-hidden bg-white/5 border border-white/10 shadow-lg group-hover/card:border-[#fbbf24]/50 transition-all duration-300">
+                                    <Image
+                                        src={getImageUrl(item.moviePoster)}
+                                        alt={item.movieName}
+                                        fill
+                                        className="object-cover group-hover/card:scale-105 transition-transform duration-500"
+                                    />
 
-                                {/* Overlay & Play Button */}
-                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                                    <div className="w-10 h-10 rounded-full bg-[#fbbf24] flex items-center justify-center shadow-[0_0_15px_#fbbf24] transform scale-0 group-hover/card:scale-100 transition-transform duration-300 delay-75">
-                                        <Play className="w-5 h-5 text-black fill-black ml-0.5" />
+                                    {/* Overlay & Play Button */}
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                        <div className="w-10 h-10 rounded-full bg-[#fbbf24] flex items-center justify-center shadow-[0_0_15px_#fbbf24] transform scale-0 group-hover/card:scale-100 transition-transform duration-300 delay-75">
+                                            <Play className="w-5 h-5 text-black fill-black ml-0.5" />
+                                        </div>
+                                    </div>
+
+                                    {/* Remove Button (X) */}
+                                    <button
+                                        onClick={(e) => handleRemove(e, item.movieId)}
+                                        className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 hover:bg-red-600 backdrop-blur-md flex items-center justify-center text-white/70 hover:text-white transition-colors opacity-0 group-hover/card:opacity-100 z-20"
+                                        title="Xóa khỏi lịch sử"
+                                    >
+                                        <X className="w-3 h-3" />
+                                    </button>
+
+                                    {/* Progress Bar Container - Full Width Bottom */}
+                                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
+                                        <div
+                                            className="h-full bg-red-600"
+                                            style={{ width: `${item.progress}%` }}
+                                        />
+                                    </div>
+
+                                    {/* Episode text overlay (Optional, matching design usually minimal) */}
+                                    <div className="absolute bottom-2 left-2 text-[10px] font-medium text-white/90 drop-shadow-md">
+                                        {item.episodeName}
                                     </div>
                                 </div>
 
-                                {/* Progress Bar */}
-                                <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
-                                    <div
-                                        className="h-full bg-[#fbbf24] shadow-[0_0_5px_#fbbf24]"
-                                        style={{ width: `${item.progress}%` }}
-                                    />
+                                {/* Info */}
+                                <div className="mt-2 text-center group-hover/card:text-[#fbbf24] transition-colors">
+                                    <h3 className="text-white font-bold text-sm line-clamp-1">{item.movieName}</h3>
                                 </div>
-
-                                {/* Episode Badge */}
-                                <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-md border border-white/10 text-[10px] font-bold text-white">
-                                    {item.episodeName}
-                                </div>
-                            </div>
-
-                            {/* Info */}
-                            <div className="mt-2 pl-1">
-                                <h3 className="text-white font-bold text-sm line-clamp-1 group-hover/card:text-[#fbbf24] transition-colors">{item.movieName}</h3>
-                                {item.movieOriginName && <p className="text-gray-400 text-xs italic line-clamp-1">{item.movieOriginName}</p>}
-                                <div className="flex items-center gap-1.5 mt-1 text-[10px] text-gray-500">
-                                    <Clock className="w-3 h-3" />
-                                    <span>Đã xem {item.progress}%</span>
-                                    <span className="w-1 h-1 rounded-full bg-gray-600 mx-1" />
-                                    <span>{new Date(item.lastWatched).toLocaleDateString()}</span>
-                                </div>
-                            </div>
-                        </Link>
+                            </Link>
+                        </div>
                     ))}
                 </div>
 
