@@ -136,17 +136,17 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
             {/* ================= MOBILE LAYOUT (Vertical Card Style) ================= */}
             <div className="md:hidden relative w-full h-[60vh] min-h-[500px] flex flex-col pt-20">
 
-                {/* 1. Blurred Background - Lighter & More Vibrant */}
+                {/* 1. Background - High Quality & Clear */}
                 <div className="absolute inset-0 z-0">
                     <Image
-                        src={getHeroImage(activeMovie, 'backdrop')} // Use High-Res Backdrop
+                        src={getHeroImage(activeMovie, 'backdrop')}
                         alt={activeMovie.name}
                         fill
-                        className="object-cover blur-xl opacity-40 scale-110 transition-all duration-700"
+                        className="object-cover transition-all duration-700"
                         priority
                     />
-                    {/* Lighter gradient for better visibility */}
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black" />
+                    {/* Subtle Gradient for text readability only at bottom */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/90" />
                 </div>
 
                 {/* 3. Main Content Area - Compacted */}
@@ -344,22 +344,18 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                         {heroMovies.map((movie) => {
                             return (
                                 <div key={movie._id} className="relative flex-[0_0_100%] min-w-0 h-full bg-black overflow-hidden">
-                                    {/* Background */}
+                                    {/* Background Image - High Res & Clear */}
                                     <div className="absolute inset-0">
-                                        <div className={cn(
-                                            "relative w-full h-full transition-transform duration-[20s] ease-in-out",
-                                            selectedIndex === heroMovies.indexOf(movie) ? "scale-110" : "scale-100"
-                                        )}>
-                                            <Image
-                                                src={getHeroImage(movie, 'backdrop')} // Use High-Res Backdrop
-                                                alt={movie.name}
-                                                fill
-                                                className="object-cover"
-                                                priority
-                                            />
-                                        </div>
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-                                        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/60 to-transparent" />
+                                        <Image
+                                            src={getHeroImage(movie, 'backdrop')}
+                                            alt={movie.name}
+                                            fill
+                                            className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                                            priority={index === 0}
+                                        />
+                                        {/* Overlay - Reduced darkness for clarity */}
+                                        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f] via-transparent to-transparent" />
                                     </div>
 
                                     {/* Main Content - Left Alignment */}
