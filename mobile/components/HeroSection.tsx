@@ -8,8 +8,9 @@ import { Movie, getImageUrl } from '@/services/api';
 import { useState } from 'react';
 
 const { width, height } = Dimensions.get('window');
-const ITEM_WIDTH = width * 0.72; // ~280-300px on mobile
-const ITEM_HEIGHT = ITEM_WIDTH * 1.45; // ~2:3 Ratio (Vertical Poster)
+const { width, height } = Dimensions.get('window');
+const ITEM_WIDTH = width * 0.55; // Reduced to 55% for "Small Vertical" look (RoPhim style)
+const ITEM_HEIGHT = ITEM_WIDTH * 1.5; // Standard 2:3 Ratio
 
 interface HeroSectionProps {
     movies: Movie[];
@@ -55,8 +56,8 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                 data={movies}
                 mode="parallax"
                 modeConfig={{
-                    parallaxScrollingScale: 0.9,
-                    parallaxScrollingOffset: 50,
+                    parallaxScrollingScale: 0.85, // More "shrunken" inactive items
+                    parallaxScrollingOffset: 60,
                 }}
                 onSnapToItem={(index) => setActiveIndex(index)}
                 renderItem={({ item }) => (
@@ -172,14 +173,14 @@ const styles = StyleSheet.create({
     },
     title: {
         color: 'white',
-        fontSize: 18, // Reduced from 20
+        fontSize: 16, // Reduced from 18 (User asked for "Small")
         fontWeight: 'bold',
         textAlign: 'center',
         marginBottom: 2,
     },
     subtitle: {
         color: '#9ca3af',
-        fontSize: 12, // Reduced from 13
+        fontSize: 11, // Reduced from 12
         textAlign: 'center',
         marginBottom: 10,
     },
@@ -199,7 +200,7 @@ const styles = StyleSheet.create({
     imdbText: {
         color: '#fbbf24',
         fontWeight: 'bold',
-        fontSize: 10, // Reduced
+        fontSize: 9, // Reduced
     },
     metaTag: {
         paddingHorizontal: 6,

@@ -10,7 +10,7 @@ interface MovieCardProps {
     height?: number;
 }
 
-const MovieCard = memo(({ movie, width = 140, height = 210 }: MovieCardProps) => {
+const MovieCard = memo(({ movie, width = 115, height = 172 }: MovieCardProps) => {
     const imageUrl = getImageUrl(movie.poster_url || movie.thumb_url);
 
     return (
@@ -48,7 +48,7 @@ const MovieCard = memo(({ movie, width = 140, height = 210 }: MovieCardProps) =>
 
                 {/* Title */}
                 <Text
-                    className="text-white text-xs font-bold mt-2 leading-tight"
+                    className="text-white text-[10px] font-bold mt-2 leading-tight"
                     numberOfLines={1}
                     style={{ fontFamily: 'System' }}
                 >

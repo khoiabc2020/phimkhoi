@@ -12,23 +12,24 @@ const LiquidTabIcon = ({ name, color, focused, label }: { name: any, color: stri
       {focused && (
         <View style={{
           position: 'absolute',
-          top: -5,
-          width: 40,
-          height: 40,
-          borderRadius: 20,
-          backgroundColor: '#fbbf24', // Yellow circle background
-          opacity: 0.2
+          top: -6,
+          width: 42,
+          height: 42,
+          borderRadius: 21,
+          backgroundColor: '#fbbf24', // Yellow active circle
+          opacity: 0.15,
+          transform: [{ scale: 1.1 }]
         }} />
       )}
       <Ionicons
         size={24}
         name={focused ? name : `${name}-outline`}
-        color={focused ? '#ea580c' : '#6b7280'} // Orange/Dark Yellow for active, Gray for inactive
+        color={focused ? '#fbbf24' : '#9ca3af'} // Yellow active, Gray inactive
       />
       <Text style={{
         fontSize: 10,
         fontWeight: focused ? '700' : '500',
-        color: focused ? '#ea580c' : '#6b7280',
+        color: focused ? '#fbbf24' : '#9ca3af',
         marginTop: 4
       }}>
         {label}
@@ -44,8 +45,8 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#ea580c',
-        tabBarInactiveTintColor: '#6b7280',
+        tabBarActiveTintColor: '#fbbf24',
+        tabBarInactiveTintColor: '#9ca3af',
         headerShown: false,
         tabBarShowLabel: false,
         tabBarStyle: {
@@ -55,17 +56,25 @@ export default function TabLayout() {
           right: 16,
           height: 64,
           borderRadius: 32,
-          backgroundColor: '#ffffff', // White background
+          backgroundColor: isAndroid ? 'rgba(20, 20, 20, 0.96)' : 'transparent', // Dark background
           borderTopWidth: 0,
-          elevation: 5, // Subtle shadow
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
+          elevation: 0,
           paddingTop: 0,
           alignItems: 'center',
           justifyContent: 'center',
         },
+        tabBarBackground: () => (
+          isAndroid ? null : (
+            <BlurView
+              intensity={80}
+              style={[
+                StyleSheet.absoluteFill,
+                { borderRadius: 32, overflow: 'hidden', backgroundColor: 'rgba(10, 10, 10, 0.8)' }
+              ]}
+              tint="dark"
+            />
+          )
+        ),
       }}>
       <Tabs.Screen
         name="index"
