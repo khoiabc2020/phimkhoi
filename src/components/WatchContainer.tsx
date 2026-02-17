@@ -14,6 +14,13 @@ interface WatchContainerProps {
     episodes: any[];
     initialProgress: number;
     movieData: any;
+}
+
+export default function WatchContainer({
+    movie,
+    currentEpisode,
+    episodes,
+    initialProgress,
     movieData,
 }: WatchContainerProps) {
     const [isTheaterMode, setIsTheaterMode] = useState(false);
