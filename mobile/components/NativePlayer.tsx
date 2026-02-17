@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, ActivityIndicator, Dimensions, Modal, TouchableOpacity, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator, Dimensions, Modal, TouchableOpacity, FlatList } from 'react-native';
 import { Video, ResizeMode, AVPlaybackStatus } from 'expo-av';
 import { Ionicons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
@@ -18,9 +18,19 @@ interface NativePlayerProps {
     onClose: () => void;
     onNext?: () => void;
     onProgress?: (position: number, duration: number) => void;
+    // New Props for Selection
+    episodeList?: any[];
+    serverList?: string[];
+    currentServerIndex?: number;
+    currentEpisodeSlug?: string;
+    onEpisodeChange?: (slug: string) => void;
+    onServerChange?: (index: number) => void;
 }
 
-export default function NativePlayer({ url, title, episode, onClose, onNext, onProgress, slug, episodeSlug, token }: NativePlayerProps & { slug?: string, episodeSlug?: string, token?: string }) {
+export default function NativePlayer({
+    url, title, episode, onClose, onNext, onProgress,
+    episodeList = [], serverList = [], currentServerIndex = 0, currentEpisodeSlug, onEpisodeChange, onServerChange
+}: NativePlayerProps) {
     useKeepAwake();
     const video = useRef<Video>(null);
     const [videoSource, setVideoSource] = useState({ uri: url });
@@ -28,7 +38,11 @@ export default function NativePlayer({ url, title, episode, onClose, onNext, onP
     const [showControls, setShowControls] = useState(true);
     const [resizeMode, setResizeMode] = useState(ResizeMode.CONTAIN);
     const controlTimeout = useRef<any>(null);
-    const [settingsVisible, setSettingsVisible] = useState(false);
+
+    // Modals
+    const [showEpisodes, setShowEpisodes] = useState(false);
+    const [showServers, setShowServers] = useState(false);
+
     const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
     const lastProgressUpdate = useRef(0);
     const initialSeekDone = useRef(false);
@@ -58,7 +72,7 @@ export default function NativePlayer({ url, title, episode, onClose, onNext, onP
 
     const resetControlsTimer = () => {
         if (controlTimeout.current) clearTimeout(controlTimeout.current);
-        if (showControls && !settingsVisible) {
+        if (showControls) {
             controlTimeout.current = setTimeout(() => {
                 setShowControls(false);
             }, 4000);
@@ -138,10 +152,10 @@ export default function NativePlayer({ url, title, episode, onClose, onNext, onP
         if (state !== State.ACTIVE) return;
 
         const now = Date.now();
-        const delta = -translationY / 5000;
+        const delta = -translationY / 3000;
 
         if (x < width / 2) {
-            if (now - lastBrightnessUpdate.current > 50) {
+            if (now - lastBrightnessUpdate.current > 20) {
                 let newBrightness = brightness + delta;
                 newBrightness = Math.max(0, Math.min(1, newBrightness));
                 setBrightness(newBrightness);
@@ -151,7 +165,7 @@ export default function NativePlayer({ url, title, episode, onClose, onNext, onP
                 setTimeout(() => setShowBrightnessSlider(false), 1500);
             }
         } else {
-            if (now - lastVolumeUpdate.current > 50) {
+            if (now - lastVolumeUpdate.current > 20) {
                 let newVolume = volume + delta;
                 newVolume = Math.max(0, Math.min(1, newVolume));
                 setVolume(newVolume);
@@ -192,145 +206,219 @@ export default function NativePlayer({ url, title, episode, onClose, onNext, onP
 
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
-            <PanGestureHandler onGestureEvent={onPanGestureEvent}>
-                <View style={styles.container}>
-                    <Pressable style={StyleSheet.absoluteFill} onPress={toggleControls}>
-                        <Video
-                            ref={video}
-                            style={styles.video}
-                            source={videoSource}
-                            useNativeControls={false}
-                            resizeMode={resizeMode}
-                            onPlaybackStatusUpdate={onPlaybackStatusUpdate}
-                            onError={handleVideoError}
-                            shouldPlay={true}
-                        />
-                    </Pressable>
+            <View style={styles.container}>
+                <Video
+                    ref={video}
+                    style={StyleSheet.absoluteFill}
+                    source={videoSource}
+                    useNativeControls={false}
+                    resizeMode={resizeMode}
+                    onPlaybackStatusUpdate={onPlaybackStatusUpdate}
+                    onError={handleVideoError}
+                    shouldPlay={true}
+                />
 
-                    {/* Controls Overlay */}
-                    {showControls && (
-                        <View style={styles.overlay} pointerEvents="box-none">
-                            <Pressable style={StyleSheet.absoluteFill} onPress={toggleControls} />
+                {/* Gesture Handler Layer - Exclude bottom area to prevent slider conflict */}
+                <PanGestureHandler onGestureEvent={onPanGestureEvent} activeOffsetX={[-10, 10]} activeOffsetY={[-10, 10]}>
+                    <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 100 }}>
+                        <Pressable style={StyleSheet.absoluteFill} onPress={toggleControls} />
+                    </View>
+                </PanGestureHandler>
 
-                            {/* Volume/Brightness Sliders */}
-                            {showBrightnessSlider && (
-                                <View style={styles.gestureFeedbackLeft}>
-                                    <Ionicons name="sunny" size={24} color="white" />
-                                    <View style={styles.gestureBarContainer}>
-                                        <View style={[styles.gestureBarFill, { height: `${brightness * 100}%` }]} />
-                                    </View>
+                {/* Full screen pressable for bottom area to toggle controls without gesture actions */}
+                <Pressable style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 100 }} onPress={toggleControls} />
+
+                {/* Controls Overlay - Sits on top of Gesture Handler */}
+                {showControls && (
+                    <View style={styles.overlay} pointerEvents="box-none">
+
+                        {/* Volume/Brightness Sliders (Visual Feedback) */}
+                        {showBrightnessSlider && (
+                            <View style={styles.gestureFeedbackLeft}>
+                                <Ionicons name="sunny" size={24} color="white" />
+                                <View style={styles.gestureBarContainer}>
+                                    <View style={[styles.gestureBarFill, { height: `${brightness * 100}%` }]} />
                                 </View>
-                            )}
+                            </View>
+                        )}
 
-                            {showVolumeSlider && (
-                                <View style={styles.gestureFeedbackRight}>
-                                    <Ionicons name="volume-high" size={24} color="white" />
-                                    <View style={styles.gestureBarContainer}>
-                                        <View style={[styles.gestureBarFill, { height: `${volume * 100}%` }]} />
-                                    </View>
+                        {showVolumeSlider && (
+                            <View style={styles.gestureFeedbackRight}>
+                                <Ionicons name="volume-high" size={24} color="white" />
+                                <View style={styles.gestureBarContainer}>
+                                    <View style={[styles.gestureBarFill, { height: `${volume * 100}%` }]} />
                                 </View>
-                            )}
+                            </View>
+                        )}
 
-                            {/* Header */}
-                            <LinearGradient colors={['rgba(0,0,0,0.8)', 'transparent']} style={styles.header}>
-                                <TouchableOpacity onPress={onClose} style={styles.backBtn}>
-                                    <Ionicons name="arrow-back" size={28} color="white" />
+                        {/* Header */}
+                        <LinearGradient colors={['rgba(0,0,0,0.8)', 'transparent']} style={styles.header}>
+                            <TouchableOpacity onPress={onClose} style={styles.backBtn}>
+                                <Ionicons name="arrow-back" size={28} color="white" />
+                            </TouchableOpacity>
+                            <View style={{ flex: 1 }}>
+                                <Text style={styles.videoTitle} numberOfLines={1}>{title}</Text>
+                                {episode && <Text style={styles.subTitle}>{episode}</Text>}
+                            </View>
+                            {/* Top Right Actions */}
+                            <View style={{ flexDirection: 'row', gap: 20, alignItems: 'center' }}>
+                                <TouchableOpacity>
+                                    <Ionicons name="flag-outline" size={24} color="white" />
                                 </TouchableOpacity>
-                                <View style={{ flex: 1 }}>
-                                    <Text style={styles.videoTitle} numberOfLines={1}>{title}</Text>
-                                    {episode && <Text style={styles.subTitle}>{episode}</Text>}
-                                </View>
-                                {/* Top Right Actions */}
-                                <View style={{ flexDirection: 'row', gap: 20, alignItems: 'center' }}>
-                                    <TouchableOpacity>
-                                        <Ionicons name="flag-outline" size={24} color="white" />
-                                    </TouchableOpacity>
-                                    <TouchableOpacity>
-                                        <Ionicons name="settings-outline" size={24} color="white" />
-                                    </TouchableOpacity>
-                                </View>
-                            </LinearGradient>
-
-                            {/* Center Controls (Netflix Style: Minimal Circle) */}
-                            <View style={styles.centerControls} pointerEvents="box-none">
-                                <TouchableOpacity onPress={() => handleSkip(-10000)} style={styles.skipBtn}>
-                                    <View style={styles.skipIconBg}>
-                                        <Ionicons name="refresh-outline" size={24} color="white" style={{ transform: [{ scaleX: -1 }] }} />
-                                        <Text style={styles.skipTextInside}>10</Text>
-                                    </View>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity onPress={handlePlayPause} style={styles.playPauseBtn}>
-                                    <Ionicons
-                                        name={status.isLoaded && status.isPlaying ? "pause" : "play"}
-                                        size={45} // Slightly larger
-                                        color="black" // Black icon on white circle
-                                        style={{ marginLeft: status.isLoaded && status.isPlaying ? 0 : 4 }}
-                                    />
-                                </TouchableOpacity>
-
-                                <TouchableOpacity onPress={() => handleSkip(10000)} style={styles.skipBtn}>
-                                    <View style={styles.skipIconBg}>
-                                        <Ionicons name="refresh-outline" size={24} color="white" />
-                                        <Text style={styles.skipTextInside}>10</Text>
-                                    </View>
+                                <TouchableOpacity>
+                                    <Ionicons name="settings-outline" size={24} color="white" />
                                 </TouchableOpacity>
                             </View>
+                        </LinearGradient>
 
-                            {/* Footer (Slider + Bottom Actions) */}
-                            <LinearGradient colors={['transparent', 'rgba(0,0,0,0.9)']} style={styles.footer}>
-                                {/* Seek Bar */}
-                                <View style={styles.sliderContainer}>
-                                    <Text style={styles.timeText}>{formatTime(status.isLoaded ? status.positionMillis : 0)}</Text>
-                                    <Slider
-                                        style={styles.slider}
-                                        minimumValue={0}
-                                        maximumValue={status.isLoaded ? status.durationMillis : 1}
-                                        value={sliderValue}
-                                        onSlidingStart={handleSlidingStart}
-                                        onSlidingComplete={handleSlidingComplete}
-                                        minimumTrackTintColor="#e50914"
-                                        maximumTrackTintColor="rgba(255,255,255,0.4)"
-                                        thumbTintColor="#e50914"
-                                        thumbStyle={{ width: 15, height: 15 }} // Smaller thumb
-                                    />
-                                    <Text style={styles.timeText}>{formatTime(status.isLoaded ? status.durationMillis : 0)}</Text>
+                        {/* Center Controls (Netflix Style: Minimal Circle) */}
+                        <View style={styles.centerControls} pointerEvents="box-none">
+                            <TouchableOpacity onPress={() => handleSkip(-10000)} style={styles.skipBtn}>
+                                <View style={styles.skipIconBg}>
+                                    <Ionicons name="refresh-outline" size={24} color="white" style={{ transform: [{ scaleX: -1 }] }} />
+                                    <Text style={styles.skipTextInside}>10</Text>
                                 </View>
+                            </TouchableOpacity>
 
-                                {/* Bottom Action Bar */}
-                                <View style={styles.bottomActions}>
-                                    <TouchableOpacity style={styles.actionItem}>
-                                        <Ionicons name="albums-outline" size={24} color="white" />
-                                        <Text style={styles.actionText}>DS Tập</Text>
-                                    </TouchableOpacity>
+                            <TouchableOpacity onPress={handlePlayPause} style={styles.playPauseBtn}>
+                                <Ionicons
+                                    name={status.isLoaded && status.isPlaying ? "pause" : "play"}
+                                    size={45} // Slightly larger
+                                    color="black" // Black icon on white circle
+                                    style={{ marginLeft: status.isLoaded && status.isPlaying ? 0 : 4 }}
+                                />
+                            </TouchableOpacity>
 
-                                    <TouchableOpacity style={styles.actionItem} onPress={() => {
-                                        const speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
-                                        const currentIdx = speeds.indexOf(playbackSpeed);
-                                        const nextSpeed = speeds[(currentIdx + 1) % speeds.length];
-                                        handleSpeedChange(nextSpeed);
-                                    }}>
-                                        <Ionicons name="speedometer-outline" size={24} color="white" />
-                                        <Text style={styles.actionText}>Tốc độ ({playbackSpeed}x)</Text>
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity style={styles.actionItem} onPress={handleResizeMode}>
-                                        <Ionicons name={resizeMode === ResizeMode.COVER ? "contract-outline" : "expand-outline"} size={24} color="white" />
-                                        <Text style={styles.actionText}>{resizeMode === ResizeMode.COVER ? "Vừa màn" : "Tràn màn"}</Text>
-                                    </TouchableOpacity>
-
-                                    {onNext && (
-                                        <TouchableOpacity onPress={onNext} style={styles.nextEpBtn}>
-                                            <Text style={styles.nextEpText}>Tập tiếp</Text>
-                                            <Ionicons name="play-skip-forward-outline" size={20} color="black" />
-                                        </TouchableOpacity>
-                                    )}
+                            <TouchableOpacity onPress={() => handleSkip(10000)} style={styles.skipBtn}>
+                                <View style={styles.skipIconBg}>
+                                    <Ionicons name="refresh-outline" size={24} color="white" />
+                                    <Text style={styles.skipTextInside}>10</Text>
                                 </View>
-                            </LinearGradient>
+                            </TouchableOpacity>
                         </View>
-                    )}
+
+                        {/* Footer (Slider + Bottom Actions) */}
+                        <LinearGradient colors={['transparent', 'rgba(0,0,0,0.9)']} style={styles.footer}>
+                            {/* Seek Bar */}
+                            <View style={styles.sliderContainer}>
+                                <Text style={styles.timeText}>{formatTime(status.isLoaded ? status.positionMillis : 0)}</Text>
+                                <Slider
+                                    style={styles.slider}
+                                    minimumValue={0}
+                                    maximumValue={status.isLoaded ? status.durationMillis : 1}
+                                    value={sliderValue}
+                                    onSlidingStart={handleSlidingStart}
+                                    onSlidingComplete={handleSlidingComplete}
+                                    minimumTrackTintColor="#e50914"
+                                    maximumTrackTintColor="rgba(255,255,255,0.4)"
+                                    thumbTintColor="#e50914"
+
+                                />
+                                <Text style={styles.timeText}>{formatTime(status.isLoaded ? status.durationMillis : 0)}</Text>
+                            </View>
+
+                            {/* Bottom Action Bar */}
+                            <View style={styles.bottomActions}>
+                                <TouchableOpacity onPress={() => setShowEpisodes(true)} style={styles.actionItem}>
+                                    <Ionicons name="albums-outline" size={24} color="white" />
+                                    <Text style={styles.actionText}>DS Tập</Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity style={styles.actionItem} onPress={() => setShowServers(true)}>
+                                    <Ionicons name="server-outline" size={24} color="white" />
+                                    <Text style={styles.actionText}>Server</Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity style={styles.actionItem} onPress={() => {
+                                    const speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
+                                    const currentIdx = speeds.indexOf(playbackSpeed);
+                                    const nextSpeed = speeds[(currentIdx + 1) % speeds.length];
+                                    handleSpeedChange(nextSpeed);
+                                }}>
+                                    <Ionicons name="speedometer-outline" size={24} color="white" />
+                                    <Text style={styles.actionText}>Tốc độ ({playbackSpeed}x)</Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity style={styles.actionItem} onPress={handleResizeMode}>
+                                    <Ionicons name={resizeMode === ResizeMode.COVER ? "contract-outline" : "expand-outline"} size={24} color="white" />
+                                    <Text style={styles.actionText}>{resizeMode === ResizeMode.COVER ? "Vừa màn" : "Tràn màn"}</Text>
+                                </TouchableOpacity>
+
+                                {onNext && (
+                                    <TouchableOpacity onPress={onNext} style={styles.nextEpBtn}>
+                                        <Text style={styles.nextEpText}>Tập tiếp</Text>
+                                        <Ionicons name="play-skip-forward-outline" size={20} color="black" />
+                                    </TouchableOpacity>
+                                )}
+                            </View>
+                        </LinearGradient>
+                    </View>
+                )}
+            </View>
+
+            {/* Episode Selector Modal */}
+            <Modal animationType="slide" transparent={true} visible={showEpisodes} onRequestClose={() => setShowEpisodes(false)}>
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <View style={styles.modalHeader}>
+                            <Text style={styles.modalTitle}>Chọn Tập</Text>
+                            <TouchableOpacity onPress={() => setShowEpisodes(false)}>
+                                <Ionicons name="close" size={24} color="white" />
+                            </TouchableOpacity>
+                        </View>
+                        <FlatList
+                            data={episodeList}
+                            keyExtractor={(item) => item.slug}
+                            numColumns={4}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity
+                                    style={[styles.epBtn, item.slug === currentEpisodeSlug && styles.activeEpBtn]}
+                                    onPress={() => {
+                                        onEpisodeChange?.(item.slug);
+                                        setShowEpisodes(false);
+                                    }}
+                                >
+                                    <Text style={[styles.epText, item.slug === currentEpisodeSlug && styles.activeEpText]}>
+                                        {item.name}
+                                    </Text>
+                                </TouchableOpacity>
+                            )}
+                            contentContainerStyle={{ padding: 10 }}
+                        />
+                    </View>
                 </View>
-            </PanGestureHandler>
+            </Modal>
+
+            {/* Server Selector Modal */}
+            <Modal animationType="fade" transparent={true} visible={showServers} onRequestClose={() => setShowServers(false)}>
+                <View style={styles.modalOverlay}>
+                    <View style={[styles.modalContent, { width: '50%', alignSelf: 'center' }]}>
+                        <View style={styles.modalHeader}>
+                            <Text style={styles.modalTitle}>Chọn Server</Text>
+                            <TouchableOpacity onPress={() => setShowServers(false)}>
+                                <Ionicons name="close" size={24} color="white" />
+                            </TouchableOpacity>
+                        </View>
+                        <View style={{ padding: 10 }}>
+                            {serverList.map((server, index) => (
+                                <TouchableOpacity
+                                    key={index}
+                                    style={[styles.serverBtn, index === currentServerIndex && styles.activeServerBtn]}
+                                    onPress={() => {
+                                        onServerChange?.(index);
+                                        setShowServers(false);
+                                    }}
+                                >
+                                    <Text style={[styles.serverText, index === currentServerIndex && styles.activeServerText]}>
+                                        {server}
+                                    </Text>
+                                    {index === currentServerIndex && <Ionicons name="checkmark" size={20} color="black" />}
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </GestureHandlerRootView>
     );
 }
@@ -350,7 +438,7 @@ const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: 'black' },
     video: { width: '100%', height: '100%' },
     overlay: { ...StyleSheet.absoluteFillObject, justifyContent: 'space-between', zIndex: 1 },
-    header: { flexDirection: 'row', alignItems: 'center', padding: 20, paddingTop: 50 }, // Increased padding for notch
+    header: { flexDirection: 'row', alignItems: 'center', padding: 20, paddingTop: 30 }, // Reduced padding as requested
     backBtn: { padding: 8, marginRight: 10 },
     videoTitle: { color: 'white', fontSize: 16, fontWeight: 'bold' },
     subTitle: { color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: '600' },
@@ -392,5 +480,19 @@ const styles = StyleSheet.create({
     gestureFeedbackRight: { position: 'absolute', right: 40, top: '30%', height: 150, width: 40, backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 20, alignItems: 'center', justifyContent: 'center', zIndex: 20, paddingVertical: 10 },
     gestureBarContainer: { flex: 1, width: 6, backgroundColor: 'rgba(255,255,255,0.3)', borderRadius: 3, marginTop: 10, overflow: 'hidden', alignItems: 'center', justifyContent: 'flex-end' },
     gestureBarFill: { width: '100%', backgroundColor: '#fbbf24', borderRadius: 3 },
+
+    // Modals
+    modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+    modalContent: { width: '80%', maxHeight: '80%', backgroundColor: '#1a1a1a', borderRadius: 12, padding: 16 },
+    modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, borderBottomWidth: 1, borderBottomColor: '#333', paddingBottom: 12 },
+    modalTitle: { color: 'white', fontSize: 18, fontWeight: 'bold' },
+    epBtn: { width: '23%', aspectRatio: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#333', borderRadius: 8, margin: '1%' },
+    activeEpBtn: { backgroundColor: '#fbbf24' },
+    epText: { color: 'white', fontWeight: 'bold' },
+    activeEpText: { color: 'black' },
+    serverBtn: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: '#333', borderRadius: 8, marginBottom: 10 },
+    activeServerBtn: { backgroundColor: '#fbbf24' },
+    serverText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
+    activeServerText: { color: 'black' },
 });
 

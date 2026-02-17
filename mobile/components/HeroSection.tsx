@@ -4,13 +4,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { Link } from 'expo-router';
 import Carousel from 'react-native-reanimated-carousel';
 import { Movie, getImageUrl } from '@/services/api';
-import { BlurView } from 'expo-blur';
 import { useState } from 'react';
 
 const { width, height } = Dimensions.get('window');
-const ITEM_WIDTH = width * 0.72;
+const ITEM_WIDTH = width * 0.65; // Matches the reference card width
 const ITEM_HEIGHT = ITEM_WIDTH * 1.5;
-const SPACER = (width - ITEM_WIDTH) / 2;
 
 interface HeroSectionProps {
     movies: Movie[];
@@ -24,124 +22,112 @@ export default function HeroSection({ movies }: HeroSectionProps) {
     const activeMovie = movies[activeIndex];
 
     return (
-        <View style={{ height: height * 0.7, position: 'relative' }}>
-            {/* Background Blur (Subtle) */}
+        <View style={styles.container}>
+            {/* Dynamic Background */}
             <View style={StyleSheet.absoluteFill}>
                 <Image
                     source={{ uri: getImageUrl(activeMovie?.poster_url || activeMovie?.thumb_url) }}
                     style={StyleSheet.absoluteFill}
-                    blurRadius={40} // Increased blur for softer background
+                    blurRadius={30}
+                    resizeMode="cover"
                 />
-                <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.3)' }} />
+                <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.5)' }} />
                 <LinearGradient
-                    colors={['transparent', 'rgba(0,0,0,0.8)', '#000']}
+                    colors={['transparent', 'rgba(17, 24, 39, 0.8)', '#111827']}
                     style={StyleSheet.absoluteFill}
-                    locations={[0.5, 0.8, 1]}
+                    locations={[0.4, 0.7, 1]}
                 />
             </View>
 
-            {/* Vertical Carousel - Centered Poster */}
-            <View style={{ marginTop: 60, alignItems: 'center' }}>
-                <Text style={{
-                    color: '#fbbf24',
-                    fontSize: 14,
-                    fontWeight: 'bold',
-                    textTransform: 'uppercase',
-                    letterSpacing: 2,
-                    marginBottom: 10,
-                    textShadowColor: 'rgba(0,0,0,0.8)',
-                    textShadowOffset: { width: 0, height: 1 },
-                    textShadowRadius: 2
-                }}>
-                    Phim Hot Hôm Nay
-                </Text>
-                <Carousel
-                    loop={true}
-                    width={width}
-                    height={ITEM_HEIGHT}
-                    autoPlay={false}
-                    data={movies}
-                    mode="parallax"
-                    modeConfig={{
-                        parallaxScrollingScale: 0.85,
-                        parallaxScrollingOffset: 60,
-                    }}
-                    onSnapToItem={(index) => setActiveIndex(index)}
-                    renderItem={({ item }) => (
-                        <Link href={`/movie/${item.slug}`} asChild>
-                            <Pressable style={styles.posterContainer}>
-                                <Image
-                                    source={{ uri: getImageUrl(item.poster_url || item.thumb_url) }}
-                                    style={styles.posterImage}
-                                    resizeMode="cover"
-                                />
-                                {/* No overlay on the poster itself - Let it shine */}
-                            </Pressable>
-                        </Link>
-                    )}
-                />
-            </View>
+            {/* Header Content padding */}
+            <View style={{ marginTop: 100 }} />
 
-            {/* Content Info (Clean & Elegant) */}
-            <View style={{ alignItems: 'center', paddingHorizontal: 24, marginTop: 24 }}>
-                {/* Title */}
-                <Text style={styles.title} numberOfLines={2}>
+            {/* Carousel */}
+            <Carousel
+                loop={true}
+                width={width}
+                height={ITEM_HEIGHT}
+                autoPlay={false}
+                data={movies}
+                mode="parallax"
+                modeConfig={{
+                    parallaxScrollingScale: 0.9,
+                    parallaxScrollingOffset: 50,
+                }}
+                onSnapToItem={(index) => setActiveIndex(index)}
+                renderItem={({ item }) => (
+                    <Link href={`/movie/${item.slug}`} asChild>
+                        <Pressable style={styles.posterWrapper}>
+                            <Image
+                                source={{ uri: getImageUrl(item.poster_url || item.thumb_url) }}
+                                style={styles.posterImage}
+                                resizeMode="cover"
+                            />
+                        </Pressable>
+                    </Link>
+                )}
+            />
+
+            {/* Movie Info Section */}
+            <View style={styles.infoContainer}>
+                <Text style={styles.title} numberOfLines={1}>
                     {activeMovie?.name}
                 </Text>
-                <Text style={styles.subtitle}>
+                <Text style={styles.subtitle} numberOfLines={1}>
                     {activeMovie?.origin_name}
                 </Text>
 
-                {/* Buttons Row */}
-                <View style={{ flexDirection: 'row', gap: 12, marginTop: 16, width: '100%' }}>
-                    <Link href={`/movie/${activeMovie?.slug}`} asChild>
+                {/* Buttons */}
+                <View style={styles.buttonRow}>
+                    <Link href={`/player/${activeMovie?.slug}`} asChild>
                         <Pressable style={styles.playButton}>
-                            <Ionicons name="play" size={22} color="black" />
+                            <Ionicons name="play" size={20} color="black" />
                             <Text style={styles.playButtonText}>Xem Phim</Text>
                         </Pressable>
                     </Link>
+
                     <Link href={`/movie/${activeMovie?.slug}`} asChild>
                         <Pressable style={styles.infoButton}>
-                            <Ionicons name="information-circle-outline" size={24} color="black" />
+                            <Ionicons name="information-circle" size={20} color="black" />
                             <Text style={styles.infoButtonText}>Thông tin</Text>
                         </Pressable>
                     </Link>
                 </View>
 
-                {/* Metadata Tags (Minimalist) */}
-                <View style={styles.metaContainer}>
+                {/* Meta Tags */}
+                <View style={styles.metaRow}>
                     <View style={styles.imdbTag}>
                         <Text style={styles.imdbText}>IMDb 8.5</Text>
                     </View>
-                    <View style={styles.tag}>
-                        <Text style={styles.tagText}>T16</Text>
+                    <View style={styles.metaTag}>
+                        <Text style={styles.metaText}>T16</Text>
                     </View>
-                    <View style={styles.tag}>
-                        <Text style={styles.tagText}>{activeMovie?.year}</Text>
+                    <View style={styles.metaTag}>
+                        <Text style={styles.metaText}>{activeMovie?.year}</Text>
                     </View>
-                    <View style={styles.tag}>
-                        <Text style={styles.tagText}>{activeMovie?.quality?.includes('FHD') ? 'FHD' : activeMovie?.quality}</Text>
+                    <View style={styles.metaTag}>
+                        <Text style={styles.metaText}>{activeMovie?.quality?.includes('FHD') ? 'FHD' : activeMovie?.quality}</Text>
                     </View>
                     {activeMovie?.episode_current && (
-                        <View style={styles.tag}>
-                            <Text style={styles.tagText}>{activeMovie?.episode_current}</Text>
+                        <View style={styles.metaTag}>
+                            <Text style={styles.metaText}>{activeMovie?.episode_current}</Text>
                         </View>
                     )}
                 </View>
 
-                {/* Description Preview */}
-                <Text style={styles.description} numberOfLines={2}>
+                {/* Description */}
+                <Text style={styles.description} numberOfLines={3}>
                     {activeMovie?.content?.replace(/<[^>]*>/g, '')}
                 </Text>
 
-                {/* Dots */}
-                <View style={styles.dotsContainer}>
+                {/* Dots Indicator */}
+                <View style={styles.dotsRow}>
                     {movies.map((_, i) => (
                         <View
                             key={i}
                             style={[
                                 styles.dot,
-                                { backgroundColor: i === activeIndex ? '#fff' : 'rgba(255,255,255,0.2)' }
+                                { backgroundColor: i === activeIndex ? '#fff' : 'rgba(255,255,255,0.3)', width: i === activeIndex ? 24 : 6 }
                             ]}
                         />
                     ))}
@@ -152,127 +138,136 @@ export default function HeroSection({ movies }: HeroSectionProps) {
 }
 
 const styles = StyleSheet.create({
-    posterContainer: {
-        flex: 1,
-        width: ITEM_WIDTH,
-        alignSelf: 'center',
-        borderRadius: 18,
+    container: {
+        height: height * 0.85, // Takes up most of the screen
+        position: 'relative',
+    },
+    posterWrapper: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 16,
         overflow: 'hidden',
-        // Shadow for "floating" effect
-        shadowColor: '#000',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.2)',
+        backgroundColor: '#1f2937',
+        shadowColor: "#000",
         shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.6,
+        shadowOpacity: 0.5,
         shadowRadius: 15,
         elevation: 10,
-        backgroundColor: '#1a1a1a',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)'
     },
     posterImage: {
         width: '100%',
         height: '100%',
     },
+    infoContainer: {
+        paddingHorizontal: 20,
+        alignItems: 'center',
+        marginTop: 20,
+        width: '100%',
+    },
     title: {
-        color: '#fff',
-        fontSize: 26,
-        fontWeight: '900', // Extra bold
+        color: 'white',
+        fontSize: 28,
+        fontWeight: 'bold',
         textAlign: 'center',
-        // fontFamily: 'serif', // Removed serif for modern rounded look
-        textShadowColor: 'rgba(0,0,0,0.5)',
+        marginBottom: 4,
+        textShadowColor: 'rgba(0,0,0,0.7)',
         textShadowOffset: { width: 0, height: 2 },
         textShadowRadius: 4,
-        letterSpacing: 0.5, // Added letter spacing
     },
     subtitle: {
-        color: 'rgba(255,255,255,0.7)',
-        fontSize: 15,
+        color: 'rgba(255,255,255,0.6)',
+        fontSize: 14,
         textAlign: 'center',
-        marginTop: 4,
-        fontFamily: 'serif'
+        marginBottom: 20,
+    },
+    buttonRow: {
+        flexDirection: 'row',
+        gap: 15,
+        marginBottom: 20,
+        width: '100%',
+        justifyContent: 'center',
     },
     playButton: {
-        flex: 1,
-        backgroundColor: '#fbbf24',
-        borderRadius: 12,
-        paddingVertical: 14,
+        backgroundColor: '#fbbf24', // Amber-400
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 10,
         flexDirection: 'row',
-        justifyContent: 'center',
         alignItems: 'center',
-        shadowColor: '#fbbf24',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8
+        gap: 8,
+        minWidth: 140,
+        justifyContent: 'center',
     },
     playButtonText: {
         color: 'black',
         fontWeight: 'bold',
         fontSize: 16,
-        marginLeft: 8
     },
     infoButton: {
-        flex: 1,
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        paddingVertical: 14,
+        backgroundColor: 'white',
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 10,
         flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        minWidth: 140,
         justifyContent: 'center',
-        alignItems: 'center'
     },
     infoButtonText: {
         color: 'black',
         fontWeight: 'bold',
         fontSize: 16,
-        marginLeft: 8
     },
-    metaContainer: {
+    metaRow: {
         flexDirection: 'row',
         alignItems: 'center',
+        gap: 8,
+        marginBottom: 16,
         flexWrap: 'wrap',
         justifyContent: 'center',
-        gap: 8,
-        marginTop: 16
     },
     imdbTag: {
         backgroundColor: '#fbbf24',
-        paddingHorizontal: 6,
-        paddingVertical: 2,
+        paddingHorizontal: 8,
+        paddingVertical: 4,
         borderRadius: 4,
     },
     imdbText: {
         color: 'black',
         fontWeight: 'bold',
-        fontSize: 12
+        fontSize: 12,
     },
-    tag: {
-        backgroundColor: 'rgba(255,255,255,0.1)',
+    metaTag: {
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.5)',
         paddingHorizontal: 8,
         paddingVertical: 4,
-        borderRadius: 6,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.2)'
+        borderRadius: 4,
     },
-    tagText: {
-        color: '#e5e7eb',
+    metaText: {
+        color: 'white',
+        fontSize: 12,
         fontWeight: '600',
-        fontSize: 12
     },
     description: {
-        color: '#9ca3af',
+        color: 'rgba(255,255,255,0.7)',
         fontSize: 13,
         textAlign: 'center',
-        marginTop: 16,
-        lineHeight: 18,
-        paddingHorizontal: 10
+        lineHeight: 20,
+        marginBottom: 20,
+        paddingHorizontal: 10,
     },
-    dotsContainer: {
+    dotsRow: {
         flexDirection: 'row',
         gap: 6,
-        marginTop: 20
+        alignItems: 'center',
     },
     dot: {
-        width: 6,
         height: 6,
         borderRadius: 3,
-    }
+    },
 });
 

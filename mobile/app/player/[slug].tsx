@@ -19,6 +19,8 @@ export default function PlayerScreen() {
     const [movieTitle, setMovieTitle] = useState("");
     const [episodeTitle, setEpisodeTitle] = useState("");
     const [nextEpisodeSlug, setNextEpisodeSlug] = useState<string | null>(null);
+    const [episodes, setEpisodes] = useState<any[]>([]);
+    const [selectedServer, setSelectedServer] = useState(0);
 
     const { user, token, syncHistory } = useAuth();
 
@@ -38,18 +40,24 @@ export default function PlayerScreen() {
             if (data && data.episodes) {
                 setMovieTitle(data.movie?.name || "");
 
-                // Find episode
-                let episode;
-                let allEps: any[] = [];
+                // Store full episodes data
+                setEpisodes(data.episodes);
 
-                if (data.episodes.length > 0) {
-                    allEps = data.episodes.flatMap((s: any) => s.server_data);
-                }
+                let episode;
+                // Get episodes from SELECTED server
+                const currentServerData = data.episodes[selectedServer]?.server_data || [];
 
                 if (ep) {
-                    episode = allEps.find((e: any) => e.slug === ep);
+                    episode = currentServerData.find((e: any) => e.slug === ep);
+                    // If not found in current server (e.g. switched from link), maybe try searching all? 
+                    // But for now assume consistent navigation.
+                    if (!episode) {
+                        // Fallback: search in all servers and switch server index?
+                        // This logic is complex. Simplified: just use first if not found.
+                        episode = currentServerData[0];
+                    }
                 } else {
-                    episode = allEps[0];
+                    episode = currentServerData[0];
                 }
 
                 if (episode) {
@@ -68,9 +76,10 @@ export default function PlayerScreen() {
                     }
 
                     // Find next episode
-                    const currentIndex = allEps.findIndex((e: any) => e.slug === episode.slug);
-                    if (currentIndex !== -1 && currentIndex < allEps.length - 1) {
-                        setNextEpisodeSlug(allEps[currentIndex + 1].slug);
+                    // Find next episode in CURRENT server
+                    const currentIndex = currentServerData.findIndex((e: any) => e.slug === episode.slug);
+                    if (currentIndex !== -1 && currentIndex < currentServerData.length - 1) {
+                        setNextEpisodeSlug(currentServerData[currentIndex + 1].slug);
                     } else {
                         setNextEpisodeSlug(null);
                     }
@@ -79,7 +88,7 @@ export default function PlayerScreen() {
             setLoading(false);
         };
         fetchVideo();
-    }, [slug, ep]);
+    }, [slug, ep, selectedServer]);
 
     const handleProgress = async (currentTime: number, duration: number) => {
         if (!user || !token || !slug || !ep) return;
@@ -155,6 +164,30 @@ export default function PlayerScreen() {
                     onClose={handleClose}
                     onNext={nextEpisodeSlug ? handleNextEpisode : undefined}
                     onProgress={handleProgress}
+                    // New Props
+                    episodeList={episodes[selectedServer]?.server_data || []}
+                    serverList={episodes.map((s: any) => s.server_name)}
+                    currentServerIndex={selectedServer}
+                    currentEpisodeSlug={ep as string}
+                    onEpisodeChange={(newSlug) => {
+                        router.replace(`/player/${slug}?ep=${newSlug}`);
+                    }}
+                    onServerChange={(newServerIndex) => {
+                        setSelectedServer(newServerIndex);
+                        // Try to find same episode in new server, else first
+                        const currentEpName = episodeTitle; // Heuristic using name or index
+                        const newServerData = episodes[newServerIndex]?.server_data || [];
+                        // Simple matching by index or slug if possible, but slug might differ.
+                        // For now, default to first episode of new server if slug mismatch, 
+                        // OR try to match index.
+                        // Better: Find episode with same 'name'
+                        const sameEp = newServerData.find((e: any) => e.name === currentEpName);
+                        const targetEp = sameEp || newServerData[0];
+
+                        if (targetEp) {
+                            router.replace(`/player/${slug}?ep=${targetEp.slug}`);
+                        }
+                    }}
                 />
             ) : (
                 <>

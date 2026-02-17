@@ -4,16 +4,17 @@ import MovieRow from "@/components/MovieRow";
 import TopTrending from "@/components/TopTrending";
 import QuickNav from "@/components/QuickNav";
 import ContinueWatchingRow from "@/components/ContinueWatchingRow";
-import { getMoviesList, getTrendMovies } from "@/services/api";
+import TopicSection from "@/components/TopicSection";
+import TopicCloud from "@/components/TopicCloud";
+import { getMoviesList, getTrendMovies, getMoviesByCountry } from "@/services/api";
 
 // Revalidate every 60 seconds for real-time updates
 export const revalidate = 60;
 
 // Async Component for Row
-// Async Component for Row
-import { getMoviesByCategory, getMoviesByCountry } from "@/services/api";
+import { getMoviesByCategory } from "@/services/api";
 
-async function AsyncMovieRow({ title, type, slug, country, variant = 'sidebar' }: { title: string, type?: string, slug?: string, country?: string, variant?: 'default' | 'sidebar' }) {
+async function AsyncMovieRow({ title, type, slug, country, variant = 'default' }: { title: string, type?: string, slug?: string, country?: string, variant?: 'default' | 'sidebar' }) {
   let data: any = null;
   let viewAllSlug = "#";
 
@@ -37,11 +38,13 @@ async function AsyncMovieRow({ title, type, slug, country, variant = 'sidebar' }
 
 export default async function Home() {
   // Fetch data in parallel
-  const [phimBoData, phimLeData, trendTv, trendMovies] = await Promise.all([
+  const [phimBoData, phimLeData, trendTv, trendMovies, hanQuocData, trungQuocData] = await Promise.all([
     getMoviesList('phim-bo', { limit: 12 }),
     getMoviesList('phim-le', { limit: 12 }),
     getTrendMovies('tv'),    // Top Trending Series
-    getTrendMovies('movie')  // Top Trending Movies (for the new section)
+    getTrendMovies('movie'),  // Top Trending Movies
+    getMoviesByCountry('han-quoc', 1, 10),
+    getMoviesByCountry('trung-quoc', 1, 10)
   ]);
 
   // Interleave for Hero
@@ -56,7 +59,7 @@ export default async function Home() {
   // Top 20 for Hero
   const finalHeroData = heroMovies.slice(0, 20);
 
-  // Ensure we have 10 items for Top Trending by backfilling with latest if needed
+  // Ensure we have 10 items for Top Trending by backfilling
   const fillList = (source: any[], backup: any[], limit: number) => {
     const sourceIds = new Set(source.map(m => m._id));
     const filled = [...source];
@@ -79,9 +82,14 @@ export default async function Home() {
       {/* Hero Section */}
       <HeroSection movies={finalHeroData} />
 
-      <div className="container mx-auto px-4 md:px-12 mt-8 md:mt-16 relative z-20 pb-20">
+      {/* Interested Topics Section */}
+      <div className="relative z-20 -mt-10 md:-mt-20 lg:-mt-24 mb-8">
+        <TopicSection />
+      </div>
 
-        {/* Quick Navigation (Categories) - Optional: Move below Hero or keep here */}
+      <div className="container mx-auto px-4 md:px-12 relative z-20 pb-20">
+
+        {/* Quick Navigation (Categories) */}
         <div className="mb-8">
           <QuickNav />
         </div>
@@ -89,7 +97,7 @@ export default async function Home() {
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
 
           {/* MAIN CONTENT (Left - 9 cols) */}
-          <div className="xl:col-span-9 space-y-10">
+          <div className="xl:col-span-9 space-y-12">
 
             {/* Continue Watching */}
             <ContinueWatchingRow />
@@ -98,6 +106,15 @@ export default async function Home() {
             <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
               <AsyncMovieRow title="Phim Chiếu Rạp Mới" slug="phim-chieu-rap" />
             </Suspense>
+
+            {/* Country Specific Sections */}
+            {hanQuocData?.items?.length > 0 && (
+              <MovieRow title="Phim Hàn Quốc Mới" movies={hanQuocData.items} slug="/quoc-gia/han-quoc" />
+            )}
+
+            {trungQuocData?.items?.length > 0 && (
+              <MovieRow title="Phim Trung Quốc Mới" movies={trungQuocData.items} slug="/quoc-gia/trung-quoc" />
+            )}
 
             <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
               <AsyncMovieRow title="Phim Sắp Chiếu" type="phim-sap-chieu" />
@@ -138,6 +155,9 @@ export default async function Home() {
               slug="/danh-sach/phim-bo"
             />
 
+            {/* Genre Tags Cloud */}
+            <TopicCloud />
+
             {/* Top Trending - Phim Lẻ (Movies) */}
             <TopTrending
               title="Top Phim Lẻ"
@@ -148,35 +168,19 @@ export default async function Home() {
 
             {/* Phim Sắp Chiếu (Vertical List) */}
             <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-              <div className="bg-[#111] p-4 rounded-xl border border-white/5">
+              <div className="bg-[#111] p-4 rounded-xl border border-white/5 hidden xl:block">
                 <h3 className="text-[#fbbf24] font-bold text-lg mb-4 uppercase flex items-center gap-2">
                   <span className="w-1 h-5 bg-[#fbbf24] rounded-full text-transparent">.</span>
-                  Phim S sắp chiếu
+                  Phim sắp chiếu
                 </h3>
                 <div className="space-y-3">
-                  {/* Re-use AsyncMovieRow but we might need a specific 'sidebar' variant for rendering vertical list. 
-                                 For now, standard AsyncMovieRow renders a horizontal slider which might break layout in sidebar.
-                                 Let's stick to placing full width rows in main area and specific trending lists in sidebar.
-                             */}
-                  {/* Since AsyncMovieRow returns a MovieRow (slider), it's not suitable for Sidebar unless modified.
-                                 I'll leave 'Phim Sắp Chiếu' in the main column for now if I can't easily switch it to vertical.
-                              */}
+                  {/* Placeholder for sidebar content or ad */}
+                  <div className="text-gray-500 text-xs text-center py-4">
+                    Danh sách đang cập nhật...
+                  </div>
                 </div>
-                {/* Fallback simply putting Sắp Chiếu back to Main or hidden for now in sidebar until we have a SidebarRow component */}
               </div>
             </Suspense>
-
-            {/* Genre Tags Cloud (Static for visual density) */}
-            <div className="bg-[#111] p-5 rounded-xl border border-white/5">
-              <h3 className="text-white font-bold text-base mb-4 uppercase">Từ khóa hot</h3>
-              <div className="flex flex-wrap gap-2 text-xs text-gray-400">
-                {['Hành động', 'Tình cảm', 'Cổ trang', 'Kinh dị', 'Viễn tưởng', 'Hàn Quốc', 'Anime', 'Netflix'].map(tag => (
-                  <span key={tag} className="bg-white/5 hover:bg-[#fbbf24] hover:text-black px-3 py-1.5 rounded-full transition-colors cursor-pointer border border-white/5">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
 
           </div>
         </div>

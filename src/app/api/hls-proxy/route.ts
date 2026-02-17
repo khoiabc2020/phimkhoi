@@ -72,8 +72,16 @@ export async function GET(request: NextRequest) {
         const rewrittenContent = lines.map(line => {
             const trimmed = line.trim();
             if (trimmed && !trimmed.startsWith('#')) {
-                const absoluteUrl = trimmed.startsWith('http') ? trimmed : baseUrl + trimmed;
-                return `/api/hls-proxy?url=${encodeURIComponent(absoluteUrl)}`;
+                try {
+                    // Robust relative URL resolution
+                    // If trimmed is absolute, new URL(trimmed, url) returns trimmed
+                    // If trimmed is relative, it resolves against url (which is the manifest URL)
+                    const absoluteUrl = new URL(trimmed, url).toString();
+                    return `/api/hls-proxy?url=${encodeURIComponent(absoluteUrl)}`;
+                } catch (e) {
+                    console.error("Error resolving URL:", trimmed, e);
+                    return line; // Keep original if resolution fails
+                }
             }
             return line;
         }).join('\n');

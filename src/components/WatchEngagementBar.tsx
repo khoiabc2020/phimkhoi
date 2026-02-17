@@ -46,7 +46,6 @@ export default function WatchEngagementBar({ movie, isFavorite = false }: WatchE
     const iconBtn = "w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white transition-all active:scale-95";
 
     return (
-    return (
         <div className="flex flex-col w-full">
             {/* Control Bar (Black) */}
             <div className="flex flex-wrap items-center justify-between gap-y-3 py-3 px-4 bg-black border-b border-white/10 rounded-b-xl">
@@ -58,7 +57,6 @@ export default function WatchEngagementBar({ movie, isFavorite = false }: WatchE
                         initialIsFavorite={isFavorite}
                         size="sm"
                         className="!bg-transparent !border-0 text-gray-400 hover:text-[#fbbf24] flex items-center gap-2 !w-auto !h-auto !p-0"
-                        showText={true}
                     />
                     <button type="button" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-xs font-bold uppercase tracking-wide">
                         <Plus className="w-4 h-4" /> Thêm vào

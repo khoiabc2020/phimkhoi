@@ -105,6 +105,31 @@ export default function HLSPlayer({ url, poster, initialProgress = 0, movieData,
         return `${mm}:${ss}`;
     };
 
+    const [hasError, setHasError] = useState(false);
+
+    // ... existing refs
+
+    // ... existing useEffects
+
+    if (hasError) {
+        return (
+            <div className="flex flex-col items-center justify-center w-full h-full bg-zinc-900 text-gray-400 gap-4">
+                <div className="p-4 rounded-full bg-white/5">
+                    <VolumeX className="w-8 h-8 opacity-50" />
+                </div>
+                <div className="text-center px-4">
+                    <p className="mb-2 font-medium text-white">Không thể phát video này</p>
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="text-xs bg-[#fbbf24] text-black px-3 py-1.5 rounded-md font-bold hover:bg-[#f59e0b] transition-colors"
+                    >
+                        Tải lại trang
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div
             ref={containerRef}
@@ -131,7 +156,7 @@ export default function HLSPlayer({ url, poster, initialProgress = 0, movieData,
                 onEnded={() => setShowControls(true)}
                 onError={(e: any) => {
                     console.error("HLS Error", e);
-                    // Could add logic here to trigger fallback in parent
+                    setHasError(true);
                 }}
                 config={{
                     file: {
