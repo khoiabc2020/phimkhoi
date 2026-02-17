@@ -39,23 +39,69 @@ export default function ProfileScreen() {
     return (
       <View className="flex-1 bg-[#0a0a0a]">
         <StatusBar style="light" />
-        <SafeAreaView className="flex-1 justify-center items-center px-6">
-          <View className="items-center mb-8">
-            <View className="w-24 h-24 bg-gray-800 rounded-full items-center justify-center mb-4 border border-gray-700">
-              <Ionicons name="person" size={40} color="#6b7280" />
-            </View>
-            <Text className="text-white text-xl font-bold mb-2">Chưa đăng nhập</Text>
-            <Text className="text-gray-400 text-center text-sm px-8">
-              Đăng nhập để lưu phim, xem lịch sử và đồng bộ dữ liệu.
-            </Text>
-          </View>
+        <SafeAreaView className="flex-1">
+          <View className="px-5 pt-4 pb-2">
+            <Text className="text-white text-2xl font-bold mb-6">Tài khoản</Text>
 
-          <Pressable
-            onPress={() => router.push('/(auth)/login' as any)}
-            className="w-full bg-white py-3.5 rounded-full items-center mb-4"
-          >
-            <Text className="text-black font-bold text-base">Đăng nhập</Text>
-          </Pressable>
+            {/* Auth Buttons */}
+            <View className="flex-row gap-3 mb-8">
+              <Pressable
+                className="flex-1 bg-[#fbbf24] py-3.5 rounded-xl items-center justify-center"
+                onPress={() => router.push('/(auth)/login' as any)}
+              >
+                <View className="flex-row items-center gap-2">
+                  <Ionicons name="person" size={18} color="black" />
+                  <Text className="text-black font-bold text-base">Đăng nhập</Text>
+                </View>
+              </Pressable>
+
+              <Pressable
+                className="flex-1 bg-white py-3.5 rounded-xl items-center justify-center"
+                onPress={() => router.push('/(auth)/register' as any)}
+              >
+                <Text className="text-black font-bold text-base">Đăng ký</Text>
+              </Pressable>
+            </View>
+
+            {/* Menu List */}
+            <View>
+              <ProfileMenuItem
+                icon="time-outline"
+                label="Đang xem"
+                onPress={() => router.push('/history' as any)}
+              />
+              <ProfileMenuItem
+                icon="add-outline"
+                label="Danh sách phim của tôi"
+                onPress={() => router.push('/favorites' as any)}
+              />
+              <ProfileMenuItem
+                icon="heart"
+                label="Yêu thích"
+                onPress={() => router.push('/favorites' as any)}
+              />
+              <ProfileMenuItem
+                icon="tv-outline"
+                label="Đăng nhập SmartTV"
+                onPress={() => Alert.alert("Coming Soon", "Tính năng SmartTV đang phát triển")}
+              />
+              <ProfileMenuItem
+                icon="shield-checkmark-outline"
+                label="Hợp Đồng và Chính Sách"
+                onPress={() => Linking.openURL(webUrl)}
+              />
+              <ProfileMenuItem
+                icon="document-text-outline"
+                label="Chính sách bảo mật"
+                onPress={() => Linking.openURL(webUrl)}
+              />
+              <ProfileMenuItem
+                icon="chatbox-ellipses-outline"
+                label="Góp ý"
+                onPress={() => Linking.openURL(webUrl)}
+              />
+            </View>
+          </View>
         </SafeAreaView>
       </View>
     );

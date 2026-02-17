@@ -59,25 +59,31 @@ export default function TabLayout() {
         tabBarShowLabel: false,
         tabBarStyle: {
           position: 'absolute',
-          bottom: 20,
-          left: 16,
-          right: 16,
-          height: 64,
-          borderRadius: 32,
-          backgroundColor: isAndroid ? 'rgba(20, 20, 20, 0.96)' : 'transparent', // Dark background
+          bottom: 25,
+          left: 20,
+          right: 20,
+          height: 60,
+          borderRadius: 30,
+          backgroundColor: isAndroid ? 'rgba(15, 15, 15, 0.95)' : 'transparent', // Deep dark
           borderTopWidth: 0,
-          elevation: 0,
+          elevation: 0, // Remove shadow for cleaner look
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 10 },
+          shadowOpacity: 0.3,
+          shadowRadius: 20,
           paddingTop: 0,
           alignItems: 'center',
           justifyContent: 'center',
+          borderWidth: 1,
+          borderColor: 'rgba(255,255,255,0.1)', // Subtle border
         },
         tabBarBackground: () => (
           isAndroid ? null : (
             <BlurView
-              intensity={80}
+              intensity={90}
               style={[
                 StyleSheet.absoluteFill,
-                { borderRadius: 32, overflow: 'hidden', backgroundColor: 'rgba(10, 10, 10, 0.8)' }
+                { borderRadius: 30, overflow: 'hidden', backgroundColor: 'rgba(10, 10, 10, 0.7)' }
               ]}
               tint="dark"
             />

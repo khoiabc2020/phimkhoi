@@ -21,9 +21,8 @@ const MovieRow = memo(({ title, movies }: MovieRowProps) => {
             <View className="flex-row justify-between items-center px-4 mb-3">
                 <Text className="text-white text-lg font-bold">{title}</Text>
                 <Link href={`/list/${title === 'Phim lẻ' ? 'phim-le' : 'phim-bo'}`} asChild>
-                    <Pressable className="flex-row items-center">
-                        <Text className="text-[#fbbf24] text-xs font-semibold mr-1">Xem tất cả</Text>
-                        <Ionicons name="chevron-forward" size={16} color="#fbbf24" />
+                    <Pressable className="p-1">
+                        <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
                     </Pressable>
                 </Link>
             </View>

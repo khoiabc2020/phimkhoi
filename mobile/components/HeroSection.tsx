@@ -29,7 +29,7 @@ export default function HeroSection({ movies }: HeroSectionProps) {
             {/* Dynamic Background */}
             <View style={StyleSheet.absoluteFill}>
                 <Image
-                    source={{ uri: getImageUrl(activeMovie?.poster_url || activeMovie?.thumb_url) }}
+                    source={{ uri: getImageUrl(activeMovie?.thumb_url || activeMovie?.poster_url) }}
                     style={StyleSheet.absoluteFill}
                     blurRadius={30}
                     contentFit="cover"
@@ -43,43 +43,43 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                 />
             </View>
 
-            {/* Header Spacing  */}
-            <View style={{ marginTop: 100 }} />
+            {/* Header Spacing - Optimized to push Content Higher */}
+            <View style={{ marginTop: 50 }} />
 
             {/* Carousel */}
             <Carousel
                 loop={true}
-                width={width}
+                width={ITEM_WIDTH}
                 height={ITEM_HEIGHT}
                 autoPlay={false}
                 data={movies}
                 mode="parallax"
                 modeConfig={{
-                    parallaxScrollingScale: 0.85, // More "shrunken" inactive items
-                    parallaxScrollingOffset: 60,
+                    parallaxScrollingScale: 0.9,
+                    parallaxScrollingOffset: 40,
                 }}
+                style={{ width: width, justifyContent: 'center', alignItems: 'center' }}
                 onSnapToItem={(index) => setActiveIndex(index)}
                 renderItem={({ item, index }) => (
                     <Link href={`/movie/${item.slug}`} asChild>
                         <Pressable style={styles.posterWrapper}>
                             <Image
-                                source={{ uri: getImageUrl(item.poster_url || item.thumb_url) }}
+                                source={{ uri: getImageUrl(item.thumb_url || item.poster_url) }}
                                 style={styles.posterImage}
                                 contentFit="cover"
                                 transition={300}
                             />
-                            {/* Top 3 Rank Badge */}
+                            {/* Top 3 Rank Badge - Styled like Netflix/RoPhim */}
                             {index < 3 && (
                                 <View style={styles.rankBadge}>
                                     <Text style={[
                                         styles.rankText,
-                                        index === 0 ? { color: '#fbbf24' } : // Top 1 Gold
-                                            index === 1 ? { color: '#94a3b8' } : // Top 2 Silver
-                                                { color: '#b45309' } // Top 3 Bronze
+                                        index === 0 ? { color: '#fbbf24' } :
+                                            index === 1 ? { color: '#e2e8f0' } :
+                                                { color: '#b45309' }
                                     ]}>
                                         {index + 1}
                                     </Text>
-                                    <Text style={styles.topText}>TOP</Text>
                                 </View>
                             )}
                         </Pressable>
@@ -87,9 +87,9 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                 )}
             />
 
-            {/* Info Section - Matches Image 3 Layout */}
+            {/* Info Section */}
             <View style={styles.infoContainer}>
-                {/* Title */}
+                {/* Title - Fixed spacing and font */}
                 <Text style={styles.title} numberOfLines={2}>
                     {activeMovie?.name}
                 </Text>
@@ -99,33 +99,33 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                     {activeMovie?.origin_name}
                 </Text>
 
-                {/* Buttons - Row: Yellow | White */}
+                {/* Buttons */}
                 <View style={styles.buttonRow}>
                     <Link href={activeMovie ? `/player/${activeMovie.slug}` as any : '/'} asChild>
                         <Pressable style={styles.playButton}>
                             <Ionicons name="play" size={20} color="black" />
-                            <Text style={styles.playButtonText}>Xem phim</Text>
+                            <Text style={styles.playButtonText}>Xem ngay</Text>
                         </Pressable>
                     </Link>
 
                     <Link href={activeMovie ? `/movie/${activeMovie.slug}` as any : '/'} asChild>
                         <Pressable style={styles.infoButton}>
-                            <Ionicons name="information-circle-outline" size={22} color="black" />
-                            <Text style={styles.infoButtonText}>Thông tin</Text>
+                            <Ionicons name="add" size={24} color="white" />
+                            <Text style={styles.infoButtonText}>Danh sách</Text>
                         </Pressable>
                     </Link>
                 </View>
 
-                {/* Badges Row - Image 3 Style: [IMDb] [T16] [2024] [Phần 3] [Tập 5] */}
+                {/* Tags Row */}
                 <View style={styles.badgeRow}>
                     <View style={styles.imdbBadge}>
                         <Text style={styles.imdbText}>IMDb 8.5</Text>
                     </View>
                     <View style={styles.outlineBadge}>
-                        <Text style={styles.outlineText}>T16</Text>
+                        <Text style={styles.outlineText}>{activeMovie?.year}</Text>
                     </View>
                     <View style={styles.outlineBadge}>
-                        <Text style={styles.outlineText}>{activeMovie?.year}</Text>
+                        <Text style={styles.outlineText}>{activeMovie?.quality || 'FHD'}</Text>
                     </View>
                     {activeMovie?.episode_current && (
                         <View style={styles.outlineBadge}>
@@ -134,7 +134,7 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                     )}
                 </View>
 
-                {/* Description - Bottom Text */}
+                {/* Description */}
                 <Text style={styles.description} numberOfLines={2}>
                     {activeMovie?.content?.replace(/<[^>]*>/g, '').trim() || "Mô tả đang được cập nhật..."}
                 </Text>
@@ -186,12 +186,15 @@ const styles = StyleSheet.create({
     },
     title: {
         color: 'white',
-        fontSize: 18, // Restored size for readability and impact
-        fontWeight: 'bold',
+        fontSize: 20,
+        fontWeight: '900',
         textAlign: 'center',
-        marginBottom: 4,
-        marginTop: 12,
+        marginBottom: 6,
+        marginTop: 14,
         paddingHorizontal: 10,
+        textShadowColor: 'rgba(0,0,0,0.8)',
+        textShadowOffset: { width: 0, height: 2 },
+        textShadowRadius: 4,
     },
     subtitle: {
         color: '#9ca3af',
@@ -334,14 +337,14 @@ const styles = StyleSheet.create({
         zIndex: 10,
     },
     rankText: {
-        fontSize: 70, // HUGE Number
+        fontSize: 80,
         fontWeight: '900',
         fontStyle: 'italic',
         includeFontPadding: false,
         textShadowColor: 'rgba(0, 0, 0, 0.8)',
         textShadowOffset: { width: 2, height: 2 },
         textShadowRadius: 4,
-        fontFamily: 'System', // Or a custom robust font if available
+        fontFamily: 'System',
     },
     topText: {
         display: 'none', // Hide "TOP" text, just show the Big Number like RoPhim

@@ -7,8 +7,8 @@ export async function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;
 
     // Paths that require authentication
-    const protectedPaths = ["/phim", "/danh-sach", "/tim-kiem", "/admin"];
-    const isProtected = protectedPaths.some((path) => pathname.startsWith(path)) || pathname === "/";
+    const protectedPaths = ["/admin", "/lich-su-xem", "/phim-yeu-thich", "/cai-dat", "/thong-tin-tai-khoan"];
+    const isProtected = protectedPaths.some((path) => pathname.startsWith(path));
 
     // Login/Register page should redirect to home if already logged in
     if ((pathname.startsWith("/login") || pathname.startsWith("/register")) && token) {

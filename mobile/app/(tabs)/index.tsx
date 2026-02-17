@@ -122,16 +122,15 @@ export default function HomeScreen() {
         {/* Categories Section - "Bạn đang quan tâm gì?" */}
         <View className="mt-6 px-4">
           <View className="flex-row justify-between items-center mb-3">
-            <Text className="text-white text-base font-bold">Bạn đang quan tâm gì?</Text>
-            <Ionicons name="chevron-forward" size={18} color="#6b7280" />
+            <Text className="text-white text-lg font-bold">Bạn đang quan tâm gì?</Text>
+            <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
           </View>
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 16 }}>
-            {/* Wider Cards for impact */}
-            <CategoryCard title="Xuyên Không" slug="xuyen-khong" colors={['#be123c', '#fb7185']} width={180} height={110} />
-            <CategoryCard title="Cổ Trang" slug="co-trang" colors={['#c2410c', '#fb923c']} width={180} height={110} />
-            <CategoryCard title="Kiếm Hiệp" slug="kiem-hiep" colors={['#047857', '#34d399']} width={180} height={110} />
-            <CategoryCard title="Ngôn Tình" slug="tinh-cam" colors={['#db2777', '#f472b6']} width={180} height={110} />
+            <CategoryCard title="Xuyên Không" slug="xuyen-khong" colors={['#ef4444', '#f87171']} width={160} height={85} />
+            <CategoryCard title="Cổ Trang" slug="co-trang" colors={['#ea580c', '#fb923c']} width={160} height={85} />
+            <CategoryCard title="Hành Động" slug="hanh-dong" colors={['#059669', '#34d399']} width={160} height={85} />
+            <CategoryCard title="Tình Cảm" slug="tinh-cam" colors={['#db2777', '#f472b6']} width={160} height={85} />
           </ScrollView>
         </View>
 
