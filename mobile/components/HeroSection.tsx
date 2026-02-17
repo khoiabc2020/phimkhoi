@@ -8,8 +8,8 @@ import { Movie, getImageUrl } from '@/services/api';
 import { useState } from 'react';
 
 const { width, height } = Dimensions.get('window');
-const ITEM_WIDTH = width * 0.55; // Reduced to 55% for "Small Vertical" look (RoPhim style)
-const ITEM_HEIGHT = ITEM_WIDTH * 1.5; // Standard 2:3 Ratio
+const ITEM_WIDTH = width * 0.68; // Increased to 68% for a more prominent vertical look (RoPhim standard)
+const ITEM_HEIGHT = ITEM_WIDTH * 1.5; // Strict 2:3 Ratio
 
 interface HeroSectionProps {
     movies: Movie[];
@@ -186,16 +186,31 @@ const styles = StyleSheet.create({
     },
     title: {
         color: 'white',
-        fontSize: 16, // Reduced from 18 (User asked for "Small")
+        fontSize: 18, // Restored size for readability and impact
         fontWeight: 'bold',
         textAlign: 'center',
-        marginBottom: 2,
+        marginBottom: 4,
+        marginTop: 12,
+        paddingHorizontal: 10,
     },
     subtitle: {
         color: '#9ca3af',
-        fontSize: 11, // Reduced from 12
+        fontSize: 12, // slightly larger
         textAlign: 'center',
-        marginBottom: 10,
+        marginBottom: 12,
+    },
+    input: {
+        // placeholder to ensure context
+    },
+    // ... skipping unrelated styles ... 
+    description: {
+        color: '#d1d5db',
+        fontSize: 13, // Restored size
+        textAlign: 'center',
+        lineHeight: 18,
+        marginBottom: 16,
+        paddingHorizontal: 16,
+        opacity: 0.8
     },
     metaRow: {
         flexDirection: 'row',
@@ -293,10 +308,10 @@ const styles = StyleSheet.create({
     },
     description: {
         color: '#d1d5db',
-        fontSize: 12, // Reduced from 13
+        fontSize: 13,
         textAlign: 'center',
-        lineHeight: 16,
-        marginBottom: 12,
+        lineHeight: 18,
+        marginBottom: 16,
         paddingHorizontal: 12,
     },
     dotsRow: {
