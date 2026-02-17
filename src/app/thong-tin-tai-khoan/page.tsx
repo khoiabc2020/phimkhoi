@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
-    User, LogOut, History, Heart, Settings, Camera, Plus, activity, Clock,
+    User, LogOut, History, Heart, Settings, Camera, Plus, Activity, Clock,
     ChevronRight, Play, X, Trash2, Edit2
 } from "lucide-react";
 
