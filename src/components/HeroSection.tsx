@@ -184,10 +184,10 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
                         {/* Title & Original Title */}
                         <div>
-                            <h1 className="text-lg font-black text-white uppercase tracking-tight leading-none drop-shadow-lg line-clamp-2 px-2 shadow-black text-balance">
+                            <h1 className="text-base font-black text-white uppercase tracking-tight leading-none drop-shadow-lg line-clamp-2 px-2 shadow-black text-balance">
                                 {activeMovie.name}
                             </h1>
-                            <p className="text-[11px] font-semibold text-white/70 mt-1 tracking-wide line-clamp-1 text-shadow-sm">
+                            <p className="text-[10px] font-semibold text-white/70 mt-1 tracking-wide line-clamp-1 text-shadow-sm">
                                 {activeMovie.origin_name}
                             </p>
                         </div>
@@ -365,14 +365,14 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
                                             {/* Main Title - Huge & Elegant */}
                                             <div className="">
-                                                <h1 className="text-5xl lg:text-7xl font-black text-[#fbbf24] leading-[1.1] drop-shadow-2xl line-clamp-2 uppercase">
+                                                <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-[#fbbf24] leading-[1.1] drop-shadow-2xl line-clamp-2 uppercase">
                                                     {movie.name}
                                                 </h1>
                                             </div>
 
                                             {/* Stylized Origin Name (Moved Below Title) */}
                                             <div className="flex flex-wrap items-baseline gap-2 -mt-1 mb-4">
-                                                <h2 className="text-white/90 font-bold text-xl md:text-2xl tracking-wide shadow-black drop-shadow-md">
+                                                <h2 className="text-white/90 font-bold text-lg md:text-xl tracking-wide shadow-black drop-shadow-md">
                                                     {movie.origin_name}
                                                 </h2>
                                                 <span className="text-white/60 text-lg font-medium">({movie.year})</span>

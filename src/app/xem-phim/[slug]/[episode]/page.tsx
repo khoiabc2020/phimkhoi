@@ -8,6 +8,7 @@ import { getImageUrl, cn } from "@/lib/utils";
 import VideoPlayer from "@/components/VideoPlayer";
 import CommentSection from "@/components/CommentSection";
 import WatchEngagementBar from "@/components/WatchEngagementBar";
+import WatchContainer from "@/components/WatchContainer";
 import WatchEpisodeSection from "@/components/WatchEpisodeSection";
 import { Star, Clock, Globe, Info, Users, PlayCircle, Calendar, List as ListIcon } from "lucide-react";
 import { getWatchHistoryForEpisode } from "@/app/actions/watchHistory";
@@ -95,60 +96,17 @@ export default async function WatchPage({ params }: PageProps) {
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                         {/* Main Player Column (Left - 9 cols) */}
                         <div className="lg:col-span-9 space-y-6">
-                            {/* Video Player Container */}
-                            <div className="relative aspect-video bg-black rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 group">
-                                {currentEpisode ? (
-                                    <VideoPlayer
-                                        url={currentEpisode.link_embed}
-                                        m3u8={currentEpisode.link_m3u8}
-                                        slug={movie.slug}
-                                        episode={displayEpisodeName(currentEpisode.name || episode)}
-                                        movieData={movieData}
-                                        initialProgress={initialProgress}
-                                    />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center bg-zinc-900 text-white flex-col gap-2">
-                                        <Info className="w-8 h-8 text-gray-500" />
-                                        <p className="text-gray-400">Tập phim không khả dụng.</p>
-                                    </div>
-                                )}
-                            </div>
 
-                            {/* Movie Info */}
-                            <div>
-                                <h1 className="text-xl md:text-2xl font-bold text-white mb-2 leading-tight">
-                                    {movie.name} <span className="text-gray-400 font-normal">({movie.year})</span>
-                                </h1>
-                                <h2 className="text-lg md:text-xl font-medium text-yellow-500 mb-4 flex items-center gap-2">
-                                    {displayEpisodeName(currentEpisode?.name || episode)}
-                                    {currentEpisode?.name && <span className="text-gray-500 text-sm"> - {currentEpisode.name}</span>}
-                                </h2>
+                            {/* Player & Engagement & Info */}
+                            <WatchContainer
+                                movie={movie}
+                                currentEpisode={currentEpisode}
+                                episodes={episodes}
+                                initialProgress={initialProgress}
+                                movieData={movieData}
+                                displayEpisodeName={displayEpisodeName}
+                            />
 
-                                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
-                                    <div className="flex items-center gap-1 bg-white/10 px-2 py-1 rounded">
-                                        <span className="text-yellow-500 font-bold">FHD</span>
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                        <Clock className="w-4 h-4" />
-                                        <span>{movie.time || "N/A"}</span>
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                        <Globe className="w-4 h-4" />
-                                        <span>{movie.country?.[0]?.name}</span>
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                        <Info className="w-4 h-4" />
-                                        <span>{movie.status === 'completed' ? 'Hoàn thành' : 'Đang cập nhật'}</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Engagement & Controls */}
-                            <div className="bg-[#1a1a1a] rounded-xl p-4 border border-white/5">
-                                {currentEpisode && (
-                                    <WatchEngagementBar movie={movie} />
-                                )}
-                            </div>
 
                             {/* Episodes List - Priority */}
                             {servers.length > 0 && (
