@@ -5,8 +5,8 @@ const config: CapacitorConfig = {
   appName: 'PhimKhoi',
   webDir: 'public',
   server: {
-    // Thay đổi URL này thành địa chỉ VPS của bạn (ví dụ: http://123.45.67.89:3000 hoặc https://phimkhoi.com)
-    url: 'http://YOUR_VPS_IP_HERE',
+    // Thay đổi URL này thành địa chỉ VPS của bạn
+    url: 'http://18.141.25.244:3000',
     cleartext: true
   }
 };

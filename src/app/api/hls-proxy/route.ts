@@ -30,14 +30,18 @@ export async function GET(request: NextRequest) {
 
         const headers: Record<string, string> = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Referer': upstreamOrigin + '/', // Set referer to the video source origin
-            'Origin': upstreamOrigin
+            'Referer': upstreamOrigin + '/',
+            'Origin': upstreamOrigin,
+            'Accept': '*/*',
+            'Accept-Encoding': 'gzip, deflate, br'
         };
 
+        console.log(`[Proxy] Fetching: ${url}`);
         const response = await fetch(url, { headers });
-        console.log(`[Proxy] Upstream Status: ${response.status} for ${url}`);
+        console.log(`[Proxy] Response: ${response.status} ${response.statusText} for ${url}`);
 
         if (!response.ok) {
+            console.error(`[Proxy] Failed: ${response.status} ${await response.text().catch(() => '')}`);
             return new NextResponse(`Failed to fetch: ${response.status} ${response.statusText}`, { status: response.status });
         }
 
