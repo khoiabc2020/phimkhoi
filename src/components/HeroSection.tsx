@@ -342,7 +342,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
             <div className="hidden lg:block absolute inset-0 h-full">
                 <div className="absolute inset-0 h-full" ref={desktopRef}>
                     <div className="flex h-full">
-                        {heroMovies.map((movie) => {
+                        {heroMovies.map((movie, index) => {
                             return (
                                 <div key={movie._id} className="relative flex-[0_0_100%] min-w-0 h-full bg-black overflow-hidden">
                                     {/* Background Image - High Res & Clear */}
