@@ -366,9 +366,6 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                     <div className="absolute inset-0 container mx-auto px-4 md:px-12 flex flex-col justify-center h-full pb-20 pointer-events-none">
                                         <div className="max-w-4xl space-y-6 animate-in fade-in slide-in-from-left-8 duration-700 pointer-events-auto mt-20">
 
-// ... existing imports ...
-                                            // ... existing state ...
-
                                             {/* Main Title - Huge & Elegant */}
                                             <div className="">
                                                 <h1 className="text-5xl lg:text-7xl font-black text-[#fbbf24] leading-[1.1] drop-shadow-2xl line-clamp-2 uppercase">
@@ -430,7 +427,6 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                                 </div>
                                             </div>
                                         </div>
-// ... rest of component ...
                                     </div>
                                 </div>
                             );
