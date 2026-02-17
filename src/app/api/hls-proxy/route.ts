@@ -78,10 +78,8 @@ export async function GET(request: NextRequest) {
             const trimmed = line.trim();
             if (trimmed && !trimmed.startsWith('#')) {
                 try {
-                    // Robust relative URL resolution
-                    // If trimmed is absolute, new URL(trimmed, url) returns trimmed
-                    // If trimmed is relative, it resolves against url (which is the manifest URL)
-                    const absoluteUrl = new URL(trimmed, url).toString();
+                    // Robust relative URL resolution using the FINAL response URL (handling redirects)
+                    const absoluteUrl = new URL(trimmed, response.url).toString();
                     return `/api/hls-proxy?url=${encodeURIComponent(absoluteUrl)}`;
                 } catch (e) {
                     console.error("Error resolving URL:", trimmed, e);
