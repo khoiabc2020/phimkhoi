@@ -104,7 +104,6 @@ export default async function WatchPage({ params }: PageProps) {
                                 episodes={episodes}
                                 initialProgress={initialProgress}
                                 movieData={movieData}
-                                displayEpisodeName={displayEpisodeName}
                             />
 
 

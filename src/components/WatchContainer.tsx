@@ -14,19 +14,12 @@ interface WatchContainerProps {
     episodes: any[];
     initialProgress: number;
     movieData: any;
-    displayEpisodeName: (name: string) => string;
-}
-
-export default function WatchContainer({
-    movie,
-    currentEpisode,
-    episodes,
-    initialProgress,
     movieData,
-    displayEpisodeName
 }: WatchContainerProps) {
     const [isTheaterMode, setIsTheaterMode] = useState(false);
     const [isLightOff, setIsLightOff] = useState(false);
+
+    const displayEpisodeName = (name: string) => name?.startsWith('Tập') ? name : `Tập ${name}`;
 
     return (
         <div className={cn("relative transition-all duration-500", isLightOff ? "z-50" : "")}>
