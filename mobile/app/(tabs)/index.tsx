@@ -85,8 +85,9 @@ export default function HomeScreen() {
 
           <View className="flex-row gap-3">
             <Pressable onPress={() => router.push('/notifications' as any)}
-              className="w-10 h-10 rounded-full bg-white/10 items-center justify-center backdrop-blur-md active:bg-white/20">
+              className="w-10 h-10 rounded-full bg-white/10 items-center justify-center backdrop-blur-md active:bg-white/20 relative">
               <Ionicons name="notifications-outline" size={22} color="white" />
+              <View className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full" />
             </Pressable>
             <Pressable onPress={() => router.push('/settings' as any)}
               className="w-10 h-10 rounded-full bg-white/10 items-center justify-center backdrop-blur-md active:bg-white/20">
@@ -110,13 +111,13 @@ export default function HomeScreen() {
             </Link>
             {NAV_PILLS.slice(1).map((item, index) => (
               <Link key={item.slug + index} href={`/list/${item.slug}` as any} asChild>
-                <Pressable className="flex-row items-center bg-transparent border border-gray-700 px-4 py-2 rounded-full active:bg-gray-800">
+                <Pressable className="flex-row items-center bg-transparent border border-white/30 px-4 py-2 rounded-full active:bg-white/10">
                   <Text className="text-white font-medium text-xs">{item.label}</Text>
                 </Pressable>
               </Link>
             ))}
             <Link href="/explore" asChild>
-              <Pressable className="flex-row items-center bg-transparent border border-gray-700 px-4 py-2 rounded-full active:bg-gray-800">
+              <Pressable className="flex-row items-center bg-transparent border border-white/30 px-4 py-2 rounded-full active:bg-white/10">
                 <Text className="text-white font-medium text-xs">Thể loại</Text>
                 <Ionicons name="chevron-down" size={14} color="white" style={{ marginLeft: 4 }} />
               </Pressable>

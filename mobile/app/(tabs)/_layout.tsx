@@ -1,12 +1,48 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform, View, StyleSheet } from 'react-native';
+import { Platform, View, StyleSheet, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
+import Animated, { useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
+
+const LiquidTabIcon = ({ name, color, focused, label }: { name: any, color: string, focused: boolean, label: string }) => {
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: withSpring(focused ? 1 : 0.9) }],
+      opacity: withTiming(focused ? 1 : 0.7, { duration: 200 })
+    };
+  });
+
+  return (
+    <View style={{ alignItems: 'center', justifyContent: 'center', width: 50 }}>
+      {focused && (
+        <Animated.View
+          style={[
+            StyleSheet.absoluteFill,
+            {
+              backgroundColor: 'rgba(251, 191, 36, 0.15)', // Amber/Gold glow
+              borderRadius: 20,
+              transform: [{ scale: 1.2 }],
+            }
+          ]}
+        />
+      )}
+      <Animated.View style={[animatedStyle, { alignItems: 'center' }]}>
+        <Ionicons size={24} name={focused ? name : `${name}-outline`} color={color} />
+        {focused && (
+          <Text style={{ fontSize: 9, fontWeight: '700', color: color, marginTop: 2 }}>
+            {label}
+          </Text>
+        )}
+      </Animated.View>
+    </View>
+  );
+};
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
+  const isAndroid = Platform.OS === 'android';
 
   return (
     <Tabs
@@ -14,38 +50,37 @@ export default function TabLayout() {
         tabBarActiveTintColor: '#fbbf24',
         tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.6)',
         headerShown: false,
+        tabBarShowLabel: false, // Hide default labels
         tabBarStyle: {
           position: 'absolute',
-          bottom: 15, // Reduced from 25
-          left: 15, // Reduced from 20
-          right: 15, // Reduced from 20
-          height: 60, // Reduced from 65
-          borderRadius: 30,
-          backgroundColor: 'transparent', // Handled by BlurView
+          bottom: 20, // Increased clearance
+          left: 20,
+          right: 20,
+          height: 70, // Taller for liquid effect
+          borderRadius: 35,
+          backgroundColor: isAndroid ? 'rgba(20, 20, 20, 0.95)' : 'transparent',
           borderTopWidth: 0,
-          elevation: 0, // Android shadow handled differently if needed
+          elevation: 0,
           shadowColor: '#000',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 10,
-          justifyContent: 'center',
-          alignItems: 'center',
-          paddingBottom: 0, // Reset default padding
+          shadowOffset: { width: 0, height: 10 },
+          shadowOpacity: 0.5,
+          shadowRadius: 20,
+          paddingBottom: 0,
         },
         tabBarBackground: () => (
-          <View style={[StyleSheet.absoluteFill, { borderRadius: 35, overflow: 'hidden', backgroundColor: 'rgba(20, 20, 20, 0.85)' }]}>
-            {Platform.OS === 'ios' && (
-              <BlurView intensity={30} style={StyleSheet.absoluteFill} tint="dark" />
-            )}
-          </View>
+          isAndroid ? null : (
+            <BlurView
+              intensity={40}
+              style={[
+                StyleSheet.absoluteFill,
+                { borderRadius: 35, overflow: 'hidden', backgroundColor: 'rgba(10, 10, 10, 0.7)' }
+              ]}
+              tint="dark"
+            />
+          )
         ),
-        tabBarLabelStyle: {
-          fontSize: 9,
-          fontWeight: '600',
-          marginBottom: 8,
-        },
         tabBarItemStyle: {
-          height: 65,
+          height: 70,
           justifyContent: 'center',
           alignItems: 'center',
         }
@@ -55,9 +90,7 @@ export default function TabLayout() {
         options={{
           title: 'Trang chủ',
           tabBarIcon: ({ color, focused }) => (
-            <View style={{ alignItems: 'center', justifyContent: 'center', top: 2 }}>
-              <Ionicons size={22} name={focused ? "home" : "home-outline"} color={color} />
-            </View>
+            <LiquidTabIcon name="home" color={color} focused={focused} label="Trang chủ" />
           ),
         }}
       />
@@ -66,9 +99,7 @@ export default function TabLayout() {
         options={{
           title: 'Duyệt tìm',
           tabBarIcon: ({ color, focused }) => (
-            <View style={{ alignItems: 'center', justifyContent: 'center', top: 2 }}>
-              <Ionicons size={22} name={focused ? "search" : "search-outline"} color={color} />
-            </View>
+            <LiquidTabIcon name="search" color={color} focused={focused} label="Duyệt tìm" />
           ),
         }}
       />
@@ -77,9 +108,7 @@ export default function TabLayout() {
         options={{
           title: 'Lịch chiếu',
           tabBarIcon: ({ color, focused }) => (
-            <View style={{ alignItems: 'center', justifyContent: 'center', top: 2 }}>
-              <Ionicons size={22} name={focused ? "calendar" : "calendar-outline"} color={color} />
-            </View>
+            <LiquidTabIcon name="calendar" color={color} focused={focused} label="Lịch chiếu" />
           ),
         }}
       />
@@ -88,9 +117,7 @@ export default function TabLayout() {
         options={{
           title: 'Tài khoản',
           tabBarIcon: ({ color, focused }) => (
-            <View style={{ alignItems: 'center', justifyContent: 'center', top: 2 }}>
-              <Ionicons size={22} name={focused ? "person" : "person-outline"} color={color} />
-            </View>
+            <LiquidTabIcon name="person" color={color} focused={focused} label="Tài khoản" />
           ),
         }}
       />

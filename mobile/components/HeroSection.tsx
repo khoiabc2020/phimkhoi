@@ -14,6 +14,8 @@ interface HeroSectionProps {
     movies: Movie[];
 }
 
+const BUTTON_WIDTH = (width - 60) / 2;
+
 export default function HeroSection({ movies }: HeroSectionProps) {
     const [activeIndex, setActiveIndex] = useState(0);
 
@@ -145,15 +147,15 @@ const styles = StyleSheet.create({
     posterWrapper: {
         width: '100%',
         height: '100%',
-        borderRadius: 16,
+        borderRadius: 12,
         overflow: 'hidden',
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.2)',
+        borderColor: 'rgba(255,255,255,0.1)',
         backgroundColor: '#1f2937',
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.5,
-        shadowRadius: 15,
+        shadowColor: "#fbbf24", // Gold shadow for warmth
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.3, // Soft glow
+        shadowRadius: 20,
         elevation: 10,
     },
     posterImage: {
@@ -197,8 +199,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
-        minWidth: 140,
+        width: BUTTON_WIDTH,
         justifyContent: 'center',
+        height: 48,
     },
     playButtonText: {
         color: 'black',
@@ -213,8 +216,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
-        minWidth: 140,
+        width: BUTTON_WIDTH,
         justifyContent: 'center',
+        height: 48,
     },
     infoButtonText: {
         color: 'black',
@@ -241,11 +245,12 @@ const styles = StyleSheet.create({
         fontSize: 12,
     },
     metaTag: {
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.5)',
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 4,
+        borderWidth: 0.5,
+        borderColor: 'rgba(255,255,255,0.3)',
+        backgroundColor: 'rgba(255,255,255,0.1)',
     },
     metaText: {
         color: 'white',
