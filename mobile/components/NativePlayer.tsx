@@ -127,6 +127,18 @@ export default function NativePlayer({ url, title, episode, onClose, onNext }: N
         </Modal>
     );
 
+    const handleSkipIntro = async () => {
+        if (video.current && status.isLoaded) {
+            const newPos = (status.positionMillis || 0) + 85000;
+            await video.current.setPositionAsync(newPos);
+            resetControlsTimer();
+        }
+    };
+
+    // Show Next Episode button when < 60s remaining
+    const showNextButton = status.isLoaded && status.durationMillis &&
+        (status.durationMillis - status.positionMillis < 60000) && onNext;
+
     return (
         <View style={styles.container}>
             <StatusBar hidden />
@@ -146,6 +158,26 @@ export default function NativePlayer({ url, title, episode, onClose, onNext }: N
                 shouldPlay
             />
 
+            {/* Next Episode Overlay (Auto-appears near end) */}
+            {showNextButton && !settingsVisible && (
+                <View style={styles.nextEpOverlay}>
+                    <TouchableOpacity onPress={onNext} style={styles.autoNextBtn}>
+                        <Text style={styles.autoNextText}>Tập tiếp theo</Text>
+                        <Ionicons name="play-skip-forward" size={20} color="black" />
+                    </TouchableOpacity>
+                </View>
+            )}
+
+            {/* Skip Intro Overlay (First 5 mins) */}
+            {status.isLoaded && status.positionMillis < 300000 && showControls && (
+                <View style={styles.skipIntroOverlay}>
+                    <TouchableOpacity onPress={handleSkipIntro} style={styles.skipIntroBtn}>
+                        <Text style={styles.skipIntroText}>Bỏ qua mở đầu</Text>
+                        <Ionicons name="play-forward" size={16} color="black" />
+                    </TouchableOpacity>
+                </View>
+            )}
+
             {/* Clickable Overlay to Toggle Controls */}
             <Pressable style={styles.overlay} onPress={toggleControls}>
                 {showControls && (
@@ -155,7 +187,7 @@ export default function NativePlayer({ url, title, episode, onClose, onNext }: N
                             <TouchableOpacity onPress={onClose} style={styles.backBtn}>
                                 <Ionicons name="arrow-back" size={28} color="white" />
                             </TouchableOpacity>
-                            <View>
+                            <View style={{ flex: 1 }}>
                                 <Text style={styles.videoTitle} numberOfLines={1}>{title}</Text>
                                 {episode && <Text style={styles.subTitle}>{episode}</Text>}
                             </View>
@@ -232,7 +264,13 @@ export default function NativePlayer({ url, title, episode, onClose, onNext }: N
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: 'black' },
     video: { width: '100%', height: '100%' },
-    overlay: { ...StyleSheet.absoluteFillObject, justifyContent: 'space-between' },
+    overlay: { ...StyleSheet.absoluteFillObject, justifyContent: 'space-between', zIndex: 1 },
+    nextEpOverlay: { position: 'absolute', bottom: 100, right: 20, zIndex: 10 },
+    autoNextBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fbbf24', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 30, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84, elevation: 5 },
+    autoNextText: { color: 'black', fontWeight: 'bold', fontSize: 16, marginRight: 8 },
+    skipIntroOverlay: { position: 'absolute', bottom: 100, left: 20, zIndex: 10 },
+    skipIntroBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255, 255, 255, 0.9)', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 25 },
+    skipIntroText: { color: 'black', fontWeight: 'bold', marginRight: 6 },
     controlsContainer: { flex: 1, justifyContent: 'space-between' },
     header: { flexDirection: 'row', alignItems: 'center', padding: 20, paddingTop: 40 },
     backBtn: { padding: 8, marginRight: 16 },

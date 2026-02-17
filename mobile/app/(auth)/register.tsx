@@ -41,7 +41,7 @@ export default function RegisterScreen() {
             }
 
             Alert.alert('Thành công', 'Đăng ký thành công! Vui lòng đăng nhập.', [
-                { text: 'OK', onPress: () => router.replace('/(auth)/login') }
+                { text: 'OK', onPress: () => router.replace('/login') }
             ]);
 
         } catch (error: any) {
@@ -134,7 +134,7 @@ export default function RegisterScreen() {
 
                         <View className="flex-row justify-center mt-6">
                             <Text className="text-gray-400">Đã có tài khoản? </Text>
-                            <TouchableOpacity onPress={() => router.push('/(auth)/login')}>
+                            <TouchableOpacity onPress={() => router.push('/login')}>
                                 <Text className="text-yellow-500 font-bold">Đăng nhập ngay</Text>
                             </TouchableOpacity>
                         </View>

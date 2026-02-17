@@ -148,6 +148,18 @@ export const getMoviesByCountry = async (slug: string, page = 1, limit = 24) => 
     }
 };
 
+export const getRelatedMovies = async (categorySlug: string, limit = 12) => {
+    try {
+        // Fetch movies from the same category as "related"
+        const res = await fetch(`${API_URL}/v1/api/the-loai/${categorySlug}?limit=${limit}`);
+        const data = await res.json();
+        return getItems(data);
+    } catch (error) {
+        console.error(`Error fetching related movies [${categorySlug}]:`, error);
+        return [];
+    }
+};
+
 export const checkAppVersion = async () => {
     try {
         const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/version`);

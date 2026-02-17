@@ -57,9 +57,9 @@ export default function PlayerScreen() {
 
                     // Determine video source
                     if (episode.link_m3u8 && !episode.link_m3u8.includes('youtube')) {
-                        // Use Native Player with HLS Proxy
-                        const proxyUrl = `${CONFIG.BACKEND_URL}/api/hls-proxy?url=${encodeURIComponent(episode.link_m3u8)}`;
-                        setVideoUrl(proxyUrl);
+                        // Use Native Player DIRECTLY (No Proxy)
+                        // const proxyUrl = `${CONFIG.BACKEND_URL}/api/hls-proxy?url=${encodeURIComponent(episode.link_m3u8)}`;
+                        setVideoUrl(episode.link_m3u8);
                         setIsNative(true);
                     } else {
                         // Fallback to Embed (WebView)

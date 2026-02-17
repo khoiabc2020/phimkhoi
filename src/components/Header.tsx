@@ -180,7 +180,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                     </div>
 
                     {/* Download App Button */}
-                    <a href="/app-release.apk" target="_blank" download className="hidden lg:flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold hover:brightness-110 transition-all shadow-lg shadow-blue-500/20">
+                    <a href="/app-release.apk" target="_blank" download className="hidden lg:flex items-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-5 py-2.5 rounded-full text-sm font-bold hover:scale-105 hover:shadow-lg hover:shadow-purple-500/40 transition-all duration-300">
                         <Download className="w-4 h-4" /> <span>Tải App</span>
                     </a>
 

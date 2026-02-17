@@ -4,12 +4,13 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useState, useEffect, useCallback } from 'react';
-import { getMovieDetail, getImageUrl, Movie } from '@/services/api';
+import { getMovieDetail, getImageUrl, getRelatedMovies, Movie } from '@/services/api';
 import { addFavorite, removeFavorite, isFavorite } from '@/lib/favorites';
 import { StatusBar } from 'expo-status-bar';
 import { useAuth } from '@/context/auth';
 import { CONFIG } from '@/constants/config';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import CommentSection from '@/components/CommentSection';
 
 const { width } = Dimensions.get('window');
 
@@ -23,6 +24,7 @@ export default function MovieDetailScreen() {
     const [expandDesc, setExpandDesc] = useState(false);
     const [selectedServer, setSelectedServer] = useState(0);
     const [selectedTab, setSelectedTab] = useState<'episodes' | 'actors' | 'related'>('episodes');
+    const [relatedMovies, setRelatedMovies] = useState<Movie[]>([]);
 
     const { user, token, syncFavorites } = useAuth();
 
@@ -100,6 +102,13 @@ export default function MovieDetailScreen() {
             if (data && data.movie) {
                 setMovie(data.movie);
                 setEpisodes(data.episodes || []);
+
+                // Fetch Related Movies if category exists
+                if (data.movie.category && data.movie.category.length > 0) {
+                    getRelatedMovies(data.movie.category[0].slug).then((related: Movie[]) => {
+                        setRelatedMovies(related.filter((m: Movie) => m.slug !== data.movie.slug));
+                    });
+                }
             }
             setLoading(false);
         };
@@ -347,11 +356,35 @@ export default function MovieDetailScreen() {
                         </View>
                     )}
 
+
                     {selectedTab === 'related' && (
-                        <View className="py-8 items-center">
-                            <Text className="text-gray-500">Chưa có đề xuất liên quan</Text>
+                        <View className="py-2">
+                            {relatedMovies.length > 0 ? (
+                                <View className="flex-row flex-wrap gap-3 px-2">
+                                    {relatedMovies.map((item) => (
+                                        <Link key={item.slug} href={`/movie/${item.slug}`} asChild>
+                                            <Pressable className="w-[30%] mb-4 active:scale-95 transition-transform">
+                                                <Image
+                                                    source={{ uri: getImageUrl(item.poster_url || item.thumb_url) }}
+                                                    style={{ width: '100%', aspectRatio: 2 / 3, borderRadius: 8 }}
+                                                    contentFit="cover"
+                                                />
+                                                <Text numberOfLines={2} className="text-white text-xs mt-2 font-medium">
+                                                    {item.name}
+                                                </Text>
+                                            </Pressable>
+                                        </Link>
+                                    ))}
+                                </View>
+                            ) : (
+                                <View className="py-8 items-center">
+                                    <Text className="text-gray-500">Chưa có đề xuất liên quan</Text>
+                                </View>
+                            )}
                         </View>
                     )}
+
+                    <CommentSection slug={movie.slug} />
 
                 </View>
             </ScrollView>

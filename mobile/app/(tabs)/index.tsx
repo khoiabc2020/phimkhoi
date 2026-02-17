@@ -94,36 +94,36 @@ export default function HomeScreen() {
         <HeroSection movies={data.phimLe.slice(0, 8)} />
 
         {/* Navigation Pills */}
-        <View className="mt-6 pl-4">
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 16, gap: 10 }}>
+        <View className="mt-2 pl-4">
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 16, gap: 8 }}>
             <Link href="/explore" asChild>
-              <Pressable className="flex-row items-center bg-[#fff] px-5 py-2.5 rounded-full active:bg-gray-200">
-                <Text className="text-black font-bold">Đề xuất</Text>
+              <Pressable className="flex-row items-center bg-[#fff] px-4 py-2 rounded-full active:bg-gray-200">
+                <Text className="text-black font-bold text-xs">Đề xuất</Text>
               </Pressable>
             </Link>
             {NAV_PILLS.slice(1).map((item, index) => (
               <Link key={item.slug + index} href={`/list/${item.slug}` as any} asChild>
-                <Pressable className="flex-row items-center bg-transparent border border-gray-600 px-5 py-2.5 rounded-full active:bg-gray-800">
-                  <Text className="text-white font-medium">{item.label}</Text>
+                <Pressable className="flex-row items-center bg-transparent border border-gray-700 px-4 py-2 rounded-full active:bg-gray-800">
+                  <Text className="text-white font-medium text-xs">{item.label}</Text>
                 </Pressable>
               </Link>
             ))}
             <Link href="/explore" asChild>
-              <Pressable className="flex-row items-center bg-transparent border border-gray-600 px-5 py-2.5 rounded-full active:bg-gray-800">
-                <Text className="text-white font-medium">Thể loại</Text>
-                <Ionicons name="chevron-down" size={16} color="white" style={{ marginLeft: 4 }} />
+              <Pressable className="flex-row items-center bg-transparent border border-gray-700 px-4 py-2 rounded-full active:bg-gray-800">
+                <Text className="text-white font-medium text-xs">Thể loại</Text>
+                <Ionicons name="chevron-down" size={14} color="white" style={{ marginLeft: 4 }} />
               </Pressable>
             </Link>
           </ScrollView>
         </View>
 
         {/* Categories Section */}
-        <View className="mt-8 px-4">
-          <View className="flex-row justify-between items-center mb-4">
-            <Text className="text-white text-lg font-bold">Bạn đang quan tâm gì?</Text>
+        <View className="mt-6 px-4">
+          <View className="flex-row justify-between items-center mb-3">
+            <Text className="text-white text-base font-bold">Bạn đang quan tâm gì?</Text>
             <Link href="/explore" asChild>
               <Pressable>
-                <Ionicons name="chevron-forward" size={24} color="#6b7280" />
+                <Ionicons name="chevron-forward" size={20} color="#6b7280" />
               </Pressable>
             </Link>
           </View>
@@ -137,7 +137,7 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
-        <View className="mt-8 space-y-8">
+        <View className="mt-6 space-y-6">
           <MovieRow title="Phim Lẻ Mới Cập Nhật" movies={data.phimLe} />
           <MovieRow title="Phim Bộ Đang Hot" movies={data.phimBo} />
           <MovieRow title="Hoạt Hình Đặc Sắc" movies={data.hoatHinh} />

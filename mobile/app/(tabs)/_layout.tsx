@@ -1,11 +1,12 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
+import { Platform, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const insets = useSafeAreaInsets();
+  const TAB_HEIGHT = 60 + insets.bottom; // Dynamic height
 
   return (
     <Tabs
@@ -21,14 +22,15 @@ export default function TabLayout() {
           backgroundColor: 'rgba(10, 10, 10, 0.95)', // Glass effect dark background
           borderTopWidth: 0,
           elevation: 0,
-          height: 65,
-          paddingBottom: 10,
-          paddingTop: 10,
+          height: TAB_HEIGHT,
+          paddingTop: 8,
+          // Platform specific adjustment if needed, but insets.bottom handles most
         },
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: '600',
-          marginTop: 2
+          marginTop: 2,
+          paddingBottom: insets.bottom > 0 ? 0 : 5 // Add padding if no safe area (old button nav)
         }
       }}>
       <Tabs.Screen
