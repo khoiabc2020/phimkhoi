@@ -18,43 +18,46 @@ export async function GET(request: NextRequest) {
         const response = await fetch(url, { headers });
 
         if (!response.ok) {
-            return new NextResponse(`Failed to fetch m3u8: ${response.status} ${response.statusText}`, { status: response.status });
+            return new NextResponse(`Failed to fetch: ${response.status} ${response.statusText}`, { status: response.status });
         }
 
-        const m3u8Content = await response.text();
+        const contentType = response.headers.get('Content-Type');
+        const isM3u8 = url.includes('.m3u8') || (contentType && contentType.includes('mpegurl'));
 
-        // CORS headers for the client
+        // If it's NOT an M3U8 playlist (e.g., .ts segment), return binary directly
+        if (!isM3u8) {
+            const blob = await response.blob();
+            const responseHeaders = new Headers();
+            responseHeaders.set('Access-Control-Allow-Origin', '*');
+            if (contentType) responseHeaders.set('Content-Type', contentType);
+
+            return new NextResponse(blob, {
+                status: 200,
+                headers: responseHeaders,
+            });
+        }
+
+        // If it IS an M3U8, we need to rewrite paths
+        const m3u8Content = await response.text();
         const responseHeaders = new Headers();
         responseHeaders.set('Access-Control-Allow-Origin', '*');
         responseHeaders.set('Content-Type', 'application/vnd.apple.mpegurl');
 
-        // Handle relative paths in m3u8 if necessary
-        // Ideally, if ts files are relative, we need to rewrite them to absolute, or proxy them too.
-        // For now, let's assume they are absolute or base URL handling by player works (it won't if we proxy).
-
-        // Simple rewrite for relative paths:
-        // Resolve base URL
         const baseUrl = url.substring(0, url.lastIndexOf('/') + 1);
 
-        // Rewrite lines not starting with # (URLs) to go through proxy
         const lines = m3u8Content.split('\n');
-        const params = lines.map(line => {
+        const rewrittenContent = lines.map(line => {
             const trimmed = line.trim();
             if (trimmed && !trimmed.startsWith('#')) {
-                // Determine absolute URL of the resource
-                const absoluteUrl = trimmed.startsWith('http')
-                    ? trimmed
-                    : baseUrl + trimmed;
-
-                // Recursively proxy this URL
-                // Get the current protocol and host from the request to construct full proxy URL
-                // Or just use relative path since we are on the same domain
+                // Determine absolute URL
+                const absoluteUrl = trimmed.startsWith('http') ? trimmed : baseUrl + trimmed;
+                // Recursive proxy
                 return `/api/hls-proxy?url=${encodeURIComponent(absoluteUrl)}`;
             }
             return line;
         }).join('\n');
 
-        return new NextResponse(params, {
+        return new NextResponse(rewrittenContent, {
             status: 200,
             headers: responseHeaders,
         });
