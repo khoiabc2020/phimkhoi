@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Search, Bell, User, LogOut, Shield, Trash2, Clock, History, Heart, Settings, Menu, X, ChevronDown, Play, Film, Video, LayoutGrid } from "lucide-react";
+import { Search, Bell, User, LogOut, Shield, Trash2, Clock, History, Heart, Settings, Menu, X, ChevronDown, Play, Film, Video, LayoutGrid, Download } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
@@ -178,6 +178,11 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             )}
                         </div>
                     </div>
+
+                    {/* Download App Button */}
+                    <a href="/app-release.apk" target="_blank" download className="hidden lg:flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold hover:brightness-110 transition-all shadow-lg shadow-blue-500/20">
+                        <Download className="w-4 h-4" /> <span>Tải App</span>
+                    </a>
 
                     {/* User Actions */}
                     {session ? (
@@ -376,6 +381,13 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             </div>
                         </div>
                     </nav>
+
+                    {/* Mobile Download App */}
+                    <div className="pt-4 pb-4">
+                        <a href="/app-release.apk" target="_blank" download className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold py-3 rounded-xl hover:brightness-110 transition-all shadow-lg shadow-blue-500/20">
+                            <Download className="w-5 h-5" /> Tải Ứng Dụng Mobile
+                        </a>
+                    </div>
 
                     {/* Footer Actions */}
                     {session && (
