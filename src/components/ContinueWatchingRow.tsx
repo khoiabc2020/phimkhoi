@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Play, ChevronLeft, ChevronRight, X } from "lucide-react";
-import { getContinueWatching, removeFromHistory } from "@/app/actions/watchHistory";
+import { getContinueWatching, removeWatchHistory } from "@/app/actions/watchHistory";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -46,15 +46,15 @@ export default function ContinueWatchingRow() {
         fetchData();
     }, [session]);
 
-    const handleRemove = async (e: React.MouseEvent, movieId: string) => {
+    const handleRemove = async (e: React.MouseEvent, historyId: string) => {
         e.preventDefault(); // Prevent link navigation
         e.stopPropagation();
 
         // Optimistic update
-        setMovies(prev => prev.filter(m => m.movieId !== movieId));
+        setMovies(prev => prev.filter(m => m._id !== historyId));
 
         try {
-            await removeFromHistory(movieId);
+            await removeWatchHistory(historyId);
             router.refresh();
         } catch (error) {
             console.error("Failed to remove item", error);
@@ -124,7 +124,7 @@ export default function ContinueWatchingRow() {
 
                                     {/* Remove Button (X) */}
                                     <button
-                                        onClick={(e) => handleRemove(e, item.movieId)}
+                                        onClick={(e) => handleRemove(e, item._id)}
                                         className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 hover:bg-red-600 backdrop-blur-md flex items-center justify-center text-white/70 hover:text-white transition-colors opacity-0 group-hover/card:opacity-100 z-20"
                                         title="Xóa khỏi lịch sử"
                                     >
