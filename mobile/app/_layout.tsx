@@ -1,4 +1,5 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { Platform } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
@@ -11,8 +12,26 @@ export const unstable_settings = {
   anchor: '(tabs)',
 };
 
+import * as Brightness from 'expo-brightness';
+import { useEffect } from 'react';
+
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+
+  useEffect(() => {
+    (async () => {
+      if (Platform.OS === 'android') {
+        try {
+          const { status } = await Brightness.requestPermissionsAsync();
+          if (status !== 'granted') {
+            console.log('Brightness permission denied');
+          }
+        } catch (e) {
+          console.warn('Failed to request brightness permission', e);
+        }
+      }
+    })();
+  }, []);
 
   return (
     <AuthProvider>

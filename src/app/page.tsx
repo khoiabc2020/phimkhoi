@@ -79,52 +79,107 @@ export default async function Home() {
       {/* Hero Section */}
       <HeroSection movies={finalHeroData} />
 
-      <div className="space-y-12 relative z-20 pb-20 container mx-auto px-4 md:px-12 mt-12 md:mt-24">
+      <div className="container mx-auto px-4 md:px-12 mt-8 md:mt-16 relative z-20 pb-20">
 
-        {/* Quick Navigation (Categories) */}
-        <div className="relative z-30 -mt-10 md:-mt-20 mb-8">
+        {/* Quick Navigation (Categories) - Optional: Move below Hero or keep here */}
+        <div className="mb-8">
           <QuickNav />
         </div>
 
-        {/* Continue Watching */}
-        <ContinueWatchingRow />
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
 
-        {/* Top 10 Trending Series */}
-        <TopTrending title="Top 10 Phim Bộ Hôm Nay" movies={finalTrendTv} slug="/danh-sach/phim-bo" />
+          {/* MAIN CONTENT (Left - 9 cols) */}
+          <div className="xl:col-span-9 space-y-10">
 
-        {/* Categories */}
-        <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-          <AsyncMovieRow title="Phim Chiếu Rạp Mới" slug="phim-chieu-rap" />
-        </Suspense>
+            {/* Continue Watching */}
+            <ContinueWatchingRow />
 
-        <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-          <AsyncMovieRow title="Phim Lẻ Mới Cập Nhật" type="phim-le" />
-        </Suspense>
+            {/* Hot Sections */}
+            <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
+              <AsyncMovieRow title="Phim Chiếu Rạp Mới" slug="phim-chieu-rap" />
+            </Suspense>
 
-        <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-          <AsyncMovieRow title="Phim Bộ Mới Cập Nhật" type="phim-bo" />
-        </Suspense>
+            <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
+              <AsyncMovieRow title="Phim Sắp Chiếu" type="phim-sap-chieu" />
+            </Suspense>
 
-        <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-          <AsyncMovieRow title="Phim Hàn Quốc Hot" country="han-quoc" />
-        </Suspense>
+            <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
+              <AsyncMovieRow title="Phim Lẻ Mới Cập Nhật" type="phim-le" />
+            </Suspense>
 
-        <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-          <AsyncMovieRow title="Phim Trung Quốc Hot" country="trung-quoc" />
-        </Suspense>
+            <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
+              <AsyncMovieRow title="Phim Bộ Mới Cập Nhật" type="phim-bo" />
+            </Suspense>
 
-        <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-          <AsyncMovieRow title="Hoạt Hình Mới Cập Nhật" type="hoat-hinh" />
-        </Suspense>
+            <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
+              <AsyncMovieRow title="Phim Hành Động Hot" slug="hanh-dong" />
+            </Suspense>
 
-        <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-          <AsyncMovieRow title="TV Shows Mới Cập Nhật" type="tv-shows" />
-        </Suspense>
+            <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
+              <AsyncMovieRow title="Phim Tình Cảm Lãng Mạn" slug="tinh-cam" />
+            </Suspense>
 
-        <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-          <AsyncMovieRow title="Phim Sắp Chiếu" type="phim-sap-chieu" />
-        </Suspense>
+            <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
+              <AsyncMovieRow title="Hoạt Hình - Anime" type="hoat-hinh" />
+            </Suspense>
+
+            <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
+              <AsyncMovieRow title="TV Shows" type="tv-shows" />
+            </Suspense>
+          </div>
+
+          {/* SIDEBAR (Right - 3 cols) */}
+          <div className="xl:col-span-3 space-y-8">
+
+            {/* Top Trending - Phim Bộ (Series) */}
+            <TopTrending
+              title="Top Phim Bộ"
+              movies={finalTrendTv}
+              slug="/danh-sach/phim-bo"
+            />
+
+            {/* Top Trending - Phim Lẻ (Movies) */}
+            <TopTrending
+              title="Top Phim Lẻ"
+              movies={finalTrendMovies}
+              slug="/danh-sach/phim-le"
+              className="mt-8"
+            />
+
+            {/* Phim Sắp Chiếu (Vertical List) */}
+            <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
+              <div className="bg-[#111] p-4 rounded-xl border border-white/5">
+                <h3 className="text-[#fbbf24] font-bold text-lg mb-4 uppercase flex items-center gap-2">
+                  <span className="w-1 h-5 bg-[#fbbf24] rounded-full text-transparent">.</span>
+                  Phim S sắp chiếu
+                </h3>
+                <div className="space-y-3">
+                  {/* Re-use AsyncMovieRow but we might need a specific 'sidebar' variant for rendering vertical list. 
+                                 For now, standard AsyncMovieRow renders a horizontal slider which might break layout in sidebar.
+                                 Let's stick to placing full width rows in main area and specific trending lists in sidebar.
+                             */}
+                  {/* Since AsyncMovieRow returns a MovieRow (slider), it's not suitable for Sidebar unless modified.
+                                 I'll leave 'Phim Sắp Chiếu' in the main column for now if I can't easily switch it to vertical.
+                              */}
+                </div>
+                {/* Fallback simply putting Sắp Chiếu back to Main or hidden for now in sidebar until we have a SidebarRow component */}
+              </div>
+            </Suspense>
+
+            {/* Genre Tags Cloud (Static for visual density) */}
+            <div className="bg-[#111] p-5 rounded-xl border border-white/5">
+              <h3 className="text-white font-bold text-base mb-4 uppercase">Từ khóa hot</h3>
+              <div className="flex flex-wrap gap-2 text-xs text-gray-400">
+                {['Hành động', 'Tình cảm', 'Cổ trang', 'Kinh dị', 'Viễn tưởng', 'Hàn Quốc', 'Anime', 'Netflix'].map(tag => (
+                  <span key={tag} className="bg-white/5 hover:bg-[#fbbf24] hover:text-black px-3 py-1.5 rounded-full transition-colors cursor-pointer border border-white/5">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </div>
       </div>
     </main>
-  );
 }

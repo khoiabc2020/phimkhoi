@@ -50,11 +50,13 @@ const App = {
 
             try {
                 const res = await fetch(`${API_BASE}/v1/api/danh-sach/${type}?limit=24`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
                 const items = data.data?.items || data.items || [];
                 this.renderGrid(items);
             } catch (e) {
                 console.error(e);
+                document.getElementById('movie-grid').innerHTML = `<div style="font-size:24px; color:red">Lỗi tải dữ liệu: ${e.message}<br>Vui lòng thử lại sau.</div>`;
             }
         }
     },

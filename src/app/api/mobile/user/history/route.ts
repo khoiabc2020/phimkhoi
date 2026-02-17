@@ -79,7 +79,7 @@ export async function POST(req: Request) {
         await dbConnect();
 
         // 1. Get Movie Details (needed for WatchHistory)
-        const movie = await Movie.findOne({ slug });
+        const movie = await Movie.findOne({ slug }) as any;
         if (!movie) {
             return NextResponse.json({ message: "Movie not found" }, { status: 404 });
         }

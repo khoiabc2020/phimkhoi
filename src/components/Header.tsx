@@ -109,11 +109,25 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
             <div className="container mx-auto px-4 h-20 flex items-center justify-between">
                 {/* Left: Logo & Nav */}
                 <div className="flex items-center gap-8">
-                    <Link href="/" className="flex items-center gap-2 group">
-                        <div className="relative w-10 h-10 rounded-full bg-gradient-to-br from-primary to-yellow-600 flex items-center justify-center shadow-lg shadow-primary/30 group-hover:scale-110 transition-transform">
-                            <Play className="w-5 h-5 text-black fill-black ml-1" />
+                    <Link href="/" className="flex items-center gap-3 group">
+                        <div className="relative w-10 h-10 flex items-center justify-center">
+                            <div className="absolute w-full h-full bg-primary rounded-full opacity-20 animate-pulse" />
+                            <div className="relative w-10 h-10 rounded-full border-2 border-primary bg-black/40 backdrop-blur-md flex items-center justify-center shadow-lg shadow-primary/30 group-hover:scale-110 transition-transform">
+                                <Play className="w-5 h-5 text-primary fill-primary ml-1" />
+                            </div>
                         </div>
-                        <span className="text-xl font-black text-white tracking-tighter hidden sm:inline-block">MOVIE<span className="text-primary">BOX</span> - Xem phim là mê</span>
+                        <div className="flex flex-col justify-center">
+                            <span className="text-2xl font-black text-white tracking-tighter leading-none hidden sm:block">
+                                MOVIE<span className="text-primary">BOX</span>
+                            </span>
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest hidden sm:block">
+                                Xem phim là mê
+                            </span>
+                            {/* Mobile Text (Simplified) */}
+                            <span className="text-xl font-black text-white tracking-tighter leading-none sm:hidden">
+                                MOVIE<span className="text-primary">BOX</span>
+                            </span>
+                        </div>
                     </Link>
 
                     {/* Desktop Nav */}

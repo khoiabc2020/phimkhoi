@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Image } from 'expo-image';
 import { Link } from 'expo-router';
@@ -10,7 +10,7 @@ interface MovieCardProps {
     height?: number;
 }
 
-export default function MovieCard({ movie, width = 140, height = 210 }: MovieCardProps) {
+const MovieCard = memo(({ movie, width = 140, height = 210 }: MovieCardProps) => {
     const imageUrl = getImageUrl(movie.poster_url || movie.thumb_url);
 
     return (
@@ -24,6 +24,7 @@ export default function MovieCard({ movie, width = 140, height = 210 }: MovieCar
                     style={{ width, height, borderRadius: 8 }}
                     contentFit="cover"
                     transition={200}
+                    cachePolicy="memory-disk"
                 />
 
                 {/* Quality Badge */}
@@ -32,13 +33,19 @@ export default function MovieCard({ movie, width = 140, height = 210 }: MovieCar
                 </View>
 
                 {/* Title */}
-                <Text className="text-white text-sm font-medium mt-2" numberOfLines={1}>
+                <Text
+                    className="text-white text-sm font-bold mt-2 leading-tight"
+                    numberOfLines={2}
+                    style={{ fontFamily: 'System' }}
+                >
                     {movie.name}
                 </Text>
-                <Text className="text-gray-400 text-xs" numberOfLines={1}>
+                <Text className="text-gray-400 text-xs mt-0.5" numberOfLines={1}>
                     {movie.origin_name}
                 </Text>
             </Pressable>
         </Link>
     );
-}
+});
+
+export default MovieCard;

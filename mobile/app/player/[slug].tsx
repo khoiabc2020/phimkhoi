@@ -159,12 +159,22 @@ export default function PlayerScreen() {
             ) : (
                 <>
                     <WebView
+                        key={videoUrl} // Force reload on url change
                         source={{ uri: videoUrl }}
                         style={{ flex: 1, backgroundColor: 'black' }}
                         javaScriptEnabled={true}
                         domStorageEnabled={true}
                         allowsFullscreenVideo={true}
                         userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+                        onError={(e) => console.log('WebView Error:', e.nativeEvent)}
+                        renderError={() => (
+                            <View className="flex-1 justify-center items-center bg-black">
+                                <Text className="text-white mb-4">Lỗi tải video. Vui lòng thử lại.</Text>
+                                <TouchableOpacity onPress={() => setVideoUrl(videoUrl + '?retry=1')} className="bg-[#fbbf24] px-4 py-2 rounded">
+                                    <Text className="font-bold">Tải lại</Text>
+                                </TouchableOpacity>
+                            </View>
+                        )}
                     />
                     <TouchableOpacity
                         onPress={handleClose}

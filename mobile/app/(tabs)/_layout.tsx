@@ -1,36 +1,53 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform, View } from 'react-native';
+import { Platform, View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BlurView } from 'expo-blur';
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
-  const TAB_HEIGHT = 60 + insets.bottom; // Dynamic height
 
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: '#fbbf24',
-        tabBarInactiveTintColor: '#9ca3af',
+        tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.6)',
         headerShown: false,
         tabBarStyle: {
           position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          backgroundColor: 'rgba(10, 10, 10, 0.95)', // Glass effect dark background
+          bottom: 15, // Reduced from 25
+          left: 15, // Reduced from 20
+          right: 15, // Reduced from 20
+          height: 60, // Reduced from 65
+          borderRadius: 30,
+          backgroundColor: 'transparent', // Handled by BlurView
           borderTopWidth: 0,
-          elevation: 0,
-          height: TAB_HEIGHT,
-          paddingTop: 8,
-          // Platform specific adjustment if needed, but insets.bottom handles most
+          elevation: 0, // Android shadow handled differently if needed
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 10,
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingBottom: 0, // Reset default padding
         },
+        tabBarBackground: () => (
+          <View style={[StyleSheet.absoluteFill, { borderRadius: 35, overflow: 'hidden', backgroundColor: 'rgba(20, 20, 20, 0.85)' }]}>
+            {Platform.OS === 'ios' && (
+              <BlurView intensity={30} style={StyleSheet.absoluteFill} tint="dark" />
+            )}
+          </View>
+        ),
         tabBarLabelStyle: {
-          fontSize: 10,
+          fontSize: 9,
           fontWeight: '600',
-          marginTop: 2,
-          paddingBottom: insets.bottom > 0 ? 0 : 5 // Add padding if no safe area (old button nav)
+          marginBottom: 8,
+        },
+        tabBarItemStyle: {
+          height: 65,
+          justifyContent: 'center',
+          alignItems: 'center',
         }
       }}>
       <Tabs.Screen
@@ -38,7 +55,9 @@ export default function TabLayout() {
         options={{
           title: 'Trang chủ',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons size={24} name={focused ? "home" : "home-outline"} color={color} />
+            <View style={{ alignItems: 'center', justifyContent: 'center', top: 2 }}>
+              <Ionicons size={22} name={focused ? "home" : "home-outline"} color={color} />
+            </View>
           ),
         }}
       />
@@ -47,7 +66,9 @@ export default function TabLayout() {
         options={{
           title: 'Duyệt tìm',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons size={24} name={focused ? "search" : "search-outline"} color={color} />
+            <View style={{ alignItems: 'center', justifyContent: 'center', top: 2 }}>
+              <Ionicons size={22} name={focused ? "search" : "search-outline"} color={color} />
+            </View>
           ),
         }}
       />
@@ -56,7 +77,9 @@ export default function TabLayout() {
         options={{
           title: 'Lịch chiếu',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons size={24} name={focused ? "calendar" : "calendar-outline"} color={color} />
+            <View style={{ alignItems: 'center', justifyContent: 'center', top: 2 }}>
+              <Ionicons size={22} name={focused ? "calendar" : "calendar-outline"} color={color} />
+            </View>
           ),
         }}
       />
@@ -65,7 +88,9 @@ export default function TabLayout() {
         options={{
           title: 'Tài khoản',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons size={24} name={focused ? "person" : "person-outline"} color={color} />
+            <View style={{ alignItems: 'center', justifyContent: 'center', top: 2 }}>
+              <Ionicons size={22} name={focused ? "person" : "person-outline"} color={color} />
+            </View>
           ),
         }}
       />
@@ -75,3 +100,4 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+

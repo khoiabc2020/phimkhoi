@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
+    "android:build": "cd android && ./gradlew assembleRelease",
     "build:android": "eas build --platform android --profile production",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",

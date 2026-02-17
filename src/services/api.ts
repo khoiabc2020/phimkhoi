@@ -87,10 +87,23 @@ export const getHomeData = async () => {
 
 export const getMovieDetail = async (slug: string) => {
     try {
+        // Try KKPhim first
         const res = await fetch(`${API_URL}/phim/${slug}`, { next: { revalidate: 60 } });
-        const data = await res.json();
-        // Return the full response which includes both movie and episodes
-        return data;
+
+        if (res.ok) {
+            const data = await res.json();
+            if (data.status) return data;
+        }
+
+        // Fallback to OPhim
+        console.log(`[MultiSource] KPPhim missing ${slug}, trying OPhim...`);
+        const ophimRes = await fetch(`${OPHIM_API}/phim/${slug}`, { next: { revalidate: 60 } });
+        if (ophimRes.ok) {
+            const data = await ophimRes.json();
+            return data; // OPhim detail structure is usually compatible
+        }
+
+        return null;
     } catch (error) {
         console.error(`Error fetching movie detail [${slug}]:`, error);
         return null;
@@ -99,33 +112,120 @@ export const getMovieDetail = async (slug: string) => {
 
 export const searchMovies = async (keyword: string) => {
     try {
-        const res = await fetch(`${API_URL}/v1/api/tim-kiem?keyword=${keyword}&limit=20`);
-        const data = await res.json();
-        return data.data?.items || [];
+        const [kkRes, ophimRes] = await Promise.allSettled([
+            fetch(`${API_URL}/v1/api/tim-kiem?keyword=${keyword}&limit=20`).then(r => r.json()),
+            fetch(`${OPHIM_API}/v1/api/tim-kiem?keyword=${keyword}&limit=20`).then(r => r.json())
+        ]);
+
+        let results: Movie[] = [];
+
+        if (kkRes.status === 'fulfilled') {
+            const data = kkRes.value;
+            const pathImage = data.pathImage || data.data?.pathImage || "";
+            // Ensure we construct full URL if strictly needed, though search endpoint sometimes gives full url
+            const items = (data.data?.items || []).map((item: any) => ({
+                ...item,
+                thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : `${pathImage}${item.thumb_url}`,
+                poster_url: item.poster_url?.startsWith('http') ? item.poster_url : `${pathImage}${item.poster_url}`
+            }));
+            results = [...results, ...items];
+        }
+
+        if (ophimRes.status === 'fulfilled') {
+            const data = ophimRes.value;
+            const pathImage = data.pathImage || data.data?.APP_DOMAIN_CDN_IMAGE || "https://img.ophim.live/uploads/movies/";
+            const items = (data.data?.items || []).map((item: any) => normalizeOphimItem(item, pathImage));
+            results = [...results, ...items];
+        }
+
+        // Deduplicate
+        const seen = new Set();
+        return results.filter(item => {
+            const duplicate = seen.has(item.slug);
+            seen.add(item.slug);
+            return !duplicate;
+        });
+
     } catch (error) {
         console.error(`Error searching movies [${keyword}]:`, error);
         return [];
     }
 };
 
+export const OPHIM_API = "https://ophim1.com";
+
+// Helper to normalize OPhim data to match our Movie interface
+const normalizeOphimItem = (item: any, pathImage: string): Movie => {
+    return {
+        ...item,
+        _id: item._id,
+        name: item.name,
+        slug: item.slug,
+        origin_name: item.origin_name,
+        thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : `${pathImage}${item.thumb_url}`,
+        poster_url: item.poster_url?.startsWith('http') ? item.poster_url : `${pathImage}${item.poster_url}`,
+        type: item.type || 'unknown',
+        sub_docquyen: item.sub_docquyen || false,
+        chieurap: item.chieurap || false,
+        time: item.time || '',
+        episode_current: item.episode_current || '',
+        quality: item.quality || '',
+        lang: item.lang || '',
+        year: item.year || new Date().getFullYear(),
+        category: item.category || [],
+        country: item.country || [],
+    };
+};
+
 export const getMoviesList = async (type: string, params: { page?: number; year?: number; category?: string; country?: string; limit?: number } = {}) => {
     try {
         const { page = 1, year, category, country, limit = 24 } = params;
-
-        // Build query string
         let query = `?page=${page}&limit=${limit}`;
         if (year) query += `&year=${year}`;
         if (category) query += `&category=${category}`;
         if (country) query += `&country=${country}`;
 
-        // Handle specific endpoints logic if needed, but V1/API is generic list
-        // Note: PhimApi structure: /v1/api/danh-sach/{type}
-        const res = await fetch(`${API_URL}/v1/api/danh-sach/${type}${query}`, { next: { revalidate: 60 } }); // Lower revalidate for faster updates
-        const data = await res.json();
+        // Fetch from BOTH sources in parallel
+        const [kkRes, ophimRes] = await Promise.allSettled([
+            fetch(`${API_URL}/v1/api/danh-sach/${type}${query}`, { next: { revalidate: 60 } }).then(r => r.json()),
+            fetch(`${OPHIM_API}/v1/api/danh-sach/${type}${query}`, { next: { revalidate: 60 } }).then(r => r.json()) // Ignore cache for testing or separate key
+        ]);
+
+        let items: Movie[] = [];
+        let kkPagination = { currentPage: 1, totalPages: 1 };
+
+        // Process KKPhim Data
+        if (kkRes.status === 'fulfilled' && kkRes.value?.data?.items) {
+            const data = kkRes.value;
+            const pathImage = data.pathImage || data.data?.pathImage || "";
+            const kkItems = getItems(data).map(item => ({
+                ...item,
+                thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : `${pathImage}${item.thumb_url}`,
+                poster_url: item.poster_url?.startsWith('http') ? item.poster_url : `${pathImage}${item.poster_url}`
+            }));
+            items = [...items, ...kkItems];
+            kkPagination = data.data?.params?.pagination || kkPagination;
+        }
+
+        // Process OPhim Data
+        if (ophimRes.status === 'fulfilled' && ophimRes.value?.data?.items) {
+            const data = ophimRes.value;
+            const pathImage = data.pathImage || data.data?.pathImage || "https://img.ophim.live/uploads/movies/";
+            const ophimItems = getItems(data).map(item => normalizeOphimItem(item, pathImage));
+            items = [...items, ...ophimItems];
+        }
+
+        // Deduplicate by Slug
+        const seen = new Set();
+        const uniqueItems = items.filter(item => {
+            const duplicate = seen.has(item.slug);
+            seen.add(item.slug);
+            return !duplicate;
+        });
 
         return {
-            items: getItems(data),
-            pagination: data.data?.params?.pagination || { currentPage: 1, totalPages: 1 }
+            items: uniqueItems,
+            pagination: kkPagination // Use KK pagination as primary source of truth for simplicity in this hybrid mode
         };
     } catch (error) {
         console.error(`Error fetching movies list [${type}]:`, error);
@@ -135,13 +235,45 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
 
 export const getMoviesByCategory = async (slug: string, page: number = 1, limit: number = 24) => {
     try {
-        const res = await fetch(`${API_URL}/v1/api/the-loai/${slug}?page=${page}&limit=${limit}`, { next: { revalidate: 3600 } });
-        const data = await res.json();
+        // Hybrid fetch for categories too
+        const [kkRes, ophimRes] = await Promise.allSettled([
+            fetch(`${API_URL}/v1/api/the-loai/${slug}?page=${page}&limit=${limit}`, { next: { revalidate: 3600 } }).then(r => r.json()),
+            fetch(`${OPHIM_API}/v1/api/the-loai/${slug}?page=${page}&limit=${limit}`, { next: { revalidate: 3600 } }).then(r => r.json())
+        ]);
 
-        // Normalize response structure matches list response
+        let items: Movie[] = [];
+        let kkPagination = { currentPage: 1, totalPages: 1 };
+
+        if (kkRes.status === 'fulfilled') {
+            const data = kkRes.value;
+            const pathImage = data.pathImage || data.data?.pathImage || "";
+            const kkItems = getItems(data).map(item => ({
+                ...item,
+                thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : `${pathImage}${item.thumb_url}`,
+                poster_url: item.poster_url?.startsWith('http') ? item.poster_url : `${pathImage}${item.poster_url}`
+            }));
+            items = [...items, ...kkItems];
+            kkPagination = data.data?.params?.pagination || kkPagination;
+        }
+
+        if (ophimRes.status === 'fulfilled') {
+            const data = ophimRes.value;
+            const pathImage = data.pathImage || "https://img.ophim.live/uploads/movies/";
+            const ophimItems = getItems(data).map(item => normalizeOphimItem(item, pathImage));
+            items = [...items, ...ophimItems];
+        }
+
+        // Deduplicate
+        const seen = new Set();
+        const uniqueItems = items.filter(item => {
+            const duplicate = seen.has(item.slug);
+            seen.add(item.slug);
+            return !duplicate;
+        });
+
         return {
-            items: getItems(data),
-            pagination: data.data?.params?.pagination || { currentPage: 1, totalPages: 1 }
+            items: uniqueItems,
+            pagination: kkPagination
         };
     } catch (error) {
         console.error(`Error fetching category [${slug}]:`, error);
@@ -151,12 +283,43 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
 
 export const getMoviesByCountry = async (slug: string, page: number = 1, limit: number = 24) => {
     try {
-        const res = await fetch(`${API_URL}/v1/api/quoc-gia/${slug}?page=${page}&limit=${limit}`, { next: { revalidate: 3600 } });
-        const data = await res.json();
+        const [kkRes, ophimRes] = await Promise.allSettled([
+            fetch(`${API_URL}/v1/api/quoc-gia/${slug}?page=${page}&limit=${limit}`, { next: { revalidate: 3600 } }).then(r => r.json()),
+            fetch(`${OPHIM_API}/v1/api/quoc-gia/${slug}?page=${page}&limit=${limit}`, { next: { revalidate: 3600 } }).then(r => r.json())
+        ]);
+
+        let items: Movie[] = [];
+        let kkPagination = { currentPage: 1, totalPages: 1 };
+
+        if (kkRes.status === 'fulfilled') {
+            const data = kkRes.value;
+            const pathImage = data.pathImage || data.data?.pathImage || "";
+            const kkItems = getItems(data).map(item => ({
+                ...item,
+                thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : `${pathImage}${item.thumb_url}`,
+                poster_url: item.poster_url?.startsWith('http') ? item.poster_url : `${pathImage}${item.poster_url}`
+            }));
+            items = [...items, ...kkItems];
+            kkPagination = data.data?.params?.pagination || kkPagination;
+        }
+
+        if (ophimRes.status === 'fulfilled') {
+            const data = ophimRes.value;
+            const pathImage = data.pathImage || "https://img.ophim.live/uploads/movies/";
+            const ophimItems = getItems(data).map(item => normalizeOphimItem(item, pathImage));
+            items = [...items, ...ophimItems];
+        }
+
+        const seen = new Set();
+        const uniqueItems = items.filter(item => {
+            const duplicate = seen.has(item.slug);
+            seen.add(item.slug);
+            return !duplicate;
+        });
 
         return {
-            items: getItems(data),
-            pagination: data.data?.params?.pagination || { currentPage: 1, totalPages: 1 }
+            items: uniqueItems,
+            pagination: kkPagination
         };
     } catch (error) {
         console.error(`Error fetching country [${slug}]:`, error);

@@ -11,10 +11,11 @@ import useEmblaCarousel from "embla-carousel-react";
 interface TopTrendingProps {
     title: string;
     movies: Movie[];
-    slug?: string;
+    slug: string;
+    className?: string;
 }
 
-export default function TopTrending({ title, movies, slug }: TopTrendingProps) {
+export default function TopTrending({ title, movies, slug, className }: TopTrendingProps) {
     const [emblaRef, emblaApi] = useEmblaCarousel({
         loop: false,
         align: "start",
@@ -26,7 +27,7 @@ export default function TopTrending({ title, movies, slug }: TopTrendingProps) {
     const topMovies = movies;
 
     return (
-        <div className="w-full relative py-8">
+        <div className={cn("w-full relative py-8", className)}>
             <div className="container mx-auto px-4 md:px-12 mb-5 flex flex-row items-end justify-between gap-4">
                 <h2 className="text-xl md:text-2xl font-bold text-white capitalize flex items-center gap-2 flex-1">
                     <span className="w-1 h-6 bg-[#fbbf24] rounded-full shadow-[0_0_15px_#fbbf24] flex-shrink-0"></span>

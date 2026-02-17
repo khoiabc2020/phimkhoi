@@ -126,7 +126,7 @@ export default function WatchEpisodeSection({
             {/* Episode grid */}
             {!isCollapsed && (
                 <div className="p-4 pt-0">
-                    <div className="flex flex-wrap gap-2 max-h-[280px] overflow-y-auto custom-scrollbar">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2 max-h-[350px] overflow-y-auto custom-scrollbar pr-2">
                         {episodes.map((ep) => {
                             const isActive = ep.slug === currentEpisodeSlug;
                             return (
@@ -134,14 +134,14 @@ export default function WatchEpisodeSection({
                                     key={ep.slug}
                                     href={`/xem-phim/${movieSlug}/${ep.slug}`}
                                     className={cn(
-                                        "min-w-[72px] h-10 px-3 rounded-lg flex items-center justify-center gap-1.5 text-sm font-medium transition-all",
+                                        "h-10 rounded-lg flex items-center justify-center gap-1.5 text-sm font-bold transition-all border",
                                         isActive
-                                            ? "bg-[#fbbf24] text-black shadow-[0_0_12px_rgba(251,191,36,0.4)]"
-                                            : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/5"
+                                            ? "bg-[#fbbf24] border-[#fbbf24] text-black shadow-[0_0_15px_rgba(251,191,36,0.3)] scale-105"
+                                            : "bg-[#1f2937]/50 border-white/5 text-gray-400 hover:bg-[#1f2937] hover:text-white hover:border-white/10"
                                     )}
                                 >
-                                    {isActive && <Play className="w-3.5 h-3.5 fill-current" />}
-                                    {ep.name}
+                                    {isActive ? <Play className="w-3 h-3 fill-black" /> : null}
+                                    {ep.name.replace("Tập ", "")}
                                 </Link>
                             );
                         })}

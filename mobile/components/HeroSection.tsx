@@ -24,7 +24,7 @@ export default function HeroSection({ movies }: HeroSectionProps) {
     const activeMovie = movies[activeIndex];
 
     return (
-        <View style={{ height: height * 0.82, position: 'relative' }}>
+        <View style={{ height: height * 0.7, position: 'relative' }}>
             {/* Background Blur (Subtle) */}
             <View style={StyleSheet.absoluteFill}>
                 <Image

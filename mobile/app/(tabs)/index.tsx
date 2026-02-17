@@ -64,24 +64,33 @@ export default function HomeScreen() {
       <StatusBar style="light" />
 
       {/* Floating Header (Absolute) */}
+      {/* Floating Header (Absolute) */}
       <SafeAreaView className="absolute top-0 left-0 right-0 z-50 px-4 pt-2">
-        <View className="flex-row justify-between items-center">
-          <View className="flex-row items-center">
-            {/* Logo Circle */}
-            <View className="w-10 h-10 rounded-full border-2 border-[#fbbf24] justify-center items-center bg-black/50 backdrop-blur-md">
-              <Ionicons name="play" size={20} color="#fbbf24" style={{ marginLeft: 2 }} />
+        <View className="flex-row justify-between items-center bg-transparent">
+          <View className="flex-row items-center gap-3">
+            {/* RoPhim Logo Style */}
+            <View className="relative w-10 h-10 justify-center items-center">
+              <View className="absolute w-full h-full bg-[#fbbf24] rounded-full opacity-20" />
+              <View className="w-10 h-10 rounded-full border-2 border-[#fbbf24] justify-center items-center bg-black/40 backdrop-blur-md">
+                <Ionicons name="play" size={20} color="#fbbf24" style={{ marginLeft: 3 }} />
+              </View>
+              {/* Decorative curve/bowl if possible, but keep simple for now */}
             </View>
-            <View className="ml-3">
-              <Text className="text-white font-extrabold text-xl leading-6 tracking-tight">RoPhim</Text>
-              <Text className="text-gray-400 text-[10px] leading-3 font-medium">Phim hay cả rổ</Text>
+
+            <View>
+              <Text className="text-white font-extrabold text-2xl leading-7 tracking-tighter">MovieBox</Text>
+              <Text className="text-gray-400 text-[10px] uppercase tracking-widest font-semibold">Xem phim là mê</Text>
             </View>
           </View>
-          <View className="flex-row gap-4">
-            <Pressable onPress={() => router.push('/notifications' as any)} className="">
-              <Ionicons name="notifications-outline" size={26} color="white" />
+
+          <View className="flex-row gap-3">
+            <Pressable onPress={() => router.push('/notifications' as any)}
+              className="w-10 h-10 rounded-full bg-white/10 items-center justify-center backdrop-blur-md active:bg-white/20">
+              <Ionicons name="notifications-outline" size={22} color="white" />
             </Pressable>
-            <Pressable onPress={() => router.push('/settings' as any)} className="">
-              <Ionicons name="settings-outline" size={26} color="white" />
+            <Pressable onPress={() => router.push('/settings' as any)}
+              className="w-10 h-10 rounded-full bg-white/10 items-center justify-center backdrop-blur-md active:bg-white/20">
+              <Ionicons name="settings-outline" size={22} color="white" />
             </Pressable>
           </View>
         </View>

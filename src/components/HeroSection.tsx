@@ -131,10 +131,10 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
     };
 
     return (
-        <div className="relative w-full h-[65vh] md:h-screen bg-black overflow-hidden flex flex-col">
+        <div className="relative w-full h-auto md:h-screen bg-black overflow-hidden flex flex-col">
 
             {/* ================= MOBILE LAYOUT (Vertical Card Style) ================= */}
-            <div className="md:hidden relative w-full h-[65vh] flex flex-col pt-16">
+            <div className="md:hidden relative w-full h-[60vh] min-h-[500px] flex flex-col pt-20">
 
                 {/* 1. Blurred Background - Lighter & More Vibrant */}
                 <div className="absolute inset-0 z-0">
@@ -142,26 +142,26 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                         src={getHeroImage(activeMovie, 'backdrop')} // Use High-Res Backdrop
                         alt={activeMovie.name}
                         fill
-                        className="object-cover blur-xl opacity-50 scale-110 transition-all duration-700"
+                        className="object-cover blur-xl opacity-40 scale-110 transition-all duration-700"
                         priority
                     />
                     {/* Lighter gradient for better visibility */}
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black" />
                 </div>
 
                 {/* 3. Main Content Area - Compacted */}
-                <div className="relative z-10 flex-1 flex flex-col justify-center items-center pb-4 gap-2">
+                <div className="relative z-10 flex-1 flex flex-col justify-end items-center pb-8 gap-3">
 
                     {/* Carousel - Slightly smaller */}
-                    <div className="w-full mb-1" ref={mobileRef}>
-                        <div className="flex touch-pan-y items-center py-1">
+                    <div className="w-full mb-2" ref={mobileRef}>
+                        <div className="flex touch-pan-y items-center py-2">
                             {heroMovies.map((movie, index) => (
-                                <div key={movie._id} className="flex-[0_0_40%] min-w-0 pl-3 relative perspective-1000">
+                                <div key={movie._id} className="flex-[0_0_45%] min-w-0 pl-4 relative perspective-1000">
                                     <div className={cn(
-                                        "relative rounded-lg overflow-hidden shadow-2xl transition-all duration-500 ease-out transform aspect-[2/3]",
+                                        "relative rounded-xl overflow-hidden shadow-2xl transition-all duration-500 ease-out transform aspect-[2/3]",
                                         index === selectedIndex
-                                            ? "scale-100 opacity-100 z-20 shadow-[0_8px_25px_rgba(0,0,0,0.5)] ring-1 ring-white/20"
-                                            : "scale-90 opacity-60 z-10 grayscale-[0.4] blur-[0.5px] translate-y-2"
+                                            ? "scale-100 opacity-100 z-20 shadow-[0_8px_25px_rgba(0,0,0,0.5)] ring-1 ring-white/30"
+                                            : "scale-90 opacity-60 z-10 grayscale-[0.5] blur-[1px] translate-y-3"
                                     )}>
                                         <Image
                                             src={getImageUrl(movie.poster_url || movie.thumb_url)}
@@ -171,7 +171,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                             sizes="(max-width: 768px) 45vw"
                                             priority={index === selectedIndex}
                                         />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                                     </div>
                                 </div>
                             ))}
@@ -179,47 +179,47 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                     </div>
 
                     {/* Info Section - Compacted */}
-                    <div className="w-full px-4 text-center space-y-1.5 animate-in fade-in slide-in-from-bottom-2 duration-300" key={activeMovie._id}>
+                    <div className="w-full px-4 text-center space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300" key={activeMovie._id}>
 
                         {/* Title & Original Title */}
                         <div>
-                            <h1 className="text-base font-black text-white uppercase tracking-tight leading-none drop-shadow-lg line-clamp-2 px-4 shadow-black">
+                            <h1 className="text-lg font-black text-white uppercase tracking-tight leading-none drop-shadow-lg line-clamp-2 px-2 shadow-black text-balance">
                                 {activeMovie.name}
                             </h1>
-                            <p className="text-[10px] font-medium text-white/70 mt-0.5 tracking-wide line-clamp-1">
+                            <p className="text-[11px] font-semibold text-white/70 mt-1 tracking-wide line-clamp-1 text-shadow-sm">
                                 {activeMovie.origin_name}
                             </p>
                         </div>
 
+                        {/* Badges & Meta - Minimal */}
+                        <div className="flex flex-wrap items-center justify-center gap-2 text-[10px] font-medium text-white/80">
+                            <div className="flex items-center gap-1 px-2 py-0.5 rounded bg-[#fbbf24] text-black font-bold">
+                                <span className="text-[9px]">★</span>
+                                <span>{activeRating}</span>
+                            </div>
+                            <span className="px-2 py-0.5 rounded bg-white/10 border border-white/10 backdrop-blur-sm">{activeMovie.year}</span>
+                            <span className="px-2 py-0.5 rounded bg-white/10 border border-white/10 backdrop-blur-sm">{activeMovie.quality}</span>
+                        </div>
+
                         {/* Action Buttons - Compact Circular Style */}
-                        <div className="flex gap-5 justify-center w-full px-8 pt-2">
+                        <div className="flex gap-4 justify-center w-full px-8 pt-3">
+                            <Link
+                                href={`/phim/${activeMovie.slug}`}
+                                className="w-12 h-12 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white active:scale-95 transition-transform hover:bg-white/20"
+                            >
+                                <Info className="w-5 h-5" />
+                            </Link>
+
                             <Link
                                 href={`/xem-phim/${activeMovie.slug}`}
-                                className="group relative flex items-center justify-center w-14 h-14 rounded-full bg-[#fbbf24] hover:bg-[#f59e0b] shadow-[0_0_25px_rgba(251,191,36,0.3)] transition-all duration-300 active:scale-95"
+                                className="group relative flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-[#fbbf24] to-[#d97706] shadow-[0_0_20px_rgba(251,191,36,0.4)] transition-all duration-300 active:scale-95"
                             >
                                 <Play className="w-6 h-6 fill-black text-black ml-1" />
                             </Link>
 
-                            <Link
-                                href={`/phim/${activeMovie.slug}`}
-                                className="w-12 h-12 flex items-center justify-center rounded-full bg-black/30 backdrop-blur-xl border border-white/10 text-white active:scale-95 transition-transform hover:bg-white/10 mt-1"
-                            >
-                                <Info className="w-6 h-6" />
-                            </Link>
-                            <div className="w-12 h-12 flex items-center justify-center rounded-full bg-black/30 backdrop-blur-xl border border-white/10 text-white active:scale-95 transition-transform hover:bg-white/10 mt-1">
+                            <div className="w-12 h-12 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white active:scale-95 transition-transform hover:bg-white/20">
                                 <FavoriteButton movieData={getFavoriteData(activeMovie)} initialIsFavorite={false} size="sm" />
                             </div>
-                        </div>
-
-                        {/* Badges & Meta - Minimal */}
-                        <div className="flex flex-wrap items-center justify-center gap-2 text-[10px] font-medium text-white/60 pt-2">
-                            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#fbbf24]/10 border border-[#fbbf24]/30 text-[#fbbf24]">
-                                <span className="text-[9px]">★</span>
-                                <span>{activeRating}</span>
-                            </div>
-                            <span className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10">{activeMovie.year}</span>
-                            <span className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10">{activeMovie.quality}</span>
-                            <span className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10">{activeMovie.duration || "N/A"}</span>
                         </div>
 
                     </div>

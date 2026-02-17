@@ -21,12 +21,21 @@ export async function GET(request: NextRequest) {
         return new NextResponse('Missing URL', { status: 400 });
     }
 
+    console.log(`[Proxy] Requesting: ${url}`);
+
     try {
-        const headers = {
+        // Spoof Referer to be the origin of the video URL, as many servers block external referers
+        // or set it to empty to avoid tracking/blocking
+        const upstreamOrigin = new URL(url).origin;
+
+        const headers: Record<string, string> = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Referer': upstreamOrigin + '/', // Set referer to the video source origin
+            'Origin': upstreamOrigin
         };
 
         const response = await fetch(url, { headers });
+        console.log(`[Proxy] Upstream Status: ${response.status} for ${url}`);
 
         if (!response.ok) {
             return new NextResponse(`Failed to fetch: ${response.status} ${response.statusText}`, { status: response.status });
@@ -40,15 +49,17 @@ export async function GET(request: NextRequest) {
         responseHeaders.set('Cache-Control', 'public, max-age=3600');
         if (contentType) responseHeaders.set('Content-Type', contentType);
 
-        // SAFE MODE: Buffer the response to avoid stream errors on VPS
-        const buffer = await response.arrayBuffer();
-
+        // OPTIMIZATION: Stream binary data (TS segments) directly to client
+        // This reduces memory usage and TTFB (Time To First Byte)
         if (!isM3u8) {
-            return new NextResponse(buffer, {
+            return new NextResponse(response.body, {
                 status: 200,
                 headers: responseHeaders,
             });
         }
+
+        // For Playlists (Text), we must buffer to rewrite URLs
+        const buffer = await response.arrayBuffer();
 
         // Text Processing for Playlist
         const decoder = new TextDecoder();

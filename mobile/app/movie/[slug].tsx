@@ -145,36 +145,31 @@ export default function MovieDetailScreen() {
             <StatusBar style="light" />
 
             <ScrollView contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
-                {/* Backdrop Header with Gradient */}
-                <View className="relative w-full aspect-[4/5] -mb-32">
+                {/* Vertical Backdrop Header (Netflix Style) */}
+                <View className="relative w-full aspect-[2/3] -mb-40">
                     <Image
                         source={{ uri: backdropUrl }}
                         style={{ width: '100%', height: '100%' }}
                         contentFit="cover"
                         transition={500}
                     />
-                    {/* Top Gradient */}
+                    {/* Gradient Overlay for Text Visibility */}
                     <LinearGradient
-                        colors={['rgba(0,0,0,0.6)', 'transparent']}
-                        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 120 }}
-                    />
-                    {/* Bottom Gradient for smooth transition */}
-                    <LinearGradient
-                        colors={['transparent', 'rgba(0,0,0,0.4)', '#000000']}
-                        locations={[0, 0.5, 1]}
-                        style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 300 }}
+                        colors={['transparent', 'rgba(0,0,0,0.6)', '#000000']}
+                        locations={[0.4, 0.7, 1]}
+                        style={{ position: 'absolute', inset: 0 }}
                     />
 
-                    {/* Navbar */}
+                    {/* Navbar (Absolute Top) */}
                     <View className="absolute top-12 left-0 right-0 px-4 flex-row justify-between items-center z-10">
-                        <Pressable onPress={() => router.back()} className="bg-black/40 p-2 rounded-full backdrop-blur-md">
+                        <Pressable onPress={() => router.back()} className="bg-black/30 p-2 rounded-full backdrop-blur-md">
                             <Ionicons name="arrow-back" size={24} color="white" />
                         </Pressable>
                         <View className="flex-row gap-4">
-                            <Pressable className="bg-black/40 p-2 rounded-full backdrop-blur-md">
+                            <Pressable className="bg-black/30 p-2 rounded-full backdrop-blur-md">
                                 <Ionicons name="search" size={24} color="white" />
                             </Pressable>
-                            <Pressable className="bg-black/40 p-2 rounded-full backdrop-blur-md">
+                            <Pressable className="bg-black/30 p-2 rounded-full backdrop-blur-md">
                                 <Ionicons name="share-social" size={24} color="white" />
                             </Pressable>
                         </View>
@@ -182,171 +177,147 @@ export default function MovieDetailScreen() {
                 </View>
 
                 {/* Main Content */}
-                <View className="px-4 pt-10">
-                    {/* Title */}
-                    <Animated.View entering={FadeInDown.duration(600).delay(100)}>
-                        <Text className="text-white text-3xl font-extrabold text-center mb-1 shadow-sm leading-8">
+                <View className="px-4 pt-4">
+                    {/* Title (Overlapping Image) */}
+                    <Animated.View entering={FadeInDown.duration(600).delay(100)} className="items-center mb-6">
+                        {/* Network / Type Badge */}
+                        {movie.category && movie.category[0] && (
+                            <Text className="text-[#fbbf24] font-bold text-xs tracking-widest uppercase mb-2">
+                                {movie.category[0].name} • SERIES
+                            </Text>
+                        )}
+                        <Text className="text-white text-4xl font-extrabold text-center mb-2 shadow-sm leading-tight tracking-tight">
                             {movie.name}
                         </Text>
-                        <Text className="text-gray-400 text-sm font-medium text-center mb-4">
-                            {movie.origin_name} ({movie.year})
-                        </Text>
-                    </Animated.View>
-
-                    {/* Metadata Badges */}
-                    <Animated.View entering={FadeInDown.duration(600).delay(200)} className="flex-row justify-center items-center flex-wrap gap-2 mb-6">
-                        <View className="bg-yellow-500/20 px-2 py-0.5 rounded border border-yellow-500/50">
-                            <Text className="text-yellow-500 font-bold text-xs">IMDb 8.5</Text>
-                        </View>
-                        <View className="bg-gray-800 px-2 py-0.5 rounded border border-gray-700">
-                            <Text className="text-gray-300 font-bold text-xs">T18</Text>
-                        </View>
-                        <View className="bg-gray-800 px-2 py-0.5 rounded border border-gray-700">
-                            <Text className="text-gray-300 font-bold text-xs">{movie.year}</Text>
-                        </View>
-                        <View className="bg-gray-800 px-2 py-0.5 rounded border border-gray-700">
-                            <Text className="text-gray-300 font-bold text-xs">{movie.quality}</Text>
-                        </View>
-                        <View className="bg-gray-800 px-2 py-0.5 rounded border border-gray-700">
-                            <Text className="text-gray-300 font-bold text-xs">{movie.lang}</Text>
+                        {/* Stats Row */}
+                        <View className="flex-row items-center gap-3">
+                            <Text className="text-green-400 font-bold text-sm">98% Match</Text>
+                            <Text className="text-gray-400 text-sm">{movie.year}</Text>
+                            <View className="bg-gray-800 px-1.5 py-0.5 rounded">
+                                <Text className="text-gray-300 text-[10px] font-bold">{movie.quality}</Text>
+                            </View>
+                            <View className="bg-gray-800 px-1.5 py-0.5 rounded">
+                                <Text className="text-gray-300 text-[10px] font-bold">HD</Text>
+                            </View>
                         </View>
                     </Animated.View>
 
-                    {/* Completion Status */}
-                    <View className="flex-row justify-center mb-6">
-                        <View className="bg-green-500/20 px-3 py-1 rounded-full flex-row items-center border border-green-500/30">
-                            <Ionicons name="checkmark-circle" size={14} color="#4ade80" />
-                            <Text className="text-green-400 text-xs font-bold ml-1">
-                                {movie.status === 'completed' ? 'Đã hoàn thành' : 'Đang cập nhật'}: {movie.episode_current}
-                            </Text>
-                        </View>
-                    </View>
-
-                    {/* Primary Buttons */}
-                    <View className="flex-row gap-4 mb-8">
+                    {/* Primary Buttons (Netflix Style) */}
+                    <View className="flex-col gap-3 mb-8">
                         <Link href={firstEpisode ? `/player/${movie.slug}?ep=${firstEpisode.slug}` as any : '/'} asChild>
-                            <Pressable className="flex-1 bg-yellow-500 py-3.5 rounded-xl flex-row justify-center items-center shadow-lg shadow-yellow-500/20 active:scale-95 transition-transform" disabled={!firstEpisode}>
-                                <Ionicons name="play" size={22} color="black" />
-                                <Text className="text-black font-extrabold text-lg ml-2">Xem phim</Text>
+                            <Pressable className="w-full bg-white py-3.5 rounded-lg flex-row justify-center items-center active:opacity-90 transition-opacity" disabled={!firstEpisode}>
+                                <Ionicons name="play" size={26} color="black" />
+                                <Text className="text-black font-bold text-lg ml-2">Phát</Text>
                             </Pressable>
                         </Link>
-                        <Pressable
-                            onPress={() => setSelectedTab('episodes')}
-                            className="flex-1 bg-white py-3.5 rounded-xl flex-row justify-center items-center shadow-lg active:scale-95 transition-transform"
-                        >
-                            <Ionicons name="list" size={22} color="black" />
-                            <Text className="text-black font-extrabold text-lg ml-2">Tập Phim</Text>
+
+                        <Pressable className="w-full bg-[#333] py-3.5 rounded-lg flex-row justify-center items-center active:bg-[#444] transition-colors">
+                            <Ionicons name="download-outline" size={24} color="white" />
+                            <Text className="text-white font-bold text-base ml-2">Tải xuống</Text>
                         </Pressable>
                     </View>
 
-                    {/* Description (Collapsible) */}
+                    {/* Description & Cast Preview */}
                     <View className="mb-6">
-                        <Text
-                            className="text-gray-300 text-sm leading-6"
-                            numberOfLines={expandDesc ? undefined : 3}
-                        >
+                        <Text className="text-white text-sm leading-5 mb-2" numberOfLines={3}>
                             {movie.content?.replace(/<[^>]*>/g, '').trim()}
                         </Text>
-                        <Pressable onPress={() => setExpandDesc(!expandDesc)} className="flex-row items-center mt-1">
-                            <Text className="text-white font-bold text-sm mr-1">
-                                {expandDesc ? 'Thu gọn' : 'Chi tiết'}
-                            </Text>
-                            <Ionicons name={expandDesc ? "chevron-up" : "chevron-down"} size={14} color="white" />
-                        </Pressable>
+                        <Text className="text-gray-400 text-xs">
+                            <Text className="text-gray-500">Diễn viên: </Text>
+                            {movie.actor && movie.actor.length > 0 ? movie.actor.join(", ") : "Đang cập nhật"}
+                        </Text>
+                        <Text className="text-gray-400 text-xs mt-1">
+                            <Text className="text-gray-500">Đạo diễn: </Text>
+                            {movie.director && movie.director.length > 0 ? movie.director.join(", ") : "Đang cập nhật"}
+                        </Text>
                     </View>
 
-                    {/* Content Categories */}
-                    <View className="flex-row flex-wrap gap-2 mb-6">
-                        {movie.category?.map((cat: any) => (
-                            <View key={cat.id} className="bg-gray-900 border border-gray-800 px-3 py-1.5 rounded-lg">
-                                <Text className="text-gray-400 text-xs">{cat.name}</Text>
-                            </View>
-                        ))}
-                    </View>
-
-                    {/* Action Row */}
-                    <View className="flex-row justify-between mb-8 px-2">
+                    {/* Action Icons Row */}
+                    <View className="flex-row justify-start gap-8 mb-8 px-2">
                         <Pressable onPress={toggleFavorite} className="items-center">
-                            <Ionicons name={fav ? "heart" : "heart-outline"} size={24} color={fav ? "#ef4444" : "white"} />
-                            <Text className="text-gray-400 text-xs mt-1 font-medium">Yêu thích</Text>
+                            <Ionicons name={fav ? "checkmark" : "add"} size={24} color="white" />
+                            <Text className="text-gray-400 text-[10px] mt-1">Danh sách</Text>
                         </Pressable>
                         <Pressable className="items-center">
-                            <Ionicons name="add" size={28} color="white" />
-                            <Text className="text-gray-400 text-xs mt-1 font-medium">Thêm vào</Text>
+                            <Ionicons name="thumbs-up-outline" size={22} color="white" />
+                            <Text className="text-gray-400 text-[10px] mt-1">Xếp hạng</Text>
                         </Pressable>
                         <Pressable className="items-center">
-                            <Ionicons name="happy-outline" size={24} color="white" />
-                            <Text className="text-gray-400 text-xs mt-1 font-medium">Đánh giá</Text>
-                        </Pressable>
-                        <Pressable className="items-center">
-                            <Ionicons name="chatbubble-outline" size={24} color="white" />
-                            <Text className="text-gray-400 text-xs mt-1 font-medium">Bình luận</Text>
-                        </Pressable>
-                        <Pressable className="items-center">
-                            <Ionicons name="share-social-outline" size={24} color="white" />
-                            <Text className="text-gray-400 text-xs mt-1 font-medium">Chia sẻ</Text>
+                            <Ionicons name="paper-plane-outline" size={22} color="white" />
+                            <Text className="text-gray-400 text-[10px] mt-1">Chia sẻ</Text>
                         </Pressable>
                     </View>
 
-                    {/* Tabs */}
-                    <View className="flex-row border-b border-gray-800 mb-6 px-2">
-                        {['episodes', 'actors', 'related'].map((tab) => {
-                            const isSelected = selectedTab === tab;
-                            return (
-                                <Pressable
-                                    key={tab}
-                                    onPress={() => setSelectedTab(tab as any)}
-                                    className={`mr-6 pb-2 border-b-2 items-center flex-row ${isSelected ? 'border-yellow-500' : 'border-transparent'}`}
-                                >
-                                    <Ionicons
-                                        name={tab === 'episodes' ? 'list' : tab === 'actors' ? 'people' : 'grid'}
-                                        size={18}
-                                        color={isSelected ? '#fbbf24' : '#6b7280'}
-                                        style={{ marginBottom: -2, marginRight: 6 }}
-                                    />
-                                    <Text className={`${isSelected ? 'text-white font-bold' : 'text-gray-400 font-medium'} capitalize text-base`}>
-                                        {tab === 'episodes' ? 'Tập phim' : tab === 'actors' ? 'Diễn viên' : 'Đề xuất'}
-                                    </Text>
-                                </Pressable>
-                            );
-                        })}
+                    {/* Tabs / Segmented Control */}
+                    <View className="flex-row border-t border-gray-800 pt-4 mb-4">
+                        <Pressable onPress={() => setSelectedTab('episodes')} className={`mr-6 pb-2 border-b-4 ${selectedTab === 'episodes' ? 'border-[#e50914]' : 'border-transparent'}`}>
+                            <Text className={`font-bold text-base ${selectedTab === 'episodes' ? 'text-white' : 'text-gray-400'}`}>TẬP PHIM</Text>
+                        </Pressable>
+                        <Pressable onPress={() => setSelectedTab('related')} className={`mr-6 pb-2 border-b-4 ${selectedTab === 'related' ? 'border-[#e50914]' : 'border-transparent'}`}>
+                            <Text className={`font-bold text-base ${selectedTab === 'related' ? 'text-white' : 'text-gray-400'}`}>ĐỀ XUẤT</Text>
+                        </Pressable>
                     </View>
 
                     {/* Tab Content */}
                     {selectedTab === 'episodes' && episodes.length > 0 && (
                         <View>
-                            {/* Server/Season Selector */}
-                            <View className="flex-row justify-between items-center mb-4">
-                                <Pressable className="flex-row items-center">
-                                    <Text className="text-white font-bold text-lg mr-2">Phần 1</Text>
-                                    <Ionicons name="chevron-down" size={16} color="white" />
-                                </Pressable>
-                                <Pressable className="flex-row items-center">
-                                    <Ionicons name="language" size={16} color="white" style={{ marginRight: 4 }} />
-                                    <Text className="text-white font-medium">Tiếng gốc</Text>
-                                    <Ionicons name="chevron-down" size={14} color="white" style={{ marginLeft: 2 }} />
-                                </Pressable>
-                            </View>
-
-                            {/* Episode Grid */}
-                            {episodes.map((server, idx) => (
-                                <View key={idx} className="mb-4">
+                            {/* Server/Season Selector (Simple Text) */}
+                            {episodes.length > 0 && (
+                                <View className="mb-4">
+                                    <Text className="text-white font-bold text-lg">Phần 1</Text>
                                     {episodes.length > 1 && (
-                                        <Text className="text-yellow-500 mb-3 font-medium text-sm border-l-2 border-yellow-500 pl-2">
-                                            {server.server_name}
-                                        </Text>
+                                        <Text className="text-gray-500 text-xs mt-1">Nguồn: {episodes.map((s: any) => s.server_name).join(', ')}</Text>
                                     )}
-                                    <View className="flex-row flex-wrap gap-3">
-                                        {server.server_data.map((ep: any) => (
-                                            <Link key={ep.slug} href={`/player/${movie.slug}?ep=${ep.slug}`} asChild>
-                                                <Pressable className="bg-gray-800 w-[30%] aspect-[2/1] rounded-lg justify-center items-center border border-gray-700 active:bg-gray-700 active:border-yellow-500/50">
-                                                    <Text className="text-white font-bold text-sm">{ep.name}</Text>
-                                                </Pressable>
-                                            </Link>
-                                        ))}
-                                    </View>
                                 </View>
-                            ))}
+                            )}
+
+                            {/* Vertical Episode List */}
+                            <View className="space-y-4">
+                                {episodes.flatMap((server: any) => server.server_data).map((ep: any, index: number) => {
+                                    // Generate a fake duration for UI feel if not present
+                                    const duration = "24m";
+                                    const isNext = index === 0; // Hypothetical 'next to watch' logic could go here
+
+                                    return (
+                                        <Link key={`${ep.slug}-${index}`} href={`/player/${movie.slug}?ep=${ep.slug}`} asChild>
+                                            <Pressable className="flex-row items-center active:bg-gray-800/50 rounded-lg p-2 -mx-2">
+                                                {/* Thumbnail Placeholder */}
+                                                <View className="relative w-32 h-20 bg-gray-800 rounded-md overflow-hidden mr-3 justify-center items-center">
+                                                    <Image
+                                                        source={{ uri: backdropUrl }}
+                                                        style={{ width: '100%', height: '100%', opacity: 0.6 }}
+                                                        contentFit="cover"
+                                                    />
+                                                    <View className="absolute inset-0 bg-black/20 flex justify-center items-center">
+                                                        <Ionicons name="play-circle-outline" size={30} color="white" />
+                                                    </View>
+                                                    {/* Progress Bar (Fake) */}
+                                                    {index === 0 && (
+                                                        <View className="absolute bottom-0 left-0 right-0 h-1 bg-gray-600">
+                                                            <View className="w-[40%] h-full bg-[#e50914]" />
+                                                        </View>
+                                                    )}
+                                                </View>
+
+                                                {/* Info */}
+                                                <View className="flex-1 justify-center">
+                                                    <View className="flex-row justify-between items-center mb-1">
+                                                        <Text className="text-white font-bold text-base">{index + 1}. {ep.name}</Text>
+                                                        <Text className="text-gray-500 text-xs">{duration}</Text>
+                                                    </View>
+                                                    <Text className="text-gray-400 text-xs line-clamp-2" numberOfLines={2}>
+                                                        {movie.content?.substring(0, 60).replace(/<[^>]*>/g, '')}...
+                                                    </Text>
+                                                </View>
+
+                                                <View className="ml-2">
+                                                    <Ionicons name="download-outline" size={24} color="gray" />
+                                                </View>
+                                            </Pressable>
+                                        </Link>
+                                    );
+                                })}
+                            </View>
                         </View>
                     )}
 
