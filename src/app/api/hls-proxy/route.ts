@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic'; // Prevent static caching
+
 export async function OPTIONS() {
     return new NextResponse(null, {
         status: 200,
@@ -22,14 +24,9 @@ export async function GET(request: NextRequest) {
     try {
         const headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Referer': 'https://player.phimapi.com/',
-            'Origin': 'https://player.phimapi.com'
         };
 
-        const response = await fetch(url, {
-            headers,
-            keepalive: true
-        });
+        const response = await fetch(url, { headers });
 
         if (!response.ok) {
             return new NextResponse(`Failed to fetch: ${response.status} ${response.statusText}`, { status: response.status });
@@ -40,19 +37,23 @@ export async function GET(request: NextRequest) {
 
         const responseHeaders = new Headers();
         responseHeaders.set('Access-Control-Allow-Origin', '*');
-        if (contentType) responseHeaders.set('Content-Type', contentType);
         responseHeaders.set('Cache-Control', 'public, max-age=3600');
+        if (contentType) responseHeaders.set('Content-Type', contentType);
 
-        // 1. STREAM VIDEO SEGMENTS (Binary) - Do not buffer!
+        // SAFE MODE: Buffer the response to avoid stream errors on VPS
+        const buffer = await response.arrayBuffer();
+
         if (!isM3u8) {
-            return new NextResponse(response.body, {
+            return new NextResponse(buffer, {
                 status: 200,
                 headers: responseHeaders,
             });
         }
 
-        // 2. REWRITE PLAYLISTS (Text) - Must buffer to edit
-        const m3u8Content = await response.text();
+        // Text Processing for Playlist
+        const decoder = new TextDecoder();
+        const m3u8Content = decoder.decode(buffer);
+
         responseHeaders.set('Content-Type', 'application/vnd.apple.mpegurl');
 
         const baseUrl = url.substring(0, url.lastIndexOf('/') + 1);
