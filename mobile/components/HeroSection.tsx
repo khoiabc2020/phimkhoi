@@ -162,12 +162,13 @@ const styles = StyleSheet.create({
     title: {
         color: '#fff',
         fontSize: 26,
-        fontWeight: 'bold',
+        fontWeight: '900', // Extra bold
         textAlign: 'center',
-        fontFamily: 'serif', // Elegant font approach
+        // fontFamily: 'serif', // Removed serif for modern rounded look
         textShadowColor: 'rgba(0,0,0,0.5)',
         textShadowOffset: { width: 0, height: 2 },
-        textShadowRadius: 4
+        textShadowRadius: 4,
+        letterSpacing: 0.5, // Added letter spacing
     },
     subtitle: {
         color: 'rgba(255,255,255,0.7)',

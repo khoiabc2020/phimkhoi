@@ -170,3 +170,20 @@ export const checkAppVersion = async () => {
     }
 };
 
+
+export const saveHistory = async (slug: string, episode: string, time: number, duration: number, token?: string) => {
+    try {
+        if (!token) return;
+        console.log('Saving history:', { slug, episode, time });
+        await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/history`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ slug, episode_slug: episode, time_watched: time, duration })
+        });
+    } catch (error) {
+        console.error("Error saving history:", error);
+    }
+};

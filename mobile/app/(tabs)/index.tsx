@@ -77,9 +77,9 @@ export default function HomeScreen() {
               {/* Decorative curve/bowl if possible, but keep simple for now */}
             </View>
 
-            <View>
-              <Text className="text-white font-extrabold text-2xl leading-7 tracking-tighter">MovieBox</Text>
-              <Text className="text-gray-400 text-[10px] uppercase tracking-widest font-semibold">Xem phim là mê</Text>
+            <View style={{ flexDirection: 'column', alignItems: 'flex-start', marginLeft: 4 }}>
+              <Text className="text-white font-black text-2xl leading-6 tracking-tighter" style={{ fontFamily: 'System' }}>MovieBox</Text>
+              <Text className="text-[#fbbf24] text-[10px] uppercase tracking-widest font-bold" style={{ marginTop: 2 }}>Phim hay cả rổ</Text>
             </View>
           </View>
 
@@ -100,10 +100,8 @@ export default function HomeScreen() {
         contentContainerStyle={{ paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
       >
-        <HeroSection movies={data.phimLe.slice(0, 8)} />
-
-        {/* Navigation Pills */}
-        <View className="mt-2 pl-4">
+        {/* Navigation Pills - Moves to Top */}
+        <View className="mt-20 pl-4 mb-4">
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 16, gap: 8 }}>
             <Link href="/explore" asChild>
               <Pressable className="flex-row items-center bg-[#fff] px-4 py-2 rounded-full active:bg-gray-200">
@@ -126,8 +124,10 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
-        {/* Categories Section */}
-        <View className="mt-6 px-4">
+        <HeroSection movies={data.phimLe.slice(0, 8)} />
+
+        {/* Categories Section - Below Hero */}
+        <View className="mt-4 px-4">
           <View className="flex-row justify-between items-center mb-3">
             <Text className="text-white text-base font-bold">Bạn đang quan tâm gì?</Text>
             <Link href="/explore" asChild>
@@ -145,6 +145,8 @@ export default function HomeScreen() {
             <CategoryCard title="Viễn Tưởng" slug="vien-tuong" colors={CATEGORY_GRADIENTS[4] as [string, string, ...string[]]} />
           </ScrollView>
         </View>
+
+
 
         <View className="mt-6 space-y-6">
           <MovieRow title="Phim Lẻ Mới Cập Nhật" movies={data.phimLe} />

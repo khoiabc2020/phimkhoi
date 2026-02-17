@@ -119,7 +119,7 @@ export default function HLSPlayer({ url, poster, initialProgress = 0, movieData,
             {/* @ts-ignore */}
             <ReactPlayer
                 ref={playerRef}
-                url={`/api/hls-proxy?url=${encodeURIComponent(url)}`}
+                url={`/api/hls-proxy?url=${encodeURIComponent(url)}&ext=.m3u8`} // Append fake ext for detection
                 width="100%"
                 height="100%"
                 playing={playing}
@@ -129,6 +129,10 @@ export default function HLSPlayer({ url, poster, initialProgress = 0, movieData,
                 onProgress={handleProgress}
                 onDuration={setDuration}
                 onEnded={() => setShowControls(true)}
+                onError={(e: any) => {
+                    console.error("HLS Error", e);
+                    // Could add logic here to trigger fallback in parent
+                }}
                 config={{
                     file: {
                         forceHLS: true,

@@ -127,10 +127,23 @@ export default async function WatchPage({ params }: PageProps) {
                                 )}
                             </div>
 
-                            {/* Episodes List */}
+                            {/* Movie Title & Meta (Moved from Mobile Info) */}
+                            <div className="space-y-4">
+                                <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight">
+                                    {movie.name} <span className="text-gray-500 font-normal text-xl">({movie.year})</span>
+                                </h1>
+                                <div className="flex flex-wrap gap-4 text-sm text-gray-400">
+                                    <span className="bg-yellow-500/20 text-yellow-500 px-2 py-0.5 rounded text-xs font-bold border border-yellow-500/20">{movie.quality}</span>
+                                    <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {movie.time}</span>
+                                    <span className="flex items-center gap-1"><Globe className="w-4 h-4" /> {movie.country?.[0]?.name}</span>
+                                    <span className="flex items-center gap-1"><PlayCircle className="w-4 h-4" /> {movie.status === 'completed' ? 'Hoàn thành' : 'Đang chiếu'}</span>
+                                </div>
+                            </div>
+
+                            {/* Episodes List - Priority */}
                             {servers.length > 0 && (
                                 <div className="bg-[#1a1a1a] rounded-xl p-6 border border-white/5">
-                                    <h3 className="text-white font-bold text-base mb-4 flex items-center gap-2 uppercase tracking-wide">
+                                    <h3 className="text-white font-bold text-base mb-4 flex items-center gap-2 uppercase tracking-wide border-b border-white/5 pb-2">
                                         <ListIcon className="w-4 h-4 text-yellow-500" /> Danh sách tập
                                     </h3>
                                     <WatchEpisodeSection
@@ -142,102 +155,69 @@ export default async function WatchPage({ params }: PageProps) {
                                 </div>
                             )}
 
+                            {/* Movie Content / Info (Moved from Sidebar) */}
+                            <div className="bg-[#1a1a1a] rounded-xl p-6 border border-white/5">
+                                <h3 className="text-white font-bold text-base mb-4 flex items-center gap-2 uppercase tracking-wide border-b border-white/5 pb-2">
+                                    <Info className="w-4 h-4 text-yellow-500" /> Nội dung phim
+                                </h3>
+                                <div className="flex flex-col md:flex-row gap-6">
+                                    <div className="shrink-0 w-32 md:w-40 aspect-[2/3] relative rounded-lg overflow-hidden shadow-lg hidden md:block">
+                                        <Image
+                                            src={getImageUrl(movie.poster_url || movie.thumb_url)}
+                                            alt={movie.name}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="text-gray-300 text-sm leading-relaxed whitespace-pre-line mb-4">
+                                            {(movie.content || "").replace(/<[^>]*>/g, '')}
+                                        </div>
+
+                                        {cast.length > 0 && (
+                                            <div>
+                                                <h4 className="text-white text-xs font-bold uppercase tracking-wider mb-2 text-gray-400">Diễn viên</h4>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {cast.slice(0, 10).map((actor: any) => (
+                                                        <span key={actor.id} className="text-xs bg-white/5 hover:bg-white/10 px-2 py-1 rounded text-gray-300 transition-colors cursor-default">
+                                                            {actor.name}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* Comments */}
-                            <div className="bg-[#1a1a1a] rounded-xl p-6 border border-white/5 mt-8">
-                                <h3 className="text-white font-bold text-base mb-6 flex items-center gap-2 uppercase tracking-wide">
+                            <div className="bg-[#1a1a1a] rounded-xl p-6 border border-white/5">
+                                <h3 className="text-white font-bold text-base mb-6 flex items-center gap-2 uppercase tracking-wide border-b border-white/5 pb-2">
                                     <Users className="w-4 h-4 text-yellow-500" /> Bình luận
                                 </h3>
                                 <CommentSection movieId={movie._id} movieSlug={movie.slug} />
                             </div>
-
-                            {/* Related Movies */}
-                            {movie.category?.[0]?.slug && (
-                                <RelatedMovies categorySlug={movie.category[0].slug} currentMovieId={movie._id} />
-                            )}
                         </div>
 
                         {/* Sidebar Column (Right - 3 cols) */}
                         <div className="lg:col-span-3 space-y-6">
-                            {/* Movie Info Card */}
-                            <div className="bg-[#1a1a1a] rounded-xl overflow-hidden border border-white/5 sticky top-24">
-                                <div className="relative aspect-[2/3] w-full">
-                                    <Image
-                                        src={getImageUrl(movie.poster_url || movie.thumb_url)}
-                                        alt={movie.name}
-                                        fill
-                                        className="object-cover"
-                                        sizes="(max-width: 768px) 100vw, 300px"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
-
-                                    <div className="absolute bottom-0 left-0 right-0 p-4">
-                                        <h2 className="text-white font-bold text-lg leading-tight mb-1">{movie.name}</h2>
-                                        <p className="text-gray-400 text-xs mb-3 line-clamp-1">{movie.origin_name}</p>
-
-                                        <div className="flex flex-wrap gap-2 text-[10px] font-bold uppercase tracking-wider">
-                                            <span className="bg-yellow-500 text-black px-2 py-0.5 rounded-sm">
-                                                IMDb {movie.vote_average?.toFixed(1) || 8.5}
-                                            </span>
-                                            <span className="bg-white/20 text-white px-2 py-0.5 rounded-sm backdrop-blur-sm">
-                                                {movie.quality}
-                                            </span>
-                                            <span className="bg-white/20 text-white px-2 py-0.5 rounded-sm backdrop-blur-sm">
-                                                {movie.year}
-                                            </span>
-                                        </div>
-                                    </div>
+                            {/* Related Movies (Moved Here) */}
+                            {movie.category?.[0]?.slug && (
+                                <div className="bg-[#1a1a1a] rounded-xl p-4 border border-white/5">
+                                    <h3 className="text-white font-bold text-base mb-4 px-2 border-l-4 border-yellow-500 uppercase">
+                                        Có thể bạn thích
+                                    </h3>
+                                    <RelatedMovies categorySlug={movie.category[0].slug} currentMovieId={movie._id} mode="vertical" />
                                 </div>
+                            )}
 
-                                <div className="p-4 space-y-4">
-                                    <div className="grid grid-cols-2 gap-3 text-xs">
-                                        <div className="flex flex-col gap-1">
-                                            <span className="text-gray-500 flex items-center gap-1.5"><Clock className="w-3 h-3 text-yellow-500" /> Thời lượng</span>
-                                            <span className="text-gray-300 font-medium">{movie.time}</span>
-                                        </div>
-                                        <div className="flex flex-col gap-1">
-                                            <span className="text-gray-500 flex items-center gap-1.5"><Globe className="w-3 h-3 text-yellow-500" /> Quốc gia</span>
-                                            <span className="text-gray-300 font-medium">{movie.country?.[0]?.name}</span>
-                                        </div>
-                                        <div className="flex flex-col gap-1">
-                                            <span className="text-gray-500 flex items-center gap-1.5"><Calendar className="w-3 h-3 text-yellow-500" /> Năm phát hành</span>
-                                            <span className="text-gray-300 font-medium">{movie.year}</span>
-                                        </div>
-                                        <div className="flex flex-col gap-1">
-                                            <span className="text-gray-500 flex items-center gap-1.5"><PlayCircle className="w-3 h-3 text-yellow-500" /> Trạng thái</span>
-                                            <span className="text-green-500 font-medium">{movie.status === 'completed' ? 'Hoàn thành' : 'Đang chiếu'}</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="border-t border-white/5 pt-4">
-                                        <h4 className="text-white text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-2">
-                                            <Info className="w-3 h-3 text-yellow-500" /> Nội dung
-                                        </h4>
-                                        <p className="text-xs text-gray-400 leading-relaxed line-clamp-[8] hover:line-clamp-none transition-all cursor-pointer">
-                                            {(movie.content || "").replace(/<[^>]*>/g, '')}
-                                        </p>
-                                    </div>
-
-                                    {cast.length > 0 && (
-                                        <div className="border-t border-white/5 pt-4">
-                                            <h4 className="text-white text-xs font-bold uppercase tracking-wider mb-3 flex items-center gap-2">
-                                                <Users className="w-3 h-3 text-yellow-500" /> Diễn viên
-                                            </h4>
-                                            <div className="grid grid-cols-4 gap-2">
-                                                {cast.slice(0, 8).map((actor: any) => (
-                                                    <div key={actor.id} className="text-center group" title={actor.name}>
-                                                        <div className="relative aspect-square rounded-full overflow-hidden border border-white/10 group-hover:border-yellow-500 transition-colors">
-                                                            {actor.profile_path ? (
-                                                                <Image src={actor.profile_path} alt={actor.name} fill className="object-cover" />
-                                                            ) : (
-                                                                <div className="w-full h-full bg-zinc-800 flex items-center justify-center text-[8px] text-gray-500">N/A</div>
-                                                            )}
-                                                        </div>
-                                                        <p className="text-[9px] text-gray-400 mt-1 line-clamp-1 group-hover:text-yellow-500 transition-colors">{actor.name}</p>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
+                            {/* Trending Placeholder */}
+                            <div className="bg-[#1a1a1a] rounded-xl p-4 border border-white/5">
+                                <h3 className="text-white font-bold text-base mb-4 px-2 border-l-4 border-red-500 uppercase">
+                                    Top Thịnh Hành
+                                </h3>
+                                <div className="text-center text-gray-500 py-8 text-sm">
+                                    Đang cập nhật...
                                 </div>
                             </div>
                         </div>
@@ -245,5 +225,11 @@ export default async function WatchPage({ params }: PageProps) {
                 </div>
             </div>
         </div>
+    );
+}
+                    </div >
+                </div >
+            </div >
+        </div >
     );
 }

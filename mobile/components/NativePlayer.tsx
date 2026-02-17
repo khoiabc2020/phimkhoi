@@ -20,12 +20,10 @@ interface NativePlayerProps {
     onProgress?: (position: number, duration: number) => void;
 }
 
-export default function NativePlayer({ url, title, episode, onClose, onNext, onProgress }: NativePlayerProps) {
+export default function NativePlayer({ url, title, episode, onClose, onNext, onProgress, slug, episodeSlug, token }: NativePlayerProps & { slug?: string, episodeSlug?: string, token?: string }) {
     useKeepAwake();
     const video = useRef<Video>(null);
     const [videoSource, setVideoSource] = useState({ uri: url });
-    // If using proxy, we might want to try direct link on error
-    const [useDirectSource, setUseDirectSource] = useState(false);
     const [status, setStatus] = useState<AVPlaybackStatus>({} as AVPlaybackStatus);
     const [showControls, setShowControls] = useState(true);
     const [resizeMode, setResizeMode] = useState(ResizeMode.CONTAIN);
@@ -33,6 +31,7 @@ export default function NativePlayer({ url, title, episode, onClose, onNext, onP
     const [settingsVisible, setSettingsVisible] = useState(false);
     const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
     const lastProgressUpdate = useRef(0);
+    const initialSeekDone = useRef(false);
 
     // Gesture State
     const [volume, setVolume] = useState(1.0);
@@ -69,18 +68,24 @@ export default function NativePlayer({ url, title, episode, onClose, onNext, onP
     const onPlaybackStatusUpdate = (status: AVPlaybackStatus) => {
         setStatus(status);
         if (status.isLoaded) {
-            // Only update slider if NOT seeking
+            // Auto-resume logic (if history data provided, seek once)
+            // Implementation note: Ideally, history time is passed in as a prop 'startTime'
+            // For now, assuming basic playback.
+
             if (!isSeeking.current) {
                 setSliderValue(status.positionMillis);
             }
 
-            if (status.isLoaded && status.isPlaying) {
+            if (status.isPlaying) {
                 const currentTime = status.positionMillis;
                 const duration = status.durationMillis || 0;
-                // Emit progress every 5 seconds (5000ms) - Consistent check
-                if (onProgress && currentTime - lastProgressUpdate.current > 5000) {
+
+                // Save history every 10 seconds
+                if (currentTime - lastProgressUpdate.current > 10000) {
                     lastProgressUpdate.current = currentTime;
-                    onProgress(currentTime, duration);
+                    if (onProgress) onProgress(currentTime, duration);
+                    // Also call saveHistory internally if props provided
+                    // Logic handled in parent component via onProgress usually, or here if we import api
                 }
             }
         }
@@ -129,30 +134,28 @@ export default function NativePlayer({ url, title, episode, onClose, onNext, onP
 
     const onPanGestureEvent = async (event: any) => {
         const { translationY, x, state, velocityY } = event.nativeEvent;
+        // ... (Gesture logic remains same)
         if (state !== State.ACTIVE) return;
 
         const now = Date.now();
-        const delta = -translationY / 5000; // Reduced sensitivity
+        const delta = -translationY / 5000;
 
         if (x < width / 2) {
-            // Brightness (Throttle: 50ms)
             if (now - lastBrightnessUpdate.current > 50) {
                 let newBrightness = brightness + delta;
                 newBrightness = Math.max(0, Math.min(1, newBrightness));
                 setBrightness(newBrightness);
                 setShowBrightnessSlider(true);
-                Brightness.setBrightnessAsync(newBrightness); // Fire and forget
+                Brightness.setBrightnessAsync(newBrightness);
                 lastBrightnessUpdate.current = now;
                 setTimeout(() => setShowBrightnessSlider(false), 1500);
             }
         } else {
-            // Volume (Throttle: 50ms)
             if (now - lastVolumeUpdate.current > 50) {
                 let newVolume = volume + delta;
                 newVolume = Math.max(0, Math.min(1, newVolume));
                 setVolume(newVolume);
                 setShowVolumeSlider(true);
-                // Video ref volume update if needed, but 'volume' prop handles it generally
                 lastVolumeUpdate.current = now;
                 setTimeout(() => setShowVolumeSlider(false), 1500);
             }
@@ -166,38 +169,22 @@ export default function NativePlayer({ url, title, episode, onClose, onNext, onP
     const handleSlidingComplete = async (value: number) => {
         if (video.current) {
             await video.current.setPositionAsync(value);
-            isSeeking.current = false; // Resume updates
+            isSeeking.current = false;
             resetControlsTimer();
         }
     };
 
 
-
-    // ... (Render parts similar, updating Slider props)
-
-    const handleSkipForward = async () => {
+    const handleSkip = async (amount: number) => {
         if (video.current) {
             const status = await video.current.getStatusAsync();
             if (status.isLoaded) {
-                const newPos = Math.min(status.durationMillis || 0, status.positionMillis + 10000);
+                const newPos = Math.max(0, Math.min(status.durationMillis || 0, status.positionMillis + amount));
                 await video.current.setPositionAsync(newPos);
                 resetControlsTimer();
             }
         }
     };
-
-    const handleSkipBackward = async () => {
-        if (video.current) {
-            const status = await video.current.getStatusAsync();
-            if (status.isLoaded) {
-                const newPos = Math.max(0, status.positionMillis - 10000);
-                await video.current.setPositionAsync(newPos);
-                resetControlsTimer();
-            }
-        }
-    };
-
-    // ... (Render parts similar, updating Slider props)
 
     const handleVideoError = (error: string) => {
         console.log("Video Error:", error);
@@ -207,89 +194,116 @@ export default function NativePlayer({ url, title, episode, onClose, onNext, onP
         <GestureHandlerRootView style={{ flex: 1 }}>
             <PanGestureHandler onGestureEvent={onPanGestureEvent}>
                 <View style={styles.container}>
-                    <Video
-                        ref={video}
-                        style={styles.video}
-                        source={videoSource}
-                        useNativeControls={false}
-                        resizeMode={resizeMode}
-                        onPlaybackStatusUpdate={onPlaybackStatusUpdate}
-                        onError={handleVideoError}
-                        shouldPlay={true}
-                    />
+                    <Pressable style={StyleSheet.absoluteFill} onPress={toggleControls}>
+                        <Video
+                            ref={video}
+                            style={styles.video}
+                            source={videoSource}
+                            useNativeControls={false}
+                            resizeMode={resizeMode}
+                            onPlaybackStatusUpdate={onPlaybackStatusUpdate}
+                            onError={handleVideoError}
+                            shouldPlay={true}
+                        />
+                    </Pressable>
 
                     {/* Controls Overlay */}
                     {showControls && (
-                        <View style={styles.overlay}>
+                        <View style={styles.overlay} pointerEvents="box-none">
+                            <Pressable style={StyleSheet.absoluteFill} onPress={toggleControls} />
+
                             {/* Header */}
                             <LinearGradient colors={['rgba(0,0,0,0.8)', 'transparent']} style={styles.header}>
                                 <TouchableOpacity onPress={onClose} style={styles.backBtn}>
                                     <Ionicons name="arrow-back" size={28} color="white" />
                                 </TouchableOpacity>
-                                <View>
+                                <View style={{ flex: 1 }}>
                                     <Text style={styles.videoTitle} numberOfLines={1}>{title}</Text>
                                     {episode && <Text style={styles.subTitle}>{episode}</Text>}
                                 </View>
-                                <TouchableOpacity onPress={() => setSettingsVisible(true)} style={styles.settingsBtn}>
-                                    <Ionicons name="settings-outline" size={24} color="white" />
-                                </TouchableOpacity>
+                                {/* Top Right Actions */}
+                                <View style={{ flexDirection: 'row', gap: 20, alignItems: 'center' }}>
+                                    <TouchableOpacity>
+                                        <Ionicons name="flag-outline" size={24} color="white" />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity>
+                                        <Ionicons name="settings-outline" size={24} color="white" />
+                                    </TouchableOpacity>
+                                </View>
                             </LinearGradient>
 
-                            {/* Center Controls (Play/Pause + Skip) */}
-                            <View style={styles.centerControls}>
-                                <TouchableOpacity onPress={handleSkipBackward} style={styles.skipBtn}>
-                                    <Ionicons name="play-back-circle-outline" size={45} color="rgba(255,255,255,0.8)" />
-                                    <Text style={styles.skipText}>-10s</Text>
+                            {/* Center Controls (Netflix Style: Minimal Circle) */}
+                            <View style={styles.centerControls} pointerEvents="box-none">
+                                <TouchableOpacity onPress={() => handleSkip(-10000)} style={styles.skipBtn}>
+                                    <View style={styles.skipIconBg}>
+                                        <Ionicons name="refresh-outline" size={24} color="white" style={{ transform: [{ scaleX: -1 }] }} />
+                                        <Text style={styles.skipTextInside}>10</Text>
+                                    </View>
                                 </TouchableOpacity>
 
                                 <TouchableOpacity onPress={handlePlayPause} style={styles.playPauseBtn}>
                                     <Ionicons
                                         name={status.isLoaded && status.isPlaying ? "pause" : "play"}
-                                        size={40}
-                                        color="black"
+                                        size={45} // Slightly larger
+                                        color="black" // Black icon on white circle
                                         style={{ marginLeft: status.isLoaded && status.isPlaying ? 0 : 4 }}
                                     />
                                 </TouchableOpacity>
 
-                                <TouchableOpacity onPress={handleSkipForward} style={styles.skipBtn}>
-                                    <Ionicons name="play-forward-circle-outline" size={45} color="rgba(255,255,255,0.8)" />
-                                    <Text style={styles.skipText}>+10s</Text>
+                                <TouchableOpacity onPress={() => handleSkip(10000)} style={styles.skipBtn}>
+                                    <View style={styles.skipIconBg}>
+                                        <Ionicons name="refresh-outline" size={24} color="white" />
+                                        <Text style={styles.skipTextInside}>10</Text>
+                                    </View>
                                 </TouchableOpacity>
                             </View>
 
-                            {/* Footer (Slider + Actions) */}
+                            {/* Footer (Slider + Bottom Actions) */}
                             <LinearGradient colors={['transparent', 'rgba(0,0,0,0.9)']} style={styles.footer}>
+                                {/* Seek Bar */}
                                 <View style={styles.sliderContainer}>
                                     <Text style={styles.timeText}>{formatTime(status.isLoaded ? status.positionMillis : 0)}</Text>
                                     <Slider
                                         style={styles.slider}
                                         minimumValue={0}
                                         maximumValue={status.isLoaded ? status.durationMillis : 1}
-                                        value={sliderValue} // Use local state
+                                        value={sliderValue}
                                         onSlidingStart={handleSlidingStart}
                                         onSlidingComplete={handleSlidingComplete}
-                                        minimumTrackTintColor="#e50914" // Netflix Red
-                                        maximumTrackTintColor="rgba(255,255,255,0.3)"
+                                        minimumTrackTintColor="#e50914"
+                                        maximumTrackTintColor="rgba(255,255,255,0.4)"
                                         thumbTintColor="#e50914"
+                                        thumbStyle={{ width: 15, height: 15 }} // Smaller thumb
                                     />
                                     <Text style={styles.timeText}>{formatTime(status.isLoaded ? status.durationMillis : 0)}</Text>
                                 </View>
 
+                                {/* Bottom Action Bar */}
                                 <View style={styles.bottomActions}>
-                                    <TouchableOpacity style={styles.bottomActionBtn} onPress={handleResizeMode}>
-                                        <Ionicons name={resizeMode === ResizeMode.COVER ? "contract" : "expand"} size={20} color="white" />
-                                        <Text style={styles.bottomActionText}>{resizeMode === ResizeMode.COVER ? "Thu nhỏ" : "Phóng to"}</Text>
+                                    <TouchableOpacity style={styles.actionItem}>
+                                        <Ionicons name="albums-outline" size={24} color="white" />
+                                        <Text style={styles.actionText}>Episodes</Text>
                                     </TouchableOpacity>
 
-                                    <TouchableOpacity style={styles.bottomActionBtn}>
-                                        <Ionicons name="layers-outline" size={20} color="white" />
-                                        <Text style={styles.bottomActionText}>Các tập</Text>
+                                    <TouchableOpacity style={styles.actionItem} onPress={() => {
+                                        const speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
+                                        const currentIdx = speeds.indexOf(playbackSpeed);
+                                        const nextSpeed = speeds[(currentIdx + 1) % speeds.length];
+                                        handleSpeedChange(nextSpeed);
+                                    }}>
+                                        <Ionicons name="speedometer-outline" size={24} color="white" />
+                                        <Text style={styles.actionText}>Speed ({playbackSpeed}x)</Text>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity style={styles.actionItem} onPress={handleResizeMode}>
+                                        <Ionicons name={resizeMode === ResizeMode.COVER ? "contract-outline" : "expand-outline"} size={24} color="white" />
+                                        <Text style={styles.actionText}>{resizeMode === ResizeMode.COVER ? "Fit" : "Fill"}</Text>
                                     </TouchableOpacity>
 
                                     {onNext && (
-                                        <TouchableOpacity onPress={onNext} style={styles.nextBtn}>
-                                            <Text style={styles.nextBtnText}>Tập tiếp theo</Text>
-                                            <Ionicons name="play-skip-forward" size={20} color="black" />
+                                        <TouchableOpacity onPress={onNext} style={styles.nextEpBtn}>
+                                            <Text style={styles.nextEpText}>Next Ep</Text>
+                                            <Ionicons name="play-skip-forward-outline" size={20} color="black" />
                                         </TouchableOpacity>
                                     )}
                                 </View>
@@ -310,53 +324,54 @@ const formatTime = (millis: number = 0) => {
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 };
 
+
+// ... Helper functions ...
+
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: 'black' },
     video: { width: '100%', height: '100%' },
     overlay: { ...StyleSheet.absoluteFillObject, justifyContent: 'space-between', zIndex: 1 },
-    nextEpOverlay: { position: 'absolute', bottom: 100, right: 20, zIndex: 10 },
-    autoNextBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fbbf24', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 30, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84, elevation: 5 },
-    autoNextText: { color: 'black', fontWeight: 'bold', fontSize: 16, marginRight: 8 },
-    skipIntroOverlay: { position: 'absolute', bottom: 100, left: 20, zIndex: 10 },
-    skipIntroBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255, 255, 255, 0.9)', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 25 },
-    skipIntroText: { color: 'black', fontWeight: 'bold', marginRight: 6 },
-    controlsContainer: { flex: 1, justifyContent: 'space-between' },
-    header: { flexDirection: 'row', alignItems: 'center', padding: 20, paddingTop: 40 },
-    backBtn: { padding: 8, marginRight: 16 },
-    videoTitle: { color: 'white', fontSize: 18, fontWeight: 'bold' },
-    subTitle: { color: 'rgba(255,255,255,0.7)', fontSize: 14, fontWeight: '600' },
+    header: { flexDirection: 'row', alignItems: 'center', padding: 20, paddingTop: 50 }, // Increased padding for notch
+    backBtn: { padding: 8, marginRight: 10 },
+    videoTitle: { color: 'white', fontSize: 16, fontWeight: 'bold' },
+    subTitle: { color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: '600' },
     settingsBtn: { marginLeft: 'auto', padding: 8 },
-    centerControls: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 60 },
-    playPauseBtn: { width: 80, height: 80, borderRadius: 40, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center' },
-    skipBtn: { alignItems: 'center', opacity: 0.9 },
-    skipText: { color: 'white', fontSize: 12, marginTop: 4, fontWeight: 'bold' },
-    footer: { padding: 20, paddingBottom: 30 },
-    sliderContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
-    slider: { flex: 1, marginHorizontal: 10 },
-    timeText: { color: 'white', fontSize: 12, width: 45, textAlign: 'center', fontWeight: 'bold' },
-    bottomActions: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    bottomActionBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.15)', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8 },
-    bottomActionText: { color: 'white', marginLeft: 8, fontWeight: 'bold', fontSize: 13 },
-    nextBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'white', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8 },
-    nextBtnText: { color: 'black', marginRight: 8, fontWeight: 'bold', fontSize: 13 },
 
-    // Gesture Feedback
+    // Center Controls (Netflix Style)
+    centerControls: {
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 60,
+        zIndex: 2,
+    },
+    playPauseBtn: { width: 80, height: 80, borderRadius: 40, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 5 },
+    skipBtn: { alignItems: 'center', justifyContent: 'center', width: 60, height: 60 },
+    skipIconBg: { alignItems: 'center', justifyContent: 'center' },
+    skipTextInside: { color: 'white', fontSize: 10, fontWeight: 'bold', position: 'absolute', top: 8 }, // Inside the circle
+
+    // Footer
+    footer: { padding: 20, paddingBottom: 40, paddingTop: 40 },
+    sliderContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
+    slider: { flex: 1, marginHorizontal: 10 },
+    timeText: { color: 'rgba(255,255,255,0.7)', fontSize: 12, width: 45, textAlign: 'center', fontWeight: 'bold' },
+
+    // Bottom Actions
+    bottomActions: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 10 },
+    actionItem: { alignItems: 'center', gap: 4 },
+    actionText: { color: 'white', fontSize: 10, fontWeight: '600' },
+    nextEpBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'white', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 4 },
+    nextEpText: { color: 'black', marginRight: 6, fontWeight: 'bold', fontSize: 12 },
+
+    // ... Other styles for volume/brightness ...
     gestureFeedbackLeft: { position: 'absolute', left: 40, top: '30%', height: 150, width: 40, backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 20, alignItems: 'center', justifyContent: 'center', zIndex: 20, paddingVertical: 10 },
     gestureFeedbackRight: { position: 'absolute', right: 40, top: '30%', height: 150, width: 40, backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 20, alignItems: 'center', justifyContent: 'center', zIndex: 20, paddingVertical: 10 },
     gestureBarContainer: { flex: 1, width: 6, backgroundColor: 'rgba(255,255,255,0.3)', borderRadius: 3, marginTop: 10, overflow: 'hidden', alignItems: 'center', justifyContent: 'flex-end' },
     gestureBarFill: { width: '100%', backgroundColor: '#fbbf24', borderRadius: 3 },
-
-    // Settings Modal
-    modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end', flexDirection: 'row' },
-    settingsContainer: { width: 300, backgroundColor: '#1a1a1a', height: '100%', padding: 20 },
-    settingsTitle: { color: 'white', fontSize: 20, fontWeight: 'bold', marginBottom: 24, marginTop: 20 },
-    settingRow: { marginBottom: 24 },
-    settingLabel: { color: '#9ca3af', marginBottom: 12, fontSize: 14, textTransform: 'uppercase' },
-    speedOptions: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-    speedBtn: { backgroundColor: '#333', paddingVertical: 6, paddingHorizontal: 12, borderRadius: 8, minWidth: 50, alignItems: 'center' },
-    activeSpeedBtn: { backgroundColor: '#fbbf24' },
-    speedText: { color: 'white', fontWeight: 'bold' },
-    activeSpeedText: { color: 'black' },
-    actionBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#333', padding: 12, borderRadius: 12 },
-    actionBtnText: { color: 'white', marginLeft: 10, fontWeight: '600' }
 });
+
