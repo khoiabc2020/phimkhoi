@@ -114,10 +114,33 @@ export default async function WatchPage({ params }: PageProps) {
                                 )}
                             </div>
 
-                            {/* Mobile Info (Visible only on small screens) */}
-                            <div className="lg:hidden">
-                                <h1 className="text-xl font-bold text-white mb-1">{movie.name}</h1>
-                                <p className="text-sm text-gray-500 mb-3">{movie.origin_name}</p>
+                            {/* Movie Info */}
+                            <div>
+                                <h1 className="text-xl md:text-2xl font-bold text-white mb-2 leading-tight">
+                                    {movie.name} <span className="text-gray-400 font-normal">({movie.year})</span>
+                                </h1>
+                                <h2 className="text-lg md:text-xl font-medium text-yellow-500 mb-4 flex items-center gap-2">
+                                    {displayEpisodeName(currentEpisode?.name || episode)}
+                                    {currentEpisode?.name && <span className="text-gray-500 text-sm"> - {currentEpisode.name}</span>}
+                                </h2>
+
+                                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
+                                    <div className="flex items-center gap-1 bg-white/10 px-2 py-1 rounded">
+                                        <span className="text-yellow-500 font-bold">FHD</span>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <Clock className="w-4 h-4" />
+                                        <span>{movie.time || "N/A"}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <Globe className="w-4 h-4" />
+                                        <span>{movie.country?.[0]?.name}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <Info className="w-4 h-4" />
+                                        <span>{movie.status === 'completed' ? 'Hoàn thành' : 'Đang cập nhật'}</span>
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Engagement & Controls */}
@@ -125,19 +148,6 @@ export default async function WatchPage({ params }: PageProps) {
                                 {currentEpisode && (
                                     <WatchEngagementBar movie={movie} />
                                 )}
-                            </div>
-
-                            {/* Movie Title & Meta (Moved from Mobile Info) */}
-                            <div className="space-y-4">
-                                <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight">
-                                    {movie.name} <span className="text-gray-500 font-normal text-xl">({movie.year})</span>
-                                </h1>
-                                <div className="flex flex-wrap gap-4 text-sm text-gray-400">
-                                    <span className="bg-yellow-500/20 text-yellow-500 px-2 py-0.5 rounded text-xs font-bold border border-yellow-500/20">{movie.quality}</span>
-                                    <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {movie.time}</span>
-                                    <span className="flex items-center gap-1"><Globe className="w-4 h-4" /> {movie.country?.[0]?.name}</span>
-                                    <span className="flex items-center gap-1"><PlayCircle className="w-4 h-4" /> {movie.status === 'completed' ? 'Hoàn thành' : 'Đang chiếu'}</span>
-                                </div>
                             </div>
 
                             {/* Episodes List - Priority */}

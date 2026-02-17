@@ -41,8 +41,9 @@ export async function GET(request: NextRequest) {
         console.log(`[Proxy] Response: ${response.status} ${response.statusText} for ${url}`);
 
         if (!response.ok) {
-            console.error(`[Proxy] Failed: ${response.status} ${await response.text().catch(() => '')}`);
-            return new NextResponse(`Failed to fetch: ${response.status} ${response.statusText}`, { status: response.status });
+            const errorText = await response.text().catch(() => 'No body');
+            console.error(`[Proxy] Failed: ${response.status} ${response.statusText} - Body: ${errorText.substring(0, 200)}`);
+            return new NextResponse(`Failed to fetch from upstream: ${response.status} ${response.statusText}`, { status: response.status });
         }
 
         const contentType = response.headers.get('Content-Type');
