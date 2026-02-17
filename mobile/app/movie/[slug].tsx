@@ -167,10 +167,10 @@ export default function MovieDetailScreen() {
                         </Pressable>
                         <View className="flex-row gap-4">
                             <Pressable className="bg-black/30 p-2 rounded-full backdrop-blur-md">
-                                <Ionicons name="search" size={24} color="white" />
+                                <Ionicons name="search-outline" size={24} color="white" />
                             </Pressable>
                             <Pressable className="bg-black/30 p-2 rounded-full backdrop-blur-md">
-                                <Ionicons name="share-social" size={24} color="white" />
+                                <Ionicons name="share-outline" size={24} color="white" />
                             </Pressable>
                         </View>
                     </View>
@@ -235,15 +235,15 @@ export default function MovieDetailScreen() {
                     {/* Action Icons Row */}
                     <View className="flex-row justify-start gap-8 mb-8 px-2">
                         <Pressable onPress={toggleFavorite} className="items-center">
-                            <Ionicons name={fav ? "checkmark" : "add"} size={24} color="white" />
+                            <Ionicons name={fav ? "checkmark-circle" : "add-outline"} size={26} color="white" />
                             <Text className="text-gray-400 text-[10px] mt-1">Danh sách</Text>
                         </Pressable>
                         <Pressable className="items-center">
-                            <Ionicons name="thumbs-up-outline" size={22} color="white" />
+                            <Ionicons name="thumbs-up-outline" size={24} color="white" />
                             <Text className="text-gray-400 text-[10px] mt-1">Xếp hạng</Text>
                         </Pressable>
                         <Pressable className="items-center">
-                            <Ionicons name="paper-plane-outline" size={22} color="white" />
+                            <Ionicons name="paper-plane-outline" size={24} color="white" />
                             <Text className="text-gray-400 text-[10px] mt-1">Chia sẻ</Text>
                         </Pressable>
                     </View>

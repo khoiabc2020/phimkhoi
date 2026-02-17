@@ -77,7 +77,7 @@ export default function ExploreScreen() {
         {/* Search Input */}
         <View className="px-4 pt-2 pb-4 border-b border-gray-900 bg-black z-10">
           <View className="flex-row items-center bg-gray-900 rounded-xl px-4 py-3 border border-gray-800 focus:border-yellow-500">
-            <Ionicons name="search" size={20} color="#9ca3af" />
+            <Ionicons name="search-outline" size={20} color="#9ca3af" />
             <TextInput
               value={search}
               onChangeText={setSearch}

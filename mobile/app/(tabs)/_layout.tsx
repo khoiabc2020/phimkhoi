@@ -7,35 +7,32 @@ import { BlurView } from 'expo-blur';
 import Animated, { useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
 
 const LiquidTabIcon = ({ name, color, focused, label }: { name: any, color: string, focused: boolean, label: string }) => {
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ scale: withSpring(focused ? 1 : 0.9) }],
-      opacity: withTiming(focused ? 1 : 0.7, { duration: 200 })
-    };
-  });
-
   return (
     <View style={{ alignItems: 'center', justifyContent: 'center', width: 50 }}>
       {focused && (
-        <Animated.View
-          style={[
-            StyleSheet.absoluteFill,
-            {
-              backgroundColor: 'rgba(251, 191, 36, 0.15)', // Amber/Gold glow
-              borderRadius: 20,
-              transform: [{ scale: 1.2 }],
-            }
-          ]}
-        />
+        <View style={{
+          position: 'absolute',
+          top: -5,
+          width: 40,
+          height: 40,
+          borderRadius: 20,
+          backgroundColor: '#fbbf24', // Yellow circle background
+          opacity: 0.2
+        }} />
       )}
-      <Animated.View style={[animatedStyle, { alignItems: 'center' }]}>
-        <Ionicons size={24} name={focused ? name : `${name}-outline`} color={color} />
-        {focused && (
-          <Text style={{ fontSize: 9, fontWeight: '700', color: color, marginTop: 2 }}>
-            {label}
-          </Text>
-        )}
-      </Animated.View>
+      <Ionicons
+        size={24}
+        name={focused ? name : `${name}-outline`}
+        color={focused ? '#ea580c' : '#6b7280'} // Orange/Dark Yellow for active, Gray for inactive
+      />
+      <Text style={{
+        fontSize: 10,
+        fontWeight: focused ? '700' : '500',
+        color: focused ? '#ea580c' : '#6b7280',
+        marginTop: 4
+      }}>
+        {label}
+      </Text>
     </View>
   );
 };
@@ -47,43 +44,28 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#fbbf24',
-        tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.6)',
+        tabBarActiveTintColor: '#ea580c',
+        tabBarInactiveTintColor: '#6b7280',
         headerShown: false,
-        tabBarShowLabel: false, // Hide default labels
+        tabBarShowLabel: false,
         tabBarStyle: {
           position: 'absolute',
-          bottom: 20, // Increased clearance
-          left: 20,
-          right: 20,
-          height: 70, // Taller for liquid effect
-          borderRadius: 35,
-          backgroundColor: isAndroid ? 'rgba(20, 20, 20, 0.95)' : 'transparent',
+          bottom: 20,
+          left: 16,
+          right: 16,
+          height: 64,
+          borderRadius: 32,
+          backgroundColor: '#ffffff', // White background
           borderTopWidth: 0,
-          elevation: 0,
+          elevation: 5, // Subtle shadow
           shadowColor: '#000',
-          shadowOffset: { width: 0, height: 10 },
-          shadowOpacity: 0.5,
-          shadowRadius: 20,
-          paddingBottom: 0,
-        },
-        tabBarBackground: () => (
-          isAndroid ? null : (
-            <BlurView
-              intensity={40}
-              style={[
-                StyleSheet.absoluteFill,
-                { borderRadius: 35, overflow: 'hidden', backgroundColor: 'rgba(10, 10, 10, 0.7)' }
-              ]}
-              tint="dark"
-            />
-          )
-        ),
-        tabBarItemStyle: {
-          height: 70,
-          justifyContent: 'center',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
+          paddingTop: 0,
           alignItems: 'center',
-        }
+          justifyContent: 'center',
+        },
       }}>
       <Tabs.Screen
         name="index"

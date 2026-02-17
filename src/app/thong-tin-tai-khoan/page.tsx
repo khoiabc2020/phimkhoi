@@ -5,12 +5,44 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { User, LogOut, History, Heart, Settings, Camera } from "lucide-react";
+import {
+    User, LogOut, History, Heart, Settings, Camera, Plus, activity, Clock,
+    ChevronRight, Play, X, Trash2, Edit2
+} from "lucide-react";
+
+// Mock Data for "Danh sách" (Lists) demo to match screenshot
+const MOCK_LISTS = [
+    { id: 1, name: "Hay VL", count: 3, slug: "hay-vl" }
+];
+
+const MOCK_LIST_MOVIES = [
+    {
+        id: 1,
+        title: "Gia Tài Của Ngoại",
+        image: "https://image.tmdb.org/t/p/w342/jB98FIrO7z1t3s6E3L7k0.jpg", // Placeholder or real URL
+        quality: "FHD",
+        lang: "L.Tiếng"
+    },
+    {
+        id: 2,
+        title: "Lâu Đài Di Động Của Pháp Sư Howl",
+        image: "https://image.tmdb.org/t/p/w342/6pZgH10jhpToPcf0uvyTA.jpg",
+        quality: "FHD",
+        lang: "L.Tiếng"
+    },
+    {
+        id: 3,
+        title: "Khi Điện Thoại Đổ Chuông",
+        image: "https://image.tmdb.org/t/p/w342/8GK1.jpg", // Placeholder
+        quality: "FHD",
+        lang: "TM, 8"
+    }
+];
 
 export default function ProfilePage() {
     const { data: session, status } = useSession();
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState("overview");
+    const [activeTab, setActiveTab] = useState("account"); // Default tab
 
     useEffect(() => {
         if (status === "unauthenticated") {
@@ -20,120 +52,211 @@ export default function ProfilePage() {
 
     if (status === "loading") {
         return (
-            <div className="min-h-screen bg-[#111] flex items-center justify-center text-white">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500"></div>
+            <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+                <div className="w-8 h-8 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
 
     if (!session) return null;
 
-    return (
-        <main className="min-h-screen bg-[#111] text-white pb-20">
-            {/* Cover Image */}
-            <div className="h-60 w-full relative bg-gradient-to-r from-yellow-900/20 to-black">
-                <div className="absolute inset-0 bg-gradient-to-t from-[#111] via-transparent to-transparent"></div>
-            </div>
+    const renderContent = () => {
+        switch (activeTab) {
+            case "favorites":
+                return (
+                    <div>
+                        <h2 className="text-2xl font-bold text-white mb-6">Phim Yêu Thích</h2>
+                        <div className="text-gray-400 text-center py-20 bg-[#151515] rounded-xl border border-white/5">
+                            <Heart className="w-12 h-12 mx-auto mb-4 text-gray-600" />
+                            <p>Chưa có phim yêu thích nào.</p>
+                            <Link href="/" className="text-yellow-500 mt-2 inline-block hover:underline">Khám phá ngay</Link>
+                        </div>
+                    </div>
+                );
+            case "lists":
+                return (
+                    <div>
+                        <div className="flex items-center gap-4 mb-8">
+                            <h2 className="text-2xl font-bold text-white">Danh sách</h2>
+                            <button className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-full transition-colors border border-white/10">
+                                <Plus className="w-3.5 h-3.5" /> Thêm mới
+                            </button>
+                        </div>
 
-            <div className="container mx-auto px-4 -mt-20 relative z-10">
-                <div className="flex flex-col md:flex-row gap-8 items-start">
-                    {/* Sidebar */}
-                    <div className="w-full md:w-1/4">
-                        <div className="bg-[#1a1a1a] rounded-2xl p-6 border border-white/5 text-center shadow-xl">
-                            <div className="relative inline-block mb-4">
-                                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[#111] shadow-2xl mx-auto bg-gradient-to-br from-yellow-500 to-yellow-700 p-1">
-                                    {session.user?.image ? (
-                                        <Image
-                                            src={session.user.image}
-                                            alt={session.user.name || "User"}
-                                            width={128}
-                                            height={128}
-                                            className="rounded-full object-cover w-full h-full bg-[#111]"
+                        {/* List Collections */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+                            {MOCK_LISTS.map(list => (
+                                <div key={list.id} className="bg-[#151515] border border-yellow-500/50 p-4 rounded-xl relative group cursor-pointer hover:bg-[#1a1a1a] transition-colors">
+                                    <h3 className="text-white font-bold text-lg">{list.name}</h3>
+                                    <div className="flex items-center justify-between mt-2">
+                                        <span className="text-gray-400 text-xs flex items-center gap-1">
+                                            <Play className="w-3 h-3 bg-gray-700 rounded-full p-0.5" /> {list.count} phim
+                                        </span>
+                                        <button className="text-gray-500 hover:text-white text-xs">Sửa</button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Movies Grid (Matches Screenshot) */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                            {MOCK_LIST_MOVIES.map((movie, idx) => ( // Using mock data to replicate design
+                                <div key={idx} className="relative group">
+                                    <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-[#151515]">
+                                        {/* Delete Button */}
+                                        <button className="absolute top-2 right-2 w-6 h-6 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center text-white/70 hover:text-white hover:bg-red-500 transition-all z-10">
+                                            <X className="w-3.5 h-3.5" />
+                                        </button>
+
+                                        {/* Poster */}
+                                        <img
+                                            src={movie.image || `https://placehold.co/300x450/111/333?text=${movie.title}`}
+                                            alt={movie.title}
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                         />
+
+                                        {/* Quality Badges */}
+                                        <div className="absolute bottom-2 left-2 flex flex-wrap gap-1">
+                                            <span className="px-1.5 py-0.5 bg-black/60 backdrop-blur-md border border-white/10 rounded text-[10px] font-bold text-white uppercase">
+                                                {movie.quality}
+                                            </span>
+                                            <span className="px-1.5 py-0.5 bg-blue-600/80 backdrop-blur-md rounded text-[10px] font-bold text-white uppercase">
+                                                {movie.lang}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <h3 className="text-white text-sm font-medium mt-2 line-clamp-2 hover:text-yellow-500 transition-colors cursor-pointer">
+                                        {movie.title}
+                                    </h3>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+            case "continue-watching":
+                return (
+                    <div>
+                        <h2 className="text-2xl font-bold text-white mb-6">Đang xem dở</h2>
+                        <div className="text-gray-400 text-center py-20 bg-[#151515] rounded-xl border border-white/5">
+                            <Clock className="w-12 h-12 mx-auto mb-4 text-gray-600" />
+                            <p>Lịch sử xem trống.</p>
+                            <Link href="/" className="text-yellow-500 mt-2 inline-block hover:underline">Xem phim ngay</Link>
+                        </div>
+                    </div>
+                );
+            case "account":
+            default:
+                return (
+                    <div>
+                        <h2 className="text-2xl font-bold text-white mb-6">Thông tin tài khoản</h2>
+                        <div className="bg-[#151515] rounded-2xl p-6 border border-white/5 max-w-2xl">
+                            <div className="flex items-start gap-6">
+                                <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-yellow-500/50 bg-[#222]">
+                                    {session.user?.image ? (
+                                        <Image src={session.user.image} alt="Avatar" width={96} height={96} className="w-full h-full object-cover" />
                                     ) : (
-                                        <div className="w-full h-full bg-[#333] flex items-center justify-center text-4xl font-bold text-white rounded-full">
-                                            {session.user?.name?.[0] || "U"}
+                                        <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-yellow-500">
+                                            {session.user?.name?.[0]}
                                         </div>
                                     )}
                                 </div>
-                                <button className="absolute bottom-0 right-0 bg-yellow-500 p-2 rounded-full hover:bg-yellow-400 transition-colors shadow-lg">
-                                    <Camera className="w-4 h-4 text-black" />
-                                </button>
-                            </div>
-
-                            <h1 className="text-2xl font-bold text-white mb-1">{session.user?.name}</h1>
-                            <p className="text-gray-400 text-sm mb-6">{session.user?.email}</p>
-
-                            <div className="space-y-2">
-                                <button
-                                    onClick={() => setActiveTab("overview")}
-                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === "overview" ? "bg-yellow-500 text-black font-semibold" : "hover:bg-white/5 text-gray-300"
-                                        }`}
-                                >
-                                    <User className="w-5 h-5" /> Tổng quan
-                                </button>
-                                <Link href="/lich-su-xem" className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-gray-300 transition-all">
-                                    <History className="w-5 h-5" /> Lịch sử xem
-                                </Link>
-                                <Link href="/phim-yeu-thich" className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-gray-300 transition-all">
-                                    <Heart className="w-5 h-5" /> Phim yêu thích
-                                </Link>
-                                <div className="h-px bg-white/10 my-2"></div>
-                                <button
-                                    onClick={() => signOut()}
-                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-500/10 text-red-500 transition-all"
-                                >
-                                    <LogOut className="w-5 h-5" /> Đăng xuất
-                                </button>
+                                <div className="flex-1 space-y-4">
+                                    <div>
+                                        <label className="text-gray-500 text-xs font-bold uppercase mb-1 block">Tên hiển thị</label>
+                                        <div className="flex items-center justify-between bg-[#0a0a0a] p-3 rounded-lg border border-white/5">
+                                            <span className="text-white font-medium">{session.user?.name}</span>
+                                            <Edit2 className="w-4 h-4 text-gray-500 cursor-pointer hover:text-white" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="text-gray-500 text-xs font-bold uppercase mb-1 block">Email</label>
+                                        <div className="flex items-center justify-between bg-[#0a0a0a] p-3 rounded-lg border border-white/5">
+                                            <span className="text-gray-300">{session.user?.email}</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="text-gray-500 text-xs font-bold uppercase mb-1 block">Vai trò</label>
+                                        <span className="text-yellow-500 font-bold bg-yellow-500/10 px-3 py-1 rounded text-sm">Thành viên</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                );
+        }
+    };
 
-                    {/* Content */}
-                    <div className="flex-1 w-full text-white"> {/* Add text-white explicitly */}
-                        <div className="bg-[#1a1a1a] rounded-2xl p-8 border border-white/5 min-h-[400px]">
-                            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                                <Settings className="w-6 h-6 text-yellow-500" />
-                                Thông tin cá nhân
-                            </h2>
+    return (
+        <main className="min-h-screen bg-[#0a0a0a] pt-24 pb-20">
+            <div className="container mx-auto px-4">
+                <div className="flex flex-col md:flex-row gap-8 min-h-[600px]">
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label className="text-gray-400 text-sm">Tên hiển thị</label>
-                                    <div className="bg-[#111] p-4 rounded-xl border border-white/5 text-white">
-                                        {session.user?.name}
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-gray-400 text-sm">Email</label>
-                                    <div className="bg-[#111] p-4 rounded-xl border border-white/5 text-gray-300">
-                                        {session.user?.email}
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-gray-400 text-sm">ID Người dùng</label>
-                                    <div className="bg-[#111] p-4 rounded-xl border border-white/5 text-gray-500 font-mono text-sm">
-                                        {/* @ts-ignore */}
-                                        {session.user?.id || "N/A"}
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-gray-400 text-sm">Vai trò</label>
-                                    <div className="bg-[#111] p-4 rounded-xl border border-white/5 text-yellow-500 font-semibold">
-                                        Thành viên
-                                    </div>
-                                </div>
-                            </div>
+                    {/* Sidebar Navigation */}
+                    <div className="w-full md:w-64 flex-shrink-0">
+                        <div className="bg-[#151515] rounded-2xl p-6 border border-white/5 h-full flex flex-col sticky top-24">
+                            <h1 className="text-lg font-bold text-white mb-6 px-2">Quản lý tài khoản</h1>
 
-                            <div className="mt-10 p-6 bg-yellow-500/10 rounded-xl border border-yellow-500/20">
-                                <h3 className="text-yellow-500 font-bold mb-2">Gói thành viên</h3>
-                                <p className="text-gray-300">Bạn đang sử dụng gói <span className="text-white font-bold">Miễn phí</span>. Nâng cấp lên VIP để xem phim không quảng cáo và chất lượng 4K.</p>
-                                <button className="mt-4 px-6 py-2 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-lg transition-colors">
-                                    Nâng cấp ngay
+                            <nav className="flex-1 space-y-1">
+                                <button
+                                    onClick={() => setActiveTab("favorites")}
+                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm ${activeTab === "favorites" ? "text-yellow-400 bg-white/5" : "text-gray-400 hover:text-white hover:bg-white/5"}`}
+                                >
+                                    <Heart className="w-4 h-4" /> Yêu thích
                                 </button>
+                                <button
+                                    onClick={() => setActiveTab("lists")}
+                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm ${activeTab === "lists" ? "text-yellow-400 bg-white/5" : "text-gray-400 hover:text-white hover:bg-white/5"}`}
+                                >
+                                    <Plus className="w-4 h-4" /> Danh sách
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab("continue-watching")}
+                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm ${activeTab === "continue-watching" ? "text-yellow-400 bg-white/5" : "text-gray-400 hover:text-white hover:bg-white/5"}`}
+                                >
+                                    <History className="w-4 h-4" /> Xem tiếp
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab("account")}
+                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm ${activeTab === "account" ? "text-yellow-400 bg-white/5" : "text-gray-400 hover:text-white hover:bg-white/5"}`}
+                                >
+                                    <User className="w-4 h-4" /> Tài khoản
+                                </button>
+                            </nav>
+
+                            {/* Divider */}
+                            <div className="h-px bg-white/10 my-6"></div>
+
+                            {/* User Footer */}
+                            <div className="flex items-center gap-3 px-2 mb-4">
+                                <div className="w-10 h-10 rounded-full bg-gray-700 overflow-hidden border border-white/10 shrink-0">
+                                    {session.user?.image ? (
+                                        <Image src={session.user.image} alt="Avatar" width={40} height={40} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-white font-bold bg-[#333]">
+                                            {session.user?.name?.[0]}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-white font-bold text-sm truncate">{session.user?.name}</p>
+                                    <p className="text-gray-500 text-xs truncate max-w-[120px]">{session.user?.email}</p>
+                                </div>
                             </div>
+
+                            <button
+                                onClick={() => signOut({ callbackUrl: "/login" })}
+                                className="w-full flex items-center gap-3 px-4 py-2 text-gray-400 hover:text-red-500 transition-colors text-sm font-medium"
+                            >
+                                <LogOut className="w-4 h-4" /> Thoát
+                            </button>
                         </div>
                     </div>
+
+                    {/* Main Content Area */}
+                    <div className="flex-1 w-full md:min-w-0">
+                        {renderContent()}
+                    </div>
+
                 </div>
             </div>
         </main>
