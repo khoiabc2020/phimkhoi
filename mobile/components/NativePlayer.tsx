@@ -16,7 +16,6 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useKeepAwake } from 'expo-keep-awake';
-import * as Brightness from 'expo-brightness';
 import { PanGestureHandler, State, GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const { width, height } = Dimensions.get('window');
@@ -59,22 +58,14 @@ export default function NativePlayer({
     const lastProgressUpdate = useRef(0);
     const initialSeekDone = useRef(false);
 
-    // Gesture State
-    const [brightness, setBrightness] = useState(0.5);
+    // Brightness: 1.0 = fully bright (no overlay), 0.0 = fully dark
+    // We use a black overlay with opacity = (1 - brightness)
+    const [brightness, setBrightness] = useState(1.0);
     const [showBrightnessSlider, setShowBrightnessSlider] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        (async () => {
-            // ... Brightness permission
-            const { status } = await Brightness.requestPermissionsAsync();
-            if (status === 'granted') {
-                const cur = await Brightness.getBrightnessAsync();
-                setBrightness(cur);
-            }
-        })();
-    }, []);
+    // No system brightness needed - we use video overlay only
 
     useEffect(() => {
         resetControlsTimer();
@@ -165,27 +156,25 @@ export default function NativePlayer({
     const [sliderValue, setSliderValue] = useState(0);
 
     const onPanGestureEvent = async (event: any) => {
-        if (locked) return; // No gesture when locked
+        if (locked) return;
 
         const { translationY, x, state } = event.nativeEvent;
         if (state !== State.ACTIVE) return;
 
         const now = Date.now();
-        const delta = -translationY / 3000;
+        // Swipe up = brighter (positive delta), swipe down = darker (negative delta)
+        const delta = -translationY / 400;
 
-        // LEFT SIDE ONLY -> Brightness
+        // LEFT SIDE ONLY -> Brightness overlay
         if (x < width / 2) {
-            if (now - lastBrightnessUpdate.current > 20) {
+            if (now - lastBrightnessUpdate.current > 16) {
                 let newBrightness = brightness + delta;
-                newBrightness = Math.max(0, Math.min(1, newBrightness));
+                newBrightness = Math.max(0.05, Math.min(1, newBrightness));
                 setBrightness(newBrightness);
                 setShowBrightnessSlider(true);
-                Brightness.setBrightnessAsync(newBrightness);
                 lastBrightnessUpdate.current = now;
-                setTimeout(() => setShowBrightnessSlider(false), 1500);
             }
         }
-        // RIGHT SIDE -> Volume DISABLED per user request
     };
 
     const handleSlidingStart = () => {
@@ -226,6 +215,15 @@ export default function NativePlayer({
                     onPlaybackStatusUpdate={onPlaybackStatusUpdate}
                     onError={handleVideoError}
                     shouldPlay={true}
+                />
+
+                {/* Brightness overlay - black layer, opacity = 1 - brightness */}
+                <View
+                    style={[
+                        StyleSheet.absoluteFill,
+                        { backgroundColor: 'black', opacity: 1 - brightness, zIndex: 0 }
+                    ]}
+                    pointerEvents="none"
                 />
 
                 <PanGestureHandler onGestureEvent={onPanGestureEvent} activeOffsetX={[-10, 10]} activeOffsetY={[-10, 10]}>

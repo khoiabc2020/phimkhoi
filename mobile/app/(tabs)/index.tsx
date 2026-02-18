@@ -76,12 +76,24 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.headerActions}>
-            <Pressable style={styles.iconBtn} onPress={() => router.push('/search' as any)}>
-              <Ionicons name="search-outline" size={22} color="white" />
+            {/* Search button - glassmorphism circle */}
+            <Pressable
+              style={({ pressed }) => [styles.iconBtn, pressed && styles.iconBtnPressed]}
+              onPress={() => router.push('/search' as any)}
+            >
+              <Ionicons name="search-outline" size={20} color="rgba(255,255,255,0.9)" />
             </Pressable>
-            <Pressable style={styles.iconBtn} onPress={() => router.push('/notifications' as any)}>
-              <Ionicons name="notifications-outline" size={22} color="white" />
-              <View style={styles.notifDot} />
+
+            {/* Notification button - glassmorphism circle with badge */}
+            <Pressable
+              style={({ pressed }) => [styles.iconBtn, pressed && styles.iconBtnPressed]}
+              onPress={() => router.push('/notifications' as any)}
+            >
+              <Ionicons name="notifications-outline" size={20} color="rgba(255,255,255,0.9)" />
+              {/* Badge */}
+              <View style={styles.notifBadge}>
+                <Text style={styles.notifBadgeText}>4</Text>
+              </View>
             </Pressable>
           </View>
         </View>
@@ -221,14 +233,42 @@ const styles = StyleSheet.create({
   },
   headerActions: {
     flexDirection: 'row',
-    gap: 4,
+    gap: 8,
+    alignItems: 'center',
   },
   iconBtn: {
     width: 38,
     height: 38,
+    borderRadius: 19,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
     position: 'relative',
+  },
+  iconBtnPressed: {
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    borderColor: 'rgba(255,255,255,0.25)',
+  },
+  notifBadge: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#fbbf24',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 3,
+    borderWidth: 1.5,
+    borderColor: '#0a0a0f',
+  },
+  notifBadgeText: {
+    color: 'black',
+    fontSize: 9,
+    fontWeight: '800',
   },
   notifDot: {
     position: 'absolute',
