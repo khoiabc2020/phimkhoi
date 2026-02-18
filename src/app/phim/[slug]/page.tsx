@@ -11,6 +11,8 @@ import MovieTabs from "@/components/MovieTabs";
 import MovieCast from "@/components/MovieCast";
 import { searchTMDBMovie, getTMDBDetails, getTMDBImage } from "@/services/tmdb";
 import { isFavorite } from "@/app/actions/favorites";
+import { isInWatchlist } from "@/app/actions/watchlist";
+import WatchlistButton from "@/components/WatchlistButton";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
@@ -154,20 +156,27 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                 )}
                                 <div className="flex gap-2">
                                     {movie && (
-                                        <FavoriteButton
-                                            movieData={{
-                                                movieId: movie._id,
-                                                movieSlug: movie.slug,
-                                                movieName: movie.name,
-                                                movieOriginName: movie.origin_name || "",
-                                                moviePoster: movie.poster_url || movie.thumb_url,
-                                                movieYear: movie.year,
-                                                movieQuality: movie.quality,
-                                                movieCategories: movie.category?.map((c: any) => c.slug) || [],
-                                            }}
-                                            initialIsFavorite={isFav}
-                                            className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md"
-                                        />
+                                        <>
+                                            <FavoriteButton
+                                                movieData={{
+                                                    movieId: movie._id,
+                                                    movieSlug: movie.slug,
+                                                    movieName: movie.name,
+                                                    movieOriginName: movie.origin_name || "",
+                                                    moviePoster: movie.poster_url || movie.thumb_url,
+                                                    movieYear: movie.year,
+                                                    movieQuality: movie.quality,
+                                                    movieCategories: movie.category?.map((c: any) => c.slug) || [],
+                                                }}
+                                                initialIsFavorite={isFav}
+                                                className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md"
+                                            />
+                                            <WatchlistButton
+                                                slug={movie.slug}
+                                                initialInWatchlist={(await isInWatchlist(movie.slug)).isInWatchlist}
+                                                className="w-10 h-10 rounded-full bg-white/5 hover:bg-only border border-white/10 backdrop-blur-md"
+                                            />
+                                        </>
                                     )}
                                     <button className="flex items-center justify-center w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md transition-all group" title="Chia sẻ">
                                         <Share2 className="w-5 h-5 text-gray-400 group-hover:text-blue-400 transition-colors" />

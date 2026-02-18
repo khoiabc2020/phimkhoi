@@ -103,133 +103,137 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
     return (
         <header
             className={cn(
-                "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-                isScrolled ? "bg-black/80 backdrop-blur-md border-b border-white/10" : "bg-gradient-to-b from-black/80 to-transparent"
+                "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
+                isScrolled
+                    ? "backdrop-blur-[28px] bg-[#0B0D12]/70 border-b border-white/5 shadow-2xl shadow-black/50"
+                    : "bg-gradient-to-b from-black/80 via-black/40 to-transparent backdrop-blur-[2px]"
             )}
         >
-            <div className="container mx-auto px-4 h-20 flex items-center justify-between">
+            <div className="max-w-[1400px] mx-auto px-4 lg:px-8 h-[72px] flex items-center justify-between gap-4">
+
                 {/* Mobile Menu Button */}
                 <button
                     onClick={() => setIsMobileMenuOpen(true)}
-                    className="lg:hidden p-2 hover:bg-white/10 rounded-lg transition-colors"
+                    className="lg:hidden p-2 -ml-2 text-white hover:bg-white/10 rounded-full transition-colors"
                 >
-                    <Menu className="w-6 h-6 text-white" />
+                    <Menu className="w-6 h-6" />
                 </button>
 
-                {/* Left: Logo & Nav */}
-                <div className="flex items-center gap-8">
-                    <Link href="/" className="flex items-center gap-3 group">
-                        <div className="relative w-10 h-10 flex items-center justify-center">
-                            <div className="absolute w-full h-full bg-primary rounded-full opacity-20 animate-pulse" />
-                            <div className="relative w-10 h-10 rounded-full border-2 border-primary bg-black/40 backdrop-blur-md flex items-center justify-center shadow-lg shadow-primary/30 group-hover:scale-110 transition-transform">
-                                <Play className="w-5 h-5 text-primary fill-primary ml-1" />
-                            </div>
+                {/* Left: Logo */}
+                <Link href="/" className="flex items-center gap-3 group shrink-0">
+                    <div className="relative w-10 h-10 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        <div className="relative w-10 h-10 rounded-full border border-white/10 bg-white/5 backdrop-blur-md flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300">
+                            <Play className="w-4 h-4 text-primary fill-primary ml-0.5" />
                         </div>
-                        <div className="flex flex-col justify-center">
-                            <span className="text-2xl font-black text-white tracking-tighter leading-none hidden sm:block">
-                                MOVIE<span className="text-primary">BOX</span>
-                            </span>
-                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest hidden sm:block">
-                                Xem phim là mê
-                            </span>
-                            {/* Mobile Text (Simplified) */}
-                            <span className="text-xl font-black text-white tracking-tighter leading-none sm:hidden">
-                                MOVIE<span className="text-primary">BOX</span>
-                            </span>
-                        </div>
-                    </Link>
+                    </div>
+                    <div className="flex flex-col justify-center">
+                        <span className="text-xl lg:text-2xl font-bold text-white tracking-tight leading-none font-sans">
+                            MOVIE<span className="text-primary">BOX</span>
+                        </span>
+                    </div>
+                </Link>
 
-                    {/* Desktop Nav */}
-                    <nav className="hidden lg:flex items-center gap-6">
-                        <Link href="/" className={`text-sm font-bold hover:text-primary transition-colors ${pathname === '/' ? 'text-primary' : 'text-gray-300'}`}>Trang Chủ</Link>
-                        <Link href="/danh-sach/phim-le" className={`text-sm font-bold hover:text-primary transition-colors ${pathname?.includes('/phim-le') ? 'text-primary' : 'text-gray-300'}`}>Phim Lẻ</Link>
-                        <Link href="/danh-sach/phim-bo" className={`text-sm font-bold hover:text-primary transition-colors ${pathname?.includes('/phim-bo') ? 'text-primary' : 'text-gray-300'}`}>Phim Bộ</Link>
-                        <Link href="/danh-sach/tv-shows" className={`text-sm font-bold hover:text-primary transition-colors ${pathname?.includes('/tv-shows') ? 'text-primary' : 'text-gray-300'}`}>TV Shows</Link>
-
-                        {/* Categories Dropdown */}
-                        <div className="relative group/cat py-4">
-                            <button className="flex items-center gap-1 text-sm font-bold text-gray-300 group-hover/cat:text-primary transition-colors">
-                                Thể Loại <ChevronDown className="w-4 h-4 transition-transform group-hover/cat:rotate-180" />
-                            </button>
-                            <div className="absolute top-full left-0 w-[400px] bg-[#0a0a0a]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl opacity-0 invisible group-hover/cat:opacity-100 group-hover/cat:visible transition-all duration-300 transform translate-y-2 group-hover/cat:translate-y-0 p-4 grid grid-cols-3 gap-2 z-50">
-                                {displayCategories.map(c => (
-                                    <Link key={c.slug} href={`/the-loai/${c.slug}`} className="text-xs text-gray-400 hover:text-white hover:bg-white/10 p-2 rounded transition-colors">{c.name}</Link>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Countries Dropdown */}
-                        <div className="relative group/country py-4">
-                            <button className="flex items-center gap-1 text-sm font-bold text-gray-300 group-hover/country:text-primary transition-colors">
-                                Quốc Gia <ChevronDown className="w-4 h-4 transition-transform group-hover/country:rotate-180" />
-                            </button>
-                            <div className="absolute top-full left-0 w-[300px] bg-[#0a0a0a]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl opacity-0 invisible group-hover/country:opacity-100 group-hover/country:visible transition-all duration-300 transform translate-y-2 group-hover/country:translate-y-0 p-4 grid grid-cols-2 gap-2 z-50">
-                                {displayCountries.map(c => (
-                                    <Link key={c.slug} href={`/quoc-gia/${c.slug}`} className="text-xs text-gray-400 hover:text-white hover:bg-white/10 p-2 rounded transition-colors">{c.name}</Link>
-                                ))}
-                            </div>
-                        </div>
-                    </nav>
-                </div>
-
-                {/* Right: Search & User */}
-                <div className="flex items-center gap-4">
-                    {/* Search Bar */}
-                    <div className="relative">
-                        <div className={`flex items-center bg-white/5 border border-white/10 rounded-full transition-all duration-300 ${isSearchOpen ? 'w-full md:w-64 bg-black/50 border-primary/50' : 'w-10 h-10 hover:bg-white/10 cursor-pointer justify-center'}`}>
-                            {isSearchOpen ? (
-                                <div className="flex items-center w-full px-3 py-1.5">
-                                    <Search className="w-4 h-4 text-primary shrink-0" />
-                                    <input
-                                        ref={searchInputRef}
-                                        type="text"
-                                        placeholder="Tìm kiếm..."
-                                        className="bg-transparent border-none outline-none text-white text-sm ml-2 w-full placeholder:text-gray-500"
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                                        onBlur={() => !searchQuery && setIsSearchOpen(false)}
-                                    />
-                                    <button onClick={() => { setIsSearchOpen(false); setSearchQuery(""); }} className="ml-1 text-gray-400 hover:text-white">
-                                        <X className="w-3 h-3" />
-                                    </button>
-                                </div>
-                            ) : (
-                                <button onClick={() => setIsSearchOpen(true)} className="w-full h-full flex items-center justify-center text-gray-400 hover:text-white transition-colors">
-                                    <Search className="w-4 h-4" />
+                {/* Center: Search Pill (Desktop) */}
+                <div className="hidden lg:flex flex-1 justify-center max-w-xl mx-auto">
+                    <div className="relative group/search w-full max-w-[420px]">
+                        <div className={cn(
+                            "relative flex items-center h-[44px] bg-white/5 border border-white/10 rounded-[22px] px-4 transition-all duration-300 overflow-hidden",
+                            "focus-within:bg-[#0B0D12] focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/50 focus-within:shadow-[0_0_30px_-5px_rgba(244,200,74,0.3)]",
+                            "hover:bg-white/10 hover:border-white/20"
+                        )}>
+                            <Search className="w-4 h-4 text-white/40 group-focus-within/search:text-primary transition-colors duration-300" />
+                            <input
+                                type="text"
+                                placeholder="Tìm kiếm phim, diễn viên..."
+                                className="w-full bg-transparent border-none outline-none text-white text-[15px] ml-3 placeholder:text-gray-500 font-medium h-full"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                            />
+                            {searchQuery && (
+                                <button onClick={() => setSearchQuery("")} className="p-1 rounded-full hover:bg-white/20 text-gray-400 hover:text-white transition-colors">
+                                    <X className="w-3 h-3" />
                                 </button>
                             )}
                         </div>
                     </div>
+                </div>
 
-                    {/* Download App Button */}
-                    <a href="/app-release.apk" target="_blank" download className="hidden lg:flex items-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-5 py-2.5 rounded-full text-sm font-bold hover:scale-105 hover:shadow-lg hover:shadow-purple-500/40 transition-all duration-300">
-                        <Download className="w-4 h-4" /> <span>Tải App</span>
-                    </a>
+                {/* Right: Actions */}
+                <div className="flex items-center gap-3 lg:gap-5 shrink-0">
 
-                    {/* User Actions */}
+                    {/* Desktop Nav Links (Minimal) */}
+                    <nav className="hidden xl:flex items-center gap-6 mr-4">
+                        <Link href="/" className="text-[14px] font-medium text-gray-300 hover:text-white transition-colors">Trang chủ</Link>
+                        <Link href="/danh-sach/phim-le" className="text-[14px] font-medium text-gray-300 hover:text-white transition-colors">Phim lẻ</Link>
+                        <Link href="/danh-sach/phim-bo" className="text-[14px] font-medium text-gray-300 hover:text-white transition-colors">Phim bộ</Link>
+                        <div className="h-4 w-[1px] bg-white/10" />
+                    </nav>
+
+                    {/* Mobile Search Toggle */}
+                    <button
+                        onClick={() => setIsSearchOpen(!isSearchOpen)}
+                        className="lg:hidden p-2 text-white hover:bg-white/10 rounded-full transition-colors"
+                    >
+                        <Search className="w-5 h-5" />
+                    </button>
+
+                    {/* History & Notification (Desktop) */}
+                    <div className="hidden lg:flex items-center gap-3">
+                        <Link href="/lich-su-xem" className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-all group" title="Lịch sử xem">
+                            <Clock className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                        </Link>
+                        {/* Removed Download Button from Header (too noisy for iOS style) or keep it subtle? User said "Quá nhiều badge to" -> remove/simplify */}
+                        {/* Making it an icon only or very subtle pill */}
+                        <a href="/app-release.apk" target="_blank" download className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 hover:from-indigo-500/40 hover:to-purple-500/40 border border-indigo-500/30 flex items-center justify-center text-indigo-400 hover:text-indigo-300 transition-all group" title="Tải App">
+                            <Download className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />
+                        </a>
+                    </div>
+
+                    {/* User Profile */}
                     {session ? (
-                        <div className="relative group/user hidden lg:block">
+                        <div className="relative group/user">
                             <Link href="/thong-tin-tai-khoan" className="block">
-                                <div className="w-9 h-9 rounded-full overflow-hidden border border-white/20 hover:border-primary transition-colors p-[1px]">
-                                    <img src={session.user?.image || `https://ui-avatars.com/api/?name=${session.user?.name}`} alt="User" className="w-full h-full object-cover rounded-full" />
+                                <div className="w-10 h-10 rounded-full p-[2px] border border-white/10 hover:border-primary/50 transition-colors bg-white/5">
+                                    <img
+                                        src={session.user?.image || `https://ui-avatars.com/api/?name=${session.user?.name}`}
+                                        alt="User"
+                                        className="w-full h-full object-cover rounded-full"
+                                    />
                                 </div>
                             </Link>
-                            {/* Dropdown would go here */}
                         </div>
                     ) : (
-                        <Link href="/login" className="hidden lg:flex items-center gap-2 bg-primary text-black px-5 py-2 rounded-full text-sm font-bold hover:bg-yellow-400 transition-all shadow-lg shadow-primary/20 transform hover:scale-105">
-                            <User className="w-4 h-4" /> <span>Đăng nhập</span>
+                        <Link
+                            href="/login"
+                            className="hidden lg:flex items-center gap-2 bg-[#F4C84A] text-black px-6 py-2 rounded-full text-[14px] font-bold hover:bg-[#ffe58a] transition-all shadow-[0_0_20px_-5px_rgba(244,200,74,0.4)] hover:shadow-[0_0_30px_-5px_rgba(244,200,74,0.6)] hover:scale-105 active:scale-95"
+                        >
+                            <span>Đăng nhập</span>
                         </Link>
                     )}
-
-
                 </div>
             </div>
 
+            {/* Mobile Search Overlay */}
+            <div className={cn(
+                "lg:hidden absolute top-auto left-0 right-0 bg-[#0B0D12] border-b border-white/10 p-4 transition-all duration-300 overflow-hidden",
+                isSearchOpen ? "h-auto opacity-100 visible" : "h-0 opacity-0 invisible"
+            )}>
+                <div className="relative flex items-center h-[40px] bg-white/10 rounded-full px-4">
+                    <Search className="w-4 h-4 text-gray-400" />
+                    <input
+                        type="text"
+                        placeholder="Tìm kiếm..."
+                        className="w-full bg-transparent border-none outline-none text-white text-sm ml-3"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                    />
+                </div>
+            </div>
 
-
-            {/* Modern Mobile Menu */}
+            {/* Mobile Menu */}
             <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
         </header>
     );

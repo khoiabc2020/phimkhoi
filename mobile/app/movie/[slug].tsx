@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getMovieDetail, getImageUrl, getRelatedMovies, Movie } from '@/services/api';
 import { addFavorite, removeFavorite, isFavorite } from '@/lib/favorites';
+import { addToWatchList, removeFromWatchList, isInWatchList } from '@/lib/watchList';
 import { useAuth } from '@/context/auth';
 import { CONFIG } from '@/constants/config';
 import { COLORS } from '@/constants/theme';
@@ -35,6 +36,7 @@ export default function MovieDetailScreen() {
     const [episodes, setEpisodes] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [fav, setFav] = useState(false);
+    const [inWatchList, setInWatchList] = useState(false);
     const [relatedMovies, setRelatedMovies] = useState<Movie[]>([]);
 
     // UI State
@@ -232,7 +234,7 @@ export default function MovieDetailScreen() {
                 <View style={styles.bodyContent}>
                     {/* ACTION BUTTONS */}
                     <View style={styles.playSection}>
-                        <Link href={firstEpisode ? `/player/${movie.slug}?ep=${firstEpisode.slug}` : '/'} asChild>
+                        <Link href={firstEpisode ? `/player/${movie.slug}?ep=${firstEpisode.slug}&server=${selectedServer}` : '/'} asChild>
                             <Pressable style={styles.playBtn} disabled={!firstEpisode}>
                                 <LinearGradient
                                     colors={[COLORS.accent, '#d97706']}
@@ -251,6 +253,14 @@ export default function MovieDetailScreen() {
                             >
                                 <Ionicons name={fav ? "heart" : "heart-outline"} size={22} color={fav ? COLORS.accent : 'white'} />
                             </Pressable>
+
+                            <Pressable
+                                onPress={toggleWatchList}
+                                style={[styles.actionIconBtn, inWatchList && { backgroundColor: 'rgba(255, 255, 255, 0.2)', borderColor: 'white' }]}
+                            >
+                                <Ionicons name={inWatchList ? "checkmark-circle" : "add-circle-outline"} size={22} color={inWatchList ? "white" : "white"} />
+                            </Pressable>
+
                             <Pressable style={styles.actionIconBtn}>
                                 <Ionicons name="download-outline" size={22} color="white" />
                             </Pressable>

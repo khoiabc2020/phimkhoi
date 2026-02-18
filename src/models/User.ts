@@ -7,6 +7,7 @@ export interface IUser extends Document {
     image?: string;
     role: "user" | "admin";
     favorites: string[]; // List of movie slugs
+    watchlist: string[]; // List of movie slugs for Watch Later
     history: {
         slug: string;
         episode?: string;
@@ -27,6 +28,7 @@ const UserSchema: Schema<IUser> = new Schema(
         image: { type: String },
         role: { type: String, enum: ["user", "admin"], default: "user" },
         favorites: [{ type: String }],
+        watchlist: [{ type: String }],
         history: [
             {
                 slug: { type: String, required: true },

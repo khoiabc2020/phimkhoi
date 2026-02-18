@@ -1,80 +1,103 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #0a0a0a;
-  --color-foreground: #ededed;
+  --color-background: #0B0D12;
+  --color-foreground: #ffffff;
 
-  --color-primary: #FFD700;
-  /* Gold */
+  --color-primary: #F4C84A;
+  /* Soft Yellow */
   --color-primary-foreground: #000000;
 
   --color-secondary: #1a1a1a;
   --color-secondary-foreground: #ffffff;
 
-  --color-accent: #FFD700;
+  --color-accent: #F4C84A;
   --color-accent-foreground: #000000;
 
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  --font-mono: "SF Mono", "Fira Code", monospace;
+
+  /* Custom Animations */
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
+  }
 }
 
 :root {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  --background: #0B0D12;
+  --foreground: #ffffff;
 }
 
 body {
-  background: var(--background);
+  /* iOS 26 Gradient Background */
+  background: linear-gradient(135deg, #0B0D12 0%, #121826 100%);
   color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
-  font-size: clamp(0.875rem, 2vw, 1rem);
-  /* 14px - 16px */
-  line-height: 1.6;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Fluid Typography - Mobile First */
+/* Fluid Typography - Apple Style */
 h1 {
-  font-size: clamp(1.5rem, 4vw + 0.5rem, 2.25rem);
-  /* 24px - 36px */
-  line-height: 1.2;
+  font-size: clamp(2rem, 4vw + 1rem, 3rem);
+  /* 32px - 48px */
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
 }
 
 h2 {
-  font-size: clamp(1.25rem, 3vw + 0.5rem, 1.875rem);
-  /* 20px - 30px */
-  line-height: 1.3;
+  font-size: clamp(1.5rem, 3vw + 0.5rem, 2.25rem);
+  /* 24px - 36px */
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 h3 {
-  font-size: clamp(1.125rem, 2.5vw + 0.25rem, 1.5rem);
-  /* 18px - 24px */
-  line-height: 1.4;
+  font-size: clamp(1.25rem, 2vw + 0.25rem, 1.75rem);
+  /* 20px - 28px */
+  font-weight: 600;
 }
 
-h4 {
-  font-size: clamp(1rem, 2vw + 0.125rem, 1.25rem);
-  /* 16px - 20px */
-  line-height: 1.4;
-}
-
-/* Mobile Touch Optimizations */
-@media (max-width: 768px) {
-
-  /* Prevent text size adjustment on orientation change */
-  html {
-    -webkit-text-size-adjust: 100%;
-    -moz-text-size-adjust: 100%;
-    -ms-text-size-adjust: 100%;
-    text-size-adjust: 100%;
+/* Glassmorphism Utilities */
+@layer utilities {
+  .glass {
+    @apply backdrop-blur-[24px] bg-white/10 border border-white/10;
   }
 
-  /* Smooth scrolling */
-  * {
-    -webkit-tap-highlight-color: transparent;
+  .glass-panel {
+    @apply backdrop-blur-[20px] bg-[#1c1c1e]/60 border border-white/10 shadow-2xl;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px rgba(244, 200, 74, 0.3);
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-black/50;
+  }
+
+  /* Apple Scrollbar */
+  .apple-scrollbar::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
   }
 }
 
-/* Custom Scrollbar Hide Utility */
+/* Scrollbar Hide Utility */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }

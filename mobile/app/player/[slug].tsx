@@ -11,7 +11,7 @@ import { CONFIG } from '@/constants/config';
 import NativePlayer from '@/components/NativePlayer';
 
 export default function PlayerScreen() {
-    const { slug, ep } = useLocalSearchParams();
+    const { slug, ep, server } = useLocalSearchParams();
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [videoUrl, setVideoUrl] = useState<string | null>(null);
@@ -20,7 +20,7 @@ export default function PlayerScreen() {
     const [episodeTitle, setEpisodeTitle] = useState("");
     const [nextEpisodeSlug, setNextEpisodeSlug] = useState<string | null>(null);
     const [episodes, setEpisodes] = useState<any[]>([]);
-    const [selectedServer, setSelectedServer] = useState(0);
+    const [selectedServer, setSelectedServer] = useState(server ? Number(server) : 0);
 
     const { user, token, syncHistory } = useAuth();
 

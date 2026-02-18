@@ -73,7 +73,7 @@ export default function ProfileScreen() {
               <ProfileMenuItem
                 icon="add-outline"
                 label="Danh sách phim của tôi"
-                onPress={() => router.push('/favorites' as any)}
+                onPress={() => router.push('/watchlist' as any)}
               />
               <ProfileMenuItem
                 icon="heart"

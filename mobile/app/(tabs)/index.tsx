@@ -266,16 +266,29 @@ const styles = StyleSheet.create({
   logoRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   logoText: { color: COLORS.textPrimary, fontSize: 18, fontWeight: '800', letterSpacing: -0.5 },
   headerActions: { flexDirection: 'row', gap: 10, alignItems: 'center' },
-  iconBtn: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  iconBtn: {
+    width: 36, height: 36, borderRadius: 18,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)'
+  },
   notifBadge: { position: 'absolute', top: -2, right: -2, width: 14, height: 14, borderRadius: 7, backgroundColor: COLORS.accent, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: COLORS.bg0 },
   notifBadgeText: { color: 'black', fontSize: 8, fontWeight: '800' },
 
   // Pills
   pillsRow: { paddingHorizontal: SPACING.md, gap: 8, paddingBottom: 6 },
-  pill: { height: 32, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.05)' },
-  pillActive: { backgroundColor: 'rgba(255,255,255,0.15)' },
+  pill: {
+    height: 32, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)'
+  },
+  pillActive: {
+    backgroundColor: 'rgba(251, 191, 36, 0.15)',
+    borderColor: '#fbbf24',
+    shadowColor: '#fbbf24', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 3
+  },
   pillText: { color: 'rgba(255,255,255,0.6)', fontSize: 12, fontWeight: '500' },
-  pillTextActive: { color: '#fff', fontWeight: '600' },
+  pillTextActive: { color: '#fbbf24', fontWeight: '700' },
 
   // Content
   scrollContent: { paddingTop: 110, paddingBottom: 100 },
@@ -284,7 +297,11 @@ const styles = StyleSheet.create({
   catSection: { marginVertical: 10, paddingLeft: SPACING.md },
   sectionTitle: { color: COLORS.textPrimary, fontSize: 16, fontWeight: '700', marginBottom: 12 },
   catScroll: { gap: 8, paddingRight: 20 },
-  catPill: { flexDirection: 'row', alignItems: 'center', height: 36, paddingHorizontal: 12, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  catPill: {
+    flexDirection: 'row', alignItems: 'center', height: 36, paddingHorizontal: 12, borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)'
+  },
   catDot: { width: 6, height: 6, borderRadius: 3, marginRight: 8 },
   catText: { color: 'rgba(255,255,255,0.8)', fontSize: 13, fontWeight: '500' },
 

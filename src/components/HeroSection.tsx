@@ -305,127 +305,146 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                 </button>
             </div>
 
-            {/* DESKTOP */}
+            {/* ================= DESKTOP LAYOUT (Cinematic iOS 26) ================= */}
             <div className="hidden lg:block absolute inset-0 h-full">
                 <div className="absolute inset-0 h-full" ref={desktopRef}>
                     <div className="flex h-full">
                         {heroMovies.map((movie, index) => {
+                            const posterImg = getHeroImage(movie, 'poster');
+                            const backdropImg = getHeroImage(movie, 'backdrop');
+
                             return (
-                                <div key={movie._id} className="relative flex-[0_0_100%] min-w-0 h-full bg-black overflow-hidden">
-                                    <div className="absolute inset-0">
+                                <div key={movie._id} className="relative flex-[0_0_100%] min-w-0 h-full bg-[#0B0D12] overflow-hidden">
+
+                                    {/* 1. Cinematic Background (Blurred & Ambient) */}
+                                    <div className="absolute inset-0 z-0">
+                                        <div className="absolute inset-0 bg-black/20 z-10" />
                                         <Image
-                                            src={getHeroImage(movie, 'backdrop')}
-                                            alt={movie.name}
+                                            src={backdropImg}
+                                            alt="bg"
                                             fill
-                                            className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                                            className="object-cover blur-[80px] opacity-60 scale-110"
                                             priority={index === 0}
                                         />
-                                        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f] via-transparent to-transparent" />
+                                        <div className="absolute inset-0 bg-gradient-to-r from-[#0B0D12] via-[#0B0D12]/60 to-transparent z-10" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D12] via-transparent to-transparent z-10" />
                                     </div>
-                                    <div className="absolute inset-0 container mx-auto px-4 md:px-12 flex flex-col justify-center h-full pb-20 pointer-events-none">
-                                        <div className="max-w-4xl space-y-6 animate-in fade-in slide-in-from-left-8 duration-700 pointer-events-auto mt-20">
-                                            <div>
-                                                <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-[#fbbf24] leading-[1.1] drop-shadow-2xl line-clamp-2 uppercase">
+
+                                    {/* 2. Content Container */}
+                                    <div className="relative z-20 h-full container max-w-[1400px] mx-auto px-8 flex items-center">
+                                        <div className="grid grid-cols-12 gap-12 w-full items-center">
+
+                                            {/* Left: Info */}
+                                            <div className="col-span-5 space-y-8 animate-in fade-in slide-in-from-left-10 duration-700 delay-100">
+                                                {/* Meta Badges */}
+                                                <div className="flex flex-wrap items-center gap-3">
+                                                    <span className="px-3 py-1 rounded-full bg-[#F4C84A] text-black text-xs font-black tracking-wider uppercase shadow-[0_0_15px_rgba(244,200,74,0.4)]">
+                                                        Phim Hot
+                                                    </span>
+                                                    <span className="px-3 py-1 rounded-full glass text-white text-xs font-bold flex items-center gap-1.5">
+                                                        <span className="text-[#F4C84A]">★</span> {heroMoviesData[movie._id]?.vote_average?.toFixed(1) || "N/A"}
+                                                    </span>
+                                                    <span className="px-3 py-1 rounded-full glass text-white/80 text-xs font-medium">
+                                                        {movie.year}
+                                                    </span>
+                                                    <span className="px-3 py-1 rounded-full glass text-[#F4C84A] text-xs font-bold border-[#F4C84A]/30">
+                                                        {movie.quality}
+                                                    </span>
+                                                </div>
+
+                                                {/* Title */}
+                                                <h1 className="text-5xl xl:text-6xl font-black text-white leading-[1.1] tracking-tight drop-shadow-2xl line-clamp-2 text-glow">
                                                     {movie.name}
                                                 </h1>
-                                            </div>
-                                            <div className="flex flex-wrap items-baseline gap-2 -mt-1 mb-4">
-                                                <h2 className="text-white/90 font-bold text-lg md:text-xl tracking-wide shadow-black drop-shadow-md">
-                                                    {movie.origin_name}
-                                                </h2>
-                                                <span className="text-white/60 text-lg font-medium">({movie.year})</span>
-                                                <span className="px-2 py-0.5 rounded bg-white/10 border border-white/20 text-white text-xs font-bold">{movie.duration || "N/A"}</span>
-                                            </div>
-                                            <div className="flex flex-wrap items-center gap-2 mb-6">
-                                                <div className="px-2.5 py-1 rounded bg-[#fbbf24] text-black font-bold text-xs uppercase tracking-wider shadow-lg shadow-[#fbbf24]/20">
-                                                    Lobby
-                                                </div>
-                                                <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-black/40 border border-white/10 text-[#fbbf24] font-bold text-xs">
-                                                    <span className="text-[10px]">★</span>
-                                                    <span>{heroMoviesData[movie._id]?.vote_average?.toFixed(1) || "N/A"}</span>
-                                                </div>
-                                                {movie.category?.slice(0, 3).map(c => (
-                                                    <span key={c.id} className="px-2.5 py-1 rounded bg-white/5 border border-white/10 text-white/80 text-xs font-medium hover:bg-white/10 cursor-pointer transition-colors">
-                                                        {c.name}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                            <p className="text-white/70 text-sm md:text-base line-clamp-3 font-normal max-w-2xl leading-relaxed drop-shadow-md mb-8">
-                                                {stripHtml(movie.content)}
-                                            </p>
-                                            <div className="flex items-center gap-4">
-                                                <Link
-                                                    href={`/xem-phim/${movie.slug}`}
-                                                    className="group relative flex items-center justify-center w-16 h-16 rounded-full bg-[#fbbf24] hover:bg-[#f59e0b] shadow-[0_0_25px_rgba(251,191,36,0.4)] hover:shadow-[0_0_40px_rgba(251,191,36,0.6)] transition-all duration-300 hover:scale-110 active:scale-95"
-                                                >
-                                                    <Play className="w-8 h-8 fill-black text-black ml-1" />
-                                                </Link>
-                                                <div className="flex gap-3">
-                                                    <div className="w-12 h-12 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md transition-all hover:scale-110 cursor-pointer group/fav">
-                                                        <FavoriteButton movieData={getFavoriteData(movie)} initialIsFavorite={false} size="md" />
+
+                                                {/* Origin Name & Categories */}
+                                                <div className="flex items-center gap-4 text-white/60 text-lg font-medium">
+                                                    <h2>{movie.origin_name}</h2>
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
+                                                    <div className="flex gap-2">
+                                                        {movie.category?.slice(0, 3).map(c => (
+                                                            <span key={c.id} className="text-white/80 hover:text-[#F4C84A] transition-colors cursor-pointer">
+                                                                {c.name}
+                                                            </span>
+                                                        ))}
                                                     </div>
+                                                </div>
+
+                                                {/* Description */}
+                                                <p className="text-white/70 text-lg leading-relaxed line-clamp-3 font-light max-w-xl">
+                                                    {stripHtml(movie.content)}
+                                                </p>
+
+                                                {/* CTA Buttons */}
+                                                <div className="flex items-center gap-5 pt-2">
+                                                    <Link
+                                                        href={`/xem-phim/${movie.slug}`}
+                                                        className="group relative flex items-center justify-center gap-3 h-14 px-8 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-bold text-lg shadow-[0_0_30px_rgba(244,200,74,0.3)] hover:shadow-[0_0_50px_rgba(244,200,74,0.5)] transition-all duration-300 hover:scale-105 active:scale-95"
+                                                    >
+                                                        <Play className="w-6 h-6 fill-black" />
+                                                        <span>Xem Ngay</span>
+                                                    </Link>
+
                                                     <Link
                                                         href={`/phim/${movie.slug}`}
-                                                        className="flex items-center justify-center w-12 h-12 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md transition-all hover:scale-110 group/info"
-                                                        title="Thông tin chi tiết"
+                                                        className="flex items-center justify-center gap-3 h-14 px-8 rounded-full glass hover:bg-white/20 text-white font-medium text-lg transition-all hover:scale-105 active:scale-95 group/info"
                                                     >
-                                                        <Info className="w-6 h-6 text-white group-hover/info:text-[#fbbf24] transition-colors" />
+                                                        <Info className="w-6 h-6 group-hover/info:text-[#F4C84A] transition-colors" />
+                                                        <span>Chi tiết</span>
                                                     </Link>
+
+                                                    <FavoriteButton movieData={getFavoriteData(movie)} initialIsFavorite={false} size="lg" />
                                                 </div>
                                             </div>
+
+                                            {/* Right: 3D Tilt Poster Card */}
+                                            <div className="col-span-7 flex justify-end pl-12 perspective-1000">
+                                                <div className="relative w-[360px] aspect-[2/3] rounded-[32px] overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] ring-1 ring-white/10 group/poster transition-transform duration-500 ease-out hover:[transform:rotateY(-5deg)_rotateX(5deg)_scale(1.02)] animate-[float_6s_ease-in-out_infinite]">
+                                                    <Image
+                                                        src={posterImg}
+                                                        alt={movie.name}
+                                                        fill
+                                                        className="object-cover"
+                                                        priority={index === 0}
+                                                    />
+                                                    {/* Shine Effect */}
+                                                    <div className="absolute inset-0 bg-gradient-to-tr from-white/20 via-transparent to-transparent opacity-0 group-hover/poster:opacity-100 transition-opacity duration-500" />
+                                                </div>
+                                            </div>
+
                                         </div>
                                     </div>
+
                                 </div>
                             );
                         })}
                     </div>
                 </div>
-                <div className="absolute bottom-8 right-0 z-40 w-full md:w-auto md:right-8 pl-4 md:pl-0 pointer-events-none">
-                    <div className="flex flex-col gap-2 pointer-events-auto items-end">
-                        <div className="flex gap-3 overflow-x-auto no-scrollbar md:max-w-4xl justify-start md:justify-end p-2 pb-4 mask-gradient-responsive">
-                            {heroMovies.map((m, index) => (
-                                <button
-                                    key={m._id}
-                                    onClick={() => scrollTo(index)}
-                                    className={cn(
-                                        "relative flex-shrink-0 w-32 md:w-44 aspect-video rounded-lg overflow-hidden transition-all duration-300 ease-out cursor-pointer group",
-                                        "shadow-lg hover:shadow-2xl",
-                                        index === selectedIndex
-                                            ? "ring-2 ring-[#fbbf24] scale-105 z-20 opacity-100 shadow-[0_5px_20px_rgba(0,0,0,0.5)]"
-                                            : "opacity-50 grayscale-[0.5] hover:opacity-100 hover:grayscale-0 hover:scale-105 border border-white/10"
-                                    )}
-                                >
-                                    <Image
-                                        src={getHeroImage(m, 'backdrop')}
-                                        alt={m.name}
-                                        fill
-                                        className="object-cover transition-transform duration-700 group-hover:scale-110"
-                                        sizes="(max-width: 768px) 150px, 200px"
-                                    />
-                                    <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors" />
-                                    <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black via-black/80 to-transparent">
-                                        <p className={cn(
-                                            "text-xs md:text-sm font-bold truncate tracking-wide text-left drop-shadow-md",
-                                            index === selectedIndex ? "text-[#fbbf24]" : "text-white group-hover:text-white"
-                                        )}>
-                                            {m.name}
-                                        </p>
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
+
+                {/* Navigation Arrows */}
+                <button onClick={scrollPrev} className="absolute left-8 top-1/2 -translate-y-1/2 z-50 w-14 h-14 rounded-full glass flex items-center justify-center text-white/50 hover:text-black hover:bg-[#F4C84A] hover:border-[#F4C84A] hover:scale-110 transition-all duration-300 group">
+                    <ChevronRight className="w-8 h-8 rotate-180 group-hover:scale-90 transition-transform" />
+                </button>
+                <button onClick={scrollNext} className="absolute right-8 top-1/2 -translate-y-1/2 z-50 w-14 h-14 rounded-full glass flex items-center justify-center text-white/50 hover:text-black hover:bg-[#F4C84A] hover:border-[#F4C84A] hover:scale-110 transition-all duration-300 group">
+                    <ChevronRight className="w-8 h-8 group-hover:scale-90 transition-transform" />
+                </button>
+
+                {/* Dots Indicator */}
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 flex gap-3">
+                    {heroMovies.slice(0, 10).map((_, idx) => (
+                        <button
+                            key={idx}
+                            onClick={() => scrollTo(idx)}
+                            className={cn(
+                                "h-1.5 rounded-full transition-all duration-300",
+                                idx === selectedIndex
+                                    ? "w-8 bg-[#F4C84A] shadow-[0_0_10px_#F4C84A]"
+                                    : "w-1.5 bg-white/20 hover:bg-white/40"
+                            )}
+                        />
+                    ))}
                 </div>
-                <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-4 z-50 pointer-events-none">
-                    <button onClick={scrollPrev} className="pointer-events-auto w-14 h-14 rounded-full bg-black/10 backdrop-blur-md border border-white/5 flex items-center justify-center text-white/30 hover:bg-[#fbbf24] hover:text-black hover:scale-110 hover:border-[#fbbf24] transition-all duration-300 group shadow-lg">
-                        <ChevronRight className="w-8 h-8 rotate-180 group-hover:-translate-x-0.5 transition-transform" />
-                    </button>
-                    <button onClick={scrollNext} className="pointer-events-auto w-14 h-14 rounded-full bg-black/10 backdrop-blur-md border border-white/5 flex items-center justify-center text-white/30 hover:bg-[#fbbf24] hover:text-black hover:scale-110 hover:border-[#fbbf24] transition-all duration-300 group shadow-lg">
-                        <ChevronRight className="w-8 h-8 group-hover:translate-x-0.5 transition-transform" />
-                    </button>
-                </div>
-            </div >
-        </div >
+            </div>
+        </div>
     );
 }
