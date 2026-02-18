@@ -170,22 +170,23 @@ export default function PlayerScreen() {
                     currentServerIndex={selectedServer}
                     currentEpisodeSlug={ep as string}
                     onEpisodeChange={(newSlug) => {
-                        router.replace(`/player/${slug}?ep=${newSlug}`);
+                        router.replace({
+                            pathname: `/player/${slug}`,
+                            params: { ep: newSlug, server: selectedServer }
+                        });
                     }}
                     onServerChange={(newServerIndex) => {
                         setSelectedServer(newServerIndex);
-                        // Try to find same episode in new server, else first
-                        const currentEpName = episodeTitle; // Heuristic using name or index
+                        const currentEpName = episodeTitle;
                         const newServerData = episodes[newServerIndex]?.server_data || [];
-                        // Simple matching by index or slug if possible, but slug might differ.
-                        // For now, default to first episode of new server if slug mismatch, 
-                        // OR try to match index.
-                        // Better: Find episode with same 'name'
                         const sameEp = newServerData.find((e: any) => e.name === currentEpName);
                         const targetEp = sameEp || newServerData[0];
 
                         if (targetEp) {
-                            router.replace(`/player/${slug}?ep=${targetEp.slug}`);
+                            router.replace({
+                                pathname: `/player/${slug}`,
+                                params: { ep: targetEp.slug, server: newServerIndex }
+                            });
                         }
                     }}
                 />

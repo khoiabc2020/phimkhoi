@@ -133,7 +133,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
         <div className="relative w-full h-auto md:h-screen bg-[#0B0D12] overflow-hidden flex flex-col">
 
             {/* ================= MOBILE LAYOUT (iOS 26 Liquid Glass) ================= */}
-            <div className="md:hidden relative w-full min-h-[580px] h-[85vh] flex flex-col pt-0">
+            <div className="md:hidden relative w-full min-h-[500px] h-[75vh] flex flex-col pt-0">
 
                 {/* 1. Ambient Background (Blurred Color) */}
                 <div className="absolute inset-0 z-0 overflow-hidden">

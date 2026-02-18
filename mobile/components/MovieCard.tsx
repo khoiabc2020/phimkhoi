@@ -13,6 +13,8 @@ interface MovieCardProps {
 const MovieCard = memo(({ movie, width = 115, height = 172 }: MovieCardProps) => {
     const imageUrl = getImageUrl(movie.poster_url || movie.thumb_url);
 
+    if (!movie.slug) return null;
+
     return (
         <Link href={`/movie/${movie.slug}`} asChild>
             <Pressable

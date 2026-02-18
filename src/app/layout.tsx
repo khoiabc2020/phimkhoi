@@ -21,6 +21,7 @@ export const metadata: Metadata = {
 import { Providers } from "@/components/Providers";
 import Header from "@/components/Header";
 import { getMenuData } from "@/services/api";
+import MobileBottomNav from "@/components/MobileBottomNav";
 
 export default async function RootLayout({
   children,
@@ -32,13 +33,14 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased pb-20 lg:pb-0`}
       >
         <Providers>
           <Suspense fallback={null}>
             <Header categories={categories} countries={countries} />
           </Suspense>
           {children}
+          <MobileBottomNav />
         </Providers>
       </body>
     </html>

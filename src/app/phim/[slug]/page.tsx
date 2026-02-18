@@ -50,8 +50,12 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     // Fetch related movies
     let relatedMovies: any[] = [];
     if (movie?.category?.[0]?.slug) {
-        const res = await getMoviesList('phim-moi-cap-nhat', { category: movie.category[0].slug, limit: 12 });
-        relatedMovies = res.items.filter((m: any) => m.slug !== movie.slug).slice(0, 8);
+        try {
+            const res = await getMoviesList('phim-moi-cap-nhat', { category: movie.category[0].slug, limit: 12 });
+            relatedMovies = res?.items?.filter((m: any) => m.slug !== movie.slug).slice(0, 8) || [];
+        } catch (e) {
+            console.error("Error fetching related movies:", e);
+        }
     }
 
     // Fetch TMDB Data

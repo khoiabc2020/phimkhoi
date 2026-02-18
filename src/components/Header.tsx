@@ -234,7 +234,12 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
             </div>
 
             {/* Mobile Menu */}
-            <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
+            <MobileMenu
+                isOpen={isMobileMenuOpen}
+                onClose={() => setIsMobileMenuOpen(false)}
+                categories={categories}
+                countries={countries}
+            />
         </header>
     );
 }

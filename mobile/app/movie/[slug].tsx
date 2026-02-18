@@ -7,11 +7,10 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { BlurView } from 'expo-blur';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { getMovieDetail, getImageUrl, getRelatedMovies, Movie } from '@/services/api';
+import { getMovieDetail, getImageUrl, getRelatedMovies, Movie, getTMDBRating, getTMDBCast } from '@/services/api';
 import { addFavorite, removeFavorite, isFavorite } from '@/lib/favorites';
 import { addToWatchList, removeFromWatchList, isInWatchList } from '@/lib/watchList';
 import { useAuth } from '@/context/auth';
@@ -42,11 +41,10 @@ export default function MovieDetailScreen() {
     // UI State
     const [selectedTab, setSelectedTab] = useState('episodes');
     const [selectedServer, setSelectedServer] = useState(0);
+    const [rating, setRating] = useState<number | null>(null);
+    const [cast, setCast] = useState<any[]>([]);
 
     const { user, token, syncFavorites } = useAuth();
-
-    // Standard Animated Value
-    const scrollY = useRef(new Animated.Value(0)).current;
 
     // Fetch Logic
     useEffect(() => {
@@ -76,6 +74,18 @@ export default function MovieDetailScreen() {
         fetchDetail();
         return () => { isMounted = false; };
     }, [slug]);
+
+    useEffect(() => {
+        if (movie) {
+            const yearStr = movie.year ? movie.year.toString().split('-')[0] : undefined;
+            const year = yearStr ? parseInt(yearStr) : undefined;
+            let type: 'movie' | 'tv' = 'movie';
+            if (movie.type === 'phim-bo' || movie.type === 'tv-shows' || movie.type === 'hoat-hinh') type = 'tv';
+
+            getTMDBRating(movie.origin_name || movie.name, year, type).then(setRating);
+            getTMDBCast(movie.origin_name || movie.name, year, type).then(setCast);
+        }
+    }, [movie]);
 
     // Favorite Logic
     const checkFav = useCallback(async () => {
@@ -114,24 +124,31 @@ export default function MovieDetailScreen() {
         }
     };
 
-    // Interpolations
-    const headerOpacity = scrollY.interpolate({
-        inputRange: [100, 200],
-        outputRange: [0, 1],
-        extrapolate: 'clamp'
-    });
+    // Watchlist Logic
+    const checkWatchList = useCallback(async () => {
+        if (!movie) return;
+        try {
+            setInWatchList(await isInWatchList(movie.slug));
+        } catch (e) { console.warn(e); }
+    }, [movie]);
 
-    const titleScale = scrollY.interpolate({
-        inputRange: [0, 200],
-        outputRange: [1, 0.9],
-        extrapolate: 'clamp'
-    });
+    useEffect(() => { checkWatchList(); }, [checkWatchList]);
 
-    const titleOpacity = scrollY.interpolate({
-        inputRange: [0, 150],
-        outputRange: [1, 0],
-        extrapolate: 'clamp'
-    });
+    const toggleWatchList = async () => {
+        if (!movie) return;
+        const newState = !inWatchList;
+        setInWatchList(newState);
+        try {
+            if (newState) {
+                await addToWatchList({ slug: movie.slug, name: movie.name, poster_url: movie.poster_url, thumb_url: movie.thumb_url });
+            } else {
+                await removeFromWatchList(movie.slug);
+            }
+        } catch (e) {
+            setInWatchList(!newState);
+            console.error(e);
+        }
+    };
 
     // Loading State
     if (loading) {
@@ -149,7 +166,6 @@ export default function MovieDetailScreen() {
     const currentServerData = episodes[selectedServer]?.server_data || [];
     const firstEpisode = currentServerData[0];
     const serverName = episodes[selectedServer]?.server_name || `Server ${selectedServer + 1}`;
-    const playButtonText = `Xem ngay • ${serverName}`;
 
     return (
         <View style={styles.container}>
@@ -158,25 +174,12 @@ export default function MovieDetailScreen() {
 
             {/* HEADER */}
             <View style={styles.headerContainer}>
-                {/* Background Glass/Solid */}
-                <Animated.View style={[StyleSheet.absoluteFill, { opacity: headerOpacity }]}>
-                    {Platform.OS === 'ios' ? (
-                        <BlurView intensity={50} tint="dark" style={StyleSheet.absoluteFill} />
-                    ) : (
-                        <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(11, 13, 18, 0.98)', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.1)' }]} />
-                    )}
-                </Animated.View>
-
                 <SafeAreaView edges={['top']} style={{ flex: 1 }}>
                     <View style={styles.headerRow}>
                         <Pressable onPress={() => router.back()} style={styles.iconBtn}>
                             <Ionicons name="arrow-back" size={24} color="white" />
                         </Pressable>
-
-                        <Animated.Text style={[styles.headerTitle, { opacity: headerOpacity }]} numberOfLines={1}>
-                            {movie.name}
-                        </Animated.Text>
-
+                        <Text style={styles.headerTitle} numberOfLines={1}>{movie.name}</Text>
                         <Pressable style={styles.iconBtn}>
                             <Ionicons name="share-social-outline" size={22} color="white" />
                         </Pressable>
@@ -184,12 +187,7 @@ export default function MovieDetailScreen() {
                 </SafeAreaView>
             </View>
 
-            <Animated.ScrollView
-                onScroll={Animated.event(
-                    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-                    { useNativeDriver: true }
-                )}
-                scrollEventThrottle={16}
+            <ScrollView
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingBottom: 100 }}
             >
@@ -207,7 +205,7 @@ export default function MovieDetailScreen() {
                         locations={[0, 0.6, 1]}
                     />
 
-                    <Animated.View style={[styles.heroContent, { opacity: titleOpacity, transform: [{ scale: titleScale }] }]}>
+                    <View style={styles.heroContent}>
                         <Text style={styles.movieTitle} numberOfLines={2}>{movie.name}</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12, gap: 8 }}>
                             <Text style={styles.movieSubtitle}>{movie.origin_name}</Text>
@@ -222,12 +220,18 @@ export default function MovieDetailScreen() {
                             <View style={[styles.glassChip, { borderColor: COLORS.accent }]}>
                                 <Text style={[styles.chipText, { color: COLORS.accent }]}>{movie.lang || 'Vietsub'}</Text>
                             </View>
-                            <View style={styles.glassChip}>
-                                <Ionicons name="eye-outline" size={12} color="rgba(255,255,255,0.7)" style={{ marginRight: 4 }} />
-                                <Text style={styles.chipText}>{movie.view?.toLocaleString()}</Text>
-                            </View>
+                            {rating !== null && (
+                                <View style={[styles.glassChip, { backgroundColor: '#fbbf24', borderColor: '#fbbf24' }]}>
+                                    <Text style={[styles.chipText, { color: 'black', fontWeight: 'bold' }]}>IMDb {rating.toFixed(1)}</Text>
+                                </View>
+                            )}
+                            {rating !== null && (
+                                <View style={[styles.glassChip, { backgroundColor: '#fbbf24', borderColor: '#fbbf24' }]}>
+                                    <Text style={[styles.chipText, { color: 'black', fontWeight: 'bold' }]}>IMDb {rating.toFixed(1)}</Text>
+                                </View>
+                            )}
                         </View>
-                    </Animated.View>
+                    </View>
                 </View>
 
                 {/* BODY */}
@@ -259,10 +263,6 @@ export default function MovieDetailScreen() {
                                 style={[styles.actionIconBtn, inWatchList && { backgroundColor: 'rgba(255, 255, 255, 0.2)', borderColor: 'white' }]}
                             >
                                 <Ionicons name={inWatchList ? "checkmark-circle" : "add-circle-outline"} size={22} color={inWatchList ? "white" : "white"} />
-                            </Pressable>
-
-                            <Pressable style={styles.actionIconBtn}>
-                                <Ionicons name="download-outline" size={22} color="white" />
                             </Pressable>
                         </View>
                     </View>
@@ -327,6 +327,23 @@ export default function MovieDetailScreen() {
                             </View>
                         )}
 
+                        {selectedTab === 'actors' && (
+                            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                                {cast.map((actor: any) => (
+                                    <View key={actor.id} style={{ width: '31%', marginBottom: 12 }}>
+                                        <Image
+                                            source={{ uri: actor.profile_path || 'https://ui-avatars.com/api/?name=' + actor.name }}
+                                            style={{ width: '100%', aspectRatio: 2 / 3, borderRadius: 8, marginBottom: 4, backgroundColor: '#333' }}
+                                            contentFit="cover"
+                                        />
+                                        <Text numberOfLines={1} style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>{actor.name}</Text>
+                                        <Text numberOfLines={1} style={{ color: 'gray', fontSize: 10 }}>{actor.character}</Text>
+                                    </View>
+                                ))}
+                                {cast.length === 0 && <Text style={{ color: 'gray', textAlign: 'center', width: '100%', marginTop: 20 }}>Đang cập nhật diễn viên...</Text>}
+                            </View>
+                        )}
+
                         {/* Always show content below */}
                         <View style={{ marginTop: 24, padding: 16, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 12 }}>
                             <Text style={{ color: 'white', fontWeight: 'bold', marginBottom: 8 }}>Nội dung phim</Text>
@@ -337,7 +354,7 @@ export default function MovieDetailScreen() {
                     </View>
 
                 </View>
-            </Animated.ScrollView>
+            </ScrollView>
         </View>
     );
 }
