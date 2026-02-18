@@ -144,8 +144,12 @@ export default function MovieDetailScreen() {
             {/* Floating Header */}
             <View style={styles.headerContainer}>
                 <Animated.View style={[StyleSheet.absoluteFill, headerOpacity]}>
-                    <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
-                    <View style={styles.headerBorder} />
+                    {Platform.OS === 'ios' ? (
+                        <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
+                    ) : (
+                        <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(11, 13, 18, 0.95)', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.1)' }]} />
+                    )}
+                    {Platform.OS === 'ios' && <View style={styles.headerBorder} />}
                 </Animated.View>
 
                 <SafeAreaView>
