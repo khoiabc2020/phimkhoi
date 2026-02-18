@@ -14,12 +14,12 @@ import Animated, {
     Extrapolation,
 } from 'react-native-reanimated';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
-// Optimized Specs
-const HERO_HEIGHT = height * 0.65; // Total Hero Section Height (< 65%)
-const POSTER_HEIGHT = 400; // Fixed max height
-const POSTER_WIDTH = width * 0.72; // Centered Card Width
+// Compressed iOS 26 Specs
+const HERO_HEIGHT = 540; // Fixed total height
+const POSTER_HEIGHT = 360; // Max height 360dp
+const POSTER_WIDTH = width * 0.68; // Slightly narrower for elegance
 
 interface HeroSectionProps {
     movies: Movie[];
@@ -44,33 +44,31 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                 <Image
                     source={{ uri: getImageUrl(activeMovie?.poster_url || activeMovie?.thumb_url) }}
                     style={StyleSheet.absoluteFill}
-                    blurRadius={90} // Strong blur for ambient glow
+                    blurRadius={80}
                     contentFit="cover"
                     transition={800}
                 />
-                {/* Darken overlay for contrast */}
-                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(11,13,18,0.6)' }]} />
-                {/* Bottom fade to blend with body */}
+                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(11,13,18,0.5)' }]} />
                 <LinearGradient
                     colors={['transparent', COLORS.bg0]}
                     style={StyleSheet.absoluteFill}
-                    locations={[0.4, 1]}
+                    locations={[0.3, 0.9]}
                 />
             </View>
 
-            {/* 2. Centered Poster Carousel */}
+            {/* 2. Compact Carousel */}
             <View style={styles.carouselContainer}>
                 <Carousel
                     loop
                     width={width}
-                    height={POSTER_HEIGHT + 20} // Add space for shadow
+                    height={POSTER_HEIGHT + 20}
                     data={movies}
                     onSnapToItem={onSnapToItem}
                     scrollAnimationDuration={500}
                     mode="parallax"
                     modeConfig={{
-                        parallaxScrollingScale: 0.88,
-                        parallaxScrollingOffset: 60,
+                        parallaxScrollingScale: 0.86,
+                        parallaxScrollingOffset: 50,
                     }}
                     renderItem={({ item, index }) => (
                         <HeroCard
@@ -82,36 +80,30 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                 />
             </View>
 
-            {/* 3. Info Section (Below Poster) */}
+            {/* 3. Compression Info Section */}
             <View style={styles.infoContainer}>
                 {/* Title */}
                 <Text style={styles.title} numberOfLines={1}>
                     {activeMovie?.name}
                 </Text>
 
-                {/* Meta Row */}
-                <View style={styles.metaRow}>
-                    <Text style={styles.metaText}>{activeMovie?.origin_name}</Text>
-                    <View style={styles.dotSeparator} />
-                    <Text style={styles.metaText}>{activeMovie?.year}</Text>
-                    <View style={styles.dotSeparator} />
-                    <View style={styles.glassChip}>
-                        <Text style={styles.chipText}>{activeMovie?.quality || 'HD'}</Text>
-                    </View>
-                </View>
+                {/* Inline Meta: Origins • Year • Quality */}
+                <Text style={styles.inlineMeta}>
+                    {activeMovie?.origin_name} • {activeMovie?.year} • <Text style={{ color: COLORS.accent, fontWeight: '700' }}>{activeMovie?.quality || 'FHD'}</Text>
+                </Text>
 
-                {/* Buttons Row - Optimized Height */}
+                {/* Compact CTA Row */}
                 <View style={styles.actionRow}>
                     <Link href={`/movie/${activeMovie.slug}` as any} asChild>
                         <Pressable style={styles.primaryBtn}>
-                            <Ionicons name="play" size={20} color="black" />
+                            <Ionicons name="play" size={18} color="black" />
                             <Text style={styles.primaryBtnText}>Xem ngay</Text>
                         </Pressable>
                     </Link>
 
                     <Link href={`/movie/${activeMovie.slug}` as any} asChild>
                         <Pressable style={styles.secondaryBtn}>
-                            <Ionicons name="information-circle-outline" size={24} color="rgba(255,255,255,0.8)" />
+                            <Ionicons name="information-circle-outline" size={22} color="rgba(255,255,255,0.8)" />
                         </Pressable>
                     </Link>
                 </View>
@@ -133,9 +125,8 @@ function HeroCard({ movie, isActive, onPress }: { movie: Movie, isActive: boolea
                 contentFit="cover"
                 transition={400}
             />
-            {/* Inner Gradient for Depth */}
             <LinearGradient
-                colors={['transparent', 'rgba(0,0,0,0.2)']}
+                colors={['transparent', 'rgba(0,0,0,0.1)']}
                 style={StyleSheet.absoluteFill}
             />
         </Pressable>
@@ -151,14 +142,14 @@ const styles = StyleSheet.create({
     },
     carouselContainer: {
         alignItems: 'center',
-        marginTop: 10,
+        marginTop: 0,
         zIndex: 10,
     },
-    // Poster Card Specs
+    // Poster
     cardContainer: {
         width: POSTER_WIDTH,
         height: POSTER_HEIGHT,
-        borderRadius: 28, // High radius
+        borderRadius: 28,
         overflow: 'hidden',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.1)',
@@ -167,95 +158,65 @@ const styles = StyleSheet.create({
     },
     cardActive: {
         borderColor: 'rgba(255,255,255,0.25)',
-        shadowColor: COLORS.accent, // Ambient glow
-        shadowOffset: { width: 0, height: 12 },
-        shadowOpacity: 0.35,
-        shadowRadius: 24,
-        elevation: 12, // Android shadow
+        shadowColor: COLORS.accent,
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.3,
+        shadowRadius: 20,
+        elevation: 10,
     },
-    cardImage: {
-        width: '100%',
-        height: '100%',
-    },
+    cardImage: { width: '100%', height: '100%' },
 
-    // Info Section
+    // Info
     infoContainer: {
         alignItems: 'center',
-        marginTop: 16,
-        paddingHorizontal: 24,
+        marginTop: 12, // Tighter spacing
+        paddingHorizontal: 20,
     },
     title: {
         color: COLORS.textPrimary,
-        fontSize: 26,
-        fontWeight: '700', // Semibold
+        fontSize: 24, // Slightly smaller for compactness
+        fontWeight: '700',
         textAlign: 'center',
-        marginBottom: 6,
+        marginBottom: 4,
         letterSpacing: -0.5,
     },
-    metaRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 8,
-        marginBottom: 16,
-    },
-    metaText: {
+    inlineMeta: {
         color: COLORS.textSecondary,
-        fontSize: 14,
+        fontSize: 13,
         fontWeight: '500',
-    },
-    dotSeparator: {
-        width: 3,
-        height: 3,
-        borderRadius: 1.5,
-        backgroundColor: COLORS.textSecondary,
-        opacity: 0.5,
-    },
-    glassChip: {
-        backgroundColor: 'rgba(255,255,255,0.1)',
-        borderRadius: 6,
-        paddingHorizontal: 6,
-        paddingVertical: 2,
-    },
-    chipText: {
-        color: 'white',
-        fontSize: 11,
-        fontWeight: '700',
+        marginBottom: 12,
     },
 
-    // Buttons
+    // Buttons Buttons
     actionRow: {
         flexDirection: 'row',
-        gap: 12,
-        width: '100%',
-        justifyContent: 'center',
-        maxWidth: 280, // Constrain width
+        gap: 10,
+        alignItems: 'center',
     },
     primaryBtn: {
-        flex: 1,
-        height: 48, // Compact height
+        width: 140, // Compact Width
+        height: 44, // Compact Height 44dp
         backgroundColor: COLORS.accent,
-        borderRadius: 24,
+        borderRadius: 22,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 8,
+        gap: 6,
         shadowColor: COLORS.accent,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.25,
-        shadowRadius: 10,
-        elevation: 4,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
     },
     primaryBtnText: {
         color: 'black',
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: '700',
     },
     secondaryBtn: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        backgroundColor: 'rgba(255,255,255,0.08)', // Glass
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        backgroundColor: 'rgba(255,255,255,0.08)',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.15)',
         alignItems: 'center',

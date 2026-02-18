@@ -33,28 +33,26 @@ export interface Movie {
     episodes: { server_name: string; server_data: { name: string; slug: string; filename: string; link_embed: string; link_m3u8: string }[] }[];
 }
 
-// Helper to normalize response - PhimAPI returns { data: { items: [...] } }
+// Helper to normalize response
 const getItems = (data: any): Movie[] => {
-    if (!data) return [];
-    if (Array.isArray(data.items)) return data.items;
-    if (data.data?.items && Array.isArray(data.data.items)) return data.data.items;
-    return [];
+    try {
+        if (!data) return [];
+        if (Array.isArray(data.items)) return data.items;
+        if (data.data?.items && Array.isArray(data.data.items)) return data.data.items;
+        return [];
+    } catch (e) {
+        return [];
+    }
 };
 
 export const getHomeData = async () => {
     try {
-        console.log("Fetching Home Data (Mobile) from:", API_URL);
         const [phimLe, phimBo, hoatHinh, tvShows] = await Promise.all([
-            fetch(`${API_URL}/v1/api/danh-sach/phim-le?limit=12`).then((res) => res.json()),
-            fetch(`${API_URL}/v1/api/danh-sach/phim-bo?limit=12`).then((res) => res.json()),
-            fetch(`${API_URL}/v1/api/danh-sach/hoat-hinh?limit=12`).then((res) => res.json()),
-            fetch(`${API_URL}/v1/api/danh-sach/tv-shows?limit=12`).then((res) => res.json()),
+            fetch(`${API_URL}/v1/api/danh-sach/phim-le?limit=12`).then((res) => res.json()).catch(() => null),
+            fetch(`${API_URL}/v1/api/danh-sach/phim-bo?limit=12`).then((res) => res.json()).catch(() => null),
+            fetch(`${API_URL}/v1/api/danh-sach/hoat-hinh?limit=12`).then((res) => res.json()).catch(() => null),
+            fetch(`${API_URL}/v1/api/danh-sach/tv-shows?limit=12`).then((res) => res.json()).catch(() => null),
         ]);
-
-        console.log("Data fetched successfully:", {
-            phimLe: getItems(phimLe).length,
-            phimBo: getItems(phimBo).length
-        });
 
         return {
             phimLe: getItems(phimLe),
@@ -63,7 +61,7 @@ export const getHomeData = async () => {
             tvShows: getItems(tvShows),
         };
     } catch (error) {
-        console.error("Error fetching home data DETAILED:", error);
+        console.error("Error fetching home data:", error);
         return { phimLe: [], phimBo: [], hoatHinh: [], tvShows: [] };
     }
 };
@@ -71,6 +69,7 @@ export const getHomeData = async () => {
 export const getMovieDetail = async (slug: string) => {
     try {
         const res = await fetch(`${API_URL}/phim/${slug}`);
+        if (!res.ok) return null;
         const data = await res.json();
         return data; // Returns { status, msg, movie, episodes }
     } catch (error) {
@@ -81,7 +80,8 @@ export const getMovieDetail = async (slug: string) => {
 
 export const searchMovies = async (keyword: string, limit = 20) => {
     try {
-        const res = await fetch(`${API_URL}/v1/api/tim-kiem?keyword=${keyword}&limit=${limit}`);
+        const res = await fetch(`${API_URL}/v1/api/tim-kiem?keyword=${encodeURIComponent(keyword)}&limit=${limit}`);
+        if (!res.ok) return [];
         const data = await res.json();
         return getItems(data);
     } catch (error) {
@@ -100,14 +100,12 @@ export const getImageUrl = (url?: string) => {
 export const getMenuData = async () => {
     try {
         const [categoriesRes, countriesRes] = await Promise.all([
-            fetch(`${API_URL}/the-loai`),
-            fetch(`${API_URL}/quoc-gia`),
+            fetch(`${API_URL}/the-loai`).then(r => r.json()).catch(() => []),
+            fetch(`${API_URL}/quoc-gia`).then(r => r.json()).catch(() => []),
         ]);
-        const categories = await categoriesRes.json();
-        const countries = await countriesRes.json();
         return {
-            categories: Array.isArray(categories) ? categories : [],
-            countries: Array.isArray(countries) ? countries : [],
+            categories: Array.isArray(categoriesRes) ? categoriesRes : [],
+            countries: Array.isArray(countriesRes) ? countriesRes : [],
         };
     } catch (error) {
         console.error('Error fetching menu:', error);
@@ -118,6 +116,7 @@ export const getMenuData = async () => {
 export const getMoviesList = async (type: string, page = 1, limit = 24) => {
     try {
         const res = await fetch(`${API_URL}/v1/api/danh-sach/${type}?page=${page}&limit=${limit}`);
+        if (!res.ok) return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
         const data = await res.json();
         return { items: getItems(data), pagination: data.data?.params?.pagination || { currentPage: 1, totalPages: 1 } };
     } catch (error) {
@@ -129,6 +128,7 @@ export const getMoviesList = async (type: string, page = 1, limit = 24) => {
 export const getMoviesByCategory = async (slug: string, page = 1, limit = 24) => {
     try {
         const res = await fetch(`${API_URL}/v1/api/the-loai/${slug}?page=${page}&limit=${limit}`);
+        if (!res.ok) return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
         const data = await res.json();
         return { items: getItems(data), pagination: data.data?.params?.pagination || { currentPage: 1, totalPages: 1 } };
     } catch (error) {
@@ -140,6 +140,7 @@ export const getMoviesByCategory = async (slug: string, page = 1, limit = 24) =>
 export const getMoviesByCountry = async (slug: string, page = 1, limit = 24) => {
     try {
         const res = await fetch(`${API_URL}/v1/api/quoc-gia/${slug}?page=${page}&limit=${limit}`);
+        if (!res.ok) return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
         const data = await res.json();
         return { items: getItems(data), pagination: data.data?.params?.pagination || { currentPage: 1, totalPages: 1 } };
     } catch (error) {
@@ -150,10 +151,13 @@ export const getMoviesByCountry = async (slug: string, page = 1, limit = 24) => 
 
 export const getRelatedMovies = async (categorySlug: string, limit = 12) => {
     try {
-        // Fetch movies from the same category as "related"
+        if (!categorySlug) return [];
         const res = await fetch(`${API_URL}/v1/api/the-loai/${categorySlug}?limit=${limit}`);
+        if (!res.ok) return [];
         const data = await res.json();
-        return getItems(data);
+        const items = getItems(data);
+        // Fallback if empty, maybe fetch popular
+        return items;
     } catch (error) {
         console.error(`Error fetching related movies [${categorySlug}]:`, error);
         return [];
@@ -163,13 +167,12 @@ export const getRelatedMovies = async (categorySlug: string, limit = 12) => {
 export const checkAppVersion = async () => {
     try {
         const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/version`);
+        if (!res.ok) return null;
         return await res.json();
     } catch (error) {
-        console.error("Check version error:", error);
         return null;
     }
 };
-
 
 export const saveHistory = async (slug: string, episode: string, time: number, duration: number, token?: string) => {
     try {

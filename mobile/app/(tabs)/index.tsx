@@ -12,13 +12,16 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import HeroSection from '@/components/HeroSection';
 import MovieRow from '@/components/MovieRow';
-import CategoryCard from '@/components/CategoryCard';
 import LoadingState from '@/components/LoadingState';
-import { getHomeData, Movie } from '@/services/api';
+import {
+  getHomeData, getMoviesByCategory, getMoviesByCountry,
+  Movie, getMoviesList
+} from '@/services/api'; // Added imports
 import { COLORS, SPACING, RADIUS, BLUR } from '@/constants/theme';
 
 const { width } = Dimensions.get('window');
 
+// Main Nav Pills (Top)
 const NAV_PILLS = [
   { label: 'Đề xuất', href: '/explore', active: true },
   { label: 'Phim bộ', href: '/list/phim-bo', active: false },
@@ -27,21 +30,84 @@ const NAV_PILLS = [
   { label: 'TV Shows', href: '/list/tv-shows', active: false },
 ];
 
+// Highlight Categories (Horizontal Scroll)
+const HIGHLIGHT_CATS = [
+  { label: 'Chiếu Rạp', color: '#eab308', slug: 'phim-chieu-rap' },
+  { label: 'Hàn Quốc', color: '#db2777', isCountry: true, slug: 'han-quoc' },
+  { label: 'Trung Quốc', color: '#ef4444', isCountry: true, slug: 'trung-quoc' },
+  { label: 'Hành Động', color: '#059669', slug: 'hanh-dong' },
+  { label: 'Tình Cảm', color: '#ec4899', slug: 'tinh-cam' },
+  { label: 'Kinh Dị', color: '#7c3aed', slug: 'kinh-di' },
+];
+
 export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
+
+  // Extended Data State
   const [data, setData] = useState<{
+    heroMovies: Movie[];
     phimLe: Movie[];
     phimBo: Movie[];
     hoatHinh: Movie[];
     tvShows: Movie[];
-  }>({ phimLe: [], phimBo: [], hoatHinh: [], tvShows: [] });
+    phimChieuRap: Movie[];
+    hanQuoc: Movie[];
+    trungQuoc: Movie[];
+    hanhDong: Movie[];
+    tinhCam: Movie[];
+    sapChieu: Movie[];
+  }>({
+    heroMovies: [], phimLe: [], phimBo: [], hoatHinh: [], tvShows: [],
+    phimChieuRap: [], hanQuoc: [], trungQuoc: [], hanhDong: [], tinhCam: [], sapChieu: []
+  });
 
   const fetchData = useCallback(async () => {
     try {
-      const result = await getHomeData();
-      setData(result);
+      // Parallel Fetching for speed
+      const [
+        homeBasic,
+        chieuRapRes,
+        hanQuocRes,
+        trungQuocRes,
+        hanhDongRes,
+        tinhCamRes,
+        sapChieuRes
+      ] = await Promise.all([
+        getHomeData(),
+        getMoviesByCategory('phim-chieu-rap', 1, 12),
+        getMoviesByCountry('han-quoc', 1, 10),
+        getMoviesByCountry('trung-quoc', 1, 10),
+        getMoviesByCategory('hanh-dong', 1, 10),
+        getMoviesByCategory('tinh-cam', 1, 10),
+        getMoviesList('phim-sap-chieu', 1, 10)
+      ]);
+
+      // Merge Logic for Hero (Interleave Phim Bo & Phim Le)
+      const heroMixed: Movie[] = [];
+      const len = Math.max(homeBasic.phimBo.length, homeBasic.phimLe.length);
+      for (let i = 0; i < len; i++) {
+        if (homeBasic.phimBo[i]) heroMixed.push(homeBasic.phimBo[i]);
+        if (homeBasic.phimLe[i]) heroMixed.push(homeBasic.phimLe[i]);
+      }
+      // Top 8 for Hero
+      const finalHero = heroMixed.slice(0, 8);
+
+      setData({
+        heroMovies: finalHero,
+        phimLe: homeBasic.phimLe,
+        phimBo: homeBasic.phimBo,
+        hoatHinh: homeBasic.hoatHinh,
+        tvShows: homeBasic.tvShows,
+        phimChieuRap: chieuRapRes.items,
+        hanQuoc: hanQuocRes.items,
+        trungQuoc: trungQuocRes.items,
+        hanhDong: hanhDongRes.items,
+        tinhCam: tinhCamRes.items,
+        sapChieu: sapChieuRes.items,
+      });
+
     } catch (error) {
       console.error(error);
     } finally {
@@ -52,7 +118,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -63,39 +129,29 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <StatusBar style="light" />
 
-      {/* Background Gradient - Dark Premium */}
+      {/* Background Gradient - Dark Cinematic */}
       <LinearGradient
         colors={[COLORS.bg0, '#121826', COLORS.bg0]}
         locations={[0, 0.4, 0.9]}
         style={StyleSheet.absoluteFill}
       />
 
-      {/* Floating Glass Header - Optimized Height 56dp */}
+      {/* Floating Glass Header */}
       <View style={styles.headerWrapper}>
         <BlurView intensity={25} tint="dark" style={StyleSheet.absoluteFill} />
         <View style={styles.headerGlassBorder} />
         <SafeAreaView edges={['top']} style={styles.headerContent}>
-          {/* Top Row */}
           <View style={styles.headerRow}>
             <View style={styles.logoRow}>
-              <View style={styles.logoIcon}>
-                <Ionicons name="film" size={20} color={COLORS.accent} />
-              </View>
+              <Ionicons name="film" size={24} color={COLORS.accent} />
               <Text style={styles.logoText}>MovieBox</Text>
             </View>
 
             <View style={styles.headerActions}>
-              <Pressable
-                style={({ pressed }) => [styles.iconBtn, pressed && styles.iconBtnPressed]}
-                onPress={() => router.push('/search' as any)}
-              >
+              <Pressable style={styles.iconBtn} onPress={() => router.push('/search' as any)}>
                 <Ionicons name="search-outline" size={20} color={COLORS.textPrimary} />
               </Pressable>
-
-              <Pressable
-                style={({ pressed }) => [styles.iconBtn, pressed && styles.iconBtnPressed]}
-                onPress={() => router.push('/notifications' as any)}
-              >
+              <Pressable style={styles.iconBtn} onPress={() => router.push('/notifications' as any)}>
                 <Ionicons name="notifications-outline" size={20} color={COLORS.textPrimary} />
                 <View style={styles.notifBadge}>
                   <Text style={styles.notifBadgeText}>4</Text>
@@ -105,12 +161,7 @@ export default function HomeScreen() {
           </View>
 
           {/* Category Pills */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.pillsRow}
-            style={{ marginTop: 4, paddingBottom: 12 }}
-          >
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.pillsRow}>
             {NAV_PILLS.map((pill, index) => (
               <Link key={index} href={pill.href as any} asChild>
                 <Pressable style={[styles.pill, index === 0 && styles.pillActive]}>
@@ -120,82 +171,83 @@ export default function HomeScreen() {
                 </Pressable>
               </Link>
             ))}
-            <Pressable style={[styles.pill, styles.pillOutline]}>
-              <Text style={styles.pillText}>Thể loại</Text>
-              <Ionicons name="chevron-down" size={12} color={COLORS.textSecondary} style={{ marginLeft: 4 }} />
-            </Pressable>
           </ScrollView>
         </SafeAreaView>
       </View>
 
-      {/* Main Content */}
+      {/* Main Scroll Content */}
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={COLORS.accent}
-            colors={[COLORS.accent]}
-            progressViewOffset={140}
-          />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.accent} colors={[COLORS.accent]} progressViewOffset={140} />
         }
       >
-        {/* Hero Section */}
+        {/* Hero Section - Mixed Content */}
         {loading ? (
-          <View style={{ height: height * 0.6, justifyContent: 'center' }}>
+          <View style={{ height: 400, justifyContent: 'center' }}>
             <LoadingState count={1} type="card" />
           </View>
         ) : (
-          <HeroSection movies={data.phimLe.slice(0, 8)} />
+          <HeroSection movies={data.heroMovies} />
         )}
 
-        {/* Categories Grid */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Thể loại nổi bật</Text>
-            <Ionicons name="chevron-forward" size={18} color={COLORS.textSecondary} />
-          </View>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.categoriesContainer}
-          >
-            <CategoryCard title="Xuyên Không" slug="xuyen-khong" colors={['#ef4444', '#f87171']} width={140} height={70} />
-            <CategoryCard title="Cổ Trang" slug="co-trang" colors={['#ea580c', '#fb923c']} width={140} height={70} />
-            <CategoryCard title="Hành Động" slug="hanh-dong" colors={['#059669', '#34d399']} width={140} height={70} />
-            <CategoryCard title="Tình Cảm" slug="tinh-cam" colors={['#db2777', '#f472b6']} width={140} height={70} />
+        {/* Categories Compact */}
+        <View style={styles.catSection}>
+          <Text style={styles.sectionTitle}>Thể loại nổi bật</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.catScroll}>
+            {HIGHLIGHT_CATS.map((cat, idx) => (
+              <Link
+                key={idx}
+                href={cat.isCountry ? `/country/${cat.slug}` as any : `/category/${cat.slug}` as any}
+                asChild
+              >
+                <Pressable style={styles.catPill}>
+                  <View style={[styles.catDot, { backgroundColor: cat.color }]} />
+                  <Text style={styles.catText}>{cat.label}</Text>
+                </Pressable>
+              </Link>
+            ))}
           </ScrollView>
         </View>
 
-        {/* Movie Rows */}
+        {/* Movie Rows - Synced with Web */}
         {loading ? (
           <View style={{ padding: 20 }}>
             <LoadingState count={4} type="card" />
           </View>
         ) : (
           <View style={styles.movieRows}>
-            <MovieRow
-              title="Phim Bộ Mới Nhất"
-              movies={data.phimBo.slice(0, 12)}
-              slug="phim-bo"
-            />
-            <MovieRow
-              title="Phim Lẻ Đặc Sắc"
-              movies={data.phimLe.slice(0, 12)}
-              slug="phim-le"
-            />
-            <MovieRow
-              title="Hoạt Hình"
-              movies={data.hoatHinh.slice(0, 12)}
-              slug="hoat-hinh"
-            />
-            <MovieRow
-              title="TV Shows"
-              movies={data.tvShows.slice(0, 12)}
-              slug="tv-shows"
-            />
+            {/* Hot Sections */}
+            {data.phimChieuRap.length > 0 &&
+              <MovieRow title="Phim Chiếu Rạp Mới" movies={data.phimChieuRap} slug="phim-chieu-rap" />
+            }
+
+            <MovieRow title="Phim Bộ Mới Nhất" movies={data.phimBo.slice(0, 12)} slug="phim-bo" />
+            <MovieRow title="Phim Lẻ Đặc Sắc" movies={data.phimLe.slice(0, 12)} slug="phim-le" />
+
+            {/* Countries */}
+            {data.hanQuoc.length > 0 &&
+              <MovieRow title="Phim Hàn Quốc Hot" movies={data.hanQuoc} slug="han-quoc" />
+            }
+            {data.trungQuoc.length > 0 &&
+              <MovieRow title="Phim Trung Quốc Hot" movies={data.trungQuoc} slug="trung-quoc" />
+            }
+
+            {/* Genres */}
+            {data.hanhDong.length > 0 &&
+              <MovieRow title="Phim Hành Động Kịch Tính" movies={data.hanhDong} slug="hanh-dong" />
+            }
+            {data.tinhCam.length > 0 &&
+              <MovieRow title="Phim Tình Cảm Lãng Mạn" movies={data.tinhCam} slug="tinh-cam" />
+            }
+
+            <MovieRow title="Hoạt Hình" movies={data.hoatHinh.slice(0, 12)} slug="hoat-hinh" />
+            <MovieRow title="TV Shows" movies={data.tvShows.slice(0, 12)} slug="tv-shows" />
+
+            {data.sapChieu.length > 0 &&
+              <MovieRow title="Phim Sắp Chiếu" movies={data.sapChieu} slug="phim-sap-chieu" />
+            }
           </View>
         )}
       </ScrollView>
@@ -204,162 +256,37 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.bg0,
-  },
+  container: { flex: 1, backgroundColor: COLORS.bg0 },
 
   // Header
-  headerWrapper: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 100,
-    overflow: 'hidden',
-    // No border bottom here to let blur blend
-  },
-  headerGlassBorder: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 1,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-  },
-  headerContent: {
-    backgroundColor: 'transparent',
-    paddingBottom: 8,
-  },
-  headerRow: {
-    height: 50, // Compact
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: SPACING.md,
-  },
-  logoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  logoIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
-    backgroundColor: 'rgba(244, 200, 74, 0.1)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(244, 200, 74, 0.2)',
-  },
-  logoText: {
-    color: COLORS.textPrimary,
-    fontSize: 20,
-    fontWeight: '800',
-    letterSpacing: -0.5,
-  },
-  headerActions: {
-    flexDirection: 'row',
-    gap: 10,
-    alignItems: 'center',
-  },
-  iconBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.05)', // Subtle glass
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-  },
-  iconBtnPressed: {
-    backgroundColor: 'rgba(255,255,255,0.15)',
-  },
-  notifBadge: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    minWidth: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: COLORS.accent,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1.5,
-    borderColor: COLORS.bg0,
-  },
-  notifBadgeText: {
-    color: 'black',
-    fontSize: 9,
-    fontWeight: '800',
-  },
+  headerWrapper: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 100, overflow: 'hidden' },
+  headerGlassBorder: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 1, backgroundColor: 'rgba(255,255,255,0.08)' },
+  headerContent: { backgroundColor: 'transparent', paddingBottom: 8 },
+  headerRow: { height: 50, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: SPACING.md },
+  logoRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  logoText: { color: COLORS.textPrimary, fontSize: 18, fontWeight: '800', letterSpacing: -0.5 },
+  headerActions: { flexDirection: 'row', gap: 10, alignItems: 'center' },
+  iconBtn: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  notifBadge: { position: 'absolute', top: -2, right: -2, width: 14, height: 14, borderRadius: 7, backgroundColor: COLORS.accent, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: COLORS.bg0 },
+  notifBadgeText: { color: 'black', fontSize: 8, fontWeight: '800' },
 
   // Pills
-  pillsRow: {
-    paddingHorizontal: SPACING.md,
-    gap: 8,
-    paddingBottom: 4,
-  },
-  pill: {
-    height: 36, // Spec 36dp
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 14,
-    borderRadius: 18, // Spec 18dp
-    backgroundColor: 'rgba(255,255,255,0.05)',
-  },
-  pillActive: {
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderWidth: 0, // Cleaner
-  },
-  pillOutline: {
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-    backgroundColor: 'transparent',
-  },
-  pillText: {
-    color: 'rgba(255,255,255,0.6)',
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  pillTextActive: {
-    color: '#fff',
-    fontWeight: '600',
-  },
+  pillsRow: { paddingHorizontal: SPACING.md, gap: 8, paddingBottom: 6 },
+  pill: { height: 32, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.05)' },
+  pillActive: { backgroundColor: 'rgba(255,255,255,0.15)' },
+  pillText: { color: 'rgba(255,255,255,0.6)', fontSize: 12, fontWeight: '500' },
+  pillTextActive: { color: '#fff', fontWeight: '600' },
 
   // Content
-  scrollContent: {
-    paddingTop: 120, // Adjusted for Header + Pills
-    paddingBottom: 90,
-  },
+  scrollContent: { paddingTop: 110, paddingBottom: 100 },
 
-  // Sections
-  section: {
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: SPACING.md,
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    color: COLORS.textPrimary,
-    fontSize: 19,
-    fontWeight: '700',
-    letterSpacing: -0.5,
-  },
-  categoriesContainer: {
-    paddingHorizontal: SPACING.md,
-    gap: 12,
-  },
-  movieRows: {
-    gap: 10,
-  },
+  // Categories Compact
+  catSection: { marginVertical: 10, paddingLeft: SPACING.md },
+  sectionTitle: { color: COLORS.textPrimary, fontSize: 16, fontWeight: '700', marginBottom: 12 },
+  catScroll: { gap: 8, paddingRight: 20 },
+  catPill: { flexDirection: 'row', alignItems: 'center', height: 36, paddingHorizontal: 12, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  catDot: { width: 6, height: 6, borderRadius: 3, marginRight: 8 },
+  catText: { color: 'rgba(255,255,255,0.8)', fontSize: 13, fontWeight: '500' },
+
+  movieRows: { gap: 10 },
 });
-
-const height = Dimensions.get('window').height;
