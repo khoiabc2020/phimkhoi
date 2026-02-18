@@ -223,14 +223,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         </Link>
                     )}
 
-                    {/* Mobile Menu Toggle */}
-                    <button
-                        className="lg:hidden p-2 text-white hover:bg-white/10 rounded-full transition-colors"
-                        onClick={() => setIsMobileMenuOpen(true)}
-                        aria-label="Open menu"
-                    >
-                        <Menu className="w-6 h-6" />
-                    </button>
+
                 </div>
             </div>
 
