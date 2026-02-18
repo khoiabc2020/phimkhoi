@@ -33,6 +33,7 @@ export default function VideoPlayer({
 }: VideoPlayerProps) {
     const [saved, setSaved] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const [hlsFailed, setHlsFailed] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const { data: session } = useSession();
 
@@ -51,15 +52,17 @@ export default function VideoPlayer({
         return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
     }, []);
 
-    // 1. Priority: Use HLS Player if m3u8 is available
-    if (m3u8) {
+    // 1. Priority: Use HLS Player if m3u8 is available and HLS hasn't failed
+    if (m3u8 && !hlsFailed) {
         return (
             <HLSPlayer
                 url={m3u8}
+                fallbackUrl={url}
                 poster={movieData?.moviePoster}
                 initialProgress={initialProgress}
                 movieData={movieData}
                 autoPlay={true}
+                onHLSFail={() => setHlsFailed(true)}
             />
         );
     }

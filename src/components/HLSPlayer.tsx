@@ -11,13 +11,15 @@ import { addWatchHistory } from "@/app/actions/watchHistory";
 
 interface HLSPlayerProps {
     url: string; // m3u8 url
+    fallbackUrl?: string; // iframe embed url to use when HLS fails
     poster?: string;
     initialProgress?: number; // 0-100
     movieData?: any;
     autoPlay?: boolean;
+    onHLSFail?: () => void; // callback when HLS fails (for parent to switch to iframe)
 }
 
-export default function HLSPlayer({ url, poster, initialProgress = 0, movieData, autoPlay = false }: HLSPlayerProps) {
+export default function HLSPlayer({ url, fallbackUrl, poster, initialProgress = 0, movieData, autoPlay = false, onHLSFail }: HLSPlayerProps) {
     const [playing, setPlaying] = useState(autoPlay);
     const [volume, setVolume] = useState(1);
     const [muted, setMuted] = useState(false);
@@ -106,10 +108,26 @@ export default function HLSPlayer({ url, poster, initialProgress = 0, movieData,
     };
 
     const [hasError, setHasError] = useState(false);
+    const [useFallback, setUseFallback] = useState(false);
 
     // ... existing refs
 
     // ... existing useEffects
+
+    // When HLS fails and we have a fallback iframe URL, use it
+    if (useFallback && fallbackUrl) {
+        return (
+            <div className="relative w-full h-full bg-black">
+                <iframe
+                    src={fallbackUrl}
+                    className="w-full h-full"
+                    allowFullScreen
+                    allow="autoplay; encrypted-media; gyroscope; picture-in-picture"
+                    title="video player"
+                />
+            </div>
+        );
+    }
 
     if (hasError) {
         return (
@@ -156,7 +174,13 @@ export default function HLSPlayer({ url, poster, initialProgress = 0, movieData,
                 onEnded={() => setShowControls(true)}
                 onError={(e: any) => {
                     console.error("HLS Error", e);
-                    setHasError(true);
+                    // If we have a fallback URL, switch to iframe instead of showing error
+                    if (fallbackUrl) {
+                        setUseFallback(true);
+                        onHLSFail?.();
+                    } else {
+                        setHasError(true);
+                    }
                 }}
                 config={{
                     file: {

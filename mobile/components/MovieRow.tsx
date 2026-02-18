@@ -10,21 +10,31 @@ interface MovieRowProps {
     title: string;
     movies: Movie[];
     slug?: string;
+    subtitle?: string;
 }
 
-const MovieRow = memo(({ title, movies, slug }: MovieRowProps) => {
+const MovieRow = memo(({ title, movies, slug, subtitle }: MovieRowProps) => {
     if (!movies || movies.length === 0) return null;
 
     return (
         <View style={styles.container}>
             {/* Section Header */}
             <View style={styles.header}>
-                <Text style={styles.title}>{title}</Text>
+                <View style={styles.titleGroup}>
+                    {/* Yellow accent bar */}
+                    <View style={styles.accentBar} />
+                    <View>
+                        <Text style={styles.title}>{title}</Text>
+                        {subtitle && (
+                            <Text style={styles.subtitle}>{subtitle}</Text>
+                        )}
+                    </View>
+                </View>
                 {slug && (
                     <Link href={`/list/${slug}` as any} asChild>
                         <Pressable style={styles.seeAllBtn}>
-                            <Text style={styles.seeAllText}>Xem tất cả</Text>
-                            <Ionicons name="chevron-forward" size={14} color="#fbbf24" />
+                            <Text style={styles.seeAllText}>Tất cả</Text>
+                            <Ionicons name="chevron-forward" size={13} color="#fbbf24" />
                         </Pressable>
                     </Link>
                 )}
@@ -46,7 +56,7 @@ const MovieRow = memo(({ title, movies, slug }: MovieRowProps) => {
 
 const styles = StyleSheet.create({
     container: {
-        marginBottom: 28,
+        marginBottom: 32,
     },
     header: {
         flexDirection: 'row',
@@ -55,23 +65,43 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         marginBottom: 12,
     },
+    titleGroup: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        flex: 1,
+    },
+    accentBar: {
+        width: 3,
+        height: 18,
+        borderRadius: 2,
+        backgroundColor: '#fbbf24',
+    },
     title: {
         color: '#ffffff',
-        fontSize: 17,
+        fontSize: 16,
         fontWeight: '700',
         letterSpacing: -0.3,
+    },
+    subtitle: {
+        color: 'rgba(255,255,255,0.45)',
+        fontSize: 11,
+        fontWeight: '400',
+        marginTop: 1,
     },
     seeAllBtn: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 2,
-        paddingVertical: 4,
+        gap: 1,
+        paddingVertical: 5,
         paddingHorizontal: 8,
+        borderRadius: 12,
+        backgroundColor: 'rgba(251,191,36,0.1)',
     },
     seeAllText: {
         color: '#fbbf24',
-        fontSize: 13,
-        fontWeight: '500',
+        fontSize: 12,
+        fontWeight: '600',
     },
     listContent: {
         paddingHorizontal: 16,

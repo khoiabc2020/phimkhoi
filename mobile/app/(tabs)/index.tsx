@@ -134,7 +134,7 @@ export default function HomeScreen() {
         {/* Categories */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Bạn đang quan tâm gì?</Text>
+            <Text style={styles.sectionTitle}>Thể loại nổi bật</Text>
             <Ionicons name="chevron-forward" size={18} color="#6b7280" />
           </View>
           <ScrollView
@@ -159,22 +159,22 @@ export default function HomeScreen() {
         ) : (
           <View style={styles.movieRows}>
             <MovieRow
-              title="🔥 Phim Bộ Mới Nhất"
+              title="Phim Bộ Mới Nhất"
               movies={data.phimBo.slice(0, 12)}
               slug="phim-bo"
             />
             <MovieRow
-              title="🎬 Phim Lẻ Đặc Sắc"
+              title="Phim Lẻ Đặc Sắc"
               movies={data.phimLe.slice(0, 12)}
               slug="phim-le"
             />
             <MovieRow
-              title="🎌 Hoạt Hình"
+              title="Hoạt Hình"
               movies={data.hoatHinh.slice(0, 12)}
               slug="hoat-hinh"
             />
             <MovieRow
-              title="📺 TV Shows"
+              title="TV Shows"
               movies={data.tvShows.slice(0, 12)}
               slug="tv-shows"
             />
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
   // Content
   scrollContent: {
     paddingTop: 120,
-    paddingBottom: 100,
+    paddingBottom: 120,
   },
   heroSkeleton: {
     height: 400,
