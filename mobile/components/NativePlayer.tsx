@@ -236,13 +236,14 @@ export default function NativePlayer({
 
                 <Pressable style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 100 }} onPress={toggleControls} />
 
-                {/* VISUAL BRIGHTNESS SLIDER (LEFT) */}
-                {showBrightnessSlider && (
-                    <View style={styles.gestureFeedbackLeft}>
-                        <Ionicons name="sunny" size={20} color="#fbbf24" style={{ marginBottom: 10 }} />
-                        <View style={styles.gestureBarContainer}>
-                            <View style={[styles.gestureBarFill, { height: `${brightness * 100}%` }]} />
+                {/* VISUAL BRIGHTNESS SLIDER - Always visible when controls shown, left side */}
+                {showControls && !locked && (
+                    <View style={styles.brightnessBar}>
+                        <Ionicons name="sunny" size={14} color="rgba(255,255,255,0.9)" />
+                        <View style={styles.brightnessTrack}>
+                            <View style={[styles.brightnessFill, { height: `${brightness * 100}%` as any }]} />
                         </View>
+                        <Ionicons name="moon" size={12} color="rgba(255,255,255,0.5)" />
                     </View>
                 )}
 
@@ -282,21 +283,30 @@ export default function NativePlayer({
 
                         {/* Center Controls */}
                         <View style={styles.centerControls} pointerEvents="box-none">
+                            {/* Skip Back -10s - Netflix Style */}
                             <TouchableOpacity onPress={() => handleSkip(-10000)} style={styles.skipBtn}>
-                                <Ionicons name="play-back-outline" size={32} color="rgba(255,255,255,0.85)" />
+                                <View style={styles.skipIconWrap}>
+                                    <Ionicons name="play-back" size={28} color="white" />
+                                    <Text style={styles.skipLabel}>10</Text>
+                                </View>
                             </TouchableOpacity>
 
+                            {/* Play/Pause - Netflix Style Circle */}
                             <TouchableOpacity onPress={handlePlayPause} style={styles.playPauseBtn}>
                                 <Ionicons
                                     name={status.isLoaded && status.isPlaying ? "pause" : "play"}
-                                    size={36} // More elegant size
-                                    color="white" // Apple style often uses white on clear blur, but stick to design
-                                    style={{ marginLeft: status.isLoaded && status.isPlaying ? 0 : 3 }}
+                                    size={34}
+                                    color="white"
+                                    style={{ marginLeft: status.isLoaded && status.isPlaying ? 0 : 4 }}
                                 />
                             </TouchableOpacity>
 
+                            {/* Skip Forward +10s - Netflix Style */}
                             <TouchableOpacity onPress={() => handleSkip(10000)} style={styles.skipBtn}>
-                                <Ionicons name="play-forward-outline" size={32} color="rgba(255,255,255,0.85)" />
+                                <View style={styles.skipIconWrap}>
+                                    <Ionicons name="play-forward" size={28} color="white" />
+                                    <Text style={styles.skipLabel}>10</Text>
+                                </View>
                             </TouchableOpacity>
                         </View>
 
@@ -497,7 +507,52 @@ const styles = StyleSheet.create({
         flex: 1, width: 4, backgroundColor: 'rgba(255,255,255,0.2)',
         borderRadius: 2, overflow: 'hidden', alignItems: 'center', justifyContent: 'flex-end'
     },
-    gestureBarFill: { width: '100%', backgroundColor: 'white', borderRadius: 2 }, // Apply white initially, typically brightness bars are white
+    gestureBarFill: { width: '100%', backgroundColor: 'white', borderRadius: 2 },
+
+    // Netflix-style persistent brightness bar
+    brightnessBar: {
+        position: 'absolute',
+        left: 20,
+        top: '20%',
+        bottom: '20%',
+        width: 32,
+        backgroundColor: 'rgba(0,0,0,0.55)',
+        borderRadius: 16,
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 10,
+        zIndex: 10,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+    },
+    brightnessTrack: {
+        flex: 1,
+        width: 4,
+        backgroundColor: 'rgba(255,255,255,0.15)',
+        borderRadius: 2,
+        overflow: 'hidden',
+        justifyContent: 'flex-end',
+        marginVertical: 6,
+    },
+    brightnessFill: {
+        width: '100%',
+        backgroundColor: '#fbbf24',
+        borderRadius: 2,
+    },
+
+    // Netflix-style skip button
+    skipIconWrap: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+    },
+    skipLabel: {
+        position: 'absolute',
+        color: 'white',
+        fontSize: 9,
+        fontWeight: '800',
+        letterSpacing: -0.5,
+    },
 
     drawerOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', flexDirection: 'row', justifyContent: 'flex-end' },
     drawerContent: { width: '45%', height: '100%', backgroundColor: '#111', paddingBottom: 20 },
