@@ -54,10 +54,19 @@ export default async function WatchPage({ params }: PageProps) {
     const episodes = servers[0]?.server_data || [];
     const currentEpisode = episodes.find((ep: any) => ep.slug === episode);
 
-    const [session, cast] = await Promise.all([
-        getServerSession(authOptions),
-        getMovieCast(movie.origin_name || movie.name, movie.year, movie.type === 'series' ? 'tv' : 'movie')
-    ]);
+    let session = null;
+    let cast = [];
+
+    try {
+        const [sessionRes, castRes] = await Promise.all([
+            getServerSession(authOptions).catch(() => null),
+            getMovieCast(movie.origin_name || movie.name, movie.year, movie.type === 'series' ? 'tv' : 'movie').catch(() => [])
+        ]);
+        session = sessionRes;
+        cast = castRes || [];
+    } catch (e) {
+        console.error("Error fetching session or cast:", e);
+    }
 
     let initialProgress = 0;
     if (session?.user?.id) {
