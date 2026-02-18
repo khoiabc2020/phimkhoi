@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "MovieBox Xem phim là mê",
-    "slug": "moviebox-mobile",
+    "slug": "phimkhoi-mobile",
     "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
