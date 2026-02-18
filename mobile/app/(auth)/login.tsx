@@ -29,6 +29,12 @@ export default function LoginScreen() {
                 body: JSON.stringify({ username, password }),
             });
 
+            // Check content type before parsing JSON
+            const contentType = res.headers.get('content-type') || '';
+            if (!contentType.includes('application/json')) {
+                throw new Error('Server không phản hồi đúng định dạng. Vui lòng thử lại sau.');
+            }
+
             const data = await res.json();
 
             if (!res.ok) {
@@ -41,7 +47,11 @@ export default function LoginScreen() {
             ]);
 
         } catch (error: any) {
-            Alert.alert('Lỗi', error.message);
+            if (error.message === 'Network request failed') {
+                Alert.alert('Lỗi kết nối', 'Không thể kết nối đến server. Vui lòng kiểm tra mạng.');
+            } else {
+                Alert.alert('Lỗi', error.message);
+            }
         } finally {
             setLoading(false);
         }

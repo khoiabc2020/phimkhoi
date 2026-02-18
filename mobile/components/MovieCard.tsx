@@ -19,49 +19,50 @@ const MovieCard = memo(({ movie, width = 115, height = 172 }: MovieCardProps) =>
                 className="mr-3 active:opacity-80 transition-opacity"
                 style={{ width }}
             >
-                <Image
-                    source={{ uri: imageUrl }}
-                    style={{ width, height, borderRadius: 8 }}
-                    contentFit="cover"
-                    transition={200}
-                    cachePolicy="memory-disk"
-                />
+                {/* Image + Overlay Badges */}
+                <View style={{ width, height, borderRadius: 8, overflow: 'hidden', position: 'relative' }}>
+                    <Image
+                        source={{ uri: imageUrl }}
+                        style={{ width, height }}
+                        contentFit="cover"
+                        transition={200}
+                        cachePolicy="memory-disk"
+                    />
 
-                {/* Badge: PD/TM + Ep */}
-                <View className="absolute bottom-2 left-2 flex-row gap-1">
-                    {/* Logic: TM (Blue) vs PD (Gray) */}
-                    {movie.lang?.includes('Thuyết') ? (
-                        <View className="bg-blue-500/90 px-1.5 py-0.5 rounded-md shadow-sm">
-                            <Text className="text-[10px] font-bold text-white">
-                                TM.<Text className="text-white">{movie.episode_current?.replace(/[^0-9]/g, '') || '?'}</Text>
-                            </Text>
-                        </View>
-                    ) : (
-                        <View className="bg-gray-600/90 px-1.5 py-0.5 rounded-md shadow-sm">
-                            <Text className="text-[10px] font-bold text-white">
-                                PD.<Text className="text-white">{movie.episode_current?.replace(/[^0-9]/g, '') || '?'}</Text>
-                            </Text>
+                    {/* Badge: PD/TM + Ep - Inside image, bottom-left */}
+                    <View style={{ position: 'absolute', bottom: 6, left: 6, flexDirection: 'row', gap: 4 }}>
+                        {movie.lang?.includes('Thuyết') ? (
+                            <View style={{ backgroundColor: 'rgba(59,130,246,0.9)', paddingHorizontal: 5, paddingVertical: 2, borderRadius: 4 }}>
+                                <Text style={{ fontSize: 9, fontWeight: 'bold', color: 'white' }}>
+                                    TM.{movie.episode_current?.replace(/[^0-9]/g, '') || '?'}
+                                </Text>
+                            </View>
+                        ) : (
+                            <View style={{ backgroundColor: 'rgba(75,85,99,0.9)', paddingHorizontal: 5, paddingVertical: 2, borderRadius: 4 }}>
+                                <Text style={{ fontSize: 9, fontWeight: 'bold', color: 'white' }}>
+                                    PD.{movie.episode_current?.replace(/[^0-9]/g, '') || '?'}
+                                </Text>
+                            </View>
+                        )}
+                    </View>
+
+                    {/* Quality Badge - Inside image, top-right */}
+                    {movie.quality && (
+                        <View style={{ position: 'absolute', top: 6, right: 6, backgroundColor: '#fbbf24', paddingHorizontal: 5, paddingVertical: 2, borderRadius: 4 }}>
+                            <Text style={{ fontSize: 9, fontWeight: 'bold', color: 'black' }}>{movie.quality}</Text>
                         </View>
                     )}
                 </View>
 
-                {/* Quality Badge (Optional - Top Right) */}
-                {movie.quality && (
-                    <View className="absolute top-2 right-2 bg-[#fbbf24] px-1.5 py-0.5 rounded-md shadow-sm">
-                        <Text className="text-[9px] font-bold text-black">{movie.quality.replace('FHD', 'FHD')}</Text>
-                    </View>
-                )}
-
-                {/* Title Section - Vertical Layout */}
-                <View className="mt-2">
+                {/* Title Section */}
+                <View style={{ marginTop: 6 }}>
                     <Text
-                        className="text-white text-[12px] font-bold leading-tight"
+                        style={{ color: 'white', fontSize: 12, fontWeight: '700', lineHeight: 16 }}
                         numberOfLines={1}
-                        style={{ fontFamily: 'System' }}
                     >
                         {movie.name}
                     </Text>
-                    <Text className="text-gray-400 text-[10px] mt-0.5" numberOfLines={1}>
+                    <Text style={{ color: '#9ca3af', fontSize: 10, marginTop: 2 }} numberOfLines={1}>
                         {movie.origin_name}
                     </Text>
                 </View>

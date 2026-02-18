@@ -1,4 +1,18 @@
-// ... imports
+import React, { useRef, useState, useEffect } from 'react';
+import {
+    View,
+    Text,
+    TouchableOpacity,
+    StyleSheet,
+    Dimensions,
+    Pressable,
+    Modal,
+    FlatList,
+    ScrollView,
+} from 'react-native';
+import { Video, AVPlaybackStatus, ResizeMode } from 'expo-av';
+import Slider from '@react-native-community/slider';
+import { Ionicons } from '@expo/vector-icons';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useKeepAwake } from 'expo-keep-awake';
@@ -48,6 +62,8 @@ export default function NativePlayer({
     // Gesture State
     const [brightness, setBrightness] = useState(0.5);
     const [showBrightnessSlider, setShowBrightnessSlider] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         (async () => {

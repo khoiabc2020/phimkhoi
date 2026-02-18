@@ -1,95 +1,75 @@
 import { View, Text, Dimensions, Pressable, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import Carousel from 'react-native-reanimated-carousel';
 import { Image } from 'expo-image';
 import { Movie, getImageUrl } from '@/services/api';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import Animated, {
+    useSharedValue,
+    useAnimatedStyle,
+    withTiming,
+    interpolate,
+    Extrapolation,
+} from 'react-native-reanimated';
 
 const { width, height } = Dimensions.get('window');
-const ITEM_WIDTH = width * 0.68; // Increased to 68% for a more prominent vertical look (RoPhim standard)
-const ITEM_HEIGHT = ITEM_WIDTH * 1.5; // Strict 2:3 Ratio
 
 interface HeroSectionProps {
     movies: Movie[];
 }
 
-const BUTTON_WIDTH = (width - 48) / 2;
-
 export default function HeroSection({ movies }: HeroSectionProps) {
     const [activeIndex, setActiveIndex] = useState(0);
+    const router = useRouter();
 
     if (!movies.length) return null;
 
     const activeMovie = movies[activeIndex];
 
+    const onSnapToItem = useCallback((index: number) => {
+        setActiveIndex(index);
+    }, []);
+
     return (
         <View style={styles.container}>
-            {/* Dynamic Background */}
+            {/* Blurred Background - changes with active movie */}
             <View style={StyleSheet.absoluteFill}>
                 <Image
                     source={{ uri: getImageUrl(activeMovie?.thumb_url || activeMovie?.poster_url) }}
                     style={StyleSheet.absoluteFill}
-                    blurRadius={30}
+                    blurRadius={50}
                     contentFit="cover"
-                    transition={500}
+                    transition={600}
                 />
-                <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.4)' }} />
                 <LinearGradient
-                    colors={['transparent', '#111827']}
+                    colors={['rgba(0,0,0,0.2)', 'rgba(0,0,0,0.6)', '#0a0a0f']}
                     style={StyleSheet.absoluteFill}
-                    locations={[0.4, 0.9]}
+                    locations={[0, 0.55, 0.9]}
                 />
             </View>
 
-            {/* Header Spacing - Optimized to push Content Higher */}
-            <View style={{ marginTop: 50 }} />
-
-            {/* Carousel */}
+            {/* Swipeable Carousel */}
             <Carousel
-                loop={true}
-                width={ITEM_WIDTH}
-                height={ITEM_HEIGHT}
-                autoPlay={false}
+                loop
+                width={width}
+                height={height * 0.52}
                 data={movies}
-                mode="parallax"
-                modeConfig={{
-                    parallaxScrollingScale: 0.9,
-                    parallaxScrollingOffset: 40,
-                }}
-                style={{ width: width, justifyContent: 'center', alignItems: 'center' }}
-                onSnapToItem={(index) => setActiveIndex(index)}
+                onSnapToItem={onSnapToItem}
+                scrollAnimationDuration={400}
                 renderItem={({ item, index }) => (
-                    <Link href={`/movie/${item.slug}`} asChild>
-                        <Pressable style={styles.posterWrapper}>
-                            <Image
-                                source={{ uri: getImageUrl(item.thumb_url || item.poster_url) }}
-                                style={styles.posterImage}
-                                contentFit="cover"
-                                transition={300}
-                            />
-                            {/* Top 3 Rank Badge - Styled like Netflix/RoPhim */}
-                            {index < 3 && (
-                                <View style={styles.rankBadge}>
-                                    <Text style={[
-                                        styles.rankText,
-                                        index === 0 ? { color: '#fbbf24' } :
-                                            index === 1 ? { color: '#e2e8f0' } :
-                                                { color: '#b45309' }
-                                    ]}>
-                                        {index + 1}
-                                    </Text>
-                                </View>
-                            )}
-                        </Pressable>
-                    </Link>
+                    <CarouselItem
+                        movie={item}
+                        isActive={index === activeIndex}
+                        onPress={() => router.push(`/movie/${item.slug}` as any)}
+                    />
                 )}
             />
 
-            {/* Info Section */}
+            {/* Movie Info Section */}
             <View style={styles.infoContainer}>
-                {/* Title - Fixed spacing and font */}
+                {/* Title */}
                 <Text style={styles.title} numberOfLines={2}>
                     {activeMovie?.name}
                 </Text>
@@ -99,165 +79,172 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                     {activeMovie?.origin_name}
                 </Text>
 
-                {/* Buttons */}
+                {/* Action Buttons */}
                 <View style={styles.buttonRow}>
-                    <Link href={activeMovie ? `/player/${activeMovie.slug}` as any : '/'} asChild>
+                    <Link href={activeMovie ? `/movie/${activeMovie.slug}` : '/'} asChild>
                         <Pressable style={styles.playButton}>
-                            <Ionicons name="play" size={20} color="black" />
-                            <Text style={styles.playButtonText}>Xem ngay</Text>
+                            <Ionicons name="play" size={18} color="black" />
+                            <Text style={styles.playButtonText}>Xem Phim</Text>
                         </Pressable>
                     </Link>
 
-                    <Link href={activeMovie ? `/movie/${activeMovie.slug}` as any : '/'} asChild>
+                    <Link href={activeMovie ? `/movie/${activeMovie.slug}` : '/'} asChild>
                         <Pressable style={styles.infoButton}>
-                            <Ionicons name="add" size={24} color="white" />
-                            <Text style={styles.infoButtonText}>Danh sách</Text>
+                            <Ionicons name="information-circle" size={20} color="black" />
+                            <Text style={styles.infoButtonText}>Thông tin</Text>
                         </Pressable>
                     </Link>
                 </View>
 
-                {/* Tags Row */}
+                {/* Info Badges Row */}
                 <View style={styles.badgeRow}>
                     <View style={styles.imdbBadge}>
-                        <Text style={styles.imdbText}>IMDb 8.5</Text>
+                        <Text style={styles.imdbText}>IMDb</Text>
+                        <Text style={styles.imdbScore}>
+                            {activeMovie?.view ? (activeMovie.view / 1000).toFixed(1) : 'N/A'}
+                        </Text>
                     </View>
-                    <View style={styles.outlineBadge}>
-                        <Text style={styles.outlineText}>{activeMovie?.year}</Text>
-                    </View>
-                    <View style={styles.outlineBadge}>
-                        <Text style={styles.outlineText}>{activeMovie?.quality || 'FHD'}</Text>
-                    </View>
+
+                    {activeMovie?.quality && (
+                        <View style={styles.qualityBadge}>
+                            <Text style={styles.badgeText}>{activeMovie.quality}</Text>
+                        </View>
+                    )}
+
+                    {activeMovie?.lang && (
+                        <View style={styles.qualityBadge}>
+                            <Text style={styles.badgeText}>{activeMovie.lang}</Text>
+                        </View>
+                    )}
+
+                    {activeMovie?.year && (
+                        <View style={styles.qualityBadge}>
+                            <Text style={styles.badgeText}>{activeMovie.year}</Text>
+                        </View>
+                    )}
+
                     {activeMovie?.episode_current && (
-                        <View style={styles.outlineBadge}>
-                            <Text style={styles.outlineText}>{activeMovie?.episode_current}</Text>
+                        <View style={styles.qualityBadge}>
+                            <Text style={styles.badgeText}>{activeMovie.episode_current}</Text>
                         </View>
                     )}
                 </View>
 
-                {/* Description */}
-                <Text style={styles.description} numberOfLines={2}>
-                    {activeMovie?.content?.replace(/<[^>]*>/g, '').trim() || "Mô tả đang được cập nhật..."}
-                </Text>
-
-                {/* Dots */}
+                {/* Carousel Dots */}
                 <View style={styles.dotsRow}>
-                    {movies.map((_, i) => (
+                    {movies.slice(0, 10).map((_, i) => (
                         <View
                             key={i}
                             style={[
                                 styles.dot,
                                 {
                                     backgroundColor: i === activeIndex ? 'white' : 'rgba(255,255,255,0.3)',
-                                    width: i === activeIndex ? 24 : 6
+                                    width: i === activeIndex ? 24 : 6,
                                 }
                             ]}
                         />
                     ))}
                 </View>
-
             </View>
         </View>
     );
 }
 
+// Individual carousel item
+function CarouselItem({ movie, isActive, onPress }: {
+    movie: Movie;
+    isActive: boolean;
+    onPress: () => void;
+}) {
+    return (
+        <Pressable
+            style={[styles.carouselItem, isActive && styles.carouselItemActive]}
+            onPress={onPress}
+        >
+            <Image
+                source={{ uri: getImageUrl(movie?.thumb_url || movie?.poster_url) }}
+                style={styles.carouselImage}
+                contentFit="cover"
+                transition={300}
+            />
+            {/* Subtle bottom gradient on card */}
+            <LinearGradient
+                colors={['transparent', 'rgba(0,0,0,0.4)']}
+                style={StyleSheet.absoluteFill}
+            />
+        </Pressable>
+    );
+}
+
 const styles = StyleSheet.create({
     container: {
-        height: height * 0.85, // Need height for description
+        minHeight: height * 0.82,
         position: 'relative',
-        alignItems: 'center',
+        backgroundColor: '#0a0a0f',
     },
-    posterWrapper: {
-        width: '100%',
-        height: '100%',
-        borderRadius: 16,
+    // Carousel
+    carouselItem: {
+        width: width * 0.6,
+        height: '90%',
+        borderRadius: 18,
         overflow: 'hidden',
+        alignSelf: 'center',
+        marginTop: 10,
+        opacity: 0.5,
+        transform: [{ scale: 0.88 }],
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.2)',
+        borderColor: 'rgba(255,255,255,0.1)',
     },
-    posterImage: {
+    carouselItemActive: {
+        opacity: 1,
+        transform: [{ scale: 1 }],
+        borderColor: 'rgba(255,255,255,0.3)',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 12 },
+        shadowOpacity: 0.6,
+        shadowRadius: 20,
+        elevation: 12,
+    },
+    carouselImage: {
         width: '100%',
         height: '100%',
     },
+    // Info
     infoContainer: {
-        paddingHorizontal: 16,
+        paddingHorizontal: 20,
         alignItems: 'center',
-        marginTop: 16, // Reduced top margin
         width: '100%',
+        paddingTop: 16,
     },
     title: {
         color: 'white',
-        fontSize: 20,
+        fontSize: 22,
         fontWeight: '900',
         textAlign: 'center',
-        marginBottom: 6,
-        marginTop: 14,
+        marginBottom: 4,
         paddingHorizontal: 10,
         textShadowColor: 'rgba(0,0,0,0.8)',
         textShadowOffset: { width: 0, height: 2 },
         textShadowRadius: 4,
+        letterSpacing: -0.3,
     },
     subtitle: {
         color: '#9ca3af',
-        fontSize: 12, // slightly larger
+        fontSize: 13,
         textAlign: 'center',
-        marginBottom: 12,
-    },
-    input: {
-        // placeholder to ensure context
-    },
-    // ... skipping unrelated styles ... 
-    description: {
-        color: '#d1d5db',
-        fontSize: 13, // Restored size
-        textAlign: 'center',
-        lineHeight: 18,
         marginBottom: 16,
-        paddingHorizontal: 16,
-        opacity: 0.8
-    },
-    metaRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-        marginBottom: 10,
-        justifyContent: 'center',
-    },
-    imdbTag: {
-        backgroundColor: '#fbbf24',
-        paddingHorizontal: 6,
-        paddingVertical: 2,
-        borderRadius: 3,
-    },
-    imdbText: {
-        color: '#fbbf24',
-        fontWeight: 'bold',
-        fontSize: 9, // Reduced
-    },
-    metaTag: {
-        paddingHorizontal: 6,
-        paddingVertical: 2,
-        borderRadius: 3,
-        borderWidth: 0.5,
-        borderColor: 'rgba(255,255,255,0.2)',
-        backgroundColor: 'rgba(255,255,255,0.05)',
-    },
-    metaText: {
-        color: '#e5e7eb',
-        fontSize: 10,
-        fontWeight: '600',
     },
     buttonRow: {
         flexDirection: 'row',
-        gap: 10,
-        marginBottom: 10,
+        gap: 12,
+        marginBottom: 14,
         width: '100%',
-        justifyContent: 'center',
-        paddingHorizontal: 32, // Constrain width more
+        paddingHorizontal: 16,
     },
     playButton: {
         backgroundColor: '#fbbf24',
-        paddingVertical: 8, // Reduced height
-        borderRadius: 8,
+        paddingVertical: 13,
+        borderRadius: 12,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
@@ -266,13 +253,13 @@ const styles = StyleSheet.create({
     },
     playButtonText: {
         color: 'black',
-        fontWeight: 'bold',
-        fontSize: 13, // Reduced
+        fontWeight: '800',
+        fontSize: 14,
     },
     infoButton: {
         backgroundColor: 'white',
-        paddingVertical: 8,
-        borderRadius: 8,
+        paddingVertical: 13,
+        borderRadius: 12,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
@@ -281,72 +268,59 @@ const styles = StyleSheet.create({
     },
     infoButtonText: {
         color: 'black',
-        fontWeight: 'bold',
-        fontSize: 13,
+        fontWeight: '700',
+        fontSize: 14,
     },
     badgeRow: {
         flexDirection: 'row',
-        gap: 6,
+        gap: 8,
         alignItems: 'center',
-        marginBottom: 12,
+        marginBottom: 16,
+        flexWrap: 'wrap',
+        justifyContent: 'center',
     },
     imdbBadge: {
-        borderWidth: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+        borderWidth: 1.5,
         borderColor: '#fbbf24',
-        paddingHorizontal: 6,
-        paddingVertical: 3,
-        borderRadius: 4,
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 6,
+        backgroundColor: 'rgba(251, 191, 36, 0.1)',
     },
-    outlineBadge: {
-        borderWidth: 1,
-        borderColor: 'white',
-        paddingHorizontal: 6,
-        paddingVertical: 3,
-        borderRadius: 4,
-    },
-    outlineText: {
-        color: 'white',
+    imdbText: {
+        color: '#fbbf24',
         fontWeight: 'bold',
         fontSize: 10,
     },
-    description: {
-        color: '#d1d5db',
-        fontSize: 13,
-        textAlign: 'center',
-        lineHeight: 18,
-        marginBottom: 16,
-        paddingHorizontal: 12,
+    imdbScore: {
+        color: '#fbbf24',
+        fontWeight: 'bold',
+        fontSize: 11,
+    },
+    qualityBadge: {
+        borderWidth: 1.5,
+        borderColor: 'rgba(255,255,255,0.4)',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 6,
+        backgroundColor: 'rgba(255,255,255,0.05)',
+    },
+    badgeText: {
+        color: 'white',
+        fontWeight: '600',
+        fontSize: 11,
     },
     dotsRow: {
         flexDirection: 'row',
-        gap: 6,
-        alignItems: 'center',
-    },
-    dot: {
-        height: 6,
-        borderRadius: 3,
-    },
-    rankBadge: {
-        position: 'absolute',
-        bottom: -15, // Hanging off the bottom-left
-        left: -10,
-        width: 60,
-        height: 60,
+        gap: 5,
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 10,
     },
-    rankText: {
-        fontSize: 80,
-        fontWeight: '900',
-        fontStyle: 'italic',
-        includeFontPadding: false,
-        textShadowColor: 'rgba(0, 0, 0, 0.8)',
-        textShadowOffset: { width: 2, height: 2 },
-        textShadowRadius: 4,
-        fontFamily: 'System',
-    },
-    topText: {
-        display: 'none', // Hide "TOP" text, just show the Big Number like RoPhim
+    dot: {
+        height: 5,
+        borderRadius: 2.5,
     },
 });

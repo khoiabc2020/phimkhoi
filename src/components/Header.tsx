@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
+import MobileMenu from "./MobileMenu";
 
 interface HeaderProps {
     categories?: { name: string; slug: string }[];
@@ -107,6 +108,14 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
             )}
         >
             <div className="container mx-auto px-4 h-20 flex items-center justify-between">
+                {/* Mobile Menu Button */}
+                <button
+                    onClick={() => setIsMobileMenuOpen(true)}
+                    className="lg:hidden p-2 hover:bg-white/10 rounded-lg transition-colors"
+                >
+                    <Menu className="w-6 h-6 text-white" />
+                </button>
+
                 {/* Left: Logo & Nav */}
                 <div className="flex items-center gap-8">
                     <Link href="/" className="flex items-center gap-3 group">
@@ -416,6 +425,9 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                     )}
                 </div>
             </div>
+
+            {/* Modern Mobile Menu */}
+            <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
         </header>
     );
 }

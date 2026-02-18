@@ -2,134 +2,148 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 import { Platform, View, StyleSheet, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
-import Animated, { useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
 
-const LiquidTabIcon = ({ name, color, focused, label }: { name: any, color: string, focused: boolean, label: string }) => {
+// Refined icon set - tinh tế, đầy đủ
+const TABS = [
+  {
+    name: 'index',
+    label: 'Trang chủ',
+    icon: 'tv',              // filled - TV/streaming feel
+    iconOutline: 'tv-outline',
+  },
+  {
+    name: 'explore',
+    label: 'Khám phá',
+    icon: 'compass',         // filled - discovery
+    iconOutline: 'compass-outline',
+  },
+  {
+    name: 'schedule',
+    label: 'Lịch chiếu',
+    icon: 'film',            // filled - cinema schedule
+    iconOutline: 'film-outline',
+  },
+  {
+    name: 'profile',
+    label: 'Tài khoản',
+    icon: 'person-circle',   // filled - profile
+    iconOutline: 'person-circle-outline',
+  },
+];
+
+function TabIcon({ focused, label, icon, iconOutline }: {
+  focused: boolean;
+  label: string;
+  icon: string;
+  iconOutline: string;
+}) {
   return (
-    <View style={{ alignItems: 'center', justifyContent: 'center', width: 60 }}>
-      {focused && (
-        <View style={{
-          position: 'absolute',
-          width: 50,
-          height: 50,
-          borderRadius: 25,
-          backgroundColor: 'rgba(251, 191, 36, 0.15)', // Yellow tint
-        }} />
-      )}
-      <View style={{
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: focused ? '#fbbf24' : 'transparent', // Solid yellow pill for icon? No, usually icon is colored.
-        width: focused ? 40 : 24,
-        height: focused ? 24 : 24,
-        borderRadius: 12,
-        marginBottom: 2
-      }}>
-        <Ionicons
-          size={22}
-          name={focused ? name : `${name}-outline`}
-          color={focused ? '#000000' : '#9ca3af'}
-        />
-      </View>
-      {focused && (
-        <Text style={{
-          fontSize: 10,
-          fontWeight: '700',
-          color: '#fbbf24',
-        }}>
-          {label}
-        </Text>
-      )}
+    <View style={[styles.tabItem, focused && styles.tabItemActive]}>
+      <Ionicons
+        name={(focused ? icon : iconOutline) as any}
+        size={20}
+        color={focused ? '#fbbf24' : 'rgba(255,255,255,0.5)'}
+      />
+      <Text
+        style={[styles.tabLabel, focused && styles.tabLabelActive]}
+        numberOfLines={1}
+      >
+        {label}
+      </Text>
     </View>
   );
-};
+}
 
 export default function TabLayout() {
-  const insets = useSafeAreaInsets();
   const isAndroid = Platform.OS === 'android';
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#fbbf24',
-        tabBarInactiveTintColor: '#9ca3af',
         headerShown: false,
         tabBarShowLabel: false,
-        tabBarStyle: {
-          position: 'absolute',
-          bottom: 25,
-          left: 20,
-          right: 20,
-          height: 60,
-          borderRadius: 30,
-          backgroundColor: isAndroid ? 'rgba(15, 15, 15, 0.95)' : 'transparent', // Deep dark
-          borderTopWidth: 0,
-          elevation: 0, // Remove shadow for cleaner look
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 10 },
-          shadowOpacity: 0.3,
-          shadowRadius: 20,
+        // KEY FIX: override default padding that pushes icons up
+        tabBarItemStyle: {
           paddingTop: 0,
+          paddingBottom: 0,
+          height: '100%',
           alignItems: 'center',
           justifyContent: 'center',
-          borderWidth: 1,
-          borderColor: 'rgba(255,255,255,0.1)', // Subtle border
         },
-        tabBarBackground: () => (
-          isAndroid ? null : (
+        tabBarStyle: {
+          position: 'absolute',
+          bottom: 20,
+          left: 20,
+          right: 20,
+          height: 62,
+          borderRadius: 31,
+          backgroundColor: isAndroid ? 'rgba(18,18,24,0.97)' : 'transparent',
+          borderTopWidth: 0,
+          elevation: 0,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 8 },
+          shadowOpacity: 0.4,
+          shadowRadius: 16,
+          borderWidth: 0.5,
+          borderColor: 'rgba(255,255,255,0.1)',
+        },
+        tabBarBackground: () =>
+          !isAndroid ? (
             <BlurView
               intensity={90}
+              tint="dark"
               style={[
                 StyleSheet.absoluteFill,
-                { borderRadius: 30, overflow: 'hidden', backgroundColor: 'rgba(10, 10, 10, 0.7)' }
+                { borderRadius: 31, overflow: 'hidden' },
               ]}
-              tint="dark"
             />
-          )
-        ),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Trang chủ',
-          tabBarIcon: ({ color, focused }) => (
-            <LiquidTabIcon name="home" color={color} focused={focused} label="Trang chủ" />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Duyệt tìm',
-          tabBarIcon: ({ color, focused }) => (
-            <LiquidTabIcon name="search" color={color} focused={focused} label="Duyệt tìm" />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="schedule"
-        options={{
-          title: 'Lịch chiếu',
-          tabBarIcon: ({ color, focused }) => (
-            <LiquidTabIcon name="calendar" color={color} focused={focused} label="Lịch chiếu" />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: 'Tài khoản',
-          tabBarIcon: ({ color, focused }) => (
-            <LiquidTabIcon name="person" color={color} focused={focused} label="Tài khoản" />
-          ),
-        }}
-      />
-
-      {/* Hidden Tabs */}
-      <Tabs.Screen name="favorites" options={{ href: null }} />
+          ) : null,
+      }}
+    >
+      {TABS.map((tab) => (
+        <Tabs.Screen
+          key={tab.name}
+          name={tab.name}
+          options={{
+            title: tab.label,
+            tabBarIcon: ({ focused }) => (
+              <TabIcon
+                focused={focused}
+                label={tab.label}
+                icon={tab.icon}
+                iconOutline={tab.iconOutline}
+              />
+            ),
+          }}
+        />
+      ))}
     </Tabs>
   );
 }
 
+const styles = StyleSheet.create({
+  tabItem: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    gap: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 22,
+    minWidth: 40,
+  },
+  tabItemActive: {
+    backgroundColor: 'rgba(251,191,36,0.12)',
+  },
+  tabLabel: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.5)',
+    fontWeight: '500',
+    letterSpacing: 0.1,
+  },
+  tabLabelActive: {
+    color: '#fbbf24',
+    fontWeight: '700',
+  },
+});

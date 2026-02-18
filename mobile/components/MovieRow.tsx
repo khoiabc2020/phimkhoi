@@ -1,44 +1,81 @@
-import React from 'react';
-import { View, Text, Pressable } from 'react-native';
+import React, { memo } from 'react';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Movie } from '@/services/api';
 import MovieCard from './MovieCard';
 import { FlashList } from '@shopify/flash-list';
-import { memo } from 'react';
 
 interface MovieRowProps {
     title: string;
     movies: Movie[];
+    slug?: string;
 }
 
-const MovieRow = memo(({ title, movies }: MovieRowProps) => {
+const MovieRow = memo(({ title, movies, slug }: MovieRowProps) => {
     if (!movies || movies.length === 0) return null;
 
     return (
-        <View className="mb-6 w-full h-[280px]">
-            {/* Header */}
-            <View className="flex-row justify-between items-center px-4 mb-3">
-                <Text className="text-white text-lg font-bold">{title}</Text>
-                <Link href={`/list/${title === 'Phim lẻ' ? 'phim-le' : 'phim-bo'}`} asChild>
-                    <Pressable className="p-1">
-                        <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
-                    </Pressable>
-                </Link>
+        <View style={styles.container}>
+            {/* Section Header */}
+            <View style={styles.header}>
+                <Text style={styles.title}>{title}</Text>
+                {slug && (
+                    <Link href={`/list/${slug}` as any} asChild>
+                        <Pressable style={styles.seeAllBtn}>
+                            <Text style={styles.seeAllText}>Xem tất cả</Text>
+                            <Ionicons name="chevron-forward" size={14} color="#fbbf24" />
+                        </Pressable>
+                    </Link>
+                )}
             </View>
 
-            {/* List */}
+            {/* Movie List */}
             <FlashList
                 data={movies}
                 renderItem={({ item }) => <MovieCard movie={item} />}
-                estimatedItemSize={140}
+                estimatedItemSize={130}
                 keyExtractor={(item) => item._id}
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ paddingHorizontal: 16 }}
+                contentContainerStyle={styles.listContent}
             />
         </View>
     );
+});
+
+const styles = StyleSheet.create({
+    container: {
+        marginBottom: 28,
+    },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        marginBottom: 12,
+    },
+    title: {
+        color: '#ffffff',
+        fontSize: 17,
+        fontWeight: '700',
+        letterSpacing: -0.3,
+    },
+    seeAllBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 2,
+        paddingVertical: 4,
+        paddingHorizontal: 8,
+    },
+    seeAllText: {
+        color: '#fbbf24',
+        fontSize: 13,
+        fontWeight: '500',
+    },
+    listContent: {
+        paddingHorizontal: 16,
+    },
 });
 
 export default MovieRow;
