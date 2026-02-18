@@ -1,6 +1,6 @@
 import {
   ScrollView, View, Text, Pressable,
-  RefreshControl, Platform, StyleSheet
+  RefreshControl, Platform, StyleSheet, Dimensions
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useEffect, useCallback } from 'react';
@@ -8,12 +8,16 @@ import { Link, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import HeroSection from '@/components/HeroSection';
 import MovieRow from '@/components/MovieRow';
 import CategoryCard from '@/components/CategoryCard';
 import LoadingState from '@/components/LoadingState';
 import { getHomeData, Movie } from '@/services/api';
+import { COLORS, SPACING, RADIUS, BLUR } from '@/constants/theme';
+
+const { width } = Dimensions.get('window');
 
 const NAV_PILLS = [
   { label: 'Đề xuất', href: '/explore', active: true },
@@ -59,67 +63,69 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <StatusBar style="light" />
 
-      {/* RoPhim-style Floating Transparent Header */}
-      <SafeAreaView style={styles.header} edges={['top']}>
-        {/* Blur background - very subtle, like RoPhim */}
-        {Platform.OS === 'ios' ? (
-          <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
-        ) : (
-          <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(10,10,15,0.85)' }]} />
-        )}
+      {/* Background Gradient - Dark Premium */}
+      <LinearGradient
+        colors={[COLORS.bg0, '#1a1d26', COLORS.bg0]}
+        locations={[0, 0.4, 0.8]}
+        style={StyleSheet.absoluteFill}
+      />
 
-        {/* Top row: Logo + Actions */}
-        <View style={styles.headerRow}>
-          <View style={styles.logoRow}>
-            <Ionicons name="film" size={26} color="#fbbf24" />
-            <Text style={styles.logoText}>MovieBox</Text>
-          </View>
-
-          <View style={styles.headerActions}>
-            {/* Search button - glassmorphism circle */}
-            <Pressable
-              style={({ pressed }) => [styles.iconBtn, pressed && styles.iconBtnPressed]}
-              onPress={() => router.push('/search' as any)}
-            >
-              <Ionicons name="search-outline" size={20} color="rgba(255,255,255,0.9)" />
-            </Pressable>
-
-            {/* Notification button - glassmorphism circle with badge */}
-            <Pressable
-              style={({ pressed }) => [styles.iconBtn, pressed && styles.iconBtnPressed]}
-              onPress={() => router.push('/notifications' as any)}
-            >
-              <Ionicons name="notifications-outline" size={20} color="rgba(255,255,255,0.9)" />
-              {/* Badge */}
-              <View style={styles.notifBadge}>
-                <Text style={styles.notifBadgeText}>4</Text>
+      {/* Floating Glass Header */}
+      <View style={styles.headerWrapper}>
+        <BlurView intensity={BLUR.header} tint="dark" style={StyleSheet.absoluteFill} />
+        <SafeAreaView edges={['top']} style={styles.headerContent}>
+          {/* Top Row */}
+          <View style={styles.headerRow}>
+            <View style={styles.logoRow}>
+              <View style={styles.logoIcon}>
+                <Ionicons name="film" size={20} color={COLORS.accent} />
               </View>
-            </Pressable>
-          </View>
-        </View>
+              <Text style={styles.logoText}>MovieBox</Text>
+            </View>
 
-        {/* Navigation Pills */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.pillsRow}
-          style={{ marginBottom: 8 }}
-        >
-          {NAV_PILLS.map((pill, index) => (
-            <Link key={index} href={pill.href as any} asChild>
-              <Pressable style={[styles.pill, index === 0 && styles.pillActive]}>
-                <Text style={[styles.pillText, index === 0 && styles.pillTextActive]}>
-                  {pill.label}
-                </Text>
+            <View style={styles.headerActions}>
+              <Pressable
+                style={({ pressed }) => [styles.iconBtn, pressed && styles.iconBtnPressed]}
+                onPress={() => router.push('/search' as any)}
+              >
+                <Ionicons name="search-outline" size={20} color={COLORS.textPrimary} />
               </Pressable>
-            </Link>
-          ))}
-          <Pressable style={styles.pill}>
-            <Text style={styles.pillText}>Thể loại</Text>
-            <Ionicons name="chevron-down" size={11} color="rgba(255,255,255,0.6)" style={{ marginLeft: 2 }} />
-          </Pressable>
-        </ScrollView>
-      </SafeAreaView>
+
+              <Pressable
+                style={({ pressed }) => [styles.iconBtn, pressed && styles.iconBtnPressed]}
+                onPress={() => router.push('/notifications' as any)}
+              >
+                <Ionicons name="notifications-outline" size={20} color={COLORS.textPrimary} />
+                <View style={styles.notifBadge}>
+                  <Text style={styles.notifBadgeText}>4</Text>
+                </View>
+              </Pressable>
+            </View>
+          </View>
+
+          {/* Category Pills */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.pillsRow}
+            style={{ marginTop: 4, paddingBottom: 12 }}
+          >
+            {NAV_PILLS.map((pill, index) => (
+              <Link key={index} href={pill.href as any} asChild>
+                <Pressable style={[styles.pill, index === 0 && styles.pillActive]}>
+                  <Text style={[styles.pillText, index === 0 && styles.pillTextActive]}>
+                    {pill.label}
+                  </Text>
+                </Pressable>
+              </Link>
+            ))}
+            <Pressable style={[styles.pill, styles.pillOutline]}>
+              <Text style={styles.pillText}>Thể loại</Text>
+              <Ionicons name="chevron-down" size={12} color={COLORS.textSecondary} style={{ marginLeft: 4 }} />
+            </Pressable>
+          </ScrollView>
+        </SafeAreaView>
+      </View>
 
       {/* Main Content */}
       <ScrollView
@@ -129,45 +135,44 @@ export default function HomeScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#fbbf24"
-            colors={['#fbbf24']}
+            tintColor={COLORS.accent}
+            colors={[COLORS.accent]}
+            progressViewOffset={140}
           />
         }
       >
         {/* Hero Section */}
         {loading ? (
-          <View style={styles.heroSkeleton}>
-            <LoadingState count={3} type="card" />
+          <View style={{ height: height * 0.6, justifyContent: 'center' }}>
+            <LoadingState count={1} type="card" />
           </View>
         ) : (
           <HeroSection movies={data.phimLe.slice(0, 8)} />
         )}
 
-        {/* Categories */}
+        {/* Categories Grid */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Thể loại nổi bật</Text>
-            <Ionicons name="chevron-forward" size={18} color="#6b7280" />
+            <Ionicons name="chevron-forward" size={18} color={COLORS.textSecondary} />
           </View>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.categoriesContainer}
           >
-            <CategoryCard title="Xuyên Không" slug="xuyen-khong" colors={['#ef4444', '#f87171']} width={150} height={80} />
-            <CategoryCard title="Cổ Trang" slug="co-trang" colors={['#ea580c', '#fb923c']} width={150} height={80} />
-            <CategoryCard title="Hành Động" slug="hanh-dong" colors={['#059669', '#34d399']} width={150} height={80} />
-            <CategoryCard title="Tình Cảm" slug="tinh-cam" colors={['#db2777', '#f472b6']} width={150} height={80} />
-            <CategoryCard title="Kinh Dị" slug="kinh-di" colors={['#7c3aed', '#a78bfa']} width={150} height={80} />
+            <CategoryCard title="Xuyên Không" slug="xuyen-khong" colors={['#ef4444', '#f87171']} width={140} height={70} />
+            <CategoryCard title="Cổ Trang" slug="co-trang" colors={['#ea580c', '#fb923c']} width={140} height={70} />
+            <CategoryCard title="Hành Động" slug="hanh-dong" colors={['#059669', '#34d399']} width={140} height={70} />
+            <CategoryCard title="Tình Cảm" slug="tinh-cam" colors={['#db2777', '#f472b6']} width={140} height={70} />
           </ScrollView>
         </View>
 
         {/* Movie Rows */}
         {loading ? (
-          <>
+          <View style={{ padding: 20 }}>
             <LoadingState count={4} type="card" />
-            <LoadingState count={4} type="card" />
-          </>
+          </View>
         ) : (
           <View style={styles.movieRows}>
             <MovieRow
@@ -200,152 +205,153 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a0f',
+    backgroundColor: COLORS.bg0,
   },
 
   // Header
-  header: {
+  headerWrapper: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    zIndex: 50,
+    zIndex: 100,
     overflow: 'hidden',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.05)',
+  },
+  headerContent: {
+    backgroundColor: 'transparent',
   },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingTop: 6,
-    paddingBottom: 10,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.xs,
+    marginBottom: 4,
   },
   logoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
+  },
+  logoIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: 'rgba(244, 200, 74, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(244, 200, 74, 0.2)',
   },
   logoText: {
-    color: '#ffffff',
+    color: COLORS.textPrimary,
     fontSize: 20,
     fontWeight: '800',
     letterSpacing: -0.5,
   },
   headerActions: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 10,
     alignItems: 'center',
   },
   iconBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: 'rgba(255,255,255,0.05)', // Subtle glass
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
-    position: 'relative',
+    borderColor: 'rgba(255,255,255,0.1)',
   },
   iconBtnPressed: {
-    backgroundColor: 'rgba(255,255,255,0.16)',
-    borderColor: 'rgba(255,255,255,0.25)',
+    backgroundColor: 'rgba(255,255,255,0.15)',
   },
   notifBadge: {
     position: 'absolute',
-    top: -2,
-    right: -2,
+    top: 0,
+    right: 0,
     minWidth: 16,
     height: 16,
     borderRadius: 8,
-    backgroundColor: '#fbbf24',
+    backgroundColor: COLORS.accent,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 3,
     borderWidth: 1.5,
-    borderColor: '#0a0a0f',
+    borderColor: COLORS.bg0,
   },
   notifBadgeText: {
     color: 'black',
     fontSize: 9,
     fontWeight: '800',
   },
-  notifDot: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
-    backgroundColor: '#ef4444',
-    borderWidth: 1.5,
-    borderColor: '#0a0a0f',
-  },
 
   // Pills
   pillsRow: {
-    paddingHorizontal: 16,
-    gap: 8,
-    flexDirection: 'row',
+    paddingHorizontal: SPACING.md,
+    gap: 10,
   },
   pill: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: RADIUS.pill,
+    backgroundColor: 'transparent',
+  },
+  pillActive: {
+    backgroundColor: 'rgba(255,255,255,0.15)', // Glass active
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.2)',
   },
-  pillActive: {
-    backgroundColor: '#ffffff',
-    borderColor: '#ffffff',
+  pillOutline: {
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: 'rgba(0,0,0,0.2)',
   },
   pillText: {
-    color: 'rgba(255,255,255,0.75)',
-    fontSize: 12,
-    fontWeight: '500',
+    color: COLORS.textSecondary,
+    fontSize: 13,
+    fontWeight: '600',
   },
   pillTextActive: {
-    color: '#000000',
+    color: COLORS.textPrimary,
     fontWeight: '700',
   },
 
   // Content
   scrollContent: {
-    paddingTop: 120,
-    paddingBottom: 120,
-  },
-  heroSkeleton: {
-    height: 400,
-    justifyContent: 'center',
+    paddingTop: 130, // Clear header
+    paddingBottom: 100, // Clear tabbar
   },
 
   // Sections
   section: {
-    marginTop: 24,
+    marginTop: 10,
+    marginBottom: 20,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: SPACING.md,
     marginBottom: 12,
   },
   sectionTitle: {
-    color: '#ffffff',
-    fontSize: 18,
+    color: COLORS.textPrimary,
+    fontSize: 19,
     fontWeight: '700',
-    letterSpacing: -0.3,
+    letterSpacing: -0.5,
   },
   categoriesContainer: {
-    paddingHorizontal: 16,
-    gap: 10,
-    flexDirection: 'row',
+    paddingHorizontal: SPACING.md,
+    gap: 12,
   },
-
   movieRows: {
-    marginTop: 8,
+    gap: 10,
   },
 });
 
+const height = Dimensions.get('window').height;

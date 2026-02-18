@@ -4,8 +4,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { Link, useRouter } from 'expo-router';
 import Carousel from 'react-native-reanimated-carousel';
 import { Image } from 'expo-image';
+import { BlurView } from 'expo-blur';
 import { Movie, getImageUrl } from '@/services/api';
 import { useState, useCallback } from 'react';
+import { COLORS, RADIUS, SPACING, BLUR } from '@/constants/theme';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -34,32 +36,38 @@ export default function HeroSection({ movies }: HeroSectionProps) {
 
     return (
         <View style={styles.container}>
-            {/* Blurred Background - changes with active movie */}
+            {/* Ambient Background Blur - deep depth */}
             <View style={StyleSheet.absoluteFill}>
                 <Image
                     source={{ uri: getImageUrl(activeMovie?.thumb_url || activeMovie?.poster_url) }}
                     style={StyleSheet.absoluteFill}
-                    blurRadius={50}
+                    blurRadius={80} // Very strong blur for ambient light
                     contentFit="cover"
-                    transition={600}
+                    transition={800}
                 />
+                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(11, 13, 18, 0.7)' }]} />
                 <LinearGradient
-                    colors={['rgba(0,0,0,0.2)', 'rgba(0,0,0,0.6)', '#0a0a0f']}
+                    colors={['transparent', COLORS.bg0]}
                     style={StyleSheet.absoluteFill}
-                    locations={[0, 0.55, 0.9]}
+                    locations={[0.2, 1]}
                 />
             </View>
 
-            {/* Swipeable Carousel */}
+            {/* Cinematic Carousel */}
             <Carousel
                 loop
                 width={width}
-                height={height * 0.52}
+                height={height * 0.62} // Taller for cinematic look
                 data={movies}
                 onSnapToItem={onSnapToItem}
-                scrollAnimationDuration={400}
+                scrollAnimationDuration={500}
+                mode="parallax" // Parallax effect built-in
+                modeConfig={{
+                    parallaxScrollingScale: 0.92,
+                    parallaxScrollingOffset: 40,
+                }}
                 renderItem={({ item, index }) => (
-                    <CarouselItem
+                    <HeroCard
                         movie={item}
                         isActive={index === activeIndex}
                         onPress={() => router.push(`/movie/${item.slug}` as any)}
@@ -67,260 +75,217 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                 )}
             />
 
-            {/* Movie Info Section */}
-            <View style={styles.infoContainer}>
-                {/* Title */}
-                <Text style={styles.title} numberOfLines={2}>
-                    {activeMovie?.name}
-                </Text>
-
-                {/* English Name */}
-                <Text style={styles.subtitle} numberOfLines={1}>
-                    {activeMovie?.origin_name}
-                </Text>
-
-                {/* Action Buttons */}
-                <View style={styles.buttonRow}>
-                    <Link href={activeMovie ? `/movie/${activeMovie.slug}` : '/'} asChild>
-                        <Pressable style={styles.playButton}>
-                            <Ionicons name="play" size={18} color="black" />
-                            <Text style={styles.playButtonText}>Xem Phim</Text>
-                        </Pressable>
-                    </Link>
-
-                    <Link href={activeMovie ? `/movie/${activeMovie.slug}` : '/'} asChild>
-                        <Pressable style={styles.infoButton}>
-                            <Ionicons name="information-circle" size={20} color="black" />
-                            <Text style={styles.infoButtonText}>Thông tin</Text>
-                        </Pressable>
-                    </Link>
-                </View>
-
-                {/* Info Badges Row */}
-                <View style={styles.badgeRow}>
-                    <View style={styles.imdbBadge}>
-                        <Text style={styles.imdbText}>IMDb</Text>
-                        <Text style={styles.imdbScore}>
-                            {activeMovie?.view ? (activeMovie.view / 1000).toFixed(1) : 'N/A'}
-                        </Text>
-                    </View>
-
-                    {activeMovie?.quality && (
-                        <View style={styles.qualityBadge}>
-                            <Text style={styles.badgeText}>{activeMovie.quality}</Text>
-                        </View>
-                    )}
-
-                    {activeMovie?.lang && (
-                        <View style={styles.qualityBadge}>
-                            <Text style={styles.badgeText}>{activeMovie.lang}</Text>
-                        </View>
-                    )}
-
-                    {activeMovie?.year && (
-                        <View style={styles.qualityBadge}>
-                            <Text style={styles.badgeText}>{activeMovie.year}</Text>
-                        </View>
-                    )}
-
-                    {activeMovie?.episode_current && (
-                        <View style={styles.qualityBadge}>
-                            <Text style={styles.badgeText}>{activeMovie.episode_current}</Text>
-                        </View>
-                    )}
-                </View>
-
-                {/* Carousel Dots */}
-                <View style={styles.dotsRow}>
-                    {movies.slice(0, 10).map((_, i) => (
-                        <View
-                            key={i}
-                            style={[
-                                styles.dot,
-                                {
-                                    backgroundColor: i === activeIndex ? 'white' : 'rgba(255,255,255,0.3)',
-                                    width: i === activeIndex ? 24 : 6,
-                                }
-                            ]}
-                        />
-                    ))}
-                </View>
+            {/* Pagination Dots */}
+            <View style={styles.dotsRow}>
+                {movies.slice(0, 8).map((_, i) => ( // Limit dots
+                    <View
+                        key={i}
+                        style={[
+                            styles.dot,
+                            {
+                                backgroundColor: i === activeIndex ? COLORS.accent : 'rgba(255,255,255,0.2)',
+                                width: i === activeIndex ? 20 : 6,
+                            }
+                        ]}
+                    />
+                ))}
             </View>
         </View>
     );
 }
 
-// Individual carousel item
-function CarouselItem({ movie, isActive, onPress }: {
+// Individual Hero Card
+function HeroCard({ movie, isActive, onPress }: {
     movie: Movie;
     isActive: boolean;
     onPress: () => void;
 }) {
     return (
         <Pressable
-            style={[styles.carouselItem, isActive && styles.carouselItemActive]}
+            style={[styles.cardContainer, isActive && styles.cardActive]}
             onPress={onPress}
+            activeOpacity={0.9}
         >
+            {/* Poster Image */}
             <Image
                 source={{ uri: getImageUrl(movie?.thumb_url || movie?.poster_url) }}
-                style={styles.carouselImage}
+                style={styles.cardImage}
                 contentFit="cover"
-                transition={300}
+                transition={400}
             />
-            {/* Subtle bottom gradient on card */}
+
+            {/* Gradient Overlay for Text Readability */}
             <LinearGradient
-                colors={['transparent', 'rgba(0,0,0,0.4)']}
+                colors={['transparent', 'rgba(0,0,0,0.2)', 'rgba(0,0,0,0.85)']}
                 style={StyleSheet.absoluteFill}
+                locations={[0, 0.5, 1]}
             />
+
+            {/* Content within Poster */}
+            <View style={styles.cardContent}>
+                {/* Meta Chips Row */}
+                <View style={styles.metaRow}>
+                    <View style={styles.glassChip}>
+                        <Text style={styles.chipText}>{movie.quality || 'HD'}</Text>
+                    </View>
+                    <View style={styles.glassChip}>
+                        <Text style={styles.chipText}>{movie.lang || 'Vietsub'}</Text>
+                    </View>
+                    <View style={styles.glassChip}>
+                        <Text style={[styles.chipText, { color: COLORS.accent }]}>★ {movie.view ? (movie.view / 1000).toFixed(1) : '8.5'}</Text>
+                    </View>
+                </View>
+
+                {/* Title */}
+                <Text style={styles.title} numberOfLines={2}>
+                    {movie.name}
+                </Text>
+                <Text style={styles.subtitle} numberOfLines={1}>
+                    {movie.origin_name} • {movie.year}
+                </Text>
+
+                {/* Action Buttons Row */}
+                <View style={styles.actionsRow}>
+                    <Link href={`/movie/${movie.slug}` as any} asChild>
+                        <Pressable style={styles.primaryBtn}>
+                            <Ionicons name="play" size={20} color="black" />
+                            <Text style={styles.primaryBtnText}>Xem ngay</Text>
+                        </Pressable>
+                    </Link>
+
+                    <Link href={`/movie/${movie.slug}` as any} asChild>
+                        <Pressable style={styles.glassBtn}>
+                            <Ionicons name="information-circle-outline" size={24} color="white" />
+                        </Pressable>
+                    </Link>
+                </View>
+            </View>
         </Pressable>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        minHeight: height * 0.82,
+        minHeight: height * 0.7,
         position: 'relative',
-        backgroundColor: '#0a0a0f',
+        marginBottom: 20,
     },
-    // Carousel
-    carouselItem: {
-        width: width * 0.6,
-        height: '90%',
-        borderRadius: 18,
+    // Card Styles
+    cardContainer: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 32, // Large radius
         overflow: 'hidden',
-        alignSelf: 'center',
-        marginTop: 10,
-        opacity: 0.5,
-        transform: [{ scale: 0.88 }],
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
+        borderColor: 'rgba(255,255,255,0.08)',
+        backgroundColor: COLORS.bg1,
     },
-    carouselItemActive: {
-        opacity: 1,
-        transform: [{ scale: 1 }],
-        borderColor: 'rgba(255,255,255,0.3)',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 12 },
-        shadowOpacity: 0.6,
-        shadowRadius: 20,
-        elevation: 12,
+    cardActive: {
+        borderColor: 'rgba(255,255,255,0.15)',
+        shadowColor: COLORS.accent,
+        shadowOffset: { width: 0, height: 15 },
+        shadowOpacity: 0.15,
+        shadowRadius: 30,
+        elevation: 10,
     },
-    carouselImage: {
+    cardImage: {
         width: '100%',
         height: '100%',
     },
-    // Info
-    infoContainer: {
-        paddingHorizontal: 20,
-        alignItems: 'center',
-        width: '100%',
-        paddingTop: 16,
+    cardContent: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        padding: 24,
+        paddingBottom: 32,
     },
+
+    // Typography
     title: {
-        color: 'white',
-        fontSize: 22,
-        fontWeight: '900',
-        textAlign: 'center',
+        color: COLORS.textPrimary,
+        fontSize: 26,
+        fontWeight: '800',
+        letterSpacing: -0.5,
         marginBottom: 4,
-        paddingHorizontal: 10,
-        textShadowColor: 'rgba(0,0,0,0.8)',
+        textShadowColor: 'rgba(0,0,0,0.5)',
         textShadowOffset: { width: 0, height: 2 },
         textShadowRadius: 4,
-        letterSpacing: -0.3,
     },
     subtitle: {
-        color: '#9ca3af',
-        fontSize: 13,
-        textAlign: 'center',
+        color: COLORS.textSecondary,
+        fontSize: 15,
+        fontWeight: '500',
         marginBottom: 16,
     },
-    buttonRow: {
-        flexDirection: 'row',
-        gap: 12,
-        marginBottom: 14,
-        width: '100%',
-        paddingHorizontal: 16,
-    },
-    playButton: {
-        backgroundColor: '#fbbf24',
-        paddingVertical: 13,
-        borderRadius: 12,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 6,
-        flex: 1,
-    },
-    playButtonText: {
-        color: 'black',
-        fontWeight: '800',
-        fontSize: 14,
-    },
-    infoButton: {
-        backgroundColor: 'white',
-        paddingVertical: 13,
-        borderRadius: 12,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 6,
-        flex: 1,
-    },
-    infoButtonText: {
-        color: 'black',
-        fontWeight: '700',
-        fontSize: 14,
-    },
-    badgeRow: {
+
+    // Meta Chips
+    metaRow: {
         flexDirection: 'row',
         gap: 8,
-        alignItems: 'center',
-        marginBottom: 16,
-        flexWrap: 'wrap',
-        justifyContent: 'center',
+        marginBottom: 12,
     },
-    imdbBadge: {
+    glassChip: {
+        backgroundColor: 'rgba(255,255,255,0.12)', // Glass opacity
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 100, // Pill shape
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.08)',
+        backdropFilter: 'blur(10px)', // Web support
+    },
+    chipText: {
+        color: 'rgba(255,255,255,0.9)',
+        fontSize: 12,
+        fontWeight: '600',
+    },
+
+    // Actions
+    actionsRow: {
+        flexDirection: 'row',
+        gap: 12,
+        alignItems: 'center',
+    },
+    primaryBtn: {
+        flex: 1,
+        height: 54, // Large touch target
+        backgroundColor: COLORS.accent,
+        borderRadius: 27, // Fully rounded
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 4,
-        borderWidth: 1.5,
-        borderColor: '#fbbf24',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 6,
-        backgroundColor: 'rgba(251, 191, 36, 0.1)',
+        justifyContent: 'center',
+        gap: 8,
+        shadowColor: COLORS.accent,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 12,
     },
-    imdbText: {
-        color: '#fbbf24',
-        fontWeight: 'bold',
-        fontSize: 10,
+    primaryBtnText: {
+        color: 'black', // Contrast
+        fontSize: 16,
+        fontWeight: '700',
     },
-    imdbScore: {
-        color: '#fbbf24',
-        fontWeight: 'bold',
-        fontSize: 11,
+    glassBtn: {
+        width: 54,
+        height: 54,
+        borderRadius: 27,
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.15)',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
-    qualityBadge: {
-        borderWidth: 1.5,
-        borderColor: 'rgba(255,255,255,0.4)',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 6,
-        backgroundColor: 'rgba(255,255,255,0.05)',
-    },
-    badgeText: {
-        color: 'white',
-        fontWeight: '600',
-        fontSize: 11,
-    },
+
+    // Dots
     dotsRow: {
         flexDirection: 'row',
-        gap: 5,
+        gap: 6,
         alignItems: 'center',
         justifyContent: 'center',
+        marginTop: 16,
     },
     dot: {
-        height: 5,
-        borderRadius: 2.5,
+        height: 6,
+        borderRadius: 3,
     },
 });
