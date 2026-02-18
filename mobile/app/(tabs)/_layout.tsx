@@ -52,27 +52,27 @@ export default function TabLayout() {
         },
         tabBarStyle: {
           position: 'absolute',
-          bottom: 14, // Floating upwards
+          bottom: 12, // Spec 12dp
           left: 16,
           right: 16,
-          height: 72, // Taller for floating look
-          borderRadius: 36, // Full rounded ends
-          backgroundColor: isAndroid ? 'rgba(12,12,18,0.92)' : 'transparent', // Android fallback needs high opacity
+          height: 64, // Spec 64dp
+          borderRadius: 28, // Spec 28dp
+          backgroundColor: isAndroid ? 'rgba(12,12,18,0.95)' : 'transparent',
           borderTopWidth: 0,
           elevation: 0,
           shadowColor: '#000',
-          shadowOffset: { width: 0, height: 10 },
-          shadowOpacity: 0.4,
-          shadowRadius: 20,
+          shadowOffset: { width: 0, height: 8 },
+          shadowOpacity: 0.25, // Lighter shadow
+          shadowRadius: 16,
           borderWidth: 1,
           borderColor: COLORS.stroke,
         },
         tabBarBackground: () =>
           !isAndroid ? (
             <BlurView
-              intensity={BLUR.tabBar} // High blur for glass effect
+              intensity={35}
               tint="dark"
-              style={[StyleSheet.absoluteFill, { borderRadius: 36, overflow: 'hidden' }]}
+              style={[StyleSheet.absoluteFill, { borderRadius: 28, overflow: 'hidden' }]}
             />
           ) : null,
       }}

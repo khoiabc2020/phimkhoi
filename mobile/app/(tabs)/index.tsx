@@ -65,14 +65,15 @@ export default function HomeScreen() {
 
       {/* Background Gradient - Dark Premium */}
       <LinearGradient
-        colors={[COLORS.bg0, '#1a1d26', COLORS.bg0]}
-        locations={[0, 0.4, 0.8]}
+        colors={[COLORS.bg0, '#121826', COLORS.bg0]}
+        locations={[0, 0.4, 0.9]}
         style={StyleSheet.absoluteFill}
       />
 
-      {/* Floating Glass Header */}
+      {/* Floating Glass Header - Optimized Height 56dp */}
       <View style={styles.headerWrapper}>
-        <BlurView intensity={BLUR.header} tint="dark" style={StyleSheet.absoluteFill} />
+        <BlurView intensity={25} tint="dark" style={StyleSheet.absoluteFill} />
+        <View style={styles.headerGlassBorder} />
         <SafeAreaView edges={['top']} style={styles.headerContent}>
           {/* Top Row */}
           <View style={styles.headerRow}>
@@ -216,19 +217,26 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 100,
     overflow: 'hidden',
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
+    // No border bottom here to let blur blend
+  },
+  headerGlassBorder: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.08)',
   },
   headerContent: {
     backgroundColor: 'transparent',
+    paddingBottom: 8,
   },
   headerRow: {
+    height: 50, // Compact
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.xs,
-    marginBottom: 4,
   },
   logoRow: {
     flexDirection: 'row',
@@ -291,40 +299,40 @@ const styles = StyleSheet.create({
   // Pills
   pillsRow: {
     paddingHorizontal: SPACING.md,
-    gap: 10,
+    gap: 8,
+    paddingBottom: 4,
   },
   pill: {
+    height: 36, // Spec 36dp
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: RADIUS.pill,
-    backgroundColor: 'transparent',
+    paddingHorizontal: 14,
+    borderRadius: 18, // Spec 18dp
+    backgroundColor: 'rgba(255,255,255,0.05)',
   },
   pillActive: {
-    backgroundColor: 'rgba(255,255,255,0.15)', // Glass active
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderWidth: 0, // Cleaner
   },
   pillOutline: {
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    borderColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'transparent',
   },
   pillText: {
-    color: COLORS.textSecondary,
+    color: 'rgba(255,255,255,0.6)',
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '500',
   },
   pillTextActive: {
-    color: COLORS.textPrimary,
-    fontWeight: '700',
+    color: '#fff',
+    fontWeight: '600',
   },
 
   // Content
   scrollContent: {
-    paddingTop: 130, // Clear header
-    paddingBottom: 100, // Clear tabbar
+    paddingTop: 120, // Adjusted for Header + Pills
+    paddingBottom: 90,
   },
 
   // Sections

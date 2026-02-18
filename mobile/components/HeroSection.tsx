@@ -4,19 +4,22 @@ import { Ionicons } from '@expo/vector-icons';
 import { Link, useRouter } from 'expo-router';
 import Carousel from 'react-native-reanimated-carousel';
 import { Image } from 'expo-image';
-import { BlurView } from 'expo-blur';
 import { Movie, getImageUrl } from '@/services/api';
 import { useState, useCallback } from 'react';
-import { COLORS, RADIUS, SPACING, BLUR } from '@/constants/theme';
+import { COLORS, RADIUS, SPACING } from '@/constants/theme';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
-    withTiming,
     interpolate,
     Extrapolation,
 } from 'react-native-reanimated';
 
 const { width, height } = Dimensions.get('window');
+
+// Optimized Specs
+const HERO_HEIGHT = height * 0.65; // Total Hero Section Height (< 65%)
+const POSTER_HEIGHT = 400; // Fixed max height
+const POSTER_WIDTH = width * 0.72; // Centered Card Width
 
 interface HeroSectionProps {
     movies: Movie[];
@@ -36,256 +39,226 @@ export default function HeroSection({ movies }: HeroSectionProps) {
 
     return (
         <View style={styles.container}>
-            {/* Ambient Background Blur - deep depth */}
+            {/* 1. Cinematic Ambient Background */}
             <View style={StyleSheet.absoluteFill}>
                 <Image
-                    source={{ uri: getImageUrl(activeMovie?.thumb_url || activeMovie?.poster_url) }}
+                    source={{ uri: getImageUrl(activeMovie?.poster_url || activeMovie?.thumb_url) }}
                     style={StyleSheet.absoluteFill}
-                    blurRadius={80} // Very strong blur for ambient light
+                    blurRadius={90} // Strong blur for ambient glow
                     contentFit="cover"
                     transition={800}
                 />
-                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(11, 13, 18, 0.7)' }]} />
+                {/* Darken overlay for contrast */}
+                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(11,13,18,0.6)' }]} />
+                {/* Bottom fade to blend with body */}
                 <LinearGradient
                     colors={['transparent', COLORS.bg0]}
                     style={StyleSheet.absoluteFill}
-                    locations={[0.2, 1]}
+                    locations={[0.4, 1]}
                 />
             </View>
 
-            {/* Cinematic Carousel */}
-            <Carousel
-                loop
-                width={width}
-                height={height * 0.62} // Taller for cinematic look
-                data={movies}
-                onSnapToItem={onSnapToItem}
-                scrollAnimationDuration={500}
-                mode="parallax" // Parallax effect built-in
-                modeConfig={{
-                    parallaxScrollingScale: 0.92,
-                    parallaxScrollingOffset: 40,
-                }}
-                renderItem={({ item, index }) => (
-                    <HeroCard
-                        movie={item}
-                        isActive={index === activeIndex}
-                        onPress={() => router.push(`/movie/${item.slug}` as any)}
-                    />
-                )}
-            />
-
-            {/* Pagination Dots */}
-            <View style={styles.dotsRow}>
-                {movies.slice(0, 8).map((_, i) => ( // Limit dots
-                    <View
-                        key={i}
-                        style={[
-                            styles.dot,
-                            {
-                                backgroundColor: i === activeIndex ? COLORS.accent : 'rgba(255,255,255,0.2)',
-                                width: i === activeIndex ? 20 : 6,
-                            }
-                        ]}
-                    />
-                ))}
+            {/* 2. Centered Poster Carousel */}
+            <View style={styles.carouselContainer}>
+                <Carousel
+                    loop
+                    width={width}
+                    height={POSTER_HEIGHT + 20} // Add space for shadow
+                    data={movies}
+                    onSnapToItem={onSnapToItem}
+                    scrollAnimationDuration={500}
+                    mode="parallax"
+                    modeConfig={{
+                        parallaxScrollingScale: 0.88,
+                        parallaxScrollingOffset: 60,
+                    }}
+                    renderItem={({ item, index }) => (
+                        <HeroCard
+                            movie={item}
+                            isActive={index === activeIndex}
+                            onPress={() => router.push(`/movie/${item.slug}` as any)}
+                        />
+                    )}
+                />
             </View>
-        </View>
-    );
-}
 
-// Individual Hero Card
-function HeroCard({ movie, isActive, onPress }: {
-    movie: Movie;
-    isActive: boolean;
-    onPress: () => void;
-}) {
-    return (
-        <Pressable
-            style={[styles.cardContainer, isActive && styles.cardActive]}
-            onPress={onPress}
-            activeOpacity={0.9}
-        >
-            {/* Poster Image */}
-            <Image
-                source={{ uri: getImageUrl(movie?.thumb_url || movie?.poster_url) }}
-                style={styles.cardImage}
-                contentFit="cover"
-                transition={400}
-            />
+            {/* 3. Info Section (Below Poster) */}
+            <View style={styles.infoContainer}>
+                {/* Title */}
+                <Text style={styles.title} numberOfLines={1}>
+                    {activeMovie?.name}
+                </Text>
 
-            {/* Gradient Overlay for Text Readability */}
-            <LinearGradient
-                colors={['transparent', 'rgba(0,0,0,0.2)', 'rgba(0,0,0,0.85)']}
-                style={StyleSheet.absoluteFill}
-                locations={[0, 0.5, 1]}
-            />
-
-            {/* Content within Poster */}
-            <View style={styles.cardContent}>
-                {/* Meta Chips Row */}
+                {/* Meta Row */}
                 <View style={styles.metaRow}>
+                    <Text style={styles.metaText}>{activeMovie?.origin_name}</Text>
+                    <View style={styles.dotSeparator} />
+                    <Text style={styles.metaText}>{activeMovie?.year}</Text>
+                    <View style={styles.dotSeparator} />
                     <View style={styles.glassChip}>
-                        <Text style={styles.chipText}>{movie.quality || 'HD'}</Text>
-                    </View>
-                    <View style={styles.glassChip}>
-                        <Text style={styles.chipText}>{movie.lang || 'Vietsub'}</Text>
-                    </View>
-                    <View style={styles.glassChip}>
-                        <Text style={[styles.chipText, { color: COLORS.accent }]}>★ {movie.view ? (movie.view / 1000).toFixed(1) : '8.5'}</Text>
+                        <Text style={styles.chipText}>{activeMovie?.quality || 'HD'}</Text>
                     </View>
                 </View>
 
-                {/* Title */}
-                <Text style={styles.title} numberOfLines={2}>
-                    {movie.name}
-                </Text>
-                <Text style={styles.subtitle} numberOfLines={1}>
-                    {movie.origin_name} • {movie.year}
-                </Text>
-
-                {/* Action Buttons Row */}
-                <View style={styles.actionsRow}>
-                    <Link href={`/movie/${movie.slug}` as any} asChild>
+                {/* Buttons Row - Optimized Height */}
+                <View style={styles.actionRow}>
+                    <Link href={`/movie/${activeMovie.slug}` as any} asChild>
                         <Pressable style={styles.primaryBtn}>
                             <Ionicons name="play" size={20} color="black" />
                             <Text style={styles.primaryBtnText}>Xem ngay</Text>
                         </Pressable>
                     </Link>
 
-                    <Link href={`/movie/${movie.slug}` as any} asChild>
-                        <Pressable style={styles.glassBtn}>
-                            <Ionicons name="information-circle-outline" size={24} color="white" />
+                    <Link href={`/movie/${activeMovie.slug}` as any} asChild>
+                        <Pressable style={styles.secondaryBtn}>
+                            <Ionicons name="information-circle-outline" size={24} color="rgba(255,255,255,0.8)" />
                         </Pressable>
                     </Link>
                 </View>
             </View>
+        </View>
+    );
+}
+
+function HeroCard({ movie, isActive, onPress }: { movie: Movie, isActive: boolean, onPress: () => void }) {
+    return (
+        <Pressable
+            style={[styles.cardContainer, isActive && styles.cardActive]}
+            onPress={onPress}
+            activeOpacity={0.9}
+        >
+            <Image
+                source={{ uri: getImageUrl(movie.poster_url || movie.thumb_url) }}
+                style={styles.cardImage}
+                contentFit="cover"
+                transition={400}
+            />
+            {/* Inner Gradient for Depth */}
+            <LinearGradient
+                colors={['transparent', 'rgba(0,0,0,0.2)']}
+                style={StyleSheet.absoluteFill}
+            />
         </Pressable>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        minHeight: height * 0.7,
-        position: 'relative',
-        marginBottom: 20,
-    },
-    // Card Styles
-    cardContainer: {
+        height: HERO_HEIGHT,
         width: '100%',
-        height: '100%',
-        borderRadius: 32, // Large radius
+        justifyContent: 'flex-start',
+        paddingTop: 10,
+    },
+    carouselContainer: {
+        alignItems: 'center',
+        marginTop: 10,
+        zIndex: 10,
+    },
+    // Poster Card Specs
+    cardContainer: {
+        width: POSTER_WIDTH,
+        height: POSTER_HEIGHT,
+        borderRadius: 28, // High radius
         overflow: 'hidden',
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.08)',
+        borderColor: 'rgba(255,255,255,0.1)',
         backgroundColor: COLORS.bg1,
+        alignSelf: 'center',
     },
     cardActive: {
-        borderColor: 'rgba(255,255,255,0.15)',
-        shadowColor: COLORS.accent,
-        shadowOffset: { width: 0, height: 15 },
-        shadowOpacity: 0.15,
-        shadowRadius: 30,
-        elevation: 10,
+        borderColor: 'rgba(255,255,255,0.25)',
+        shadowColor: COLORS.accent, // Ambient glow
+        shadowOffset: { width: 0, height: 12 },
+        shadowOpacity: 0.35,
+        shadowRadius: 24,
+        elevation: 12, // Android shadow
     },
     cardImage: {
         width: '100%',
         height: '100%',
     },
-    cardContent: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        padding: 24,
-        paddingBottom: 32,
-    },
 
-    // Typography
+    // Info Section
+    infoContainer: {
+        alignItems: 'center',
+        marginTop: 16,
+        paddingHorizontal: 24,
+    },
     title: {
         color: COLORS.textPrimary,
         fontSize: 26,
-        fontWeight: '800',
+        fontWeight: '700', // Semibold
+        textAlign: 'center',
+        marginBottom: 6,
         letterSpacing: -0.5,
-        marginBottom: 4,
-        textShadowColor: 'rgba(0,0,0,0.5)',
-        textShadowOffset: { width: 0, height: 2 },
-        textShadowRadius: 4,
     },
-    subtitle: {
-        color: COLORS.textSecondary,
-        fontSize: 15,
-        fontWeight: '500',
-        marginBottom: 16,
-    },
-
-    // Meta Chips
     metaRow: {
         flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
         gap: 8,
-        marginBottom: 12,
+        marginBottom: 16,
+    },
+    metaText: {
+        color: COLORS.textSecondary,
+        fontSize: 14,
+        fontWeight: '500',
+    },
+    dotSeparator: {
+        width: 3,
+        height: 3,
+        borderRadius: 1.5,
+        backgroundColor: COLORS.textSecondary,
+        opacity: 0.5,
     },
     glassChip: {
-        backgroundColor: 'rgba(255,255,255,0.12)', // Glass opacity
-        paddingHorizontal: 10,
-        paddingVertical: 5,
-        borderRadius: 100, // Pill shape
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.08)',
-        backdropFilter: 'blur(10px)', // Web support
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        borderRadius: 6,
+        paddingHorizontal: 6,
+        paddingVertical: 2,
     },
     chipText: {
-        color: 'rgba(255,255,255,0.9)',
-        fontSize: 12,
-        fontWeight: '600',
+        color: 'white',
+        fontSize: 11,
+        fontWeight: '700',
     },
 
-    // Actions
-    actionsRow: {
+    // Buttons
+    actionRow: {
         flexDirection: 'row',
         gap: 12,
-        alignItems: 'center',
+        width: '100%',
+        justifyContent: 'center',
+        maxWidth: 280, // Constrain width
     },
     primaryBtn: {
         flex: 1,
-        height: 54, // Large touch target
+        height: 48, // Compact height
         backgroundColor: COLORS.accent,
-        borderRadius: 27, // Fully rounded
+        borderRadius: 24,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 8,
         shadowColor: COLORS.accent,
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 12,
+        shadowOpacity: 0.25,
+        shadowRadius: 10,
+        elevation: 4,
     },
     primaryBtnText: {
-        color: 'black', // Contrast
+        color: 'black',
         fontSize: 16,
         fontWeight: '700',
     },
-    glassBtn: {
-        width: 54,
-        height: 54,
-        borderRadius: 27,
-        backgroundColor: 'rgba(255,255,255,0.1)',
+    secondaryBtn: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: 'rgba(255,255,255,0.08)', // Glass
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.15)',
         alignItems: 'center',
         justifyContent: 'center',
-    },
-
-    // Dots
-    dotsRow: {
-        flexDirection: 'row',
-        gap: 6,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: 16,
-    },
-    dot: {
-        height: 6,
-        borderRadius: 3,
     },
 });
