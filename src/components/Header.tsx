@@ -155,7 +155,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
 
 
 
-                <nav className="hidden lg:flex items-center gap-6">
+                <nav className="hidden lg:flex items-center gap-4">
                     <Link href="/" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
                         Trang chủ
                     </Link>
@@ -209,7 +209,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
             </div>
 
             {/* Right: Search & Actions */}
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4 lg:gap-6">
                 {/* Search Bar - iOS Style Pill */}
                 {/* Search Bar - Expandable */}
                 <div className="hidden lg:flex items-center">
@@ -217,7 +217,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         onSubmit={handleSearch}
                         className={cn(
                             "relative flex items-center transition-all duration-500 ease-out",
-                            isSearchOpen ? "w-80" : "w-10"
+                            isSearchOpen ? "w-60" : "w-10"
                         )}
                     >
                         {/* Search Toggle / Icon */}
@@ -247,7 +247,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             onBlur={() => {
                                 if (!searchQuery) setIsSearchOpen(false);
                             }}
-                            placeholder="Tìm kiếm phim..."
+                            placeholder="Tìm kiếm..."
                             className={cn(
                                 "absolute left-0 top-0 h-10 bg-white/[0.08] border border-white/[0.08] rounded-full pl-10 pr-4 text-sm text-white outline-none focus:border-primary/50 focus:bg-black/40 transition-all duration-500",
                                 isSearchOpen ? "w-full opacity-100 visible" : "w-10 opacity-0 invisible"
