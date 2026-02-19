@@ -131,12 +131,12 @@ export default function WatchEngagementBar({
 
                 <div className="flex-grow flex flex-col justify-center min-w-0">
                     {/* Vietnamese title */}
-                    <h1 className="text-[15px] font-medium text-white leading-snug tracking-tight mb-1.5 line-clamp-2">
+                    <h1 className="text-[17px] font-medium text-white leading-snug tracking-tight mb-1.5 line-clamp-2">
                         {movie.name}
                     </h1>
                     {/* English subtitle + meta */}
                     <div className="flex flex-col gap-1 mb-2.5">
-                        <span className="text-[14px] font-normal text-white/70 leading-snug">{movie.origin_name}</span>
+                        <span className="text-[16px] font-medium text-yellow-400 leading-snug">{movie.origin_name}</span>
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-1" style={{ fontSize: '13px', letterSpacing: '0.3px', opacity: 0.75, color: '#9ca3af' }}>
                             {movie.year && <><span className="w-1 h-1 rounded-full bg-gray-600" /><span>{movie.year}</span></>}
                             {movie.quality && <><span className="w-1 h-1 rounded-full bg-gray-600" />
