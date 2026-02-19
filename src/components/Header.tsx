@@ -319,15 +319,13 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
             </div>
 
             {/* Mobile Menu Overlay */}
-            {
-                {/* Mobile Menu Integration */ }
-                < MobileMenu 
+            {/* Mobile Menu Integration */}
+            <MobileMenu
                 isOpen={isMobileMenuOpen}
-            onClose={() => setIsMobileMenuOpen(false)}
-            categories={displayCategories}
-            countries={displayCountries}
+                onClose={() => setIsMobileMenuOpen(false)}
+                categories={displayCategories}
+                countries={displayCountries}
             />
-            }
         </header >
     );
 }
