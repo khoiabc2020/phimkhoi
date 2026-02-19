@@ -140,21 +140,56 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
 
 
 
-                <nav className="hidden lg:flex items-center gap-8">
-                    {[
-                        { name: "Trang chủ", href: "/" },
-                        { name: "Phim lẻ", href: "/danh-sach/phim-le" },
-                        { name: "Phim bộ", href: "/danh-sach/phim-bo" },
-                        { name: "Hoạt hình", href: "/danh-sach/hoat-hinh" },
-                    ].map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className="text-sm font-medium text-white/70 hover:text-white hover:text-glow transition-all"
-                        >
-                            {item.name}
-                        </Link>
-                    ))}
+                <nav className="hidden lg:flex items-center gap-6">
+                    <Link href="/" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
+                        Trang chủ
+                    </Link>
+
+                    {/* Categories Dropdown */}
+                    <div className="relative group">
+                        <button className="flex items-center gap-1 text-sm font-medium text-white/70 group-hover:text-white transition-colors py-4">
+                            Thể loại <ChevronDown className="w-3 h-3 transition-transform group-hover:rotate-180" />
+                        </button>
+                        <div className="absolute top-full left-0 w-80 bg-[#0B0D12]/95 backdrop-blur-xl border border-white/10 rounded-xl p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 shadow-xl grid grid-cols-2 gap-2 z-50">
+                            {displayCategories.map((cat) => (
+                                <Link
+                                    key={cat.slug}
+                                    href={`/the-loai/${cat.slug}`}
+                                    className="block px-3 py-2 rounded-lg hover:bg-white/10 text-sm text-white/80 hover:text-white transition-colors"
+                                >
+                                    {cat.name}
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Countries Dropdown */}
+                    <div className="relative group">
+                        <button className="flex items-center gap-1 text-sm font-medium text-white/70 group-hover:text-white transition-colors py-4">
+                            Quốc gia <ChevronDown className="w-3 h-3 transition-transform group-hover:rotate-180" />
+                        </button>
+                        <div className="absolute top-full left-0 w-48 bg-[#0B0D12]/95 backdrop-blur-xl border border-white/10 rounded-xl p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 shadow-xl flex flex-col gap-1 z-50">
+                            {displayCountries.map((country) => (
+                                <Link
+                                    key={country.slug}
+                                    href={`/quoc-gia/${country.slug}`}
+                                    className="block px-3 py-2 rounded-lg hover:bg-white/10 text-sm text-white/80 hover:text-white transition-colors"
+                                >
+                                    {country.name}
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+
+                    <Link href="/danh-sach/phim-le" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
+                        Phim lẻ
+                    </Link>
+                    <Link href="/danh-sach/phim-bo" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
+                        Phim bộ
+                    </Link>
+                    <Link href="/danh-sach/hoat-hinh" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
+                        Hoạt hình
+                    </Link>
                 </nav>
             </div>
 
