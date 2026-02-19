@@ -15,14 +15,6 @@ interface WatchEngagementBarProps {
     toggleLight?: () => void;
 }
 
-// Dynamic font size based on title length (Netflix-style)
-const getTitleSize = (name: string) => {
-    const len = name.length;
-    if (len > 50) return '20px';
-    if (len > 30) return '24px';
-    return '28px';
-};
-
 export default function WatchEngagementBar({
     movie,
     isFavorite = false,
@@ -139,15 +131,12 @@ export default function WatchEngagementBar({
 
                 <div className="flex-grow flex flex-col justify-center min-w-0">
                     {/* Vietnamese title */}
-                    <h1
-                        className="font-semibold text-white leading-[1.2] tracking-tight mb-3 line-clamp-2"
-                        style={{ fontSize: getTitleSize(movie.name) }}
-                    >
+                    <h1 className="text-[15px] font-medium text-white leading-snug tracking-tight mb-1.5 line-clamp-2">
                         {movie.name}
                     </h1>
                     {/* English subtitle + meta */}
-                    <div className="flex flex-col gap-1.5 mb-3">
-                        <span className="text-[22px] font-medium text-white/75 leading-snug">{movie.origin_name}</span>
+                    <div className="flex flex-col gap-1 mb-2.5">
+                        <span className="text-[14px] font-normal text-white/70 leading-snug">{movie.origin_name}</span>
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-1" style={{ fontSize: '13px', letterSpacing: '0.3px', opacity: 0.75, color: '#9ca3af' }}>
                             {movie.year && <><span className="w-1 h-1 rounded-full bg-gray-600" /><span>{movie.year}</span></>}
                             {movie.quality && <><span className="w-1 h-1 rounded-full bg-gray-600" />
