@@ -50,7 +50,7 @@ export default function MobileMenu({
     return (
         <div
             className={cn(
-                "fixed inset-0 z-[10000] lg:hidden bg-black/95 backdrop-blur-xl transition-transform duration-300 ease-in-out flex flex-col",
+                "fixed inset-0 z-[10000] lg:hidden bg-[#0a0a0a] transition-transform duration-300 ease-in-out flex flex-col",
                 isOpen ? "translate-x-0" : "-translate-x-full"
             )}
         >
