@@ -8,7 +8,7 @@
     "scheme": "phimkhoi",
     "userInterfaceStyle": "dark",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "ios": {
       "supportsTablet": true
     },

@@ -29,6 +29,7 @@ const nextConfig: NextConfig = {
         hostname: "img.ophim1.com",
       },
     ],
+    unoptimized: true,
   },
 };
 
