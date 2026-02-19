@@ -267,7 +267,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
                                                 {/* Origin Name & Categories */}
                                                 <div className="flex items-center gap-4 mb-5">
-                                                    <h2 className="text-[18px] text-white/70 font-normal tracking-wide">{movie.origin_name}</h2>
+                                                    <h2 className="text-[18px] text-[#F4C84A] font-normal tracking-wide">{movie.origin_name}</h2>
                                                     <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
                                                     <div className="flex gap-3">
                                                         {movie.category?.slice(0, 3).map(c => (
