@@ -225,47 +225,47 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                     </button>
                 </div>
             </div>
-        </div >
 
 
-        {/* Mobile Menu Overlay */ }
-    {
-        isMobileMenuOpen && (
-            <div className="absolute top-16 left-0 right-0 glass-panel border-t border-white/10 p-4 md:hidden animate-in slide-in-from-top-4 fade-in duration-200">
-                <form onSubmit={handleSearch} className="mb-6">
-                    <div className="flex items-center bg-white/10 rounded-xl px-4 py-3">
-                        <Search className="w-5 h-5 text-white/50" />
-                        <input
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Tìm kiếm..."
-                            className="bg-transparent border-none outline-none text-white ml-3 w-full"
-                        />
+
+            {/* Mobile Menu Overlay */}
+            {
+                isMobileMenuOpen && (
+                    <div className="absolute top-16 left-0 right-0 glass-panel border-t border-white/10 p-4 md:hidden animate-in slide-in-from-top-4 fade-in duration-200">
+                        <form onSubmit={handleSearch} className="mb-6">
+                            <div className="flex items-center bg-white/10 rounded-xl px-4 py-3">
+                                <Search className="w-5 h-5 text-white/50" />
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    placeholder="Tìm kiếm..."
+                                    className="bg-transparent border-none outline-none text-white ml-3 w-full"
+                                />
+                            </div>
+                        </form>
+                        <nav className="flex flex-col gap-2">
+                            {[
+                                { name: "Trang chủ", href: "/" },
+                                { name: "Phim lẻ", href: "/danh-sach/phim-le" },
+                                { name: "Phim bộ", href: "/danh-sach/phim-bo" },
+                                { name: "Hoạt hình", href: "/danh-sach/hoat-hinh" },
+                                { name: "Lịch sử xem", href: "/lich-su-xem" },
+                                { name: "Phim yêu thích", href: "/phim-yeu-thich" },
+                            ].map((item) => (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="px-4 py-3 rounded-xl hover:bg-white/10 text-white font-medium transition-colors"
+                                >
+                                    {item.name}
+                                </Link>
+                            ))}
+                        </nav>
                     </div>
-                </form>
-                <nav className="flex flex-col gap-2">
-                    {[
-                        { name: "Trang chủ", href: "/" },
-                        { name: "Phim lẻ", href: "/danh-sach/phim-le" },
-                        { name: "Phim bộ", href: "/danh-sach/phim-bo" },
-                        { name: "Hoạt hình", href: "/danh-sach/hoat-hinh" },
-                        { name: "Lịch sử xem", href: "/lich-su-xem" },
-                        { name: "Phim yêu thích", href: "/phim-yeu-thich" },
-                    ].map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="px-4 py-3 rounded-xl hover:bg-white/10 text-white font-medium transition-colors"
-                        >
-                            {item.name}
-                        </Link>
-                    ))}
-                </nav>
-            </div>
-        )
-    }
+                )
+            }
         </header >
     );
 }
