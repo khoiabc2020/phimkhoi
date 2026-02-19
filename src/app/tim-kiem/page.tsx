@@ -27,10 +27,10 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     return (
         <main className="min-h-screen pb-20 bg-[#0a0a0a]">
             <div className="container mx-auto px-4 pt-24">
-                <div className="mb-8">
-                    <h1 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
-                        <span className="w-1 h-6 bg-[#fbbf24] rounded-full shadow-[0_0_10px_#fbbf24]"></span>
-                        Kết quả tìm kiếm: <span className="text-primary">"{keyword}"</span>
+                <div className="mb-6">
+                    <h1 className="text-lg md:text-xl font-bold text-white flex items-center gap-2">
+                        <span className="w-1 h-5 bg-[#fbbf24] rounded-full shadow-[0_0_10px_#fbbf24]"></span>
+                        Kết quả: <span className="text-primary truncate max-w-[200px] md:max-w-md">"{keyword}"</span>
                     </h1>
                     <p className="text-gray-400 text-sm mt-1">
                         Tìm thấy {filteredMovies.length} kết quả {movies.length !== filteredMovies.length && `(từ ${movies.length} phim gốc)`}

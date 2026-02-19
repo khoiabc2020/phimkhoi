@@ -131,7 +131,7 @@ export default function WatchEngagementBar({
 
                 <div className="flex-grow flex flex-col justify-center min-w-0">
                     {/* Vietnamese title */}
-                    <h1 className="text-[20px] font-semibold text-white leading-snug tracking-tight mb-1.5 line-clamp-2">
+                    <h1 className="text-[18px] font-semibold text-white leading-snug tracking-tight mb-1.5 line-clamp-2">
                         {movie.name}
                     </h1>
                     {/* English subtitle + meta */}

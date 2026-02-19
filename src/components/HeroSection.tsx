@@ -16,11 +16,10 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
     // Desktop Carousel (Laptops & Desktops)
     const [desktopRef, desktopApi] = useEmblaCarousel({ loop: true, duration: 40 }, [Autoplay({ delay: 8000 })]);
 
-    // Mobile/Tablet Carousel - Swipeable
     const [mobileRef, mobileApi] = useEmblaCarousel({
         loop: true,
         align: "center",
-        containScroll: false,
+        containScroll: "trimSnaps",
         dragFree: false
     });
 
@@ -135,8 +134,8 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
             {/* Shows on < lg screens (approx < 1024px) */}
             <div className="lg:hidden relative w-full h-[85vh] md:h-[60vh] flex flex-col pt-0">
 
-                {/* 1. Ambient Background */}
-                <div className="absolute inset-0 z-0 overflow-hidden">
+                {/* 1. Ambient Background - Touch action handling for swipe */}
+                <div className="absolute inset-0 z-0 overflow-hidden touch-pan-y">
                     <Image
                         src={getHeroImage(activeMovie, 'poster')}
                         alt="bg"
@@ -165,10 +164,13 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                     </Link>
 
                     {/* Metadata */}
-                    <div className="space-y-4 mb-8 max-w-md mx-auto">
-                        <h1 className="text-2xl md:text-3xl font-black text-white leading-tight drop-shadow-xl text-glow line-clamp-2">
+                    <div className="space-y-3 mb-6 max-w-md mx-auto">
+                        <h1 className="text-xl md:text-2xl font-black text-white leading-tight drop-shadow-xl text-glow line-clamp-2 px-2">
                             {activeMovie.name}
                         </h1>
+                        <h2 className="text-sm md:text-base text-[#F4C84A] font-medium line-clamp-1">
+                            {activeMovie.origin_name}
+                        </h2>
                         <div className="flex items-center justify-center gap-3 text-sm font-medium text-white/90">
                             <span className="bg-white/10 px-2 py-0.5 rounded text-xs">{activeMovie.year}</span>
                             <span className="text-[#F4C84A] flex items-center gap-1">★ {activeRating}</span>
@@ -211,7 +213,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
             {/* Shows on lg screens (approx >= 1024px) */}
             <div className="hidden lg:block relative w-full h-screen">
                 <div className="absolute inset-0 h-full" ref={desktopRef}>
-                    <div className="flex h-full">
+                    <div className="flex h-full touch-pan-y">
                         {heroMovies.map((movie, index) => {
                             const posterImg = getHeroImage(movie, 'poster');
                             const backdropImg = getHeroImage(movie, 'backdrop');
@@ -267,7 +269,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
                                                 {/* Origin Name & Categories */}
                                                 <div className="flex items-center gap-4 mb-5">
-                                                    <h2 className="text-[18px] text-[#F4C84A] font-normal tracking-wide">{movie.origin_name}</h2>
+                                                    <h2 className="text-[16px] text-[#F4C84A] font-medium tracking-wide opacity-90">{movie.origin_name}</h2>
                                                     <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
                                                     <div className="flex gap-3">
                                                         {movie.category?.slice(0, 3).map(c => (
