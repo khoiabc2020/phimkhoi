@@ -320,57 +320,13 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
 
             {/* Mobile Menu Overlay */}
             {
-                isMobileMenuOpen && (
-                    <>
-                        <div
-                            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                        />
-                        <div className="fixed top-0 left-0 bottom-0 w-[280px] bg-[#0B0D12] z-50 lg:hidden border-r border-white/10 flex flex-col animate-in slide-in-from-left duration-300">
-                            <div className="p-4 flex items-center justify-between border-b border-white/5">
-                                <span className="text-lg font-bold text-white">Menu</span>
-                                <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-white/50 hover:text-white">
-                                    <X className="w-5 h-5" />
-                                </button>
-                            </div>
-
-                            <div className="p-4">
-                                {/* Mobile Search */}
-                                <form onSubmit={handleSearch} className="mb-6 relative">
-                                    <input
-                                        type="text"
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        placeholder="Tìm kiếm phim..."
-                                        className="w-full h-11 bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 text-sm text-white outline-none focus:border-primary/50 transition-colors"
-                                    />
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-                                </form>
-
-                                <nav className="flex flex-col gap-1">
-                                    {[
-                                        { name: "Trang chủ", href: "/", icon: null },
-                                        { name: "Phim lẻ", href: "/danh-sach/phim-le", icon: Film },
-                                        { name: "Phim bộ", href: "/danh-sach/phim-bo", icon: LayoutGrid },
-                                        { name: "Hoạt hình", href: "/danh-sach/hoat-hinh", icon: Play },
-                                        { name: "Lịch sử xem", href: "/lich-su-xem", icon: History },
-                                        { name: "Phim yêu thích", href: "/phim-yeu-thich", icon: Heart },
-                                    ].map((item) => (
-                                        <Link
-                                            key={item.href}
-                                            href={item.href}
-                                            onClick={() => setIsMobileMenuOpen(false)}
-                                            className="px-4 py-3 rounded-xl hover:bg-white/10 text-white/80 hover:text-white font-medium transition-colors flex items-center gap-3"
-                                        >
-                                            {item.icon && <item.icon className="w-4 h-4 text-white/50" />}
-                                            {item.name}
-                                        </Link>
-                                    ))}
-                                </nav>
-                            </div>
-                        </div>
-                    </>
-                )
+                {/* Mobile Menu Integration */ }
+                < MobileMenu 
+                isOpen={isMobileMenuOpen}
+            onClose={() => setIsMobileMenuOpen(false)}
+            categories={displayCategories}
+            countries={displayCountries}
+            />
             }
         </header >
     );

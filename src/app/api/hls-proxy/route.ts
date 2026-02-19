@@ -48,7 +48,14 @@ export async function GET(request: NextRequest) {
         }
 
         const contentType = response.headers.get('Content-Type');
-        const isM3u8 = url.includes('.m3u8') || (contentType && contentType.includes('mpegurl'));
+        const isM3u8 = url.includes('.m3u8') ||
+            (contentType && (
+                contentType.includes('mpegurl') ||
+                contentType.includes('application/x-mpegURL') ||
+                contentType.includes('application/vnd.apple.mpegurl')
+            ));
+
+        console.log(`[Proxy] Response Content-Type: ${contentType}, isM3u8: ${isM3u8}`);
 
         const responseHeaders = new Headers();
         responseHeaders.set('Access-Control-Allow-Origin', '*');
@@ -58,6 +65,7 @@ export async function GET(request: NextRequest) {
         // OPTIMIZATION: Stream binary data (TS segments) directly to client
         // This reduces memory usage and TTFB (Time To First Byte)
         if (!isM3u8) {
+            console.log(`[Proxy] Streaming binary/other content directly.`);
             return new NextResponse(response.body, {
                 status: 200,
                 headers: responseHeaders,

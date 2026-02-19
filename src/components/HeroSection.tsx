@@ -166,7 +166,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
                     {/* Metadata */}
                     <div className="space-y-4 mb-8 max-w-md mx-auto">
-                        <h1 className="text-3xl md:text-4xl font-black text-white leading-tight drop-shadow-xl text-glow line-clamp-2">
+                        <h1 className="text-2xl md:text-3xl font-black text-white leading-tight drop-shadow-xl text-glow line-clamp-2">
                             {activeMovie.name}
                         </h1>
                         <div className="flex items-center justify-center gap-3 text-sm font-medium text-white/90">
@@ -258,17 +258,17 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                                 </div>
 
                                                 {/* Title */}
-                                                <h1 className="text-5xl xl:text-7xl font-black text-white leading-[0.95] tracking-tighter drop-shadow-2xl line-clamp-3">
+                                                <h1 className="text-4xl xl:text-6xl font-black text-white leading-[0.95] tracking-tighter drop-shadow-2xl line-clamp-3">
                                                     {movie.name}
                                                 </h1>
 
                                                 {/* Origin Name & Categories */}
-                                                <div className="flex items-center gap-4 text-white/60 text-lg font-medium">
+                                                <div className="flex items-center gap-4 text-white/60 text-base font-medium">
                                                     <h2 className="tracking-wide">{movie.origin_name}</h2>
                                                     <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
                                                     <div className="flex gap-3">
                                                         {movie.category?.slice(0, 3).map(c => (
-                                                            <span key={c.id} className="text-white/80 hover:text-[#F4C84A] transition-colors cursor-pointer text-sm font-semibold">
+                                                            <span key={c.id} className="text-white/80 hover:text-[#F4C84A] transition-colors cursor-pointer text-xs font-semibold uppercase tracking-wider">
                                                                 {c.name}
                                                             </span>
                                                         ))}
@@ -276,30 +276,30 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                                 </div>
 
                                                 {/* Description */}
-                                                <p className="text-white/70 text-lg leading-relaxed line-clamp-3 font-normal max-w-2xl text-shadow-sm">
+                                                <p className="text-white/60 text-base leading-relaxed line-clamp-3 font-normal max-w-2xl text-shadow-sm">
                                                     {stripHtml(movie.content)}
                                                 </p>
 
                                                 {/* CTA Buttons */}
-                                                <div className="flex items-center gap-5 pt-4">
+                                                <div className="flex items-center gap-4 pt-2">
                                                     <Link
                                                         href={`/xem-phim/${movie.slug}`}
-                                                        className="group relative flex items-center justify-center gap-3 h-14 px-8 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-extrabold text-lg shadow-[0_0_30px_rgba(244,200,74,0.3)] hover:shadow-[0_0_50px_rgba(244,200,74,0.5)] transition-all duration-300 hover:-translate-y-1 hover:scale-105 active:scale-95 active:translate-y-0"
+                                                        className="group relative flex items-center justify-center gap-2 h-12 px-6 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-extrabold text-base shadow-[0_0_20px_rgba(244,200,74,0.3)] hover:shadow-[0_0_40px_rgba(244,200,74,0.5)] transition-all duration-300 hover:-translate-y-1 hover:scale-105 active:scale-95 active:translate-y-0"
                                                     >
-                                                        <Play className="w-6 h-6 fill-black" />
+                                                        <Play className="w-5 h-5 fill-black" />
                                                         <span>Xem Ngay</span>
                                                     </Link>
 
                                                     <Link
                                                         href={`/phim/${movie.slug}`}
-                                                        className="flex items-center justify-center gap-3 h-14 px-8 rounded-full glass hover:bg-white/10 border border-white/10 text-white font-semibold text-lg transition-all hover:-translate-y-1 hover:scale-105 active:scale-95 group/info backdrop-blur-md"
+                                                        className="flex items-center justify-center gap-2 h-12 px-6 rounded-full glass hover:bg-white/10 border border-white/10 text-white font-semibold text-base transition-all hover:-translate-y-1 hover:scale-105 active:scale-95 group/info backdrop-blur-md"
                                                     >
-                                                        <Info className="w-6 h-6 text-white/80 group-hover/info:text-[#F4C84A] transition-colors" />
+                                                        <Info className="w-5 h-5 text-white/80 group-hover/info:text-[#F4C84A] transition-colors" />
                                                         <span>Chi tiết</span>
                                                     </Link>
 
-                                                    <div className="h-14 w-14 flex items-center justify-center rounded-full glass hover:bg-white/10 border border-white/10 transition-all hover:scale-110 cursor-pointer backdrop-blur-md">
-                                                        <FavoriteButton movieData={getFavoriteData(movie)} initialIsFavorite={false} size="lg" />
+                                                    <div className="h-12 w-12 flex items-center justify-center rounded-full glass hover:bg-white/10 border border-white/10 transition-all hover:scale-110 cursor-pointer backdrop-blur-md">
+                                                        <FavoriteButton movieData={getFavoriteData(movie)} initialIsFavorite={false} size="md" />
                                                     </div>
                                                 </div>
                                             </div>
