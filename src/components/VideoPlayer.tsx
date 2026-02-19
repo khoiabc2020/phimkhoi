@@ -61,7 +61,7 @@ export default function VideoPlayer({
                 poster={movieData?.moviePoster}
                 initialProgress={initialProgress}
                 movieData={movieData}
-                autoPlay={true}
+                autoPlay={false}
                 onHLSFail={() => setHlsFailed(true)}
             />
         );
