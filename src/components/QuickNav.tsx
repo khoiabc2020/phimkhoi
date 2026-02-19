@@ -17,7 +17,7 @@ export default function QuickNav() {
     return (
         <div className="w-full py-2 pb-8">
             <div className="container mx-auto px-4 md:px-12 mb-4">
-                <h2 className="text-xl font-bold text-white mb-4">Danh sách nổi bật</h2>
+                <h2 className="text-lg font-bold text-white mb-4">Danh sách nổi bật</h2>
 
                 <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2 snap-x">
                     {NAV_ITEMS.map((item, index) => (
