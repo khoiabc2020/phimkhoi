@@ -79,9 +79,9 @@ export default function ContinueWatchingRow() {
     return (
         <div className="space-y-4 group relative py-4 container mx-auto px-4 md:px-12">
             <div className="flex items-center justify-between">
-                <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
+                <h2 className="text-lg md:text-xl font-bold text-white flex items-center gap-2">
                     Xem tiếp của bạn
-                    <ChevronRight className="w-5 h-5 text-gray-500" />
+                    <ChevronRight className="w-4 h-4 text-gray-500" />
                 </h2>
             </div>
 

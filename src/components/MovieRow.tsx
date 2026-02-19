@@ -34,7 +34,7 @@ export default function MovieRow({ title, movies, slug, variant = 'default' }: M
                 <div className="flex flex-col md:flex-row md:items-start gap-8">
                     {/* Sidebar Title Section */}
                     <div className="w-full md:w-[220px] flex-shrink-0 flex flex-col justify-start space-y-4 pt-2">
-                        <h2 className="text-xl md:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-gray-200 to-gray-500 capitalize leading-[1.1] tracking-tight">
+                        <h2 className="text-lg md:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-white via-gray-200 to-gray-500 capitalize leading-[1.2] tracking-tight">
                             {title}
                         </h2>
                         {slug && (
@@ -88,8 +88,8 @@ export default function MovieRow({ title, movies, slug, variant = 'default' }: M
     return (
         <div className="space-y-6 group relative py-4">
             <div className="flex items-center justify-between px-4 md:px-12">
-                <h2 className="text-[13px] font-bold text-white flex items-center gap-2 uppercase tracking-widest">
-                    <span className="w-1.5 h-6 md:h-8 bg-gradient-to-t from-[#fbbf24] to-yellow-200 rounded-sm shadow-[0_0_15px_rgba(251,191,36,0.5)]"></span>
+                <h2 className="text-[15px] md:text-[17px] font-bold text-white flex items-center gap-2 uppercase tracking-wide">
+                    <span className="w-1 h-5 md:h-6 bg-gradient-to-t from-[#fbbf24] to-yellow-200 rounded-sm shadow-[0_0_15px_rgba(251,191,36,0.5)]"></span>
                     <span className="drop-shadow-lg">{title}</span>
                 </h2>
                 {slug && (

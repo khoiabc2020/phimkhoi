@@ -28,9 +28,9 @@ export default async function CategoryPage({ params, searchParams }: { params: P
     return (
         <main className="min-h-screen pb-20 bg-[#0a0a0a]">
             <div className="pt-24 container mx-auto px-4 md:px-12">
-                <div className="mb-8">
-                    <h1 className="text-xl md:text-2xl font-bold text-white capitalize flex items-center gap-2">
-                        <span className="w-1 h-6 bg-[#fbbf24] rounded-full shadow-[0_0_10px_#fbbf24]"></span>
+                <div className="mb-6">
+                    <h1 className="text-[18px] md:text-xl font-bold text-white capitalize flex items-center gap-2">
+                        <span className="w-1 h-5 bg-[#fbbf24] rounded-full shadow-[0_0_10px_#fbbf24]"></span>
                         Thể loại: <span className="text-primary">{slug.replace(/-/g, " ")}</span>
                     </h1>
                 </div>

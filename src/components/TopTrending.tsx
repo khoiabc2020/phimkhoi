@@ -21,8 +21,8 @@ export default function TopTrending({ title, movies, slug, className }: TopTrend
         <div className={cn("w-full relative py-4", className)}>
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-white capitalize flex items-center gap-3">
-                    <span className="w-1 h-6 bg-[#fbbf24] rounded-full shadow-[0_0_15px_#fbbf24]"></span>
+                <h2 className="text-lg font-bold text-white capitalize flex items-center gap-3">
+                    <span className="w-1 h-5 bg-[#fbbf24] rounded-full shadow-[0_0_15px_#fbbf24]"></span>
                     <span className="leading-tight">{title}</span>
                 </h2>
                 {slug && (

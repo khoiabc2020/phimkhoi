@@ -89,8 +89,8 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
                 {/* Title & Badge */}
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
                     <div>
-                        <h1 className="text-xl md:text-2xl font-bold text-white mb-2 uppercase tracking-wide flex items-center gap-2">
-                            <span className="w-1 h-6 bg-[#fbbf24] rounded-full shadow-[0_0_10px_#fbbf24]"></span>
+                        <h1 className="text-[18px] md:text-xl font-bold text-white mb-2 uppercase tracking-wide flex items-center gap-2">
+                            <span className="w-1 h-5 bg-[#fbbf24] rounded-full shadow-[0_0_10px_#fbbf24]"></span>
                             {typeName}
                         </h1>
                         <p className="text-gray-400 text-sm">
