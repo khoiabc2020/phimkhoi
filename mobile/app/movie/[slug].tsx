@@ -225,11 +225,6 @@ export default function MovieDetailScreen() {
                                     <Text style={[styles.chipText, { color: 'black', fontWeight: 'bold' }]}>IMDb {rating.toFixed(1)}</Text>
                                 </View>
                             )}
-                            {rating !== null && (
-                                <View style={[styles.glassChip, { backgroundColor: '#fbbf24', borderColor: '#fbbf24' }]}>
-                                    <Text style={[styles.chipText, { color: 'black', fontWeight: 'bold' }]}>IMDb {rating.toFixed(1)}</Text>
-                                </View>
-                            )}
                         </View>
                     </View>
                 </View>
