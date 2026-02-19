@@ -227,6 +227,27 @@ export default function NativePlayer({
         })
     ).current;
 
+    // Drawer Animation
+    const slideAnim = useRef(new Animated.Value(width)).current; // Start off-screen (right)
+
+    useEffect(() => {
+        if (showEpisodes) {
+            Animated.timing(slideAnim, {
+                toValue: 0,
+                duration: 300,
+                useNativeDriver: true,
+                easing: Easing.out(Easing.poly(4)), // Spring-like easing
+            }).start();
+        } else {
+            Animated.timing(slideAnim, {
+                toValue: width, // Slide back out
+                duration: 250,
+                useNativeDriver: true,
+                easing: Easing.in(Easing.poly(4)),
+            }).start();
+        }
+    }, [showEpisodes]);
+
     return (
         <View style={{ flex: 1, backgroundColor: 'black' }}>
             <View style={styles.container} {...panResponder.panHandlers}>
@@ -387,22 +408,34 @@ export default function NativePlayer({
                 )}
             </View>
 
-            {/* Episode Selector Modal */}
-            <Modal animationType="fade" transparent={true} visible={showEpisodes} onRequestClose={() => setShowEpisodes(false)}>
+            {/* Episode Selector Modal (iOS 26 Style Drawer) */}
+            <Modal animationType="none" transparent={true} visible={showEpisodes} onRequestClose={() => setShowEpisodes(false)}>
                 <View style={styles.drawerOverlay}>
+                    {/* Click outside to close */}
                     <Pressable style={{ flex: 1 }} onPress={() => setShowEpisodes(false)} />
-                    <View style={styles.drawerContent}>
+
+                    {/* Animated Glass Drawer */}
+                    <Animated.View style={[
+                        styles.drawerContent,
+                        { transform: [{ translateX: slideAnim }] }
+                    ]}>
                         <View style={styles.drawerHeader}>
                             <Text style={styles.drawerTitle}>Danh sách tập</Text>
-                            <TouchableOpacity onPress={() => setShowEpisodes(false)}>
-                                <Ionicons name="close" size={24} color="#9ca3af" />
+                            <TouchableOpacity
+                                onPress={() => setShowEpisodes(false)}
+                                style={styles.closeBtn}
+                            >
+                                <Ionicons name="close" size={20} color="white" />
                             </TouchableOpacity>
                         </View>
+
                         <FlatList
                             data={episodeList}
                             keyExtractor={(item) => item.slug}
-                            contentContainerStyle={{ padding: 12, paddingBottom: 40 }}
+                            contentContainerStyle={{ padding: 28, paddingBottom: 60, gap: 16 }}
+                            columnWrapperStyle={{ gap: 16 }}
                             numColumns={4}
+                            showsVerticalScrollIndicator={false}
                             renderItem={({ item }) => {
                                 const isActive = item.slug === currentEpisodeSlug;
                                 return (
@@ -416,11 +449,15 @@ export default function NativePlayer({
                                         <Text style={[styles.epGridText, isActive && styles.activeEpGridText]} numberOfLines={1}>
                                             {item.name.replace('Tập ', '')}
                                         </Text>
+                                        {/* Optional: Checkmark or progress bar could go here */}
+                                        {isActive && (
+                                            <View style={{ position: 'absolute', bottom: 6, width: 4, height: 4, borderRadius: 2, backgroundColor: '#fbbf24' }} />
+                                        )}
                                     </TouchableOpacity>
                                 );
                             }}
                         />
-                    </View>
+                    </Animated.View>
                 </View>
             </Modal>
 
@@ -545,27 +582,72 @@ const styles = StyleSheet.create({
         borderRadius: 2.5,
     },
 
-    drawerOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', flexDirection: 'row', justifyContent: 'flex-end' },
-    drawerContent: { width: '45%', height: '100%', backgroundColor: '#111', paddingBottom: 20 },
-    drawerHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.1)' },
-    drawerTitle: { color: 'white', fontSize: 16, fontWeight: 'bold' },
+    // --- DRAWER STYLES (iOS 26) ---
+    drawerOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', flexDirection: 'row', justifyContent: 'flex-end' },
+    drawerContent: {
+        width: 380, // Fixed clear width
+        maxWidth: '80%',
+        height: '100%',
+        backgroundColor: 'rgba(15,18,26,0.96)', // Deep glass
+        borderLeftWidth: 1,
+        borderLeftColor: 'rgba(255,255,255,0.08)',
+        shadowColor: "#000",
+        shadowOffset: { width: -10, height: 0 },
+        shadowOpacity: 0.5,
+        shadowRadius: 20,
+        elevation: 10,
+    },
+    drawerHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 24,
+        paddingTop: 32, // More top padding
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(255,255,255,0.05)'
+    },
+    drawerTitle: {
+        color: 'white',
+        fontSize: 20, // Larger title
+        fontWeight: '700',
+        letterSpacing: 0.5
+    },
+    closeBtn: {
+        width: 36, height: 36, borderRadius: 18,
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        alignItems: 'center', justifyContent: 'center'
+    },
 
+    // --- EPISODE GRID (Premium) ---
     epGridItem: {
         flex: 1,
-        aspectRatio: 1.5,
-        margin: 4,
-        backgroundColor: 'rgba(255,255,255,0.1)',
-        borderRadius: 8,
+        height: 56, // Fixed height 56px
+        backgroundColor: 'rgba(255,255,255,0.04)',
+        borderRadius: 16,
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: 'transparent'
+        borderColor: 'rgba(255,255,255,0.05)',
+        // Shadow for depth
     },
     activeEpGridItem: {
-        backgroundColor: '#fbbf24',
+        backgroundColor: 'rgba(251, 191, 36, 0.15)', // Subtle gold tint
+        borderColor: '#fbbf24',
+        shadowColor: "#fbbf24",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        elevation: 4,
     },
-    epGridText: { color: 'rgba(255,255,255,0.8)', fontSize: 14, fontWeight: '600' },
-    activeEpGridText: { color: 'black', fontWeight: 'bold' },
+    epGridText: {
+        color: 'rgba(255,255,255,0.6)',
+        fontSize: 15,
+        fontWeight: '600'
+    },
+    activeEpGridText: {
+        color: '#fbbf24',
+        fontWeight: '800'
+    },
 
     sheetOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
     sheetContent: { width: '100%', backgroundColor: '#1c1c1c', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, paddingBottom: 40 },
