@@ -25,8 +25,12 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
     const { data: session } = useSession();
     const searchInputRef = useRef<HTMLInputElement>(null);
 
-    const handleSearch = (query?: string) => {
-        const searchTerm = query || searchQuery;
+    const handleSearch = (e?: React.FormEvent | string) => {
+        if (e && typeof e === 'object' && 'preventDefault' in e) {
+            e.preventDefault();
+        }
+        const searchTerm = typeof e === 'string' ? e : searchQuery;
+
         if (searchTerm.trim()) {
             // Save to history
             const newHistory = [searchTerm, ...searchHistory.filter(h => h !== searchTerm)].slice(0, 10);
