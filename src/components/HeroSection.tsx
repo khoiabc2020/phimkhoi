@@ -250,32 +250,32 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                             <div className="col-span-5 space-y-8 animate-in fade-in slide-in-from-left-10 duration-700 delay-100">
                                                 {/* Meta Badges */}
                                                 <div className="flex flex-wrap items-center gap-3">
-                                                    <span className="px-3 py-1 rounded-full bg-[#F4C84A] text-black text-xs font-black tracking-wider uppercase shadow-[0_0_15px_rgba(244,200,74,0.4)]">
+                                                    <span className="px-2.5 py-0.5 rounded shadow-[0_0_10px_rgba(244,200,74,0.3)] bg-[#F4C84A] text-black text-[11px] font-bold tracking-wider uppercase">
                                                         Phim Hot
                                                     </span>
-                                                    <span className="px-3 py-1 rounded-full glass text-white text-xs font-bold flex items-center gap-1.5">
+                                                    <span className="px-2.5 py-0.5 rounded border border-white/10 bg-white/5 text-white text-[11px] font-medium flex items-center gap-1.5 backdrop-blur-sm">
                                                         <span className="text-[#F4C84A]">★</span> {heroMoviesData[movie._id]?.vote_average?.toFixed(1) || "N/A"}
                                                     </span>
-                                                    <span className="px-3 py-1 rounded-full glass text-white/80 text-xs font-medium">
+                                                    <span className="px-2.5 py-0.5 rounded border border-white/10 bg-white/5 text-white/80 text-[11px] font-medium backdrop-blur-sm">
                                                         {movie.year}
                                                     </span>
-                                                    <span className="px-3 py-1 rounded-full glass text-[#F4C84A] text-xs font-bold border-[#F4C84A]/30">
+                                                    <span className="px-2.5 py-0.5 rounded border border-[#F4C84A]/30 bg-[#F4C84A]/10 text-[#F4C84A] text-[11px] font-bold backdrop-blur-sm">
                                                         {movie.quality}
                                                     </span>
                                                 </div>
 
                                                 {/* Title */}
-                                                <h1 className="text-5xl xl:text-6xl font-black text-white leading-[1.1] tracking-tight drop-shadow-2xl line-clamp-2 text-glow">
+                                                <h1 className="text-4xl xl:text-5xl font-extrabold text-white leading-[1.15] tracking-tight drop-shadow-2xl line-clamp-2 text-glow">
                                                     {movie.name}
                                                 </h1>
 
                                                 {/* Origin Name & Categories */}
-                                                <div className="flex items-center gap-4 text-white/60 text-lg font-medium">
+                                                <div className="flex items-center gap-3 text-white/60 text-base font-medium">
                                                     <h2>{movie.origin_name}</h2>
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
+                                                    <span className="w-1 h-1 rounded-full bg-white/20" />
                                                     <div className="flex gap-2">
                                                         {movie.category?.slice(0, 3).map(c => (
-                                                            <span key={c.id} className="text-white/80 hover:text-[#F4C84A] transition-colors cursor-pointer">
+                                                            <span key={c.id} className="text-white/70 hover:text-[#F4C84A] transition-colors cursor-pointer text-sm">
                                                                 {c.name}
                                                             </span>
                                                         ))}
@@ -283,25 +283,25 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                                 </div>
 
                                                 {/* Description */}
-                                                <p className="text-white/70 text-lg leading-relaxed line-clamp-3 font-light max-w-xl">
+                                                <p className="text-white/60 text-base leading-relaxed line-clamp-3 font-normal max-w-xl">
                                                     {stripHtml(movie.content)}
                                                 </p>
 
                                                 {/* CTA Buttons */}
-                                                <div className="flex items-center gap-5 pt-2">
+                                                <div className="flex items-center gap-4 pt-2">
                                                     <Link
                                                         href={`/xem-phim/${movie.slug}`}
-                                                        className="group relative flex items-center justify-center gap-3 h-14 px-8 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-bold text-lg shadow-[0_0_30px_rgba(244,200,74,0.3)] hover:shadow-[0_0_50px_rgba(244,200,74,0.5)] transition-all duration-300 hover:scale-105 active:scale-95"
+                                                        className="group relative flex items-center justify-center gap-2 h-12 px-6 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-bold text-base shadow-[0_0_20px_rgba(244,200,74,0.2)] hover:shadow-[0_0_30px_rgba(244,200,74,0.4)] transition-all duration-300 hover:scale-105 active:scale-95"
                                                     >
-                                                        <Play className="w-6 h-6 fill-black" />
+                                                        <Play className="w-5 h-5 fill-black" />
                                                         <span>Xem Ngay</span>
                                                     </Link>
 
                                                     <Link
                                                         href={`/phim/${movie.slug}`}
-                                                        className="flex items-center justify-center gap-3 h-14 px-8 rounded-full glass hover:bg-white/20 text-white font-medium text-lg transition-all hover:scale-105 active:scale-95 group/info"
+                                                        className="flex items-center justify-center gap-2 h-12 px-6 rounded-full glass hover:bg-white/10 border border-white/10 text-white font-medium text-base transition-all hover:scale-105 active:scale-95 group/info"
                                                     >
-                                                        <Info className="w-6 h-6 group-hover/info:text-[#F4C84A] transition-colors" />
+                                                        <Info className="w-5 h-5 text-white/70 group-hover/info:text-[#F4C84A] transition-colors" />
                                                         <span>Chi tiết</span>
                                                     </Link>
 

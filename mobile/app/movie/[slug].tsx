@@ -46,10 +46,83 @@ export default function MovieDetailScreen() {
 
     const { user, token, syncFavorites, syncWatchList } = useAuth();
 
-    // ... (fetch logic remains same)
+    // Fetch Data
+    useEffect(() => {
+        const fetchMovie = async () => {
+            setLoading(true);
+            try {
+                if (!slug) return;
+                const data = await getMovieDetail(slug as string);
 
-    // Favorite Logic (remains same)
-    // ...
+                if (data?.movie) {
+                    setMovie(data.movie);
+                    setEpisodes(data.episodes || []);
+
+                    // Fetch related and other data in parallel
+                    const [related, tmdbRating, tmdbCast] = await Promise.all([
+                        getRelatedMovies(data.movie.category?.[0]?.slug),
+                        getTMDBRating(data.movie.name, data.movie.year),
+                        getTMDBCast(data.movie.name, data.movie.year)
+                    ]);
+
+                    setRelatedMovies(related);
+                    setRating(tmdbRating);
+                    setCast(tmdbCast);
+                }
+            } catch (error) {
+                console.error("Failed to fetch movie:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchMovie();
+    }, [slug]);
+
+    // Favorite Logic
+    const checkFavorite = useCallback(async () => {
+        if (!movie) return;
+        try {
+            if (user?.favorites) {
+                setFav(user.favorites.some((f: any) => (typeof f === 'string' ? f : f.slug) === movie.slug));
+            } else {
+                setFav(await isFavorite(movie.slug));
+            }
+        } catch (e) {
+            console.warn(e);
+        }
+    }, [movie, user]);
+
+    useEffect(() => {
+        checkFavorite();
+    }, [checkFavorite]);
+
+    const toggleFavorite = async () => {
+        if (!movie) return;
+        const newState = !fav;
+        setFav(newState); // Optimistic UI
+
+        try {
+            if (user && token) {
+                const method = newState ? 'POST' : 'DELETE';
+                await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/favorites`, {
+                    method,
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                    body: JSON.stringify({ slug: movie.slug })
+                });
+                syncFavorites();
+            } else {
+                if (newState) {
+                    await addFavorite({ ...movie, time: Date.now() });
+                } else {
+                    await removeFavorite(movie.slug);
+                }
+            }
+        } catch (e) {
+            setFav(!newState); // Revert
+            console.error(e);
+        }
+    };
 
     // Watchlist Logic
     const checkWatchList = useCallback(async () => {
