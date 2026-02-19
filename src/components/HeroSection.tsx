@@ -209,7 +209,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
             {/* ================= DESKTOP LAYOUT (Large Screens) ================= */}
             {/* Shows on lg screens (approx >= 1024px) */}
-            <div className="hidden lg:block absolute inset-0 h-screen">
+            <div className="hidden lg:block relative w-full h-screen">
                 <div className="absolute inset-0 h-full" ref={desktopRef}>
                     <div className="flex h-full">
                         {heroMovies.map((movie, index) => {
