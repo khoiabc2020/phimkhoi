@@ -11,6 +11,7 @@ interface User {
     image?: string;
     favorites?: string[];
     history?: any[];
+    watchlist?: any[];
 }
 
 interface AuthContextType {
@@ -22,6 +23,7 @@ interface AuthContextType {
     updateUser: (user: User) => void;
     syncFavorites: () => Promise<void>;
     syncHistory: () => Promise<void>;
+    syncWatchList: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -111,8 +113,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     }
 
+    const syncWatchList = async () => {
+        if (!token) return;
+        try {
+            const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/watchlist`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setUser((prev) => prev ? { ...prev, watchlist: data.watchlist } : null);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ user, token, isLoading, login, logout, updateUser, syncFavorites, syncHistory }}>
+        <AuthContext.Provider value={{ user, token, isLoading, login, logout, updateUser, syncFavorites, syncHistory, syncWatchList }}>
             {children}
         </AuthContext.Provider>
     );
