@@ -13,10 +13,10 @@ import FavoriteButton from "./FavoriteButton";
 import Autoplay from "embla-carousel-autoplay";
 
 export default function HeroSection({ movies }: { movies: Movie[] }) {
-    // Desktop Carousel
+    // Desktop Carousel (Laptops & Desktops)
     const [desktopRef, desktopApi] = useEmblaCarousel({ loop: true, duration: 40 }, [Autoplay({ delay: 8000 })]);
 
-    // Mobile Carousel - iOS 26 Style (Wider cards, smoother snap)
+    // Mobile/Tablet Carousel - Swipeable
     const [mobileRef, mobileApi] = useEmblaCarousel({
         loop: true,
         align: "center",
@@ -27,7 +27,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [heroMoviesData, setHeroMoviesData] = useState<Record<string, { vote_average: number, backdrop_path?: string, poster_path?: string }>>({});
 
-    // Sync Desktop Carousel
+    // Sync Desktop
     useEffect(() => {
         if (!desktopApi) return;
         const onSelect = () => setSelectedIndex(desktopApi.selectedScrollSnap());
@@ -35,7 +35,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
         return () => { desktopApi.off("select", onSelect); };
     }, [desktopApi]);
 
-    // Sync Mobile Carousel
+    // Sync Mobile
     useEffect(() => {
         if (!mobileApi) return;
         const onSelect = () => setSelectedIndex(mobileApi.selectedScrollSnap());
@@ -43,7 +43,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
         return () => { mobileApi.off("select", onSelect); };
     }, [mobileApi]);
 
-    // Hydrate TMDB Data
+    // Hydrate TMDB
     useEffect(() => {
         const fetchHeroData = async () => {
             const updates: Record<string, { vote_average: number, backdrop_path?: string, poster_path?: string }> = {};
@@ -117,7 +117,6 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
         movieCategories: movie.category?.map(c => c.name) || [],
     });
 
-    // Helper to get high-res image
     const getHeroImage = (movie: Movie, type: 'backdrop' | 'poster' = 'backdrop') => {
         const tmdbData = heroMoviesData[movie._id];
         if (type === 'backdrop' && tmdbData?.backdrop_path) {
@@ -130,51 +129,54 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
     };
 
     return (
-        <div className="relative w-full h-auto md:h-screen bg-[#0B0D12] overflow-hidden flex flex-col">
+        <div className="relative w-full h-auto bg-[#0B0D12] overflow-hidden flex flex-col font-sans">
 
-            {/* ================= MOBILE LAYOUT (iOS 26 Liquid Glass) ================= */}
-            <div className="lg:hidden relative w-full min-h-[500px] h-[75vh] flex flex-col pt-0">
+            {/* ================= TABLET & MOBILE LAYOUT (Portrait/Small Screens) ================= */}
+            {/* Shows on < lg screens (approx < 1024px) */}
+            <div className="lg:hidden relative w-full h-[85vh] md:h-[60vh] flex flex-col pt-0">
 
-                {/* 1. Ambient Background (Blurred Color) */}
+                {/* 1. Ambient Background */}
                 <div className="absolute inset-0 z-0 overflow-hidden">
                     <Image
                         src={getHeroImage(activeMovie, 'poster')}
                         alt="bg"
                         fill
-                        className="object-cover blur-[50px] opacity-50 scale-125"
+                        className="object-cover blur-[60px] opacity-40 scale-125"
                         priority
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D12] via-[#0B0D12]/60 to-transparent" />
+                    {/* Darker overlays for readability */}
+                    <div className="absolute inset-0 bg-[#0B0D12]/40" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D12] via-[#0B0D12]/70 to-transparent" />
                 </div>
 
-                {/* 2. Poster & Content */}
-                <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-20 text-center">
+                {/* 2. Content */}
+                <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-24 md:pb-12 text-center">
 
-                    {/* Poster Card (Small 3D) */}
-                    <Link href={`/xem-phim/${activeMovie.slug}`} className="relative w-[180px] aspect-[2/3] mb-8 rounded-2xl overflow-hidden shadow-[0_20px_40px_-10px_rgba(0,0,0,0.6)] ring-1 ring-white/20 animate-in fade-in zoom-in duration-700">
+                    {/* Poster Card (3D Floating) */}
+                    <Link href={`/xem-phim/${activeMovie.slug}`} className="relative w-[180px] md:w-[200px] aspect-[2/3] mb-8 rounded-2xl overflow-hidden shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] ring-1 ring-white/10 animate-in fade-in zoom-in duration-700">
                         <Image
                             src={getHeroImage(activeMovie, 'poster')}
                             alt={activeMovie.name}
                             fill
                             className="object-cover"
                         />
+                        {/* Shine */}
+                        <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-50" />
                     </Link>
 
                     {/* Metadata */}
-                    <div className="space-y-4 mb-6">
-                        <h1 className="text-3xl font-black text-white leading-tight drop-shadow-xl text-glow">
+                    <div className="space-y-4 mb-8 max-w-md mx-auto">
+                        <h1 className="text-3xl md:text-4xl font-black text-white leading-tight drop-shadow-xl text-glow line-clamp-2">
                             {activeMovie.name}
                         </h1>
-                        <div className="flex items-center justify-center gap-3 text-sm font-medium text-white/80">
-                            <span>{activeMovie.year}</span>
-                            <span className="w-1 h-1 rounded-full bg-white/40" />
-                            <span className="text-[#F4C84A]">{activeRating} ★</span>
-                            <span className="w-1 h-1 rounded-full bg-white/40" />
-                            <span>{activeMovie.quality}</span>
+                        <div className="flex items-center justify-center gap-3 text-sm font-medium text-white/90">
+                            <span className="bg-white/10 px-2 py-0.5 rounded text-xs">{activeMovie.year}</span>
+                            <span className="text-[#F4C84A] flex items-center gap-1">★ {activeRating}</span>
+                            <span className="bg-[#F4C84A]/20 text-[#F4C84A] px-2 py-0.5 rounded text-xs border border-[#F4C84A]/30">{activeMovie.quality}</span>
                         </div>
                         <div className="flex flex-wrap justify-center gap-2">
                             {activeMovie.category?.slice(0, 3).map(c => (
-                                <span key={c.id} className="text-xs text-white/60 px-2 py-1 rounded-lg bg-white/5 border border-white/5">
+                                <span key={c.id} className="text-xs text-white/70 px-2.5 py-1 rounded-full bg-black/40 border border-white/5 backdrop-blur-md">
                                     {c.name}
                                 </span>
                             ))}
@@ -182,43 +184,32 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex items-center gap-4 pt-4">
+                    <div className="flex items-center gap-4 w-full justify-center max-w-sm mx-auto">
                         <Link
                             href={`/xem-phim/${activeMovie.slug}`}
-                            className="group relative flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-[#fbbf24] to-[#d97706] shadow-[0_0_20px_rgba(251,191,36,0.5)] hover:shadow-[0_0_40px_rgba(251,191,36,0.7)] hover:scale-110 transition-all duration-500 ease-out"
+                            className="flex-1 flex items-center justify-center gap-2 h-12 rounded-2xl bg-[#F4C84A] text-black font-bold shadow-lg shadow-[#F4C84A]/20 active:scale-95 transition-transform"
                         >
-                            <div className="absolute inset-0 rounded-full border border-[#fbbf24] opacity-0 scale-100 group-hover:scale-150 group-hover:opacity-0 transition-all duration-1000 ease-out" />
-                            <Play className="w-8 h-8 text-black fill-black ml-1 transition-transform duration-300 group-hover:scale-110" />
+                            <Play className="w-5 h-5 fill-black" />
+                            <span>Xem Ngay</span>
                         </Link>
-                        <div className="flex flex-col gap-1">
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#fbbf24] to-[#f59e0b] font-black text-xl md:text-2xl uppercase tracking-widest drop-shadow-sm leading-none">
-                                Xem Ngay
-                            </span>
-                        </div>
-                        <div className="h-12 w-[1px] bg-gradient-to-b from-transparent via-white/10 to-transparent mx-2" />
+
                         <Link
                             href={`/phim/${activeMovie.slug}`}
-                            className="flex items-center justify-center w-11 h-11 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md transition-all hover:scale-110 group/btn"
+                            className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 active:scale-95 transition-transform"
                         >
-                            <Info className="w-5 h-5 text-white/70 group-hover/btn:text-[#fbbf24] transition-colors" />
+                            <Info className="w-6 h-6 text-white" />
                         </Link>
-                        <div className="w-11 h-11 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md transition-all hover:scale-110 cursor-pointer">
+
+                        <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 active:scale-95 transition-transform">
                             <FavoriteButton movieData={getFavoriteData(activeMovie)} initialIsFavorite={false} size="md" />
                         </div>
                     </div>
                 </div>
-
-                {/* Navigation Arrows (Mobile) */}
-                <button onClick={scrollPrev} className="absolute left-4 top-1/2 -translate-y-1/2 z-50 w-11 h-11 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white/50 hover:bg-[#fbbf24] hover:text-black hover:scale-110 transition-all">
-                    <ChevronRight className="w-7 h-7 rotate-180" />
-                </button>
-                <button onClick={scrollNext} className="absolute right-4 top-1/2 -translate-y-1/2 z-50 w-11 h-11 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white/50 hover:bg-[#fbbf24] hover:text-black hover:scale-110 transition-all">
-                    <ChevronRight className="w-7 h-7" />
-                </button>
             </div>
 
-            {/* ================= DESKTOP LAYOUT (Cinematic iOS 26) ================= */}
-            <div className="hidden lg:block absolute inset-0 h-full">
+            {/* ================= DESKTOP LAYOUT (Large Screens) ================= */}
+            {/* Shows on lg screens (approx >= 1024px) */}
+            <div className="hidden lg:block absolute inset-0 h-screen">
                 <div className="absolute inset-0 h-full" ref={desktopRef}>
                     <div className="flex h-full">
                         {heroMovies.map((movie, index) => {
@@ -228,54 +219,56 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                             return (
                                 <div key={movie._id} className="relative flex-[0_0_100%] min-w-0 h-full bg-[#0B0D12] overflow-hidden">
 
-                                    {/* 1. Cinematic Background (Blurred & Ambient) */}
-                                    <div className="absolute inset-0 z-0">
-                                        <div className="absolute inset-0 bg-black/20 z-10" />
+                                    {/* 1. Cinematic Background */}
+                                    <div className="absolute inset-0 z-0 select-none">
+                                        <div className="absolute inset-0 bg-black/40 z-10" /> {/* Darken base */}
                                         <Image
                                             src={backdropImg}
                                             alt="bg"
                                             fill
-                                            className="object-cover blur-[80px] opacity-60 scale-110"
+                                            className="object-cover blur-sm opacity-80"
                                             priority={index === 0}
                                         />
-                                        <div className="absolute inset-0 bg-gradient-to-r from-[#0B0D12] via-[#0B0D12]/60 to-transparent z-10" />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D12] via-transparent to-transparent z-10" />
+                                        {/* Vignettes for focus */}
+                                        <div className="absolute inset-0 bg-gradient-to-r from-[#0B0D12] via-[#0B0D12]/80 to-transparent z-20 w-2/3" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D12] via-transparent to-transparent z-20 h-1/2 bottom-0 top-auto" />
                                     </div>
 
                                     {/* 2. Content Container */}
-                                    <div className="relative z-20 h-full container max-w-[1400px] mx-auto px-8 flex items-center">
-                                        <div className="grid grid-cols-12 gap-12 w-full items-center">
+                                    <div className="relative z-30 h-full container max-w-[1600px] mx-auto px-8 flex items-center">
+                                        <div className="grid grid-cols-12 gap-12 w-full items-center mt-16">
 
                                             {/* Left: Info */}
-                                            <div className="col-span-5 space-y-8 animate-in fade-in slide-in-from-left-10 duration-700 delay-100">
+                                            <div className="col-span-12 xl:col-span-5 lg:col-span-6 space-y-8 animate-in fade-in slide-in-from-left-10 duration-700 delay-100">
+
                                                 {/* Meta Badges */}
                                                 <div className="flex flex-wrap items-center gap-3">
-                                                    <span className="px-2.5 py-0.5 rounded shadow-[0_0_10px_rgba(244,200,74,0.3)] bg-[#F4C84A] text-black text-[11px] font-bold tracking-wider uppercase">
+                                                    <span className="px-3 py-1 rounded bg-[#F4C84A] text-black text-xs font-bold tracking-wider uppercase shadow-[0_0_15px_rgba(244,200,74,0.4)]">
                                                         Phim Hot
                                                     </span>
-                                                    <span className="px-2.5 py-0.5 rounded border border-white/10 bg-white/5 text-white text-[11px] font-medium flex items-center gap-1.5 backdrop-blur-sm">
-                                                        <span className="text-[#F4C84A]">★</span> {heroMoviesData[movie._id]?.vote_average?.toFixed(1) || "N/A"}
-                                                    </span>
-                                                    <span className="px-2.5 py-0.5 rounded border border-white/10 bg-white/5 text-white/80 text-[11px] font-medium backdrop-blur-sm">
+                                                    <span className="px-3 py-1 rounded border border-white/20 bg-white/5 text-white text-xs font-semibold backdrop-blur-md">
                                                         {movie.year}
                                                     </span>
-                                                    <span className="px-2.5 py-0.5 rounded border border-[#F4C84A]/30 bg-[#F4C84A]/10 text-[#F4C84A] text-[11px] font-bold backdrop-blur-sm">
+                                                    <span className="px-3 py-1 rounded border border-[#F4C84A]/50 bg-[#F4C84A]/10 text-[#F4C84A] text-xs font-bold backdrop-blur-md border-glow-accent">
                                                         {movie.quality}
+                                                    </span>
+                                                    <span className="flex items-center gap-1 text-white/80 text-xs font-medium">
+                                                        <span className="text-[#F4C84A]">★</span> {heroMoviesData[movie._id]?.vote_average?.toFixed(1) || "N/A"}
                                                     </span>
                                                 </div>
 
                                                 {/* Title */}
-                                                <h1 className="text-4xl xl:text-5xl font-extrabold text-white leading-[1.15] tracking-tight drop-shadow-2xl line-clamp-2 text-glow">
+                                                <h1 className="text-5xl xl:text-7xl font-black text-white leading-[0.95] tracking-tighter drop-shadow-2xl line-clamp-3">
                                                     {movie.name}
                                                 </h1>
 
                                                 {/* Origin Name & Categories */}
-                                                <div className="flex items-center gap-3 text-white/60 text-base font-medium">
-                                                    <h2>{movie.origin_name}</h2>
-                                                    <span className="w-1 h-1 rounded-full bg-white/20" />
-                                                    <div className="flex gap-2">
+                                                <div className="flex items-center gap-4 text-white/60 text-lg font-medium">
+                                                    <h2 className="tracking-wide">{movie.origin_name}</h2>
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
+                                                    <div className="flex gap-3">
                                                         {movie.category?.slice(0, 3).map(c => (
-                                                            <span key={c.id} className="text-white/70 hover:text-[#F4C84A] transition-colors cursor-pointer text-sm">
+                                                            <span key={c.id} className="text-white/80 hover:text-[#F4C84A] transition-colors cursor-pointer text-sm font-semibold">
                                                                 {c.name}
                                                             </span>
                                                         ))}
@@ -283,44 +276,47 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                                 </div>
 
                                                 {/* Description */}
-                                                <p className="text-white/60 text-base leading-relaxed line-clamp-3 font-normal max-w-xl">
+                                                <p className="text-white/70 text-lg leading-relaxed line-clamp-3 font-normal max-w-2xl text-shadow-sm">
                                                     {stripHtml(movie.content)}
                                                 </p>
 
                                                 {/* CTA Buttons */}
-                                                <div className="flex items-center gap-4 pt-2">
+                                                <div className="flex items-center gap-5 pt-4">
                                                     <Link
                                                         href={`/xem-phim/${movie.slug}`}
-                                                        className="group relative flex items-center justify-center gap-2 h-12 px-6 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-bold text-base shadow-[0_0_20px_rgba(244,200,74,0.2)] hover:shadow-[0_0_30px_rgba(244,200,74,0.4)] transition-all duration-300 hover:scale-105 active:scale-95"
+                                                        className="group relative flex items-center justify-center gap-3 h-14 px-8 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-extrabold text-lg shadow-[0_0_30px_rgba(244,200,74,0.3)] hover:shadow-[0_0_50px_rgba(244,200,74,0.5)] transition-all duration-300 hover:-translate-y-1 hover:scale-105 active:scale-95 active:translate-y-0"
                                                     >
-                                                        <Play className="w-5 h-5 fill-black" />
+                                                        <Play className="w-6 h-6 fill-black" />
                                                         <span>Xem Ngay</span>
                                                     </Link>
 
                                                     <Link
                                                         href={`/phim/${movie.slug}`}
-                                                        className="flex items-center justify-center gap-2 h-12 px-6 rounded-full glass hover:bg-white/10 border border-white/10 text-white font-medium text-base transition-all hover:scale-105 active:scale-95 group/info"
+                                                        className="flex items-center justify-center gap-3 h-14 px-8 rounded-full glass hover:bg-white/10 border border-white/10 text-white font-semibold text-lg transition-all hover:-translate-y-1 hover:scale-105 active:scale-95 group/info backdrop-blur-md"
                                                     >
-                                                        <Info className="w-5 h-5 text-white/70 group-hover/info:text-[#F4C84A] transition-colors" />
+                                                        <Info className="w-6 h-6 text-white/80 group-hover/info:text-[#F4C84A] transition-colors" />
                                                         <span>Chi tiết</span>
                                                     </Link>
 
-                                                    <FavoriteButton movieData={getFavoriteData(movie)} initialIsFavorite={false} size="lg" />
+                                                    <div className="h-14 w-14 flex items-center justify-center rounded-full glass hover:bg-white/10 border border-white/10 transition-all hover:scale-110 cursor-pointer backdrop-blur-md">
+                                                        <FavoriteButton movieData={getFavoriteData(movie)} initialIsFavorite={false} size="lg" />
+                                                    </div>
                                                 </div>
                                             </div>
 
                                             {/* Right: 3D Tilt Poster Card */}
-                                            <div className="col-span-7 flex justify-end pl-12 perspective-1000">
-                                                <div className="relative w-[360px] aspect-[2/3] rounded-[32px] overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] ring-1 ring-white/10 group/poster transition-transform duration-500 ease-out hover:[transform:rotateY(-5deg)_rotateX(5deg)_scale(1.02)] animate-[float_6s_ease-in-out_infinite]">
+                                            {/* Only show on very large screens to maintain layout balance */}
+                                            <div className="col-span-12 xl:col-span-7 lg:col-span-6 hidden lg:flex justify-end pr-8 xl:pr-16 perspective-1000">
+                                                <div className="relative w-[340px] xl:w-[400px] aspect-[2/3] rounded-[32px] overflow-hidden shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)] ring-1 ring-white/10 group/poster transition-transform duration-700 ease-out hover:[transform:rotateY(-8deg)_rotateX(5deg)_scale(1.02)] z-30">
                                                     <Image
                                                         src={posterImg}
                                                         alt={movie.name}
                                                         fill
-                                                        className="object-cover"
+                                                        className="object-cover transition-transform duration-700 group-hover/poster:scale-110"
                                                         priority={index === 0}
                                                     />
                                                     {/* Shine Effect */}
-                                                    <div className="absolute inset-0 bg-gradient-to-tr from-white/20 via-transparent to-transparent opacity-0 group-hover/poster:opacity-100 transition-opacity duration-500" />
+                                                    <div className="absolute inset-0 bg-gradient-to-tr from-white/20 via-transparent to-transparent opacity-0 group-hover/poster:opacity-100 transition-opacity duration-700" />
                                                 </div>
                                             </div>
 
@@ -334,24 +330,24 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                 </div>
 
                 {/* Navigation Arrows (Desktop) */}
-                <button onClick={scrollPrev} className="absolute left-8 top-1/2 -translate-y-1/2 z-50 w-14 h-14 rounded-full glass flex items-center justify-center text-white/50 hover:text-black hover:bg-[#F4C84A] hover:border-[#F4C84A] hover:scale-110 transition-all duration-300 group">
+                <button onClick={scrollPrev} className="absolute left-8 top-1/2 -translate-y-1/2 z-50 w-16 h-16 rounded-full glass flex items-center justify-center text-white/40 hover:text-black hover:bg-[#F4C84A] hover:border-[#F4C84A] hover:scale-110 transition-all duration-300 group">
                     <ChevronRight className="w-8 h-8 rotate-180 group-hover:scale-90 transition-transform" />
                 </button>
-                <button onClick={scrollNext} className="absolute right-8 top-1/2 -translate-y-1/2 z-50 w-14 h-14 rounded-full glass flex items-center justify-center text-white/50 hover:text-black hover:bg-[#F4C84A] hover:border-[#F4C84A] hover:scale-110 transition-all duration-300 group">
+                <button onClick={scrollNext} className="absolute right-8 top-1/2 -translate-y-1/2 z-50 w-16 h-16 rounded-full glass flex items-center justify-center text-white/40 hover:text-black hover:bg-[#F4C84A] hover:border-[#F4C84A] hover:scale-110 transition-all duration-300 group">
                     <ChevronRight className="w-8 h-8 group-hover:scale-90 transition-transform" />
                 </button>
 
                 {/* Dots Indicator */}
-                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 flex gap-3">
+                <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-50 flex gap-4">
                     {heroMovies.slice(0, 10).map((_, idx) => (
                         <button
                             key={idx}
                             onClick={() => scrollTo(idx)}
                             className={cn(
-                                "h-1.5 rounded-full transition-all duration-300",
+                                "h-2 rounded-full transition-all duration-500 ease-out",
                                 idx === selectedIndex
-                                    ? "w-8 bg-[#F4C84A] shadow-[0_0_10px_#F4C84A]"
-                                    : "w-1.5 bg-white/20 hover:bg-white/40"
+                                    ? "w-12 bg-[#F4C84A] shadow-[0_0_15px_#F4C84A]"
+                                    : "w-2 bg-white/20 hover:bg-white/50"
                             )}
                         />
                     ))}
