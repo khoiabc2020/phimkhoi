@@ -37,68 +37,89 @@ export default function WatchEngagementBar({
 
     const handleShare = () => {
         if (navigator.share) {
-            navigator.share({
-                title: movie.name,
-                url: window.location.href,
-            });
+            navigator.share({ title: movie.name, url: window.location.href });
         }
     };
 
     return (
-        <div className="flex flex-col w-full bg-[#1a1a1a] rounded-xl border border-white/5 overflow-hidden">
-            {/* Control Bar (Black) */}
-            <div className="flex flex-wrap items-center justify-between gap-y-3 py-3 px-4 bg-black/50 border-b border-white/5">
+        <div className="rounded-2xl border border-white/[0.06] overflow-hidden"
+            style={{ background: 'rgba(15,18,26,0.9)', backdropFilter: 'blur(20px)' }}>
 
-                {/* Left Actions */}
+            {/* Controls bar */}
+            <div className="flex flex-wrap items-center justify-between gap-y-3 py-3 px-5 border-b border-white/[0.05]"
+                style={{ background: 'rgba(0,0,0,0.3)' }}>
+
+                {/* Left */}
                 <div className="flex items-center gap-4">
                     <FavoriteButton
                         movieData={movieData}
                         initialIsFavorite={isFavorite}
                         size="sm"
-                        className="!bg-transparent !border-0 text-gray-400 hover:text-[#fbbf24] flex items-center gap-2 !w-auto !h-auto !p-0"
+                        className="!bg-transparent !border-0 text-gray-400 hover:text-yellow-400 flex items-center gap-2 !w-auto !h-auto !p-0 transition-colors"
                     />
                     <div className="h-4 w-[1px] bg-white/10" />
-                    <button type="button" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-xs font-bold uppercase tracking-wide">
-                        <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Thêm vào</span>
+                    <button type="button" className="flex items-center gap-2 text-gray-400 hover:text-white transition-all text-xs font-semibold uppercase tracking-wide group">
+                        <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+                        <span className="hidden sm:inline">Thêm vào</span>
                     </button>
                     <div className="h-4 w-[1px] bg-white/10" />
-                    <div className="flex items-center gap-2 text-xs font-bold text-gray-500">
-                        Chuyển tập <span className="px-1.5 py-0.5 bg-[#fbbf24] text-black rounded text-[10px]">ON</span>
+                    <div className="flex items-center gap-2 text-xs font-semibold text-gray-500">
+                        Chuyển tập
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold"
+                            style={{ background: 'rgba(251,191,36,0.15)', color: '#fbbf24', border: '1px solid rgba(251,191,36,0.3)' }}>
+                            ON
+                        </span>
                     </div>
                 </div>
 
                 {/* Center Toggles */}
-                <div className="hidden md:flex items-center gap-6">
-                    <button onClick={toggleTheater} className={cn("flex items-center gap-2 text-xs font-bold transition-colors", isTheaterMode ? "text-[#fbbf24]" : "text-gray-400 hover:text-white")}>
-                        <Monitor className="w-4 h-4" /> Rạp phim <span className={cn("px-1.5 py-0.5 rounded text-[10px]", isTheaterMode ? "bg-[#fbbf24] text-black" : "bg-white/10 text-gray-400")}>{isTheaterMode ? "ON" : "OFF"}</span>
+                <div className="hidden md:flex items-center gap-5">
+                    <button onClick={toggleTheater}
+                        className={cn("flex items-center gap-2 text-xs font-semibold transition-all", isTheaterMode ? "text-yellow-400" : "text-gray-400 hover:text-white")}>
+                        <Monitor className="w-4 h-4" /> Rạp phim
+                        <span className={cn("px-1.5 py-0.5 rounded text-[10px] font-bold border", isTheaterMode
+                            ? "bg-yellow-400/15 text-yellow-400 border-yellow-400/30"
+                            : "bg-white/5 text-gray-500 border-white/10")}>
+                            {isTheaterMode ? "ON" : "OFF"}
+                        </span>
                     </button>
-                    <button onClick={toggleLight} className={cn("flex items-center gap-2 text-xs font-bold transition-colors", isLightOff ? "text-[#fbbf24]" : "text-gray-400 hover:text-white")}>
-                        <Moon className="w-4 h-4" /> Đèn <span className={cn("px-1.5 py-0.5 rounded text-[10px]", isLightOff ? "bg-[#fbbf24] text-black" : "bg-white/10 text-gray-400")}>{isLightOff ? "OFF" : "ON"}</span>
+                    <button onClick={toggleLight}
+                        className={cn("flex items-center gap-2 text-xs font-semibold transition-all", isLightOff ? "text-yellow-400" : "text-gray-400 hover:text-white")}>
+                        <Moon className="w-4 h-4" /> Đèn
+                        <span className={cn("px-1.5 py-0.5 rounded text-[10px] font-bold border", isLightOff
+                            ? "bg-yellow-400/15 text-yellow-400 border-yellow-400/30"
+                            : "bg-white/5 text-gray-500 border-white/10")}>
+                            {isLightOff ? "OFF" : "ON"}
+                        </span>
                     </button>
-                    <button className="flex items-center gap-2 text-xs font-bold text-gray-400 hover:text-white transition-colors">
-                        <Zap className="w-4 h-4" /> Anti Lag <span className="px-1.5 py-0.5 bg-[#fbbf24] text-black rounded text-[10px]">ON</span>
+                    <button className="flex items-center gap-2 text-xs font-semibold text-gray-400 hover:text-white transition-all">
+                        <Zap className="w-4 h-4" /> Anti Lag
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-yellow-400/15 text-yellow-400 border border-yellow-400/30">ON</span>
                     </button>
                 </div>
 
-                {/* Right Actions */}
+                {/* Right */}
                 <div className="flex items-center gap-4 text-gray-400">
-                    <button type="button" onClick={handleShare} className="flex items-center gap-2 hover:text-white transition-colors text-xs font-bold">
-                        <Share2 className="w-4 h-4" /> <span className="hidden sm:inline">Chia sẻ</span>
+                    <button type="button" onClick={handleShare} className="flex items-center gap-2 hover:text-white transition-all text-xs font-semibold group">
+                        <Share2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                        <span className="hidden sm:inline">Chia sẻ</span>
                     </button>
-                    <button type="button" className="hidden sm:flex items-center gap-2 hover:text-white transition-colors text-xs font-bold">
-                        <Users className="w-4 h-4" /> <span className="hidden lg:inline">Xem chung</span>
+                    <button type="button" className="hidden sm:flex items-center gap-2 hover:text-white transition-all text-xs font-semibold">
+                        <Users className="w-4 h-4" />
+                        <span className="hidden lg:inline">Xem chung</span>
                     </button>
-                    <button type="button" className="hover:text-red-500 transition-colors flex items-center gap-2" title="Báo lỗi">
-                        <Flag className="w-4 h-4" /> <span className="hidden lg:inline text-xs font-bold">Báo lỗi</span>
+                    <button type="button" className="hover:text-red-400 transition-all flex items-center gap-2">
+                        <Flag className="w-4 h-4" />
+                        <span className="hidden lg:inline text-xs font-semibold">Báo lỗi</span>
                     </button>
                 </div>
             </div>
 
-            {/* Movie Info Section (Below Bar) - Matches Screenshot */}
-            <div className="flex flex-col md:flex-row gap-6 p-4 bg-[#111]">
-                {/* Poster - Small Vertical */}
+            {/* Movie Info - Premium layout */}
+            <div className="flex flex-col md:flex-row gap-5 p-5">
+                {/* Poster */}
                 <div className="flex-shrink-0">
-                    <div className="relative w-16 h-24 md:w-20 md:h-28 rounded overflow-hidden shadow-lg ring-1 ring-white/10">
+                    <div className="relative w-16 h-24 md:w-20 md:h-[112px] rounded-xl overflow-hidden shadow-xl ring-1 ring-white/10 transition-transform hover:scale-105 duration-300">
                         <Image
                             src={getImageUrl(movie.poster_url || movie.thumb_url)}
                             alt={movie.name}
@@ -108,45 +129,50 @@ export default function WatchEngagementBar({
                     </div>
                 </div>
 
-                {/* Info Text */}
-                <div className="flex-grow flex flex-col justify-center">
-                    <h1 className="text-xl md:text-2xl font-bold text-white mb-1.5 leading-tight">
+                {/* Title & Meta */}
+                <div className="flex-grow flex flex-col justify-center min-w-0">
+                    <h1 className="text-2xl md:text-[28px] font-bold text-white mb-2 leading-tight tracking-tight">
                         {movie.name}
                     </h1>
-                    <div className="flex flex-wrap items-center gap-2 text-sm text-gray-400 mb-2">
-                        <span className="text-[#fbbf24] font-medium">{movie.origin_name}</span>
-                        <span className="w-1 h-1 rounded-full bg-gray-600" />
-                        <span>{movie.year}</span>
-                        <span className="w-1 h-1 rounded-full bg-gray-600" />
-                        <span className="px-1.5 py-0.5 bg-white/10 rounded text-xs text-white">{movie.quality}</span>
-                        <span className="w-1 h-1 rounded-full bg-gray-600" />
-                        <span className="text-gray-400">{movie.time || "N/A"}</span>
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-400 mb-3">
+                        <span className="text-yellow-400 font-medium text-sm">{movie.origin_name}</span>
+                        {movie.year && <><span className="w-1 h-1 rounded-full bg-gray-600" /><span>{movie.year}</span></>}
+                        {movie.quality && <><span className="w-1 h-1 rounded-full bg-gray-600" />
+                            <span className="text-xs px-2 py-0.5 rounded-md font-semibold text-white"
+                                style={{ background: 'rgba(255,255,255,0.1)' }}>{movie.quality}</span></>}
+                        {movie.time && <><span className="w-1 h-1 rounded-full bg-gray-600" /><span className="text-sm text-gray-400">{movie.time}</span></>}
                     </div>
+                    {/* Genre chips - glass style */}
                     <div className="flex flex-wrap gap-2">
-                        {movie.category?.slice(0, 3).map((c: any) => (
-                            <span key={c.id} className="text-xs px-2 py-0.5 rounded-full border border-white/10 text-gray-400 hover:text-white hover:border-white/30 cursor-pointer transition-colors">
+                        {movie.category?.slice(0, 4).map((c: any) => (
+                            <span key={c.id}
+                                className="text-xs px-3 py-1 rounded-full text-gray-300 cursor-pointer transition-all hover:text-white border border-white/[0.08] hover:border-white/20"
+                                style={{ background: 'rgba(255,255,255,0.05)' }}>
                                 {c.name}
                             </span>
                         ))}
                     </div>
                 </div>
 
-                {/* Right Stats/Actions */}
-                <div className="flex items-center gap-3 self-center md:self-auto pt-4 md:pt-0 border-t md:border-t-0 border-white/5 w-full md:w-auto justify-center md:justify-end">
-                    <button className="flex flex-col items-center justify-center min-w-[60px] h-14 bg-[#1f2937]/50 hover:bg-[#1f2937] rounded-lg transition-colors group px-3">
-                        <Star className="w-5 h-5 text-gray-400 group-hover:text-[#fbbf24] mb-1" />
-                        <span className="text-[10px] text-gray-400 font-bold">Đánh giá</span>
+                {/* Stats buttons */}
+                <div className="flex items-center gap-3 self-center pt-4 md:pt-0 border-t md:border-t-0 border-white/[0.05] w-full md:w-auto justify-center md:justify-end shrink-0">
+                    <button className="flex flex-col items-center justify-center min-w-[64px] h-14 rounded-xl transition-all group hover:scale-105 px-3 border border-white/[0.06]"
+                        style={{ background: 'rgba(255,255,255,0.04)' }}>
+                        <Star className="w-5 h-5 text-gray-400 group-hover:text-yellow-400 mb-1 transition-colors" />
+                        <span className="text-[10px] text-gray-400 font-semibold">Đánh giá</span>
                     </button>
-                    <button className="flex flex-col items-center justify-center min-w-[60px] h-14 bg-[#1f2937]/50 hover:bg-[#1f2937] rounded-lg transition-colors group px-3">
-                        <MessageSquare className="w-5 h-5 text-gray-400 group-hover:text-blue-400 mb-1" />
-                        <span className="text-[10px] text-gray-400 font-bold">Bình luận</span>
+                    <button className="flex flex-col items-center justify-center min-w-[64px] h-14 rounded-xl transition-all group hover:scale-105 px-3 border border-white/[0.06]"
+                        style={{ background: 'rgba(255,255,255,0.04)' }}>
+                        <MessageSquare className="w-5 h-5 text-gray-400 group-hover:text-blue-400 mb-1 transition-colors" />
+                        <span className="text-[10px] text-gray-400 font-semibold">Bình luận</span>
                     </button>
-                    <div className="flex flex-col items-center justify-center min-w-[120px] h-14 bg-gradient-to-r from-blue-600/20 to-blue-500/20 border border-blue-500/30 rounded-lg px-4">
-                        <div className="flex items-center gap-1.5 text-blue-400 font-bold text-lg leading-none">
-                            <Star className="w-4 h-4 fill-blue-400" />
+                    <div className="flex flex-col items-center justify-center min-w-[110px] h-14 rounded-xl px-4 border"
+                        style={{ background: 'rgba(59,130,246,0.1)', borderColor: 'rgba(59,130,246,0.2)' }}>
+                        <div className="flex items-center gap-1.5 font-bold text-lg leading-none" style={{ color: '#60a5fa' }}>
+                            <Star className="w-4 h-4 fill-current" />
                             {movie.vote_average ? movie.vote_average.toFixed(1) : "N/A"}
                         </div>
-                        <span className="text-[10px] text-blue-300/70 mt-1 font-medium uppercase tracking-wider">Điểm tín nhiệm</span>
+                        <span className="text-[10px] mt-1 font-medium uppercase tracking-wider" style={{ color: 'rgba(147,197,253,0.6)' }}>Điểm tín nhiệm</span>
                     </div>
                 </div>
             </div>

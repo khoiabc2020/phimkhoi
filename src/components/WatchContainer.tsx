@@ -39,15 +39,24 @@ export default function WatchContainer({
                 />
             )}
 
-            {/* Player Container */}
+            {/* Cinematic Glow Aura */}
+            <div className="absolute -inset-8 pointer-events-none z-0"
+                style={{
+                    background: 'radial-gradient(ellipse at center, rgba(251,191,36,0.06) 0%, transparent 65%)',
+                    filter: 'blur(20px)',
+                }} />
+
+            {/* Player Card */}
             <div className={cn(
-                "relative transition-all duration-500 z-50",
-                isTheaterMode ? "w-full max-w-[100vw] -mx-4 lg:-mx-8" : "w-full"
+                "relative z-10 transition-all duration-500",
+                isTheaterMode ? "w-full max-w-[100vw] -mx-4 lg:-mx-10" : "w-full"
             )}>
+                {/* Glass Border Ring */}
                 <div className={cn(
-                    "bg-black rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 relative group",
+                    "rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.6)] ring-1 ring-white/[0.08]",
                     isTheaterMode ? "aspect-video md:aspect-[21/9] h-[80vh]" : "aspect-video"
-                )}>
+                )}
+                    style={{ background: 'rgba(15,18,26,0.95)' }}>
                     {currentEpisode ? (
                         <VideoPlayer
                             url={currentEpisode.link_embed}
@@ -58,15 +67,18 @@ export default function WatchContainer({
                             initialProgress={initialProgress}
                         />
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-zinc-900 text-white">
-                            <p>Tập phim không khả dụng.</p>
+                        <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-white gap-3">
+                            <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center">
+                                <span className="text-3xl">🎬</span>
+                            </div>
+                            <p className="text-gray-400 text-sm">Tập phim không khả dụng.</p>
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* Engagement Bar & Info */}
-            <div className="mt-4">
+            {/* Engagement Bar */}
+            <div className="mt-4 relative z-10">
                 <WatchEngagementBar
                     movie={movie}
                     isTheaterMode={isTheaterMode}
