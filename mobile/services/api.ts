@@ -190,3 +190,45 @@ export const saveHistory = async (slug: string, episode: string, time: number, d
         console.error("Error saving history:", error);
     }
 };
+
+// TMDB Integration
+const TMDB_API_KEY = "dae5842ebb3cb34367b94550aae10cf3"; // Direct use for mobile to avoid env issues
+
+export const getTMDBRating = async (query: string, year?: number, type: 'movie' | 'tv' = 'movie') => {
+    try {
+        if (!query) return null;
+        const searchUrl = `https://api.themoviedb.org/3/search/${type}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&year=${year}`;
+        const res = await fetch(searchUrl);
+        const data = await res.json();
+        if (data.results?.length > 0) {
+            return data.results[0].vote_average;
+        }
+        return null;
+    } catch (error) {
+        console.error("TMDB Rating Error:", error);
+        return null;
+    }
+};
+
+export const getTMDBCast = async (query: string, year?: number, type: 'movie' | 'tv' = 'movie') => {
+    try {
+        if (!query) return [];
+        // 1. Search for ID
+        const searchUrl = `https://api.themoviedb.org/3/search/${type}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&year=${year}`;
+        const searchRes = await fetch(searchUrl);
+        const searchData = await searchRes.json();
+
+        if (searchData.results?.length > 0) {
+            const id = searchData.results[0].id;
+            // 2. Get Credits
+            const creditUrl = `https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${TMDB_API_KEY}`;
+            const creditRes = await fetch(creditUrl);
+            const creditData = await creditRes.json();
+            return creditData.cast || [];
+        }
+        return [];
+    } catch (error) {
+        console.error("TMDB Cast Error:", error);
+        return [];
+    }
+};

@@ -109,16 +109,16 @@ export default async function Home() {
           <QuickNav />
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
 
           {/* MAIN CONTENT (Left - 9 cols) */}
-          <div className="xl:col-span-9 space-y-12">
+          <div className="xl:col-span-9 space-y-20">
 
             {/* Continue Watching */}
             <ContinueWatchingRow />
 
             {/* Hot Sections */}
-            <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
+            <Suspense fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
               <AsyncMovieRow title="Phim Chiếu Rạp Mới" slug="phim-chieu-rap" />
             </Suspense>
 
@@ -161,7 +161,7 @@ export default async function Home() {
           </div>
 
           {/* SIDEBAR (Right - 3 cols) */}
-          <div className="xl:col-span-3 space-y-8">
+          <div className="xl:col-span-3 space-y-12">
 
             {/* Top Trending - Phim Bộ (Series) */}
             <TopTrending

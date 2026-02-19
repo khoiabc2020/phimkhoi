@@ -96,73 +96,81 @@ export default function MovieCard({ movie, orientation = 'portrait' }: { movie: 
         <>
             <div
                 ref={cardRef}
-                className="relative block h-full w-full cursor-pointer z-10"
+                className="relative block h-full w-full cursor-pointer z-10 group/static-card card-hover-3d"
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
-                <div className={`relative ${orientation === 'landscape' ? 'aspect-video' : 'aspect-[2/3]'} rounded-md overflow-hidden bg-[#1a1a1a] group/static-card`}>
+                <div className={`relative ${orientation === 'landscape' ? 'aspect-video' : 'aspect-[2/3]'} rounded-2xl overflow-hidden bg-[#1a1a1a] shadow-lg`}>
                     <Link href={`/phim/${movie.slug}`} className="block h-full w-full absolute inset-0 z-0">
                         <Image
                             src={displayPoster || "/placeholder.jpg"}
                             alt={movie.name}
                             fill
-                            className={`object-cover transition-opacity duration-500 ${tmdbData ? "opacity-100" : "opacity-95"}`}
+                            className={`object-cover transition-transform duration-700 ease-out group-hover/static-card:scale-110 ${tmdbData ? "opacity-100" : "opacity-95"}`}
                             loading="lazy"
                             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 20vw, 15vw"
                         />
+                        {/* Gradient Overlay for Text Readability */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
                     </Link>
 
-                    {/* Status/Episode Badge */}
-                    <div className="absolute top-2 left-2 flex flex-col gap-1 z-10 pointer-events-none">
+                    {/* Status/Episode Badge - Apple Style: Small, Blur, Clean */}
+                    <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-10 pointer-events-none">
                         {movie.quality && (
-                            <span className="bg-black/60 backdrop-blur-md text-white text-[9px] font-bold px-1.5 py-0.5 rounded border border-white/10">
+                            <span className="bg-black/40 backdrop-blur-md border border-white/10 text-white/90 text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wide">
                                 {movie.quality}
                             </span>
                         )}
                         {movie.episode_current && (
-                            <span className="bg-primary/90 text-black text-[9px] font-bold px-1.5 py-0.5 rounded">
+                            <span className="bg-primary/90 text-black text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">
                                 {movie.episode_current}
                             </span>
                         )}
                     </div>
 
-                    {/* Touch Friendly Favorite Button - Visible on Touch or Hover */}
+                    {/* Touch Friendly Favorite Button */}
                     <div className={`absolute top-2 right-2 z-20 ${isTouchDevice ? 'opacity-100' : 'opacity-0 group-hover/static-card:opacity-100'} transition-opacity duration-200`}>
-                        <FavoriteButton
-                            movieData={{
-                                movieId: movie._id,
-                                movieSlug: movie.slug,
-                                movieName: movie.name,
-                                movieOriginName: movie.origin_name,
-                                moviePoster: movie.poster_url,
-                                movieYear: movie.year,
-                                movieQuality: movie.quality,
-                                movieCategories: movie.category?.map(c => c.name) || []
-                            }}
-                            initialIsFavorite={false} // Would need real state but for list view false is safer or pass in
-                            size="sm"
-                        />
+                        <div className="bg-black/20 backdrop-blur-md rounded-full p-1">
+                            <FavoriteButton
+                                movieData={{
+                                    movieId: movie._id,
+                                    movieSlug: movie.slug,
+                                    movieName: movie.name,
+                                    movieOriginName: movie.origin_name,
+                                    moviePoster: movie.poster_url,
+                                    movieYear: movie.year,
+                                    movieQuality: movie.quality,
+                                    movieCategories: movie.category?.map(c => c.name) || []
+                                }}
+                                initialIsFavorite={false}
+                                size="sm"
+                            />
+                        </div>
                     </div>
 
-                    {/* Rating Badge (If TMDB available) - Moved down slightly if button is present */}
+                    {/* Rating Badge - Minimalist */}
                     {displayRating && (
-                        <div className="absolute bottom-2 right-2 z-10 animate-in fade-in duration-300 pointer-events-none">
-                            <span className="bg-yellow-500/90 text-black text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5 shadow-sm">
-                                <Star size={8} fill="currentColor" /> {displayRating}
-                            </span>
+                        <div className="absolute top-2.5 right-2.5 z-10 pointer-events-none">
+                            <div className="flex items-center gap-1 bg-black/40 backdrop-blur-md border border-white/10 px-1.5 py-0.5 rounded-md">
+                                <Star size={10} fill="#F4C84A" className="text-[#F4C84A]" />
+                                <span className="text-white text-[10px] font-bold">{displayRating}</span>
+                            </div>
                         </div>
                     )}
                 </div>
 
-                <div className="mt-2 space-y-0.5">
-                    <h3 className="text-white font-bold text-[11px] truncate group-hover:text-primary transition-colors leading-tight">
+                <div className="mt-3 space-y-1 px-1">
+                    <h3 className="text-white font-semibold text-[15px] truncate group-hover/static-card:text-primary transition-colors leading-tight">
                         {movie.name}
                     </h3>
-                    {movie.origin_name && (
-                        <p className="text-gray-400 text-[10px] truncate font-medium group-hover:text-white/80 transition-colors">
-                            {movie.origin_name}
-                        </p>
-                    )}
+                    <div className="flex items-center justify-between">
+                        {movie.origin_name && (
+                            <p className="text-white/40 text-[12px] truncate font-medium max-w-[80%]">
+                                {movie.origin_name}
+                            </p>
+                        )}
+                        <span className="text-white/30 text-[11px] font-medium">{movie.year || 2024}</span>
+                    </div>
                 </div>
             </div>
 

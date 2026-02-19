@@ -134,115 +134,139 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                     </div>
                 </Link>
 
-                {/* Center: Search Pill (Desktop) */}
-                <div className="hidden lg:flex flex-1 justify-center max-w-xl mx-auto">
-                    <div className="relative group/search w-full max-w-[420px]">
-                        <div className={cn(
-                            "relative flex items-center h-[44px] bg-white/5 border border-white/10 rounded-[22px] px-4 transition-all duration-300 overflow-hidden",
-                            "focus-within:bg-[#0B0D12] focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/50 focus-within:shadow-[0_0_30px_-5px_rgba(244,200,74,0.3)]",
-                            "hover:bg-white/10 hover:border-white/20"
-                        )}>
-                            <Search className="w-4 h-4 text-white/40 group-focus-within/search:text-primary transition-colors duration-300" />
-                            <input
-                                type="text"
-                                placeholder="Tìm kiếm phim, diễn viên..."
-                                className="w-full bg-transparent border-none outline-none text-white text-[15px] ml-3 placeholder:text-gray-500 font-medium h-full"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                            />
-                            {searchQuery && (
-                                <button onClick={() => setSearchQuery("")} className="p-1 rounded-full hover:bg-white/20 text-gray-400 hover:text-white transition-colors">
-                                    <X className="w-3 h-3" />
-                                </button>
-                            )}
-                        </div>
-                    </div>
-                </div>
+            </Link>
 
-                {/* Right: Actions */}
-                <div className="flex items-center gap-3 lg:gap-5 shrink-0">
-
-                    {/* Desktop Nav Links (Minimal) */}
-                    <nav className="hidden xl:flex items-center gap-6 mr-4">
-                        <Link href="/" className="text-[14px] font-medium text-gray-300 hover:text-white transition-colors">Trang chủ</Link>
-                        <Link href="/danh-sach/phim-le" className="text-[14px] font-medium text-gray-300 hover:text-white transition-colors">Phim lẻ</Link>
-                        <Link href="/danh-sach/phim-bo" className="text-[14px] font-medium text-gray-300 hover:text-white transition-colors">Phim bộ</Link>
-                        <div className="h-4 w-[1px] bg-white/10" />
-                    </nav>
-
-                    {/* Mobile Search Toggle */}
-                    <button
-                        onClick={() => setIsSearchOpen(!isSearchOpen)}
-                        className="lg:hidden p-2 text-white hover:bg-white/10 rounded-full transition-colors"
+            <nav className="hidden md:flex items-center gap-8">
+                {[
+                    { name: "Trang chủ", href: "/" },
+                    { name: "Phim lẻ", href: "/danh-sach/phim-le" },
+                    { name: "Phim bộ", href: "/danh-sach/phim-bo" },
+                    { name: "Hoạt hình", href: "/danh-sach/hoat-hinh" },
+                ].map((item) => (
+                    <Link
+                        key={item.href}
+                        href={item.href}
+                        className="text-sm font-medium text-white/70 hover:text-white hover:text-glow transition-all"
                     >
-                        <Search className="w-5 h-5" />
-                    </button>
+                        {item.name}
+                    </Link>
+                ))}
+            </nav>
+        </div>
 
-                    {/* History & Notification (Desktop) */}
-                    <div className="hidden lg:flex items-center gap-3">
-                        <Link href="/lich-su-xem" className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-all group" title="Lịch sử xem">
-                            <Clock className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                        </Link>
-                        {/* Removed Download Button from Header (too noisy for iOS style) or keep it subtle? User said "Quá nhiều badge to" -> remove/simplify */}
-                        {/* Making it an icon only or very subtle pill */}
-                        <a href="/app-release.apk" target="_blank" download className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 hover:from-indigo-500/40 hover:to-purple-500/40 border border-indigo-500/30 flex items-center justify-center text-indigo-400 hover:text-indigo-300 transition-all group" title="Tải App">
-                            <Download className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />
-                        </a>
-                    </div>
+                {/* Right: Search & Actions */ }
+    <div className="flex items-center gap-6">
+        {/* Search Bar - iOS Style Pill */}
+        <form onSubmit={handleSearch} className="hidden md:flex items-center relative group">
+            <div className={`absolute inset-0 bg-primary/5 blur-lg rounded-full transition-opacity duration-300 ${searchQuery ? 'opacity-100' : 'opacity-0'}`} />
+            <div className="relative flex items-center bg-white/[0.08] hover:bg-white/[0.12] border border-white/[0.08] rounded-full px-4 py-2 w-64 focus-within:w-80 focus-within:border-primary/50 focus-within:bg-black/40 transition-all duration-300">
+                <Search className="w-4 h-4 text-white/50 group-focus-within:text-primary transition-colors" />
+                <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Tìm kiếm phim, diễn viên..."
+                    className="bg-transparent border-none outline-none text-sm text-white ml-3 w-full placeholder:text-white/30"
+                />
+            </div>
+        </form>
 
-                    {/* User Profile */}
-                    {session ? (
-                        <div className="relative group/user">
-                            <Link href="/thong-tin-tai-khoan" className="block">
-                                <div className="w-10 h-10 rounded-full p-[2px] border border-white/10 hover:border-primary/50 transition-colors bg-white/5">
-                                    <img
-                                        src={session.user?.image || `https://ui-avatars.com/api/?name=${session.user?.name}`}
-                                        alt="User"
-                                        className="w-full h-full object-cover rounded-full"
-                                    />
-                                </div>
-                            </Link>
+        <div className="flex items-center gap-4">
+            {/* History Button */}
+            <Link href="/lich-su-xem" className="hidden md:flex w-10 h-10 items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.08] transition-all hover:scale-105 active:scale-95" title="Lịch sử xem">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white/80"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /><path d="M12 7v5l4 2" /></svg>
+            </Link>
+
+            {/* Watchlist Button */}
+            <Link href="/phim-yeu-thich" className="hidden md:flex w-10 h-10 items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.08] transition-all hover:scale-105 active:scale-95" title="Phim yêu thích">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white/80"><path d="M19 14c1.49-1.28 3.6-2.34 2.44-5.1a6 6 0 0 0-16 4.7 2.45 2.45 0 0 0 1.05 2.05" /><path d="M12 21.05a9 9 0 0 1-6.5-2.6 15 15 0 0 1 7.2-14.8" /></svg>
+            </Link>
+
+            {session ? (
+                <div className="relative group">
+                    <button className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/10 hover:border-primary/50 transition-all p-0.5">
+                        <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center text-sm font-bold text-white">
+                            {session.user?.name?.[0]?.toUpperCase() || "U"}
                         </div>
-                    ) : (
-                        <Link
-                            href="/login"
-                            className="hidden lg:flex items-center gap-2 bg-[#F4C84A] text-black px-6 py-2 rounded-full text-[14px] font-bold hover:bg-[#ffe58a] transition-all shadow-[0_0_20px_-5px_rgba(244,200,74,0.4)] hover:shadow-[0_0_30px_-5px_rgba(244,200,74,0.6)] hover:scale-105 active:scale-95"
-                        >
-                            <span>Đăng nhập</span>
+                    </button>
+                    {/* Dropdown Menu */}
+                    <div className="absolute right-0 top-full mt-2 w-56 glass-panel p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right">
+                        <div className="px-3 py-2 border-b border-white/10 mb-2">
+                            <p className="text-sm font-medium text-white">{session.user?.name}</p>
+                            <p className="text-xs text-white/50 truncate">{session.user?.email}</p>
+                        </div>
+                        <Link href="/thong-tin-tai-khoan" className="flex items-center gap-2 px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                            <User className="w-4 h-4" /> Tài khoản
                         </Link>
-                    )}
+                        <Link href="/admin" className="first-letter:flex items-center gap-2 px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10 10 10 0 0 0-10-10Z" /><path d="m9 12 2 2 4-4" /></svg>
+                            Quản trị
+                        </Link>
+                        <button
+                            onClick={() => signOut()}
+                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors mt-1"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" x2="9" y1="12" y2="12" /></svg>
+                            Đăng xuất
+                        </button>
+                    </div>
                 </div>
-            </div>
+            ) : (
+                <Link href="/login" className="btn-ios bg-white text-black px-6 py-2 rounded-full font-bold text-sm hover:bg-white/90">
+                    Đăng nhập
+                </Link>
+            )}
 
-            {/* Mobile Search Overlay */}
-            <div className={cn(
-                "lg:hidden absolute top-auto left-0 right-0 bg-[#0B0D12] border-b border-white/10 p-4 transition-all duration-300 overflow-hidden",
-                isSearchOpen ? "h-auto opacity-100 visible" : "h-0 opacity-0 invisible"
-            )}>
-                <div className="relative flex items-center h-[40px] bg-white/10 rounded-full px-4">
-                    <Search className="w-4 h-4 text-gray-400" />
-                    <input
-                        type="text"
-                        placeholder="Tìm kiếm..."
-                        className="w-full bg-transparent border-none outline-none text-white text-sm ml-3"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                    />
-                </div>
-            </div>
+            <button
+                className="md:hidden p-2 text-white"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+                {isMobileMenuOpen ? <X /> : <Menu />}
+            </button>
+        </div>
+    </div>
+            </div >
 
-            {/* Mobile Menu */}
-            <MobileMenu
-                isOpen={isMobileMenuOpen}
-                onClose={() => setIsMobileMenuOpen(false)}
-                categories={categories}
-                countries={countries}
-            />
-        </header>
+        {/* Mobile Menu Overlay */ }
+    {
+        isMobileMenuOpen && (
+            <div className="absolute top-16 left-0 right-0 glass-panel border-t border-white/10 p-4 md:hidden animate-in slide-in-from-top-4 fade-in duration-200">
+                <form onSubmit={handleSearch} className="mb-6">
+                    <div className="flex items-center bg-white/10 rounded-xl px-4 py-3">
+                        <Search className="w-5 h-5 text-white/50" />
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Tìm kiếm..."
+                            className="bg-transparent border-none outline-none text-white ml-3 w-full"
+                        />
+                    </div>
+                </form>
+                <nav className="flex flex-col gap-2">
+                    {[
+                        { name: "Trang chủ", href: "/" },
+                        { name: "Phim lẻ", href: "/danh-sach/phim-le" },
+                        { name: "Phim bộ", href: "/danh-sach/phim-bo" },
+                        { name: "Hoạt hình", href: "/danh-sach/hoat-hinh" },
+                        { name: "Lịch sử xem", href: "/lich-su-xem" },
+                        { name: "Phim yêu thích", href: "/phim-yeu-thich" },
+                    ].map((item) => (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="px-4 py-3 rounded-xl hover:bg-white/10 text-white font-medium transition-colors"
+                        >
+                            {item.name}
+                        </Link>
+                    ))}
+                </nav>
+            </div>
+        )
+    }
+        </header >
     );
 }
 
 // Helper icons (if not imported from lucide-react, but we imported them so we use them directly)
-// Added imports: Menu, X, ChevronDown, Play, Film, Video, LayoutGrid to top import.
