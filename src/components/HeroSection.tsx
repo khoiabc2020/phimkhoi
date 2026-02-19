@@ -258,7 +258,10 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                                 </div>
 
                                                 {/* Title */}
-                                                <h1 className="text-[36px] 2xl:text-[38px] font-semibold text-white leading-[1.15] tracking-tight drop-shadow-2xl line-clamp-3 mb-3.5">
+                                                <h1
+                                                    className="font-semibold text-white leading-[1.15] tracking-tight drop-shadow-2xl line-clamp-2 mb-3.5"
+                                                    style={{ fontSize: movie.name.length > 40 ? '28px' : movie.name.length > 25 ? '32px' : '36px' }}
+                                                >
                                                     {movie.name}
                                                 </h1>
 

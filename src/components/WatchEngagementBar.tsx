@@ -15,6 +15,14 @@ interface WatchEngagementBarProps {
     toggleLight?: () => void;
 }
 
+// Dynamic font size based on title length (Netflix-style)
+const getTitleSize = (name: string) => {
+    const len = name.length;
+    if (len > 50) return '20px';
+    if (len > 30) return '24px';
+    return '28px';
+};
+
 export default function WatchEngagementBar({
     movie,
     isFavorite = false,
@@ -131,7 +139,10 @@ export default function WatchEngagementBar({
 
                 <div className="flex-grow flex flex-col justify-center min-w-0">
                     {/* Vietnamese title */}
-                    <h1 className="text-[28px] 2xl:text-[30px] font-semibold text-white leading-[1.2] tracking-tight mb-3">
+                    <h1
+                        className="font-semibold text-white leading-[1.2] tracking-tight mb-3 line-clamp-2"
+                        style={{ fontSize: getTitleSize(movie.name) }}
+                    >
                         {movie.name}
                     </h1>
                     {/* English subtitle + meta */}
