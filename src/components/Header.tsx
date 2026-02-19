@@ -185,12 +185,12 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         <button className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white/70 group-hover:text-white hover:bg-white/5 rounded-full transition-all whitespace-nowrap">
                             Quốc gia <ChevronDown className="w-3 h-3 transition-transform group-hover:rotate-180" />
                         </button>
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 w-48 bg-[#0B0D12]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 shadow-[0_20px_40px_rgba(0,0,0,0.5)] flex flex-col gap-1 z-50 mt-2">
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 w-72 bg-[#0B0D12]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 shadow-[0_20px_40px_rgba(0,0,0,0.5)] grid grid-cols-2 gap-1 z-50 mt-2">
                             {displayCountries.map((country) => (
                                 <Link
                                     key={country.slug}
                                     href={`/quoc-gia/${country.slug}`}
-                                    className="block px-3 py-2 rounded-lg hover:bg-white/10 text-sm text-white/80 hover:text-white transition-colors"
+                                    className="block px-3 py-1.5 rounded-lg hover:bg-white/10 text-sm text-white/80 hover:text-white transition-colors truncate"
                                 >
                                     {country.name}
                                 </Link>

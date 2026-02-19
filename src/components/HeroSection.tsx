@@ -258,7 +258,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                                 </div>
 
                                                 {/* Title */}
-                                                <h1 className="text-4xl xl:text-6xl font-black text-white leading-[0.95] tracking-tighter drop-shadow-2xl line-clamp-3">
+                                                <h1 className="text-3xl xl:text-5xl font-bold text-white leading-[1.05] tracking-tight drop-shadow-2xl line-clamp-3">
                                                     {movie.name}
                                                 </h1>
 

@@ -88,7 +88,7 @@ export default function MovieRow({ title, movies, slug, variant = 'default' }: M
     return (
         <div className="space-y-6 group relative py-4">
             <div className="flex items-center justify-between px-4 md:px-12">
-                <h2 className="text-base md:text-xl font-black text-white flex items-center gap-3 uppercase tracking-tight">
+                <h2 className="text-sm md:text-base font-black text-white flex items-center gap-3 uppercase tracking-tight">
                     <span className="w-1.5 h-6 md:h-8 bg-gradient-to-t from-[#fbbf24] to-yellow-200 rounded-sm shadow-[0_0_15px_rgba(251,191,36,0.5)]"></span>
                     <span className="drop-shadow-lg">{title}</span>
                 </h2>
