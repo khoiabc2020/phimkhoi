@@ -225,9 +225,9 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
             </button>
         </div>
     </div>
-            </div >
 
-        {/* Mobile Menu Overlay */ }
+
+    {/* Mobile Menu Overlay */ }
     {
         isMobileMenuOpen && (
             <div className="absolute top-16 left-0 right-0 glass-panel border-t border-white/10 p-4 md:hidden animate-in slide-in-from-top-4 fade-in duration-200">

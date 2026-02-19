@@ -138,9 +138,49 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                 {/* 1. Ambient Background (Blurred Color) */}
                 <div className="absolute inset-0 z-0 overflow-hidden">
                     <Image
-                        src={getHeroImage(activeMovie, 'poster')}
-                        alt="bg"
-                            <div className="flex items-center gap-4 pt-4">
+                        fill
+                        className="object-cover blur-[50px] opacity-50 scale-125"
+                        priority
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D12] via-[#0B0D12]/60 to-transparent" />
+                </div>
+
+                {/* 2. Poster & Content */}
+                <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-20 text-center">
+                    
+                    {/* Poster Card (Small 3D) */}
+                    <Link href={`/xem-phim/${activeMovie.slug}`} className="relative w-[180px] aspect-[2/3] mb-8 rounded-2xl overflow-hidden shadow-[0_20px_40px_-10px_rgba(0,0,0,0.6)] ring-1 ring-white/20 animate-in fade-in zoom-in duration-700">
+                        <Image
+                            src={getHeroImage(activeMovie, 'poster')}
+                            alt={activeMovie.name}
+                            fill
+                            className="object-cover"
+                        />
+                    </Link>
+
+                    {/* Metadata */}
+                    <div className="space-y-4 mb-6">
+                        <h1 className="text-3xl font-black text-white leading-tight drop-shadow-xl text-glow">
+                            {activeMovie.name}
+                        </h1>
+                        <div className="flex items-center justify-center gap-3 text-sm font-medium text-white/80">
+                            <span>{activeMovie.year}</span>
+                            <span className="w-1 h-1 rounded-full bg-white/40" />
+                            <span className="text-[#F4C84A]">{activeRating} ★</span>
+                            <span className="w-1 h-1 rounded-full bg-white/40" />
+                            <span>{activeMovie.quality}</span>
+                        </div>
+                        <div className="flex flex-wrap justify-center gap-2">
+                             {activeMovie.category?.slice(0, 3).map(c => (
+                                <span key={c.id} className="text-xs text-white/60 px-2 py-1 rounded-lg bg-white/5 border border-white/5">
+                                    {c.name}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-4 pt-4">
                                 <Link
                                     href={`/xem-phim/${activeMovie.slug}`}
                                     className="group relative flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-[#fbbf24] to-[#d97706] shadow-[0_0_20px_rgba(251,191,36,0.5)] hover:shadow-[0_0_40px_rgba(251,191,36,0.7)] hover:scale-110 transition-all duration-500 ease-out"
