@@ -218,7 +218,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             <form
                                 onSubmit={handleSearch}
                                 className={cn(
-                                    "relative flex items-center transition-all duration-500 ease-out",
+                                    "relative flex items-center transition-all duration-500 ease-out h-10",
                                     isSearchOpen ? "w-[180px] md:w-60" : "w-10"
                                 )}
                             >
@@ -265,7 +265,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                 e.preventDefault();
                                             }
                                         }}
-                                        className="absolute right-0 top-0 w-10 h-10 flex items-center justify-center z-30 text-white/50 hover:text-white transition-colors"
+                                        className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center z-30 text-white/50 hover:text-white transition-colors"
                                     >
                                         {searchQuery ? <Search className="w-4 h-4" /> : <X className="w-4 h-4" />}
                                     </button>
