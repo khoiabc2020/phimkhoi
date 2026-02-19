@@ -129,24 +129,26 @@ export default function WatchEngagementBar({
                     </div>
                 </div>
 
-                {/* Title & Meta */}
                 <div className="flex-grow flex flex-col justify-center min-w-0">
-                    <h1 className="text-[15px] font-semibold text-white mb-1.5 leading-tight tracking-tight">
+                    {/* Vietnamese title */}
+                    <h1 className="text-[28px] 2xl:text-[30px] font-semibold text-white leading-[1.2] tracking-tight mb-3">
                         {movie.name}
                     </h1>
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-400 mb-3">
-                        <span className="text-yellow-400 font-medium text-sm">{movie.origin_name}</span>
-                        {movie.year && <><span className="w-1 h-1 rounded-full bg-gray-600" /><span>{movie.year}</span></>}
-                        {movie.quality && <><span className="w-1 h-1 rounded-full bg-gray-600" />
-                            <span className="text-xs px-2 py-0.5 rounded-md font-semibold text-white"
-                                style={{ background: 'rgba(255,255,255,0.1)' }}>{movie.quality}</span></>}
-                        {movie.time && <><span className="w-1 h-1 rounded-full bg-gray-600" /><span className="text-sm text-gray-400">{movie.time}</span></>}
+                    {/* English subtitle + meta */}
+                    <div className="flex flex-col gap-1.5 mb-3">
+                        <span className="text-[22px] font-medium text-white/75 leading-snug">{movie.origin_name}</span>
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1" style={{ fontSize: '13px', letterSpacing: '0.3px', opacity: 0.75, color: '#9ca3af' }}>
+                            {movie.year && <><span className="w-1 h-1 rounded-full bg-gray-600" /><span>{movie.year}</span></>}
+                            {movie.quality && <><span className="w-1 h-1 rounded-full bg-gray-600" />
+                                <span className="px-1.5 py-0.5 rounded font-semibold text-white" style={{ background: 'rgba(255,255,255,0.1)', fontSize: '12px' }}>{movie.quality}</span></>}
+                            {movie.time && <><span className="w-1 h-1 rounded-full bg-gray-600" /><span>{movie.time}</span></>}
+                        </div>
                     </div>
-                    {/* Genre chips - glass style */}
-                    <div className="flex flex-wrap gap-2">
+                    {/* Genre chips */}
+                    <div className="flex flex-wrap gap-1.5">
                         {movie.category?.slice(0, 4).map((c: any) => (
                             <span key={c.id}
-                                className="text-xs px-3 py-1 rounded-full text-gray-300 cursor-pointer transition-all hover:text-white border border-white/[0.08] hover:border-white/20"
+                                className="text-[12px] px-2.5 py-1 rounded-full text-gray-300 cursor-pointer transition-all hover:text-white border border-white/[0.08] hover:border-white/20"
                                 style={{ background: 'rgba(255,255,255,0.05)' }}>
                                 {c.name}
                             </span>
