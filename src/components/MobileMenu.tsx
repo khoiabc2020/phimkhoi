@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
-import { Play, Film, Video, LayoutGrid, Download, History, Heart, LogOut, Settings, X, ChevronDown } from "lucide-react";
+import { Play, Film, Video, LayoutGrid, Download, History, Heart, LogOut, Globe, X, ChevronDown, Home, Tv } from "lucide-react";
 import { useState } from "react";
 
 interface MobileMenuProps {
@@ -21,7 +21,6 @@ export default function MobileMenu({
 }: MobileMenuProps) {
     const { data: session } = useSession();
 
-    // Fallback data if empty
     const displayCategories = categories.length > 0 ? categories : [
         { name: "Hành Động", slug: "hanh-dong" },
         { name: "Tình Cảm", slug: "tinh-cam" },
@@ -47,210 +46,228 @@ export default function MobileMenu({
     const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
     const [isCountriesOpen, setIsCountriesOpen] = useState(false);
 
+    const navLinks = [
+        { href: "/", label: "Trang Chủ", icon: Home },
+        { href: "/danh-sach/phim-le", label: "Phim Lẻ", icon: Film },
+        { href: "/danh-sach/phim-bo", label: "Phim Bộ", icon: Video },
+        { href: "/danh-sach/tv-shows", label: "TV Shows", icon: Tv },
+    ];
+
     return (
-        <div
-            className={cn(
-                "fixed inset-0 z-[10000] lg:hidden bg-[#0a0a0a] transition-transform duration-300 ease-in-out flex flex-col",
-                isOpen ? "translate-x-0" : "-translate-x-full"
-            )}
-        >
-            {/* Mobile Header with Close Button */}
-            <div className="flex items-center justify-between px-4 h-20 border-b border-white/10 shrink-0">
-                <Link href="/" onClick={onClose} className="flex items-center gap-2">
-                    <div className="relative w-8 h-8 rounded-full bg-gradient-to-br from-primary to-yellow-600 flex items-center justify-center shadow-lg shadow-primary/30">
-                        <Play className="w-4 h-4 text-black fill-black ml-0.5" />
-                    </div>
-                    <span className="text-xl font-black text-white tracking-tighter">MOVIE<span className="text-primary">BOX</span></span>
-                </Link>
-                <button
+        <>
+            {/* Backdrop overlay */}
+            {isOpen && (
+                <div
+                    className="fixed inset-0 z-[9999] lg:hidden bg-black/60 backdrop-blur-sm"
                     onClick={onClose}
-                    className="p-2 rounded-full hover:bg-white/10 transition-colors text-white"
-                    aria-label="Close menu"
-                >
-                    <X className="w-8 h-8" />
-                </button>
-            </div>
+                />
+            )}
 
-            {/* Mobile Menu Content */}
-            <div className="flex-1 overflow-y-auto py-6 px-4 space-y-6">
-                {/* User Profile Section */}
-                {session ? (
-                    <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
-                        <div className="flex items-center gap-4 mb-4">
-                            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary">
-                                <img
-                                    src={session.user?.image || `https://ui-avatars.com/api/?name=${session.user?.name}&background=random`}
-                                    alt={session.user?.name || "User"}
-                                    className="w-full h-full object-cover"
-                                />
-                            </div>
-                            <div>
-                                <p className="font-bold text-white text-lg">{session.user?.name}</p>
-                                <p className="text-xs text-gray-400">Thành viên</p>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                            <Link
-                                href="/lich-su-xem"
-                                onClick={onClose}
-                                className="flex items-center gap-2 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-sm text-gray-300"
-                            >
-                                <History className="w-4 h-4 text-blue-400" /> Lịch sử
-                            </Link>
-                            <Link
-                                href="/phim-yeu-thich"
-                                onClick={onClose}
-                                className="flex items-center gap-2 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-sm text-gray-300"
-                            >
-                                <Heart className="w-4 h-4 text-red-400" /> Yêu thích
-                            </Link>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="bg-gradient-to-r from-primary/20 to-yellow-600/20 rounded-2xl p-6 border border-primary/20 text-center">
-                        <p className="text-gray-300 mb-4 text-sm">Đăng nhập để lưu phim yêu thích và lịch sử xem</p>
-                        <Link
-                            href="/login"
-                            onClick={onClose}
-                            className="block w-full bg-primary text-black font-bold py-3 rounded-xl hover:brightness-110 transition-all shadow-lg shadow-primary/20"
-                        >
-                            Đăng Nhập / Đăng Ký
-                        </Link>
-                    </div>
+            {/* Drawer */}
+            <div
+                className={cn(
+                    "fixed top-0 left-0 bottom-0 z-[10000] lg:hidden w-[310px] flex flex-col transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
+                    "border-r border-white/[0.06]",
+                    isOpen ? "translate-x-0" : "-translate-x-full"
                 )}
-
-                {/* Navigation Links */}
-                <nav className="space-y-2">
-                    <Link
-                        href="/"
-                        onClick={onClose}
-                        className="flex items-center gap-3 text-base font-semibold text-white p-3 rounded-xl hover:bg-white/5 transition-colors"
-                    >
-                        <span className="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center text-red-500">
-                            <Play className="w-4 h-4 fill-current" />
-                        </span>
-                        Trang Chủ
+                style={{
+                    background: "rgba(13,16,26,0.95)",
+                    backdropFilter: "blur(40px) saturate(180%)",
+                    WebkitBackdropFilter: "blur(40px) saturate(180%)",
+                }}
+            >
+                {/* Header */}
+                <div className="flex items-center justify-between px-6 h-[72px] shrink-0 border-b border-white/[0.06]">
+                    <Link href="/" onClick={onClose} className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-full bg-[#F4C84A] flex items-center justify-center shadow-[0_0_12px_rgba(244,200,74,0.4)]">
+                            <Play className="w-3.5 h-3.5 text-black fill-black ml-0.5" />
+                        </div>
+                        <span className="text-[17px] font-black text-white tracking-tighter">MOVIE<span className="text-[#F4C84A]">BOX</span></span>
                     </Link>
-                    <Link
-                        href="/danh-sach/phim-le"
+                    <button
                         onClick={onClose}
-                        className="flex items-center gap-3 text-base font-semibold text-white p-3 rounded-xl hover:bg-white/5 transition-colors"
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.08] transition-all"
+                        aria-label="Đóng menu"
                     >
-                        <span className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-500">
-                            <Film className="w-4 h-4" />
-                        </span>
-                        Phim Lẻ
-                    </Link>
-                    <Link
-                        href="/danh-sach/phim-bo"
-                        onClick={onClose}
-                        className="flex items-center gap-3 text-base font-semibold text-white p-3 rounded-xl hover:bg-white/5 transition-colors"
-                    >
-                        <span className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center text-green-500">
-                            <Film className="w-4 h-4" />
-                        </span>
-                        Phim Bộ
-                    </Link>
-                    <Link
-                        href="/danh-sach/tv-shows"
-                        onClick={onClose}
-                        className="flex items-center gap-3 text-base font-semibold text-white p-3 rounded-xl hover:bg-white/5 transition-colors"
-                    >
-                        <span className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-500">
-                            <Video className="w-4 h-4" />
-                        </span>
-                        TV Shows
-                    </Link>
-
-                    {/* Expandable Categories */}
-                    <div className="space-y-1">
-                        <button
-                            onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
-                            className="w-full flex items-center justify-between text-lg font-bold text-white p-3 rounded-xl bg-white/5"
-                        >
-                            <div className="flex items-center gap-4">
-                                <span className="w-8 h-8 rounded-lg bg-yellow-500/20 flex items-center justify-center text-yellow-500">
-                                    <LayoutGrid className="w-4 h-4" />
-                                </span>
-                                <span>Thể Loại</span>
-                            </div>
-                            <ChevronDown className={cn("w-5 h-5 transition-transform", isCategoriesOpen ? "rotate-180" : "")} />
-                        </button>
-
-                        {isCategoriesOpen && (
-                            <div className="pl-4 grid grid-cols-2 gap-2 pt-2">
-                                {displayCategories.slice(0, 10).map((cat) => (
-                                    <Link
-                                        key={cat.slug}
-                                        href={`/the-loai/${cat.slug}`}
-                                        onClick={onClose}
-                                        className="text-gray-400 text-sm hover:text-white bg-white/5 p-2 rounded text-center transition-colors"
-                                    >
-                                        {cat.name}
-                                    </Link>
-                                ))}
-                                <Link
-                                    href="/danh-sach/tat-ca-the-loai"
-                                    onClick={onClose}
-                                    className="text-primary text-sm font-medium hover:text-white bg-white/5 p-2 rounded text-center transition-colors col-span-2"
-                                >
-                                    Xem tất cả...
-                                </Link>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Expandable Countries */}
-                    <div className="space-y-1">
-                        <button
-                            onClick={() => setIsCountriesOpen(!isCountriesOpen)}
-                            className="w-full flex items-center justify-between text-lg font-bold text-white p-3 rounded-xl bg-white/5"
-                        >
-                            <div className="flex items-center gap-4">
-                                <span className="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center text-indigo-500">
-                                    <Settings className="w-4 h-4" />
-                                </span>
-                                <span>Quốc Gia</span>
-                            </div>
-                            <ChevronDown className={cn("w-5 h-5 transition-transform", isCountriesOpen ? "rotate-180" : "")} />
-                        </button>
-
-                        {isCountriesOpen && (
-                            <div className="pl-4 grid grid-cols-2 gap-2 pt-2">
-                                {displayCountries.map((country) => (
-                                    <Link
-                                        key={country.slug}
-                                        href={`/quoc-gia/${country.slug}`}
-                                        onClick={onClose}
-                                        className="text-gray-400 text-sm hover:text-white bg-white/5 p-2 rounded text-center transition-colors"
-                                    >
-                                        {country.name}
-                                    </Link>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                </nav>
-
-                {/* Mobile Download App */}
-                <div className="pt-4 pb-4">
-                    <a href="/app-release.apk" target="_blank" download className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold py-3 rounded-xl hover:brightness-110 transition-all shadow-lg shadow-blue-500/20">
-                        <Download className="w-5 h-5" /> Tải Ứng Dụng Mobile
-                    </a>
+                        <X className="w-5 h-5" strokeWidth={1.5} />
+                    </button>
                 </div>
 
-                {/* Footer Actions */}
-                {session && (
-                    <div className="pt-6 border-t border-white/10 pb-20">
-                        <button
-                            onClick={() => signOut({ callbackUrl: "/login" })}
-                            className="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-red-500/10 text-red-500 font-bold hover:bg-red-500/20 transition-colors"
+                {/* Scrollable Content */}
+                <div className="flex-1 overflow-y-auto min-h-0 px-4 py-5 space-y-5">
+
+                    {/* User Card */}
+                    {session ? (
+                        <div
+                            className="rounded-[20px] p-4 border border-white/[0.07]"
+                            style={{ background: "rgba(255,255,255,0.05)" }}
                         >
-                            <LogOut className="w-5 h-5" /> Đăng Xuất
-                        </button>
-                    </div>
-                )}
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-12 h-12 rounded-full overflow-hidden border border-white/20 shrink-0">
+                                    <img
+                                        src={session.user?.image || `https://ui-avatars.com/api/?name=${session.user?.name}&background=2a2d3a&color=F4C84A&bold=true`}
+                                        alt={session.user?.name || "User"}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="font-semibold text-white text-[16px] truncate">{session.user?.name}</p>
+                                    <p className="text-[13px] text-white/50">Thành viên</p>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                                <Link
+                                    href="/lich-su-xem"
+                                    onClick={onClose}
+                                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-[13px] text-white/60 hover:text-white transition-colors"
+                                    style={{ background: "rgba(255,255,255,0.05)" }}
+                                >
+                                    <History className="w-4 h-4" strokeWidth={1.5} /> Lịch sử
+                                </Link>
+                                <Link
+                                    href="/phim-yeu-thich"
+                                    onClick={onClose}
+                                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-[13px] text-white/60 hover:text-white transition-colors"
+                                    style={{ background: "rgba(255,255,255,0.05)" }}
+                                >
+                                    <Heart className="w-4 h-4" strokeWidth={1.5} /> Yêu thích
+                                </Link>
+                            </div>
+                        </div>
+                    ) : (
+                        <div
+                            className="rounded-[20px] p-5 border border-[#F4C84A]/15 text-center"
+                            style={{ background: "rgba(244,200,74,0.07)" }}
+                        >
+                            <p className="text-white/50 mb-4 text-[13px] leading-relaxed">Đăng nhập để lưu phim yêu thích và lịch sử xem</p>
+                            <Link
+                                href="/login"
+                                onClick={onClose}
+                                className="block w-full bg-[#F4C84A] text-black font-bold py-2.5 rounded-[14px] text-[14px] hover:brightness-110 transition-all"
+                            >
+                                Đăng Nhập / Đăng Ký
+                            </Link>
+                        </div>
+                    )}
+
+                    {/* Navigation */}
+                    <nav className="space-y-0.5">
+                        {navLinks.map(({ href, label, icon: Icon }) => (
+                            <Link
+                                key={href}
+                                href={href}
+                                onClick={onClose}
+                                className="flex items-center gap-3 px-3 py-3 rounded-[14px] text-[15px] font-medium text-white/75 hover:text-white hover:bg-white/[0.06] transition-all"
+                            >
+                                <Icon className="w-[18px] h-[18px] text-white/40" strokeWidth={1.5} />
+                                {label}
+                            </Link>
+                        ))}
+
+                        {/* Categories Accordion */}
+                        <div>
+                            <button
+                                onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
+                                className="w-full flex items-center justify-between px-3 py-3 rounded-[14px] text-[15px] font-medium text-white/75 hover:text-white hover:bg-white/[0.06] transition-all"
+                            >
+                                <span className="flex items-center gap-3">
+                                    <LayoutGrid className="w-[18px] h-[18px] text-white/40" strokeWidth={1.5} />
+                                    Thể Loại
+                                </span>
+                                <ChevronDown
+                                    className="w-4 h-4 text-white/30 transition-transform duration-200"
+                                    style={{ transform: isCategoriesOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+                                    strokeWidth={1.5}
+                                />
+                            </button>
+                            {isCategoriesOpen && (
+                                <div
+                                    className="mx-1 mt-1 mb-1 rounded-[16px] p-3 grid grid-cols-2 gap-1.5"
+                                    style={{ background: "rgba(255,255,255,0.04)" }}
+                                >
+                                    {displayCategories.slice(0, 10).map((cat) => (
+                                        <Link
+                                            key={cat.slug}
+                                            href={`/the-loai/${cat.slug}`}
+                                            onClick={onClose}
+                                            className="text-white/55 text-[13px] hover:text-white px-3 py-2 rounded-xl text-center transition-colors hover:bg-white/[0.06]"
+                                        >
+                                            {cat.name}
+                                        </Link>
+                                    ))}
+                                    <Link
+                                        href="/danh-sach/tat-ca-the-loai"
+                                        onClick={onClose}
+                                        className="text-[#F4C84A]/80 text-[13px] hover:text-[#F4C84A] px-3 py-2 rounded-xl text-center transition-colors col-span-2"
+                                    >
+                                        Xem tất cả →
+                                    </Link>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Countries Accordion */}
+                        <div>
+                            <button
+                                onClick={() => setIsCountriesOpen(!isCountriesOpen)}
+                                className="w-full flex items-center justify-between px-3 py-3 rounded-[14px] text-[15px] font-medium text-white/75 hover:text-white hover:bg-white/[0.06] transition-all"
+                            >
+                                <span className="flex items-center gap-3">
+                                    <Globe className="w-[18px] h-[18px] text-white/40" strokeWidth={1.5} />
+                                    Quốc Gia
+                                </span>
+                                <ChevronDown
+                                    className="w-4 h-4 text-white/30 transition-transform duration-200"
+                                    style={{ transform: isCountriesOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+                                    strokeWidth={1.5}
+                                />
+                            </button>
+                            {isCountriesOpen && (
+                                <div
+                                    className="mx-1 mt-1 mb-1 rounded-[16px] p-3 grid grid-cols-2 gap-1.5"
+                                    style={{ background: "rgba(255,255,255,0.04)" }}
+                                >
+                                    {displayCountries.map((country) => (
+                                        <Link
+                                            key={country.slug}
+                                            href={`/quoc-gia/${country.slug}`}
+                                            onClick={onClose}
+                                            className="text-white/55 text-[13px] hover:text-white px-3 py-2 rounded-xl text-center transition-colors hover:bg-white/[0.06]"
+                                        >
+                                            {country.name}
+                                        </Link>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </nav>
+
+                    {/* Download App Button */}
+                    <a
+                        href="/app-release.apk"
+                        target="_blank"
+                        download
+                        className="flex items-center justify-center gap-2 w-full py-3 rounded-[16px] text-[14px] font-semibold text-black bg-[#F4C84A] hover:brightness-105 transition-all shadow-[0_0_20px_rgba(244,200,74,0.2)]"
+                    >
+                        <Download className="w-4 h-4" strokeWidth={2} />
+                        Tải Ứng Dụng Mobile
+                    </a>
+
+                    {/* Logout */}
+                    {session && (
+                        <div className="pb-8">
+                            <button
+                                onClick={() => signOut({ callbackUrl: "/login" })}
+                                className="w-full flex items-center justify-center gap-2 py-3 rounded-[16px] text-[14px] font-medium transition-all"
+                                style={{ color: "#ff5555", background: "rgba(255,60,60,0.08)" }}
+                            >
+                                <LogOut className="w-4 h-4" strokeWidth={1.5} />
+                                Đăng Xuất
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
+        </>
     );
 }
