@@ -112,14 +112,14 @@ export default function MovieRow({ title, movies, slug, variant = 'default' }: M
                     <ChevronLeft className="w-10 h-10 text-white hover:text-[#fbbf24] transition-colors drop-shadow-lg transform hover:scale-110" />
                 </button>
 
-                {/* Scroll Container */}
+                {/* Scroll Container - High Density */}
                 <div
                     ref={rowRef}
-                    className="flex gap-3 overflow-x-auto px-4 md:px-12 pb-10 pt-2 no-scrollbar snap-x scroll-smooth"
+                    className="flex gap-2.5 overflow-x-auto px-4 md:px-12 pb-8 pt-2 no-scrollbar snap-x scroll-smooth"
                     style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
                     {movies.map((movie) => (
-                        <div key={movie._id} className="min-w-[140px] md:min-w-[160px] snap-center">
+                        <div key={movie._id} className="min-w-[130px] md:min-w-[150px] snap-center">
                             <MovieCard movie={movie} />
                         </div>
                     ))}

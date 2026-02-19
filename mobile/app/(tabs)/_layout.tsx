@@ -31,11 +31,10 @@ function TabIcon({ focused, label, icon }: {
   return (
     <View style={styles.tabItem}>
       <Animated.View style={[styles.iconWrap, { transform: [{ scale }] }]}>
-        <Feather
-          name={icon as any}
-          size={20} // Smaller size (was 24)
-          color={focused ? '#F4C84A' : 'rgba(255,255,255,0.6)'}
-          style={{ strokeWidth: focused ? 2.5 : 1.5 }}
+        name={icon as any}
+        size={18} // Even smaller (was 20)
+        color={focused ? '#F4C84A' : 'rgba(255,255,255,0.6)'}
+        style={{ strokeWidth: focused ? 2.5 : 1.5 }}
         />
       </Animated.View>
       {/* Label below icon */}

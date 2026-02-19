@@ -159,17 +159,17 @@ export default function MovieCard({ movie, orientation = 'portrait' }: { movie: 
                     )}
                 </div>
 
-                <div className="mt-3 space-y-1 px-1">
-                    <h3 className="text-white font-semibold text-[15px] truncate group-hover/static-card:text-primary transition-colors leading-tight">
+                <div className="mt-2 space-y-0.5 px-0.5">
+                    <h3 className="text-white font-bold text-[13px] truncate group-hover/static-card:text-primary transition-colors leading-tight">
                         {movie.name}
                     </h3>
                     <div className="flex items-center justify-between">
                         {movie.origin_name && (
-                            <p className="text-white/40 text-[12px] truncate font-medium max-w-[80%]">
+                            <p className="text-white/40 text-[11px] truncate font-medium max-w-[80%]">
                                 {movie.origin_name}
                             </p>
                         )}
-                        <span className="text-white/30 text-[11px] font-medium">{movie.year || 2024}</span>
+                        <span className="text-white/30 text-[10px] font-medium">{movie.year || 2024}</span>
                     </div>
                 </div>
             </div>
@@ -260,20 +260,20 @@ function PortalHoverCard({ movie, position, tmdbData, displayPoster, orientation
                         </div>
                     </div>
 
-                    {/* Info Section with glassmorphism - More compact */}
-                    <div className="relative p-2 space-y-1.5 bg-gradient-to-b from-[#1a1a1a]/50 to-[#181818]/80 backdrop-blur-xl">
+                    {/* Info Section - High Density Optimization */}
+                    <div className="relative px-2 py-2 space-y-1 bg-gradient-to-b from-[#1a1a1a]/50 to-[#181818]/90 backdrop-blur-xl">
                         {/* Subtle inner glow */}
                         <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none" />
 
-                        {/* Actions - More compact */}
-                        <div className="relative flex items-center gap-1 z-10">
+                        {/* Actions - Ultra Compact */}
+                        <div className="relative flex items-center gap-1.5 z-10 mb-1.5">
                             <Link
                                 href={`/xem-phim/${movie.slug}`}
-                                className="flex-1 bg-white/95 hover:bg-white text-black font-bold text-[11px] py-1.5 px-2 rounded-md flex items-center justify-center gap-1 transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] backdrop-blur-sm"
+                                className="flex-1 bg-white/95 hover:bg-white text-black font-bold text-[10px] h-6 rounded flex items-center justify-center gap-1 transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] backdrop-blur-sm"
                             >
-                                <Play size={11} fill="currentColor" /> Xem
+                                <Play size={10} fill="currentColor" /> Xem
                             </Link>
-                            <div className="w-7 h-7 flex items-center justify-center rounded-full border border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/40 cursor-pointer backdrop-blur-md transition-all duration-300 ease-out hover:scale-110 active:scale-95">
+                            <div className="w-6 h-6 flex items-center justify-center rounded-full border border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/40 cursor-pointer backdrop-blur-md transition-all duration-300 ease-out hover:scale-110 active:scale-95">
                                 <FavoriteButton
                                     movieData={{
                                         movieId: movie._id,
@@ -287,33 +287,32 @@ function PortalHoverCard({ movie, position, tmdbData, displayPoster, orientation
                                     }}
                                     initialIsFavorite={false}
                                     size="sm"
-                                    className="w-full h-full text-white hover:text-red-500"
+                                    className="w-3.5 h-3.5 text-white hover:text-red-500"
                                 />
                             </div>
                             <Link
                                 href={`/phim/${movie.slug}`}
-                                className="w-7 h-7 flex items-center justify-center rounded-full border border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-110 active:scale-95 backdrop-blur-md"
+                                className="w-6 h-6 flex items-center justify-center rounded-full border border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-110 active:scale-95 backdrop-blur-md"
                                 title="Chi tiết"
                             >
                                 <ChevronDown size={12} />
                             </Link>
                         </div>
 
-                        {/* Metadata - More compact */}
-                        <div className="relative flex flex-wrap items-center gap-1.5 text-[10px] font-medium text-gray-400 z-10">
-                            <span className="text-green-400 transition-colors duration-300 group-hover/card:text-green-300">{movie.match || "98%"}</span>
-                            <span className="border border-white/20 bg-white/5 px-1.5 py-0.5 rounded backdrop-blur-sm text-gray-300 transition-all duration-300 hover:border-white/30 hover:bg-white/10">{movie.quality || "HD"}</span>
-                            <span className="transition-colors duration-300 group-hover/card:text-gray-300">{movie.year}</span>
-                            {movie.episode_current && <span className="transition-colors duration-300 group-hover/card:text-gray-300">{movie.episode_current}</span>}
+                        {/* Metadata - Ultra Compact */}
+                        <div className="relative flex flex-wrap items-center gap-1 text-[9px] font-medium text-gray-400 z-10">
+                            <span className="text-green-400">{movie.match || "98%"}</span>
+                            <span className="w-0.5 h-0.5 rounded-full bg-gray-600"></span>
+                            <span className="border border-white/10 bg-white/5 px-1 rounded-[3px] text-gray-300">{movie.quality || "HD"}</span>
+                            <span className="w-0.5 h-0.5 rounded-full bg-gray-600"></span>
+                            <span>{movie.year}</span>
                         </div>
 
-                        {/* Genres - More compact */}
-                        <div className="relative flex flex-wrap gap-1 z-10">
-                            {movie.category?.slice(0, 2).map((c) => (
-                                <span key={c.id} className="text-[9px] text-gray-400 transition-colors duration-300 group-hover/card:text-gray-300 relative after:content-['•'] after:ml-1 last:after:content-['']">
-                                    {c.name}
-                                </span>
-                            ))}
+                        {/* Genres - Single Line Truncated */}
+                        <div className="relative z-10">
+                            <p className="text-[9px] text-gray-500 truncate leading-none">
+                                {movie.category?.map(c => c.name).join(' • ')}
+                            </p>
                         </div>
                     </div>
 
