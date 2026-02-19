@@ -44,8 +44,8 @@ export default function MobileMenu({
         { name: "Việt Nam", slug: "viet-nam" }
     ];
 
-    const [isCategoriesOpen, setIsCategoriesOpen] = useState(true);
-    const [isCountriesOpen, setIsCountriesOpen] = useState(true);
+    const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
+    const [isCountriesOpen, setIsCountriesOpen] = useState(false);
 
     return (
         <div
@@ -124,7 +124,7 @@ export default function MobileMenu({
                     <Link
                         href="/"
                         onClick={onClose}
-                        className="flex items-center gap-4 text-lg font-bold text-white p-3 rounded-xl hover:bg-white/5 transition-colors"
+                        className="flex items-center gap-3 text-base font-semibold text-white p-3 rounded-xl hover:bg-white/5 transition-colors"
                     >
                         <span className="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center text-red-500">
                             <Play className="w-4 h-4 fill-current" />
@@ -134,7 +134,7 @@ export default function MobileMenu({
                     <Link
                         href="/danh-sach/phim-le"
                         onClick={onClose}
-                        className="flex items-center gap-4 text-lg font-bold text-white p-3 rounded-xl hover:bg-white/5 transition-colors"
+                        className="flex items-center gap-3 text-base font-semibold text-white p-3 rounded-xl hover:bg-white/5 transition-colors"
                     >
                         <span className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-500">
                             <Film className="w-4 h-4" />
@@ -144,7 +144,7 @@ export default function MobileMenu({
                     <Link
                         href="/danh-sach/phim-bo"
                         onClick={onClose}
-                        className="flex items-center gap-4 text-lg font-bold text-white p-3 rounded-xl hover:bg-white/5 transition-colors"
+                        className="flex items-center gap-3 text-base font-semibold text-white p-3 rounded-xl hover:bg-white/5 transition-colors"
                     >
                         <span className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center text-green-500">
                             <Film className="w-4 h-4" />
@@ -154,7 +154,7 @@ export default function MobileMenu({
                     <Link
                         href="/danh-sach/tv-shows"
                         onClick={onClose}
-                        className="flex items-center gap-4 text-lg font-bold text-white p-3 rounded-xl hover:bg-white/5 transition-colors"
+                        className="flex items-center gap-3 text-base font-semibold text-white p-3 rounded-xl hover:bg-white/5 transition-colors"
                     >
                         <span className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-500">
                             <Video className="w-4 h-4" />
@@ -178,7 +178,7 @@ export default function MobileMenu({
                         </button>
 
                         {isCategoriesOpen && (
-                            <div className="pl-4 grid grid-cols-2 gap-2 pt-2 animate-in slide-in-from-top-2 duration-200">
+                            <div className="pl-4 grid grid-cols-2 gap-2 pt-2">
                                 {displayCategories.slice(0, 10).map((cat) => (
                                     <Link
                                         key={cat.slug}
@@ -216,7 +216,7 @@ export default function MobileMenu({
                         </button>
 
                         {isCountriesOpen && (
-                            <div className="pl-4 grid grid-cols-2 gap-2 pt-2 animate-in slide-in-from-top-2 duration-200">
+                            <div className="pl-4 grid grid-cols-2 gap-2 pt-2">
                                 {displayCountries.map((country) => (
                                     <Link
                                         key={country.slug}

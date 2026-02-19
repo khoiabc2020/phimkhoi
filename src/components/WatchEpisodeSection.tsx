@@ -71,7 +71,7 @@ export default function WatchEpisodeSection({
                             onClick={() => setShowServerDropdown(!showServerDropdown)}
                             className="flex items-center gap-1.5 text-white text-sm font-medium py-1.5 px-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
                         >
-                            Phần {activeServerIndex + 1}
+                            Server {activeServerIndex + 1}
                             <ChevronDown className={cn("w-4 h-4 transition-transform", showServerDropdown && "rotate-180")} />
                         </button>
                         {showServerDropdown && (
