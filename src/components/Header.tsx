@@ -196,19 +196,64 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
             {/* Right: Search & Actions */}
             <div className="flex items-center gap-6">
                 {/* Search Bar - iOS Style Pill */}
-                <form onSubmit={handleSearch} className="hidden lg:flex items-center relative group">
-                    <div className={`absolute inset-0 bg-primary/5 blur-lg rounded-full transition-opacity duration-300 ${searchQuery ? 'opacity-100' : 'opacity-0'}`} />
-                    <div className="relative flex items-center bg-white/[0.08] hover:bg-white/[0.12] border border-white/[0.08] rounded-full px-4 py-2 w-64 focus-within:w-80 focus-within:border-primary/50 focus-within:bg-black/40 transition-all duration-300">
-                        <Search className="w-4 h-4 text-white/50 group-focus-within:text-primary transition-colors" />
+                {/* Search Bar - Expandable */}
+                <div className="hidden lg:flex items-center">
+                    <form
+                        onSubmit={handleSearch}
+                        className={cn(
+                            "relative flex items-center transition-all duration-500 ease-out",
+                            isSearchOpen ? "w-80" : "w-10"
+                        )}
+                    >
+                        {/* Search Toggle / Icon */}
+                        <div
+                            onClick={() => {
+                                if (!isSearchOpen) {
+                                    setIsSearchOpen(true);
+                                    // setTimeout(() => searchInputRef.current?.focus(), 100);
+                                }
+                            }}
+                            className={cn(
+                                "cursor-pointer absolute left-0 z-20 w-10 h-10 flex items-center justify-center rounded-full border transition-all duration-300",
+                                isSearchOpen
+                                    ? "bg-transparent border-transparent"
+                                    : "bg-white/[0.08] hover:bg-white/[0.15] border-white/[0.08] hover:scale-105 active:scale-95"
+                            )}
+                        >
+                            <Search className={cn("w-4 h-4 transition-colors", isSearchOpen ? "text-primary" : "text-white/80")} />
+                        </div>
+
+                        {/* Input Field */}
                         <input
+                            ref={searchInputRef}
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Tìm kiếm phim, diễn viên..."
-                            className="bg-transparent border-none outline-none text-sm text-white ml-3 w-full placeholder:text-white/30"
+                            onBlur={() => {
+                                if (!searchQuery) setIsSearchOpen(false);
+                            }}
+                            placeholder="Tìm kiếm phim..."
+                            className={cn(
+                                "absolute left-0 top-0 h-10 bg-white/[0.08] border border-white/[0.08] rounded-full pl-10 pr-4 text-sm text-white outline-none focus:border-primary/50 focus:bg-black/40 transition-all duration-500",
+                                isSearchOpen ? "w-full opacity-100 visible" : "w-10 opacity-0 invisible"
+                            )}
                         />
-                    </div>
-                </form>
+
+                        {/* Close Button (only when typed) */}
+                        {isSearchOpen && searchQuery && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setSearchQuery("");
+                                    setIsSearchOpen(false);
+                                }}
+                                className="absolute right-3 z-20 text-white/50 hover:text-white"
+                            >
+                                <X className="w-3 h-3" />
+                            </button>
+                        )}
+                    </form>
+                </div>
 
                 <div className="flex items-center gap-4">
                     {/* History Button */}
