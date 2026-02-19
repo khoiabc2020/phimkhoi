@@ -17,7 +17,7 @@ export default function TopicSection() {
         <section className="container mx-auto px-4 md:px-12 py-6">
             <div className="flex items-center gap-2 mb-4 px-2">
                 <Sparkles className="w-4 h-4 text-[#fbbf24]" />
-                <h2 className="text-lg font-bold text-white tracking-tight">
+                <h2 className="text-[20px] font-semibold text-white tracking-tight">
                     Khám phá nhanh
                 </h2>
             </div>
