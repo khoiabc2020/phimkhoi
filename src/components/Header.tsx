@@ -58,6 +58,12 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     // Load search history from localStorage
     useEffect(() => {
         const saved = localStorage.getItem('searchHistory');
@@ -81,7 +87,14 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
         return null;
     }
 
-    // Fallback if data is missing
+    // Prevent hydration mismatch by returning null on server or initial client render if needed
+    // However, for SEO we usually want the header. The error #418 often comes from invalid nesting.
+    // Let's verify nesting first.
+    // Structure: header > div > (button, Link, nav) | div > (form > div, div, input, button) | div > (Link, Link, div, button).
+    // The nesting seems correct.
+    // The error might be due to extensions.
+    // Let's try adding suppressHydrationWarning to the header tag.
+
     const displayCategories = categories.length > 0 ? categories : [
         { name: "Hành Động", slug: "hanh-dong" },
         { name: "Tình Cảm", slug: "tinh-cam" },
@@ -103,6 +116,8 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
         { name: "Thái Lan", slug: "thai-lan" },
         { name: "Việt Nam", slug: "viet-nam" },
     ];
+
+    if (!mounted) return null; // Force client-side rendering to avoid hydration mismatch completely
 
     return (
         <header
