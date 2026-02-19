@@ -136,7 +136,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
 
             </Link>
 
-            <nav className="hidden md:flex items-center gap-8">
+            <nav className="hidden lg:flex items-center gap-8">
                 {[
                     { name: "Trang chủ", href: "/" },
                     { name: "Phim lẻ", href: "/danh-sach/phim-le" },
@@ -157,7 +157,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                 {/* Right: Search & Actions */ }
     <div className="flex items-center gap-6">
         {/* Search Bar - iOS Style Pill */}
-        <form onSubmit={handleSearch} className="hidden md:flex items-center relative group">
+        <form onSubmit={handleSearch} className="hidden lg:flex items-center relative group">
             <div className={`absolute inset-0 bg-primary/5 blur-lg rounded-full transition-opacity duration-300 ${searchQuery ? 'opacity-100' : 'opacity-0'}`} />
             <div className="relative flex items-center bg-white/[0.08] hover:bg-white/[0.12] border border-white/[0.08] rounded-full px-4 py-2 w-64 focus-within:w-80 focus-within:border-primary/50 focus-within:bg-black/40 transition-all duration-300">
                 <Search className="w-4 h-4 text-white/50 group-focus-within:text-primary transition-colors" />
@@ -173,13 +173,13 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
 
         <div className="flex items-center gap-4">
             {/* History Button */}
-            <Link href="/lich-su-xem" className="hidden md:flex w-10 h-10 items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.08] transition-all hover:scale-105 active:scale-95" title="Lịch sử xem">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white/80"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /><path d="M12 7v5l4 2" /></svg>
+            <Link href="/lich-su-xem" className="hidden lg:flex w-10 h-10 items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.08] transition-all hover:scale-105 active:scale-95" title="Lịch sử xem">
+                <History className="w-4 h-4 text-white/80" />
             </Link>
 
             {/* Watchlist Button */}
-            <Link href="/phim-yeu-thich" className="hidden md:flex w-10 h-10 items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.08] transition-all hover:scale-105 active:scale-95" title="Phim yêu thích">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white/80"><path d="M19 14c1.49-1.28 3.6-2.34 2.44-5.1a6 6 0 0 0-16 4.7 2.45 2.45 0 0 0 1.05 2.05" /><path d="M12 21.05a9 9 0 0 1-6.5-2.6 15 15 0 0 1 7.2-14.8" /></svg>
+            <Link href="/phim-yeu-thich" className="hidden lg:flex w-10 h-10 items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.08] transition-all hover:scale-105 active:scale-95" title="Phim yêu thích">
+                <Heart className="w-4 h-4 text-white/80" />
             </Link>
 
             {session ? (
@@ -225,9 +225,10 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
             </button>
         </div>
     </div>
+    </div >
 
 
-    {/* Mobile Menu Overlay */ }
+        {/* Mobile Menu Overlay */ }
     {
         isMobileMenuOpen && (
             <div className="absolute top-16 left-0 right-0 glass-panel border-t border-white/10 p-4 md:hidden animate-in slide-in-from-top-4 fade-in duration-200">

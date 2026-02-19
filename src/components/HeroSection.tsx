@@ -3,7 +3,7 @@
 import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
 import Link from "next/link";
-import { Play, ChevronRight, Info, Plus, Check } from "lucide-react";
+import { Play, ChevronRight, Info } from "lucide-react";
 import { Movie } from "@/services/api";
 import { getImageUrl } from "@/lib/utils";
 import { getTMDBDataForCard } from "@/app/actions/tmdb";
@@ -133,11 +133,13 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
         <div className="relative w-full h-auto md:h-screen bg-[#0B0D12] overflow-hidden flex flex-col">
 
             {/* ================= MOBILE LAYOUT (iOS 26 Liquid Glass) ================= */}
-            <div className="md:hidden relative w-full min-h-[500px] h-[75vh] flex flex-col pt-0">
+            <div className="lg:hidden relative w-full min-h-[500px] h-[75vh] flex flex-col pt-0">
 
                 {/* 1. Ambient Background (Blurred Color) */}
                 <div className="absolute inset-0 z-0 overflow-hidden">
                     <Image
+                        src={getHeroImage(activeMovie, 'poster')}
+                        alt="bg"
                         fill
                         className="object-cover blur-[50px] opacity-50 scale-125"
                         priority
@@ -147,7 +149,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
                 {/* 2. Poster & Content */}
                 <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-20 text-center">
-                    
+
                     {/* Poster Card (Small 3D) */}
                     <Link href={`/xem-phim/${activeMovie.slug}`} className="relative w-[180px] aspect-[2/3] mb-8 rounded-2xl overflow-hidden shadow-[0_20px_40px_-10px_rgba(0,0,0,0.6)] ring-1 ring-white/20 animate-in fade-in zoom-in duration-700">
                         <Image
@@ -171,7 +173,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                             <span>{activeMovie.quality}</span>
                         </div>
                         <div className="flex flex-wrap justify-center gap-2">
-                             {activeMovie.category?.slice(0, 3).map(c => (
+                            {activeMovie.category?.slice(0, 3).map(c => (
                                 <span key={c.id} className="text-xs text-white/60 px-2 py-1 rounded-lg bg-white/5 border border-white/5">
                                     {c.name}
                                 </span>
@@ -181,157 +183,157 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
                     {/* Action Buttons */}
                     <div className="flex items-center gap-4 pt-4">
-                                <Link
-                                    href={`/xem-phim/${activeMovie.slug}`}
-                                    className="group relative flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-[#fbbf24] to-[#d97706] shadow-[0_0_20px_rgba(251,191,36,0.5)] hover:shadow-[0_0_40px_rgba(251,191,36,0.7)] hover:scale-110 transition-all duration-500 ease-out"
-                                >
-                                    <div className="absolute inset-0 rounded-full border border-[#fbbf24] opacity-0 scale-100 group-hover:scale-150 group-hover:opacity-0 transition-all duration-1000 ease-out" />
-                                    <Play className="w-8 h-8 text-black fill-black ml-1 transition-transform duration-300 group-hover:scale-110" />
-                                </Link>
-                                <div className="flex flex-col gap-1">
-                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#fbbf24] to-[#f59e0b] font-black text-xl md:text-2xl uppercase tracking-widest drop-shadow-sm leading-none">
-                                        Xem Ngay
-                                    </span>
-                                </div>
-                                <div className="h-12 w-[1px] bg-gradient-to-b from-transparent via-white/10 to-transparent mx-2" />
-                                <Link
-                                    href={`/phim/${activeMovie.slug}`}
-                                    className="flex items-center justify-center w-11 h-11 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md transition-all hover:scale-110 group/btn"
-                                >
-                                    <Info className="w-5 h-5 text-white/70 group-hover/btn:text-[#fbbf24] transition-colors" />
-                                </Link>
-                                <div className="w-11 h-11 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md transition-all hover:scale-110 cursor-pointer">
-                                    <FavoriteButton movieData={getFavoriteData(activeMovie)} initialIsFavorite={false} size="md" />
-                                </div>
-                            </div>
+                        <Link
+                            href={`/xem-phim/${activeMovie.slug}`}
+                            className="group relative flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-[#fbbf24] to-[#d97706] shadow-[0_0_20px_rgba(251,191,36,0.5)] hover:shadow-[0_0_40px_rgba(251,191,36,0.7)] hover:scale-110 transition-all duration-500 ease-out"
+                        >
+                            <div className="absolute inset-0 rounded-full border border-[#fbbf24] opacity-0 scale-100 group-hover:scale-150 group-hover:opacity-0 transition-all duration-1000 ease-out" />
+                            <Play className="w-8 h-8 text-black fill-black ml-1 transition-transform duration-300 group-hover:scale-110" />
+                        </Link>
+                        <div className="flex flex-col gap-1">
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#fbbf24] to-[#f59e0b] font-black text-xl md:text-2xl uppercase tracking-widest drop-shadow-sm leading-none">
+                                Xem Ngay
+                            </span>
+                        </div>
+                        <div className="h-12 w-[1px] bg-gradient-to-b from-transparent via-white/10 to-transparent mx-2" />
+                        <Link
+                            href={`/phim/${activeMovie.slug}`}
+                            className="flex items-center justify-center w-11 h-11 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md transition-all hover:scale-110 group/btn"
+                        >
+                            <Info className="w-5 h-5 text-white/70 group-hover/btn:text-[#fbbf24] transition-colors" />
+                        </Link>
+                        <div className="w-11 h-11 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md transition-all hover:scale-110 cursor-pointer">
+                            <FavoriteButton movieData={getFavoriteData(activeMovie)} initialIsFavorite={false} size="md" />
                         </div>
                     </div>
                 </div>
+
+                {/* Navigation Arrows (Mobile) */}
                 <button onClick={scrollPrev} className="absolute left-4 top-1/2 -translate-y-1/2 z-50 w-11 h-11 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white/50 hover:bg-[#fbbf24] hover:text-black hover:scale-110 transition-all">
                     <ChevronRight className="w-7 h-7 rotate-180" />
                 </button>
                 <button onClick={scrollNext} className="absolute right-4 top-1/2 -translate-y-1/2 z-50 w-11 h-11 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white/50 hover:bg-[#fbbf24] hover:text-black hover:scale-110 transition-all">
                     <ChevronRight className="w-7 h-7" />
                 </button>
-            </div >
+            </div>
 
-        {/* ================= DESKTOP LAYOUT (Cinematic iOS 26) ================= */ }
-        < div className = "hidden lg:block absolute inset-0 h-full" >
-            <div className="absolute inset-0 h-full" ref={desktopRef}>
-                <div className="flex h-full">
-                    {heroMovies.map((movie, index) => {
-                        const posterImg = getHeroImage(movie, 'poster');
-                        const backdropImg = getHeroImage(movie, 'backdrop');
+            {/* ================= DESKTOP LAYOUT (Cinematic iOS 26) ================= */}
+            <div className="hidden lg:block absolute inset-0 h-full">
+                <div className="absolute inset-0 h-full" ref={desktopRef}>
+                    <div className="flex h-full">
+                        {heroMovies.map((movie, index) => {
+                            const posterImg = getHeroImage(movie, 'poster');
+                            const backdropImg = getHeroImage(movie, 'backdrop');
 
-                        return (
-                            <div key={movie._id} className="relative flex-[0_0_100%] min-w-0 h-full bg-[#0B0D12] overflow-hidden">
+                            return (
+                                <div key={movie._id} className="relative flex-[0_0_100%] min-w-0 h-full bg-[#0B0D12] overflow-hidden">
 
-                                {/* 1. Cinematic Background (Blurred & Ambient) */}
-                                <div className="absolute inset-0 z-0">
-                                    <div className="absolute inset-0 bg-black/20 z-10" />
-                                    <Image
-                                        src={backdropImg}
-                                        alt="bg"
-                                        fill
-                                        className="object-cover blur-[80px] opacity-60 scale-110"
-                                        priority={index === 0}
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-r from-[#0B0D12] via-[#0B0D12]/60 to-transparent z-10" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D12] via-transparent to-transparent z-10" />
-                                </div>
+                                    {/* 1. Cinematic Background (Blurred & Ambient) */}
+                                    <div className="absolute inset-0 z-0">
+                                        <div className="absolute inset-0 bg-black/20 z-10" />
+                                        <Image
+                                            src={backdropImg}
+                                            alt="bg"
+                                            fill
+                                            className="object-cover blur-[80px] opacity-60 scale-110"
+                                            priority={index === 0}
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-r from-[#0B0D12] via-[#0B0D12]/60 to-transparent z-10" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D12] via-transparent to-transparent z-10" />
+                                    </div>
 
-                                {/* 2. Content Container */}
-                                <div className="relative z-20 h-full container max-w-[1400px] mx-auto px-8 flex items-center">
-                                    <div className="grid grid-cols-12 gap-12 w-full items-center">
+                                    {/* 2. Content Container */}
+                                    <div className="relative z-20 h-full container max-w-[1400px] mx-auto px-8 flex items-center">
+                                        <div className="grid grid-cols-12 gap-12 w-full items-center">
 
-                                        {/* Left: Info */}
-                                        <div className="col-span-5 space-y-8 animate-in fade-in slide-in-from-left-10 duration-700 delay-100">
-                                            {/* Meta Badges */}
-                                            <div className="flex flex-wrap items-center gap-3">
-                                                <span className="px-3 py-1 rounded-full bg-[#F4C84A] text-black text-xs font-black tracking-wider uppercase shadow-[0_0_15px_rgba(244,200,74,0.4)]">
-                                                    Phim Hot
-                                                </span>
-                                                <span className="px-3 py-1 rounded-full glass text-white text-xs font-bold flex items-center gap-1.5">
-                                                    <span className="text-[#F4C84A]">★</span> {heroMoviesData[movie._id]?.vote_average?.toFixed(1) || "N/A"}
-                                                </span>
-                                                <span className="px-3 py-1 rounded-full glass text-white/80 text-xs font-medium">
-                                                    {movie.year}
-                                                </span>
-                                                <span className="px-3 py-1 rounded-full glass text-[#F4C84A] text-xs font-bold border-[#F4C84A]/30">
-                                                    {movie.quality}
-                                                </span>
-                                            </div>
+                                            {/* Left: Info */}
+                                            <div className="col-span-5 space-y-8 animate-in fade-in slide-in-from-left-10 duration-700 delay-100">
+                                                {/* Meta Badges */}
+                                                <div className="flex flex-wrap items-center gap-3">
+                                                    <span className="px-3 py-1 rounded-full bg-[#F4C84A] text-black text-xs font-black tracking-wider uppercase shadow-[0_0_15px_rgba(244,200,74,0.4)]">
+                                                        Phim Hot
+                                                    </span>
+                                                    <span className="px-3 py-1 rounded-full glass text-white text-xs font-bold flex items-center gap-1.5">
+                                                        <span className="text-[#F4C84A]">★</span> {heroMoviesData[movie._id]?.vote_average?.toFixed(1) || "N/A"}
+                                                    </span>
+                                                    <span className="px-3 py-1 rounded-full glass text-white/80 text-xs font-medium">
+                                                        {movie.year}
+                                                    </span>
+                                                    <span className="px-3 py-1 rounded-full glass text-[#F4C84A] text-xs font-bold border-[#F4C84A]/30">
+                                                        {movie.quality}
+                                                    </span>
+                                                </div>
 
-                                            {/* Title */}
-                                            <h1 className="text-5xl xl:text-6xl font-black text-white leading-[1.1] tracking-tight drop-shadow-2xl line-clamp-2 text-glow">
-                                                {movie.name}
-                                            </h1>
+                                                {/* Title */}
+                                                <h1 className="text-5xl xl:text-6xl font-black text-white leading-[1.1] tracking-tight drop-shadow-2xl line-clamp-2 text-glow">
+                                                    {movie.name}
+                                                </h1>
 
-                                            {/* Origin Name & Categories */}
-                                            <div className="flex items-center gap-4 text-white/60 text-lg font-medium">
-                                                <h2>{movie.origin_name}</h2>
-                                                <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
-                                                <div className="flex gap-2">
-                                                    {movie.category?.slice(0, 3).map(c => (
-                                                        <span key={c.id} className="text-white/80 hover:text-[#F4C84A] transition-colors cursor-pointer">
-                                                            {c.name}
-                                                        </span>
-                                                    ))}
+                                                {/* Origin Name & Categories */}
+                                                <div className="flex items-center gap-4 text-white/60 text-lg font-medium">
+                                                    <h2>{movie.origin_name}</h2>
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
+                                                    <div className="flex gap-2">
+                                                        {movie.category?.slice(0, 3).map(c => (
+                                                            <span key={c.id} className="text-white/80 hover:text-[#F4C84A] transition-colors cursor-pointer">
+                                                                {c.name}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                {/* Description */}
+                                                <p className="text-white/70 text-lg leading-relaxed line-clamp-3 font-light max-w-xl">
+                                                    {stripHtml(movie.content)}
+                                                </p>
+
+                                                {/* CTA Buttons */}
+                                                <div className="flex items-center gap-5 pt-2">
+                                                    <Link
+                                                        href={`/xem-phim/${movie.slug}`}
+                                                        className="group relative flex items-center justify-center gap-3 h-14 px-8 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-bold text-lg shadow-[0_0_30px_rgba(244,200,74,0.3)] hover:shadow-[0_0_50px_rgba(244,200,74,0.5)] transition-all duration-300 hover:scale-105 active:scale-95"
+                                                    >
+                                                        <Play className="w-6 h-6 fill-black" />
+                                                        <span>Xem Ngay</span>
+                                                    </Link>
+
+                                                    <Link
+                                                        href={`/phim/${movie.slug}`}
+                                                        className="flex items-center justify-center gap-3 h-14 px-8 rounded-full glass hover:bg-white/20 text-white font-medium text-lg transition-all hover:scale-105 active:scale-95 group/info"
+                                                    >
+                                                        <Info className="w-6 h-6 group-hover/info:text-[#F4C84A] transition-colors" />
+                                                        <span>Chi tiết</span>
+                                                    </Link>
+
+                                                    <FavoriteButton movieData={getFavoriteData(movie)} initialIsFavorite={false} size="lg" />
                                                 </div>
                                             </div>
 
-                                            {/* Description */}
-                                            <p className="text-white/70 text-lg leading-relaxed line-clamp-3 font-light max-w-xl">
-                                                {stripHtml(movie.content)}
-                                            </p>
-
-                                            {/* CTA Buttons */}
-                                            <div className="flex items-center gap-5 pt-2">
-                                                <Link
-                                                    href={`/xem-phim/${movie.slug}`}
-                                                    className="group relative flex items-center justify-center gap-3 h-14 px-8 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-bold text-lg shadow-[0_0_30px_rgba(244,200,74,0.3)] hover:shadow-[0_0_50px_rgba(244,200,74,0.5)] transition-all duration-300 hover:scale-105 active:scale-95"
-                                                >
-                                                    <Play className="w-6 h-6 fill-black" />
-                                                    <span>Xem Ngay</span>
-                                                </Link>
-
-                                                <Link
-                                                    href={`/phim/${movie.slug}`}
-                                                    className="flex items-center justify-center gap-3 h-14 px-8 rounded-full glass hover:bg-white/20 text-white font-medium text-lg transition-all hover:scale-105 active:scale-95 group/info"
-                                                >
-                                                    <Info className="w-6 h-6 group-hover/info:text-[#F4C84A] transition-colors" />
-                                                    <span>Chi tiết</span>
-                                                </Link>
-
-                                                <FavoriteButton movieData={getFavoriteData(movie)} initialIsFavorite={false} size="lg" />
+                                            {/* Right: 3D Tilt Poster Card */}
+                                            <div className="col-span-7 flex justify-end pl-12 perspective-1000">
+                                                <div className="relative w-[360px] aspect-[2/3] rounded-[32px] overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] ring-1 ring-white/10 group/poster transition-transform duration-500 ease-out hover:[transform:rotateY(-5deg)_rotateX(5deg)_scale(1.02)] animate-[float_6s_ease-in-out_infinite]">
+                                                    <Image
+                                                        src={posterImg}
+                                                        alt={movie.name}
+                                                        fill
+                                                        className="object-cover"
+                                                        priority={index === 0}
+                                                    />
+                                                    {/* Shine Effect */}
+                                                    <div className="absolute inset-0 bg-gradient-to-tr from-white/20 via-transparent to-transparent opacity-0 group-hover/poster:opacity-100 transition-opacity duration-500" />
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        {/* Right: 3D Tilt Poster Card */}
-                                        <div className="col-span-7 flex justify-end pl-12 perspective-1000">
-                                            <div className="relative w-[360px] aspect-[2/3] rounded-[32px] overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] ring-1 ring-white/10 group/poster transition-transform duration-500 ease-out hover:[transform:rotateY(-5deg)_rotateX(5deg)_scale(1.02)] animate-[float_6s_ease-in-out_infinite]">
-                                                <Image
-                                                    src={posterImg}
-                                                    alt={movie.name}
-                                                    fill
-                                                    className="object-cover"
-                                                    priority={index === 0}
-                                                />
-                                                {/* Shine Effect */}
-                                                <div className="absolute inset-0 bg-gradient-to-tr from-white/20 via-transparent to-transparent opacity-0 group-hover/poster:opacity-100 transition-opacity duration-500" />
-                                            </div>
                                         </div>
-
                                     </div>
+
                                 </div>
-
-                            </div>
-                        );
-                    })}
+                            );
+                        })}
+                    </div>
                 </div>
-            </div>
 
-    {/* Navigation Arrows */ }
+                {/* Navigation Arrows (Desktop) */}
                 <button onClick={scrollPrev} className="absolute left-8 top-1/2 -translate-y-1/2 z-50 w-14 h-14 rounded-full glass flex items-center justify-center text-white/50 hover:text-black hover:bg-[#F4C84A] hover:border-[#F4C84A] hover:scale-110 transition-all duration-300 group">
                     <ChevronRight className="w-8 h-8 rotate-180 group-hover:scale-90 transition-transform" />
                 </button>
@@ -339,22 +341,22 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                     <ChevronRight className="w-8 h-8 group-hover:scale-90 transition-transform" />
                 </button>
 
-    {/* Dots Indicator */ }
-    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 flex gap-3">
-        {heroMovies.slice(0, 10).map((_, idx) => (
-            <button
-                key={idx}
-                onClick={() => scrollTo(idx)}
-                className={cn(
-                    "h-1.5 rounded-full transition-all duration-300",
-                    idx === selectedIndex
-                        ? "w-8 bg-[#F4C84A] shadow-[0_0_10px_#F4C84A]"
-                        : "w-1.5 bg-white/20 hover:bg-white/40"
-                )}
-            />
-        ))}
-    </div>
-            </div >
+                {/* Dots Indicator */}
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 flex gap-3">
+                    {heroMovies.slice(0, 10).map((_, idx) => (
+                        <button
+                            key={idx}
+                            onClick={() => scrollTo(idx)}
+                            className={cn(
+                                "h-1.5 rounded-full transition-all duration-300",
+                                idx === selectedIndex
+                                    ? "w-8 bg-[#F4C84A] shadow-[0_0_10px_#F4C84A]"
+                                    : "w-1.5 bg-white/20 hover:bg-white/40"
+                            )}
+                        />
+                    ))}
+                </div>
+            </div>
         </div >
     );
 }

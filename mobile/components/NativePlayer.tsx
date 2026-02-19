@@ -46,6 +46,11 @@ export default function NativePlayer({
     useKeepAwake();
     const video = useRef<Video>(null);
     const [videoSource, setVideoSource] = useState({ uri: url });
+
+    // Update video source when prop changes
+    useEffect(() => {
+        setVideoSource({ uri: url });
+    }, [url]);
     const [status, setStatus] = useState<AVPlaybackStatus>({} as AVPlaybackStatus);
     const [showControls, setShowControls] = useState(true);
     const [resizeMode, setResizeMode] = useState(ResizeMode.CONTAIN);
