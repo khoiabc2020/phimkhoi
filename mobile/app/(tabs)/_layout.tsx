@@ -1,34 +1,44 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform, View, StyleSheet, Text } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useRef, useEffect } from 'react';
+import { Platform, View, StyleSheet, Text, Animated, Easing } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
-import { COLORS, BLUR, RADIUS, SPACING } from '@/constants/theme';
+import { COLORS } from '@/constants/theme';
 
 const TABS = [
-  { name: 'index', label: 'Trang chủ', icon: 'home', iconOutline: 'home-outline' }, // Changed to 'home' for standard iOS feel, or keep 'tv' if preferred
-  { name: 'explore', label: 'Duyệt tìm', icon: 'compass', iconOutline: 'compass-outline' },
-  { name: 'schedule', label: 'Lịch chiếu', icon: 'calendar', iconOutline: 'calendar-outline' },
-  { name: 'profile', label: 'Tài khoản', icon: 'person', iconOutline: 'person-outline' },
+  { name: 'index', label: 'Trang chủ', icon: 'home' },
+  { name: 'explore', label: 'Duyệt tìm', icon: 'compass' },
+  { name: 'schedule', label: 'Lịch chiếu', icon: 'calendar' },
+  { name: 'profile', label: 'Tài khoản', icon: 'user' },
 ];
 
-function TabIcon({ focused, label, icon, iconOutline }: {
+function TabIcon({ focused, label, icon }: {
   focused: boolean;
   label: string;
   icon: string;
-  iconOutline: string;
 }) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.timing(scale, {
+      toValue: focused ? 1.15 : 1,
+      duration: 200,
+      useNativeDriver: true,
+      easing: Easing.out(Easing.cubic),
+    }).start();
+  }, [focused]);
+
   return (
     <View style={styles.tabItem}>
-      {/* Icon with refined spacing */}
-      <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
-        <Ionicons
-          name={(focused ? icon : iconOutline) as any}
-          size={24} // Standard iOS tab icon size
-          color={focused ? COLORS.accent : 'rgba(255,255,255,0.5)'}
+      <Animated.View style={[styles.iconWrap, { transform: [{ scale }] }]}>
+        <Feather
+          name={icon as any}
+          size={24}
+          color={focused ? '#F4C84A' : 'rgba(255,255,255,0.6)'}
+          style={{ strokeWidth: focused ? 2.5 : 1.5 }} // Thicker when active
         />
-      </View>
-      {/* Label below icon - Apple style: small and subtle */}
+      </Animated.View>
+      {/* Label below icon */}
       <Text style={[styles.tabLabel, focused && styles.tabLabelActive]} numberOfLines={1}>
         {label}
       </Text>
@@ -52,27 +62,28 @@ export default function TabLayout() {
         },
         tabBarStyle: {
           position: 'absolute',
-          bottom: 12, // Spec 12dp
-          left: 16,
-          right: 16,
-          height: 64, // Spec 64dp
-          borderRadius: 28, // Spec 28dp
-          backgroundColor: isAndroid ? 'rgba(12,12,18,0.95)' : 'transparent',
+          bottom: 20, // Spec 20px
+          left: '10%', // Center with width
+          right: '10%',
+          width: '80%',
+          height: 68, // Taller for floating feel
+          borderRadius: 34,
+          backgroundColor: isAndroid ? 'rgba(15,18,26,0.95)' : 'transparent', // Fallback for android
           borderTopWidth: 0,
           elevation: 0,
           shadowColor: '#000',
-          shadowOffset: { width: 0, height: 8 },
-          shadowOpacity: 0.25, // Lighter shadow
-          shadowRadius: 16,
+          shadowOffset: { width: 0, height: 10 },
+          shadowOpacity: 0.3,
+          shadowRadius: 20,
           borderWidth: 1,
-          borderColor: COLORS.stroke,
+          borderColor: 'rgba(255,255,255,0.08)',
         },
         tabBarBackground: () =>
           !isAndroid ? (
             <BlurView
-              intensity={35}
+              intensity={50} // Stronger blur
               tint="dark"
-              style={[StyleSheet.absoluteFill, { borderRadius: 28, overflow: 'hidden' }]}
+              style={[StyleSheet.absoluteFill, { borderRadius: 34, overflow: 'hidden', backgroundColor: 'rgba(15,18,26,0.75)' }]}
             />
           ) : null,
       }}
@@ -88,7 +99,6 @@ export default function TabLayout() {
                 focused={focused}
                 label={tab.label}
                 icon={tab.icon}
-                iconOutline={tab.iconOutline}
               />
             ),
           }}
@@ -108,13 +118,6 @@ const styles = StyleSheet.create({
   iconWrap: {
     alignItems: 'center',
     justifyContent: 'center',
-    // Removed pill background for cleaner iOS look, can add back if desired
-    // width: 44,
-    // height: 32,
-    // borderRadius: 16,
-  },
-  iconWrapActive: {
-    // backgroundColor: 'rgba(244, 200, 74, 0.1)', // Optional subtle pill
   },
   tabLabel: {
     fontSize: 10,
@@ -123,7 +126,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
   tabLabelActive: {
-    color: COLORS.accent,
-    fontWeight: '600',
+    color: '#F4C84A',
+    fontWeight: '700',
   },
 });
