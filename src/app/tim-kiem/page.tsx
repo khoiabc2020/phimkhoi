@@ -43,7 +43,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                 </div>
 
                 {filteredMovies.length > 0 ? (
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 animate-in fade-in slide-in-from-bottom-5 duration-500">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2 sm:gap-3 md:gap-4 animate-in fade-in slide-in-from-bottom-5 duration-500">
                         {filteredMovies.map((movie: any) => (
                             <MovieCard key={movie._id} movie={movie} />
                         ))}
