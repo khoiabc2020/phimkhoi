@@ -60,17 +60,18 @@ export default function NativePlayer({
     // Modals
     const [showEpisodes, setShowEpisodes] = useState(false);
     const [showServers, setShowServers] = useState(false);
+    const [epRange, setEpRange] = useState(0); // for range picker in drawer
+    const EP_CHUNK = 50;
 
     const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
     const lastProgressUpdate = useRef(0);
     const initialSeekDone = useRef(false);
 
     // Brightness with Standard Animated
-    const brightness = useRef(new Animated.Value(0)).current; // 0 = normal (opacity 0), 1 = dark (opacity 1) - Wait, logic reversed?
-    // Let's say brightnessValue 1.0 = full bright (overlay opacity 0)
-    // brightnessValue 0.0 = dark (overlay opacity 0.8)
-    const brightnessValue = useRef(1.0);
+    const brightnessValue = useRef(1.0);   // 1.0 = max bright
+    const brightnessStart = useRef(1.0);   // Snapshot at gesture start
     const brightnessOpacity = useRef(new Animated.Value(0)).current;
+    const brightness = useRef(new Animated.Value(1)).current; // For visual bar
 
     // Slider visibility
     const sliderOpacity = useRef(new Animated.Value(0)).current;
@@ -181,47 +182,43 @@ export default function NativePlayer({
     };
 
     // --- BRIGHTNESS GESTURE (PanResponder) ---
-    const updateBrightness = (dy: number) => {
-        const delta = -dy / 250;
-        let newVal = brightnessValue.current + delta;
+    const updateBrightness = (totalDy: number) => {
+        // Compute from start value + total dy (not accumulated delta)
+        const delta = -totalDy / 300;
+        let newVal = brightnessStart.current + delta;
         newVal = Math.max(0, Math.min(1, newVal));
         brightnessValue.current = newVal;
 
-        // Update overlay opacity: 1.0 bright -> 0 opacity, 0.0 bright -> 0.8 opacity
-        const opacity = (1 - newVal) * 0.8;
+        // Overlay: 0% opacity at max bright, 75% at min
+        const opacity = (1 - newVal) * 0.75;
         brightnessOpacity.setValue(opacity);
 
-        // Update slider height visual
+        // Visual bar: height reflects brightness level
         brightness.setValue(newVal);
     };
 
     const panResponder = useRef(
         PanResponder.create({
-            onStartShouldSetPanResponder: (evt, gestureState) => {
-                // Only verify if touch starts on left side
+            onStartShouldSetPanResponder: (evt) => {
                 return !locked && evt.nativeEvent.pageX < width / 3;
             },
             onMoveShouldSetPanResponder: (evt, gestureState) => {
-                return !locked && Math.abs(gestureState.dy) > 10 && evt.nativeEvent.pageX < width / 3;
+                return !locked && Math.abs(gestureState.dy) > 8 && evt.nativeEvent.pageX < width / 3;
             },
             onPanResponderGrant: () => {
-                // Show slider
+                // Snapshot brightness at gesture start
+                brightnessStart.current = brightnessValue.current;
                 Animated.timing(sliderOpacity, {
-                    toValue: 1,
-                    duration: 200,
-                    useNativeDriver: true
+                    toValue: 1, duration: 200, useNativeDriver: true
                 }).start();
             },
             onPanResponderMove: (evt, gestureState) => {
+                // Pass cumulative dy from gesture start
                 updateBrightness(gestureState.dy);
             },
             onPanResponderRelease: () => {
-                // Hide slider
                 Animated.timing(sliderOpacity, {
-                    toValue: 0,
-                    duration: 1000,
-                    delay: 500,
-                    useNativeDriver: true
+                    toValue: 0, duration: 1000, delay: 500, useNativeDriver: true
                 }).start();
             }
         })
@@ -429,8 +426,34 @@ export default function NativePlayer({
                             </TouchableOpacity>
                         </View>
 
+                        {/* Range Picker for large series */}
+                        {episodeList.length > EP_CHUNK && (
+                            <ScrollView
+                                horizontal
+                                showsHorizontalScrollIndicator={false}
+                                contentContainerStyle={{ paddingHorizontal: 20, gap: 8, paddingBottom: 12, paddingTop: 8 }}
+                            >
+                                {Array.from({ length: Math.ceil(episodeList.length / EP_CHUNK) }).map((_, i) => {
+                                    const from = i * EP_CHUNK + 1;
+                                    const to = Math.min((i + 1) * EP_CHUNK, episodeList.length);
+                                    const isActive = epRange === i;
+                                    return (
+                                        <TouchableOpacity
+                                            key={i}
+                                            onPress={() => setEpRange(i)}
+                                            style={[styles.rangeChip, isActive && styles.rangeChipActive]}
+                                        >
+                                            <Text style={[styles.rangeChipText, isActive && styles.rangeChipTextActive]}>
+                                                {from}–{to}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    );
+                                })}
+                            </ScrollView>
+                        )}
+
                         <FlatList
-                            data={episodeList}
+                            data={episodeList.slice(epRange * EP_CHUNK, (epRange + 1) * EP_CHUNK)}
                             keyExtractor={(item) => item.slug}
                             contentContainerStyle={{ padding: 28, paddingBottom: 60, gap: 16 }}
                             columnWrapperStyle={{ gap: 16 }}
@@ -648,6 +671,16 @@ const styles = StyleSheet.create({
         color: '#fbbf24',
         fontWeight: '800'
     },
+
+    // Range chip for episode pagination
+    rangeChip: {
+        paddingHorizontal: 14, paddingVertical: 6, borderRadius: 16,
+        backgroundColor: 'rgba(255,255,255,0.06)',
+        borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+    },
+    rangeChipActive: { backgroundColor: 'rgba(251,191,36,0.15)', borderColor: '#fbbf24' },
+    rangeChipText: { color: 'rgba(255,255,255,0.55)', fontSize: 13, fontWeight: '600' },
+    rangeChipTextActive: { color: '#fbbf24', fontWeight: '700' },
 
     sheetOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
     sheetContent: { width: '100%', backgroundColor: '#1c1c1c', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, paddingBottom: 40 },

@@ -43,6 +43,8 @@ export default function MovieDetailScreen() {
     const [selectedServer, setSelectedServer] = useState(0);
     const [rating, setRating] = useState<number | null>(null);
     const [cast, setCast] = useState<any[]>([]);
+    const [selectedEpRange, setSelectedEpRange] = useState(0); // 0 = first group of 50
+    const EP_CHUNK = 50; // Episodes per page
 
     const { user, token, syncFavorites, syncWatchList } = useAuth();
 
@@ -308,15 +310,54 @@ export default function MovieDetailScreen() {
                     {/* CONTENT */}
                     <View style={{ minHeight: 300 }}>
                         {selectedTab === 'episodes' && (
-                            <View style={styles.episodeGrid}>
-                                {currentServerData.map((ep: any, idx: number) => (
-                                    <Link key={idx} href={`/player/${movie.slug}?ep=${ep.slug}`} asChild>
-                                        <Pressable style={styles.epCard}>
-                                            <Text style={styles.epText}>{ep.name}</Text>
-                                        </Pressable>
-                                    </Link>
-                                ))}
-                                {currentServerData.length === 0 && <Text style={{ color: 'gray', textAlign: 'center', width: '100%', marginTop: 20 }}>Chưa có tập phim nào.</Text>}
+                            <View>
+                                {/* Range Picker - only show if many episodes */}
+                                {currentServerData.length > EP_CHUNK && (() => {
+                                    const totalGroups = Math.ceil(currentServerData.length / EP_CHUNK);
+                                    return (
+                                        <ScrollView
+                                            horizontal
+                                            showsHorizontalScrollIndicator={false}
+                                            contentContainerStyle={{ paddingHorizontal: 16, gap: 8, paddingBottom: 12 }}
+                                        >
+                                            {Array.from({ length: totalGroups }).map((_, i) => {
+                                                const from = i * EP_CHUNK + 1;
+                                                const to = Math.min((i + 1) * EP_CHUNK, currentServerData.length);
+                                                return (
+                                                    <Pressable
+                                                        key={i}
+                                                        onPress={() => setSelectedEpRange(i)}
+                                                        style={[
+                                                            styles.rangeBtn,
+                                                            selectedEpRange === i && styles.rangeBtnActive
+                                                        ]}
+                                                    >
+                                                        <Text style={[
+                                                            styles.rangeBtnText,
+                                                            selectedEpRange === i && styles.rangeBtnTextActive
+                                                        ]}>
+                                                            {from}–{to}
+                                                        </Text>
+                                                    </Pressable>
+                                                );
+                                            })}
+                                        </ScrollView>
+                                    );
+                                })()}
+
+                                {/* Episode Grid (paginated) */}
+                                <View style={styles.episodeGrid}>
+                                    {currentServerData
+                                        .slice(selectedEpRange * EP_CHUNK, (selectedEpRange + 1) * EP_CHUNK)
+                                        .map((ep: any, idx: number) => (
+                                            <Link key={idx} href={`/player/${movie.slug}?ep=${ep.slug}&server=${selectedServer}`} asChild>
+                                                <Pressable style={styles.epCard}>
+                                                    <Text style={styles.epText}>{ep.name}</Text>
+                                                </Pressable>
+                                            </Link>
+                                        ))}
+                                    {currentServerData.length === 0 && <Text style={{ color: 'gray', textAlign: 'center', width: '100%', marginTop: 20 }}>Chưa có tập phim nào.</Text>}
+                                </View>
                             </View>
                         )}
 
@@ -402,7 +443,17 @@ const styles = StyleSheet.create({
     tabText: { color: 'rgba(255,255,255,0.5)', fontWeight: '600' },
     tabTextActive: { color: 'white' },
 
-    episodeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+    episodeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: 16, paddingTop: 4 },
     epCard: { width: '18%', aspectRatio: 1.4, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 8, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
-    epText: { color: 'white', fontWeight: 'bold' }
+    epText: { color: 'white', fontWeight: 'bold' },
+
+    // Range picker
+    rangeBtn: {
+        paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20,
+        backgroundColor: 'rgba(255,255,255,0.06)',
+        borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+    },
+    rangeBtnActive: { backgroundColor: 'rgba(251,191,36,0.15)', borderColor: COLORS.accent },
+    rangeBtnText: { color: 'rgba(255,255,255,0.55)', fontSize: 13, fontWeight: '600' },
+    rangeBtnTextActive: { color: COLORS.accent },
 });
