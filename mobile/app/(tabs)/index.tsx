@@ -12,6 +12,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import HeroSection from '@/components/HeroSection';
 import MovieRow from '@/components/MovieRow';
+import ContinueWatchingRow from '@/components/ContinueWatchingRow';
 import LoadingState from '@/components/LoadingState';
 import {
   getHomeData, getMoviesByCategory, getMoviesByCountry,
@@ -236,17 +237,9 @@ export default function HomeScreen() {
         {/* Tiếp tục xem (Continue Watching) */}
         {!loading && user?.history && user.history.length > 0 && (
           <View style={{ marginBottom: 10 }}>
-            <MovieRow
+            <ContinueWatchingRow
               title="Tiếp tục xem"
-              movies={user.history.map((h: any) => ({
-                _id: h.movie?._id,
-                name: h.movie?.name,
-                origin_name: h.movie?.original_name,
-                thumb_url: h.movie?.thumb_url,
-                poster_url: h.movie?.poster_url,
-                slug: h.slug
-              }))}
-              slug=""
+              items={user.history}
             />
           </View>
         )}
