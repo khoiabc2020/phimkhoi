@@ -14,7 +14,7 @@ export const unstable_settings = {
 };
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-// import { ErrorBoundary } from '@/components/ErrorBoundary'; // Ensure this exists or omit if not confirmed
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export default function RootLayout() {
     const colorScheme = useColorScheme();
@@ -25,28 +25,28 @@ export default function RootLayout() {
 
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
-            {/* <ErrorBoundary> */}
-            <AuthProvider>
-                <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-                    <Stack>
-                        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                        <Stack.Screen name="movie/[slug]" options={{ headerShown: false }} />
-                        <Stack.Screen name="player/[slug]" options={{ headerShown: false }} />
-                        <Stack.Screen name="list/[type]" options={{ headerShown: false }} />
-                        <Stack.Screen name="category/[slug]" options={{ headerShown: false }} />
-                        <Stack.Screen name="country/[slug]" options={{ headerShown: false }} />
-                        <Stack.Screen name="search" options={{ headerShown: false }} />
-                        <Stack.Screen name="settings" options={{ headerShown: false }} />
-                        <Stack.Screen name="watchlist" options={{ headerShown: false }} />
-                        <Stack.Screen name="history" options={{ headerShown: false }} />
-                        <Stack.Screen name="notifications" options={{ headerShown: false }} />
-                        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-                    </Stack>
-                    <StatusBar style="light" />
-                </ThemeProvider>
-            </AuthProvider>
-            {/* </ErrorBoundary> */}
+            <ErrorBoundary>
+                <AuthProvider>
+                    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+                        <Stack>
+                            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                            <Stack.Screen name="movie/[slug]" options={{ headerShown: false }} />
+                            <Stack.Screen name="player/[slug]" options={{ headerShown: false }} />
+                            <Stack.Screen name="list/[type]" options={{ headerShown: false }} />
+                            <Stack.Screen name="category/[slug]" options={{ headerShown: false }} />
+                            <Stack.Screen name="country/[slug]" options={{ headerShown: false }} />
+                            <Stack.Screen name="search" options={{ headerShown: false }} />
+                            <Stack.Screen name="settings" options={{ headerShown: false }} />
+                            <Stack.Screen name="watchlist" options={{ headerShown: false }} />
+                            <Stack.Screen name="history" options={{ headerShown: false }} />
+                            <Stack.Screen name="notifications" options={{ headerShown: false }} />
+                            <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+                        </Stack>
+                        <StatusBar style="light" />
+                    </ThemeProvider>
+                </AuthProvider>
+            </ErrorBoundary>
         </GestureHandlerRootView>
     );
 }
