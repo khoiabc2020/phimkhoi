@@ -12,7 +12,6 @@ export const unstable_settings = {
   anchor: '(tabs)',
 };
 
-import * as Brightness from 'expo-brightness';
 import { useEffect } from 'react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
@@ -20,18 +19,7 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   useEffect(() => {
-    (async () => {
-      if (Platform.OS === 'android') {
-        try {
-          const { status } = await Brightness.requestPermissionsAsync();
-          if (status !== 'granted') {
-            console.log('Brightness permission denied');
-          }
-        } catch (e) {
-          console.warn('Failed to request brightness permission', e);
-        }
-      }
-    })();
+    // Platform-specific initialization if needed
   }, []);
 
   return (

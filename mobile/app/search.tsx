@@ -36,9 +36,10 @@ export default function SearchScreen() {
         setLoading(true);
         setSearched(true);
         try {
-            const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/search?q=${encodeURIComponent(text.trim())}`);
-            const data = await res.json();
-            setResults(data.movies || data.items || []);
+            // Use standard API service
+            const { searchMovies } = require('@/services/api');
+            const items = await searchMovies(text.trim());
+            setResults(items);
         } catch (e) {
             setResults([]);
         } finally {

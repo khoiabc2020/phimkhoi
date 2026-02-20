@@ -20,7 +20,12 @@
       },
       "package": "com.phimkhoi.mobile",
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "navigationBar": {
+        "backgroundColor": "#000000",
+        "barStyle": "light-content",
+        "visible": "sticky-immersive"
+      }
     },
     "web": {
       "output": "static",
