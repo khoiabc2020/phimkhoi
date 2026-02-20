@@ -213,22 +213,26 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                     {/* Right: Search & Actions */}
                     <div className="flex items-center gap-3 shrink-0">
 
-                        {/* Search Bar - Expandable */}
+                        {/* Search: icon-only on mobile → links to /tim-kiem. Expandable on desktop. */}
                         <div className="flex items-center">
+                            {/* Mobile: simple link to search page */}
+                            <a
+                                href="/tim-kiem"
+                                className="lg:hidden w-10 h-10 flex items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.08] transition-all active:scale-95"
+                            >
+                                <Search className="w-4 h-4 text-white/80" />
+                            </a>
+
+                            {/* Desktop: expandable search bar */}
                             <form
                                 onSubmit={handleSearch}
                                 className={cn(
-                                    "relative flex items-center transition-all duration-500 ease-out h-10",
-                                    isSearchOpen ? "w-[180px] md:w-60" : "w-10"
+                                    "hidden lg:flex relative items-center transition-all duration-500 ease-out h-10",
+                                    isSearchOpen ? "w-60" : "w-10"
                                 )}
                             >
-                                {/* Search Toggle / Icon */}
                                 <div
-                                    onClick={() => {
-                                        if (!isSearchOpen) {
-                                            setIsSearchOpen(true);
-                                        }
-                                    }}
+                                    onClick={() => { if (!isSearchOpen) setIsSearchOpen(true); }}
                                     className={cn(
                                         "cursor-pointer absolute right-0 z-20 w-10 h-10 flex items-center justify-center rounded-full border transition-all duration-300",
                                         isSearchOpen
@@ -236,35 +240,24 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                             : "bg-white/[0.08] hover:bg-white/[0.15] border-white/[0.08] hover:scale-105 active:scale-95"
                                     )}
                                 >
-                                    <Search className={cn("w-4.5 h-4.5 transition-colors", isSearchOpen ? "hidden" : "text-white/80")} />
+                                    <Search className={cn("w-4 h-4 transition-colors", isSearchOpen ? "hidden" : "text-white/80")} />
                                 </div>
-
-                                {/* Input Field */}
                                 <input
                                     ref={searchInputRef}
                                     type="text"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    onBlur={() => {
-                                        if (!searchQuery) setIsSearchOpen(false);
-                                    }}
+                                    onBlur={() => { if (!searchQuery) setIsSearchOpen(false); }}
                                     placeholder="Tìm kiếm..."
                                     className={cn(
                                         "absolute right-0 top-0 h-10 bg-white/[0.08] border border-white/[0.08] rounded-full pl-4 pr-10 text-sm text-white outline-none focus:border-primary/50 focus:bg-black/40 transition-all duration-500",
                                         isSearchOpen ? "w-full opacity-100 visible" : "w-10 opacity-0 invisible"
                                     )}
                                 />
-
-                                {/* Close/Search Icon inside Input */}
                                 {isSearchOpen && (
                                     <button
                                         type={searchQuery ? "submit" : "button"}
-                                        onClick={(e) => {
-                                            if (!searchQuery) {
-                                                setIsSearchOpen(false);
-                                                e.preventDefault();
-                                            }
-                                        }}
+                                        onClick={(e) => { if (!searchQuery) { setIsSearchOpen(false); e.preventDefault(); } }}
                                         className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center z-30 text-white/50 hover:text-white transition-colors"
                                     >
                                         {searchQuery ? <Search className="w-4 h-4" /> : <X className="w-4 h-4" />}
@@ -283,9 +276,9 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             </Link>
                         </div>
 
-                        {/* Auth */}
+                        {/* Auth — hidden on mobile (accessible via hamburger menu) */}
                         {session ? (
-                            <div className="relative group ml-1">
+                            <div className="hidden lg:block relative group ml-1">
                                 <button className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/10 hover:border-primary/50 transition-all p-0.5">
                                     <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center text-sm font-bold text-white shadow-inner">
                                         {session.user?.name?.[0]?.toUpperCase() || "U"}
@@ -312,7 +305,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                 </div>
                             </div>
                         ) : (
-                            <Link href="/login" className="bg-[#F4C84A] hover:bg-[#ffe58a] text-black px-5 py-2 rounded-full font-bold text-sm transition-transform hover:scale-105 active:scale-95 ml-1 whitespace-nowrap shadow-[0_0_15px_rgba(244,200,74,0.3)]">
+                            <Link href="/login" className="hidden lg:block bg-[#F4C84A] hover:bg-[#ffe58a] text-black px-5 py-2 rounded-full font-bold text-sm transition-transform hover:scale-105 active:scale-95 ml-1 whitespace-nowrap shadow-[0_0_15px_rgba(244,200,74,0.3)]">
                                 Đăng nhập
                             </Link>
                         )}
