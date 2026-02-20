@@ -246,17 +246,23 @@ export default function MovieDetailScreen() {
                 <View style={styles.bodyContent}>
                     {/* ACTION BUTTONS */}
                     <View style={styles.playSection}>
-                        <Link href={firstEpisode ? `/player/${movie.slug}?ep=${firstEpisode.slug}&server=${selectedServer}` : '/'} asChild>
-                            <Pressable style={styles.playBtn} disabled={!firstEpisode}>
-                                <LinearGradient
-                                    colors={[COLORS.accent, '#d97706']}
-                                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                                    style={StyleSheet.absoluteFill}
-                                />
-                                <Ionicons name="play" size={22} color="black" />
-                                <Text style={styles.playBtnText}>{firstEpisode ? 'Xem Phim' : 'Đang cập nhật'}</Text>
-                            </Pressable>
-                        </Link>
+                        <Pressable
+                            style={styles.playBtn}
+                            disabled={!firstEpisode}
+                            onPress={() => {
+                                if (firstEpisode) {
+                                    router.push(`/player/${movie.slug}?ep=${firstEpisode.slug}&server=${selectedServer}`);
+                                }
+                            }}
+                        >
+                            <LinearGradient
+                                colors={[COLORS.accent, '#d97706']}
+                                start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                                style={StyleSheet.absoluteFill}
+                            />
+                            <Ionicons name="play" size={22} color="black" />
+                            <Text style={styles.playBtnText}>{firstEpisode ? 'Xem Phim' : 'Đang cập nhật'}</Text>
+                        </Pressable>
 
                         <View style={styles.actionRow}>
                             <Pressable
@@ -444,7 +450,7 @@ const styles = StyleSheet.create({
     tabTextActive: { color: 'white' },
 
     episodeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: 16, paddingTop: 4 },
-    epCard: { width: '18%', aspectRatio: 1.4, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 8, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
+    epCard: { width: '18.4%', aspectRatio: 1.4, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 8, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
     epText: { color: 'white', fontWeight: 'bold' },
 
     // Range picker

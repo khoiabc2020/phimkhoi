@@ -118,7 +118,7 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
                                         {currentServerData.length} tập
                                     </span>
                                 </div>
-                                <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-8 lg:grid-cols-10 gap-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                                <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                                     {currentServerData.map((ep: any) => (
                                         <Link
                                             key={ep.slug}

@@ -151,6 +151,9 @@ export default function PlayerScreen() {
         );
     }
 
+    const currentHistory = user?.history?.find((h: any) => h.slug === slug && h.episode === ep);
+    const initialTime = currentHistory?.currentTime ? currentHistory.currentTime * 1000 : 0;
+
     return (
         <View className="flex-1 bg-black relative">
             <StatusBar hidden />
@@ -164,7 +167,9 @@ export default function PlayerScreen() {
                     onClose={handleClose}
                     onNext={nextEpisodeSlug ? handleNextEpisode : undefined}
                     onProgress={handleProgress}
+                    initialTime={initialTime}
                     // New Props
+
                     episodeList={episodes[selectedServer]?.server_data || []}
                     serverList={episodes.map((s: any) => s.server_name)}
                     currentServerIndex={selectedServer}

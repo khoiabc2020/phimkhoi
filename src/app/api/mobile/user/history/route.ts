@@ -42,8 +42,9 @@ export async function GET(req: Request) {
             slug: h.movieSlug,
             episode: h.episodeSlug,
             episode_name: h.episodeName,
-            progress: h.progress, // This is percentage 0-100 in WatchHistory model usually? 
-            // Check WatchHistory model: progress is 0-100. duration/currentTime are seconds.
+            progress: h.progress, // percentage 0-100
+            currentTime: h.currentTime || 0, // exact time in seconds
+            duration: h.duration || 0,
             timestamp: new Date(h.lastWatched).getTime(),
             movie: {
                 _id: h.movieId,
