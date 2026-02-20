@@ -58,20 +58,12 @@ const getItems = (data: any): Movie[] => {
 
 export const getHomeData = async () => {
     try {
-        console.log("Fetching Home Data...");
         const [phimLe, phimBo, hoatHinh, tvShows] = await Promise.all([
             fetch(`${API_URL}/v1/api/danh-sach/phim-le?limit=12`, { next: { revalidate: 60 } }).then((res) => res.json()),
             fetch(`${API_URL}/v1/api/danh-sach/phim-bo?limit=12`, { next: { revalidate: 60 } }).then((res) => res.json()),
             fetch(`${API_URL}/v1/api/danh-sach/hoat-hinh?limit=12`, { next: { revalidate: 60 } }).then((res) => res.json()),
             fetch(`${API_URL}/v1/api/danh-sach/tv-shows?limit=12`, { next: { revalidate: 60 } }).then((res) => res.json()),
         ]);
-
-        console.log("Home Data Fetched:", {
-            phimLe: getItems(phimLe).length,
-            phimBo: getItems(phimBo).length,
-            hoatHinh: getItems(hoatHinh).length,
-            tvShows: getItems(tvShows).length,
-        });
 
         return {
             phimLe: getItems(phimLe),
@@ -96,9 +88,6 @@ export const getMovieDetail = async (slug: string) => {
         }
 
         // Fallback to OPhim
-        console.log(`[MultiSource] KPPhim missing ${slug}, trying OPhim...`);
-        // Fallback to OPhim
-        console.log(`[MultiSource] KPPhim missing ${slug}, trying OPhim...`);
         const ophimRes = await fetch(`https://ophim1.com/phim/${slug}`, { next: { revalidate: 60 } });
 
         if (ophimRes.ok) {

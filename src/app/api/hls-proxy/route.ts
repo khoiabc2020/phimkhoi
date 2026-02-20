@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
         return new NextResponse('Missing URL', { status: 400 });
     }
 
-    console.log(`[Proxy] Requesting: ${url}`);
+    // console.log(`[Proxy] Requesting: ${url}`);
 
     try {
         // Spoof Referer to be the origin of the video URL, as many servers block external referers
@@ -37,9 +37,9 @@ export async function GET(request: NextRequest) {
             'Accept-Encoding': 'gzip, deflate, br'
         };
 
-        console.log(`[Proxy] Fetching: ${url}`);
+        // console.log(`[Proxy] Fetching: ${url}`);
         const response = await fetch(url, { headers });
-        console.log(`[Proxy] Response: ${response.status} ${response.statusText} for ${url}`);
+        // console.log(`[Proxy] Response: ${response.status} ${response.statusText} for ${url}`);
 
         if (!response.ok) {
             const errorText = await response.text().catch(() => 'No body');
@@ -52,10 +52,9 @@ export async function GET(request: NextRequest) {
             (contentType && (
                 contentType.includes('mpegurl') ||
                 contentType.includes('application/x-mpegURL') ||
-                contentType.includes('application/vnd.apple.mpegurl')
             ));
 
-        console.log(`[Proxy] Response Content-Type: ${contentType}, isM3u8: ${isM3u8}`);
+        // console.log(`[Proxy] Response Content-Type: ${contentType}, isM3u8: ${isM3u8}`);
 
         const responseHeaders = new Headers();
         responseHeaders.set('Access-Control-Allow-Origin', '*');
@@ -65,7 +64,7 @@ export async function GET(request: NextRequest) {
         // OPTIMIZATION: Stream binary data (TS segments) directly to client
         // This reduces memory usage and TTFB (Time To First Byte)
         if (!isM3u8) {
-            console.log(`[Proxy] Streaming binary/other content directly.`);
+            // console.log(`[Proxy] Streaming binary/other content directly.`);
             return new NextResponse(response.body, {
                 status: 200,
                 headers: responseHeaders,

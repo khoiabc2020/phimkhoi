@@ -38,7 +38,6 @@ export default function RootLayout() {
               <Stack.Screen name="list/[type]" options={{ headerShown: false }} />
               <Stack.Screen name="category/[slug]" options={{ headerShown: false }} />
               <Stack.Screen name="country/[slug]" options={{ headerShown: false }} />
-              <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
             </Stack>
             <StatusBar style="light" />
           </ThemeProvider>
