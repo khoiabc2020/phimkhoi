@@ -34,12 +34,12 @@ function TabIcon({ focused, label, icon }: {
       <Animated.View style={[styles.iconWrap, { transform: [{ scale }] }]}>
         <Feather
           name={icon as any}
-          size={20}
-          color={focused ? '#F4C84A' : 'rgba(255,255,255,0.5)'}
+          size={22}
+          color={focused ? COLORS.accent : 'rgba(255,255,255,0.6)'}
         />
       </Animated.View>
       {/* Label below icon */}
-      <Text style={[styles.tabLabel, focused && styles.tabLabelActive]} numberOfLines={1}>
+      <Text style={[styles.tabLabel, focused && { color: COLORS.accent, fontWeight: '700' }]} numberOfLines={1}>
         {label}
       </Text>
     </View>
@@ -50,11 +50,7 @@ export default function TabLayout() {
   const isAndroid = Platform.OS === 'android';
   const insets = useSafeAreaInsets();
 
-  // Dynamically position tab bar above system UI:
-  // - Gesture nav: insets.bottom is small (~0-16px) → pill sits close to edge
-  // - 3-button nav: insets.bottom is larger (~24-48px) → pill rises above buttons
-  const tabBarBottom = insets.bottom > 0 ? insets.bottom + 8 : 14;
-
+  // Edge-to-edge flat bottom bar with Liquid Glass
   return (
     <Tabs
       screenOptions={{
@@ -68,27 +64,22 @@ export default function TabLayout() {
         },
         tabBarStyle: {
           position: 'absolute',
-          bottom: tabBarBottom,
-          left: 50,
-          right: 50,
-          height: 58,
-          borderRadius: 34,
-          backgroundColor: isAndroid ? 'rgba(15,18,26,0.95)' : 'transparent',
-          borderTopWidth: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 65 + insets.bottom,
+          paddingBottom: insets.bottom, // push icons up safely
+          backgroundColor: isAndroid ? 'rgba(15,18,26,0.92)' : 'transparent',
+          borderTopWidth: StyleSheet.hairlineWidth,
+          borderTopColor: 'rgba(255,255,255,0.15)',
           elevation: 0,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 10 },
-          shadowOpacity: 0.3,
-          shadowRadius: 20,
-          borderWidth: 1,
-          borderColor: 'rgba(255,255,255,0.08)',
         },
         tabBarBackground: () =>
           !isAndroid ? (
             <BlurView
-              intensity={50}
+              intensity={80} // Heavy liquid glass
               tint="dark"
-              style={[StyleSheet.absoluteFill, { borderRadius: 34, overflow: 'hidden', backgroundColor: 'rgba(15,18,26,0.75)' }]}
+              style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(10,12,18,0.4)' }]}
             />
           ) : null,
       }}
@@ -127,12 +118,8 @@ const styles = StyleSheet.create({
   },
   tabLabel: {
     fontSize: 10,
-    color: 'rgba(255,255,255,0.5)',
+    color: 'rgba(255,255,255,0.6)',
     fontWeight: '500',
     letterSpacing: 0.2,
-  },
-  tabLabelActive: {
-    color: '#F4C84A',
-    fontWeight: '700',
   },
 });
