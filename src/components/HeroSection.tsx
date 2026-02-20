@@ -208,7 +208,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                         </Link>
 
                                         <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 active:scale-95 transition-transform relative z-20">
-                                            <FavoriteButton movieData={getFavoriteData(movie)} initialIsFavorite={false} size="md" />
+                                            <FavoriteButton movieData={getFavoriteData(movie)} size="md" />
                                         </div>
                                     </div>
                                 </div>

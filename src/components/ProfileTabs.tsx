@@ -62,7 +62,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                                                         movieQuality: movie.movieQuality,
                                                         movieCategories: Array.isArray(movie.movieCategories) ? movie.movieCategories : [movie.movieCategories],
                                                     }}
-                                                    initialIsFavorite={true}
+                                                    // initialIsFavorite removed
                                                     size="sm"
                                                 />
                                             </div>
