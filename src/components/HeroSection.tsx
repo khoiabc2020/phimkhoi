@@ -132,80 +132,89 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
             {/* ================= TABLET & MOBILE LAYOUT (Portrait/Small Screens) ================= */}
             {/* Shows on < lg screens (approx < 1024px) */}
-            <div className="lg:hidden relative w-full h-[85vh] md:h-[60vh] flex flex-col pt-0">
+            <div className="lg:hidden relative w-full h-[85vh] md:h-[60vh] flex flex-col pt-0 overflow-hidden" ref={mobileRef}>
+                <div className="flex flex-row touch-pan-y h-full">
+                    {heroMovies.map((movie, index) => {
+                        const posterImg = getHeroImage(movie, 'poster');
+                        const rating = heroMoviesData[movie._id]?.vote_average ? heroMoviesData[movie._id].vote_average.toFixed(1) : "N/A";
 
-                {/* 1. Ambient Background - Touch action handling for swipe */}
-                <div className="absolute inset-0 z-0 overflow-hidden touch-pan-y">
-                    <Image
-                        src={getHeroImage(activeMovie, 'poster')}
-                        alt="bg"
-                        fill
-                        className="object-cover blur-[60px] opacity-40 scale-125"
-                        priority
-                    />
-                    {/* Darker overlays for readability */}
-                    <div className="absolute inset-0 bg-[#0B0D12]/40" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D12] via-[#0B0D12]/70 to-transparent" />
-                </div>
+                        return (
+                            <div key={movie._id} className="relative flex-[0_0_100%] min-w-0 h-full flex flex-col">
+                                {/* 1. Ambient Background */}
+                                <div className="absolute inset-0 z-0 overflow-hidden">
+                                    <Image
+                                        src={posterImg}
+                                        alt="bg"
+                                        fill
+                                        className="object-cover blur-[60px] opacity-40 scale-125"
+                                        priority={index === 0}
+                                    />
+                                    <div className="absolute inset-0 bg-[#0B0D12]/40" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D12] via-[#0B0D12]/70 to-transparent" />
+                                </div>
 
-                {/* 2. Content */}
-                <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-24 md:pb-12 text-center">
+                                {/* 2. Content */}
+                                <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-24 md:pb-12 text-center">
 
-                    {/* Poster Card (3D Floating) */}
-                    <Link href={`/xem-phim/${activeMovie.slug}`} className="relative w-[180px] md:w-[200px] aspect-[2/3] mb-8 rounded-2xl overflow-hidden shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] ring-1 ring-white/10 animate-in fade-in zoom-in duration-700">
-                        <Image
-                            src={getHeroImage(activeMovie, 'poster')}
-                            alt={activeMovie.name}
-                            fill
-                            className="object-cover"
-                        />
-                        {/* Shine */}
-                        <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-50" />
-                    </Link>
+                                    {/* Poster Card (3D Floating) */}
+                                    <Link href={`/xem-phim/${movie.slug}`} className="relative w-[180px] md:w-[200px] aspect-[2/3] mb-8 rounded-2xl overflow-hidden shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] ring-1 ring-white/10 animate-in fade-in zoom-in duration-700">
+                                        <Image
+                                            src={posterImg}
+                                            alt={movie.name}
+                                            fill
+                                            className="object-cover"
+                                            priority={index === 0}
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-50" />
+                                    </Link>
 
-                    {/* Metadata */}
-                    <div className="space-y-3 mb-6 max-w-md mx-auto">
-                        <h1 className="text-xl md:text-2xl font-black text-white leading-tight drop-shadow-xl text-glow line-clamp-2 px-2">
-                            {activeMovie.name}
-                        </h1>
-                        <h2 className="text-sm md:text-base text-[#F4C84A] font-medium line-clamp-1">
-                            {activeMovie.origin_name}
-                        </h2>
-                        <div className="flex items-center justify-center gap-3 text-sm font-medium text-white/90">
-                            <span className="bg-white/10 px-2 py-0.5 rounded text-xs">{activeMovie.year}</span>
-                            <span className="text-[#F4C84A] flex items-center gap-1">★ {activeRating}</span>
-                            <span className="bg-[#F4C84A]/20 text-[#F4C84A] px-2 py-0.5 rounded text-xs border border-[#F4C84A]/30">{activeMovie.quality}</span>
-                        </div>
-                        <div className="flex flex-wrap justify-center gap-2">
-                            {activeMovie.category?.slice(0, 3).map(c => (
-                                <span key={c.id} className="text-xs text-white/70 px-2.5 py-1 rounded-full bg-black/40 border border-white/5 backdrop-blur-md">
-                                    {c.name}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
+                                    {/* Metadata */}
+                                    <div className="space-y-3 mb-6 max-w-md mx-auto">
+                                        <h1 className="text-xl md:text-2xl font-black text-white leading-tight drop-shadow-xl text-glow line-clamp-2 px-2">
+                                            {movie.name}
+                                        </h1>
+                                        <h2 className="text-sm md:text-base text-[#F4C84A] font-medium line-clamp-1">
+                                            {movie.origin_name}
+                                        </h2>
+                                        <div className="flex items-center justify-center gap-3 text-sm font-medium text-white/90">
+                                            <span className="bg-white/10 px-2 py-0.5 rounded text-xs">{movie.year}</span>
+                                            <span className="text-[#F4C84A] flex items-center gap-1">★ {rating}</span>
+                                            <span className="bg-[#F4C84A]/20 text-[#F4C84A] px-2 py-0.5 rounded text-xs border border-[#F4C84A]/30">{movie.quality}</span>
+                                        </div>
+                                        <div className="flex flex-wrap justify-center gap-2">
+                                            {movie.category?.slice(0, 3).map(c => (
+                                                <span key={c.id} className="text-xs text-white/70 px-2.5 py-1 rounded-full bg-black/40 border border-white/5 backdrop-blur-md">
+                                                    {c.name}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex items-center gap-4 w-full justify-center max-w-sm mx-auto">
-                        <Link
-                            href={`/xem-phim/${activeMovie.slug}`}
-                            className="flex-1 flex items-center justify-center gap-2 h-12 rounded-2xl bg-[#F4C84A] text-black font-bold shadow-lg shadow-[#F4C84A]/20 active:scale-95 transition-transform"
-                        >
-                            <Play className="w-5 h-5 fill-black" />
-                            <span>Xem Ngay</span>
-                        </Link>
+                                    {/* Action Buttons */}
+                                    <div className="flex items-center gap-4 w-full justify-center max-w-sm mx-auto">
+                                        <Link
+                                            href={`/xem-phim/${movie.slug}`}
+                                            className="flex-1 flex items-center justify-center gap-2 h-12 rounded-2xl bg-[#F4C84A] text-black font-bold shadow-lg shadow-[#F4C84A]/20 active:scale-95 transition-transform"
+                                        >
+                                            <Play className="w-5 h-5 fill-black" />
+                                            <span>Xem Ngay</span>
+                                        </Link>
 
-                        <Link
-                            href={`/phim/${activeMovie.slug}`}
-                            className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 active:scale-95 transition-transform"
-                        >
-                            <Info className="w-6 h-6 text-white" />
-                        </Link>
+                                        <Link
+                                            href={`/phim/${movie.slug}`}
+                                            className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 active:scale-95 transition-transform"
+                                        >
+                                            <Info className="w-6 h-6 text-white" />
+                                        </Link>
 
-                        <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 active:scale-95 transition-transform">
-                            <FavoriteButton movieData={getFavoriteData(activeMovie)} initialIsFavorite={false} size="md" />
-                        </div>
-                    </div>
+                                        <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 active:scale-95 transition-transform relative z-20">
+                                            <FavoriteButton movieData={getFavoriteData(movie)} initialIsFavorite={false} size="md" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
 
@@ -303,7 +312,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                                     </Link>
 
                                                     <div className="h-12 w-12 flex items-center justify-center rounded-full glass hover:bg-white/10 border border-white/10 transition-all hover:scale-110 cursor-pointer backdrop-blur-md">
-                                                        <FavoriteButton movieData={getFavoriteData(movie)} initialIsFavorite={false} size="md" />
+                                                        <FavoriteButton movieData={getFavoriteData(movie)} size="md" />
                                                     </div>
                                                 </div>
                                             </div>

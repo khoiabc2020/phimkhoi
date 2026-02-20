@@ -21,7 +21,6 @@ export const metadata: Metadata = {
 import { Providers } from "@/components/Providers";
 import Header from "@/components/Header";
 import { getMenuData } from "@/services/api";
-import MobileBottomNav from "@/components/MobileBottomNav";
 
 export default async function RootLayout({
   children,
@@ -40,7 +39,6 @@ export default async function RootLayout({
             <Header categories={categories} countries={countries} />
           </Suspense>
           {children}
-          <MobileBottomNav />
         </Providers>
       </body>
     </html>

@@ -142,7 +142,6 @@ export default function MovieCard({ movie, orientation = 'portrait' }: { movie: 
                                     movieQuality: movie.quality,
                                     movieCategories: movie.category?.map(c => c.name) || []
                                 }}
-                                initialIsFavorite={false}
                                 size="sm"
                             />
                         </div>
@@ -285,7 +284,6 @@ function PortalHoverCard({ movie, position, tmdbData, displayPoster, orientation
                                         movieQuality: movie.quality,
                                         movieCategories: movie.category?.map((c) => c.name) || [],
                                     }}
-                                    initialIsFavorite={false}
                                     size="sm"
                                     className="w-3.5 h-3.5 text-white hover:text-red-500"
                                 />

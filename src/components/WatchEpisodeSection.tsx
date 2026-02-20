@@ -20,6 +20,8 @@ interface WatchEpisodeSectionProps {
     movieName: string;
     servers: Server[];
     currentEpisodeSlug: string;
+    activeServerName: string;
+    onServerChange: (serverName: string) => void;
 }
 
 export default function WatchEpisodeSection({
@@ -27,13 +29,17 @@ export default function WatchEpisodeSection({
     movieName,
     servers,
     currentEpisodeSlug,
+    activeServerName,
+    onServerChange,
 }: WatchEpisodeSectionProps) {
-    const [activeServerIndex, setActiveServerIndex] = useState(0);
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [showServerDropdown, setShowServerDropdown] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    const episodes = servers[activeServerIndex]?.server_data || [];
+    // Find active server index based on name
+    const activeServerIndex = servers.findIndex(s => s.server_name === activeServerName);
+    const safeIndex = activeServerIndex !== -1 ? activeServerIndex : 0;
+    const episodes = servers[safeIndex]?.server_data || [];
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
@@ -44,7 +50,8 @@ export default function WatchEpisodeSection({
         document.addEventListener("click", handleClickOutside);
         return () => document.removeEventListener("click", handleClickOutside);
     }, []);
-    const serverName = servers[activeServerIndex]?.server_name || "VIP";
+
+    const serverName = activeServerName || servers[0]?.server_name || "VIP";
 
     return (
         <div className="bg-[#0d0d0d] border-b border-white/5">
@@ -71,7 +78,7 @@ export default function WatchEpisodeSection({
                             onClick={() => setShowServerDropdown(!showServerDropdown)}
                             className="flex items-center gap-1.5 text-white text-sm font-medium py-1.5 px-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
                         >
-                            Server {activeServerIndex + 1}
+                            Server {safeIndex + 1}
                             <ChevronDown className={cn("w-4 h-4 transition-transform", showServerDropdown && "rotate-180")} />
                         </button>
                         {showServerDropdown && (
@@ -81,12 +88,12 @@ export default function WatchEpisodeSection({
                                         key={i}
                                         type="button"
                                         onClick={() => {
-                                            setActiveServerIndex(i);
+                                            onServerChange(s.server_name);
                                             setShowServerDropdown(false);
                                         }}
                                         className={cn(
                                             "w-full text-left px-4 py-2 text-sm transition-colors",
-                                            i === activeServerIndex ? "bg-[#fbbf24]/20 text-[#fbbf24]" : "text-gray-300 hover:bg-white/5"
+                                            s.server_name === activeServerName ? "bg-[#fbbf24]/20 text-[#fbbf24]" : "text-gray-300 hover:bg-white/5"
                                         )}
                                     >
                                         {s.server_name}

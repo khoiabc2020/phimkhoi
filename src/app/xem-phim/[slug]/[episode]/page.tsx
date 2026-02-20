@@ -9,7 +9,6 @@ import VideoPlayer from "@/components/VideoPlayer";
 import CommentSection from "@/components/CommentSection";
 import WatchEngagementBar from "@/components/WatchEngagementBar";
 import WatchContainer from "@/components/WatchContainer";
-import WatchEpisodeSection from "@/components/WatchEpisodeSection";
 import { Star, Clock, Globe, Info, Users, PlayCircle, Calendar, List as ListIcon } from "lucide-react";
 import { getWatchHistoryForEpisode } from "@/app/actions/watchHistory";
 import { getMovieCast } from "@/app/actions/tmdb";
@@ -115,34 +114,15 @@ export default async function WatchPage({ params }: PageProps) {
                         {/* ── Left Column (9 cols) ── */}
                         <div className="lg:col-span-9 space-y-6">
 
-                            {/* Player */}
+                            {/* Player & Episode List */}
                             <WatchContainer
                                 movie={movie}
                                 currentEpisode={currentEpisode}
                                 episodes={episodes}
+                                servers={servers}
                                 initialProgress={initialProgress}
                                 movieData={movieData}
                             />
-
-                            {/* Episodes List */}
-                            {servers.length > 0 && (
-                                <div className="rounded-2xl border border-white/[0.06] overflow-hidden"
-                                    style={{ background: 'rgba(15,18,26,0.8)', backdropFilter: 'blur(20px)' }}>
-                                    <div className="px-6 pt-5 pb-4 border-b border-white/[0.06]">
-                                        <h3 className="text-white font-semibold text-base flex items-center gap-2 uppercase tracking-wide">
-                                            <ListIcon className="w-4 h-4 text-yellow-400" /> Danh sách tập
-                                        </h3>
-                                    </div>
-                                    <div className="p-6">
-                                        <WatchEpisodeSection
-                                            movieSlug={movie.slug}
-                                            movieName={movie.name}
-                                            servers={servers}
-                                            currentEpisodeSlug={episode}
-                                        />
-                                    </div>
-                                </div>
-                            )}
 
                             {/* Movie Content */}
                             <div className="rounded-2xl border border-white/[0.06] overflow-hidden"

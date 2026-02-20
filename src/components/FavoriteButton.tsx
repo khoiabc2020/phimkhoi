@@ -1,9 +1,9 @@
 "use client";
 
 import { Heart } from "lucide-react";
-import { useState, useTransition } from "react";
-import { addFavorite, removeFavorite } from "@/app/actions/favorites";
+import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useFavorites } from "@/context/FavoritesContext";
 
 interface FavoriteButtonProps {
     movieData: {
@@ -16,15 +16,16 @@ interface FavoriteButtonProps {
         movieQuality: string;
         movieCategories: string[];
     };
-    initialIsFavorite: boolean;
     size?: "sm" | "md" | "lg";
     className?: string;
 }
 
-export default function FavoriteButton({ movieData, initialIsFavorite, size = "md", className = "" }: FavoriteButtonProps) {
-    const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
-    const [isPending, startTransition] = useTransition();
+export default function FavoriteButton({ movieData, size = "md", className = "" }: FavoriteButtonProps) {
+    const { isFavorite, toggleFavorite, isLoading } = useFavorites();
     const router = useRouter();
+    const [isPending, startTransition] = useTransition();
+
+    const isFav = isFavorite(movieData.movieId);
 
     const sizeClasses = {
         sm: "w-8 h-8",
@@ -43,31 +44,26 @@ export default function FavoriteButton({ movieData, initialIsFavorite, size = "m
         e.stopPropagation();
 
         startTransition(async () => {
-            if (isFavorite) {
-                const result = await removeFavorite(movieData.movieId);
-                if (result.success) {
-                    setIsFavorite(false);
-                    router.refresh();
-                }
-            } else {
-                const result = await addFavorite(movieData);
-                if (result.success) {
-                    setIsFavorite(true);
-                    router.refresh();
-                }
-            }
+            await toggleFavorite(movieData);
+            router.refresh();
         });
     };
+
+    if (isLoading) {
+        return (
+            <div className={`${sizeClasses[size]} rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center animate-pulse ${className}`} />
+        );
+    }
 
     return (
         <button
             onClick={handleToggle}
             disabled={isPending}
             className={`${sizeClasses[size]} rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-all group disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
-            title={isFavorite ? "Bỏ yêu thích" : "Thêm vào yêu thích"}
+            title={isFav ? "Bỏ yêu thích" : "Thêm vào yêu thích"}
         >
             <Heart
-                className={`${iconSizes[size]} transition-all ${isFavorite
+                className={`${iconSizes[size]} transition-all ${isFav
                     ? "text-red-500 fill-red-500"
                     : "text-white group-hover:text-red-400"
                     } ${isPending ? "animate-pulse" : ""}`}

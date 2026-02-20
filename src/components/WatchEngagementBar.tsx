@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 
 interface WatchEngagementBarProps {
     movie: any;
-    isFavorite?: boolean;
     isTheaterMode?: boolean;
     toggleTheater?: () => void;
     isLightOff?: boolean;
@@ -17,7 +16,6 @@ interface WatchEngagementBarProps {
 
 export default function WatchEngagementBar({
     movie,
-    isFavorite = false,
     isTheaterMode = false,
     toggleTheater,
     isLightOff = false,
@@ -53,7 +51,6 @@ export default function WatchEngagementBar({
                 <div className="flex items-center gap-4">
                     <FavoriteButton
                         movieData={movieData}
-                        initialIsFavorite={isFavorite}
                         size="sm"
                         className="!bg-transparent !border-0 text-gray-400 hover:text-yellow-400 flex items-center gap-2 !w-auto !h-auto !p-0 transition-colors"
                     />
