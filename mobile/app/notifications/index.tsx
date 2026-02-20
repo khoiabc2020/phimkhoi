@@ -1,174 +1,274 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import {
+    View, Text, Pressable, StyleSheet, Animated, Easing
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { Feather } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
+import { useEffect, useRef } from 'react';
+import * as Haptics from 'expo-haptics';
+import { COLORS } from '@/constants/theme';
+
+const ACCENT = COLORS.accent ?? '#F4C84A';
 
 export default function NotificationsScreen() {
     const router = useRouter();
 
+    // ── Entry Animations ────────────────────────────────────────────────────
+    const iconScale = useRef(new Animated.Value(0.7)).current;
+    const iconOpacity = useRef(new Animated.Value(0)).current;
+    const textOpacity = useRef(new Animated.Value(0)).current;
+    const textY = useRef(new Animated.Value(12)).current;
+    const btnOpacity = useRef(new Animated.Value(0)).current;
+    const btnY = useRef(new Animated.Value(16)).current;
+
+    // Button press scale
+    const btnScale = useRef(new Animated.Value(1)).current;
+
+    useEffect(() => {
+        Animated.sequence([
+            // 1. Icon appears
+            Animated.parallel([
+                Animated.spring(iconScale, { toValue: 1, damping: 14, stiffness: 100, useNativeDriver: true }),
+                Animated.timing(iconOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
+            ]),
+            // 2. Text fades in
+            Animated.parallel([
+                Animated.timing(textOpacity, { toValue: 1, duration: 280, useNativeDriver: true }),
+                Animated.timing(textY, { toValue: 0, duration: 280, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+            ]),
+            // 3. Button slides up
+            Animated.parallel([
+                Animated.timing(btnOpacity, { toValue: 1, duration: 260, useNativeDriver: true }),
+                Animated.timing(btnY, { toValue: 0, duration: 260, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+            ]),
+        ]).start();
+    }, []);
+
+    const onPressIn = () => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        Animated.spring(btnScale, { toValue: 0.96, useNativeDriver: true, damping: 20 }).start();
+    };
+    const onPressOut = () => {
+        Animated.spring(btnScale, { toValue: 1, useNativeDriver: true, damping: 14 }).start();
+    };
+
     return (
-        <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={styles.root}>
             <StatusBar style="light" />
+            <SafeAreaView style={styles.safe} edges={['top']}>
 
-            {/* Header */}
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-                    <Ionicons name="arrow-back" size={22} color="white" />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Thông báo</Text>
-                <TouchableOpacity style={styles.settingsBtn}>
-                    <Ionicons name="settings-outline" size={20} color="rgba(255,255,255,0.5)" />
-                </TouchableOpacity>
-            </View>
+                {/*── Header ──────────────────────────────────────────────────*/}
+                <View style={styles.header}>
+                    <Pressable onPress={() => router.back()} hitSlop={12} style={styles.iconBtn}>
+                        <Feather name="arrow-left" size={22} color="rgba(255,255,255,0.8)" strokeWidth={1.5} />
+                    </Pressable>
 
-            {/* Empty State */}
-            <View style={styles.emptyContainer}>
-                {/* Animated-style icon with glow */}
-                <View style={styles.iconOuter}>
-                    <LinearGradient
-                        colors={['rgba(251,191,36,0.12)', 'rgba(251,191,36,0.03)']}
-                        style={styles.iconGlow}
+                    <Text style={styles.headerTitle}>Thông báo</Text>
+
+                    <Pressable hitSlop={12} style={styles.iconBtn}>
+                        <Feather name="settings" size={22} color="rgba(255,255,255,0.8)" strokeWidth={1.5} />
+                    </Pressable>
+                </View>
+
+                {/*── Empty State ─────────────────────────────────────────────*/}
+                <View style={styles.body}>
+
+                    {/* Liquid Glow Icon */}
+                    <Animated.View style={[
+                        styles.iconWrapper,
+                        { opacity: iconOpacity, transform: [{ scale: iconScale }] }
+                    ]}>
+                        <View style={styles.glowOuter}>
+                            <View style={styles.glowInner}>
+                                <Feather
+                                    name="bell"
+                                    size={32}
+                                    color={`rgba(244,200,74,0.8)`}
+                                    strokeWidth={1.5}
+                                />
+                            </View>
+                        </View>
+                    </Animated.View>
+
+                    {/* Title + Sub */}
+                    <Animated.View style={[
+                        styles.textBlock,
+                        { opacity: textOpacity, transform: [{ translateY: textY }] }
+                    ]}>
+                        <Text style={styles.emptyTitle}>Chưa có thông báo</Text>
+                        <Text style={styles.emptySub}>
+                            Bật thông báo để không bỏ lỡ{'\n'}tập phim mới và cập nhật
+                        </Text>
+                    </Animated.View>
+
+                    {/* CTA Button */}
+                    <Animated.View style={[
+                        { opacity: btnOpacity, transform: [{ translateY: btnY }, { scale: btnScale }] }
+                    ]}>
+                        <Pressable
+                            style={styles.btn}
+                            onPressIn={onPressIn}
+                            onPressOut={onPressOut}
+                        >
+                            <Feather name="bell" size={16} color="black" strokeWidth={2} />
+                            <Text style={styles.btnText}>Bật thông báo</Text>
+                        </Pressable>
+                    </Animated.View>
+                </View>
+
+                {/*── Feature Items ───────────────────────────────────────────*/}
+                <View style={styles.features}>
+                    <FeatureItem
+                        icon="film"
+                        title="Tập mới"
+                        sub="Thông báo khi phim yêu thích có tập mới"
                     />
-                    <View style={styles.iconInner}>
-                        <Ionicons name="notifications-outline" size={36} color="rgba(255,255,255,0.5)" />
-                    </View>
+                    <FeatureItem
+                        icon="star"
+                        title="Phim hot"
+                        sub="Phim trending và được đánh giá cao"
+                    />
                 </View>
 
-                <Text style={styles.emptyTitle}>Chưa có thông báo</Text>
-                <Text style={styles.emptySubtitle}>
-                    Bật thông báo để không bỏ lỡ{'\n'}tập phim mới và cập nhật
-                </Text>
+            </SafeAreaView>
+        </View>
+    );
+}
 
-                <TouchableOpacity style={styles.enableBtn} activeOpacity={0.8}>
-                    <Ionicons name="notifications" size={16} color="black" />
-                    <Text style={styles.enableBtnText}>Bật thông báo</Text>
-                </TouchableOpacity>
+function FeatureItem({ icon, title, sub }: { icon: any; title: string; sub: string }) {
+    return (
+        <View style={styles.featureItem}>
+            <View style={styles.featureIcon}>
+                <Feather name={icon} size={20} color={`rgba(244,200,74,0.85)`} strokeWidth={1.5} />
             </View>
-
-            {/* Coming soon section */}
-            <View style={styles.comingSoon}>
-                <View style={styles.comingSoonItem}>
-                    <View style={styles.comingSoonIcon}>
-                        <Ionicons name="film-outline" size={18} color="#fbbf24" />
-                    </View>
-                    <View style={styles.comingSoonText}>
-                        <Text style={styles.comingSoonTitle}>Tập mới</Text>
-                        <Text style={styles.comingSoonDesc}>Thông báo khi phim yêu thích có tập mới</Text>
-                    </View>
-                </View>
-                <View style={styles.comingSoonItem}>
-                    <View style={styles.comingSoonIcon}>
-                        <Ionicons name="star-outline" size={18} color="#fbbf24" />
-                    </View>
-                    <View style={styles.comingSoonText}>
-                        <Text style={styles.comingSoonTitle}>Phim hot</Text>
-                        <Text style={styles.comingSoonDesc}>Phim trending và được đánh giá cao</Text>
-                    </View>
-                </View>
+            <View style={styles.featureText}>
+                <Text style={styles.featureTitle}>{title}</Text>
+                <Text style={styles.featureSub}>{sub}</Text>
             </View>
-        </SafeAreaView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#0a0a0f' },
+    root: { flex: 1, backgroundColor: '#09090f' },
+    safe: { flex: 1 },
 
+    // Header
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 16,
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
         paddingVertical: 14,
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255,255,255,0.06)',
     },
-    backBtn: { padding: 4, marginRight: 12 },
-    headerTitle: { flex: 1, color: 'white', fontSize: 18, fontWeight: '700' },
-    settingsBtn: { padding: 4 },
+    iconBtn: {
+        width: 36, height: 36,
+        alignItems: 'center', justifyContent: 'center',
+    },
+    headerTitle: {
+        color: '#fff',
+        fontSize: 20,
+        fontWeight: '600',
+        letterSpacing: -0.3,
+    },
 
-    emptyContainer: {
+    // Empty State body
+    body: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: 40,
-        gap: 14,
-        marginTop: -60,
-    },
-    iconOuter: {
-        width: 100,
-        height: 100,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: 8,
-    },
-    iconGlow: {
-        position: 'absolute',
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-    },
-    iconInner: {
-        width: 72,
-        height: 72,
-        borderRadius: 36,
-        backgroundColor: 'rgba(255,255,255,0.06)',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    emptyTitle: {
-        color: 'white',
-        fontSize: 18,
-        fontWeight: '700',
-        letterSpacing: -0.3,
-    },
-    emptySubtitle: {
-        color: 'rgba(255,255,255,0.4)',
-        fontSize: 14,
-        textAlign: 'center',
-        lineHeight: 22,
-    },
-    enableBtn: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-        backgroundColor: '#fbbf24',
-        paddingHorizontal: 24,
-        paddingVertical: 12,
-        borderRadius: 24,
-        marginTop: 8,
-    },
-    enableBtnText: {
-        color: 'black',
-        fontSize: 14,
-        fontWeight: '700',
+        paddingHorizontal: 32,
+        gap: 0,
+        marginTop: -40, // Optical center
     },
 
-    comingSoon: {
-        paddingHorizontal: 20,
-        paddingBottom: 40,
-        gap: 2,
+    // Liquid glow icon
+    iconWrapper: { marginBottom: 20 },
+    glowOuter: {
+        width: 120, height: 120, borderRadius: 60,
+        backgroundColor: 'rgba(244,200,74,0.06)',
+        alignItems: 'center', justifyContent: 'center',
+        // Radial glow via shadow
+        shadowColor: ACCENT,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.3,
+        shadowRadius: 30,
+        elevation: 0,
     },
-    comingSoonItem: {
+    glowInner: {
+        width: 76, height: 76, borderRadius: 38,
+        backgroundColor: 'rgba(244,200,74,0.08)',
+        borderWidth: 1,
+        borderColor: 'rgba(244,200,74,0.12)',
+        alignItems: 'center', justifyContent: 'center',
+    },
+
+    textBlock: { alignItems: 'center', marginBottom: 24 },
+    emptyTitle: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: '600',
+        marginBottom: 8,
+        letterSpacing: -0.2,
+    },
+    emptySub: {
+        color: 'rgba(255,255,255,0.6)',
+        fontSize: 14,
+        lineHeight: 21,
+        textAlign: 'center',
+    },
+
+    // CTA Button
+    btn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        height: 48,
+        paddingHorizontal: 32,
+        borderRadius: 24,
+        backgroundColor: ACCENT,
+    },
+    btnText: {
+        color: 'black',
+        fontSize: 15,
+        fontWeight: '500',
+        letterSpacing: -0.1,
+    },
+
+    // Feature items
+    features: {
+        paddingHorizontal: 20,
+        paddingBottom: 32,
+        gap: 8,
+        marginTop: 40,
+    },
+    featureItem: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 14,
-        paddingVertical: 14,
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(255,255,255,0.05)',
+        padding: 16,
+        borderRadius: 20,
+        backgroundColor: 'rgba(255,255,255,0.04)',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.05)',
     },
-    comingSoonIcon: {
-        width: 40,
-        height: 40,
-        borderRadius: 12,
-        backgroundColor: 'rgba(251,191,36,0.1)',
-        alignItems: 'center',
-        justifyContent: 'center',
+    featureIcon: {
+        width: 42, height: 42, borderRadius: 12,
+        backgroundColor: 'rgba(244,200,74,0.08)',
+        alignItems: 'center', justifyContent: 'center',
     },
-    comingSoonText: { flex: 1, gap: 2 },
-    comingSoonTitle: { color: 'rgba(255,255,255,0.85)', fontSize: 14, fontWeight: '600' },
-    comingSoonDesc: { color: 'rgba(255,255,255,0.35)', fontSize: 12 },
+    featureText: { flex: 1 },
+    featureTitle: {
+        color: '#fff',
+        fontSize: 14,
+        fontWeight: '600',
+        marginBottom: 2,
+    },
+    featureSub: {
+        color: 'rgba(255,255,255,0.5)',
+        fontSize: 12,
+        lineHeight: 17,
+    },
 });

@@ -7,9 +7,10 @@ import ContinueWatchingRow from "@/components/ContinueWatchingRow";
 import TopicSection from "@/components/TopicSection";
 import TopicCloud from "@/components/TopicCloud";
 import { getMoviesList, getTrendMovies, getMoviesByCountry } from "@/services/api";
+import { getTMDBTrending } from "@/services/tmdb";
 
-// Revalidate every 60 seconds for real-time updates
-export const revalidate = 60;
+// Revalidate every hour - TMDB trending updates daily
+export const revalidate = 3600;
 
 // Async Component for Row
 import { getMoviesByCategory } from "@/services/api";
@@ -37,42 +38,30 @@ async function AsyncMovieRow({ title, type, slug, country, variant = 'default' }
 }
 
 export default async function Home() {
-  // Fetch data in parallel
-  const [phimBoData, phimLeData, trendTv, trendMovies, hanQuocData, trungQuocData] = await Promise.all([
+  // Fetch data in parallel: TMDB trending for hero + section data
+  const [heroTrending, phimBoData, phimLeData, trendTv, trendMovies, hanQuocData, trungQuocData] = await Promise.all([
+    getTrendMovies('all').catch(() => []),    // TMDB trending -> matched KKPHIM movies
     getMoviesList('phim-bo', { limit: 12 }),
     getMoviesList('phim-le', { limit: 12 }),
-    getTrendMovies('tv'),    // Top Trending Series
-    getTrendMovies('movie'),  // Top Trending Movies
+    getTrendMovies('tv').catch(() => []),     // Top Trending Series (sidebar)
+    getTrendMovies('movie').catch(() => []),  // Top Trending Movies (sidebar)
     getMoviesByCountry('han-quoc', 1, 10),
     getMoviesByCountry('trung-quoc', 1, 10)
   ]);
 
-  // Interleave for Hero
-  const heroMovies: any[] = [];
-  const maxLen = Math.max(phimBoData.items?.length || 0, phimLeData.items?.length || 0);
+  // Hero: TMDB trending is primary. Fallback to interleaved if empty.
+  let finalHeroData: any[] = heroTrending.slice(0, 20);
 
-  for (let i = 0; i < maxLen; i++) {
-    if (phimBoData.items?.[i]) heroMovies.push(phimBoData.items[i]);
-    if (phimLeData.items?.[i]) heroMovies.push(phimLeData.items[i]);
+  if (finalHeroData.length < 4) {
+    // Fallback: interleave phimBo + phimLe
+    const heroMixed: any[] = [];
+    const maxLen = Math.max(phimBoData.items?.length || 0, phimLeData.items?.length || 0);
+    for (let i = 0; i < maxLen; i++) {
+      if (phimBoData.items?.[i]) heroMixed.push(phimBoData.items[i]);
+      if (phimLeData.items?.[i]) heroMixed.push(phimLeData.items[i]);
+    }
+    finalHeroData = heroMixed.slice(0, 20);
   }
-
-  // Create a Set of Trending Titles for Boost
-  const trendingTitles = new Set([
-    ...trendTv.map((m: any) => m.name || m.original_name),
-    ...trendMovies.map((m: any) => m.title || m.original_title)
-  ].map(t => t?.toLowerCase().trim()));
-
-  // Boost trending items to the top
-  heroMovies.sort((a, b) => {
-    const aTrend = trendingTitles.has(a.name?.toLowerCase().trim()) || trendingTitles.has(a.origin_name?.toLowerCase().trim());
-    const bTrend = trendingTitles.has(b.name?.toLowerCase().trim()) || trendingTitles.has(b.origin_name?.toLowerCase().trim());
-    if (aTrend && !bTrend) return -1;
-    if (!aTrend && bTrend) return 1;
-    return 0;
-  });
-
-  // Top 20 for Hero
-  const finalHeroData = heroMovies.slice(0, 20);
 
   // Ensure we have 10 items for Top Trending by backfilling
   const fillList = (source: any[], backup: any[], limit: number) => {

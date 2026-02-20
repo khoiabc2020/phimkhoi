@@ -17,6 +17,7 @@ import {
   getHomeData, getMoviesByCategory, getMoviesByCountry,
   Movie, getMoviesList
 } from '@/services/api';
+import { CONFIG } from '@/constants/config';
 import { useAuth } from '@/context/auth'; // Added imports
 import { COLORS, SPACING, RADIUS, BLUR } from '@/constants/theme';
 
@@ -70,6 +71,7 @@ export default function HomeScreen() {
       // Parallel Fetching for speed
       const [
         homeBasic,
+        heroTrendingRes,
         chieuRapRes,
         hanQuocRes,
         trungQuocRes,
@@ -78,6 +80,10 @@ export default function HomeScreen() {
         sapChieuRes
       ] = await Promise.all([
         getHomeData(),
+        // TMDB trending hero from backend
+        fetch(`${CONFIG.BACKEND_URL}/api/mobile/hero-trending`)
+          .then(r => r.ok ? r.json() : null)
+          .catch(() => null),
         getMoviesByCategory('phim-chieu-rap', 1, 12),
         getMoviesByCountry('han-quoc', 1, 10),
         getMoviesByCountry('trung-quoc', 1, 10),
@@ -86,15 +92,20 @@ export default function HomeScreen() {
         getMoviesList('phim-sap-chieu', 1, 10)
       ]);
 
-      // Merge Logic for Hero (Interleave Phim Bo & Phim Le)
-      const heroMixed: Movie[] = [];
-      const len = Math.max(homeBasic.phimBo.length, homeBasic.phimLe.length);
-      for (let i = 0; i < len; i++) {
-        if (homeBasic.phimBo[i]) heroMixed.push(homeBasic.phimBo[i]);
-        if (homeBasic.phimLe[i]) heroMixed.push(homeBasic.phimLe[i]);
+      // Hero: prefer TMDB trending, fallback to interleaved KKPHIM
+      let finalHero: Movie[] = [];
+      if (heroTrendingRes?.movies?.length > 0) {
+        finalHero = heroTrendingRes.movies.slice(0, 12);
+      } else {
+        // Fallback: interleave phimBo & phimLe
+        const heroMixed: Movie[] = [];
+        const len = Math.max(homeBasic.phimBo.length, homeBasic.phimLe.length);
+        for (let i = 0; i < len; i++) {
+          if (homeBasic.phimBo[i]) heroMixed.push(homeBasic.phimBo[i]);
+          if (homeBasic.phimLe[i]) heroMixed.push(homeBasic.phimLe[i]);
+        }
+        finalHero = heroMixed.slice(0, 8);
       }
-      // Top 8 for Hero
-      const finalHero = heroMixed.slice(0, 8);
 
       setData({
         heroMovies: finalHero,
