@@ -116,38 +116,34 @@ export default function ContinueWatchingRow() {
                                     />
 
                                     {/* Overlay & Play Button */}
-                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
                                         <div className="w-10 h-10 rounded-full bg-[#fbbf24] flex items-center justify-center shadow-[0_0_15px_#fbbf24] transform scale-0 group-hover/card:scale-100 transition-transform duration-300 delay-75">
                                             <Play className="w-5 h-5 text-black fill-black ml-0.5" />
                                         </div>
                                     </div>
 
+                                    {/* Liquid Glass Info Container (iOS 26 Style) */}
+                                    <div className="absolute bottom-0 left-0 right-0 pt-8 pb-[6px] px-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-sm border-t border-white/10 flex flex-col justify-end z-20 overflow-hidden">
+                                        <h3 className="text-white font-extrabold text-sm tracking-wide line-clamp-1 drop-shadow-md">{item.movieName}</h3>
+                                        <span className="text-white/80 font-bold text-[11px] mt-[2px] drop-shadow-sm">{item.episodeName || "Tiếp tục xem"}</span>
+                                    </div>
+
                                     {/* Remove Button (X) */}
                                     <button
                                         onClick={(e) => handleRemove(e, item._id)}
-                                        className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 hover:bg-red-600 backdrop-blur-md flex items-center justify-center text-white/70 hover:text-white transition-colors opacity-0 group-hover/card:opacity-100 z-20"
+                                        className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 hover:bg-red-600 backdrop-blur-md flex items-center justify-center text-white/70 hover:text-white transition-colors opacity-0 group-hover/card:opacity-100 z-30"
                                         title="Xóa khỏi lịch sử"
                                     >
                                         <X className="w-3 h-3" />
                                     </button>
 
-                                    {/* Progress Bar Container - Full Width Bottom */}
-                                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
+                                    {/* Progress Bar Container - Netflix Style Overlay */}
+                                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/30 z-30">
                                         <div
-                                            className="h-full bg-red-600"
-                                            style={{ width: `${item.progress}%` }}
+                                            className="h-full bg-[#E50914] rounded-r-md"
+                                            style={{ width: `${Math.max(2, Math.min(100, item.progress || 0))}%` }}
                                         />
                                     </div>
-
-                                    {/* Episode text overlay (Optional, matching design usually minimal) */}
-                                    <div className="absolute bottom-2 left-2 text-[10px] font-medium text-white/90 drop-shadow-md">
-                                        {item.episodeName}
-                                    </div>
-                                </div>
-
-                                {/* Info */}
-                                <div className="mt-2 text-center group-hover/card:text-[#fbbf24] transition-colors">
-                                    <h3 className="text-white font-bold text-sm line-clamp-1">{item.movieName}</h3>
                                 </div>
                             </Link>
                         </div>

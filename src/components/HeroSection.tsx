@@ -190,24 +190,24 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                         </div>
                                     </div>
 
-                                    {/* Action Buttons */}
-                                    <div className="flex items-center gap-4 w-full justify-center max-w-sm mx-auto">
+                                    {/* CTA Buttons - Liquid Glass Container (Mobile) */}
+                                    <div className="flex items-center p-2 rounded-full backdrop-blur-xl bg-black/10 border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] w-max mx-auto gap-3">
                                         <Link
                                             href={`/xem-phim/${movie.slug}`}
-                                            className="flex-1 flex items-center justify-center gap-2 h-12 rounded-2xl bg-[#F4C84A] text-black font-bold shadow-lg shadow-[#F4C84A]/20 active:scale-95 transition-transform"
+                                            className="flex flex-1 items-center justify-center gap-2 h-[42px] px-5 rounded-full bg-[#F4C84A] text-black font-extrabold shadow-lg shadow-[#F4C84A]/20 active:scale-95 transition-transform"
                                         >
-                                            <Play className="w-5 h-5 fill-black" />
-                                            <span>Xem Ngay</span>
+                                            <Play className="w-4 h-4 fill-black" />
+                                            <span>Xem</span>
                                         </Link>
 
                                         <Link
                                             href={`/phim/${movie.slug}`}
-                                            className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 active:scale-95 transition-transform"
+                                            className="w-[42px] h-[42px] flex items-center justify-center rounded-full bg-white/10 border border-white/10 active:scale-95 transition-transform"
                                         >
-                                            <Info className="w-6 h-6 text-white" />
+                                            <Info className="w-5 h-5 text-white" />
                                         </Link>
 
-                                        <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 active:scale-95 transition-transform relative z-20">
+                                        <div className="w-[42px] h-[42px] flex items-center justify-center rounded-full bg-white/10 border border-white/10 active:scale-95 transition-transform relative z-20">
                                             <FavoriteButton movieData={getFavoriteData(movie)} size="md" />
                                         </div>
                                     </div>
@@ -293,11 +293,11 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                                     {stripHtml(movie.content)}
                                                 </p>
 
-                                                {/* CTA Buttons */}
-                                                <div className="flex items-center gap-4 pt-2">
+                                                {/* CTA Buttons - Liquid Glass Container (Desktop) */}
+                                                <div className="flex items-center gap-3 p-[6px] rounded-full backdrop-blur-2xl bg-white/5 border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] w-max mt-4">
                                                     <Link
                                                         href={`/xem-phim/${movie.slug}`}
-                                                        className="group relative flex items-center justify-center gap-2 h-12 px-6 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-extrabold text-base shadow-[0_0_20px_rgba(244,200,74,0.3)] hover:shadow-[0_0_40px_rgba(244,200,74,0.5)] transition-all duration-300 hover:-translate-y-1 hover:scale-105 active:scale-95 active:translate-y-0"
+                                                        className="group relative flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-extrabold text-[15px] shadow-[0_0_20px_rgba(244,200,74,0.3)] hover:shadow-[0_0_40px_rgba(244,200,74,0.5)] transition-all duration-300 hover:-translate-y-1 hover:scale-105 active:scale-95 active:translate-y-0"
                                                     >
                                                         <Play className="w-5 h-5 fill-black" />
                                                         <span>Xem Ngay</span>
@@ -305,13 +305,13 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
                                                     <Link
                                                         href={`/phim/${movie.slug}`}
-                                                        className="flex items-center justify-center gap-2 h-12 px-6 rounded-full glass hover:bg-white/10 border border-white/10 text-white font-semibold text-base transition-all hover:-translate-y-1 hover:scale-105 active:scale-95 group/info backdrop-blur-md"
+                                                        className="flex items-center justify-center gap-2 h-12 px-6 rounded-full glass hover:bg-white/15 border border-white/10 text-white font-bold text-[15px] transition-all hover:scale-105 active:scale-95 group/info"
                                                     >
                                                         <Info className="w-5 h-5 text-white/80 group-hover/info:text-[#F4C84A] transition-colors" />
                                                         <span>Chi tiết</span>
                                                     </Link>
 
-                                                    <div className="h-12 w-12 flex items-center justify-center rounded-full glass hover:bg-white/10 border border-white/10 transition-all hover:scale-110 cursor-pointer backdrop-blur-md">
+                                                    <div className="h-12 w-12 flex items-center justify-center rounded-full glass hover:bg-white/15 border border-white/10 transition-all hover:scale-110 cursor-pointer">
                                                         <FavoriteButton movieData={getFavoriteData(movie)} size="md" />
                                                     </div>
                                                 </div>
