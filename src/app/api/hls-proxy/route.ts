@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
         const isM3u8 = url.includes('.m3u8') ||
             (contentType && (
                 contentType.includes('mpegurl') ||
-                contentType.includes('application/x-mpegURL') ||
+                contentType.includes('application/x-mpegURL')
             ));
 
         // console.log(`[Proxy] Response Content-Type: ${contentType}, isM3u8: ${isM3u8}`);
