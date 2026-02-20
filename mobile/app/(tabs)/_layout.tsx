@@ -3,6 +3,7 @@ import React, { useRef, useEffect } from 'react';
 import { Platform, View, StyleSheet, Text, Animated, Easing } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/theme';
 
 const TABS = [
@@ -33,9 +34,8 @@ function TabIcon({ focused, label, icon }: {
       <Animated.View style={[styles.iconWrap, { transform: [{ scale }] }]}>
         <Feather
           name={icon as any}
-          size={24}
-          color={focused ? '#F4C84A' : 'rgba(255,255,255,0.6)'}
-          style={{ strokeWidth: focused ? 2.5 : 1.5 }} // Thicker when active
+          size={20}
+          color={focused ? '#F4C84A' : 'rgba(255,255,255,0.5)'}
         />
       </Animated.View>
       {/* Label below icon */}
@@ -48,6 +48,12 @@ function TabIcon({ focused, label, icon }: {
 
 export default function TabLayout() {
   const isAndroid = Platform.OS === 'android';
+  const insets = useSafeAreaInsets();
+
+  // Dynamically position tab bar above system UI:
+  // - Gesture nav: insets.bottom is small (~0-16px) → pill sits close to edge
+  // - 3-button nav: insets.bottom is larger (~24-48px) → pill rises above buttons
+  const tabBarBottom = insets.bottom > 0 ? insets.bottom + 8 : 14;
 
   return (
     <Tabs
@@ -62,13 +68,12 @@ export default function TabLayout() {
         },
         tabBarStyle: {
           position: 'absolute',
-          bottom: 20, // Spec 20px
-          left: '10%', // Center with width
-          right: '10%',
-          width: '80%',
-          height: 68, // Taller for floating feel
+          bottom: tabBarBottom,
+          left: 50,
+          right: 50,
+          height: 58,
           borderRadius: 34,
-          backgroundColor: isAndroid ? 'rgba(15,18,26,0.95)' : 'transparent', // Fallback for android
+          backgroundColor: isAndroid ? 'rgba(15,18,26,0.95)' : 'transparent',
           borderTopWidth: 0,
           elevation: 0,
           shadowColor: '#000',
@@ -81,7 +86,7 @@ export default function TabLayout() {
         tabBarBackground: () =>
           !isAndroid ? (
             <BlurView
-              intensity={50} // Stronger blur
+              intensity={50}
               tint="dark"
               style={[StyleSheet.absoluteFill, { borderRadius: 34, overflow: 'hidden', backgroundColor: 'rgba(15,18,26,0.75)' }]}
             />
@@ -104,6 +109,7 @@ export default function TabLayout() {
           }}
         />
       ))}
+      <Tabs.Screen name="favorites" options={{ href: null }} />
     </Tabs>
   );
 }

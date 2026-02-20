@@ -23,7 +23,7 @@ const FavoriteSchema = new Schema<IFavorite>(
         },
         movieId: {
             type: String,
-            required: true,
+            default: "",
         },
         movieSlug: {
             type: String,
@@ -63,8 +63,8 @@ const FavoriteSchema = new Schema<IFavorite>(
     }
 );
 
-// Compound index for unique favorites and efficient queries
-FavoriteSchema.index({ userId: 1, movieId: 1 }, { unique: true });
+// Unique per user+movieSlug (more reliable than movieId from external API)
+FavoriteSchema.index({ userId: 1, movieSlug: 1 }, { unique: true });
 FavoriteSchema.index({ userId: 1, addedAt: -1 });
 
 export default mongoose.models.Favorite || mongoose.model<IFavorite>("Favorite", FavoriteSchema);

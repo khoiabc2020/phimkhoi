@@ -3,9 +3,18 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const FAVORITES_KEY = '@phimkhoi_favorites';
 
 export interface FavoriteMovie {
-  _id: string;
-  slug: string;
-  name: string;
+  movieId: string;
+  movieSlug: string;
+  movieName: string;
+  movieOriginName: string;
+  moviePoster: string;
+  movieYear: number;
+  movieQuality: string;
+  movieCategories: string[];
+  // Legacy support
+  _id?: string;
+  slug?: string;
+  name?: string;
   poster_url?: string;
   thumb_url?: string;
 }
@@ -21,16 +30,16 @@ export async function getFavorites(): Promise<FavoriteMovie[]> {
 
 export async function addFavorite(movie: FavoriteMovie): Promise<void> {
   const list = await getFavorites();
-  if (list.some((m) => m._id === movie._id)) return;
+  if (list.some((m) => (m.movieSlug || m.slug) === (movie.movieSlug || movie.slug))) return;
   await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify([...list, movie]));
 }
 
-export async function removeFavorite(movieId: string): Promise<void> {
-  const list = await getFavorites().then((l) => l.filter((m) => m._id !== movieId));
+export async function removeFavorite(slug: string): Promise<void> {
+  const list = await getFavorites().then((l) => l.filter((m) => (m.movieSlug || m.slug) !== slug));
   await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(list));
 }
 
-export async function isFavorite(movieId: string): Promise<boolean> {
+export async function isFavorite(slug: string): Promise<boolean> {
   const list = await getFavorites();
-  return list.some((m) => m._id === movieId);
+  return list.some((m) => (m.movieSlug || m.slug) === slug);
 }

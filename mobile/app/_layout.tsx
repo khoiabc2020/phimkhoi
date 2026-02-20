@@ -1,8 +1,9 @@
+import 'react-native-gesture-handler';
+import 'react-native-reanimated';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Platform } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
 import '../global.css';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -13,6 +14,7 @@ export const unstable_settings = {
 };
 
 import { useEffect } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export default function RootLayout() {
@@ -23,23 +25,25 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <ErrorBoundary>
-      <AuthProvider>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)/login" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)/register" options={{ headerShown: false }} />
-            <Stack.Screen name="movie/[slug]" options={{ headerShown: false }} />
-            <Stack.Screen name="player/[slug]" options={{ headerShown: false }} />
-            <Stack.Screen name="list/[type]" options={{ headerShown: false }} />
-            <Stack.Screen name="category/[slug]" options={{ headerShown: false }} />
-            <Stack.Screen name="country/[slug]" options={{ headerShown: false }} />
-            <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-          </Stack>
-          <StatusBar style="light" />
-        </ThemeProvider>
-      </AuthProvider>
-    </ErrorBoundary>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ErrorBoundary>
+        <AuthProvider>
+          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="(auth)/login" options={{ headerShown: false }} />
+              <Stack.Screen name="(auth)/register" options={{ headerShown: false }} />
+              <Stack.Screen name="movie/[slug]" options={{ headerShown: false }} />
+              <Stack.Screen name="player/[slug]" options={{ headerShown: false }} />
+              <Stack.Screen name="list/[type]" options={{ headerShown: false }} />
+              <Stack.Screen name="category/[slug]" options={{ headerShown: false }} />
+              <Stack.Screen name="country/[slug]" options={{ headerShown: false }} />
+              <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+            </Stack>
+            <StatusBar style="light" />
+          </ThemeProvider>
+        </AuthProvider>
+      </ErrorBoundary>
+    </GestureHandlerRootView>
   );
 }

@@ -29,5 +29,7 @@ export default async function SettingsPage() {
         ? settingsResult.data
         : DEFAULT_SETTINGS;
 
-    return <SettingsForm initialSettings={settings} />;
+    const cleanSettings = JSON.parse(JSON.stringify(settings));
+
+    return <SettingsForm initialSettings={cleanSettings} />;
 }

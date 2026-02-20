@@ -10,7 +10,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { getMovieDetail, getImageUrl, getRelatedMovies, Movie, getTMDBRating, getTMDBCast } from '@/services/api';
+import { getMovieDetail, getImageUrl, getRelatedMovies, Movie, getTMDBRating, getTMDBCast, toggleFavorite as apiToggleFavorite } from '@/services/api';
 import { addFavorite, removeFavorite, isFavorite } from '@/lib/favorites';
 import { addToWatchList, removeFromWatchList, isInWatchList } from '@/lib/watchList';
 import { useAuth } from '@/context/auth';
@@ -46,10 +46,68 @@ export default function MovieDetailScreen() {
 
     const { user, token, syncFavorites, syncWatchList } = useAuth();
 
-    // ... (fetch logic remains same)
+    // Fetch Logic
+    const fetchData = useCallback(async () => {
+        try {
+            setLoading(true);
+            const data = await getMovieDetail(slug as string);
+            if (data?.movie) {
+                setMovie(data.movie);
+                setEpisodes(data.episodes || []);
+                const related = await getRelatedMovies(data.movie.category?.[0]?.slug || '');
+                setRelatedMovies(related);
 
-    // Favorite Logic (remains same)
-    // ...
+                const tmdbRating = await getTMDBRating(data.movie.name, data.movie.year);
+                if (tmdbRating) setRating(tmdbRating);
+                const tmdbCast = await getTMDBCast(data.movie.name, data.movie.year);
+                if (tmdbCast) setCast(tmdbCast.slice(0, 15));
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    }, [slug]);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
+    // Favorite Logic
+    const checkFavorite = useCallback(async () => {
+        if (!movie) return;
+        try {
+            if (user?.favorites) {
+                setFav(user.favorites.some((f: any) => (typeof f === 'string' ? f : f.slug) === movie.slug));
+            } else {
+                setFav(await isFavorite(movie.slug));
+            }
+        } catch (e) { console.warn(e); }
+    }, [movie, user]);
+
+    useEffect(() => { checkFavorite(); }, [checkFavorite]);
+
+    const toggleFavoriteAction = async () => {
+        if (!movie) return;
+        const newState = !fav;
+        setFav(newState); // Optimistic
+
+        try {
+            if (user && token) {
+                await apiToggleFavorite(movie, fav, token); // isFav = old state
+                syncFavorites();
+            } else {
+                if (newState) {
+                    await addFavorite({ slug: movie.slug, name: movie.name, poster_url: movie.poster_url, thumb_url: movie.thumb_url });
+                } else {
+                    await removeFavorite(movie.slug);
+                }
+            }
+        } catch (e) {
+            setFav(!newState); // Revert
+            console.error(e);
+        }
+    };
 
     // Watchlist Logic
     const checkWatchList = useCallback(async () => {
@@ -73,10 +131,21 @@ export default function MovieDetailScreen() {
         try {
             if (user && token) {
                 const method = newState ? 'POST' : 'DELETE';
+                const payload = newState ? {
+                    movieId: movie._id,
+                    movieSlug: movie.slug,
+                    movieName: movie.name,
+                    movieOriginName: movie.origin_name || "",
+                    moviePoster: movie.thumb_url || movie.poster_url,
+                    movieYear: movie.year || new Date().getFullYear(),
+                    movieQuality: movie.quality || "HD",
+                    movieCategories: movie.category ? movie.category.map((c: any) => c.name) : []
+                } : { slug: movie.slug };
+
                 await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/watchlist`, {
                     method,
                     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                    body: JSON.stringify({ slug: movie.slug })
+                    body: JSON.stringify(payload)
                 });
                 syncWatchList();
             } else {
@@ -189,7 +258,7 @@ export default function MovieDetailScreen() {
 
                         <View style={styles.actionRow}>
                             <Pressable
-                                onPress={toggleFavorite}
+                                onPress={toggleFavoriteAction}
                                 style={[styles.actionIconBtn, fav && { backgroundColor: 'rgba(251, 191, 36, 0.2)', borderColor: COLORS.accent }]}
                             >
                                 <Ionicons name={fav ? "heart" : "heart-outline"} size={22} color={fav ? COLORS.accent : 'white'} />

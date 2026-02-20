@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
-import User from "@/models/User";
-import Movie from "@/models/Movie";
+import Watchlist from "@/models/Watchlist";
 import jwt from "jsonwebtoken";
 
 const verifyToken = (req: Request) => {
@@ -26,13 +25,10 @@ export async function GET(req: Request) {
         }
 
         await dbConnect();
-        const user = await User.findById(userPayload.id);
-        if (!user) {
-            return NextResponse.json({ message: "User not found" }, { status: 404 });
-        }
 
-        const watchlist = await Movie.find({ slug: { $in: user.watchlist } })
-            .select("name slug thumb_url poster_url _id");
+        const watchlist = await Watchlist.find({ userId: userPayload.id })
+            .sort({ addedAt: -1 })
+            .lean();
 
         return NextResponse.json({ watchlist });
     } catch (error) {
@@ -48,33 +44,33 @@ export async function POST(req: Request) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
-        const { slug } = await req.json();
-        if (!slug) {
+        const movieData = await req.json();
+        if (!movieData.movieSlug) {
             return NextResponse.json(
-                { message: "Slug is required" },
+                { message: "movieSlug is required" },
                 { status: 400 }
             );
         }
 
         await dbConnect();
-        const user = await User.findById(userPayload.id);
-        if (!user) {
-            return NextResponse.json({ message: "User not found" }, { status: 404 });
+
+        try {
+            await Watchlist.create({
+                userId: userPayload.id,
+                ...movieData,
+            });
+        } catch (e: any) {
+            // Ignore duplicate key error (11000)
+            if (e.code !== 11000) throw e;
         }
 
-        if (!user.watchlist) user.watchlist = [];
-
-        if (!user.watchlist.includes(slug)) {
-            user.watchlist.push(slug);
-            await user.save();
-        }
-
-        // Return populated list
-        const watchlist = await Movie.find({ slug: { $in: user.watchlist } })
-            .select("name slug thumb_url poster_url _id");
+        const watchlist = await Watchlist.find({ userId: userPayload.id })
+            .sort({ addedAt: -1 })
+            .lean();
 
         return NextResponse.json({ watchlist });
     } catch (error) {
+        console.error("Post Watchlist Error:", error);
         return NextResponse.json({ message: "Server Error" }, { status: 500 });
     }
 }
@@ -95,22 +91,19 @@ export async function DELETE(req: Request) {
         }
 
         await dbConnect();
-        const user = await User.findById(userPayload.id);
-        if (!user) {
-            return NextResponse.json({ message: "User not found" }, { status: 404 });
-        }
 
-        if (user.watchlist) {
-            user.watchlist = user.watchlist.filter((s: string) => s !== slug);
-            await user.save();
-        }
+        await Watchlist.findOneAndDelete({
+            userId: userPayload.id,
+            movieSlug: slug,
+        });
 
-        // Return populated list
-        const watchlist = await Movie.find({ slug: { $in: user.watchlist } })
-            .select("name slug thumb_url poster_url _id");
+        const watchlist = await Watchlist.find({ userId: userPayload.id })
+            .sort({ addedAt: -1 })
+            .lean();
 
         return NextResponse.json({ watchlist });
     } catch (error) {
+        console.error("Delete Watchlist Error:", error);
         return NextResponse.json({ message: "Server Error" }, { status: 500 });
     }
 }

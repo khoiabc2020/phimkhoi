@@ -184,10 +184,71 @@ export const saveHistory = async (slug: string, episode: string, time: number, d
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`
             },
-            body: JSON.stringify({ slug, episode_slug: episode, time_watched: time, duration })
+            body: JSON.stringify({ slug, episode, progress: time, duration })
         });
     } catch (error) {
         console.error("Error saving history:", error);
+    }
+};
+
+export const getHistory = async (token?: string) => {
+    try {
+        if (!token) return [];
+        const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/history`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) return [];
+        const data = await res.json();
+        return data.history || [];
+    } catch (error) {
+        console.error("Error getting history:", error);
+        return [];
+    }
+};
+
+export const getFavorites = async (token?: string) => {
+    try {
+        if (!token) return [];
+        const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/favorites`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) return [];
+        const data = await res.json();
+        return data.favorites || [];
+    } catch (error) {
+        console.error("Error getting favorites:", error);
+        return [];
+    }
+};
+
+export const toggleFavorite = async (movie: Movie, isFav: boolean, token?: string) => {
+    try {
+        if (!token) return { success: false };
+
+        const payload = isFav ? { slug: movie.slug } : {
+            movieId: movie._id,
+            movieSlug: movie.slug,
+            movieName: movie.name,
+            movieOriginName: movie.origin_name || "",
+            moviePoster: movie.thumb_url || movie.poster_url,
+            movieYear: movie.year || new Date().getFullYear(),
+            movieQuality: movie.quality || "HD",
+            movieCategories: movie.category ? movie.category.map((c: any) => c.name) : []
+        };
+
+        const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/favorites`, {
+            method: isFav ? 'DELETE' : 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        return { success: res.ok, favorites: data.favorites || [] };
+    } catch (error) {
+        console.error("Error toggling favorite:", error);
+        return { success: false };
     }
 };
 

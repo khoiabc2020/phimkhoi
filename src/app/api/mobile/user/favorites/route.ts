@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
-import User from "@/models/User";
-import Movie from "@/models/Movie";
+import Favorite from "@/models/Favorite";
 import jwt from "jsonwebtoken";
 
 const verifyToken = (req: Request) => {
@@ -26,13 +25,10 @@ export async function GET(req: Request) {
         }
 
         await dbConnect();
-        const user = await User.findById(userPayload.id);
-        if (!user) {
-            return NextResponse.json({ message: "User not found" }, { status: 404 });
-        }
 
-        const favorites = await Movie.find({ slug: { $in: user.favorites } })
-            .select("name slug thumb_url poster_url _id");
+        const favorites = await Favorite.find({ userId: userPayload.id })
+            .sort({ addedAt: -1 })
+            .lean();
 
         return NextResponse.json({ favorites });
     } catch (error) {
@@ -48,31 +44,57 @@ export async function POST(req: Request) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
-        const { slug } = await req.json();
-        if (!slug) {
+        const movieData = await req.json();
+
+        // Validate required field
+        if (!movieData.movieSlug) {
             return NextResponse.json(
-                { message: "Slug is required" },
+                { message: "movieSlug is required" },
                 { status: 400 }
             );
         }
 
-        await dbConnect();
-        const user = await User.findById(userPayload.id);
-        if (!user) {
-            return NextResponse.json({ message: "User not found" }, { status: 404 });
+        // movieName is required by schema - provide fallback
+        if (!movieData.movieName) {
+            return NextResponse.json(
+                { message: "movieName is required" },
+                { status: 400 }
+            );
         }
 
-        if (!user.favorites.includes(slug)) {
-            user.favorites.push(slug);
-            await user.save();
+        // moviePoster fallback
+        if (!movieData.moviePoster) {
+            movieData.moviePoster = "";
+        }
+
+        // movieYear fallback
+        if (!movieData.movieYear) {
+            movieData.movieYear = new Date().getFullYear();
+        }
+
+        await dbConnect();
+
+        try {
+            await Favorite.create({
+                userId: userPayload.id,
+                ...movieData,
+            });
+        } catch (e: any) {
+            // Ignore duplicate key error (11000) - already favorited
+            if (e.code !== 11000) {
+                console.error("Favorite create error:", e);
+                throw e;
+            }
         }
 
         // Return populated list
-        const favorites = await Movie.find({ slug: { $in: user.favorites } })
-            .select("name slug thumb_url poster_url _id");
+        const favorites = await Favorite.find({ userId: userPayload.id })
+            .sort({ addedAt: -1 })
+            .lean();
 
         return NextResponse.json({ favorites });
     } catch (error) {
+        console.error("Post Favorites Error:", error);
         return NextResponse.json({ message: "Server Error" }, { status: 500 });
     }
 }
@@ -93,20 +115,20 @@ export async function DELETE(req: Request) {
         }
 
         await dbConnect();
-        const user = await User.findById(userPayload.id);
-        if (!user) {
-            return NextResponse.json({ message: "User not found" }, { status: 404 });
-        }
 
-        user.favorites = user.favorites.filter((s: string) => s !== slug);
-        await user.save();
+        await Favorite.findOneAndDelete({
+            userId: userPayload.id,
+            movieSlug: slug,
+        });
 
         // Return populated list
-        const favorites = await Movie.find({ slug: { $in: user.favorites } })
-            .select("name slug thumb_url poster_url _id");
+        const favorites = await Favorite.find({ userId: userPayload.id })
+            .sort({ addedAt: -1 })
+            .lean();
 
         return NextResponse.json({ favorites });
     } catch (error) {
+        console.error("Delete Favorites Error:", error);
         return NextResponse.json({ message: "Server Error" }, { status: 500 });
     }
 }

@@ -66,15 +66,15 @@ export default function FavoritesScreen() {
           },
           body: JSON.stringify({ slug })
         });
-        setFavorites((prev) => prev.filter((m) => m.slug !== slug));
+        setFavorites((prev) => prev.filter((m) => (m.movieSlug || m.slug) !== slug));
         syncFavorites();
       } catch (e) {
         console.error(e);
       }
     } else {
       // Remove local
-      await removeFavorite(movieId);
-      setFavorites((prev) => prev.filter((m) => m._id !== movieId));
+      await removeFavorite(slug);
+      setFavorites((prev) => prev.filter((m) => (m.movieSlug || m.slug) !== slug));
     }
   };
 
@@ -106,51 +106,58 @@ export default function FavoritesScreen() {
         <FlatList
           data={favorites}
           numColumns={2}
-          keyExtractor={(item) => item._id}
+          keyExtractor={(item, index) => item.movieId || item._id || String(index)}
           columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 16 }}
           contentContainerStyle={{ paddingBottom: 100, paddingHorizontal: 16 }}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#fbbf24" />}
-          renderItem={({ item }) => (
-            <View style={{ width: CARD_WIDTH }}>
-              <View className="relative">
-                <MovieCard
-                  movie={{
-                    ...item,
-                    origin_name: '',
-                    content: '',
-                    type: '',
-                    status: '',
-                    is_copyright: false,
-                    sub_docquyen: false,
-                    chieurap: false,
-                    trailer_url: '',
-                    time: '',
-                    episode_current: '',
-                    episode_total: '',
-                    quality: 'HD',
-                    lang: '',
-                    notify: '',
-                    showtimes: '',
-                    year: 0,
-                    view: 0,
-                    actor: [],
-                    director: [],
-                    category: [],
-                    country: [],
-                    episodes: [],
-                  }}
-                  width={CARD_WIDTH}
-                  height={CARD_WIDTH * 1.4}
-                />
-                <Pressable
-                  onPress={() => handleRemove(item._id, item.slug)}
-                  className="absolute top-1 left-1 w-8 h-8 rounded-full bg-black/60 items-center justify-center"
-                >
-                  <Ionicons name="heart" size={18} color="#ef4444" />
-                </Pressable>
+          renderItem={({ item }) => {
+            const slug = item.movieSlug || item.slug;
+            return (
+              <View style={{ width: CARD_WIDTH }}>
+                <View className="relative">
+                  <MovieCard
+                    movie={{
+                      _id: item.movieId || item._id || '',
+                      name: item.movieName || item.name || '',
+                      slug: slug || '',
+                      origin_name: item.movieOriginName || item.name || '',
+                      thumb_url: item.moviePoster || item.thumb_url || item.poster_url || '',
+                      poster_url: item.moviePoster || item.poster_url || item.thumb_url || '',
+                      year: item.movieYear || 0,
+                      quality: item.movieQuality || 'HD',
+                      content: '',
+                      type: '',
+                      status: '',
+                      is_copyright: false,
+                      sub_docquyen: false,
+                      chieurap: false,
+                      trailer_url: '',
+                      time: '',
+                      episode_current: '',
+                      episode_total: '',
+                      lang: '',
+                      notify: '',
+                      showtimes: '',
+                      view: 0,
+                      actor: [],
+                      director: [],
+                      category: [],
+                      country: [],
+                      episodes: [],
+                    }}
+                    width={CARD_WIDTH}
+                    height={CARD_WIDTH * 1.4}
+                  />
+                  <Pressable
+                    onPress={() => handleRemove(item.movieId || item._id || '', slug || '')}
+                    className="absolute top-1 left-1 w-8 h-8 rounded-full bg-black/60 items-center justify-center"
+                  >
+                    <Ionicons name="heart" size={18} color="#ef4444" />
+                  </Pressable>
+                </View>
               </View>
-            </View>
-          )}
+            );
+          }}
         />
       </SafeAreaView>
     </View>

@@ -16,7 +16,8 @@ import LoadingState from '@/components/LoadingState';
 import {
   getHomeData, getMoviesByCategory, getMoviesByCountry,
   Movie, getMoviesList
-} from '@/services/api'; // Added imports
+} from '@/services/api';
+import { useAuth } from '@/context/auth'; // Added imports
 import { COLORS, SPACING, RADIUS, BLUR } from '@/constants/theme';
 
 const { width } = Dimensions.get('window');
@@ -44,6 +45,7 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
+  const { user, syncHistory } = useAuth();
 
   // Extended Data State
   const [data, setData] = useState<{
@@ -120,6 +122,12 @@ export default function HomeScreen() {
     fetchData();
   }, [fetchData]);
 
+  useEffect(() => {
+    if (user?.id) {
+      syncHistory();
+    }
+  }, [user?.id]);
+
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     fetchData();
@@ -136,10 +144,13 @@ export default function HomeScreen() {
         style={StyleSheet.absoluteFill}
       />
 
-      {/* Floating Glass Header */}
+      {/* Header Background */}
       <View style={styles.headerWrapper}>
-        <BlurView intensity={25} tint="dark" style={StyleSheet.absoluteFill} />
-        <View style={styles.headerGlassBorder} />
+        <LinearGradient
+          colors={['rgba(11,13,18,0.95)', 'rgba(11,13,18,0.8)', 'transparent']}
+          locations={[0.2, 0.7, 1]}
+          style={StyleSheet.absoluteFill}
+        />
         <SafeAreaView edges={['top']} style={styles.headerContent}>
           <View style={styles.headerRow}>
             <View style={styles.logoRow}>
@@ -211,6 +222,24 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
+        {/* Tiếp tục xem (Continue Watching) */}
+        {!loading && user?.history && user.history.length > 0 && (
+          <View style={{ marginBottom: 10 }}>
+            <MovieRow
+              title="Tiếp tục xem"
+              movies={user.history.map((h: any) => ({
+                _id: h.movie?._id,
+                name: h.movie?.name,
+                origin_name: h.movie?.original_name,
+                thumb_url: h.movie?.thumb_url,
+                poster_url: h.movie?.poster_url,
+                slug: h.slug
+              }))}
+              slug=""
+            />
+          </View>
+        )}
+
         {/* Movie Rows - Synced with Web */}
         {loading ? (
           <View style={{ padding: 20 }}>
@@ -259,39 +288,35 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.bg0 },
 
   // Header
-  headerWrapper: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 100, overflow: 'hidden' },
-  headerGlassBorder: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 1, backgroundColor: 'rgba(255,255,255,0.08)' },
-  headerContent: { backgroundColor: 'transparent', paddingBottom: 8 },
+  headerWrapper: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 100 },
+  headerContent: { paddingBottom: 10 },
   headerRow: { height: 50, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: SPACING.md },
   logoRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   logoText: { color: COLORS.textPrimary, fontSize: 18, fontWeight: '800', letterSpacing: -0.5 },
-  headerActions: { flexDirection: 'row', gap: 10, alignItems: 'center' },
+  headerActions: { flexDirection: 'row', gap: 12, alignItems: 'center' },
   iconBtn: {
-    width: 36, height: 36, borderRadius: 18,
+    width: 38, height: 38, borderRadius: 19,
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)'
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.2)',
+    overflow: 'hidden',
   },
-  notifBadge: { position: 'absolute', top: -2, right: -2, width: 14, height: 14, borderRadius: 7, backgroundColor: COLORS.accent, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: COLORS.bg0 },
+  notifBadge: { position: 'absolute', top: 0, right: 0, width: 14, height: 14, borderRadius: 7, backgroundColor: COLORS.accent, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: COLORS.bg0 },
   notifBadgeText: { color: 'black', fontSize: 8, fontWeight: '800' },
 
-  // Pills
-  pillsRow: { paddingHorizontal: SPACING.md, gap: 8, paddingBottom: 6 },
+  // Text Pills Menu (Under Header)
+  pillsRow: { paddingHorizontal: SPACING.md, gap: 20, paddingBottom: 4, paddingTop: 4 },
   pill: {
-    height: 40, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)'
+    height: 30, justifyContent: 'center',
   },
   pillActive: {
-    backgroundColor: 'rgba(251, 191, 36, 0.15)',
-    borderColor: '#fbbf24',
-    shadowColor: '#fbbf24', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 3
+    borderBottomWidth: 0,
   },
-  pillText: { color: 'rgba(255,255,255,0.6)', fontSize: 18, fontWeight: '500' },
-  pillTextActive: { color: '#fbbf24', fontWeight: '700' },
+  pillText: { color: 'rgba(255,255,255,0.5)', fontSize: 16, fontWeight: '600' },
+  pillTextActive: { color: COLORS.accent, fontWeight: '800' },
 
   // Content
-  scrollContent: { paddingTop: 110, paddingBottom: 100 },
+  scrollContent: { paddingTop: 130, paddingBottom: 100 },
 
   // Categories Compact
   catSection: { marginVertical: 10, paddingLeft: SPACING.md },
