@@ -4,7 +4,7 @@ import {
     StyleSheet, ActivityIndicator, Image, Pressable
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { CONFIG } from '@/constants/config';
@@ -76,6 +76,7 @@ export default function SearchScreen() {
 
     return (
         <SafeAreaView style={styles.container} edges={['top']}>
+            <Stack.Screen options={{ headerShown: false }} />
             <StatusBar style="light" />
 
             {/* Header */}

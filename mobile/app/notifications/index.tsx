@@ -4,7 +4,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import * as Haptics from 'expo-haptics';
 import { COLORS } from '@/constants/theme';
@@ -55,6 +55,7 @@ export default function NotificationsScreen() {
 
     return (
         <View style={styles.root}>
+            <Stack.Screen options={{ headerShown: false }} />
             <StatusBar style="light" />
             <SafeAreaView style={styles.safe} edges={['top']}>
 
