@@ -33,8 +33,9 @@ function TabIcon({ focused, label, icon }: {
       <Animated.View style={[styles.iconWrap, { transform: [{ scale }] }]}>
         <Feather
           name={icon as any}
-          size={18}
+          size={24}
           color={focused ? '#F4C84A' : 'rgba(255,255,255,0.6)'}
+          style={{ strokeWidth: focused ? 2.5 : 1.5 }} // Thicker when active
         />
       </Animated.View>
       {/* Label below icon */}
@@ -61,27 +62,28 @@ export default function TabLayout() {
         },
         tabBarStyle: {
           position: 'absolute',
-          bottom: 12, // Reduced bottom spacing
-          left: 10,   // Wider (10dp form edge)
-          right: 10,
-          height: 58, // Reduced height (was 68)
-          borderRadius: 29, // Pill shape
-          backgroundColor: isAndroid ? 'rgba(15,18,26,0.95)' : 'transparent',
+          bottom: 20, // Spec 20px
+          left: '10%', // Center with width
+          right: '10%',
+          width: '80%',
+          height: 68, // Taller for floating feel
+          borderRadius: 34,
+          backgroundColor: isAndroid ? 'rgba(15,18,26,0.95)' : 'transparent', // Fallback for android
           borderTopWidth: 0,
           elevation: 0,
           shadowColor: '#000',
-          shadowOffset: { width: 0, height: 8 },
+          shadowOffset: { width: 0, height: 10 },
           shadowOpacity: 0.3,
-          shadowRadius: 16,
+          shadowRadius: 20,
           borderWidth: 1,
           borderColor: 'rgba(255,255,255,0.08)',
         },
         tabBarBackground: () =>
           !isAndroid ? (
             <BlurView
-              intensity={50}
+              intensity={50} // Stronger blur
               tint="dark"
-              style={[StyleSheet.absoluteFill, { borderRadius: 29, overflow: 'hidden', backgroundColor: 'rgba(15,18,26,0.75)' }]}
+              style={[StyleSheet.absoluteFill, { borderRadius: 34, overflow: 'hidden', backgroundColor: 'rgba(15,18,26,0.75)' }]}
             />
           ) : null,
       }}

@@ -11,15 +11,15 @@ import { useState } from 'react';
 const ProfileMenuItem = ({ icon, label, onPress, isDestructive = false }: any) => (
   <Pressable
     onPress={onPress}
-    className="flex-row items-center justify-between py-4 px-4 border-b border-white/5 active:bg-white/10"
+    className="flex-row items-center justify-between py-4 border-b border-gray-800 active:bg-white/5 px-2"
   >
     <View className="flex-row items-center gap-4">
-      <Ionicons name={icon} size={20} color={isDestructive ? '#ef4444' : 'rgba(255,255,255,0.7)'} />
-      <Text className={`text-[15px] font-medium ${isDestructive ? 'text-red-500' : 'text-white'}`}>
+      <Ionicons name={icon} size={22} color={isDestructive ? '#ef4444' : 'white'} />
+      <Text className={`text-base font-medium ${isDestructive ? 'text-red-500' : 'text-white'}`}>
         {label}
       </Text>
     </View>
-    {!isDestructive && <Ionicons name="chevron-forward" size={16} color="rgba(255,255,255,0.3)" />}
+    <Ionicons name="chevron-forward" size={18} color="#6b7280" />
   </Pressable>
 );
 
@@ -39,33 +39,68 @@ export default function ProfileScreen() {
     return (
       <View className="flex-1 bg-[#0a0a0a]">
         <StatusBar style="light" />
-        <SafeAreaView className="flex-1 px-5 pt-8">
-          <View className="items-center mb-10">
-            <Text className="text-[#F4C84A] text-3xl font-black tracking-tighter mb-2">MOVIEBOX</Text>
-            <Text className="text-gray-500 text-sm">Đăng nhập để đồng bộ lịch sử & yêu thích</Text>
-          </View>
+        <SafeAreaView className="flex-1">
+          <View className="px-5 pt-4 pb-2">
+            <Text className="text-white text-2xl font-bold mb-6">Tài khoản</Text>
 
-          {/* Auth Buttons */}
-          <View className="gap-4">
-            <Pressable
-              className="w-full bg-[#F4C84A] py-4 rounded-full items-center justify-center shadow-lg shadow-yellow-500/20"
-              onPress={() => router.push('/(auth)/login' as any)}
-            >
-              <Text className="text-black font-extrabold text-base uppercase tracking-wide">Đăng nhập</Text>
-            </Pressable>
+            {/* Auth Buttons */}
+            <View className="flex-row gap-3 mb-8">
+              <Pressable
+                className="flex-1 bg-[#fbbf24] py-3.5 rounded-xl items-center justify-center"
+                onPress={() => router.push('/(auth)/login' as any)}
+              >
+                <View className="flex-row items-center gap-2">
+                  <Ionicons name="person" size={18} color="black" />
+                  <Text className="text-black font-bold text-base">Đăng nhập</Text>
+                </View>
+              </Pressable>
 
-            <Pressable
-              className="w-full bg-white/10 py-4 rounded-full items-center justify-center border border-white/10"
-              onPress={() => router.push('/(auth)/register' as any)}
-            >
-              <Text className="text-white font-bold text-base uppercase tracking-wide">Đăng ký</Text>
-            </Pressable>
-          </View>
+              <Pressable
+                className="flex-1 bg-white py-3.5 rounded-xl items-center justify-center"
+                onPress={() => router.push('/(auth)/register' as any)}
+              >
+                <Text className="text-black font-bold text-base">Đăng ký</Text>
+              </Pressable>
+            </View>
 
-          {/* Footer Links */}
-          <View className="mt-auto pb-10 gap-4">
-            <ProfileMenuItem icon="shield-checkmark-outline" label="Chính sách bảo mật" onPress={() => Linking.openURL(webUrl)} />
-            <ProfileMenuItem icon="help-circle-outline" label="Trợ giúp & Góp ý" onPress={() => Linking.openURL(webUrl)} />
+            {/* Menu List */}
+            <View>
+              <ProfileMenuItem
+                icon="time-outline"
+                label="Đang xem"
+                onPress={() => router.push('/history' as any)}
+              />
+              <ProfileMenuItem
+                icon="add-outline"
+                label="Danh sách phim của tôi"
+                onPress={() => router.push('/watchlist' as any)}
+              />
+              <ProfileMenuItem
+                icon="heart"
+                label="Yêu thích"
+                onPress={() => router.push('/favorites' as any)}
+              />
+              <ProfileMenuItem
+                icon="tv-outline"
+                label="Đăng nhập SmartTV"
+                onPress={() => Alert.alert("Coming Soon", "Tính năng SmartTV đang phát triển")}
+              />
+              <ProfileMenuItem
+                icon="shield-checkmark-outline"
+                label="Hợp Đồng và Chính Sách"
+                onPress={() => Linking.openURL(webUrl)}
+              />
+              <ProfileMenuItem
+                icon="document-text-outline"
+                label="Chính sách bảo mật"
+                onPress={() => Linking.openURL(webUrl)}
+              />
+              <ProfileMenuItem
+                icon="chatbox-ellipses-outline"
+                label="Góp ý"
+                onPress={() => Linking.openURL(webUrl)}
+              />
+            </View>
           </View>
         </SafeAreaView>
       </View>
@@ -78,78 +113,90 @@ export default function ProfileScreen() {
       <SafeAreaView className="flex-1">
         <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }}>
 
-          {/* User Card */}
-          <View className="flex-row items-center mb-8 bg-white/5 p-4 rounded-2xl border border-white/5">
-            <View className="w-16 h-16 rounded-full overflow-hidden border-2 border-[#F4C84A] mr-4 bg-gray-800">
+          {/* Header Profile */}
+          <View className="flex-row items-center mb-6">
+            <View className="w-16 h-16 rounded-full overflow-hidden border border-gray-700 mr-4 bg-gray-800">
               {user.image ? (
                 <Image source={{ uri: user.image }} className="w-full h-full" />
               ) : (
-                <View className="w-full h-full items-center justify-center bg-gray-900">
-                  <Text className="text-xl font-bold text-[#F4C84A]">{user.name?.charAt(0)}</Text>
+                <View className="w-full h-full items-center justify-center bg-gray-800">
+                  <Text className="text-xl font-bold text-gray-400">{user.name?.charAt(0)}</Text>
                 </View>
               )}
             </View>
             <View>
               <View className="flex-row items-center gap-2">
-                <Text className="text-white text-xl font-black tracking-tight">{user.name}</Text>
-                <View className="bg-[#F4C84A] px-2 py-0.5 rounded flex-row items-center">
-                  <Text className="text-black text-[10px] font-black uppercase">Member</Text>
+                <Text className="text-white text-lg font-bold">{user.name}</Text>
+                <View className="bg-green-500/20 px-2 py-0.5 rounded">
+                  <Text className="text-green-500 text-[10px] font-bold uppercase">Member</Text>
                 </View>
               </View>
-              <Text className="text-gray-400 text-xs mt-1 font-medium tracking-wider">ID: {user.id ? user.id.slice(0, 8).toUpperCase() : 'UNKNOWN'}</Text>
+              <Text className="text-gray-400 text-xs mt-1">ID: {user.id ? user.id.slice(0, 8) : 'Unknown'}</Text>
             </View>
           </View>
 
-          {/* Big White "Manage Account" Button (Synced Design) */}
+          {/* Manage Account Button */}
           <Pressable
-            className="w-full bg-white py-4 rounded-xl items-center mb-10 shadow-lg active:scale-95 transition-all"
-            onPress={() => Alert.alert("Thông báo", "Chức năng đang được đồng bộ với Web")}
+            className="w-full bg-white py-3 rounded-xl items-center mb-8 active:opacity-90"
+            onPress={() => Alert.alert("Thông báo", "Tính năng quản lý tài khoản đang phát triển")}
           >
-            <Text className="text-black font-extrabold text-base">Quản lý tài khoản</Text>
+            <Text className="text-black font-bold text-sm">Quản lý tài khoản</Text>
           </Pressable>
 
-          {/* Menu Groups */}
-          <View className="space-y-6">
-
-            {/* Group 1: Personal */}
-            <View>
-              <Text className="text-gray-500 text-xs font-bold uppercase mb-2 ml-2">Cá nhân</Text>
-              <View className="bg-white/5 rounded-2xl overflow-hidden">
-                <ProfileMenuItem icon="time-outline" label="Đang xem" onPress={() => router.push('/history' as any)} />
-                <View className="h-[1px] bg-white/5 mx-4" />
-                <ProfileMenuItem icon="add-circle-outline" label="Danh sách của tôi" onPress={() => router.push('/watchlist' as any)} />
-                <View className="h-[1px] bg-white/5 mx-4" />
-                <ProfileMenuItem icon="heart-outline" label="Yêu thích" onPress={() => router.push('/favorites' as any)} />
-              </View>
-            </View>
-
-            {/* Group 2: System */}
-            <View>
-              <Text className="text-gray-500 text-xs font-bold uppercase mb-2 ml-2">Hệ thống</Text>
-              <View className="bg-white/5 rounded-2xl overflow-hidden">
-                <ProfileMenuItem icon="tv-outline" label="Đăng nhập SmartTV" onPress={() => Alert.alert("Coming Soon", "Tính năng SmartTV đang phát triển")} />
-                <View className="h-[1px] bg-white/5 mx-4" />
-                <ProfileMenuItem icon="document-text-outline" label="Hợp đồng & Chính sách" onPress={() => Linking.openURL(webUrl)} />
-                <View className="h-[1px] bg-white/5 mx-4" />
-                <ProfileMenuItem icon="lock-closed-outline" label="Chính sách bảo mật" onPress={() => Linking.openURL(webUrl)} />
-                <View className="h-[1px] bg-white/5 mx-4" />
-                <ProfileMenuItem icon="chatbubble-ellipses-outline" label="Góp ý & Báo lỗi" onPress={() => Linking.openURL(webUrl)} />
-              </View>
-            </View>
-
-            {/* Logout */}
-            <Pressable
-              className="flex-row items-center justify-center gap-2 py-4 mt-4"
-              onPress={handleLogout}
-            >
-              <Ionicons name="log-out-outline" size={20} color="#ef4444" />
-              <Text className="text-red-500 font-bold text-base">Đăng xuất</Text>
-            </Pressable>
-
+          {/* Menu List */}
+          <View className="mb-6">
+            <ProfileMenuItem
+              icon="time-outline"
+              label="Đang xem"
+              onPress={() => router.push('/history' as any)}
+            />
+            <ProfileMenuItem
+              icon="add-outline"
+              label="Danh sách phim của tôi"
+              onPress={() => router.push('/favorites' as any)}
+            />
+            <ProfileMenuItem
+              icon="heart-outline"
+              label="Yêu thích"
+              onPress={() => router.push('/favorites' as any)}
+            />
           </View>
 
-          <Text className="text-gray-800 text-center text-[10px] font-bold mt-12 uppercase tracking-widest">
-            MovieBox Mobile v2.0
+          <View className="mb-6">
+            <ProfileMenuItem
+              icon="tv-outline"
+              label="Đăng nhập SmartTV"
+              onPress={() => Alert.alert("Coming Soon", "Tính năng SmartTV đang phát triển")}
+            />
+            <ProfileMenuItem
+              icon="shield-checkmark-outline"
+              label="Hợp đồng và Chính sách"
+              onPress={() => Linking.openURL(webUrl)}
+            />
+            <ProfileMenuItem
+              icon="lock-closed-outline"
+              label="Chính sách bảo mật"
+              onPress={() => Linking.openURL(webUrl)}
+            />
+            <ProfileMenuItem
+              icon="chatbox-ellipses-outline"
+              label="Góp ý"
+              onPress={() => Linking.openURL(webUrl)}
+            />
+          </View>
+
+          {/* Logout */}
+          <View className="mt-4">
+            <ProfileMenuItem
+              icon="log-out-outline"
+              label="Đăng xuất"
+              isDestructive
+              onPress={handleLogout}
+            />
+          </View>
+
+          <Text className="text-gray-700 text-center text-xs mt-12 mb-4">
+            Version 1.2.0 • Build 2024
           </Text>
 
         </ScrollView>

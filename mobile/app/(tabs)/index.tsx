@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useEffect, useCallback } from 'react';
-import { Link, useRouter, useFocusEffect } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
@@ -13,7 +13,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import HeroSection from '@/components/HeroSection';
 import MovieRow from '@/components/MovieRow';
 import LoadingState from '@/components/LoadingState';
-import { useAuth } from '@/context/auth';
 import {
   getHomeData, getMoviesByCategory, getMoviesByCountry,
   Movie, getMoviesList
@@ -45,27 +44,6 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
-  const { user, syncHistory } = useAuth();
-
-  // Sync History on Focus (for Continue Watching)
-  // Wrapped in try-catch and debounced logically by focus
-  useFocusEffect(
-    useCallback(() => {
-      let isActive = true;
-      const sync = async () => {
-        try {
-          if (user?.token && isActive) {
-            // Only sync if we have a token
-            await syncHistory();
-          }
-        } catch (e) {
-          console.log("Sync history failed silently", e);
-        }
-      };
-      sync();
-      return () => { isActive = false; };
-    }, [user?.token])
-  );
 
   // Extended Data State
   const [data, setData] = useState<{
@@ -240,23 +218,6 @@ export default function HomeScreen() {
           </View>
         ) : (
           <View style={styles.movieRows}>
-            {/* Continue Watching Section */}
-            {user?.history && user.history.length > 0 && (
-              <MovieRow
-                title="Tiếp Tục Xem"
-                movies={user.history.map((h: any) => ({
-                  _id: h.slug, // Use slug as ID
-                  slug: h.slug,
-                  name: h.movie_name || h.name || "Phim đang xem",
-                  poster_url: h.poster_url || h.thumb_url,
-                  thumb_url: h.thumb_url || h.poster_url,
-                  // Add progress indicator if MovieCard supports it, or just show basic
-                  episode_current: h.episode_name ? `Tập ${h.episode_name}` : undefined
-                }))}
-                slug="history" // Or redirect to history tab
-              />
-            )}
-
             {/* Hot Sections */}
             {data.phimChieuRap.length > 0 &&
               <MovieRow title="Phim Chiếu Rạp Mới" movies={data.phimChieuRap} slug="phim-chieu-rap" />
@@ -317,7 +278,7 @@ const styles = StyleSheet.create({
   // Pills
   pillsRow: { paddingHorizontal: SPACING.md, gap: 8, paddingBottom: 6 },
   pill: {
-    height: 32, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, borderRadius: 16,
+    height: 40, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, borderRadius: 20,
     backgroundColor: 'rgba(255,255,255,0.08)',
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)'
   },
@@ -326,7 +287,7 @@ const styles = StyleSheet.create({
     borderColor: '#fbbf24',
     shadowColor: '#fbbf24', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 3
   },
-  pillText: { color: 'rgba(255,255,255,0.6)', fontSize: 12, fontWeight: '500' },
+  pillText: { color: 'rgba(255,255,255,0.6)', fontSize: 18, fontWeight: '500' },
   pillTextActive: { color: '#fbbf24', fontWeight: '700' },
 
   // Content

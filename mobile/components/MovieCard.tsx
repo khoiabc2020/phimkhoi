@@ -22,89 +22,49 @@ const MovieCard = memo(({ movie, width = 115, height = 172 }: MovieCardProps) =>
                 style={{ width }}
             >
                 {/* Image + Overlay Badges */}
-                <View style={{
-                    width,
-                    height,
-                    borderRadius: 18, // User Spec: 18dp
-                    overflow: 'hidden',
-                    position: 'relative',
-                    borderWidth: 1,
-                    borderColor: 'rgba(255,255,255,0.08)',
-                    backgroundColor: '#15171E',
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 8,
-                    elevation: 4
-                }}>
+                <View style={{ width, height, borderRadius: 8, overflow: 'hidden', position: 'relative' }}>
                     <Image
                         source={{ uri: imageUrl }}
                         style={{ width, height }}
                         contentFit="cover"
-                        transition={300}
+                        transition={200}
                         cachePolicy="memory-disk"
                     />
 
-                    {/* Badge: PD/TM + Ep - Glass Style */}
+                    {/* Badge: PD/TM + Ep - Inside image, bottom-left */}
                     <View style={{ position: 'absolute', bottom: 6, left: 6, flexDirection: 'row', gap: 4 }}>
                         {movie.lang?.includes('Thuyết') ? (
-                            <View style={{
-                                backgroundColor: 'rgba(15,18,26,0.85)',
-                                paddingHorizontal: 6,
-                                paddingVertical: 3,
-                                borderRadius: 6,
-                                borderWidth: 0.5,
-                                borderColor: 'rgba(255,255,255,0.1)'
-                            }}>
-                                <Text style={{ fontSize: 9, fontWeight: '700', color: 'white' }}>
+                            <View style={{ backgroundColor: 'rgba(59,130,246,0.9)', paddingHorizontal: 5, paddingVertical: 2, borderRadius: 4 }}>
+                                <Text style={{ fontSize: 9, fontWeight: 'bold', color: 'white' }}>
                                     TM.{movie.episode_current?.replace(/[^0-9]/g, '') || '?'}
                                 </Text>
                             </View>
                         ) : (
-                            <View style={{
-                                backgroundColor: 'rgba(255,255,255,0.15)',
-                                paddingHorizontal: 6,
-                                paddingVertical: 3,
-                                borderRadius: 6,
-                                borderWidth: 0.5,
-                                borderColor: 'rgba(255,255,255,0.2)'
-                            }}>
-                                <Text style={{ fontSize: 9, fontWeight: '700', color: 'white' }}>
+                            <View style={{ backgroundColor: 'rgba(75,85,99,0.9)', paddingHorizontal: 5, paddingVertical: 2, borderRadius: 4 }}>
+                                <Text style={{ fontSize: 9, fontWeight: 'bold', color: 'white' }}>
                                     PD.{movie.episode_current?.replace(/[^0-9]/g, '') || '?'}
                                 </Text>
                             </View>
                         )}
                     </View>
 
-                    {/* Quality Badge - Top Right */}
+                    {/* Quality Badge - Inside image, top-right */}
                     {movie.quality && (
-                        <View style={{
-                            position: 'absolute',
-                            top: 6,
-                            right: 6,
-                            backgroundColor: '#F4C84A', // Accent
-                            paddingHorizontal: 6,
-                            paddingVertical: 3,
-                            borderRadius: 6,
-                            shadowColor: '#F4C84A',
-                            shadowOffset: { width: 0, height: 2 },
-                            shadowOpacity: 0.3,
-                            shadowRadius: 4,
-                        }}>
-                            <Text style={{ fontSize: 9, fontWeight: '800', color: 'black' }}>{movie.quality}</Text>
+                        <View style={{ position: 'absolute', top: 6, right: 6, backgroundColor: '#fbbf24', paddingHorizontal: 5, paddingVertical: 2, borderRadius: 4 }}>
+                            <Text style={{ fontSize: 9, fontWeight: 'bold', color: 'black' }}>{movie.quality}</Text>
                         </View>
                     )}
                 </View>
 
                 {/* Title Section */}
-                <View style={{ marginTop: 8, paddingHorizontal: 2 }}>
+                <View style={{ marginTop: 6 }}>
                     <Text
-                        style={{ color: 'rgba(255,255,255,0.95)', fontSize: 13, fontWeight: '600', lineHeight: 18 }}
+                        style={{ color: 'white', fontSize: 12, fontWeight: '700', lineHeight: 16 }}
                         numberOfLines={1}
                     >
                         {movie.name}
                     </Text>
-                    <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, marginTop: 2 }} numberOfLines={1}>
+                    <Text style={{ color: '#9ca3af', fontSize: 10, marginTop: 2 }} numberOfLines={1}>
                         {movie.origin_name}
                     </Text>
                 </View>

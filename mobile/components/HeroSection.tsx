@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { Link, useRouter } from 'expo-router';
 import Carousel from 'react-native-reanimated-carousel';
 import { Image } from 'expo-image';
-import { BlurView } from 'expo-blur';
 import { Movie, getImageUrl } from '@/services/api';
 import { useState, useCallback } from 'react';
 import { COLORS, RADIUS, SPACING } from '@/constants/theme';
@@ -45,15 +44,15 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                 <Image
                     source={{ uri: getImageUrl(activeMovie?.poster_url || activeMovie?.thumb_url) }}
                     style={StyleSheet.absoluteFill}
-                    blurRadius={90} // Stronger blur for cinematic feel
+                    blurRadius={80}
                     contentFit="cover"
                     transition={800}
                 />
-                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(11,13,18,0.6)' }]} />
+                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(11,13,18,0.5)' }]} />
                 <LinearGradient
                     colors={['transparent', COLORS.bg0]}
                     style={StyleSheet.absoluteFill}
-                    locations={[0.2, 0.9]}
+                    locations={[0.3, 0.9]}
                 />
             </View>
 
@@ -62,14 +61,14 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                 <Carousel
                     loop
                     width={width}
-                    height={POSTER_HEIGHT + 30}
+                    height={POSTER_HEIGHT + 20}
                     data={movies}
                     onSnapToItem={onSnapToItem}
-                    scrollAnimationDuration={600}
+                    scrollAnimationDuration={500}
                     mode="parallax"
                     modeConfig={{
-                        parallaxScrollingScale: 0.85,
-                        parallaxScrollingOffset: 60,
+                        parallaxScrollingScale: 0.86,
+                        parallaxScrollingOffset: 50,
                     }}
                     renderItem={({ item, index }) => (
                         <HeroCard
@@ -104,8 +103,7 @@ export default function HeroSection({ movies }: HeroSectionProps) {
 
                     <Link href={`/movie/${activeMovie.slug}` as any} asChild>
                         <Pressable style={styles.secondaryBtn}>
-                            <BlurView intensity={20} tint="light" style={StyleSheet.absoluteFill} />
-                            <Ionicons name="information-circle-outline" size={24} color="#FFF" />
+                            <Ionicons name="information-circle-outline" size={22} color="rgba(255,255,255,0.8)" />
                         </Pressable>
                     </Link>
                 </View>
@@ -119,16 +117,16 @@ function HeroCard({ movie, isActive, onPress }: { movie: Movie, isActive: boolea
         <Pressable
             style={[styles.cardContainer, isActive && styles.cardActive]}
             onPress={onPress}
-            activeOpacity={0.95}
+            activeOpacity={0.9}
         >
             <Image
                 source={{ uri: getImageUrl(movie.poster_url || movie.thumb_url) }}
                 style={styles.cardImage}
                 contentFit="cover"
-                transition={500}
+                transition={400}
             />
             <LinearGradient
-                colors={['transparent', 'rgba(0,0,0,0.2)']}
+                colors={['transparent', 'rgba(0,0,0,0.1)']}
                 style={StyleSheet.absoluteFill}
             />
         </Pressable>
@@ -140,18 +138,18 @@ const styles = StyleSheet.create({
         height: HERO_HEIGHT,
         width: '100%',
         justifyContent: 'flex-start',
-        paddingTop: 0,
+        paddingTop: 10,
     },
     carouselContainer: {
         alignItems: 'center',
-        marginTop: 10,
+        marginTop: 0,
         zIndex: 10,
     },
     // Poster
     cardContainer: {
         width: POSTER_WIDTH,
         height: POSTER_HEIGHT,
-        borderRadius: 32, // Liquid Radius
+        borderRadius: 28,
         overflow: 'hidden',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.1)',
@@ -159,74 +157,69 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
     },
     cardActive: {
-        borderColor: 'rgba(255,255,255,0.3)',
+        borderColor: 'rgba(255,255,255,0.25)',
         shadowColor: COLORS.accent,
-        shadowOffset: { width: 0, height: 12 },
-        shadowOpacity: 0.35,
-        shadowRadius: 24,
-        elevation: 12,
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.3,
+        shadowRadius: 20,
+        elevation: 10,
     },
     cardImage: { width: '100%', height: '100%' },
 
     // Info
     infoContainer: {
         alignItems: 'center',
-        marginTop: 16,
+        marginTop: 12, // Tighter spacing
         paddingHorizontal: 20,
     },
     title: {
         color: COLORS.textPrimary,
-        fontSize: 26,
-        fontWeight: '800', // Thicker font
+        fontSize: 24, // Slightly smaller for compactness
+        fontWeight: '700',
         textAlign: 'center',
-        marginBottom: 6,
-        letterSpacing: -0.8, // Tighter tracking
-        textShadowColor: 'rgba(0,0,0,0.5)',
-        textShadowOffset: { width: 0, height: 2 },
-        textShadowRadius: 4,
+        marginBottom: 4,
+        letterSpacing: -0.5,
     },
     inlineMeta: {
         color: COLORS.textSecondary,
         fontSize: 13,
         fontWeight: '500',
-        marginBottom: 16,
-        opacity: 0.8,
+        marginBottom: 12,
     },
 
     // Buttons Buttons
     actionRow: {
         flexDirection: 'row',
-        gap: 12,
+        gap: 10,
         alignItems: 'center',
     },
     primaryBtn: {
-        width: 150,
-        height: 48, // Standard iOS Button Height
+        width: 140, // Compact Width
+        height: 44, // Compact Height 44dp
         backgroundColor: COLORS.accent,
-        borderRadius: 24,
+        borderRadius: 22,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 8,
+        gap: 6,
         shadowColor: COLORS.accent,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
     },
     primaryBtnText: {
-        color: '#000',
-        fontSize: 16,
+        color: 'black',
+        fontSize: 15,
         fontWeight: '700',
     },
     secondaryBtn: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        backgroundColor: 'transparent',
-        borderWidth: 1.5,
-        borderColor: 'rgba(255,255,255,0.2)',
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        backgroundColor: 'rgba(255,255,255,0.08)',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.15)',
         alignItems: 'center',
         justifyContent: 'center',
-        overflow: 'hidden', // For BlurView
     },
 });

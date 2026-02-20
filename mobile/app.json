@@ -7,7 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "phimkhoi",
     "userInterfaceStyle": "dark",
-    "userInterfaceStyle": "dark",
     "newArchEnabled": false,
     "ios": {
       "supportsTablet": true
@@ -45,15 +44,15 @@
         "expo-build-properties",
         {
           "android": {
-            "compileSdkVersion": 34,
-            "targetSdkVersion": 34
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35
           }
         }
       ]
     ],
     "experiments": {
       "typedRoutes": true,
-      "reactCompiler": false
+      "reactCompiler": true
     },
     "extra": {
       "router": {},

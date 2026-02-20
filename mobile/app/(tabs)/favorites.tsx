@@ -21,13 +21,7 @@ export default function FavoritesScreen() {
 
   const load = useCallback(async () => {
     if (user && token) {
-      // Prioritize Context if available (fastest)
-      if (user.favorites && user.favorites.length > 0) {
-        // If context has full objects? user.favorites might be just strings or objects depending on backend.
-        // The API returns full objects usually. Let's rely on API fetch for full details if context is partial.
-        // Actually, let's just trigger a sync if we think we are stale, but mostly trust the API load.
-      }
-
+      // Load from API
       try {
         const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/favorites`, {
           headers: { Authorization: `Bearer ${token}` }
@@ -35,8 +29,8 @@ export default function FavoritesScreen() {
         const data = await res.json();
         if (res.ok) {
           setFavorites(data.favorites);
-          // Update context if it differs?
-          // syncFavorites(); // This might cause loop if not careful.
+          // Also sync context
+          syncFavorites();
         }
       } catch (e) {
         console.error("Failed to load favorites from API", e);
@@ -47,18 +41,6 @@ export default function FavoritesScreen() {
       setFavorites(list);
     }
   }, [user, token]);
-
-  // Reactive Update: When user context favorites change (e.g. from MovieDetail), reload.
-  useEffect(() => {
-    if (user?.favorites) {
-      // If user.favorites contains the full data, use it directly!
-      // If it's just IDs, we might need to fetch. 
-      // Assuming AuthContext.syncFavorites updates user.favorites with the RESPONSE from API (which is the list),
-      // we can try to use it. 
-      // But let's just trigger load() to be safe and consistent.
-      load();
-    }
-  }, [user?.favorites, load]);
 
   useFocusEffect(
     useCallback(() => {

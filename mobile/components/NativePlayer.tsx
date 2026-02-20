@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { Video, AVPlaybackStatus, ResizeMode } from 'expo-av';
 import Slider from '@react-native-community/slider';
-import { Feather, MaterialIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useKeepAwake } from 'expo-keep-awake';
@@ -66,7 +66,9 @@ export default function NativePlayer({
     const initialSeekDone = useRef(false);
 
     // Brightness with Standard Animated
-    const brightness = useRef(new Animated.Value(0)).current;
+    const brightness = useRef(new Animated.Value(0)).current; // 0 = normal (opacity 0), 1 = dark (opacity 1) - Wait, logic reversed?
+    // Let's say brightnessValue 1.0 = full bright (overlay opacity 0)
+    // brightnessValue 0.0 = dark (overlay opacity 0.8)
     const brightnessValue = useRef(1.0);
     const brightnessOpacity = useRef(new Animated.Value(0)).current;
 
@@ -274,7 +276,7 @@ export default function NativePlayer({
 
                 {/* VISUAL BRIGHTNESS SLIDER */}
                 <Animated.View style={[styles.brightnessBar, { opacity: sliderOpacity }]} pointerEvents="none">
-                    <Feather name="sun" size={14} color="rgba(255,255,255,0.9)" />
+                    <Ionicons name="sunny" size={14} color="rgba(255,255,255,0.9)" />
                     <View style={styles.brightnessTrack}>
                         <Animated.View
                             style={[
@@ -288,7 +290,7 @@ export default function NativePlayer({
                             ]}
                         />
                     </View>
-                    <Feather name="moon" size={12} color="rgba(255,255,255,0.5)" />
+                    <Ionicons name="moon" size={12} color="rgba(255,255,255,0.5)" />
                 </Animated.View>
 
                 {/* CONTROLS */}
@@ -299,7 +301,7 @@ export default function NativePlayer({
                         {!locked && (
                             <LinearGradient colors={['rgba(0,0,0,0.8)', 'transparent']} style={styles.header}>
                                 <TouchableOpacity onPress={onClose} style={styles.backBtn}>
-                                    <Feather name="arrow-left" size={26} color="white" />
+                                    <Ionicons name="arrow-back" size={26} color="white" />
                                 </TouchableOpacity>
                                 <View style={{ flex: 1 }}>
                                     <Text style={styles.videoTitle} numberOfLines={1}>{title}</Text>
@@ -311,7 +313,7 @@ export default function NativePlayer({
                                 </View>
                                 <View style={{ flexDirection: 'row', gap: 20, alignItems: 'center' }}>
                                     <TouchableOpacity onPress={() => setShowServers(true)}>
-                                        <Feather name="server" size={22} color="white" />
+                                        <Ionicons name="server-outline" size={22} color="white" />
                                     </TouchableOpacity>
                                 </View>
                             </LinearGradient>
@@ -322,7 +324,7 @@ export default function NativePlayer({
                             style={[styles.lockBtn, locked ? { backgroundColor: '#fbbf24', borderColor: '#fbbf24' } : { backgroundColor: 'rgba(0,0,0,0.5)' }]}
                             onPress={() => setLocked(!locked)}
                         >
-                            <Feather name={locked ? "lock" : "unlock"} size={22} color={locked ? "black" : "white"} />
+                            <Ionicons name={locked ? "lock-closed" : "lock-open-outline"} size={22} color={locked ? "black" : "white"} />
                         </TouchableOpacity>
 
                         {/* Center Controls */}
@@ -335,7 +337,7 @@ export default function NativePlayer({
 
                                 {/* Play/Pause */}
                                 <TouchableOpacity onPress={handlePlayPause} style={styles.playPauseBtn}>
-                                    <Feather
+                                    <Ionicons
                                         name={status.isLoaded && status.isPlaying ? "pause" : "play"}
                                         size={36}
                                         color="white"
@@ -373,7 +375,7 @@ export default function NativePlayer({
                                 <View style={styles.bottomActions}>
                                     <View style={{ flexDirection: 'row', gap: 24, alignItems: 'center' }}>
                                         <TouchableOpacity style={styles.actionItem} onPress={() => setShowEpisodes(true)}>
-                                            <Feather name="list" size={24} color="white" />
+                                            <Ionicons name="list" size={24} color="white" />
                                             <Text style={styles.actionText}>Tập phim</Text>
                                         </TouchableOpacity>
 
@@ -383,19 +385,19 @@ export default function NativePlayer({
                                             const nextSpeed = speeds[(currentIdx + 1) % speeds.length];
                                             handleSpeedChange(nextSpeed);
                                         }}>
-                                            <Feather name="sliders" size={24} color="white" />
+                                            <Ionicons name="speedometer-outline" size={24} color="white" />
                                             <Text style={styles.actionText}>{playbackSpeed}x</Text>
                                         </TouchableOpacity>
                                     </View>
 
                                     <View style={{ flexDirection: 'row', gap: 20 }}>
                                         <TouchableOpacity onPress={handleResizeMode}>
-                                            <Feather name={resizeMode === ResizeMode.COVER ? "minimize" : "maximize"} size={22} color="white" />
+                                            <Ionicons name={resizeMode === ResizeMode.COVER ? "scan" : "resize"} size={22} color="white" />
                                         </TouchableOpacity>
 
                                         {onNext && (
                                             <TouchableOpacity onPress={onNext} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                                                <Feather name="skip-forward" size={24} color="white" />
+                                                <Ionicons name="play-skip-forward" size={24} color="white" />
                                             </TouchableOpacity>
                                         )}
                                     </View>
@@ -423,7 +425,7 @@ export default function NativePlayer({
                                 onPress={() => setShowEpisodes(false)}
                                 style={styles.closeBtn}
                             >
-                                <Feather name="x" size={20} color="white" />
+                                <Ionicons name="close" size={20} color="white" />
                             </TouchableOpacity>
                         </View>
 
@@ -467,7 +469,7 @@ export default function NativePlayer({
                         <View style={styles.sheetHeader}>
                             <Text style={styles.sheetTitle}>Nguồn phát</Text>
                             <TouchableOpacity onPress={() => setShowServers(false)}>
-                                <Feather name="x-circle" size={28} color="#4b5563" />
+                                <Ionicons name="close-circle" size={28} color="#4b5563" />
                             </TouchableOpacity>
                         </View>
                         <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
@@ -481,12 +483,12 @@ export default function NativePlayer({
                                     }}
                                 >
                                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                                        <Feather name="server" size={20} color={index === currentServerIndex ? '#fbbf24' : 'gray'} />
+                                        <Ionicons name="server-outline" size={20} color={index === currentServerIndex ? '#fbbf24' : 'gray'} />
                                         <Text style={[styles.serverRowText, index === currentServerIndex && styles.activeServerRowText]}>
                                             {server}
                                         </Text>
                                     </View>
-                                    {index === currentServerIndex && <Feather name="check" size={20} color="#fbbf24" />}
+                                    {index === currentServerIndex && <Ionicons name="checkmark" size={20} color="#fbbf24" />}
                                 </TouchableOpacity>
                             ))}
                         </ScrollView>
