@@ -21,7 +21,6 @@ const WatchHistorySchema = new Schema<IWatchHistory>(
     {
         userId: {
             type: String,
-            ref: "User",
             required: true,
             index: true,
         },
