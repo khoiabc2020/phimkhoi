@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IFavorite extends Document {
-    userId: mongoose.Types.ObjectId;
+    userId: string;
     movieId: string;
     movieSlug: string;
     movieName: string;
@@ -16,7 +16,7 @@ export interface IFavorite extends Document {
 const FavoriteSchema = new Schema<IFavorite>(
     {
         userId: {
-            type: Schema.Types.ObjectId,
+            type: String,
             ref: "User",
             required: true,
             index: true,

@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IWatchHistory extends Document {
-    userId: mongoose.Types.ObjectId;
+    userId: string;
     movieId: string;
     movieSlug: string;
     movieName: string;
@@ -20,7 +20,7 @@ export interface IWatchHistory extends Document {
 const WatchHistorySchema = new Schema<IWatchHistory>(
     {
         userId: {
-            type: Schema.Types.ObjectId,
+            type: String,
             ref: "User",
             required: true,
             index: true,
