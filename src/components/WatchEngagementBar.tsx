@@ -44,11 +44,11 @@ export default function WatchEngagementBar({
             style={{ background: '#11131A' }}>
 
             {/* Controls bar */}
-            <div className="flex flex-wrap items-center justify-between gap-y-3 py-3 px-5 border-b border-white/[0.05]"
+            <div className="flex items-center gap-4 py-3 px-5 border-b border-white/[0.05] overflow-x-auto hide-scrollbar md:flex-wrap md:justify-between md:overflow-visible"
                 style={{ background: 'rgba(0,0,0,0.3)' }}>
 
                 {/* Left */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center shrink-0 gap-4">
                     <FavoriteButton
                         movieData={movieData}
                         size="sm"
@@ -70,7 +70,7 @@ export default function WatchEngagementBar({
                 </div>
 
                 {/* Center Toggles */}
-                <div className="hidden md:flex items-center gap-5">
+                <div className="flex items-center shrink-0 gap-5">
                     <button onClick={toggleTheater}
                         className={cn("flex items-center gap-2 text-xs font-semibold transition-all", isTheaterMode ? "text-yellow-400" : "text-gray-400 hover:text-white")}>
                         <Monitor className="w-4 h-4" /> Rạp phim
@@ -96,7 +96,7 @@ export default function WatchEngagementBar({
                 </div>
 
                 {/* Right */}
-                <div className="flex items-center gap-4 text-gray-400">
+                <div className="flex items-center shrink-0 gap-4 text-gray-400">
                     <button type="button" onClick={handleShare} className="flex items-center gap-2 hover:text-white transition-all text-xs font-semibold group">
                         <Share2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
                         <span className="hidden sm:inline">Chia sẻ</span>
@@ -155,16 +155,6 @@ export default function WatchEngagementBar({
 
                 {/* Stats buttons */}
                 <div className="flex items-center gap-3 self-center pt-4 md:pt-0 border-t md:border-t-0 border-white/[0.05] w-full md:w-auto justify-center md:justify-end shrink-0">
-                    <button className="flex flex-col items-center justify-center min-w-[64px] h-14 rounded-xl transition-all group hover:scale-105 px-3 border border-white/[0.06]"
-                        style={{ background: 'rgba(255,255,255,0.04)' }}>
-                        <Star className="w-5 h-5 text-gray-400 group-hover:text-yellow-400 mb-1 transition-colors" />
-                        <span className="text-[10px] text-gray-400 font-semibold">Đánh giá</span>
-                    </button>
-                    <button className="flex flex-col items-center justify-center min-w-[64px] h-14 rounded-xl transition-all group hover:scale-105 px-3 border border-white/[0.06]"
-                        style={{ background: 'rgba(255,255,255,0.04)' }}>
-                        <MessageSquare className="w-5 h-5 text-gray-400 group-hover:text-blue-400 mb-1 transition-colors" />
-                        <span className="text-[10px] text-gray-400 font-semibold">Bình luận</span>
-                    </button>
                     <div className="flex flex-col items-center justify-center min-w-[110px] h-14 rounded-xl px-4 border"
                         style={{ background: 'rgba(59,130,246,0.1)', borderColor: 'rgba(59,130,246,0.2)' }}>
                         <div className="flex items-center gap-1.5 font-bold text-lg leading-none" style={{ color: '#60a5fa' }}>

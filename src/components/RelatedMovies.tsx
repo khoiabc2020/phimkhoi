@@ -21,7 +21,7 @@ export default async function RelatedMovies({ categorySlug, currentMovieId, mode
     if (mode === 'vertical') {
         return (
             <div className="space-y-3">
-                {movies.map((movie: any) => (
+                {movies.slice(0, 5).map((movie: any) => (
                     <Link key={movie._id} href={`/phim/${movie.slug}`}
                         className="flex gap-3 group rounded-xl p-2 transition-all duration-200 hover:bg-white/[0.04]">
                         {/* Poster */}

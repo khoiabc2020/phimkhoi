@@ -166,6 +166,30 @@ export default async function WatchPage({ params }: PageProps) {
                                 </div>
                             </div>
 
+                            {/* Info card (Moved from right sidebar) */}
+                            <div className="rounded-2xl border border-white/[0.06] overflow-hidden"
+                                style={{ background: 'rgba(15,18,26,0.8)', backdropFilter: 'blur(20px)' }}>
+                                <div className="px-6 pt-5 pb-4 border-b border-white/[0.06]">
+                                    <h3 className="text-white font-semibold text-base flex items-center gap-2 uppercase tracking-wide">
+                                        <div className="w-1 h-4 rounded-full bg-blue-400" /> Thông tin phim
+                                    </h3>
+                                </div>
+                                <div className="p-6 space-y-4 text-sm">
+                                    {[
+                                        { label: 'Năm', value: movie.year },
+                                        { label: 'Chất lượng', value: movie.quality },
+                                        { label: 'Thời lượng', value: movie.time || 'N/A' },
+                                        { label: 'Ngôn ngữ', value: movie.lang || 'Vietsub' },
+                                        { label: 'Quốc gia', value: movie.country?.[0]?.name },
+                                    ].filter(i => i.value).map(item => (
+                                        <div key={item.label} className="flex items-center justify-between">
+                                            <span className="text-gray-500 text-xs font-medium">{item.label}</span>
+                                            <span className="text-gray-200 text-xs font-medium px-3 py-1 rounded" style={{ background: 'rgba(255,255,255,0.06)' }}>{item.value}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
                             {/* Comments */}
                             <div className="rounded-2xl border border-white/[0.06] overflow-hidden"
                                 style={{ background: 'rgba(15,18,26,0.8)', backdropFilter: 'blur(20px)' }}>
@@ -197,28 +221,7 @@ export default async function WatchPage({ params }: PageProps) {
                                 </div>
                             )}
 
-                            {/* Info card */}
-                            <div className="rounded-2xl border border-white/[0.06] overflow-hidden"
-                                style={{ background: 'rgba(15,18,26,0.85)', backdropFilter: 'blur(28px)' }}>
-                                <div className="px-5 pt-5 pb-4 border-b border-white/[0.06] flex items-center gap-2">
-                                    <div className="w-1 h-4 rounded-full bg-blue-400" />
-                                    <h3 className="text-white font-semibold text-sm uppercase tracking-wide">Thông tin phim</h3>
-                                </div>
-                                <div className="p-4 space-y-3 text-sm">
-                                    {[
-                                        { label: 'Năm', value: movie.year },
-                                        { label: 'Chất lượng', value: movie.quality },
-                                        { label: 'Thời lượng', value: movie.time || 'N/A' },
-                                        { label: 'Ngôn ngữ', value: movie.lang || 'Vietsub' },
-                                        { label: 'Quốc gia', value: movie.country?.[0]?.name },
-                                    ].filter(i => i.value).map(item => (
-                                        <div key={item.label} className="flex items-center justify-between">
-                                            <span className="text-gray-500 text-xs font-medium">{item.label}</span>
-                                            <span className="text-gray-200 text-xs font-medium px-2 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.06)' }}>{item.value}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
+
 
                         </div>
                     </div>

@@ -108,7 +108,7 @@ export default function WatchContainer({
 
             {/* Episodes List (Moved inside WatchContainer) */}
             {servers && servers.length > 0 && (
-                <div className="mt-6 rounded-2xl border border-white/[0.06] overflow-hidden"
+                <div className="mt-6 rounded-2xl border border-white/[0.06] relative"
                     style={{ background: 'rgba(15,18,26,0.8)', backdropFilter: 'blur(20px)' }}>
                     <div className="px-6 pt-5 pb-4 border-b border-white/[0.06]">
                         <h3 className="text-white font-semibold text-base flex items-center gap-2 uppercase tracking-wide">
