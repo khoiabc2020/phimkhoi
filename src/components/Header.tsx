@@ -213,36 +213,30 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                     {/* Right: Search & Actions */}
                     <div className="flex items-center gap-3 shrink-0">
 
-                        {/* Search: icon-only on mobile → links to /tim-kiem. Expandable on desktop. */}
-                        <div className="flex items-center">
-                            {/* Mobile: simple link to search page */}
-                            <Link
-                                href="/tim-kiem"
-                                onClick={(e) => e.stopPropagation()}
-                                className="lg:hidden z-50 w-10 h-10 flex items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.08] transition-all active:scale-95 relative"
-                            >
-                                <Search className="w-4 h-4 text-white/80 pointer-events-none" />
-                            </Link>
-
-                            {/* Desktop: expandable search bar */}
+                        <div className="flex items-center justify-end flex-1">
+                            {/* Unified expandable search bar for both Mobile and Desktop */}
                             <form
                                 onSubmit={handleSearch}
                                 className={cn(
-                                    "hidden lg:flex relative items-center transition-all duration-500 ease-out h-10",
-                                    isSearchOpen ? "w-60" : "w-10"
+                                    "flex relative items-center transition-all duration-500 ease-out h-10",
+                                    isSearchOpen ? "w-[calc(100vw-6rem)] md:w-80 lg:w-60 absolute right-4 lg:relative lg:right-0 bg-[#0B0D12] lg:bg-transparent z-40 rounded-full" : "w-10 relative"
                                 )}
                             >
-                                <div
-                                    onClick={() => { if (!isSearchOpen) setIsSearchOpen(true); }}
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        if (!isSearchOpen) setIsSearchOpen(true);
+                                    }}
                                     className={cn(
-                                        "cursor-pointer absolute right-0 z-20 w-10 h-10 flex items-center justify-center rounded-full border transition-all duration-300",
+                                        "absolute right-0 z-20 w-10 h-10 flex items-center justify-center rounded-full border transition-all duration-300",
                                         isSearchOpen
                                             ? "bg-transparent border-transparent pointer-events-none"
                                             : "bg-white/[0.08] hover:bg-white/[0.15] border-white/[0.08] hover:scale-105 active:scale-95"
                                     )}
                                 >
                                     <Search className={cn("w-4 h-4 transition-colors", isSearchOpen ? "hidden" : "text-white/80")} />
-                                </div>
+                                </button>
                                 {/* Input wrapper to position popup correctly */}
                                 <div className={cn(
                                     "absolute right-0 top-0 transition-all duration-500",
