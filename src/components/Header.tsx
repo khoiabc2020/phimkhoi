@@ -216,12 +216,13 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         {/* Search: icon-only on mobile → links to /tim-kiem. Expandable on desktop. */}
                         <div className="flex items-center">
                             {/* Mobile: simple link to search page */}
-                            <a
+                            <Link
                                 href="/tim-kiem"
-                                className="lg:hidden w-10 h-10 flex items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.08] transition-all active:scale-95"
+                                onClick={(e) => e.stopPropagation()}
+                                className="lg:hidden z-50 w-10 h-10 flex items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.08] transition-all active:scale-95 relative"
                             >
-                                <Search className="w-4 h-4 text-white/80" />
-                            </a>
+                                <Search className="w-4 h-4 text-white/80 pointer-events-none" />
+                            </Link>
 
                             {/* Desktop: expandable search bar */}
                             <form
