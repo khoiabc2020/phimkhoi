@@ -254,35 +254,35 @@ export default function HomeScreen() {
         ) : (
           <View style={styles.movieRows}>
             {/* Hot Sections */}
-            {data.phimChieuRap.length > 0 &&
+            {data.phimChieuRap.length > 0 && (
               <MovieRow title="Phim Chiếu Rạp Mới" movies={data.phimChieuRap} slug="phim-chieu-rap" />
-            }
+            )}
 
             <MovieRow title="Phim Bộ Mới Nhất" movies={data.phimBo.slice(0, 12)} slug="phim-bo" />
             <MovieRow title="Phim Lẻ Đặc Sắc" movies={data.phimLe.slice(0, 12)} slug="phim-le" />
 
             {/* Countries */}
-            {data.hanQuoc.length > 0 &&
+            {data.hanQuoc.length > 0 && (
               <MovieRow title="Phim Hàn Quốc Hot" movies={data.hanQuoc} slug="han-quoc" type="country" />
-            }
-            {data.trungQuoc.length > 0 &&
+            )}
+            {data.trungQuoc.length > 0 && (
               <MovieRow title="Phim Trung Quốc Hot" movies={data.trungQuoc} slug="trung-quoc" type="country" />
-            }
+            )}
 
             {/* Genres */}
-            {data.hanhDong.length > 0 &&
+            {data.hanhDong.length > 0 && (
               <MovieRow title="Phim Hành Động Kịch Tính" movies={data.hanhDong} slug="hanh-dong" type="category" />
-            }
-            {data.tinhCam.length > 0 &&
+            )}
+            {data.tinhCam.length > 0 && (
               <MovieRow title="Phim Tình Cảm Lãng Mạn" movies={data.tinhCam} slug="tinh-cam" type="category" />
-            }
+            )}
 
             <MovieRow title="Hoạt Hình" movies={data.hoatHinh.slice(0, 12)} slug="hoat-hinh" />
             <MovieRow title="TV Shows" movies={data.tvShows.slice(0, 12)} slug="tv-shows" />
 
-            {data.sapChieu.length > 0 &&
+            {data.sapChieu.length > 0 && (
               <MovieRow title="Phim Sắp Chiếu" movies={data.sapChieu} slug="phim-sap-chieu" />
-            }
+            )}
           </View>
         )}
       </ScrollView>
