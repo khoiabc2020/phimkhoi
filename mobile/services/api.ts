@@ -182,18 +182,19 @@ export const checkAppVersion = async () => {
 export const saveHistory = async (slug: string, episode: string, time: number, duration: number, token?: string) => {
     if (!token) return;
 
-    // Thống nhất dữ liệu POST (gửi cả slug cũ lẫn movieSlug mới cho an toàn)
-    await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/history`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ slug, episode, movieSlug: slug, episodeSlug: episode, progress: time, duration })
-    });
-} catch (error) {
-    console.error("Error saving history:", error);
-}
+    try {
+        // Thống nhất dữ liệu POST (gửi cả slug cũ lẫn movieSlug mới cho an toàn)
+        await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/history`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ slug, episode, movieSlug: slug, episodeSlug: episode, progress: time, duration })
+        });
+    } catch (error) {
+        console.error("Error saving history:", error);
+    }
 };
 
 export const getHistory = async (token?: string) => {

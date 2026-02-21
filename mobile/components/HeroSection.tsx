@@ -1,7 +1,8 @@
-import { View, Text, Dimensions, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Dimensions, StyleSheet, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Carousel from 'react-native-reanimated-carousel';
+import FocusableButton from './FocusableButton';
 import { Image } from 'expo-image';
 import { Movie, getImageUrl } from '@/services/api';
 import { useState, useCallback } from 'react';
@@ -10,9 +11,9 @@ import { COLORS } from '@/constants/theme';
 const { width } = Dimensions.get('window');
 const isTablet = width > 700;
 
-const POSTER_WIDTH = isTablet ? width * 0.4 : width * 0.6;
-const POSTER_HEIGHT = POSTER_WIDTH * 1.45; // 2:3 aspect
-const CAROUSEL_HEIGHT = POSTER_HEIGHT + 230; // Extra room for vertical stacked info
+const POSTER_WIDTH = Platform.isTV ? width * 0.35 : (isTablet ? width * 0.4 : width * 0.6);
+const POSTER_HEIGHT = POSTER_WIDTH * 1.30;
+const CAROUSEL_HEIGHT = POSTER_HEIGHT + (Platform.isTV ? 120 : 180);
 
 interface HeroSectionProps {
     movies: Movie[];
@@ -63,7 +64,7 @@ function HeroCard({ movie, isActive, onPress }: { movie: Movie; isActive: boolea
     return (
         <View style={[styles.cardContainer, !isActive && { opacity: 0.4 }]}>
             {/* 1. Centered Poster */}
-            <Pressable style={styles.posterWrapper} onPress={onPress}>
+            <FocusableButton style={styles.posterWrapper} onPress={onPress}>
                 <Image
                     source={{ uri: getImageUrl(movie.poster_url || movie.thumb_url) }}
                     style={styles.posterImage}
@@ -71,7 +72,7 @@ function HeroCard({ movie, isActive, onPress }: { movie: Movie; isActive: boolea
                     transition={400}
                     cachePolicy="memory-disk" // Force memory-disk caching for lagless swipes
                 />
-            </Pressable>
+            </FocusableButton>
 
             {/* 2. Vertically Stacked Movie Info */}
             <View style={styles.infoWrapper}>
@@ -113,21 +114,21 @@ function HeroCard({ movie, isActive, onPress }: { movie: Movie; isActive: boolea
 
                 {/* 5. Action Buttons */}
                 <View style={styles.actionRow}>
-                    <Pressable
+                    <FocusableButton
                         style={styles.playBtn}
                         onPress={() => router.push(`/movie/${movie.slug}?autoPlay=true` as any)}
                     >
                         <Ionicons name="play" size={18} color="black" style={{ marginLeft: 3 }} />
                         <Text style={styles.playBtnText}>Xem</Text>
-                    </Pressable>
+                    </FocusableButton>
 
-                    <Pressable style={styles.circleBtn} onPress={onPress}>
+                    <FocusableButton style={styles.circleBtn} onPress={onPress}>
                         <Ionicons name="information-outline" size={22} color="white" />
-                    </Pressable>
+                    </FocusableButton>
 
-                    <Pressable style={styles.circleBtn} onPress={() => {/* Handle fav */ }}>
+                    <FocusableButton style={styles.circleBtn} onPress={() => {/* Handle fav */ }}>
                         <Ionicons name="heart-outline" size={20} color="white" />
-                    </Pressable>
+                    </FocusableButton>
                 </View>
             </View>
         </View>

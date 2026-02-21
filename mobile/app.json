@@ -3,7 +3,7 @@
     "name": "MovieBox Xem phim là mê",
     "slug": "phimkhoi-mobile",
     "version": "1.0.2",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "phimkhoi",
     "userInterfaceStyle": "dark",

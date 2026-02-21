@@ -63,6 +63,7 @@ export default function TabLayout() {
           paddingVertical: 8,
         },
         tabBarStyle: {
+          display: Platform.isTV ? 'none' : 'flex',
           position: 'absolute',
           bottom: 0,
           left: 0,

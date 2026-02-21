@@ -148,7 +148,7 @@ export default function HomeScreen() {
   }, [fetchData]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, Platform.isTV && { paddingLeft: 80 }]}>
       <StatusBar style="light" />
 
       {/* Background Gradient - Dark Cinematic */}
@@ -167,22 +167,26 @@ export default function HomeScreen() {
         />
         <SafeAreaView edges={['top']} style={styles.headerContent}>
           <View style={styles.headerRow}>
-            <View style={styles.logoRow}>
-              <Ionicons name="film" size={24} color={COLORS.accent} />
-              <Text style={styles.logoText}>MovieBox</Text>
-            </View>
-
-            <View style={styles.headerActions}>
-              <Pressable style={styles.iconBtn} onPress={() => router.push('/search' as any)}>
-                <Ionicons name="search-outline" size={20} color={COLORS.textPrimary} />
-              </Pressable>
-              <Pressable style={styles.iconBtn} onPress={() => router.push('/notifications' as any)}>
-                <Ionicons name="notifications-outline" size={20} color={COLORS.textPrimary} />
-                <View style={styles.notifBadge}>
-                  <Text style={styles.notifBadgeText}>4</Text>
+            {!Platform.isTV && (
+              <>
+                <View style={styles.logoRow}>
+                  <Ionicons name="film" size={24} color={COLORS.accent} />
+                  <Text style={styles.logoText}>MovieBox</Text>
                 </View>
-              </Pressable>
-            </View>
+
+                <View style={styles.headerActions}>
+                  <Pressable style={styles.iconBtn} onPress={() => router.push('/search' as any)}>
+                    <Ionicons name="search-outline" size={20} color={COLORS.textPrimary} />
+                  </Pressable>
+                  <Pressable style={styles.iconBtn} onPress={() => router.push('/notifications' as any)}>
+                    <Ionicons name="notifications-outline" size={20} color={COLORS.textPrimary} />
+                    <View style={styles.notifBadge}>
+                      <Text style={styles.notifBadgeText}>4</Text>
+                    </View>
+                  </Pressable>
+                </View>
+              </>
+            )}
           </View>
 
           {/* Category Pills */}

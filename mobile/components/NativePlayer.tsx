@@ -11,7 +11,8 @@ import {
     ScrollView,
     PanResponder,
     Animated,
-    Easing
+    Easing,
+    useTVEventHandler
 } from 'react-native';
 import { Video, AVPlaybackStatus, ResizeMode } from 'expo-av';
 import Slider from '@react-native-community/slider';
@@ -244,6 +245,31 @@ export default function NativePlayer({
             }).start();
         }
     }, [showEpisodes]);
+
+    // TV Remote Support (D-Pad)
+    useTVEventHandler((evt) => {
+        if (!evt) return;
+        const { eventType } = evt;
+        resetControlsTimer();
+
+        switch (eventType) {
+            case 'right':
+                handleSkip(10000); // Tua tới 10s
+                break;
+            case 'left':
+                handleSkip(-10000); // Tua lui 10s
+                break;
+            case 'select':
+            case 'playPause':
+            case 'center':
+                handlePlayPause();
+                break;
+            case 'up':
+            case 'down':
+                toggleControls(); // Bấm mũi tên dọc thì bật thanh menu lên
+                break;
+        }
+    });
 
     return (
         <View style={{ flex: 1, backgroundColor: 'black' }}>

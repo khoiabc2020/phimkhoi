@@ -1,8 +1,9 @@
 import React, { memo } from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text } from 'react-native';
 import { Image } from 'expo-image';
 import { Link } from 'expo-router';
 import { Movie, getImageUrl } from '@/services/api';
+import FocusableButton from './FocusableButton';
 
 interface MovieCardProps {
     movie: Movie;
@@ -17,9 +18,10 @@ const MovieCard = memo(({ movie, width = 115, height = 172 }: MovieCardProps) =>
 
     return (
         <Link href={`/movie/${movie.slug}`} asChild>
-            <Pressable
-                className="mr-3 active:opacity-80 transition-opacity"
-                style={{ width }}
+            <FocusableButton
+                className="mr-3 transition-opacity"
+                style={{ width, borderRadius: 8, padding: 2 }}
+                focusStyle={{ borderWidth: 2, borderColor: '#fbbf24', transform: [{ scale: 1.05 }] }}
             >
                 {/* Image + Overlay Badges */}
                 <View style={{ width, height, borderRadius: 8, overflow: 'hidden', position: 'relative' }}>
@@ -68,7 +70,7 @@ const MovieCard = memo(({ movie, width = 115, height = 172 }: MovieCardProps) =>
                         {movie.origin_name}
                     </Text>
                 </View>
-            </Pressable>
+            </FocusableButton>
         </Link>
     );
 });
