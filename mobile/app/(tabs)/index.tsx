@@ -237,14 +237,14 @@ export default function HomeScreen() {
         </View>
 
         {/* Tiếp tục xem (Continue Watching) */}
-        {!loading && user?.history && user.history.length > 0 && (
+        {!loading && user?.history && user.history.length > 0 ? (
           <View style={{ marginBottom: 10 }}>
             <ContinueWatchingRow
               title="Tiếp tục xem"
               items={user.history}
             />
           </View>
-        )}
+        ) : null}
 
         {/* Movie Rows - Synced with Web */}
         {loading ? (

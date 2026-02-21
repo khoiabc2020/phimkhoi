@@ -159,7 +159,6 @@ export default function WatchContainer({
 
             {/* Đóng thẻ container focus mode */}
         </div>
-
         </div >
     );
 }
