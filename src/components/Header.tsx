@@ -123,7 +123,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
         <>
             <header
                 className={cn(
-                    "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
+                    "fixed top-0 left-0 right-0 z-40 transition-all duration-500",
                     isScrolled
                         ? "bg-[#0B0D12]/98 border-b border-white/5 shadow-2xl shadow-black/50"
                         : "bg-gradient-to-b from-black/80 via-black/40 to-transparent"

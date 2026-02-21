@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
   // Header
   headerWrapper: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 100 },
   headerContent: { paddingBottom: 10 },
-  headerRow: { height: 50, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: SPACING.md },
+  headerRow: { height: 50, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20 },
   logoRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   logoText: { color: COLORS.textPrimary, fontSize: 18, fontWeight: '800', letterSpacing: -0.5 },
   headerActions: { flexDirection: 'row', gap: 12, alignItems: 'center' },
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
   notifBadgeText: { color: 'black', fontSize: 8, fontWeight: '800' },
 
   // Text Pills Menu (Under Header)
-  pillsRow: { paddingHorizontal: SPACING.md, gap: 20, paddingBottom: 4, paddingTop: 4 },
+  pillsRow: { paddingHorizontal: 20, gap: 16, paddingBottom: 4, paddingTop: 4 },
   pill: {
     height: 30, justifyContent: 'center',
   },

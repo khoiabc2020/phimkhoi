@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -46,8 +46,16 @@ export default function WatchContainer({
 
     const displayEpisodeName = (name: string) => name?.startsWith('Tập') ? name : `Tập ${name}`;
 
+    // Khóa cuộn trang khi bật chế độ rạp phim
+    useEffect(() => {
+        if (isTheaterMode) {
+            document.body.style.overflow = 'hidden';
+            return () => { document.body.style.overflow = ''; };
+        }
+    }, [isTheaterMode]);
+
     return (
-        <div className={cn("relative transition-all duration-500", isLightOff ? "z-50" : "")}>
+        <div className={cn("relative transition-all duration-500", isLightOff ? "z-[60]" : "")}>
 
             {/* Light Off Overlay */}
             {isLightOff && (
@@ -64,15 +72,33 @@ export default function WatchContainer({
                     filter: 'blur(20px)',
                 }} />
 
-            {/* Player Card */}
+            {/* Placeholder khi Bật Rạp Phim để tránh giật khung hình */}
+            {isTheaterMode && <div className="w-full aspect-video hidden md:block" />}
+
+            {/* Container Bao Bọc Rạp Phim (Focus Mode) */}
             <div className={cn(
-                "relative z-10 transition-all duration-500 mx-auto",
-                isTheaterMode ? "w-[100vw] max-w-full relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]" : "w-full"
+                "transition-all duration-500",
+                isTheaterMode
+                    ? "fixed top-[70px] md:top-[80px] left-0 right-0 bottom-0 z-[100] bg-[#080b12] overflow-y-auto w-full px-4 md:px-10 lg:px-20 py-6 pb-32"
+                    : "relative z-10 w-full"
             )}>
-                {/* Glass Border Ring */}
+
+                {/* Nút Đóng Rạp Phim trên cùng */}
+                {isTheaterMode && (
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-white text-lg font-semibold tracking-wide flex items-center gap-2">
+                            <Monitor className="w-5 h-5 text-yellow-500" /> BẬT RẠP PHIM
+                        </h2>
+                        <button onClick={() => setIsTheaterMode(false)} className="text-gray-400 hover:text-white px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors font-medium text-sm flex gap-2 items-center tracking-wider uppercase">
+                            Đóng <span className="text-xl leading-none">&times;</span>
+                        </button>
+                    </div>
+                )}
+
+                {/* Player Card */}
                 <div className={cn(
-                    "rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.6)] ring-1 ring-white/[0.08]",
-                    isTheaterMode ? "aspect-video md:aspect-[21/9] h-[80vh]" : "aspect-video"
+                    "rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.6)] ring-1 ring-white/[0.08] relative z-10 mx-auto transition-all duration-500",
+                    isTheaterMode ? "w-full max-w-[1500px] aspect-video md:aspect-[21/9] h-auto" : "w-full aspect-video"
                 )}
                     style={{ background: 'rgba(15,18,26,0.95)' }}>
                     {activeEpisode ? (
@@ -108,7 +134,10 @@ export default function WatchContainer({
 
             {/* Episodes List (Moved inside WatchContainer) */}
             {servers && servers.length > 0 && (
-                <div className="mt-6 rounded-2xl border border-white/[0.06] relative"
+                <div className={cn(
+                    "mt-6 rounded-2xl border border-white/[0.06] relative mx-auto",
+                    isTheaterMode ? "max-w-[1500px]" : "w-full"
+                )}
                     style={{ background: 'rgba(15,18,26,0.8)', backdropFilter: 'blur(20px)' }}>
                     <div className="px-6 pt-5 pb-4 border-b border-white/[0.06]">
                         <h3 className="text-white font-semibold text-base flex items-center gap-2 uppercase tracking-wide">
@@ -128,6 +157,9 @@ export default function WatchContainer({
                 </div>
             )}
 
+            {/* Đóng thẻ container focus mode */}
         </div>
+
+        </div >
     );
 }
