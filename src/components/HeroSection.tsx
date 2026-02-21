@@ -25,6 +25,43 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [heroMoviesData, setHeroMoviesData] = useState<Record<string, { vote_average: number, backdrop_path?: string, poster_path?: string }>>({});
+    const [tweenValues, setTweenValues] = useState<number[]>([]);
+
+    // Embla Tween Scale Logic cho Mobile
+    const tweenScale = useCallback(() => {
+        if (!mobileApi) return;
+        const engine = mobileApi.internalEngine();
+        const scrollProgress = mobileApi.scrollProgress();
+        const slidesInView = mobileApi.slidesInView();
+        const isScrollEvent = mobileApi.scrollSnapList().length > 1;
+
+        if (!isScrollEvent) return;
+
+        const TWEEN_FACTOR = 0.85; // Slide bên sẽ thụt xuống 85%
+
+        const speeds = mobileApi.scrollSnapList().map((scrollSnap, index) => {
+            let diffToTarget = scrollSnap - scrollProgress;
+            if (engine.options.loop) {
+                engine.slideLooper.loopPoints.forEach((loopItem) => {
+                    const target = loopItem.target();
+                    if (index === loopItem.index && target !== 0) {
+                        const sign = Math.sign(target);
+                        if (sign === -1) {
+                            diffToTarget = scrollSnap - (1 + scrollProgress);
+                        }
+                        if (sign === 1) {
+                            diffToTarget = scrollSnap + (1 - scrollProgress);
+                        }
+                    }
+                });
+            }
+
+            const tweenValue = 1 - Math.abs(diffToTarget * 1.5);
+            return Math.max(0, Math.min(Math.max(tweenValue, TWEEN_FACTOR), 1));
+        });
+
+        setTweenValues(speeds);
+    }, [mobileApi]);
 
     // Sync Desktop
     useEffect(() => {
@@ -37,10 +74,18 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
     // Sync Mobile
     useEffect(() => {
         if (!mobileApi) return;
+        tweenScale();
+        mobileApi.on("scroll", tweenScale);
+        mobileApi.on("reInit", tweenScale);
+
         const onSelect = () => setSelectedIndex(mobileApi.selectedScrollSnap());
         mobileApi.on("select", onSelect);
-        return () => { mobileApi.off("select", onSelect); };
-    }, [mobileApi]);
+        return () => {
+            mobileApi.off("select", onSelect);
+            mobileApi.off("scroll", tweenScale);
+            mobileApi.off("reInit", tweenScale);
+        };
+    }, [mobileApi, tweenScale]);
 
     // Hydrate TMDB
     useEffect(() => {
@@ -138,11 +183,22 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                         const posterImg = getHeroImage(movie, 'poster');
                         const rating = heroMoviesData[movie._id]?.vote_average ? heroMoviesData[movie._id].vote_average.toFixed(1) : "N/A";
 
-                        return (
-                            <div key={movie._id} className="relative flex-[0_0_100%] min-w-0 h-full flex flex-col items-center pt-8">
+                        const tweenValue = tweenValues.length ? tweenValues[index] : 1;
+                        // Transform 85% to 50% opacity, 100% to 100%
+                        const opacityValue = Math.min(1, Math.max(0.4, (tweenValue - 0.85) / 0.15));
 
-                                {/* 1. Centered Poster */}
-                                <Link href={`/xem-phim/${movie.slug}`} className="relative w-[55%] md:w-[220px] aspect-[2/3] mb-4 rounded-xl overflow-hidden shadow-lg ring-1 ring-white/10 shrink-0">
+                        return (
+                            <div key={movie._id} className="relative flex-[0_0_75%] sm:flex-[0_0_60%] max-w-[300px] min-w-0 h-full flex flex-col items-center pt-8">
+
+                                {/* 1. Centered Poster with 3D Tween */}
+                                <Link
+                                    href={`/xem-phim/${movie.slug}`}
+                                    className="relative w-full aspect-[2/3] mb-4 rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 shrink-0 transition-all duration-300 ease-out"
+                                    style={{
+                                        transform: `scale(${tweenValue})`,
+                                        opacity: Math.min(1, opacityValue + 0.3)
+                                    }}
+                                >
                                     <Image
                                         src={posterImg}
                                         alt={movie.name}
@@ -154,7 +210,14 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                 </Link>
 
                                 {/* 2. Vertically Stacked Movie Info */}
-                                <div className="flex flex-col items-center w-[90%] text-center">
+                                <div
+                                    className="flex flex-col items-center w-[110%] text-center transition-all duration-300 ease-out"
+                                    style={{
+                                        opacity: opacityValue,
+                                        transform: `translateY(${(1 - tweenValue) * 40}px)`,
+                                        pointerEvents: tweenValue > 0.95 ? 'auto' : 'none'
+                                    }}
+                                >
                                     <h1 className="text-2xl md:text-3xl font-black text-white leading-tight drop-shadow-lg line-clamp-2 px-2 tracking-tight mb-2">
                                         {movie.name}
                                     </h1>
