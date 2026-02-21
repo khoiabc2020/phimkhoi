@@ -86,10 +86,11 @@ export async function getContinueWatching() {
 
         await dbConnect();
 
-        // Get movies with progress between 5% and 95%
+        // Get movies the user recently watched, regardless of strictly low/high progress limits
         const continueWatching = await WatchHistory.find({
             userId: session.user.id,
-            progress: { $gte: 5, $lte: 95 },
+            // (Removed strict progress constraints so newly started videos appear immediately)
+            progress: { $lt: 99 },
         })
             .sort({ lastWatched: -1 })
             .limit(10)

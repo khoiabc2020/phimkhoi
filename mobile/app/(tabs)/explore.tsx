@@ -61,8 +61,13 @@ export default function ExploreScreen() {
   const [searchResults, setSearchResults] = useState<Movie[]>([]);
   const [searching, setSearching] = useState(false);
   const [hotMovies, setHotMovies] = useState<Movie[]>([]);
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
 
   useEffect(() => {
+    // Load search history
+    AsyncStorage.getItem('search_history').then(data => {
+      if (data) setSearchHistory(JSON.parse(data));
+    });
     // Fetch mock "Hot" movies (using Phim Le)
     getHomeData().then((data) => {
       if (data.phimLe) {
@@ -78,12 +83,32 @@ export default function ExploreScreen() {
     }
     const timer = setTimeout(async () => {
       setSearching(true);
-      const results = await searchMovies(search.trim(), 20);
+      const query = search.trim();
+      const results = await searchMovies(query, 20);
       setSearchResults(results);
       setSearching(false);
+
+      // Save to history if we got results (or even if we didn't, to track intent)
+      if (query.length > 1) {
+        AsyncStorage.getItem('search_history').then(data => {
+          let history = data ? JSON.parse(data) : [];
+          // Remove if exists to push to front
+          history = history.filter((item: string) => item.toLowerCase() !== query.toLowerCase());
+          history.unshift(query);
+          if (history.length > 10) history.pop(); // Keep top 10
+          setSearchHistory(history);
+          AsyncStorage.setItem('search_history', JSON.stringify(history));
+        });
+      }
+
     }, 800);
     return () => clearTimeout(timer);
   }, [search]);
+
+  const clearHistory = () => {
+    setSearchHistory([]);
+    AsyncStorage.removeItem('search_history');
+  };
 
   return (
     <View className="flex-1 bg-[#0f172a]">
@@ -129,8 +154,32 @@ export default function ExploreScreen() {
               {searching && <Text className="text-gray-400 text-center mt-4">Đang tìm...</Text>}
             </View>
           ) : (
-            /* Hot Search Section */
             <View className="px-4">
+              {/* Search History Section */}
+              {searchHistory.length > 0 && (
+                <View className="mb-6 mt-2">
+                  <View className="flex-row justify-between items-center mb-3">
+                    <Text className="text-white text-base font-bold">Lịch sử tìm kiếm</Text>
+                    <Pressable onPress={clearHistory}>
+                      <Text className="text-gray-400 text-xs">Xóa lịch sử</Text>
+                    </Pressable>
+                  </View>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                    {searchHistory.map((item, index) => (
+                      <Pressable
+                        key={index}
+                        onPress={() => setSearch(item)}
+                        className="bg-[#1e293b] px-4 py-2 rounded-full border border-gray-700 flex-row items-center gap-2"
+                      >
+                        <Ionicons name="time-outline" size={14} color="#94a3b8" />
+                        <Text className="text-gray-300 text-sm">{item}</Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                </View>
+              )}
+
+              {/* Hot Search Section */}
               <Text className="text-white text-base font-bold mb-4 mt-2">Được tìm kiếm nhiều</Text>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
                 {hotMovies.map((item, index) => (

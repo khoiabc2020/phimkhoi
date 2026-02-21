@@ -168,20 +168,20 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                                     movieName: movie.name,
                                                     movieOriginName: movie.origin_name || "",
                                                     moviePoster: movie.poster_url || movie.thumb_url,
-                                                    movieYear: movie.year,
-                                                    movieQuality: movie.quality,
-                                                    movieCategories: movie.category?.map((c: any) => c.slug) || [],
+                                                    movieYear: Number(movie.year) || new Date().getFullYear(),
+                                                    movieQuality: movie.quality || "HD",
+                                                    movieCategories: movie.category?.map((c: any) => c.name) || [],
                                                 }}
-                                                className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md"
+                                                className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10"
                                             />
                                             <WatchlistButton
                                                 slug={movie.slug}
                                                 initialInWatchlist={(await isInWatchlist(movie.slug)).isInWatchlist}
-                                                className="w-10 h-10 rounded-full bg-white/5 hover:bg-only border border-white/10 backdrop-blur-md"
+                                                className="w-10 h-10 rounded-full bg-white/5 hover:bg-only border border-white/10"
                                             />
                                         </>
                                     )}
-                                    <button className="flex items-center justify-center w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md transition-all group" title="Chia sẻ">
+                                    <button className="flex items-center justify-center w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-all group" title="Chia sẻ">
                                         <Share2 className="w-5 h-5 text-gray-400 group-hover:text-blue-400 transition-colors" />
                                     </button>
                                 </div>

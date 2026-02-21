@@ -20,7 +20,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
         loop: true,
         align: "center",
         containScroll: "trimSnaps",
-        dragFree: false
+        dragFree: true
     });
 
     const [selectedIndex, setSelectedIndex] = useState(0);
@@ -111,8 +111,8 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
         movieName: movie.name,
         movieOriginName: movie.origin_name,
         moviePoster: movie.poster_url || movie.thumb_url,
-        movieYear: movie.year,
-        movieQuality: movie.quality,
+        movieYear: Number(movie.year) || new Date().getFullYear(),
+        movieQuality: movie.quality || "HD",
         movieCategories: movie.category?.map(c => c.name) || [],
     });
 
@@ -132,82 +132,77 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
             {/* ================= TABLET & MOBILE LAYOUT (Portrait/Small Screens) ================= */}
             {/* Shows on < lg screens (approx < 1024px) */}
-            <div className="lg:hidden relative w-full h-[85vh] md:h-[60vh] flex flex-col pt-0 overflow-hidden" ref={mobileRef}>
+            <div className="lg:hidden relative w-full h-[85vh] md:h-[65vh] flex flex-col pt-10 overflow-hidden bg-[#0B0D12]" ref={mobileRef}>
                 <div className="flex flex-row touch-pan-y h-full">
                     {heroMovies.map((movie, index) => {
                         const posterImg = getHeroImage(movie, 'poster');
                         const rating = heroMoviesData[movie._id]?.vote_average ? heroMoviesData[movie._id].vote_average.toFixed(1) : "N/A";
 
                         return (
-                            <div key={movie._id} className="relative flex-[0_0_100%] min-w-0 h-full flex flex-col">
-                                {/* 1. Ambient Background */}
-                                <div className="absolute inset-0 z-0 overflow-hidden">
+                            <div key={movie._id} className="relative flex-[0_0_100%] min-w-0 h-full flex flex-col items-center pt-8">
+
+                                {/* 1. Centered Poster */}
+                                <Link href={`/xem-phim/${movie.slug}`} className="relative w-[55%] md:w-[220px] aspect-[2/3] mb-4 rounded-xl overflow-hidden shadow-lg ring-1 ring-white/10 shrink-0">
                                     <Image
                                         src={posterImg}
-                                        alt="bg"
+                                        alt={movie.name}
                                         fill
-                                        className="object-cover blur-[60px] opacity-40 scale-125"
+                                        className="object-cover"
                                         priority={index === 0}
+                                        sizes="(max-width: 768px) 60vw, (max-width: 1200px) 30vw, 20vw"
                                     />
-                                    <div className="absolute inset-0 bg-[#0B0D12]/40" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D12] via-[#0B0D12]/70 to-transparent" />
-                                </div>
+                                </Link>
 
-                                {/* 2. Content */}
-                                <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-24 md:pb-12 text-center">
+                                {/* 2. Vertically Stacked Movie Info */}
+                                <div className="flex flex-col items-center w-[90%] text-center">
+                                    <h1 className="text-2xl md:text-3xl font-black text-white leading-tight drop-shadow-lg line-clamp-2 px-2 tracking-tight mb-2">
+                                        {movie.name}
+                                    </h1>
 
-                                    {/* Poster Card (3D Floating) */}
-                                    <Link href={`/xem-phim/${movie.slug}`} className="relative w-[180px] md:w-[200px] aspect-[2/3] mb-8 rounded-2xl overflow-hidden shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] ring-1 ring-white/10 animate-in fade-in zoom-in duration-700">
-                                        <Image
-                                            src={posterImg}
-                                            alt={movie.name}
-                                            fill
-                                            className="object-cover"
-                                            priority={index === 0}
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-50" />
-                                    </Link>
+                                    <h2 className="text-[15px] md:text-base text-[#F4C84A] font-medium line-clamp-1 mb-4">
+                                        {movie.origin_name}
+                                    </h2>
 
-                                    {/* Metadata */}
-                                    <div className="space-y-3 mb-6 max-w-md mx-auto">
-                                        <h1 className="text-xl md:text-2xl font-black text-white leading-tight drop-shadow-xl text-glow line-clamp-2 px-2">
-                                            {movie.name}
-                                        </h1>
-                                        <h2 className="text-sm md:text-base text-[#F4C84A] font-medium line-clamp-1">
-                                            {movie.origin_name}
-                                        </h2>
-                                        <div className="flex items-center justify-center gap-3 text-sm font-medium text-white/90">
-                                            <span className="bg-white/10 px-2 py-0.5 rounded text-xs">{movie.year}</span>
-                                            <span className="text-[#F4C84A] flex items-center gap-1">★ {rating}</span>
-                                            <span className="bg-[#F4C84A]/20 text-[#F4C84A] px-2 py-0.5 rounded text-xs border border-[#F4C84A]/30">{movie.quality}</span>
-                                        </div>
-                                        <div className="flex flex-wrap justify-center gap-2">
-                                            {movie.category?.slice(0, 3).map(c => (
-                                                <span key={c.id} className="text-xs text-white/70 px-2.5 py-1 rounded-full bg-black/40 border border-white/5 backdrop-blur-md">
-                                                    {c.name}
-                                                </span>
-                                            ))}
-                                        </div>
+                                    {/* Meta Row */}
+                                    <div className="flex items-center justify-center gap-3 mb-4">
+                                        {movie.year && (
+                                            <span className="bg-white/10 px-3 py-1 rounded-md text-sm font-bold text-white border border-white/10">{movie.year}</span>
+                                        )}
+                                        <span className="bg-white/10 px-3 py-1 rounded-md text-sm font-bold text-[#F4C84A] border border-white/10 flex items-center gap-1">
+                                            ★ {rating}
+                                        </span>
+                                        {movie.quality && (
+                                            <span className="bg-[#F4C84A]/10 text-[#F4C84A] px-3 py-1 rounded-md text-sm font-bold border border-[#F4C84A]/40">{movie.quality}</span>
+                                        )}
                                     </div>
 
-                                    {/* CTA Buttons - Liquid Glass Container (Mobile) */}
-                                    <div className="flex items-center p-2 rounded-full backdrop-blur-xl bg-black/10 border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] w-max mx-auto gap-3">
+                                    {/* Genres */}
+                                    <div className="flex flex-wrap justify-center gap-2 mb-6">
+                                        {movie.category?.slice(0, 3).map(c => (
+                                            <span key={c.id} className="text-xs font-semibold text-white/80 px-4 py-1.5 rounded-full bg-black/40 border border-white/10">
+                                                {c.name}
+                                            </span>
+                                        ))}
+                                    </div>
+
+                                    {/* CTA Buttons */}
+                                    <div className="flex items-center justify-center gap-4 w-full px-4">
                                         <Link
-                                            href={`/xem-phim/${movie.slug}`}
-                                            className="flex flex-1 items-center justify-center gap-2 h-[42px] px-5 rounded-full bg-[#F4C84A] text-black font-extrabold shadow-lg shadow-[#F4C84A]/20 active:scale-95 transition-transform"
+                                            href={`/xem-phim/${movie.slug}?autoPlay=true`}
+                                            className="flex flex-1 max-w-[160px] items-center justify-center gap-2 h-12 rounded-full bg-[#F4C84A] text-black font-extrabold shadow-md hover:scale-105 active:scale-95 transition-transform"
                                         >
-                                            <Play className="w-4 h-4 fill-black" />
-                                            <span>Xem</span>
+                                            <Play className="w-5 h-5 fill-black" />
+                                            <span className="text-[15px]">Xem</span>
                                         </Link>
 
                                         <Link
                                             href={`/phim/${movie.slug}`}
-                                            className="w-[42px] h-[42px] flex items-center justify-center rounded-full bg-white/10 border border-white/10 active:scale-95 transition-transform"
+                                            className="w-12 h-12 flex items-center justify-center rounded-full bg-white/10 border border-white/20 active:scale-95 transition-transform"
                                         >
-                                            <Info className="w-5 h-5 text-white" />
+                                            <Info className="w-6 h-6 text-white" />
                                         </Link>
 
-                                        <div className="w-[42px] h-[42px] flex items-center justify-center rounded-full bg-white/10 border border-white/10 active:scale-95 transition-transform relative z-20">
+                                        <div className="w-12 h-12 flex items-center justify-center rounded-full bg-white/10 border border-white/20 active:scale-95 transition-transform">
                                             <FavoriteButton movieData={getFavoriteData(movie)} size="md" />
                                         </div>
                                     </div>
@@ -232,12 +227,12 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
                                     {/* 1. Cinematic Background */}
                                     <div className="absolute inset-0 z-0 select-none">
-                                        <div className="absolute inset-0 bg-black/40 z-10" /> {/* Darken base */}
+                                        <div className="absolute inset-0 bg-black/50 z-10" /> {/* Tối giản màu nền Darken */}
                                         <Image
                                             src={backdropImg}
                                             alt="bg"
                                             fill
-                                            className="object-cover blur-sm opacity-80"
+                                            className="object-cover opacity-60"
                                             priority={index === 0}
                                         />
                                         {/* Vignettes for focus */}
@@ -257,10 +252,10 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                                     <span className="px-3 py-1 rounded bg-[#F4C84A] text-black text-xs font-bold tracking-wider uppercase shadow-[0_0_15px_rgba(244,200,74,0.4)]">
                                                         Phim Hot
                                                     </span>
-                                                    <span className="px-3 py-1 rounded border border-white/20 bg-white/5 text-white text-xs font-semibold backdrop-blur-md">
+                                                    <span className="px-3 py-1 rounded border border-white/20 bg-white/5 text-white text-xs font-semibold">
                                                         {movie.year}
                                                     </span>
-                                                    <span className="px-3 py-1 rounded border border-[#F4C84A]/50 bg-[#F4C84A]/10 text-[#F4C84A] text-xs font-bold backdrop-blur-md border-glow-accent">
+                                                    <span className="px-3 py-1 rounded border border-[#F4C84A]/50 bg-[#F4C84A]/10 text-[#F4C84A] text-xs font-bold border-glow-accent">
                                                         {movie.quality}
                                                     </span>
                                                     <span className="flex items-center gap-1 text-white/80 text-xs font-medium">
@@ -294,9 +289,9 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                                 </p>
 
                                                 {/* CTA Buttons - Liquid Glass Container (Desktop) */}
-                                                <div className="flex items-center gap-3 p-[6px] rounded-full backdrop-blur-2xl bg-white/5 border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] w-max mt-4">
+                                                <div className="flex items-center gap-3 p-[6px] rounded-full bg-[#1A1C23] border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] w-max mt-4">
                                                     <Link
-                                                        href={`/xem-phim/${movie.slug}`}
+                                                        href={`/xem-phim/${movie.slug}?autoPlay=true`}
                                                         className="group relative flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-extrabold text-[15px] shadow-[0_0_20px_rgba(244,200,74,0.3)] hover:shadow-[0_0_40px_rgba(244,200,74,0.5)] transition-all duration-300 hover:-translate-y-1 hover:scale-105 active:scale-95 active:translate-y-0"
                                                     >
                                                         <Play className="w-5 h-5 fill-black" />

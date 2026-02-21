@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "postbuild": "cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public",
+    "postbuild": "xcopy .next\\static .next\\standalone\\.next\\static\\ /E /H /C /I /Y && xcopy public .next\\standalone\\public\\ /E /H /C /I /Y",
     "start": "node .next/standalone/server.js",
     "lint": "eslint"
   },

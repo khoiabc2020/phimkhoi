@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useEffect, useCallback } from 'react';
-import { Link, useRouter } from 'expo-router';
+import { Link, useRouter, useFocusEffect } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
@@ -134,11 +134,13 @@ export default function HomeScreen() {
     fetchData();
   }, [fetchData]);
 
-  useEffect(() => {
-    if (user?.id) {
-      syncHistory();
-    }
-  }, [user?.id]);
+  useFocusEffect(
+    useCallback(() => {
+      if (user?.id) {
+        syncHistory();
+      }
+    }, [user?.id])
+  );
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -261,18 +263,18 @@ export default function HomeScreen() {
 
             {/* Countries */}
             {data.hanQuoc.length > 0 &&
-              <MovieRow title="Phim Hàn Quốc Hot" movies={data.hanQuoc} slug="han-quoc" />
+              <MovieRow title="Phim Hàn Quốc Hot" movies={data.hanQuoc} slug="han-quoc" type="country" />
             }
             {data.trungQuoc.length > 0 &&
-              <MovieRow title="Phim Trung Quốc Hot" movies={data.trungQuoc} slug="trung-quoc" />
+              <MovieRow title="Phim Trung Quốc Hot" movies={data.trungQuoc} slug="trung-quoc" type="country" />
             }
 
             {/* Genres */}
             {data.hanhDong.length > 0 &&
-              <MovieRow title="Phim Hành Động Kịch Tính" movies={data.hanhDong} slug="hanh-dong" />
+              <MovieRow title="Phim Hành Động Kịch Tính" movies={data.hanhDong} slug="hanh-dong" type="category" />
             }
             {data.tinhCam.length > 0 &&
-              <MovieRow title="Phim Tình Cảm Lãng Mạn" movies={data.tinhCam} slug="tinh-cam" />
+              <MovieRow title="Phim Tình Cảm Lãng Mạn" movies={data.tinhCam} slug="tinh-cam" type="category" />
             }
 
             <MovieRow title="Hoạt Hình" movies={data.hoatHinh.slice(0, 12)} slug="hoat-hinh" />

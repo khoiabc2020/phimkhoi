@@ -106,21 +106,21 @@ export default function MovieCard({ movie, orientation = 'portrait' }: { movie: 
                             src={displayPoster || "/placeholder.jpg"}
                             alt={movie.name}
                             fill
-                            className={`object-cover transition-transform duration-700 ease-out group-hover/static-card:scale-110 ${tmdbData ? "opacity-100" : "opacity-95"}`}
+                            className="object-cover transition-transform duration-500 ease-out group-hover/static-card:scale-105"
                             loading="lazy"
-                            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 20vw, 15vw"
+                            sizes={orientation === 'landscape' ? "(max-width: 768px) 60vw, (max-width: 1200px) 30vw, 25vw" : "(max-width: 768px) 40vw, (max-width: 1200px) 20vw, 15vw"}
                         />
-                        {/* Gradient Overlay for Text Readability */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
+                        {/* Gradient Overlay cho Text - Đổi từ gradient nặng (to-t) sang phủ đen nhẹ */}
+                        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
                     </Link>
 
                     {/* Status/Episode Badge - Apple Style: Small, Blur, Clean */}
                     <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-10 pointer-events-none">
-                        {movie.quality && (
-                            <span className="bg-black/40 backdrop-blur-md border border-white/10 text-white/90 text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wide">
-                                {movie.quality}
-                            </span>
-                        )}
+                        if (movie.quality && (
+                        <span className="bg-[#1A1C23]/95 border border-white/10 text-white/90 text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wide">
+                            {movie.quality}
+                        </span>
+                        ))
                         {movie.episode_current && (
                             <span className="bg-primary/90 text-black text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">
                                 {movie.episode_current}
@@ -130,7 +130,7 @@ export default function MovieCard({ movie, orientation = 'portrait' }: { movie: 
 
                     {/* Touch Friendly Favorite Button */}
                     <div className={`absolute top-2 right-2 z-20 ${isTouchDevice ? 'opacity-100' : 'opacity-0 group-hover/static-card:opacity-100'} transition-opacity duration-200`}>
-                        <div className="bg-black/20 backdrop-blur-md rounded-full p-1">
+                        <div className="bg-[#1A1C23]/90 rounded-full p-1 shadow-sm">
                             <FavoriteButton
                                 movieData={{
                                     movieId: movie._id,
@@ -150,7 +150,7 @@ export default function MovieCard({ movie, orientation = 'portrait' }: { movie: 
                     {/* Rating Badge - Minimalist */}
                     {displayRating && (
                         <div className="absolute top-2.5 right-2.5 z-10 pointer-events-none">
-                            <div className="flex items-center gap-1 bg-black/40 backdrop-blur-md border border-white/10 px-1.5 py-0.5 rounded-md">
+                            <div className="flex items-center gap-1 bg-[#1A1C23]/95 border border-white/10 px-1.5 py-0.5 rounded-md shadow-sm">
                                 <Star size={10} fill="#F4C84A" className="text-[#F4C84A]" />
                                 <span className="text-white text-[10px] font-bold">{displayRating}</span>
                             </div>
@@ -212,7 +212,7 @@ function PortalHoverCard({ movie, position, tmdbData, displayPoster, orientation
                 <div className="absolute -inset-1 bg-gradient-to-br from-white/10 via-transparent to-white/5 rounded-lg blur-xl opacity-0 group-hover/card:opacity-100 transition-opacity duration-500" />
 
                 {/* Main card with glassmorphism */}
-                <div className="relative bg-gradient-to-br from-[#1a1a1a]/95 via-[#181818]/90 to-[#141414]/95 backdrop-blur-2xl rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.8),0_0_1px_rgba(255,255,255,0.1)] overflow-hidden border border-white/10 transition-all duration-500 ease-out hover:border-white/20 hover:shadow-[0_12px_48px_rgba(0,0,0,0.9),0_0_2px_rgba(255,255,255,0.2)]">
+                <div className="relative bg-[#111111] rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.8),0_0_1px_rgba(255,255,255,0.1)] overflow-hidden border border-white/10 transition-all duration-500 ease-out hover:border-white/20 hover:shadow-[0_12px_48px_rgba(0,0,0,0.9),0_0_2px_rgba(255,255,255,0.2)]">
 
                     {/* Animated gradient overlay - Apple style */}
                     <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-700 pointer-events-none" />
@@ -260,7 +260,7 @@ function PortalHoverCard({ movie, position, tmdbData, displayPoster, orientation
                     </div>
 
                     {/* Info Section - High Density Optimization */}
-                    <div className="relative px-2 py-2 space-y-1 bg-gradient-to-b from-[#1a1a1a]/50 to-[#181818]/90 backdrop-blur-xl">
+                    <div className="relative px-2 py-2 space-y-1 bg-[#111111]">
                         {/* Subtle inner glow */}
                         <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none" />
 
@@ -268,11 +268,11 @@ function PortalHoverCard({ movie, position, tmdbData, displayPoster, orientation
                         <div className="relative flex items-center gap-1.5 z-10 mb-1.5">
                             <Link
                                 href={`/xem-phim/${movie.slug}`}
-                                className="flex-1 bg-white/95 hover:bg-white text-black font-bold text-[10px] h-6 rounded flex items-center justify-center gap-1 transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] backdrop-blur-sm"
+                                className="flex-1 bg-white hover:bg-gray-200 text-black font-bold text-[10px] h-6 rounded flex items-center justify-center gap-1 transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-lg active:scale-[0.98]"
                             >
                                 <Play size={10} fill="currentColor" /> Xem
                             </Link>
-                            <div className="w-6 h-6 flex items-center justify-center rounded-full border border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/40 cursor-pointer backdrop-blur-md transition-all duration-300 ease-out hover:scale-110 active:scale-95">
+                            <div className="w-6 h-6 flex items-center justify-center rounded-full border border-white/20 bg-white/10 hover:bg-white/20 cursor-pointer transition-all duration-300 ease-out hover:scale-110 active:scale-95">
                                 <FavoriteButton
                                     movieData={{
                                         movieId: movie._id,
@@ -290,7 +290,7 @@ function PortalHoverCard({ movie, position, tmdbData, displayPoster, orientation
                             </div>
                             <Link
                                 href={`/phim/${movie.slug}`}
-                                className="w-6 h-6 flex items-center justify-center rounded-full border border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/40 text-white transition-all duration-300 ease-out hover:scale-110 active:scale-95 backdrop-blur-md"
+                                className="w-6 h-6 flex items-center justify-center rounded-full border border-white/20 bg-white/10 hover:bg-white/20 text-white transition-all duration-300 ease-out hover:scale-110 active:scale-95"
                                 title="Chi tiết"
                             >
                                 <ChevronDown size={12} />

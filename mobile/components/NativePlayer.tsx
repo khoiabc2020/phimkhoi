@@ -457,7 +457,7 @@ export default function NativePlayer({
                             keyExtractor={(item) => item.slug}
                             contentContainerStyle={{ padding: 28, paddingBottom: 60, gap: 16 }}
                             columnWrapperStyle={{ gap: 16 }}
-                            numColumns={4}
+                            numColumns={5}
                             showsVerticalScrollIndicator={false}
                             renderItem={({ item }) => {
                                 const isActive = item.slug === currentEpisodeSlug;
@@ -665,7 +665,8 @@ const styles = StyleSheet.create({
     epGridText: {
         color: 'rgba(255,255,255,0.6)',
         fontSize: 15,
-        fontWeight: '600'
+        fontWeight: '600',
+        textAlign: 'center'
     },
     activeEpGridText: {
         color: '#fbbf24',

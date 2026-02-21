@@ -1,10 +1,8 @@
 import { View, Text, Dimensions, Pressable, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Carousel from 'react-native-reanimated-carousel';
 import { Image } from 'expo-image';
-import { BlurView } from 'expo-blur';
 import { Movie, getImageUrl } from '@/services/api';
 import { useState, useCallback } from 'react';
 import { COLORS } from '@/constants/theme';
@@ -12,9 +10,9 @@ import { COLORS } from '@/constants/theme';
 const { width } = Dimensions.get('window');
 const isTablet = width > 700;
 
-const POSTER_WIDTH = isTablet ? width * 0.45 : width * 0.72;
-const POSTER_HEIGHT = POSTER_WIDTH * 1.5; // Maintain 2:3 aspect roughly
-const CAROUSEL_HEIGHT = POSTER_HEIGHT + 40; // Extra for parallax clipping and shadow
+const POSTER_WIDTH = isTablet ? width * 0.4 : width * 0.6;
+const POSTER_HEIGHT = POSTER_WIDTH * 1.45; // 2:3 aspect
+const CAROUSEL_HEIGHT = POSTER_HEIGHT + 230; // Extra room for vertical stacked info
 
 interface HeroSectionProps {
     movies: Movie[];
@@ -26,209 +24,251 @@ export default function HeroSection({ movies }: HeroSectionProps) {
 
     if (!movies?.length) return null;
 
-    const activeMovie = movies[activeIndex];
-
     const onSnapToItem = useCallback((index: number) => {
         setActiveIndex(index);
     }, []);
 
     return (
-        // Outer wrapper: plain flex column — carousel on top, info below
-        <View>
-            {/* ── SECTION 1: Carousel with ambient background ── */}
-            <View style={styles.carouselSection}>
-                {/* Blurred ambient background fills carousel section only */}
-                <Image
-                    source={{ uri: getImageUrl(activeMovie?.poster_url || activeMovie?.thumb_url) }}
-                    style={StyleSheet.absoluteFill}
-                    blurRadius={70}
-                    contentFit="cover"
-                    transition={800}
-                />
-                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(10,12,18,0.55)' }]} />
-                <LinearGradient
-                    colors={['transparent', COLORS.bg0]}
-                    style={StyleSheet.absoluteFill}
-                    locations={[0.5, 1]}
-                />
-
-                {/* Poster Carousel */}
-                <Carousel
-                    loop
-                    width={width}
-                    height={CAROUSEL_HEIGHT}
-                    data={movies}
-                    autoPlay={true}
-                    autoPlayInterval={6000}
-                    onSnapToItem={onSnapToItem}
-                    scrollAnimationDuration={800}
-                    mode="parallax"
-                    modeConfig={{
-                        parallaxScrollingScale: 0.88,
-                        parallaxScrollingOffset: 55,
-                    }}
-                    renderItem={({ item, index }) => (
-                        <HeroCard
-                            movie={item}
-                            isActive={index === activeIndex}
-                            onPress={() => router.push(`/movie/${item.slug}` as any)}
-                        />
-                    )}
-                />
-            </View>
+        <View style={styles.carouselSection}>
+            <Carousel
+                loop
+                width={width}
+                height={CAROUSEL_HEIGHT}
+                data={movies}
+                autoPlay={true}
+                autoPlayInterval={6000}
+                onSnapToItem={onSnapToItem}
+                scrollAnimationDuration={800}
+                mode="parallax"
+                modeConfig={{
+                    parallaxScrollingScale: 0.85,
+                    parallaxScrollingOffset: 60,
+                }}
+                renderItem={({ item, index }) => (
+                    <HeroCard
+                        movie={item}
+                        isActive={index === activeIndex}
+                        onPress={() => router.push(`/movie/${item.slug}` as any)}
+                    />
+                )}
+            />
         </View>
     );
 }
 
 function HeroCard({ movie, isActive, onPress }: { movie: Movie; isActive: boolean; onPress: () => void }) {
+    const router = useRouter();
+    const categories = movie.category?.slice(0, 3) || [];
+
     return (
-        <Pressable
-            style={[styles.card, isActive && styles.cardActive]}
-            onPress={onPress}
-        >
-            <Image
-                source={{ uri: getImageUrl(movie.poster_url || movie.thumb_url) }}
-                style={StyleSheet.absoluteFill}
-                contentFit="cover"
-                transition={400}
-            />
-            {/* Gradient Darkener to ensure text readability */}
-            <LinearGradient
-                colors={['rgba(0,0,0,0.8)', 'transparent', 'rgba(0,0,0,0.7)']}
-                locations={[0, 0.5, 1]}
-                style={StyleSheet.absoluteFill}
-            />
+        <View style={[styles.cardContainer, !isActive && { opacity: 0.4 }]}>
+            {/* 1. Centered Poster */}
+            <Pressable style={styles.posterWrapper} onPress={onPress}>
+                <Image
+                    source={{ uri: getImageUrl(movie.poster_url || movie.thumb_url) }}
+                    style={styles.posterImage}
+                    contentFit="cover"
+                    transition={400}
+                    cachePolicy="memory-disk" // Force memory-disk caching for lagless swipes
+                />
+            </Pressable>
 
-            {/* TOP: Title & Meta positioned cleanly at top */}
-            <View style={styles.innerTopInfo}>
-                <Text style={styles.innerTitle} numberOfLines={2}>{movie.name}</Text>
-                <Text style={styles.innerMeta}>
-                    {movie.year ? `${movie.year}` : ''}
-                    {movie.year && movie.quality ? ' • ' : ''}
-                    <Text style={{ color: COLORS.accent, fontWeight: '800' }}>
-                        {movie.quality || 'FHD'}
-                    </Text>
-                </Text>
-            </View>
+            {/* 2. Vertically Stacked Movie Info */}
+            <View style={styles.infoWrapper}>
+                <Text style={styles.title} numberOfLines={1}>{movie.name}</Text>
 
-            {/* BOTTOM: Action Buttons in Liquid Glass */}
-            <View style={styles.innerBottomActions}>
-                <BlurView intensity={70} tint="dark" style={styles.glassActionContainer}>
-                    <Pressable style={styles.primaryBtn} onPress={onPress}>
+                {movie.origin_name && (
+                    <Text style={styles.subtitle} numberOfLines={1}>{movie.origin_name}</Text>
+                )}
+
+                {/* 3. Meta Row (Year, Rating, Quality) */}
+                <View style={styles.metaRow}>
+                    {movie.year && (
+                        <View style={styles.metaBadgeDark}>
+                            <Text style={styles.metaTextWhite}>{movie.year}</Text>
+                        </View>
+                    )}
+                    {/* Placeholder for Rating (since KKPhim might lack TMDB for heroes instantly) */}
+                    <View style={styles.metaBadgeDark}>
+                        <Ionicons name="star" size={12} color="#fbbf24" style={{ marginRight: 4 }} />
+                        <Text style={styles.metaTextYellow}>{(movie as any).tmdb?.vote_average ? (movie as any).tmdb.vote_average.toFixed(1) : '7.5'}</Text>
+                    </View>
+                    {(movie.quality || movie.lang) && (
+                        <View style={styles.metaBadgeOutline}>
+                            <Text style={styles.metaTextYellow}>{movie.quality || 'HD'}</Text>
+                        </View>
+                    )}
+                </View>
+
+                {/* 4. Genres */}
+                {categories.length > 0 && (
+                    <View style={styles.genreRow}>
+                        {categories.map((c: any, idx: number) => (
+                            <View key={idx} style={styles.genreBadge}>
+                                <Text style={styles.genreText}>{c.name}</Text>
+                            </View>
+                        ))}
+                    </View>
+                )}
+
+                {/* 5. Action Buttons */}
+                <View style={styles.actionRow}>
+                    <Pressable
+                        style={styles.playBtn}
+                        onPress={() => router.push(`/movie/${movie.slug}?autoPlay=true` as any)}
+                    >
                         <Ionicons name="play" size={18} color="black" style={{ marginLeft: 3 }} />
-                        <Text style={styles.primaryBtnText}>Xem ngay</Text>
+                        <Text style={styles.playBtnText}>Xem</Text>
                     </Pressable>
-                    <Pressable style={styles.secondaryBtn} onPress={onPress}>
-                        <Ionicons name="information" size={22} color="white" />
+
+                    <Pressable style={styles.circleBtn} onPress={onPress}>
+                        <Ionicons name="information-outline" size={22} color="white" />
                     </Pressable>
-                </BlurView>
+
+                    <Pressable style={styles.circleBtn} onPress={() => {/* Handle fav */ }}>
+                        <Ionicons name="heart-outline" size={20} color="white" />
+                    </Pressable>
+                </View>
             </View>
-        </Pressable>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
-    // Section 1: fixed-height container for carousel + background
     carouselSection: {
         height: CAROUSEL_HEIGHT,
         width: '100%',
-        overflow: 'hidden',
+        marginTop: 20, // Add space under header
     },
-
-    // Poster card
-    card: {
+    cardContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        paddingTop: 10,
+    },
+    posterWrapper: {
         width: POSTER_WIDTH,
         height: POSTER_HEIGHT,
-        borderRadius: 24,
-        overflow: 'hidden',
-        borderWidth: StyleSheet.hairlineWidth,
-        borderColor: 'rgba(255,255,255,0.2)',
-        backgroundColor: COLORS.bg1,
-        alignSelf: 'center',
+        borderRadius: 16,
+        marginBottom: 16,
+        backgroundColor: '#1f2937',
+        // Removed heavy animated shadows to fix Parallax FPS lag on Android
     },
-    cardActive: {
-        borderColor: 'rgba(255,255,255,0.4)',
-        shadowColor: COLORS.accent,
-        shadowOffset: { width: 0, height: 12 },
-        shadowOpacity: 0.35,
-        shadowRadius: 20,
-        elevation: 12,
+    posterImage: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 16,
     },
-
-    // Inner Elements (Liquid Glass Design)
-    innerTopInfo: {
-        position: 'absolute',
-        top: 20,
-        left: 16,
-        right: 16,
+    infoWrapper: {
         alignItems: 'center',
+        width: '90%',
     },
-    innerTitle: {
+    title: {
         color: 'white',
-        fontSize: 22,
+        fontSize: 24,
         fontWeight: '900',
         textAlign: 'center',
-        textShadowColor: 'rgba(0,0,0,0.85)',
-        textShadowOffset: { width: 0, height: 2 },
-        textShadowRadius: 6,
+        marginBottom: 6,
         letterSpacing: -0.5,
-        marginBottom: 4,
-    },
-    innerMeta: {
-        color: 'rgba(255,255,255,0.85)',
-        fontSize: 12,
-        fontWeight: '600',
-        textAlign: 'center',
         textShadowColor: 'rgba(0,0,0,0.8)',
         textShadowOffset: { width: 0, height: 1 },
         textShadowRadius: 3,
     },
-    innerBottomActions: {
-        position: 'absolute',
-        bottom: 20,
-        left: 20,
-        right: 20,
+    subtitle: {
+        color: '#fbbf24',
+        fontSize: 14,
+        fontWeight: '700',
+        textAlign: 'center',
+        marginBottom: 12,
     },
-    glassActionContainer: {
+    metaRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 12,
-        padding: 12,
-        borderRadius: 24,
-        overflow: 'hidden',
-        borderWidth: StyleSheet.hairlineWidth,
-        borderColor: 'rgba(255,255,255,0.25)',
+        gap: 10,
+        marginBottom: 12,
     },
-    primaryBtn: {
-        flex: 1,
-        height: 44,
-        backgroundColor: COLORS.accent,
-        borderRadius: 22,
+    metaBadgeDark: {
+        backgroundColor: 'rgba(255,255,255,0.08)',
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 6,
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)'
+    },
+    metaBadgeOutline: {
+        backgroundColor: 'rgba(251,191,36,0.1)',
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 6,
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#fbbf24'
+    },
+    metaTextWhite: {
+        color: 'white',
+        fontSize: 12,
+        fontWeight: '700',
+    },
+    metaTextYellow: {
+        color: '#fbbf24',
+        fontSize: 12,
+        fontWeight: '800',
+    },
+    genreRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+        gap: 8,
+        marginBottom: 20,
+    },
+    genreBadge: {
+        backgroundColor: 'rgba(0,0,0,0.4)',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 16,
+    },
+    genreText: {
+        color: 'rgba(255,255,255,0.7)',
+        fontSize: 12,
+        fontWeight: '600',
+    },
+    actionRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 16,
+    },
+    playBtn: {
+        backgroundColor: '#fbbf24',
+        paddingHorizontal: 32,
+        height: 46,
+        borderRadius: 23,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 6,
-        shadowColor: COLORS.accent,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.4,
-        shadowRadius: 8,
-        elevation: 6,
+        // Removed heavy shadows
     },
-    primaryBtnText: {
+    playBtnText: {
         color: 'black',
-        fontSize: 15,
+        fontSize: 16,
         fontWeight: '800',
-        letterSpacing: -0.2,
     },
-    secondaryBtn: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        backgroundColor: 'rgba(255,255,255,0.15)',
+    circleBtn: {
+        width: 46,
+        height: 46,
+        borderRadius: 23,
+        backgroundColor: 'rgba(255,255,255,0.08)',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.15)',
         alignItems: 'center',
         justifyContent: 'center',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.3)',
     },
 });

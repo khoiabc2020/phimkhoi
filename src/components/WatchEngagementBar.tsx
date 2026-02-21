@@ -27,8 +27,8 @@ export default function WatchEngagementBar({
         movieName: movie.name,
         movieOriginName: movie.origin_name || "",
         moviePoster: movie.poster_url || movie.thumb_url || "",
-        movieYear: movie.year,
-        movieQuality: movie.quality,
+        movieYear: Number(movie.year) || new Date().getFullYear(),
+        movieQuality: movie.quality || "HD",
         movieVoteAverage: movie.vote_average || 0,
         movieCategories: movie.category?.map((c: any) => c.name) || [],
     };
@@ -41,7 +41,7 @@ export default function WatchEngagementBar({
 
     return (
         <div className="rounded-2xl border border-white/[0.06] overflow-hidden"
-            style={{ background: 'rgba(15,18,26,0.9)', backdropFilter: 'blur(20px)' }}>
+            style={{ background: '#11131A' }}>
 
             {/* Controls bar */}
             <div className="flex flex-wrap items-center justify-between gap-y-3 py-3 px-5 border-b border-white/[0.05]"

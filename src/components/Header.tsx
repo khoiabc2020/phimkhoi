@@ -125,8 +125,8 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                 className={cn(
                     "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
                     isScrolled
-                        ? "backdrop-blur-[28px] bg-[#0B0D12]/80 border-b border-white/5 shadow-2xl shadow-black/50"
-                        : "bg-gradient-to-b from-black/80 via-black/40 to-transparent backdrop-blur-[2px]"
+                        ? "bg-[#0B0D12]/98 border-b border-white/5 shadow-2xl shadow-black/50"
+                        : "bg-gradient-to-b from-black/80 via-black/40 to-transparent"
                 )}
             >
                 <div className="max-w-[1600px] mx-auto px-4 lg:px-8 h-[72px] flex items-center justify-between gap-4 flex-nowrap">
@@ -145,7 +145,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         <Link href="/" className="flex items-center gap-3 group shrink-0 order-2 md:order-none">
                             <div className="relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center">
                                 <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                <div className="relative w-full h-full rounded-full border border-white/10 bg-white/5 backdrop-blur-md flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300">
+                                <div className="relative w-full h-full rounded-full border border-white/10 bg-[#1A1C23] flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300">
                                     <Play className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary fill-primary ml-0.5" />
                                 </div>
                             </div>
@@ -168,7 +168,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             <button className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white/70 group-hover:text-white hover:bg-white/5 rounded-full transition-all whitespace-nowrap">
                                 Thể loại <ChevronDown className="w-3 h-3 transition-transform group-hover:rotate-180" />
                             </button>
-                            <div className="absolute top-full left-1/2 -translate-x-1/2 w-[400px] bg-[#0B0D12]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 shadow-[0_20px_40px_rgba(0,0,0,0.5)] grid grid-cols-2 gap-2 z-50 mt-2">
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 w-[400px] bg-[#0B0D12] border border-white/10 rounded-2xl p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 shadow-[0_20px_40px_rgba(0,0,0,0.8)] grid grid-cols-2 gap-2 z-50 mt-2">
                                 {displayCategories.map((cat) => (
                                     <Link
                                         key={cat.slug}
@@ -186,7 +186,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             <button className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white/70 group-hover:text-white hover:bg-white/5 rounded-full transition-all whitespace-nowrap">
                                 Quốc gia <ChevronDown className="w-3 h-3 transition-transform group-hover:rotate-180" />
                             </button>
-                            <div className="absolute top-full left-1/2 -translate-x-1/2 w-72 bg-[#0B0D12]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 shadow-[0_20px_40px_rgba(0,0,0,0.5)] grid grid-cols-2 gap-1 z-50 mt-2">
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 w-72 bg-[#0B0D12] border border-white/10 rounded-2xl p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 shadow-[0_20px_40px_rgba(0,0,0,0.8)] grid grid-cols-2 gap-1 z-50 mt-2">
                                 {displayCountries.map((country) => (
                                     <Link
                                         key={country.slug}
@@ -242,28 +242,73 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                 >
                                     <Search className={cn("w-4 h-4 transition-colors", isSearchOpen ? "hidden" : "text-white/80")} />
                                 </div>
-                                <input
-                                    ref={searchInputRef}
-                                    type="text"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    onBlur={() => { if (!searchQuery) setIsSearchOpen(false); }}
-                                    placeholder="Tìm kiếm..."
-                                    className={cn(
-                                        "absolute right-0 top-0 h-10 bg-white/[0.08] border border-white/[0.08] rounded-full pl-4 pr-10 text-sm text-white outline-none focus:border-primary/50 focus:bg-black/40 transition-all duration-500",
-                                        isSearchOpen ? "w-full opacity-100 visible" : "w-10 opacity-0 invisible"
+                                {/* Input wrapper to position popup correctly */}
+                                <div className={cn(
+                                    "absolute right-0 top-0 transition-all duration-500",
+                                    isSearchOpen ? "w-full opacity-100 visible h-auto z-40" : "w-10 opacity-0 invisible h-10"
+                                )}>
+                                    <input
+                                        ref={searchInputRef}
+                                        type="text"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        onFocus={() => setShowHistory(true)}
+                                        placeholder="Tìm kiếm..."
+                                        className="w-full h-10 bg-white/[0.08] border border-white/[0.08] rounded-full pl-4 pr-10 text-sm text-white outline-none focus:border-primary/50 focus:bg-black/80 transition-all duration-300 shadow-xl"
+                                    />
+
+                                    {isSearchOpen && (
+                                        <button
+                                            type={searchQuery ? "submit" : "button"}
+                                            onClick={(e) => {
+                                                if (!searchQuery) {
+                                                    setIsSearchOpen(false);
+                                                    setShowHistory(false);
+                                                    e.preventDefault();
+                                                }
+                                            }}
+                                            className="absolute right-0 top-0 w-10 h-10 flex items-center justify-center z-30 text-white/50 hover:text-white transition-colors"
+                                        >
+                                            {searchQuery ? <Search className="w-4 h-4" /> : <X className="w-4 h-4" />}
+                                        </button>
                                     )}
-                                />
-                                {isSearchOpen && (
-                                    <button
-                                        type={searchQuery ? "submit" : "button"}
-                                        onClick={(e) => { if (!searchQuery) { setIsSearchOpen(false); e.preventDefault(); } }}
-                                        className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center z-30 text-white/50 hover:text-white transition-colors"
-                                    >
-                                        {searchQuery ? <Search className="w-4 h-4" /> : <X className="w-4 h-4" />}
-                                    </button>
-                                )}
+
+                                    {/* History Dropdown */}
+                                    {showHistory && searchHistory.length > 0 && isSearchOpen && (
+                                        <div className="absolute top-full left-0 right-0 mt-2 bg-[#0B0D12] border border-white/10 rounded-2xl p-2 shadow-2xl z-50 animate-in fade-in slide-in-from-top-2">
+                                            <div className="flex items-center justify-between px-3 pb-2 pt-1 border-b border-white/10 mb-2">
+                                                <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Lịch sử tìm kiếm</span>
+                                                <button type="button" onClick={clearHistory} className="text-xs text-red-400 hover:text-red-300 transition-colors">Xóa</button>
+                                            </div>
+                                            <div className="flex flex-col gap-1 max-h-[300px] overflow-y-auto custom-scrollbar">
+                                                {searchHistory.map((item, idx) => (
+                                                    <button
+                                                        key={idx}
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setSearchQuery(item);
+                                                            handleSearch(item);
+                                                        }}
+                                                        className="flex items-center gap-3 px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-colors text-left"
+                                                    >
+                                                        <Clock className="w-3.5 h-3.5 text-white/40 shrunk-0" />
+                                                        <span className="truncate">{item}</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </form>
+
+                            {/* Invisible overlay to close history when clicking out */}
+                            {showHistory && isSearchOpen && (
+                                <div
+                                    className="fixed inset-0 z-30"
+                                    onClick={() => setShowHistory(false)}
+                                    aria-hidden="true"
+                                />
+                            )}
                         </div>
 
                         {/* Desktop Actions */}
@@ -285,7 +330,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                     </div>
                                 </button>
                                 {/* Dropdown Menu */}
-                                <div className="absolute right-0 top-full mt-3 w-60 bg-[#0B0D12]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right shadow-2xl ring-1 ring-black/50">
+                                <div className="absolute right-0 top-full mt-3 w-60 bg-[#0B0D12] border border-white/10 rounded-2xl p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right shadow-2xl ring-1 ring-black/50">
                                     <div className="px-4 py-3 border-b border-white/10 mb-2">
                                         <p className="text-sm font-bold text-white truncate">{session.user?.name}</p>
                                         <p className="text-xs text-white/50 truncate">{session.user?.email}</p>

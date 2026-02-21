@@ -6,15 +6,11 @@ import QuickNav from "@/components/QuickNav";
 import ContinueWatchingRow from "@/components/ContinueWatchingRow";
 import TopicSection from "@/components/TopicSection";
 import TopicCloud from "@/components/TopicCloud";
-import { getMoviesList, getTrendMovies, getMoviesByCountry } from "@/services/api";
-import { getTMDBTrending } from "@/services/tmdb";
+import { getMoviesList, getTrendMovies, getMoviesByCountry, getMoviesByCategory } from "@/services/api";
 
-// Revalidate every hour - TMDB trending updates daily
 export const revalidate = 3600;
 
-// Async Component for Row
-import { getMoviesByCategory } from "@/services/api";
-
+// Reusable Async component for Rows
 async function AsyncMovieRow({ title, type, slug, country, variant = 'default' }: { title: string, type?: string, slug?: string, country?: string, variant?: 'default' | 'sidebar' }) {
   let data: any = null;
   let viewAllSlug = "#";
@@ -23,63 +19,58 @@ async function AsyncMovieRow({ title, type, slug, country, variant = 'default' }
     data = await getMoviesByCountry(country, 1, 12);
     viewAllSlug = `/quoc-gia/${country}`;
   } else if (slug) {
-    // If it's a category (like phim-chieu-rap)
     data = await getMoviesByCategory(slug, 1, 12);
     viewAllSlug = `/the-loai/${slug}`;
   } else if (type) {
-    // Standard lists (phim-le, phim-bo, tv-shows, hoat-hinh, phim-sap-chieu)
     data = await getMoviesList(type, { limit: 12 });
     viewAllSlug = `/danh-sach/${type}`;
   }
 
   if (!data?.items?.length) return null;
-
   return <MovieRow title={title} movies={data.items} slug={viewAllSlug} variant={variant} />;
 }
 
-export default async function Home() {
-  // Fetch data in parallel: TMDB trending for hero + section data
-  const [heroTrending, phimBoData, phimLeData, trendTv, trendMovies, hanQuocData, trungQuocData] = await Promise.all([
-    getTrendMovies('all').catch(() => []),    // TMDB trending -> matched KKPHIM movies
-    getMoviesList('phim-bo', { limit: 12 }),
-    getMoviesList('phim-le', { limit: 12 }),
-    getTrendMovies('tv').catch(() => []),     // Top Trending Series (sidebar)
-    getTrendMovies('movie').catch(() => []),  // Top Trending Movies (sidebar)
-    getMoviesByCountry('han-quoc', 1, 10),
-    getMoviesByCountry('trung-quoc', 1, 10)
-  ]);
+// Wrapper cho Sidebar Trending
+async function AsyncTopTrending({ title, slug, type }: { title: string, slug: string, type: 'tv' | 'movie' }) {
+  let data: any[] = await getTrendMovies(type).catch(() => []);
 
-  // Hero: TMDB trending is primary. Fallback to interleaved if empty.
-  let finalHeroData: any[] = heroTrending.slice(0, 20);
-
-  if (finalHeroData.length < 4) {
-    // Fallback: interleave phimBo + phimLe
-    const heroMixed: any[] = [];
-    const maxLen = Math.max(phimBoData.items?.length || 0, phimLeData.items?.length || 0);
-    for (let i = 0; i < maxLen; i++) {
-      if (phimBoData.items?.[i]) heroMixed.push(phimBoData.items[i]);
-      if (phimLeData.items?.[i]) heroMixed.push(phimLeData.items[i]);
-    }
-    finalHeroData = heroMixed.slice(0, 20);
-  }
-
-  // Ensure we have 10 items for Top Trending by backfilling
-  const fillList = (source: any[], backup: any[], limit: number) => {
-    const sourceIds = new Set(source.map(m => m._id));
-    const filled = [...source];
-
-    for (const item of backup) {
-      if (filled.length >= limit) break;
+  // Backfill if empty
+  if (data.length < 10) {
+    const backup = await getMoviesList(type === 'tv' ? 'phim-bo' : 'phim-le', { limit: 10 });
+    const sourceIds = new Set(data.map((m: any) => m._id));
+    for (const item of (backup?.items || [])) {
+      if (data.length >= 10) break;
       if (!sourceIds.has(item._id)) {
-        filled.push(item);
+        data.push(item);
         sourceIds.add(item._id);
       }
     }
-    return filled.slice(0, limit);
-  };
+  }
 
-  const finalTrendTv = fillList(trendTv, phimBoData.items || [], 10);
-  const finalTrendMovies = fillList(trendMovies, phimLeData.items || [], 10);
+  if (!data?.length) return null;
+  return <TopTrending title={title} movies={data.slice(0, 10)} slug={slug} className={type === 'movie' ? "mt-8" : ""} />;
+}
+
+export default async function Home() {
+  // Chỉ fetch dữ liệu của Hero để trang render FCP lẹ nhất
+  const heroTrending = await getTrendMovies('all').catch(() => []);
+
+  let finalHeroData: any[] = heroTrending.slice(0, 20);
+
+  if (finalHeroData.length < 4) {
+    // Nếu Hero fail, gọi fallback
+    const [phimBo, phimLe] = await Promise.all([
+      getMoviesList('phim-bo', { limit: 10 }),
+      getMoviesList('phim-le', { limit: 10 })
+    ]);
+    const heroMixed: any[] = [];
+    const maxLen = Math.max(phimBo.items?.length || 0, phimLe.items?.length || 0);
+    for (let i = 0; i < maxLen; i++) {
+      if (phimBo.items?.[i]) heroMixed.push(phimBo.items[i]);
+      if (phimLe.items?.[i]) heroMixed.push(phimLe.items[i]);
+    }
+    finalHeroData = heroMixed.slice(0, 20);
+  }
 
   return (
     <main className="min-h-screen pb-20 bg-[#0a0a0a]">
@@ -92,33 +83,27 @@ export default async function Home() {
       </div>
 
       <div className="container mx-auto px-4 md:px-12 relative z-20 pb-20">
-
-        {/* Quick Navigation (Categories) */}
         <div className="mb-8">
           <QuickNav />
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
 
-          {/* MAIN CONTENT (Left - 9 cols) */}
-          <div className="xl:col-span-9 space-y-20">
-
-            {/* Continue Watching */}
+          {/* MAIN CONTENT */}
+          <div className="xl:col-span-9 space-y-16">
             <ContinueWatchingRow />
 
-            {/* Hot Sections */}
             <Suspense fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
               <AsyncMovieRow title="Phim Chiếu Rạp Mới" slug="phim-chieu-rap" />
             </Suspense>
 
-            {/* Country Specific Sections */}
-            {hanQuocData?.items?.length > 0 && (
-              <MovieRow title="Phim Hàn Quốc Mới" movies={hanQuocData.items} slug="/quoc-gia/han-quoc" />
-            )}
+            <Suspense fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
+              <AsyncMovieRow title="Phim Hàn Quốc Mới" country="han-quoc" />
+            </Suspense>
 
-            {trungQuocData?.items?.length > 0 && (
-              <MovieRow title="Phim Trung Quốc Mới" movies={trungQuocData.items} slug="/quoc-gia/trung-quoc" />
-            )}
+            <Suspense fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
+              <AsyncMovieRow title="Phim Trung Quốc Mới" country="trung-quoc" />
+            </Suspense>
 
             <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
               <AsyncMovieRow title="Phim Sắp Chiếu" type="phim-sap-chieu" />
@@ -137,10 +122,6 @@ export default async function Home() {
             </Suspense>
 
             <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-              <AsyncMovieRow title="Phim Tình Cảm Lãng Mạn" slug="tinh-cam" />
-            </Suspense>
-
-            <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
               <AsyncMovieRow title="Hoạt Hình - Anime" type="hoat-hinh" />
             </Suspense>
 
@@ -149,43 +130,17 @@ export default async function Home() {
             </Suspense>
           </div>
 
-          {/* SIDEBAR (Right - 3 cols) */}
+          {/* SIDEBAR */}
           <div className="xl:col-span-3 space-y-12">
-
-            {/* Top Trending - Phim Bộ (Series) */}
-            <TopTrending
-              title="Top Phim Bộ"
-              movies={finalTrendTv}
-              slug="/danh-sach/phim-bo"
-            />
-
-            {/* Genre Tags Cloud */}
-            <TopicCloud />
-
-            {/* Top Trending - Phim Lẻ (Movies) */}
-            <TopTrending
-              title="Top Phim Lẻ"
-              movies={finalTrendMovies}
-              slug="/danh-sach/phim-le"
-              className="mt-8"
-            />
-
-            {/* Phim Sắp Chiếu (Vertical List) */}
-            <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-              <div className="bg-[#111] p-4 rounded-xl border border-white/5 hidden xl:block">
-                <h3 className="text-[#fbbf24] font-bold text-lg mb-4 uppercase flex items-center gap-2">
-                  <span className="w-1 h-5 bg-[#fbbf24] rounded-full text-transparent">.</span>
-                  Phim sắp chiếu
-                </h3>
-                <div className="space-y-3">
-                  {/* Placeholder for sidebar content or ad */}
-                  <div className="text-gray-500 text-xs text-center py-4">
-                    Danh sách đang cập nhật...
-                  </div>
-                </div>
-              </div>
+            <Suspense fallback={<div className="h-[600px] bg-white/5 rounded-xl animate-pulse" />}>
+              <AsyncTopTrending title="Top Phim Bộ" slug="/danh-sach/phim-bo" type="tv" />
             </Suspense>
 
+            <TopicCloud />
+
+            <Suspense fallback={<div className="h-[600px] bg-white/5 rounded-xl animate-pulse mt-8" />}>
+              <AsyncTopTrending title="Top Phim Lẻ" slug="/danh-sach/phim-le" type="movie" />
+            </Suspense>
           </div>
         </div>
       </div>

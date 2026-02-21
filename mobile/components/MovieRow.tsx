@@ -11,9 +11,10 @@ interface MovieRowProps {
     movies: Movie[];
     slug?: string;
     subtitle?: string;
+    type?: 'list' | 'country';
 }
 
-const MovieRow = memo(({ title, movies, slug, subtitle }: MovieRowProps) => {
+const MovieRow = memo(({ title, movies, slug, subtitle, type = 'list' }: MovieRowProps) => {
     if (!movies || movies.length === 0) return null;
 
     return (
@@ -31,7 +32,7 @@ const MovieRow = memo(({ title, movies, slug, subtitle }: MovieRowProps) => {
                     </View>
                 </View>
                 {slug && (
-                    <Link href={`/list/${slug}` as any} asChild>
+                    <Link href={`/${type}/${slug}` as any} asChild>
                         <Pressable style={styles.seeAllBtn}>
                             <Text style={styles.seeAllText}>Tất cả</Text>
                             <Ionicons name="chevron-forward" size={13} color="#fbbf24" />

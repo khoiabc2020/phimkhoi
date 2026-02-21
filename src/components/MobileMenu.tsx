@@ -58,7 +58,7 @@ export default function MobileMenu({
             {/* Backdrop overlay */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 z-[9999] lg:hidden bg-black/60 backdrop-blur-sm"
+                    className="fixed inset-0 z-[9999] lg:hidden bg-black/80"
                     onClick={onClose}
                 />
             )}
@@ -71,9 +71,7 @@ export default function MobileMenu({
                     isOpen ? "translate-x-0" : "-translate-x-full"
                 )}
                 style={{
-                    background: "rgba(13,16,26,0.95)",
-                    backdropFilter: "blur(40px) saturate(180%)",
-                    WebkitBackdropFilter: "blur(40px) saturate(180%)",
+                    background: "#0D101A",
                 }}
             >
                 {/* Header */}

@@ -47,7 +47,7 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
             <button
                 onClick={() => handlePageChange(1)}
                 disabled={currentPage === 1}
-                className="w-10 h-10 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/20 text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 backdrop-blur-sm border border-white/5 hover:scale-110 active:scale-95 group"
+                className="w-10 h-10 rounded-full flex items-center justify-center bg-[#1A1C23] hover:bg-white/20 text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 border border-white/5 hover:scale-110 active:scale-95 group"
                 title="Trang đầu"
             >
                 <ChevronLeft className="w-4 h-4 -mr-1 opacity-50 group-hover:opacity-100 transition-opacity" />
@@ -58,14 +58,14 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
             <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="w-10 h-10 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/20 text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 backdrop-blur-sm border border-white/5 hover:scale-110 active:scale-95"
+                className="w-10 h-10 rounded-full flex items-center justify-center bg-[#1A1C23] hover:bg-white/20 text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 border border-white/5 hover:scale-110 active:scale-95"
                 title="Trang trước"
             >
                 <ChevronLeft className="w-5 h-5" />
             </button>
 
             {/* Page Numbers */}
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/10">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#1A1C23] border border-white/10">
                 {pages.map((page) => (
                     <button
                         key={page}
@@ -89,7 +89,7 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
             <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="w-10 h-10 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/20 text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 backdrop-blur-sm border border-white/5 hover:scale-110 active:scale-95"
+                className="w-10 h-10 rounded-full flex items-center justify-center bg-[#1A1C23] hover:bg-white/20 text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 border border-white/5 hover:scale-110 active:scale-95"
                 title="Trang sau"
             >
                 <ChevronRight className="w-5 h-5" />
@@ -99,7 +99,7 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
             <button
                 onClick={() => handlePageChange(totalPages)}
                 disabled={currentPage === totalPages}
-                className="w-10 h-10 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/20 text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 backdrop-blur-sm border border-white/5 hover:scale-110 active:scale-95 group"
+                className="w-10 h-10 rounded-full flex items-center justify-center bg-[#1A1C23] hover:bg-white/20 text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 border border-white/5 hover:scale-110 active:scale-95 group"
                 title="Trang cuối"
             >
                 <ChevronRight className="w-4 h-4" />

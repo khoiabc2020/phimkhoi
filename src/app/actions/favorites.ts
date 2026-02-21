@@ -35,7 +35,7 @@ export async function addFavorite(movieData: {
     } catch (error: any) {
         // Handle duplicate key error
         if (error.code === 11000) {
-            return { success: false, error: "Already in favorites" };
+            return { success: true, error: "Already in favorites", data: movieData };
         }
         console.error("Add favorite error:", error);
         return { success: false, error: "Failed to add to favorites" };

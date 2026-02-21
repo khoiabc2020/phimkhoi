@@ -2,7 +2,7 @@ import { View, ActivityIndicator, TouchableOpacity, Text, Dimensions, StatusBar 
 import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import { WebView } from 'react-native-webview';
 import * as ScreenOrientation from 'expo-screen-orientation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getMovieDetail } from '@/services/api';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -23,6 +23,19 @@ export default function PlayerScreen() {
     const [selectedServer, setSelectedServer] = useState(server ? Number(server) : 0);
 
     const { user, token, syncHistory } = useAuth();
+
+    // Create a stable ref to syncHistory so we can call it on unmount safely without recreating the effect
+    const syncHistoryRef = useRef(syncHistory);
+    useEffect(() => {
+        syncHistoryRef.current = syncHistory;
+    }, [syncHistory]);
+
+    // Force sync when component unmounts (e.g. system back gesture)
+    useEffect(() => {
+        return () => {
+            syncHistoryRef.current();
+        };
+    }, []);
 
     useEffect(() => {
         // Lock to Landscape
@@ -119,12 +132,10 @@ export default function PlayerScreen() {
     };
 
     const handleClose = () => {
-        syncHistory(); // Sync when closing player
         router.back();
     };
 
     const handleNextEpisode = () => {
-        syncHistory();
         if (nextEpisodeSlug) {
             router.replace(`/player/${slug}?ep=${nextEpisodeSlug}`);
         }

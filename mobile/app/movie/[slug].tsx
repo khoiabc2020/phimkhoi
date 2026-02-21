@@ -27,7 +27,7 @@ const TABS = [
 ];
 
 export default function MovieDetailScreen() {
-    const { slug } = useLocalSearchParams();
+    const { slug, autoPlay } = useLocalSearchParams();
     const router = useRouter();
 
     // Data State
@@ -48,7 +48,6 @@ export default function MovieDetailScreen() {
 
     const { user, token, syncFavorites, syncWatchList } = useAuth();
 
-    // Fetch Logic
     const fetchData = useCallback(async () => {
         try {
             setLoading(true);
@@ -63,13 +62,20 @@ export default function MovieDetailScreen() {
                 if (tmdbRating) setRating(tmdbRating);
                 const tmdbCast = await getTMDBCast(data.movie.name, data.movie.year);
                 if (tmdbCast) setCast(tmdbCast.slice(0, 15));
+
+                // Handle AutoPlay flag immediately after data fetches
+                const isAutoPlay = Array.isArray(autoPlay) ? autoPlay[0] === 'true' : autoPlay === 'true';
+                if (isAutoPlay && data.episodes?.[selectedServer]?.server_data?.[0]) {
+                    const firstEp = data.episodes[selectedServer].server_data[0].slug;
+                    router.replace(`/player/${data.movie.slug}?ep=${firstEp}&server=${selectedServer}` as any);
+                }
             }
         } catch (error) {
             console.error(error);
         } finally {
             setLoading(false);
         }
-    }, [slug]);
+    }, [slug, autoPlay, selectedServer, router]);
 
     useEffect(() => {
         fetchData();
@@ -450,8 +456,8 @@ const styles = StyleSheet.create({
     tabTextActive: { color: 'white' },
 
     episodeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: 16, paddingTop: 4 },
-    epCard: { width: '18.4%', aspectRatio: 1.4, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 8, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
-    epText: { color: 'white', fontWeight: 'bold' },
+    epCard: { width: (width - 64) / 5, aspectRatio: 1.4, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 8, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
+    epText: { color: 'white', fontWeight: 'bold', textAlign: 'center' },
 
     // Range picker
     rangeBtn: {
