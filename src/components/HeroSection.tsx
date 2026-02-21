@@ -20,7 +20,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
         loop: true,
         align: "center",
         containScroll: "trimSnaps",
-        dragFree: true
+        dragFree: false // Tắt dragFree để vuốt từng slide có điểm dừng rõ ràng
     });
 
     const [selectedIndex, setSelectedIndex] = useState(0);
@@ -37,7 +37,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
         if (!isScrollEvent) return;
 
-        const TWEEN_FACTOR = 0.85; // Slide bên sẽ thụt xuống 85%
+        const TWEEN_FACTOR = 0.9; // Slide bên sẽ thụt xuống 90% thay vì 85% để tránh lõm sâu
 
         const speeds = mobileApi.scrollSnapList().map((scrollSnap, index) => {
             let diffToTarget = scrollSnap - scrollProgress;
@@ -177,23 +177,23 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
             {/* ================= TABLET & MOBILE LAYOUT (Portrait/Small Screens) ================= */}
             {/* Shows on < lg screens (approx < 1024px) */}
-            <div className="lg:hidden relative w-full h-[85vh] md:h-[65vh] flex flex-col pt-10 overflow-hidden bg-[#0B0D12]" ref={mobileRef}>
-                <div className="flex flex-row touch-pan-y h-full">
+            <div className="lg:hidden relative w-full min-h-[80vh] h-auto flex flex-col pt-10 pb-12 bg-[#0B0D12]" ref={mobileRef}>
+                <div className="flex flex-row touch-pan-y h-auto">
                     {heroMovies.map((movie, index) => {
                         const posterImg = getHeroImage(movie, 'poster');
                         const rating = heroMoviesData[movie._id]?.vote_average ? heroMoviesData[movie._id].vote_average.toFixed(1) : "N/A";
 
                         const tweenValue = tweenValues.length ? tweenValues[index] : 1;
-                        // Transform 85% to 50% opacity, 100% to 100%
-                        const opacityValue = Math.min(1, Math.max(0.4, (tweenValue - 0.85) / 0.15));
+                        // Transform 90% to 50% opacity, 100% to 100%
+                        const opacityValue = Math.min(1, Math.max(0.5, (tweenValue - 0.9) / 0.1));
 
                         return (
-                            <div key={movie._id} className="relative flex-[0_0_75%] sm:flex-[0_0_60%] max-w-[300px] min-w-0 h-full flex flex-col items-center pt-8">
+                            <div key={movie._id} className="relative flex-[0_0_75%] sm:flex-[0_0_60%] max-w-[300px] min-w-0 h-auto flex flex-col items-center pt-8">
 
                                 {/* 1. Centered Poster with 3D Tween */}
                                 <Link
                                     href={`/xem-phim/${movie.slug}`}
-                                    className="relative w-full aspect-[2/3] mb-4 rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 shrink-0 transition-all duration-300 ease-out"
+                                    className="relative w-[80%] max-w-[240px] mx-auto aspect-[2/3] mb-4 rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 shrink-0 transition-all duration-300 ease-out"
                                     style={{
                                         transform: `scale(${tweenValue})`,
                                         opacity: Math.min(1, opacityValue + 0.3)
@@ -211,11 +211,10 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
                                 {/* 2. Vertically Stacked Movie Info */}
                                 <div
-                                    className="flex flex-col items-center w-[110%] text-center transition-all duration-300 ease-out"
+                                    className="flex flex-col items-center w-[105%] text-center transition-all duration-300 ease-out mt-1"
                                     style={{
                                         opacity: opacityValue,
-                                        transform: `translateY(${(1 - tweenValue) * 40}px)`,
-                                        pointerEvents: tweenValue > 0.95 ? 'auto' : 'none'
+                                        transform: `translateY(${(1 - tweenValue) * 20}px)`
                                     }}
                                 >
                                     <h1 className="text-2xl md:text-3xl font-black text-white leading-tight drop-shadow-lg line-clamp-2 px-2 tracking-tight mb-2">
