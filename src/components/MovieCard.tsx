@@ -116,11 +116,11 @@ export default function MovieCard({ movie, orientation = 'portrait' }: { movie: 
 
                     {/* Status/Episode Badge - Apple Style: Small, Blur, Clean */}
                     <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-10 pointer-events-none">
-                        if (movie.quality && (
-                        <span className="bg-[#1A1C23]/95 border border-white/10 text-white/90 text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wide">
-                            {movie.quality}
-                        </span>
-                        ))
+                        {movie.quality && (
+                            <span className="bg-[#1A1C23]/95 border border-white/10 text-white/90 text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wide">
+                                {movie.quality}
+                            </span>
+                        )}
                         {movie.episode_current && (
                             <span className="bg-primary/90 text-black text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">
                                 {movie.episode_current}
