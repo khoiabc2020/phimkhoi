@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
+import WatchHistory from "@/models/WatchHistory";
 import { authOptions } from "../../auth/[...nextauth]/route";
 
 export async function POST(req: Request) {
@@ -18,36 +19,30 @@ export async function POST(req: Request) {
         }
 
         await dbConnect();
-        const user = await User.findOne({ email: session.user.email });
 
-        if (!user) {
-            return NextResponse.json({ error: "User not found" }, { status: 404 });
-        }
+        // Cập nhật collection WatchHistory toàn cục thay vì User Array
+        await WatchHistory.findOneAndUpdate(
+            {
+                userId: session.user.id,
+                movieSlug: slug,
+                episodeSlug: episode || "full",
+            },
+            {
+                $set: {
+                    userId: session.user.id,
+                    movieSlug: slug,
+                    progress: progress || 0,
+                    lastWatched: new Date(),
+                }
+            },
+            {
+                upsert: true,
+                new: true,
+                setDefaultsOnInsert: true
+            }
+        );
 
-        // Check if item exists in history
-        const existingIndex = user.history.findIndex((item) => item.slug === slug);
-
-        if (existingIndex > -1) {
-            // Remove existing item to push to top
-            user.history.splice(existingIndex, 1);
-        }
-
-        // Add to top of history
-        user.history.unshift({
-            slug,
-            episode: episode || "full",
-            progress: progress || 0,
-            timestamp: Date.now(),
-        });
-
-        // Limit history length (e.g., keep last 100 items)
-        if (user.history.length > 100) {
-            user.history = user.history.slice(0, 100);
-        }
-
-        await user.save();
-
-        return NextResponse.json({ success: true, history: user.history });
+        return NextResponse.json({ success: true });
     } catch (error) {
         console.error("History Error:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
@@ -62,13 +57,21 @@ export async function GET(req: Request) {
         }
 
         await dbConnect();
-        const user = await User.findOne({ email: session.user.email });
 
-        if (!user) {
-            return NextResponse.json({ history: [] });
-        }
+        const histories = await WatchHistory.find({ userId: session.user.id })
+            .sort({ lastWatched: -1 })
+            .limit(100)
+            .lean();
 
-        return NextResponse.json({ history: user.history });
+        // Định dạng map theo mảng cũ của UserList Component
+        const formattedHistory = histories.map(h => ({
+            slug: h.movieSlug,
+            episode: h.episodeSlug,
+            progress: h.progress,
+            timestamp: new Date(h.lastWatched).getTime()
+        }));
+
+        return NextResponse.json({ history: formattedHistory });
     } catch (error) {
         console.error("History Error:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

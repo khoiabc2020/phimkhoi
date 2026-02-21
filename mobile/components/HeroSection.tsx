@@ -143,25 +143,38 @@ const styles = StyleSheet.create({
     cardContainer: {
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'flex-start',
+        justifyContent: 'center',
         paddingTop: 10,
     },
     posterWrapper: {
         width: POSTER_WIDTH,
         height: POSTER_HEIGHT,
-        borderRadius: 16,
-        marginBottom: 16,
+        borderRadius: 20,
         backgroundColor: '#1f2937',
-        // Removed heavy animated shadows to fix Parallax FPS lag on Android
+        zIndex: 1,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.4,
+        shadowRadius: 15,
+        elevation: 10,
     },
     posterImage: {
         width: '100%',
         height: '100%',
-        borderRadius: 16,
+        borderRadius: 20,
     },
     infoWrapper: {
         alignItems: 'center',
-        width: '90%',
+        width: '88%',
+        marginTop: -45, // Kéo lên phủ đè Poster một phần
+        backgroundColor: 'rgba(25, 30, 40, 0.85)', // Tint nền giả mờ
+        borderRadius: 24,
+        padding: 20,
+        paddingTop: 55, // Nhường chỗ cho khối lồi lên
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.15)',
+        borderTopColor: 'rgba(255, 255, 255, 0.4)', // Shine top giả môi trường 3D
+        zIndex: 0,
     },
     title: {
         color: 'white',

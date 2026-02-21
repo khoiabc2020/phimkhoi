@@ -364,7 +364,7 @@ export default function MovieDetailScreen() {
                                         .map((ep: any, idx: number) => (
                                             <Link key={idx} href={`/player/${movie.slug}?ep=${ep.slug}&server=${selectedServer}`} asChild>
                                                 <Pressable style={styles.epCard}>
-                                                    <Text style={styles.epText}>{ep.name}</Text>
+                                                    <Text style={styles.epText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>{ep.name.replace('Tập ', '')}</Text>
                                                 </Pressable>
                                             </Link>
                                         ))}
@@ -456,8 +456,8 @@ const styles = StyleSheet.create({
     tabTextActive: { color: 'white' },
 
     episodeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: 16, paddingTop: 4 },
-    epCard: { width: (width - 64) / 5, aspectRatio: 1.4, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 8, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
-    epText: { color: 'white', fontWeight: 'bold', textAlign: 'center' },
+    epCard: { width: (width - 64) / 5, aspectRatio: 1.4, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 8, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)', paddingHorizontal: 4 },
+    epText: { color: 'white', fontWeight: 'bold', textAlign: 'center', fontSize: 13 },
 
     // Range picker
     rangeBtn: {

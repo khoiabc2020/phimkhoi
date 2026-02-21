@@ -92,9 +92,14 @@ export const searchMovies = async (keyword: string, limit = 20) => {
 
 export const getImageUrl = (url?: string) => {
     if (!url) return 'https://via.placeholder.com/300x450?text=No+Image';
-    if (url.includes("tmdb.org")) return url;
-    if (url.startsWith('http')) return url;
-    return `https://phimimg.com/${url}`;
+
+    let finalUrl = url;
+    if (!url.startsWith('http')) {
+        finalUrl = `https://phimimg.com/${url}`;
+    }
+
+    // Tối ưu ảnh siêu tốc qua Global CDN (Cloudflare/Wsrv) với thiết lập WebP nén
+    return `https://wsrv.nl/?url=${encodeURIComponent(finalUrl)}&output=webp&q=80`;
 };
 
 export const getMenuData = async () => {

@@ -8,20 +8,14 @@ export function cn(...inputs: ClassValue[]) {
 export function getImageUrl(url: string) {
     if (!url) return "";
 
-    // Return direct URL for these known domains to let Next.js optimize them
-    if (url.includes("tmdb.org") || url.includes("img.ophim") || url.includes("phimimg.com")) {
-        return url;
-    }
-
-    // Handle relative paths (presumed to be from KKPhim/phimimg)
+    let finalUrl = url;
     if (!url.startsWith("http")) {
-        return `https://phimimg.com/${url}`;
+        finalUrl = `https://phimimg.com/${url}`;
     }
 
-    // For other full URLs, return as is.
-    // Previously we wrapped in phimapi.com/image.php which is returning 403.
-    // We trust Next.js Image component or standard img tag to handle them if domains are allowed.
-    return url;
+    // Sử dụng Image CDN Proxy (wsrv.nl) với định dạng WebP để tối đa hóa tốc độ load ảnh toàn cầu
+    // Cực kỳ hữu ích với mạng chập chờn hoặc thiết bị yếu
+    return `https://wsrv.nl/?url=${encodeURIComponent(finalUrl)}&output=webp&q=80`;
 }
 
 export function decodeHtml(html: string) {

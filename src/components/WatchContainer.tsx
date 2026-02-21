@@ -66,8 +66,8 @@ export default function WatchContainer({
 
             {/* Player Card */}
             <div className={cn(
-                "relative z-10 transition-all duration-500",
-                isTheaterMode ? "w-full max-w-[100vw] -mx-4 lg:-mx-10" : "w-full"
+                "relative z-10 transition-all duration-500 mx-auto",
+                isTheaterMode ? "w-[100vw] max-w-full relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]" : "w-full"
             )}>
                 {/* Glass Border Ring */}
                 <div className={cn(

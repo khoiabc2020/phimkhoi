@@ -2,11 +2,12 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
-import { authOptions } from "../../auth/[...nextauth]/route"; // We need to export authOptions from route.ts
+import Favorite from "@/models/Favorite";
+import { authOptions } from "../../auth/[...nextauth]/route";
 
 export async function POST(req: Request) {
     try {
-        const session = await getServerSession(authOptions); // Need to extract authOptions
+        const session = await getServerSession(authOptions);
         if (!session || !session.user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
@@ -17,26 +18,29 @@ export async function POST(req: Request) {
         }
 
         await dbConnect();
-        const user = await User.findOne({ email: session.user.email });
 
-        if (!user) {
-            return NextResponse.json({ error: "User not found" }, { status: 404 });
-        }
+        const existingFav = await Favorite.findOne({
+            userId: session.user.id,
+            movieSlug: slug
+        });
 
-        const isFavorite = user.favorites.includes(slug);
+        const isFavorite = !!existingFav;
 
         if (isFavorite) {
-            // Remove
-            user.favorites = user.favorites.filter((s) => s !== slug);
+            await Favorite.deleteOne({ _id: existingFav._id });
         } else {
-            // Add
-            user.favorites.push(slug);
+            await Favorite.create({
+                userId: session.user.id,
+                movieSlug: slug,
+                movieName: slug, // Placeholder fallback cho API cũ nếu không có params truyền lên
+            });
         }
 
-        await user.save();
+        const updatedFavorites = await Favorite.find({ userId: session.user.id }).lean();
+        const formattedArray = updatedFavorites.map(f => f.movieSlug);
 
         return NextResponse.json({
-            favorites: user.favorites,
+            favorites: formattedArray,
             isFavorite: !isFavorite
         });
 
@@ -54,13 +58,14 @@ export async function GET(req: Request) {
         }
 
         await dbConnect();
-        const user = await User.findOne({ email: session.user.email });
 
-        if (!user) {
-            return NextResponse.json({ favorites: [] });
-        }
+        const favorites = await Favorite.find({ userId: session.user.id })
+            .sort({ addedAt: -1 })
+            .lean();
 
-        return NextResponse.json({ favorites: user.favorites });
+        const formattedArray = favorites.map(f => f.movieSlug);
+
+        return NextResponse.json({ favorites: formattedArray });
 
     } catch (error) {
         console.error("Favorites Error:", error);
