@@ -96,48 +96,38 @@ export default async function WatchHistoryPage() {
                                             href={`/xem-phim/${item.movieSlug}/${item.episodeSlug}`}
                                             className="group relative block"
                                         >
-                                            <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-white/5 shadow-2xl border border-white/10 ring-1 ring-white/5 group-hover:ring-[#fbbf24]/50 transition-all">
+                                            <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-white/5 shadow-2xl border border-white/10 group-hover:border-[#fbbf24]/30 transition-all">
                                                 <Image
                                                     src={getImageUrl(item.moviePoster)}
                                                     alt={item.movieName}
                                                     fill
-                                                    className="object-cover group-hover:scale-110 transition-transform duration-500"
+                                                    className="object-cover group-hover:scale-105 transition-transform duration-500"
                                                 />
-                                                {/* Gradient Overlay - chỉ đủ tối để đọc text episode name */}
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80 group-hover:opacity-50 transition-opacity" />
 
-                                                {/* Play Overlay */}
-                                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                                                {/* Play button on hover */}
+                                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 bg-black/20">
                                                     <div className="w-12 h-12 rounded-full bg-[#fbbf24] flex items-center justify-center shadow-[0_0_20px_rgba(251,191,36,0.5)] scale-0 group-hover:scale-100 transition-transform duration-300">
                                                         <Play className="w-6 h-6 text-black fill-black ml-1" />
                                                     </div>
                                                 </div>
 
-                                                {/* Progress Bar */}
-                                                <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20 backdrop-blur-sm z-20">
+                                                {/* Progress Bar - đáy ảnh */}
+                                                <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20 z-20">
                                                     <div
-                                                        className="h-full bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.8)] relative"
+                                                        className="h-full bg-red-600"
                                                         style={{ width: `${item.progress}%` }}
-                                                    >
-                                                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity delay-100" />
-                                                    </div>
-                                                </div>
-
-                                                <div className="absolute top-2 right-2 bg-black/70 backdrop-blur-md px-2 py-0.5 rounded text-[10px] text-white font-bold border border-white/10 shadow-lg">
-                                                    {item.episodeName}
+                                                    />
                                                 </div>
                                             </div>
 
-                                            <div className="mt-3 px-1">
-                                                <h3 className="text-white font-bold line-clamp-1 text-sm group-hover:text-[#fbbf24] transition-colors">
+                                            {/* Text bên dưới ảnh - không che mặt nhân vật */}
+                                            <div className="mt-2 px-0.5">
+                                                <h3 className="text-white font-semibold line-clamp-1 text-sm group-hover:text-[#fbbf24] transition-colors">
                                                     {item.movieName}
                                                 </h3>
-                                                <div className="flex items-center justify-between mt-1">
-                                                    <p className="text-white/40 text-xs line-clamp-1">{item.movieOriginName}</p>
-                                                    <div className="flex items-center gap-1 text-[#fbbf24]/80 text-[10px] font-medium bg-[#fbbf24]/10 px-1.5 py-0.5 rounded">
-                                                        <Clock className="w-3 h-3" />
-                                                        <span>{item.progress}%</span>
-                                                    </div>
+                                                <div className="flex items-center justify-between mt-0.5">
+                                                    <span className="text-white/50 text-xs">{item.episodeName}</span>
+                                                    <span className="text-[#fbbf24]/70 text-[10px] font-medium">{item.progress}%</span>
                                                 </div>
                                             </div>
                                         </Link>
