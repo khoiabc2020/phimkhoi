@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Search, Bell, User, LogOut, Shield, Trash2, Clock, History, Heart, Settings, Menu, X, ChevronDown, Play, Film, Video, LayoutGrid, Download } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
@@ -145,9 +146,13 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         <Link href="/" className="flex items-center gap-3 group shrink-0 order-2 md:order-none">
                             <div className="relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center">
                                 <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                <div className="relative w-full h-full rounded-full border border-white/10 bg-[#1A1C23] flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300">
-                                    <Play className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary fill-primary ml-0.5" />
-                                </div>
+                                <Image
+                                    src="/logo.webp"
+                                    alt="MovieBox Logo"
+                                    width={40}
+                                    height={40}
+                                    className="relative w-full h-full rounded-2xl object-cover shadow-lg group-hover:scale-105 transition-transform duration-300"
+                                />
                             </div>
                             <div className="flex flex-col justify-center">
                                 <span className="text-lg md:text-xl lg:text-2xl font-bold text-white tracking-tight leading-none font-sans whitespace-nowrap">

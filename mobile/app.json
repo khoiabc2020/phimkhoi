@@ -4,7 +4,7 @@
     "slug": "phimkhoi-mobile",
     "version": "1.0.2",
     "orientation": "default",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/logo.png",
     "scheme": "phimkhoi",
     "userInterfaceStyle": "dark",
     "newArchEnabled": false,
@@ -14,7 +14,7 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#1a1c23",
-        "foregroundImage": "./assets/images/icon.png"
+        "foregroundImage": "./assets/images/adaptive-icon.png"
       },
       "package": "com.phimkhoi.mobile",
       "edgeToEdgeEnabled": true,
@@ -34,12 +34,12 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
+          "image": "./assets/images/adaptive-icon.png",
+          "imageWidth": 150,
           "resizeMode": "contain",
-          "backgroundColor": "#1a1c23",
+          "backgroundColor": "#0F121A",
           "dark": {
-            "backgroundColor": "#1a1c23"
+            "backgroundColor": "#0F121A"
           }
         }
       ],

@@ -1,9 +1,10 @@
 import 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Platform } from 'react-native';
+import { Platform, View } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import * as SplashScreen from 'expo-splash-screen';
 import '../global.css';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -18,11 +19,15 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import TvSidebar from '@/components/TvSidebar';
 
+// Giữ Splash hiển thị trong khi app đang nạp tài nguyên
+SplashScreen.preventAutoHideAsync();
+
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   useEffect(() => {
-    // Platform-specific initialization if needed
+    // Ẩn Splash Screen ngay khi component mount thành công
+    SplashScreen.hideAsync();
   }, []);
 
   return (

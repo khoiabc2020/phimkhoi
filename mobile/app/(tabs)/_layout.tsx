@@ -83,7 +83,7 @@ export default function TabLayout() {
               tint="dark"
               style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(15,18,26,0.75)' }]}
             />
-          ) : null,
+          ) : <View style={StyleSheet.absoluteFill} />,
       }}
     >
       {TABS.map((tab) => (

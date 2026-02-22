@@ -22,7 +22,8 @@ export interface FavoriteMovie {
 export async function getFavorites(): Promise<FavoriteMovie[]> {
   try {
     const json = await AsyncStorage.getItem(FAVORITES_KEY);
-    return json ? JSON.parse(json) : [];
+    const parsed = json ? JSON.parse(json) : [];
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
   }

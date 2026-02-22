@@ -12,7 +12,8 @@ import {
     PanResponder,
     Animated,
     Easing,
-    useTVEventHandler
+    Platform,
+    useTVEventHandler as _useTVEventHandler
 } from 'react-native';
 import { Video, AVPlaybackStatus, ResizeMode } from 'expo-av';
 import Slider from '@react-native-community/slider';
@@ -246,9 +247,10 @@ export default function NativePlayer({
         }
     }, [showEpisodes]);
 
-    // TV Remote Support (D-Pad)
-    useTVEventHandler((evt) => {
-        if (!evt) return;
+    // TV Remote Support (D-Pad) - chỉ chạy trên Apple TV / Android TV
+    const useTVHandler = Platform.isTV ? _useTVEventHandler : () => { };
+    useTVHandler((evt: any) => {
+        if (!evt || !Platform.isTV) return;
         const { eventType } = evt;
         resetControlsTimer();
 
@@ -478,18 +480,21 @@ export default function NativePlayer({
                             </ScrollView>
                         )}
 
-                        <FlatList
-                            data={episodeList.slice(epRange * EP_CHUNK, (epRange + 1) * EP_CHUNK)}
-                            keyExtractor={(item) => item.slug}
-                            contentContainerStyle={{ padding: 28, paddingBottom: 60, gap: 16 }}
-                            columnWrapperStyle={{ gap: 16 }}
-                            numColumns={5}
-                            showsVerticalScrollIndicator={false}
-                            renderItem={({ item }) => {
+                        {/* Improved ScrollView for episodes */}
+                        <ScrollView
+                            style={{ flex: 1 }}
+                            contentContainerStyle={{ padding: 18, paddingBottom: 100, flexDirection: 'row', flexWrap: 'wrap' }}
+                            showsVerticalScrollIndicator={true}
+                            nestedScrollEnabled={true}
+                            scrollEnabled={true}
+                            keyboardShouldPersistTaps="handled"
+                        >
+                            {episodeList.slice(epRange * EP_CHUNK, (epRange + 1) * EP_CHUNK).map((item) => {
                                 const isActive = item.slug === currentEpisodeSlug;
                                 return (
                                     <TouchableOpacity
-                                        style={[styles.epGridItem, isActive && styles.activeEpGridItem]}
+                                        key={item.slug}
+                                        style={[styles.epGridItem, isActive && styles.activeEpGridItem, { margin: 6 }]}
                                         onPress={() => {
                                             onEpisodeChange?.(item.slug);
                                             setShowEpisodes(false);
@@ -498,14 +503,13 @@ export default function NativePlayer({
                                         <Text style={[styles.epGridText, isActive && styles.activeEpGridText]} numberOfLines={1}>
                                             {item.name.replace('Tập ', '')}
                                         </Text>
-                                        {/* Optional: Checkmark or progress bar could go here */}
                                         {isActive && (
-                                            <View style={{ position: 'absolute', bottom: 6, width: 4, height: 4, borderRadius: 2, backgroundColor: '#fbbf24' }} />
+                                            <View style={{ position: 'absolute', bottom: 8, width: 4, height: 4, borderRadius: 2, backgroundColor: '#fbbf24' }} />
                                         )}
                                     </TouchableOpacity>
                                 );
-                            }}
-                        />
+                            })}
+                        </ScrollView>
                     </Animated.View>
                 </View>
             </Modal>
@@ -667,36 +671,33 @@ const styles = StyleSheet.create({
         alignItems: 'center', justifyContent: 'center'
     },
 
-    // --- EPISODE GRID (Premium) ---
+    // --- EPISODE GRID (Premium Liquid Glass) ---
     epGridItem: {
-        flex: 1,
-        height: 56, // Fixed height 56px
-        backgroundColor: 'rgba(255,255,255,0.04)',
-        borderRadius: 16,
+        minWidth: 56, // Allows 4-5 items per row naturally
+        flexGrow: 1,  // Stretch to fill row nicely
+        height: 52,
+        backgroundColor: 'rgba(255,255,255,0.06)',
+        borderRadius: 14,
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.05)',
-        // Shadow for depth
+        borderColor: 'rgba(255,255,255,0.08)',
+        paddingHorizontal: 8,
     },
     activeEpGridItem: {
-        backgroundColor: 'rgba(251, 191, 36, 0.15)', // Subtle gold tint
-        borderColor: '#fbbf24',
-        shadowColor: "#fbbf24",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-        elevation: 4,
+        backgroundColor: 'rgba(255,255,255,0.12)', // Subtle glass highlight, NO yellow box
+        borderColor: 'rgba(255,255,255,0.2)',
     },
     epGridText: {
-        color: 'rgba(255,255,255,0.6)',
+        color: 'rgba(255,255,255,0.7)',
         fontSize: 15,
-        fontWeight: '600',
-        textAlign: 'center'
+        fontWeight: '500',
+        textAlign: 'center',
+        marginBottom: 2, // nudge up slightly to make room for dot
     },
     activeEpGridText: {
-        color: '#fbbf24',
-        fontWeight: '800'
+        color: 'white',
+        fontWeight: '700'
     },
 
     // Range chip for episode pagination

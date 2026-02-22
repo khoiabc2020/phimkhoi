@@ -28,7 +28,7 @@ export default function FavoritesScreen() {
         });
         const data = await res.json();
         if (res.ok) {
-          setFavorites(data.favorites);
+          setFavorites(data.favorites || []);
           // Also sync context
           syncFavorites();
         }
@@ -38,7 +38,7 @@ export default function FavoritesScreen() {
     } else {
       // Load local
       const list = await getFavorites();
-      setFavorites(list);
+      setFavorites(list || []);
     }
   }, [user, token]);
 
@@ -66,7 +66,7 @@ export default function FavoritesScreen() {
           },
           body: JSON.stringify({ slug })
         });
-        setFavorites((prev) => prev.filter((m) => (m.movieSlug || m.slug) !== slug));
+        setFavorites((prev) => (prev || []).filter((m) => (m.movieSlug || m.slug) !== slug));
         syncFavorites();
       } catch (e) {
         console.error(e);
@@ -74,11 +74,11 @@ export default function FavoritesScreen() {
     } else {
       // Remove local
       await removeFavorite(slug);
-      setFavorites((prev) => prev.filter((m) => (m.movieSlug || m.slug) !== slug));
+      setFavorites((prev) => (prev || []).filter((m) => (m.movieSlug || m.slug) !== slug));
     }
   };
 
-  if (favorites.length === 0) {
+  if (!favorites || favorites.length === 0) {
     return (
       <View className="flex-1 bg-black">
         <StatusBar style="light" />
@@ -101,10 +101,10 @@ export default function FavoritesScreen() {
       <StatusBar style="light" />
       <SafeAreaView edges={['top']} className="flex-1">
         <View className="px-4 pt-2 pb-4">
-          <Text className="text-white text-xl font-bold">Yêu thích ({favorites.length})</Text>
+          <Text className="text-white text-xl font-bold">Yêu thích ({favorites?.length || 0})</Text>
         </View>
         <FlatList
-          data={favorites}
+          data={favorites || []}
           numColumns={2}
           keyExtractor={(item, index) => item.movieId || item._id || String(index)}
           columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 16 }}

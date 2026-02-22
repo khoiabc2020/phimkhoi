@@ -17,13 +17,11 @@ import { useAuth } from '@/context/auth';
 import { CONFIG } from '@/constants/config';
 import { COLORS } from '@/constants/theme';
 
-const { width, height } = Dimensions.get('window');
-
 // Responsive episode columns
-const EP_COLS = width < 380 ? 3 : width < 430 ? 4 : 5;
-const EP_GAP = 10;
-const EP_PADDING = 16;
-const EP_CARD_WIDTH = Math.floor((width - EP_PADDING * 2 - EP_GAP * (EP_COLS - 1)) / EP_COLS);
+const EP_GAP = 8;
+const BODY_PADDING = 16;
+
+const { width, height } = Dimensions.get('window');
 
 // Tab options
 const TABS = [
@@ -245,7 +243,7 @@ export default function MovieDetailScreen() {
                             <View style={[styles.glassChip, { borderColor: COLORS.accent }]}>
                                 <Text style={[styles.chipText, { color: COLORS.accent }]}>{movie.lang || 'Vietsub'}</Text>
                             </View>
-                            {rating !== null && (
+                            {typeof rating === 'number' && !isNaN(rating) && (
                                 <View style={[styles.glassChip, { backgroundColor: '#fbbf24', borderColor: '#fbbf24' }]}>
                                     <Text style={[styles.chipText, { color: 'black', fontWeight: 'bold' }]}>IMDb {rating.toFixed(1)}</Text>
                                 </View>
@@ -262,9 +260,9 @@ export default function MovieDetailScreen() {
                             style={styles.playBtn}
                             disabled={!firstEpisode}
                             onPress={() => {
-                                if (firstEpisode) {
-                                    router.push(`/player/${movie.slug}?ep=${firstEpisode.slug}&server=${selectedServer}`);
-                                }
+                                if (!firstEpisode) return;
+                                const url = `/player/${movie.slug}?ep=${firstEpisode.slug}&server=${selectedServer}`;
+                                router.push(url as any);
                             }}
                         >
                             <Ionicons name="play" size={20} color="#0B0D12" />
@@ -457,19 +455,21 @@ const styles = StyleSheet.create({
     tabText: { color: 'rgba(255,255,255,0.45)', fontSize: 14, fontWeight: '500' },
     tabTextActive: { color: 'white', fontWeight: '600' },
 
-    // Episode Grid — responsive (3/4/5 cột theo width màn hình)
-    episodeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: EP_GAP, paddingHorizontal: EP_PADDING, paddingTop: 4 },
+    // Episode Grid — Premium Liquid Glass (flexGrow)
+    episodeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: EP_GAP, paddingTop: 4 },
     epCard: {
-        width: EP_CARD_WIDTH,
-        height: 46,
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        borderRadius: 18,
+        minWidth: 50,  // Đảm bảo 4-5 items mỗi dòng
+        flexGrow: 1,   // Tự động giãn full khoảng trống
+        height: 44,
+        backgroundColor: 'rgba(255,255,255,0.06)',
+        borderRadius: 12,
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.06)',
+        borderColor: 'rgba(255,255,255,0.08)',
+        paddingHorizontal: 8,
     },
-    epText: { color: 'rgba(255,255,255,0.85)', fontWeight: '500', textAlign: 'center', fontSize: 14 },
+    epText: { color: 'rgba(255,255,255,0.7)', fontWeight: '500', textAlign: 'center', fontSize: 13 },
 
     // Range chip — pill shape
     rangeBtn: {

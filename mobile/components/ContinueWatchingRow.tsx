@@ -52,7 +52,14 @@ const ContinueWatchingRow = memo(({ title, items }: ContinueWatchingRowProps) =>
                     const posterUrl = item.movie?.thumb_url || item.movie?.poster_url || item.moviePoster;
                     const name = item.movie?.name || item.movieName || item.slug;
                     const progress = item.progress || 0;
-                    const linkLabel = item.episode ? `Tập ${item.episode}` : 'Tiếp tục';
+                    // Làm sạch tên tập: "tap-06" -> "Tập 6", "fullHD" -> "Tập Full"
+                    const formatEp = (ep: string | undefined) => {
+                        if (!ep) return 'Tiếp tục';
+                        if (ep.toLowerCase() === 'full' || ep.toLowerCase() === 'fullhd') return 'Tập Full';
+                        const match = ep.match(/(\d+)/);
+                        return match ? `Tập ${parseInt(match[1], 10)}` : `Tập ${ep}`;
+                    };
+                    const linkLabel = formatEp(item.episode);
 
                     return (
                         <Link href={`/player/${item.slug}?ep=${item.episode || ''}`} asChild>

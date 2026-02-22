@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Restart } from 'expo-restart'; // Or just reload logic
+import * as SplashScreen from 'expo-splash-screen';
 
 interface Props {
     children: React.ReactNode;
@@ -23,6 +24,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
 
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
         console.error("Uncaught error:", error, errorInfo);
+        SplashScreen.hideAsync().catch(() => { });
     }
 
     render() {

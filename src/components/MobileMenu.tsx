@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { Play, Film, Video, LayoutGrid, Download, History, Heart, LogOut, Globe, X, ChevronDown, Home, Tv } from "lucide-react";
@@ -77,9 +78,13 @@ export default function MobileMenu({
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 h-[72px] shrink-0 border-b border-white/[0.06]">
                     <Link href="/" onClick={onClose} className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-full bg-[#F4C84A] flex items-center justify-center shadow-[0_0_12px_rgba(244,200,74,0.4)]">
-                            <Play className="w-3.5 h-3.5 text-black fill-black ml-0.5" />
-                        </div>
+                        <Image
+                            src="/logo.webp"
+                            alt="MovieBox Logo"
+                            width={28}
+                            height={28}
+                            className="w-7 h-7 rounded-lg object-cover shadow-[0_0_12px_rgba(244,200,74,0.2)]"
+                        />
                         <span className="text-[17px] font-black text-white tracking-tighter">MOVIE<span className="text-[#F4C84A]">BOX</span></span>
                     </Link>
                     <button

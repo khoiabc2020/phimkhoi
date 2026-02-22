@@ -69,36 +69,18 @@ export default function HomeScreen() {
 
   const fetchData = useCallback(async () => {
     try {
-      // Parallel Fetching for speed
-      const [
-        homeBasic,
-        heroTrendingRes,
-        chieuRapRes,
-        hanQuocRes,
-        trungQuocRes,
-        hanhDongRes,
-        tinhCamRes,
-        sapChieuRes
-      ] = await Promise.all([
+      // Giai đoạn 1: Tải nhanh homepage + hero trước
+      const [homeBasic, heroTrendingRes] = await Promise.all([
         getHomeData(),
-        // TMDB trending hero from backend
         fetch(`${CONFIG.BACKEND_URL}/api/mobile/hero-trending`)
           .then(r => r.ok ? r.json() : null)
           .catch(() => null),
-        getMoviesByCategory('phim-chieu-rap', 1, 12),
-        getMoviesByCountry('han-quoc', 1, 10),
-        getMoviesByCountry('trung-quoc', 1, 10),
-        getMoviesByCategory('hanh-dong', 1, 10),
-        getMoviesByCategory('tinh-cam', 1, 10),
-        getMoviesList('phim-sap-chieu', 1, 10)
       ]);
 
-      // Hero: prefer TMDB trending, fallback to interleaved KKPHIM
       let finalHero: Movie[] = [];
       if (heroTrendingRes?.movies?.length > 0) {
         finalHero = heroTrendingRes.movies.slice(0, 12);
       } else {
-        // Fallback: interleave phimBo & phimLe
         const heroMixed: Movie[] = [];
         const len = Math.max(homeBasic.phimBo.length, homeBasic.phimLe.length);
         for (let i = 0; i < len; i++) {
@@ -108,19 +90,37 @@ export default function HomeScreen() {
         finalHero = heroMixed.slice(0, 8);
       }
 
-      setData({
+      // Hiện nội dung ngay — không chờ section phụ
+      setData(prev => ({
+        ...prev,
         heroMovies: finalHero,
         phimLe: homeBasic.phimLe,
         phimBo: homeBasic.phimBo,
         hoatHinh: homeBasic.hoatHinh,
         tvShows: homeBasic.tvShows,
-        phimChieuRap: chieuRapRes.items,
-        hanQuoc: hanQuocRes.items,
-        trungQuoc: trungQuocRes.items,
-        hanhDong: hanhDongRes.items,
-        tinhCam: tinhCamRes.items,
-        sapChieu: sapChieuRes.items,
-      });
+      }));
+      setLoading(false);
+      setRefreshing(false);
+
+      // Giai đoạn 2: Load section phụ ngầm sau
+      const [chieuRapRes, hanQuocRes, trungQuocRes, hanhDongRes, tinhCamRes, sapChieuRes] = await Promise.all([
+        getMoviesByCategory('phim-chieu-rap', 1, 12),
+        getMoviesByCountry('han-quoc', 1, 10),
+        getMoviesByCountry('trung-quoc', 1, 10),
+        getMoviesByCategory('hanh-dong', 1, 10),
+        getMoviesByCategory('tinh-cam', 1, 10),
+        getMoviesList('phim-sap-chieu', 1, 10)
+      ]);
+
+      setData(prev => ({
+        ...prev,
+        phimChieuRap: chieuRapRes?.items || [],
+        hanQuoc: hanQuocRes?.items || [],
+        trungQuoc: trungQuocRes?.items || [],
+        hanhDong: hanhDongRes?.items || [],
+        tinhCam: tinhCamRes?.items || [],
+        sapChieu: sapChieuRes?.items || [],
+      }));
 
     } catch (error) {
       console.error(error);
@@ -170,7 +170,11 @@ export default function HomeScreen() {
             {!Platform.isTV && (
               <>
                 <View style={styles.logoRow}>
-                  <Ionicons name="film" size={24} color={COLORS.accent} />
+                  {/* Logo chữ M cách điệu dạng Moviebase (Infinity loop look) */}
+                  <View style={styles.logoIcon}>
+                    <View style={styles.logoLoopLeft} />
+                    <View style={styles.logoLoopRight} />
+                  </View>
                   <Text style={styles.logoText}>MovieBox</Text>
                 </View>
 
@@ -213,13 +217,15 @@ export default function HomeScreen() {
         }
       >
         {/* Hero Section - Mixed Content */}
-        {loading ? (
-          <View style={{ height: 400, justifyContent: 'center' }}>
-            <LoadingState count={1} type="card" />
-          </View>
-        ) : (
-          <HeroSection movies={data.heroMovies} />
-        )}
+        {
+          loading ? (
+            <View style={{ height: 400, justifyContent: 'center' }}>
+              <LoadingState count={1} type="card" />
+            </View>
+          ) : (
+            <HeroSection movies={data.heroMovies} />
+          )
+        }
 
         {/* Categories Compact */}
         <View style={styles.catSection}>
@@ -241,56 +247,69 @@ export default function HomeScreen() {
         </View>
 
         {/* Tiếp tục xem (Continue Watching) */}
-        {!loading && user?.history && user.history.length > 0 ? (
-          <View style={{ marginBottom: 10 }}>
-            <ContinueWatchingRow
-              title="Tiếp tục xem"
-              items={user.history}
-            />
-          </View>
-        ) : null}
+        {
+          !loading && user?.history && user.history.length > 0 ? (
+            <View style={{ marginBottom: 10 }}>
+              <ContinueWatchingRow
+                title="Tiếp tục xem"
+                items={(() => {
+                  // Deduplicate: chỉ giữ tập mới nhất của mỗi phim (slug)
+                  const seen = new Set<string>();
+                  return (user.history || []).filter((item: any) => {
+                    const key = item.slug || item.movie?.slug;
+                    if (!key || seen.has(key)) return false;
+                    seen.add(key);
+                    return true;
+                  }).slice(0, 10);
+                })()}
+              />
+            </View>
+          ) : null
+        }
 
         {/* Movie Rows - Synced with Web */}
-        {loading ? (
-          <View style={{ padding: 20 }}>
-            <LoadingState count={4} type="card" />
-          </View>
-        ) : (
-          <View style={styles.movieRows}>
-            {/* Hot Sections */}
-            {data.phimChieuRap.length > 0 && (
-              <MovieRow title="Phim Chiếu Rạp Mới" movies={data.phimChieuRap} slug="phim-chieu-rap" />
-            )}
+        {
+          loading ? (
+            <View style={{ padding: 20 }}>
+              <LoadingState count={4} type="card" />
+            </View>
+          ) : (
+            <View style={styles.movieRows}>
+              {/* Hot Sections */}
+              {data.phimChieuRap.length > 0 && (
+                <MovieRow title="Phim Chiếu Rạp Mới" movies={data.phimChieuRap} slug="phim-chieu-rap" />
+              )}
 
-            <MovieRow title="Phim Bộ Mới Nhất" movies={data.phimBo.slice(0, 12)} slug="phim-bo" />
-            <MovieRow title="Phim Lẻ Đặc Sắc" movies={data.phimLe.slice(0, 12)} slug="phim-le" />
+              <MovieRow title="Phim Bộ Mới Nhất" movies={data.phimBo.slice(0, 12)} slug="phim-bo" />
+              <MovieRow title="Phim Lẻ Đặc Sắc" movies={data.phimLe.slice(0, 12)} slug="phim-le" />
 
-            {/* Countries */}
-            {data.hanQuoc.length > 0 && (
-              <MovieRow title="Phim Hàn Quốc Hot" movies={data.hanQuoc} slug="han-quoc" type="country" />
-            )}
-            {data.trungQuoc.length > 0 && (
-              <MovieRow title="Phim Trung Quốc Hot" movies={data.trungQuoc} slug="trung-quoc" type="country" />
-            )}
+              {/* Countries */}
+              {data.hanQuoc.length > 0 && (
+                <MovieRow title="Phim Hàn Quốc Hot" movies={data.hanQuoc} slug="han-quoc" type="country" />
+              )}
+              {data.trungQuoc.length > 0 && (
+                <MovieRow title="Phim Trung Quốc Hot" movies={data.trungQuoc} slug="trung-quoc" type="country" />
+              )}
 
-            {/* Genres */}
-            {data.hanhDong.length > 0 && (
-              <MovieRow title="Phim Hành Động Kịch Tính" movies={data.hanhDong} slug="hanh-dong" type="category" />
-            )}
-            {data.tinhCam.length > 0 && (
-              <MovieRow title="Phim Tình Cảm Lãng Mạn" movies={data.tinhCam} slug="tinh-cam" type="category" />
-            )}
+              {/* Genres */}
+              {data.hanhDong.length > 0 && (
+                <MovieRow title="Phim Hành Động Kịch Tính" movies={data.hanhDong} slug="hanh-dong" type="category" />
+              )}
+              {data.tinhCam.length > 0 && (
+                <MovieRow title="Phim Tình Cảm Lãng Mạn" movies={data.tinhCam} slug="tinh-cam" type="category" />
+              )}
 
-            <MovieRow title="Hoạt Hình" movies={data.hoatHinh.slice(0, 12)} slug="hoat-hinh" />
-            <MovieRow title="TV Shows" movies={data.tvShows.slice(0, 12)} slug="tv-shows" />
+              <MovieRow title="Hoạt Hình" movies={data.hoatHinh.slice(0, 12)} slug="hoat-hinh" />
+              <MovieRow title="TV Shows" movies={data.tvShows.slice(0, 12)} slug="tv-shows" />
 
-            {data.sapChieu.length > 0 && (
-              <MovieRow title="Phim Sắp Chiếu" movies={data.sapChieu} slug="phim-sap-chieu" />
-            )}
-          </View>
-        )}
-      </ScrollView>
-    </View>
+              {data.sapChieu.length > 0 && (
+                <MovieRow title="Phim Sắp Chiếu" movies={data.sapChieu} slug="phim-sap-chieu" />
+              )}
+            </View>
+          )
+        }
+      </ScrollView >
+    </View >
   );
 }
 
@@ -302,6 +321,35 @@ const styles = StyleSheet.create({
   headerContent: { paddingBottom: 10 },
   headerRow: { height: 50, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20 },
   logoRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  logoIcon: {
+    width: 32,
+    height: 32,
+    backgroundColor: 'transparent',
+    marginRight: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoLoopLeft: {
+    width: 14,
+    height: 24,
+    borderRadius: 7,
+    borderWidth: 3.5,
+    borderColor: COLORS.accent,
+    borderBottomWidth: 0,
+    borderRightWidth: 0,
+    transform: [{ rotate: '-45deg' }, { translateX: 2 }],
+  },
+  logoLoopRight: {
+    width: 14,
+    height: 24,
+    borderRadius: 7,
+    borderWidth: 3.5,
+    borderColor: COLORS.accent,
+    borderBottomWidth: 0,
+    borderLeftWidth: 0,
+    transform: [{ rotate: '45deg' }, { translateX: -2 }],
+  },
   logoText: { color: COLORS.textPrimary, fontSize: 18, fontWeight: '800', letterSpacing: -0.5 },
   headerActions: { flexDirection: 'row', gap: 12, alignItems: 'center' },
   iconBtn: {

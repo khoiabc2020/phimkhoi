@@ -92,7 +92,7 @@ function HeroCard({ movie, isActive, onPress }: { movie: Movie; isActive: boolea
                     {/* Placeholder for Rating (since KKPhim might lack TMDB for heroes instantly) */}
                     <View style={styles.metaBadgeDark}>
                         <Ionicons name="star" size={12} color="#fbbf24" style={{ marginRight: 4 }} />
-                        <Text style={styles.metaTextYellow}>{(movie as any).tmdb?.vote_average ? (movie as any).tmdb.vote_average.toFixed(1) : '7.5'}</Text>
+                        <Text style={styles.metaTextYellow}>{(movie as any).tmdb?.vote_average ? Number((movie as any).tmdb.vote_average).toFixed(1) : '7.5'}</Text>
                     </View>
                     {(movie.quality || movie.lang) && (
                         <View style={styles.metaBadgeOutline}>
@@ -126,7 +126,7 @@ function HeroCard({ movie, isActive, onPress }: { movie: Movie; isActive: boolea
                         <Ionicons name="information-outline" size={22} color="white" />
                     </FocusableButton>
 
-                    <FocusableButton style={styles.circleBtn} onPress={() => {/* Handle fav */ }}>
+                    <FocusableButton style={styles.circleBtn} onPress={() => router.push(`/movie/${movie.slug}` as any)}>
                         <Ionicons name="heart-outline" size={20} color="white" />
                     </FocusableButton>
                 </View>

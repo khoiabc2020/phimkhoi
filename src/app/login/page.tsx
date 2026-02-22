@@ -4,11 +4,12 @@ import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Lock, User } from "lucide-react";
+import { Eye, EyeOff, Lock, User } from "lucide-react";
 
 function LoginForm() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -76,13 +77,20 @@ function LoginForm() {
                     <div className="relative">
                         <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-500" />
                         <input
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded-lg py-3 pl-10 pr-4 text-white focus:outline-none focus:border-primary transition-colors hover:border-white/20"
+                            className="w-full bg-white/5 border border-white/10 rounded-lg py-3 pl-10 pr-12 text-white focus:outline-none focus:border-primary transition-colors hover:border-white/20"
                             placeholder="Nhập mật khẩu"
                             required
                         />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-3 text-gray-500 hover:text-gray-300 transition-colors"
+                        >
+                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        </button>
                     </div>
                 </div>
 
@@ -101,11 +109,7 @@ function LoginForm() {
                 </div>
             </form>
 
-            <div className="mt-8 text-center text-xs text-gray-500">
-                <p>Tài khoản mặc định:</p>
-                <p>Admin: admin / admin123</p>
-                <p>User: user / user123</p>
-            </div>
+
         </div>
     );
 }

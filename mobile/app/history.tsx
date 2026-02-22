@@ -118,7 +118,18 @@ export default function HistoryScreen() {
                             // Dùng đúng fields từ API response mới
                             const movieName = item.movieName || item.movie?.name || item.slug;
                             const poster = item.moviePoster || item.movie?.thumb_url || item.movie?.poster_url;
-                            const episodeName = item.episodeName || (item.episode ? `Tập ${item.episode}` : 'Đang xem');
+                            // Làm sạch t&ecirc;n tập: "tap-06" -> "Tập 6", "full" -> "Tập Full"
+                            const rawEp = item.episodeName || item.episode || '';
+                            let episodeName = 'Xem phim';
+                            if (rawEp) {
+                                const lower = rawEp.toLowerCase();
+                                if (lower === 'full' || lower === 'fullhd' || lower === 'tập full') {
+                                    episodeName = 'Tập Full';
+                                } else {
+                                    const match = rawEp.match(/(\d+)/);
+                                    episodeName = match ? `Tập ${parseInt(match[1], 10)}` : `Tập ${rawEp}`;
+                                }
+                            }
                             const progress = item.progress || 0;
 
                             return (
