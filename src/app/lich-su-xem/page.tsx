@@ -1,4 +1,6 @@
 
+export const dynamic = 'force-dynamic';
+
 import { History, ArrowLeft, Trash2, Play, Clock, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";

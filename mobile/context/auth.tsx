@@ -45,6 +45,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (storedToken && storedUser) {
                 setToken(storedToken);
                 setUser(JSON.parse(storedUser));
+
+                // Tự động đồng bộ history + favorites từ server sau khi load token
+                try {
+                    const [histRes, favRes] = await Promise.allSettled([
+                        fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/history`, {
+                            headers: { Authorization: `Bearer ${storedToken}` }
+                        }),
+                        fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/favorites`, {
+                            headers: { Authorization: `Bearer ${storedToken}` }
+                        })
+                    ]);
+
+                    const updates: Partial<User> = {};
+                    if (histRes.status === 'fulfilled' && histRes.value.ok) {
+                        const histData = await histRes.value.json();
+                        updates.history = histData.history;
+                    }
+                    if (favRes.status === 'fulfilled' && favRes.value.ok) {
+                        const favData = await favRes.value.json();
+                        updates.favorites = favData.favorites;
+                    }
+                    if (Object.keys(updates).length > 0) {
+                        setUser(prev => prev ? { ...prev, ...updates } : null);
+                    }
+                } catch (syncErr) {
+                    // Server offline — dùng data cũ từ AsyncStorage, không crash app
+                    console.log('Background sync skipped (server offline)');
+                }
             }
         } catch (error) {
             console.error('Failed to load auth storage', error);
