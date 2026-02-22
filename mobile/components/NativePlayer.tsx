@@ -57,6 +57,14 @@ export default function NativePlayer({
     const [showControls, setShowControls] = useState(true);
     const [resizeMode, setResizeMode] = useState(ResizeMode.CONTAIN);
     const [locked, setLocked] = useState(false);
+    const lockedRef = useRef(false);
+    const showEpisodesRef = useRef(false);
+    const showServersRef = useRef(false);
+
+    useEffect(() => { lockedRef.current = locked; }, [locked]);
+    useEffect(() => { showEpisodesRef.current = showEpisodes; }, [showEpisodes]);
+    useEffect(() => { showServersRef.current = showServers; }, [showServers]);
+
     const controlTimeout = useRef<any>(null);
 
     // Modals
@@ -202,10 +210,10 @@ export default function NativePlayer({
     const panResponder = useRef(
         PanResponder.create({
             onStartShouldSetPanResponder: (evt) => {
-                return !locked && evt.nativeEvent.pageX < width / 3;
+                return !lockedRef.current && !showEpisodesRef.current && !showServersRef.current && evt.nativeEvent.pageX < width / 3;
             },
             onMoveShouldSetPanResponder: (evt, gestureState) => {
-                return !locked && Math.abs(gestureState.dy) > 8 && evt.nativeEvent.pageX < width / 3;
+                return !lockedRef.current && !showEpisodesRef.current && !showServersRef.current && Math.abs(gestureState.dy) > 8 && evt.nativeEvent.pageX < width / 3;
             },
             onPanResponderGrant: () => {
                 // Snapshot brightness at gesture start
