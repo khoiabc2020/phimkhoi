@@ -283,7 +283,7 @@ export default function NativePlayer({
 
     return (
         <View style={{ flex: 1, backgroundColor: 'black' }}>
-            <View style={styles.container} {...panResponder.panHandlers}>
+            <View style={styles.container} {...(!showEpisodes && !showServers ? panResponder.panHandlers : {})}>
                 <Video
                     ref={video}
                     style={StyleSheet.absoluteFill}
@@ -488,21 +488,22 @@ export default function NativePlayer({
                             </ScrollView>
                         )}
 
-                        {/* Improved ScrollView for episodes */}
-                        <ScrollView
-                            style={{ flex: 1 }}
-                            contentContainerStyle={{ padding: 18, paddingBottom: 100, flexDirection: 'row', flexWrap: 'wrap' }}
+                        {/* Optimized FlatList for episodes */}
+                        <FlatList
+                            data={episodeList.slice(epRange * EP_CHUNK, (epRange + 1) * EP_CHUNK)}
+                            keyExtractor={(item) => item.slug}
+                            numColumns={4}
+                            columnWrapperStyle={{ gap: 10, paddingHorizontal: 18, marginBottom: 10 }}
+                            contentContainerStyle={{ paddingVertical: 18, paddingBottom: 100 }}
                             showsVerticalScrollIndicator={true}
                             nestedScrollEnabled={true}
                             scrollEnabled={true}
                             keyboardShouldPersistTaps="handled"
-                        >
-                            {episodeList.slice(epRange * EP_CHUNK, (epRange + 1) * EP_CHUNK).map((item) => {
+                            renderItem={({ item }) => {
                                 const isActive = item.slug === currentEpisodeSlug;
                                 return (
                                     <TouchableOpacity
-                                        key={item.slug}
-                                        style={[styles.epGridItem, isActive && styles.activeEpGridItem, { margin: 6 }]}
+                                        style={[styles.epGridItem, isActive && styles.activeEpGridItem]}
                                         onPress={() => {
                                             onEpisodeChange?.(item.slug);
                                             setShowEpisodes(false);
@@ -516,8 +517,8 @@ export default function NativePlayer({
                                         )}
                                     </TouchableOpacity>
                                 );
-                            })}
-                        </ScrollView>
+                            }}
+                        />
                     </Animated.View>
                 </View>
             </Modal>
@@ -681,8 +682,7 @@ const styles = StyleSheet.create({
 
     // --- EPISODE GRID (Premium Liquid Glass) ---
     epGridItem: {
-        minWidth: 56, // Allows 4-5 items per row naturally
-        flexGrow: 1,  // Stretch to fill row nicely
+        flex: 1,  // Fixed columns with FlatList
         height: 52,
         backgroundColor: 'rgba(255,255,255,0.06)',
         borderRadius: 14,
@@ -690,7 +690,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.08)',
-        paddingHorizontal: 8,
+        paddingHorizontal: 4,
     },
     activeEpGridItem: {
         backgroundColor: 'rgba(255,255,255,0.12)', // Subtle glass highlight, NO yellow box
