@@ -86,15 +86,26 @@ export async function getContinueWatching() {
 
         await dbConnect();
 
-        // Get movies the user recently watched, regardless of strictly low/high progress limits
-        const continueWatching = await WatchHistory.find({
-            userId: session.user.id,
-            // (Removed strict progress constraints so newly started videos appear immediately)
-            progress: { $lt: 99 },
-        })
-            .sort({ lastWatched: -1 })
-            .limit(10)
-            .lean();
+        // Dùng aggregation để chỉ lấy TẬP MỚI NHẤT mỗi phim (group by movieId)
+        const continueWatching = await WatchHistory.aggregate([
+            {
+                $match: {
+                    userId: session.user.id,
+                    progress: { $lt: 99 },
+                }
+            },
+            { $sort: { lastWatched: -1 } },
+            {
+                // Nhóm theo movieId, lấy record đầu tiên (mới nhất)
+                $group: {
+                    _id: "$movieId",
+                    doc: { $first: "$$ROOT" }
+                }
+            },
+            { $replaceRoot: { newRoot: "$doc" } },
+            { $sort: { lastWatched: -1 } },
+            { $limit: 10 }
+        ]);
 
         return { success: true, data: continueWatching };
     } catch (error) {

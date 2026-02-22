@@ -103,8 +103,8 @@ export default async function WatchHistoryPage() {
                                                     fill
                                                     className="object-cover group-hover:scale-110 transition-transform duration-500"
                                                 />
-                                                {/* Gradient Overlay */}
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
+                                                {/* Gradient Overlay - chỉ đủ tối để đọc text episode name */}
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80 group-hover:opacity-50 transition-opacity" />
 
                                                 {/* Play Overlay */}
                                                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
