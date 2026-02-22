@@ -1,7 +1,8 @@
 "use client";
 
-import { Heart, Plus, Share2, Users, Star, MessageSquare, Monitor, Moon, Zap, Flag } from "lucide-react";
+import { Heart, Plus, Share2, Users, MessageSquare, Monitor, Moon, Zap, Flag } from "lucide-react";
 import FavoriteButton from "./FavoriteButton";
+import AddToPlaylistButton from "./AddToPlaylistButton";
 import Image from "next/image";
 import { getImageUrl } from "@/lib/utils";
 import { cn } from "@/lib/utils";
@@ -55,10 +56,11 @@ export default function WatchEngagementBar({
                         className="!bg-transparent !border-0 text-gray-400 hover:text-yellow-400 flex items-center gap-2 !w-auto !h-auto !p-0 transition-colors"
                     />
                     <div className="h-4 w-[1px] bg-white/10" />
-                    <button type="button" className="flex items-center gap-2 text-gray-400 hover:text-white transition-all text-xs font-semibold uppercase tracking-wide group">
-                        <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
-                        <span className="hidden sm:inline">Thêm vào</span>
-                    </button>
+                    <AddToPlaylistButton
+                        movieData={movieData}
+                        variant="text"
+                        className="text-gray-400 hover:text-white text-xs font-semibold uppercase tracking-wide"
+                    />
                     <div className="h-4 w-[1px] bg-white/10" />
                     <div className="flex items-center gap-2 text-xs font-semibold text-gray-500">
                         Chuyển tập
@@ -153,17 +155,30 @@ export default function WatchEngagementBar({
                     </div>
                 </div>
 
-                {/* Stats buttons */}
-                <div className="flex items-center gap-3 self-center pt-4 md:pt-0 border-t md:border-t-0 border-white/[0.05] w-full md:w-auto justify-center md:justify-end shrink-0">
-                    <div className="flex flex-col items-center justify-center min-w-[110px] h-14 rounded-xl px-4 border"
-                        style={{ background: 'rgba(59,130,246,0.1)', borderColor: 'rgba(59,130,246,0.2)' }}>
-                        <div className="flex items-center gap-1.5 font-bold text-lg leading-none" style={{ color: '#60a5fa' }}>
-                            <Star className="w-4 h-4 fill-current" />
-                            {movie.vote_average ? movie.vote_average.toFixed(1) : "N/A"}
+                {/* IMDB Rating Badge — iOS 26 style, only show when rating exists */}
+                {movie.vote_average && movie.vote_average > 0 ? (
+                    <div className="flex items-center gap-1.5 self-start md:self-center shrink-0"
+                        style={{
+                            background: 'rgba(255,255,255,0.05)',
+                            backdropFilter: 'blur(12px)',
+                            WebkitBackdropFilter: 'blur(12px)',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            borderRadius: '999px',
+                            padding: '5px 12px 5px 8px',
+                        }}>
+                        {/* IMDB yellow label */}
+                        <span className="font-black text-xs tracking-tight px-1.5 py-0.5 rounded-sm"
+                            style={{ background: '#F5C518', color: '#000', letterSpacing: '-0.3px', fontSize: '11px' }}>
+                            IMDb
+                        </span>
+                        <div className="flex items-baseline gap-0.5">
+                            <span className="font-bold text-white" style={{ fontSize: '15px', letterSpacing: '-0.3px' }}>
+                                {movie.vote_average.toFixed(1)}
+                            </span>
+                            <span className="text-white/30 font-normal" style={{ fontSize: '11px' }}>/10</span>
                         </div>
-                        <span className="text-[10px] mt-1 font-medium uppercase tracking-wider" style={{ color: 'rgba(147,197,253,0.6)' }}>Điểm tín nhiệm</span>
                     </div>
-                </div>
+                ) : null}
             </div>
         </div>
     );
