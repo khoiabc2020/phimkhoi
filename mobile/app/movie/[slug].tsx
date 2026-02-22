@@ -19,6 +19,12 @@ import { COLORS } from '@/constants/theme';
 
 const { width, height } = Dimensions.get('window');
 
+// Responsive episode columns
+const EP_COLS = width < 380 ? 3 : width < 430 ? 4 : 5;
+const EP_GAP = 10;
+const EP_PADDING = 16;
+const EP_CARD_WIDTH = (width - EP_PADDING * 2 - EP_GAP * (EP_COLS - 1)) / EP_COLS;
+
 // Tab options
 const TABS = [
     { id: 'episodes', label: 'Tập phim' },
@@ -451,10 +457,10 @@ const styles = StyleSheet.create({
     tabText: { color: 'rgba(255,255,255,0.45)', fontSize: 14, fontWeight: '500' },
     tabTextActive: { color: 'white', fontWeight: '600' },
 
-    // Episode Grid — 4 cột, iOS 26
-    episodeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, paddingHorizontal: 16, paddingTop: 4 },
+    // Episode Grid — responsive (3/4/5 cột theo width màn hình)
+    episodeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: EP_GAP, paddingHorizontal: EP_PADDING, paddingTop: 4 },
     epCard: {
-        width: (width - 16 * 2 - 10 * 3) / 4, // 4 cột, gap 10dp
+        width: EP_CARD_WIDTH,
         height: 46,
         backgroundColor: 'rgba(255,255,255,0.05)',
         borderRadius: 18,
