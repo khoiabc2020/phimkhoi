@@ -155,7 +155,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             </div>
                             <div className="flex flex-col justify-center">
                                 <span className="text-lg md:text-xl lg:text-2xl font-bold text-white tracking-tight leading-none font-sans whitespace-nowrap">
-                                    MOVIE<span className="text-primary">BOX</span> <span className="text-[10px] text-yellow-500 align-top ml-1">v2.0</span>
+                                    Movie<span className="text-primary">Box</span>
                                 </span>
                             </div>
                         </Link>
