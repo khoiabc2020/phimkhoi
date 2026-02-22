@@ -18,6 +18,7 @@ interface VideoPlayerProps {
         moviePoster: string;
         episodeSlug: string;
         episodeName: string;
+        duration?: number; // duration phim (phút) để tính progress
     };
     initialProgress?: number;
 }
@@ -30,7 +31,6 @@ export default function VideoPlayer({
     movieData,
     initialProgress = 0
 }: VideoPlayerProps) {
-    const [saved, setSaved] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const { data: session } = useSession();
@@ -50,21 +50,47 @@ export default function VideoPlayer({
         return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
     }, []);
 
-    // Auto-save watch history after 10 seconds
+    // Track elapsed time và cập nhật progress mỗi 30 giây
     useEffect(() => {
-        if (!movieData || !session || saved) return;
+        if (!movieData || !session) return;
 
-        const timer = setTimeout(async () => {
+        // Thời điểm bắt đầu xem
+        const startTime = Date.now();
+
+        // Lấy duration phim từ movieData (tính bằng giây, fallback 90 phút)
+        const estimatedDuration = movieData.duration
+            ? parseInt(String(movieData.duration)) * 60
+            : 90 * 60;
+
+        // Lưu lần đầu sau 10 giây
+        const firstSave = setTimeout(async () => {
+            const elapsed = (Date.now() - startTime) / 1000;
+            const currentProgress = Math.min(
+                Math.round((elapsed / estimatedDuration) * 100),
+                98
+            );
             await addWatchHistory({
                 ...movieData,
-                duration: 100,
-                currentTime: initialProgress > 0 ? initialProgress : 5,
+                duration: estimatedDuration,
+                currentTime: Math.max(elapsed, initialProgress > 0 ? (initialProgress / 100) * estimatedDuration : 10),
             });
-            setSaved(true);
         }, 10000);
 
-        return () => clearTimeout(timer);
-    }, [movieData, session, saved, initialProgress]);
+        // Cập nhật định kỳ mỗi 30 giây
+        const interval = setInterval(async () => {
+            const elapsed = (Date.now() - startTime) / 1000;
+            await addWatchHistory({
+                ...movieData,
+                duration: estimatedDuration,
+                currentTime: elapsed,
+            });
+        }, 30000);
+
+        return () => {
+            clearTimeout(firstSave);
+            clearInterval(interval);
+        };
+    }, [movieData, session, initialProgress]);
 
     // Use iframe embed directly — HLS is blocked by upstream servers (Referer/IP check)
     // This is the most reliable playback method

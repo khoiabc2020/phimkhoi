@@ -90,6 +90,8 @@ export default async function WatchPage({ params }: PageProps) {
         moviePoster: movie.poster_url || movie.thumb_url,
         episodeSlug: episode,
         episodeName: displayEpisodeName(currentEpisode?.name || episode),
+        // Duration phim (phút) — dùng để tính progress thực tế
+        duration: movie.time ? parseInt(movie.time) || 90 : 90,
     };
 
     return (
