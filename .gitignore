@@ -40,5 +40,22 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# legacy TV builds
-tv/
+# mobile
+mobile/android/local.properties
+mobile/android/.gradle/
+mobile/android/app/build/
+mobile/ios/Pods/
+mobile/ios/build/
+mobile/.expo/
+mobile/*.txt
+mobile/*.js
+!mobile/app.json
+!mobile/package.json
+!mobile/metro.config.js
+
+# misc
+.DS_Store
+*.pem
+*.log
+tmp/
+C:\Users\LE HUY KHOI\.gemini/
