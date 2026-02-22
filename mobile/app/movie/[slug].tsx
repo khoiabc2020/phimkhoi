@@ -261,12 +261,7 @@ export default function MovieDetailScreen() {
                                 }
                             }}
                         >
-                            <LinearGradient
-                                colors={[COLORS.accent, '#d97706']}
-                                start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                                style={StyleSheet.absoluteFill}
-                            />
-                            <Ionicons name="play" size={22} color="black" />
+                            <Ionicons name="play" size={20} color="#0B0D12" />
                             <Text style={styles.playBtnText}>{firstEpisode ? 'Xem Phim' : 'Đang cập nhật'}</Text>
                         </Pressable>
 
@@ -428,7 +423,7 @@ const styles = StyleSheet.create({
     iconBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.3)', alignItems: 'center', justifyContent: 'center' },
 
     heroContent: { position: 'absolute', bottom: 20, left: 16, right: 16 },
-    movieTitle: { color: 'white', fontSize: 26, fontWeight: '800', marginBottom: 6, textShadowColor: 'rgba(0,0,0,0.7)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 4 },
+    movieTitle: { color: 'white', fontSize: 20, fontWeight: '700', marginBottom: 6 },
     movieSubtitle: { color: 'rgba(255,255,255,0.8)', fontSize: 14, fontWeight: '600' },
     dot: { width: 4, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.5)' },
 
@@ -439,33 +434,44 @@ const styles = StyleSheet.create({
     bodyContent: { padding: 16 },
 
     playSection: { flexDirection: 'row', gap: 12, marginBottom: 24 },
-    playBtn: { flex: 1, height: 50, borderRadius: 25, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, overflow: 'hidden' },
-    playBtnText: { color: 'black', fontSize: 16, fontWeight: '700' },
+    playBtn: { flex: 1, height: 46, borderRadius: 24, backgroundColor: '#F4C84A', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, overflow: 'hidden' },
+    playBtnText: { color: '#0B0D12', fontSize: 15, fontWeight: '500' },
     actionRow: { flexDirection: 'row', gap: 12 },
-    actionIconBtn: { width: 50, height: 50, borderRadius: 25, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+    actionIconBtn: { width: 46, height: 46, borderRadius: 23, backgroundColor: 'rgba(255,255,255,0.08)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
 
-    selectorPill: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.05)', marginRight: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-    selectorPillActive: { backgroundColor: 'rgba(251, 191, 36, 0.15)', borderColor: COLORS.accent },
-    selectorText: { color: 'rgba(255,255,255,0.6)', fontWeight: '600' },
-    selectorTextActive: { color: COLORS.accent },
+    selectorPill: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.05)', marginRight: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+    selectorPillActive: { backgroundColor: 'rgba(244,200,74,0.12)', borderColor: 'rgba(244,200,74,0.4)' },
+    selectorText: { color: 'rgba(255,255,255,0.55)', fontSize: 14, fontWeight: '500' },
+    selectorTextActive: { color: '#F4C84A', fontWeight: '600' },
 
-    tabContainer: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 12, padding: 4, marginBottom: 20 },
-    tabItem: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10 },
-    tabItemActive: { backgroundColor: 'rgba(255,255,255,0.1)' },
-    tabText: { color: 'rgba(255,255,255,0.5)', fontWeight: '600' },
-    tabTextActive: { color: 'white' },
+    // Segmented Tab — iOS 26 style
+    tabContainer: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 20, padding: 5, marginBottom: 20 },
+    tabItem: { flex: 1, paddingVertical: 8, alignItems: 'center', borderRadius: 16 },
+    tabItemActive: { backgroundColor: 'rgba(255,255,255,0.10)' },
+    tabText: { color: 'rgba(255,255,255,0.45)', fontSize: 14, fontWeight: '500' },
+    tabTextActive: { color: 'white', fontWeight: '600' },
 
-    episodeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: 16, paddingTop: 4 },
-    epCard: { width: (width - 64) / 5, aspectRatio: 1.4, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 8, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)', paddingHorizontal: 4 },
-    epText: { color: 'white', fontWeight: 'bold', textAlign: 'center', fontSize: 13 },
-
-    // Range picker
-    rangeBtn: {
-        paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20,
-        backgroundColor: 'rgba(255,255,255,0.06)',
-        borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+    // Episode Grid — 4 cột, iOS 26
+    episodeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, paddingHorizontal: 16, paddingTop: 4 },
+    epCard: {
+        width: (width - 16 * 2 - 10 * 3) / 4, // 4 cột, gap 10dp
+        height: 46,
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        borderRadius: 18,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.06)',
     },
-    rangeBtnActive: { backgroundColor: 'rgba(251,191,36,0.15)', borderColor: COLORS.accent },
-    rangeBtnText: { color: 'rgba(255,255,255,0.55)', fontSize: 13, fontWeight: '600' },
-    rangeBtnTextActive: { color: COLORS.accent },
+    epText: { color: 'rgba(255,255,255,0.85)', fontWeight: '500', textAlign: 'center', fontSize: 14 },
+
+    // Range chip — pill shape
+    rangeBtn: {
+        paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20,
+        backgroundColor: 'rgba(255,255,255,0.06)',
+        borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+    },
+    rangeBtnActive: { backgroundColor: 'rgba(244,200,74,0.12)', borderColor: 'rgba(244,200,74,0.4)' },
+    rangeBtnText: { color: 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: '500' },
+    rangeBtnTextActive: { color: '#F4C84A', fontWeight: '600' },
 });
