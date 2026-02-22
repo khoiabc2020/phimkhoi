@@ -23,7 +23,7 @@ const { width, height } = Dimensions.get('window');
 const EP_COLS = width < 380 ? 3 : width < 430 ? 4 : 5;
 const EP_GAP = 10;
 const EP_PADDING = 16;
-const EP_CARD_WIDTH = (width - EP_PADDING * 2 - EP_GAP * (EP_COLS - 1)) / EP_COLS;
+const EP_CARD_WIDTH = Math.floor((width - EP_PADDING * 2 - EP_GAP * (EP_COLS - 1)) / EP_COLS);
 
 // Tab options
 const TABS = [

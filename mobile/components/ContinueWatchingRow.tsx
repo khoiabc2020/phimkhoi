@@ -167,6 +167,14 @@ const styles = StyleSheet.create({
         padding: 12,
         backgroundColor: 'rgba(0,0,0,0.25)', // slight darkening
     },
+    progressOverlay: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: 3,
+        backgroundColor: 'rgba(255,255,255,0.2)',
+    },
     progressFill: {
         height: '100%',
         backgroundColor: '#e50914',
