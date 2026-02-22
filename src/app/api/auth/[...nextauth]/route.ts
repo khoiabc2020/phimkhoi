@@ -56,14 +56,19 @@ export const authOptions = {
         async jwt({ token, user }: any) {
             if (user) {
                 token.role = user.role;
-                token.id = user.id; // ← critical: persist user ID into JWT
+                token.id = user.id; // persist user ID
+            }
+            // Fallback: đảm bảo token.id luôn có giá trị
+            if (!token.id) {
+                token.id = token.sub || token.email || 'anonymous';
             }
             return token;
         },
         async session({ session, token }: any) {
             if (session?.user) {
                 session.user.role = token.role;
-                session.user.id = token.id; // ← expose user ID to server actions
+                // Fallback chain: token.id → token.sub → token.email
+                session.user.id = token.id || token.sub || token.email;
             }
             return session;
         },
