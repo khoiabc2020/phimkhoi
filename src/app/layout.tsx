@@ -35,9 +35,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased pb-20 lg:pb-0`}
       >
         <Providers>
-          <Suspense fallback={null}>
-            <Header categories={categories} countries={countries} />
-          </Suspense>
+          <Header categories={categories} countries={countries} />
           {children}
         </Providers>
       </body>

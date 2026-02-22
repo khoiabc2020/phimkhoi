@@ -118,7 +118,6 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
         { name: "Việt Nam", slug: "viet-nam" },
     ];
 
-    if (!mounted) return null; // Force client-side rendering to avoid hydration mismatch completely
 
     return (
         <>
@@ -322,38 +321,42 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         </div>
 
                         {/* Auth — hidden on mobile (accessible via hamburger menu) */}
-                        {session ? (
-                            <div className="hidden lg:block relative group ml-1">
-                                <button className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/10 hover:border-primary/50 transition-all p-0.5">
-                                    <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center text-sm font-bold text-white shadow-inner">
-                                        {session.user?.name?.[0]?.toUpperCase() || "U"}
-                                    </div>
-                                </button>
-                                {/* Dropdown Menu */}
-                                <div className="absolute right-0 top-full mt-3 w-60 bg-[#0B0D12] border border-white/10 rounded-2xl p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right shadow-2xl ring-1 ring-black/50">
-                                    <div className="px-4 py-3 border-b border-white/10 mb-2">
-                                        <p className="text-sm font-bold text-white truncate">{session.user?.name}</p>
-                                        <p className="text-xs text-white/50 truncate">{session.user?.email}</p>
-                                    </div>
-                                    <Link href="/thong-tin-tai-khoan" className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-colors">
-                                        <User className="w-4 h-4" /> Tài khoản
-                                    </Link>
-                                    <Link href="/admin" className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-colors">
-                                        <Settings className="w-4 h-4" /> Quản trị
-                                    </Link>
-                                    <button
-                                        onClick={() => signOut()}
-                                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-colors mt-1"
-                                    >
-                                        <LogOut className="w-4 h-4" /> Đăng xuất
+                        <div className="hidden lg:block">
+                            {!mounted ? (
+                                <div className="w-24 h-10 bg-white/5 rounded-full animate-pulse" />
+                            ) : session ? (
+                                <div className="relative group ml-1">
+                                    <button className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/10 hover:border-primary/50 transition-all p-0.5">
+                                        <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center text-sm font-bold text-white shadow-inner">
+                                            {session.user?.name?.[0]?.toUpperCase() || "U"}
+                                        </div>
                                     </button>
+                                    {/* Dropdown Menu */}
+                                    <div className="absolute right-0 top-full mt-3 w-60 bg-[#0B0D12] border border-white/10 rounded-2xl p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right shadow-2xl ring-1 ring-black/50">
+                                        <div className="px-4 py-3 border-b border-white/10 mb-2">
+                                            <p className="text-sm font-bold text-white truncate">{session.user?.name}</p>
+                                            <p className="text-xs text-white/50 truncate">{session.user?.email}</p>
+                                        </div>
+                                        <Link href="/thong-tin-tai-khoan" className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-colors">
+                                            <User className="w-4 h-4" /> Tài khoản
+                                        </Link>
+                                        <Link href="/admin" className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-colors">
+                                            <Settings className="w-4 h-4" /> Quản trị
+                                        </Link>
+                                        <button
+                                            onClick={() => signOut()}
+                                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-colors mt-1"
+                                        >
+                                            <LogOut className="w-4 h-4" /> Đăng xuất
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        ) : (
-                            <Link href="/login" className="hidden lg:block bg-[#F4C84A] hover:bg-[#ffe58a] text-black px-5 py-2 rounded-full font-bold text-sm transition-transform hover:scale-105 active:scale-95 ml-1 whitespace-nowrap shadow-[0_0_15px_rgba(244,200,74,0.3)]">
-                                Đăng nhập
-                            </Link>
-                        )}
+                            ) : (
+                                <Link href="/login" className="bg-[#F4C84A] hover:bg-[#ffe58a] text-black px-5 py-2 rounded-full font-bold text-sm transition-transform hover:scale-105 active:scale-95 ml-1 whitespace-nowrap shadow-[0_0_15px_rgba(244,200,74,0.3)]">
+                                    Đăng nhập
+                                </Link>
+                            )}
+                        </div>
                     </div>
                 </div>
 
