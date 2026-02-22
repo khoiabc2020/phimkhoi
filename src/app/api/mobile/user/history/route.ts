@@ -28,28 +28,37 @@ export async function GET(req: Request) {
 
         await dbConnect();
 
-        // Fetch from WatchHistory model (Source of Truth)
-        const history = await WatchHistory.find({ userId: userPayload.id })
-            .sort({ lastWatched: -1 })
-            .limit(50)
-            .lean();
+        // Dùng aggregation để dedupe: chỉ lấy tập mới nhất mỗi phim (giống web getContinueWatching)
+        const history = await WatchHistory.aggregate([
+            { $match: { userId: userPayload.id } },
+            { $sort: { lastWatched: -1 } },
+            {
+                $group: {
+                    _id: "$movieId",
+                    doc: { $first: "$$ROOT" }
+                }
+            },
+            { $replaceRoot: { newRoot: "$doc" } },
+            { $sort: { lastWatched: -1 } },
+            { $limit: 50 }
+        ]);
 
-        // Format to match mobile expectation (if needed) or just return
-        // Mobile expects: { history: [ { slug, episode, progress, movie: {...} } ] }
-        // WatchHistory has flat structure with movieName, etc.
-        const formattedHistory = history.map(h => ({
+        const formattedHistory = history.map((h: any) => ({
             _id: h._id,
             slug: h.movieSlug,
             episode: h.episodeSlug,
-            episode_name: h.episodeName,
-            progress: h.progress, // percentage 0-100
-            currentTime: h.currentTime || 0, // exact time in seconds
+            episodeName: h.episodeName,
+            progress: h.progress,
+            currentTime: h.currentTime || 0,
             duration: h.duration || 0,
             timestamp: new Date(h.lastWatched).getTime(),
+            movieName: h.movieName,
+            moviePoster: h.moviePoster,
+            movieOriginName: h.movieOriginName,
             movie: {
                 _id: h.movieId,
                 name: h.movieName,
-                thumb_url: h.moviePoster, // WatchHistory uses moviePoster for thumb
+                thumb_url: h.moviePoster,
                 poster_url: h.moviePoster,
                 original_name: h.movieOriginName
             }

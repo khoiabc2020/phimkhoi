@@ -5,20 +5,12 @@ import Image from "next/image";
 import Link from "next/link";
 import {
     User, LogOut, History, Heart, Plus, Clock,
-    Play, X, Edit2
+    Play, X, Edit2, Loader2, ListVideo
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { getImageUrl } from "@/lib/utils";
 import FavoriteButton from "./FavoriteButton";
-import { format } from "date-fns";
-import { vi } from "date-fns/locale";
-
-// Mock Data for "Danh sách" (Lists) demo
-const MOCK_LISTS = [
-    { id: 1, name: "Phim Hay 2024", count: 12 },
-    { id: 2, name: "Phim Hành Động", count: 8 },
-    { id: 3, name: "Phim Tình Cảm", count: 5 }
-];
+import PlaylistManagerModal from "./PlaylistManagerModal";
 
 interface ProfileTabsProps {
     user: any;
@@ -28,6 +20,47 @@ interface ProfileTabsProps {
 
 export default function ProfileTabs({ user, favorites, history }: ProfileTabsProps) {
     const [activeTab, setActiveTab] = useState("account");
+
+    // Playlists State
+    const [playlists, setPlaylists] = useState<any[]>([]);
+    const [isLoadingPlaylists, setIsLoadingPlaylists] = useState(true);
+
+    // Modal State
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalMode, setModalMode] = useState<"create" | "edit">("create");
+    const [selectedPlaylist, setSelectedPlaylist] = useState<any>(null);
+
+    const fetchPlaylists = async () => {
+        setIsLoadingPlaylists(true);
+        try {
+            const res = await fetch("/api/user/playlists");
+            const data = await res.json();
+            if (data.success) {
+                setPlaylists(data.data);
+            }
+        } catch (error) {
+            console.error("Failed to fetch playlists:", error);
+        } finally {
+            setIsLoadingPlaylists(false);
+        }
+    };
+
+    // Load playlists when user accesses the 'lists' tab
+    if (activeTab === "lists" && isLoadingPlaylists && playlists.length === 0) {
+        fetchPlaylists();
+    }
+
+    const handleOpenCreateModal = () => {
+        setModalMode("create");
+        setSelectedPlaylist(null);
+        setIsModalOpen(true);
+    };
+
+    const handleOpenEditModal = (playlist: any) => {
+        setModalMode("edit");
+        setSelectedPlaylist(playlist);
+        setIsModalOpen(true);
+    };
 
     const renderContent = () => {
         switch (activeTab) {
@@ -175,34 +208,68 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
             case "lists":
                 return (
                     <div>
-                        <div className="flex items-center gap-4 mb-8">
-                            <h2 className="text-2xl font-bold text-white">Danh sách của bạn</h2>
-                            <button className="flex items-center gap-1.5 px-3 py-1.5 bg-[#fbbf24] hover:brightness-110 text-black text-xs font-bold rounded-full transition-all shadow-lg active:scale-95">
-                                <Plus className="w-3.5 h-3.5" /> Thêm mới
+                        <div className="flex items-center justify-between mb-8">
+                            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                                <ListVideo className="w-6 h-6 text-[#fbbf24]" />
+                                Danh sách của bạn
+                            </h2>
+                            <button
+                                onClick={handleOpenCreateModal}
+                                className="flex items-center gap-1.5 px-4 py-2 bg-[#fbbf24] hover:brightness-110 text-black text-sm font-bold rounded-full transition-all shadow-[0_0_15px_rgba(251,191,36,0.3)] active:scale-95"
+                            >
+                                <Plus className="w-4 h-4" /> Tạo danh sách
                             </button>
                         </div>
 
                         {/* List Collections */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-                            {MOCK_LISTS.map(list => (
-                                <div key={list.id} className="bg-white/5 border border-white/10 hover:border-[#fbbf24]/50 p-5 rounded-xl relative group cursor-pointer hover:bg-white/10 transition-all">
-                                    <div className="absolute -inset-0.5 bg-gradient-to-r from-[#fbbf24] to-[#f59e0b] rounded-xl blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
-                                    <div className="relative">
-                                        <h3 className="text-white font-bold text-lg group-hover:text-[#fbbf24] transition-colors">{list.name}</h3>
-                                        <div className="flex items-center justify-between mt-3">
-                                            <span className="text-white/60 text-xs flex items-center gap-1.5 font-medium">
-                                                <Play className="w-3 h-3 text-[#fbbf24] fill-[#fbbf24]" /> {list.count} phim
-                                            </span>
-                                            <button className="text-white/40 hover:text-white text-xs font-medium transition-colors">Chỉnh sửa</button>
+                        {isLoadingPlaylists ? (
+                            <div className="flex items-center justify-center py-20">
+                                <Loader2 className="w-8 h-8 text-[#fbbf24] animate-spin" />
+                            </div>
+                        ) : playlists.length === 0 ? (
+                            <div className="text-gray-400 text-center py-20 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
+                                <ListVideo className="w-12 h-12 mx-auto mb-4 text-gray-600" />
+                                <p className="text-lg font-medium text-white mb-2">Chưa có danh sách nào</p>
+                                <p className="text-sm">Hãy tạo danh sách phim của riêng bạn để dễ dàng theo dõi.</p>
+                                <button
+                                    onClick={handleOpenCreateModal}
+                                    className="text-[#fbbf24] mt-4 inline-block hover:underline font-bold"
+                                >
+                                    + Tạo danh sách đầu tiên
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
+                                {playlists.map(list => (
+                                    <div key={list._id} className="bg-white/5 border border-white/10 hover:border-[#fbbf24]/50 p-5 rounded-xl relative group transition-all h-full flex flex-col">
+                                        <div className="absolute -inset-0.5 bg-gradient-to-r from-[#fbbf24] to-[#f59e0b] rounded-xl blur opacity-0 group-hover:opacity-10 transition duration-500 pointer-events-none"></div>
+                                        <div className="relative flex-1 flex flex-col">
+                                            <div className="flex items-start justify-between gap-4 mb-4">
+                                                <h3 className="text-white font-bold text-lg group-hover:text-[#fbbf24] transition-colors leading-tight line-clamp-2" title={list.name}>
+                                                    {list.name}
+                                                </h3>
+                                                <button
+                                                    onClick={() => handleOpenEditModal(list)}
+                                                    className="p-1.5 text-white/40 hover:text-white bg-white/5 hover:bg-white/10 rounded-md transition-colors shrink-0 z-10 block"
+                                                    title="Chỉnh sửa hoặc xoá"
+                                                >
+                                                    <Edit2 className="w-3.5 h-3.5" />
+                                                </button>
+                                            </div>
+
+                                            <div className="mt-auto flex items-center justify-between">
+                                                <span className="text-white/60 text-xs flex items-center gap-1.5 font-medium bg-black/30 px-2 py-1 rounded-md">
+                                                    <Play className="w-3 h-3 text-[#fbbf24] fill-[#fbbf24]" /> {list.movies?.length || 0} phim
+                                                </span>
+                                                <span className="text-white/40 text-[10px] uppercase tracking-wider font-bold">
+                                                    {new Date(list.updatedAt).toLocaleDateString('vi-VN')}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="text-center py-10">
-                            <p className="text-white/40 text-sm">Tính năng đang được phát triển...</p>
-                        </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 );
 
@@ -320,6 +387,13 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                 {renderContent()}
             </div>
 
+            <PlaylistManagerModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSuccess={fetchPlaylists}
+                mode={modalMode}
+                playlist={selectedPlaylist}
+            />
         </div>
     );
 }

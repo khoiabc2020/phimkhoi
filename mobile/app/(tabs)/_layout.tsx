@@ -35,13 +35,14 @@ function TabIcon({ focused, label, icon }: {
         <Feather
           name={icon as any}
           size={22}
-          color={focused ? COLORS.accent : 'rgba(255,255,255,0.6)'}
+          color={focused ? '#F4C84A' : 'rgba(255,255,255,0.5)'}
         />
       </Animated.View>
-      {/* Label below icon */}
-      <Text style={[styles.tabLabel, focused && { color: COLORS.accent, fontWeight: '700' }]} numberOfLines={1}>
+      <Text style={[styles.tabLabel, focused && { color: '#F4C84A', fontWeight: '600' }]} numberOfLines={1}>
         {label}
       </Text>
+      {/* Active dot dưới label */}
+      {focused && <View style={styles.activeDot} />}
     </View>
   );
 }
@@ -78,9 +79,9 @@ export default function TabLayout() {
         tabBarBackground: () =>
           !isAndroid ? (
             <BlurView
-              intensity={80} // Heavy liquid glass
+              intensity={25}
               tint="dark"
-              style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(10,12,18,0.4)' }]}
+              style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(15,18,26,0.75)' }]}
             />
           ) : null,
       }}
@@ -110,7 +111,7 @@ const styles = StyleSheet.create({
   tabItem: {
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 4,
+    gap: 3,
     width: 60,
   },
   iconWrap: {
@@ -118,9 +119,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   tabLabel: {
-    fontSize: 10,
-    color: 'rgba(255,255,255,0.6)',
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.5)',
     fontWeight: '500',
-    letterSpacing: 0.2,
+    letterSpacing: 0.1,
+  },
+  activeDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#F4C84A',
+    marginTop: 2,
   },
 });

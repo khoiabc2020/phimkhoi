@@ -13,6 +13,7 @@ import { searchTMDBMovie, getTMDBDetails, getTMDBImage } from "@/services/tmdb";
 import { isFavorite } from "@/app/actions/favorites";
 import { isInWatchlist } from "@/app/actions/watchlist";
 import WatchlistButton from "@/components/WatchlistButton";
+import AddToPlaylistButton from "@/components/AddToPlaylistButton";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
@@ -178,6 +179,19 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                                 slug={movie.slug}
                                                 initialInWatchlist={(await isInWatchlist(movie.slug)).isInWatchlist}
                                                 className="w-10 h-10 rounded-full bg-white/5 hover:bg-only border border-white/10"
+                                            />
+                                            <AddToPlaylistButton
+                                                movieData={{
+                                                    movieId: movie._id,
+                                                    movieSlug: movie.slug,
+                                                    movieName: movie.name,
+                                                    movieOriginName: movie.origin_name || "",
+                                                    moviePoster: movie.poster_url || movie.thumb_url,
+                                                    movieYear: Number(movie.year) || new Date().getFullYear(),
+                                                    movieQuality: movie.quality || "HD",
+                                                }}
+                                                variant="icon"
+                                                className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 border border-white/10"
                                             />
                                         </>
                                     )}

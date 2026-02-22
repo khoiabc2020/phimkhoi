@@ -424,6 +424,6 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                     ))}
                 </div>
             </div>
-        </div >
+        </div>
     );
 }

@@ -12,6 +12,7 @@
     },
     "preview": {
       "distribution": "internal",
+      "credentialsSource": "local",
       "android": {
         "buildType": "apk",
         "gradleCommand": ":app:assembleRelease"

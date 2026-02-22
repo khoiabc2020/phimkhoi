@@ -8,7 +8,7 @@ import VideoPlayer from "@/components/VideoPlayer";
 import WatchEngagementBar from "@/components/WatchEngagementBar";
 import WatchEpisodeSection from "@/components/WatchEpisodeSection";
 import { Movie } from "@/services/api";
-import { List as ListIcon } from "lucide-react";
+import { List as ListIcon, Monitor } from "lucide-react";
 
 interface WatchContainerProps {
     movie: Movie;
@@ -159,6 +159,5 @@ export default function WatchContainer({
 
             {/* Đóng thẻ container focus mode */}
         </div>
-        </div >
     );
 }

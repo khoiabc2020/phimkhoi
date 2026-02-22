@@ -1,12 +1,9 @@
 import React, { memo } from 'react';
 import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
 import { Link } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { FlashList } from '@shopify/flash-list';
 import { getImageUrl } from '@/services/api';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 
 const { width } = Dimensions.get('window');
 // Make card responsive: for tablets (width > 700), show more items so cards aren't overly huge.
@@ -59,37 +56,27 @@ const ContinueWatchingRow = memo(({ title, items }: ContinueWatchingRowProps) =>
 
                     return (
                         <Link href={`/player/${item.slug}?ep=${item.episode || ''}`} asChild>
-                            <Pressable style={styles.card}>
-                                <Image
-                                    source={{ uri: getImageUrl(posterUrl) }}
-                                    style={StyleSheet.absoluteFill}
-                                    contentFit="cover"
-                                    transition={300}
-                                    cachePolicy="memory-disk"
-                                />
-                                <LinearGradient
-                                    colors={['transparent', 'rgba(0,0,0,0.8)']}
-                                    style={StyleSheet.absoluteFill}
-                                    locations={[0.4, 1]}
-                                />
+                            <Pressable>
+                                {/* Card ảnh — không có overlay che */}
+                                <View style={styles.card}>
+                                    <Image
+                                        source={{ uri: getImageUrl(posterUrl) }}
+                                        style={StyleSheet.absoluteFill}
+                                        contentFit="cover"
+                                        transition={300}
+                                        cachePolicy="memory-disk"
+                                    />
 
-                                <View style={styles.playIconContainer}>
-                                    <View style={styles.playCircle}>
-                                        <Ionicons name="play" size={24} color="white" style={{ marginLeft: 3 }} />
+                                    {/* Progress Bar mỏng đáy ảnh */}
+                                    <View style={styles.progressOverlay}>
+                                        <View style={[styles.progressFill, { width: `${Math.max(2, Math.min(100, progress))}%` as any }]} />
                                     </View>
                                 </View>
 
-                                {/* Liquid Glass Info Container */}
-                                <BlurView intensity={60} tint="dark" style={styles.glassInfoContainer}>
-                                    <View style={styles.glassContent}>
-                                        <Text style={styles.movieName} numberOfLines={1}>{name}</Text>
-                                        <Text style={styles.episodeText}>{linkLabel}</Text>
-                                    </View>
-                                </BlurView>
-
-                                {/* Progress Bar Overlay (Netflix Style) */}
-                                <View style={styles.progressOverlay}>
-                                    <View style={[styles.progressFill, { width: `${Math.max(2, Math.min(100, progress))}%` }]} />
+                                {/* Text xuống dưới card — không che mặt nhân vật */}
+                                <View style={styles.cardInfo}>
+                                    <Text style={styles.movieName} numberOfLines={1}>{name}</Text>
+                                    <Text style={styles.episodeText}>{linkLabel}</Text>
                                 </View>
                             </Pressable>
                         </Link>
@@ -180,34 +167,26 @@ const styles = StyleSheet.create({
         padding: 12,
         backgroundColor: 'rgba(0,0,0,0.25)', // slight darkening
     },
-    movieName: {
-        color: '#ffffff',
-        fontSize: 15,
-        fontWeight: '800',
-        textShadowColor: 'rgba(0,0,0,0.85)',
-        textShadowOffset: { width: 0, height: 1 },
-        textShadowRadius: 4,
-        letterSpacing: 0.2,
-    },
-    episodeText: {
-        color: 'rgba(255,255,255,0.8)',
-        fontSize: 12,
-        fontWeight: '600',
-        marginTop: 2,
-    },
-    progressOverlay: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: 4,
-        backgroundColor: 'rgba(255,255,255,0.3)',
-    },
     progressFill: {
         height: '100%',
-        backgroundColor: '#e50914', // Netflix Red
+        backgroundColor: '#e50914',
         borderTopRightRadius: 2,
         borderBottomRightRadius: 2,
+    },
+    cardInfo: {
+        paddingTop: 8,
+        paddingHorizontal: 2,
+    },
+    movieName: {
+        color: '#ffffff',
+        fontSize: 13,
+        fontWeight: '600',
+        letterSpacing: 0.1,
+    },
+    episodeText: {
+        color: 'rgba(255,255,255,0.5)',
+        fontSize: 12,
+        marginTop: 2,
     },
 });
 
