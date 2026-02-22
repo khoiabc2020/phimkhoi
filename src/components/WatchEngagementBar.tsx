@@ -114,11 +114,11 @@ export default function WatchEngagementBar({
                 </div>
             </div>
 
-            {/* Movie Info - Premium layout */}
-            <div className="flex flex-col md:flex-row gap-5 p-5">
+            {/* Movie Info - luôn nằm ngang trên mọi thiết bị */}
+            <div className="flex flex-row gap-4 p-4 md:p-5 items-start">
                 {/* Poster */}
                 <div className="flex-shrink-0">
-                    <div className="relative w-16 h-24 md:w-20 md:h-[112px] rounded-xl overflow-hidden shadow-xl ring-1 ring-white/10 transition-transform hover:scale-105 duration-300">
+                    <div className="relative w-20 h-[112px] md:w-24 md:h-[134px] rounded-xl overflow-hidden shadow-xl ring-1 ring-white/10">
                         <Image
                             src={getImageUrl(movie.poster_url || movie.thumb_url)}
                             alt={movie.name}
@@ -128,57 +128,53 @@ export default function WatchEngagementBar({
                     </div>
                 </div>
 
-                <div className="flex-grow flex flex-col justify-center min-w-0">
-                    {/* Vietnamese title */}
-                    <h1 className="text-[18px] font-semibold text-white leading-snug tracking-tight mb-1.5 line-clamp-2">
+                {/* Info bên phải */}
+                <div className="flex-grow min-w-0 flex flex-col justify-start gap-1.5">
+                    {/* Tên Tiếng Việt */}
+                    <h1 className="text-[16px] md:text-[18px] font-semibold text-white leading-snug tracking-tight line-clamp-2">
                         {movie.name}
                     </h1>
-                    {/* English subtitle + meta */}
-                    <div className="flex flex-col gap-1 mb-3">
-                        <span className="text-[16px] font-medium text-[#F4C84A] leading-snug">{movie.origin_name}</span>
-                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1" style={{ fontSize: '13px', letterSpacing: '0.3px', opacity: 0.75, color: '#9ca3af' }}>
-                            {movie.year && <><span className="w-1 h-1 rounded-full bg-gray-600" /><span>{movie.year}</span></>}
-                            {movie.quality && <><span className="w-1 h-1 rounded-full bg-gray-600" />
-                                <span className="px-1.5 py-0.5 rounded font-semibold text-white" style={{ background: 'rgba(255,255,255,0.1)', fontSize: '12px' }}>{movie.quality}</span></>}
-                            {movie.time && <><span className="w-1 h-1 rounded-full bg-gray-600" /><span>{movie.time}</span></>}
-                        </div>
+                    {/* Tên gốc */}
+                    <span className="text-[13px] font-medium text-[#F4C84A] leading-snug line-clamp-1">{movie.origin_name}</span>
+                    {/* Meta: năm • chất lượng • thời lượng */}
+                    <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1" style={{ fontSize: '12px', color: '#6b7280' }}>
+                        {movie.year && <><span className="w-1 h-1 rounded-full bg-gray-600 inline-block" /><span>{movie.year}</span></>}
+                        {movie.quality && <><span className="w-1 h-1 rounded-full bg-gray-600 inline-block" />
+                            <span className="px-1.5 py-0.5 rounded font-semibold text-white" style={{ background: 'rgba(255,255,255,0.1)', fontSize: '11px' }}>{movie.quality}</span></>}
+                        {movie.time && <><span className="w-1 h-1 rounded-full bg-gray-600 inline-block" /><span>{movie.time}</span></>}
                     </div>
-                    {/* Genre chips */}
-                    <div className="flex flex-wrap gap-1.5">
-                        {movie.category?.slice(0, 4).map((c: any) => (
+                    {/* Genres + IMDB badge cùng hàng */}
+                    <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
+                        {movie.category?.slice(0, 3).map((c: any) => (
                             <span key={c.id}
-                                className="text-[12px] px-2.5 py-1 rounded-full text-gray-300 cursor-pointer transition-all hover:text-white border border-white/[0.08] hover:border-white/20"
+                                className="text-[11px] px-2 py-0.5 rounded-full text-gray-300 border border-white/[0.08]"
                                 style={{ background: 'rgba(255,255,255,0.05)' }}>
                                 {c.name}
                             </span>
                         ))}
+                        {/* IMDB — iOS 26 pill */}
+                        {movie.vote_average && movie.vote_average > 0 ? (
+                            <div className="flex items-center gap-1 shrink-0"
+                                style={{
+                                    background: 'rgba(255,255,255,0.05)',
+                                    backdropFilter: 'blur(12px)',
+                                    WebkitBackdropFilter: 'blur(12px)',
+                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    borderRadius: '999px',
+                                    padding: '3px 8px 3px 5px',
+                                }}>
+                                <span className="font-black px-1 py-0.5 rounded-sm"
+                                    style={{ background: '#F5C518', color: '#000', fontSize: '10px' }}>
+                                    IMDb
+                                </span>
+                                <span className="font-bold text-white" style={{ fontSize: '13px' }}>
+                                    {movie.vote_average.toFixed(1)}
+                                </span>
+                                <span className="text-white/30" style={{ fontSize: '10px' }}>/10</span>
+                            </div>
+                        ) : null}
                     </div>
                 </div>
-
-                {/* IMDB Rating Badge — iOS 26 style, only show when rating exists */}
-                {movie.vote_average && movie.vote_average > 0 ? (
-                    <div className="flex items-center gap-1.5 self-start md:self-center shrink-0"
-                        style={{
-                            background: 'rgba(255,255,255,0.05)',
-                            backdropFilter: 'blur(12px)',
-                            WebkitBackdropFilter: 'blur(12px)',
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            borderRadius: '999px',
-                            padding: '5px 12px 5px 8px',
-                        }}>
-                        {/* IMDB yellow label */}
-                        <span className="font-black text-xs tracking-tight px-1.5 py-0.5 rounded-sm"
-                            style={{ background: '#F5C518', color: '#000', letterSpacing: '-0.3px', fontSize: '11px' }}>
-                            IMDb
-                        </span>
-                        <div className="flex items-baseline gap-0.5">
-                            <span className="font-bold text-white" style={{ fontSize: '15px', letterSpacing: '-0.3px' }}>
-                                {movie.vote_average.toFixed(1)}
-                            </span>
-                            <span className="text-white/30 font-normal" style={{ fontSize: '11px' }}>/10</span>
-                        </div>
-                    </div>
-                ) : null}
             </div>
         </div>
     );

@@ -11,7 +11,7 @@ import WatchEngagementBar from "@/components/WatchEngagementBar";
 import WatchContainer from "@/components/WatchContainer";
 import { Star, Clock, Globe, Info, Users, PlayCircle, Calendar, List as ListIcon } from "lucide-react";
 import { getWatchHistoryForEpisode } from "@/app/actions/watchHistory";
-import { getMovieCast } from "@/app/actions/tmdb";
+import { getMovieCast, getTMDBDataForCard } from "@/app/actions/tmdb";
 import RelatedMovies from "@/components/RelatedMovies";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -57,12 +57,17 @@ export default async function WatchPage({ params }: PageProps) {
     let cast: any[] = [];
 
     try {
-        const [sessionRes, castRes] = await Promise.all([
+        const [sessionRes, castRes, tmdbRes] = await Promise.all([
             getServerSession(authOptions).catch(() => null),
-            getMovieCast(movie.origin_name || movie.name, movie.year, movie.type === 'series' ? 'tv' : 'movie').catch(() => [])
+            getMovieCast(movie.origin_name || movie.name, movie.year, movie.type === 'series' ? 'tv' : 'movie').catch(() => []),
+            getTMDBDataForCard(movie.origin_name || movie.name, movie.year, movie.type === 'series' ? 'tv' : 'movie').catch(() => null)
         ]);
         session = sessionRes;
         cast = castRes || [];
+        // Gắn vote_average từ TMDB vào movie object
+        if (tmdbRes?.vote_average) {
+            (movie as any).vote_average = tmdbRes.vote_average;
+        }
     } catch (e) {
         console.error("Error fetching session or cast:", e);
     }
