@@ -104,10 +104,10 @@ export default function ContinueWatchingRow() {
                         <div key={item._id} className="relative group/card flex-[0_0_200px] md:flex-[0_0_240px] snap-start">
                             <Link
                                 href={`/xem-phim/${item.movieSlug}/${item.episodeSlug}`}
-                                className="block w-full h-full"
+                                className="block w-full"
                             >
-                                {/* Card Image */}
-                                <div className="relative aspect-video rounded-lg overflow-hidden bg-white/5 border border-white/10 shadow-lg group-hover/card:border-[#fbbf24]/50 transition-all duration-300">
+                                {/* Card Image - ảnh đầy đủ không bị che */}
+                                <div className="relative aspect-video rounded-lg overflow-hidden bg-white/5 border border-white/10 group-hover/card:border-[#fbbf24]/50 transition-all duration-300">
                                     <Image
                                         src={getImageUrl(item.moviePoster)}
                                         alt={item.movieName}
@@ -115,20 +115,14 @@ export default function ContinueWatchingRow() {
                                         className="object-cover group-hover/card:scale-105 transition-transform duration-500"
                                     />
 
-                                    {/* Overlay & Play Button */}
-                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
+                                    {/* Play button on hover only */}
+                                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
                                         <div className="w-10 h-10 rounded-full bg-[#fbbf24] flex items-center justify-center shadow-[0_0_15px_#fbbf24] transform scale-0 group-hover/card:scale-100 transition-transform duration-300 delay-75">
                                             <Play className="w-5 h-5 text-black fill-black ml-0.5" />
                                         </div>
                                     </div>
 
-                                    {/* Liquid Glass Info Container (iOS 26 Style) */}
-                                    <div className="absolute bottom-0 left-0 right-0 pt-8 pb-[6px] px-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent backdrop-blur-sm border-t border-white/10 flex flex-col justify-end z-20 overflow-hidden">
-                                        <h3 className="text-white font-extrabold text-sm tracking-wide line-clamp-1 drop-shadow-md">{item.movieName}</h3>
-                                        <span className="text-white/80 font-bold text-[11px] mt-[2px] drop-shadow-sm">{item.episodeName || "Tiếp tục xem"}</span>
-                                    </div>
-
-                                    {/* Remove Button (X) */}
+                                    {/* Nút X xóa */}
                                     <button
                                         onClick={(e) => handleRemove(e, item._id)}
                                         className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 hover:bg-red-600 backdrop-blur-md flex items-center justify-center text-white/70 hover:text-white transition-colors opacity-0 group-hover/card:opacity-100 z-30"
@@ -137,12 +131,23 @@ export default function ContinueWatchingRow() {
                                         <X className="w-3 h-3" />
                                     </button>
 
-                                    {/* Progress Bar Container - Netflix Style Overlay */}
-                                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/30 z-30">
+                                    {/* Progress Bar - chỉ 1 dải mỏng đáy ảnh */}
+                                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20 z-20">
                                         <div
-                                            className="h-full bg-[#E50914] rounded-r-md"
+                                            className="h-full bg-[#E50914] rounded-r-sm"
                                             style={{ width: `${Math.max(2, Math.min(100, item.progress || 0))}%` }}
                                         />
+                                    </div>
+                                </div>
+
+                                {/* Text bên dưới ảnh - không che mặt nhân vật */}
+                                <div className="mt-2 px-0.5">
+                                    <h3 className="text-white font-semibold text-sm line-clamp-1 group-hover/card:text-[#fbbf24] transition-colors">
+                                        {item.movieName}
+                                    </h3>
+                                    <div className="flex items-center justify-between mt-0.5">
+                                        <span className="text-white/50 text-xs">{item.episodeName || "Tiếp tục xem"}</span>
+                                        <span className="text-[#fbbf24]/70 text-[10px]">{item.progress}%</span>
                                     </div>
                                 </div>
                             </Link>
