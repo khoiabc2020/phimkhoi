@@ -4,6 +4,7 @@ import { WebView } from 'react-native-webview';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { useState, useEffect, useRef } from 'react';
 import { getMovieDetail } from '@/services/api';
+import { getLocalPlayUri } from '@/lib/downloads';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/context/auth';
@@ -11,7 +12,7 @@ import { CONFIG } from '@/constants/config';
 import NativePlayer from '@/components/NativePlayer';
 
 export default function PlayerScreen() {
-    const { slug, ep, server } = useLocalSearchParams();
+    const { slug, ep, server, localUri: localUriParam } = useLocalSearchParams();
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [videoUrl, setVideoUrl] = useState<string | null>(null);
@@ -49,26 +50,33 @@ export default function PlayerScreen() {
         const fetchVideo = async () => {
             if (!slug) return;
             setLoading(true);
+            const localUriDecoded = typeof localUriParam === 'string' ? decodeURIComponent(localUriParam) : null;
+            const localFromStore = ep && slug ? await getLocalPlayUri(slug as string, ep as string) : null;
+            const useLocal = localUriDecoded || localFromStore;
+
+            if (useLocal) {
+                setVideoUrl(useLocal);
+                setIsNative(true);
+                setMovieTitle('');
+                setEpisodeTitle(ep ? `Tập ${String(ep).replace(/^.*-/, '')}` : 'Offline');
+                setNextEpisodeSlug(null);
+                setEpisodes([]);
+                setLoading(false);
+                return;
+            }
+
             const data = await getMovieDetail(slug as string);
             if (data && data.episodes) {
                 setMovieTitle(data.movie?.name || "");
 
-                // Store full episodes data
                 setEpisodes(data.episodes);
 
-                let episode;
-                // Get episodes from SELECTED server
+                let episode: { slug: string; name: string; link_m3u8?: string; link_embed?: string } | undefined;
                 const currentServerData = data.episodes[selectedServer]?.server_data || [];
 
                 if (ep) {
                     episode = currentServerData.find((e: any) => e.slug === ep);
-                    // If not found in current server (e.g. switched from link), maybe try searching all? 
-                    // But for now assume consistent navigation.
-                    if (!episode) {
-                        // Fallback: search in all servers and switch server index?
-                        // This logic is complex. Simplified: just use first if not found.
-                        episode = currentServerData[0];
-                    }
+                    if (!episode) episode = currentServerData[0];
                 } else {
                     episode = currentServerData[0];
                 }
@@ -76,23 +84,18 @@ export default function PlayerScreen() {
                 if (episode) {
                     setEpisodeTitle(episode.name);
 
-                    // Determine video source
                     if (episode.link_m3u8 && !episode.link_m3u8.includes('youtube')) {
-                        // Use Native Player DIRECTLY (No Proxy)
-                        // const proxyUrl = `${CONFIG.BACKEND_URL}/api/hls-proxy?url=${encodeURIComponent(episode.link_m3u8)}`;
                         setVideoUrl(episode.link_m3u8);
                         setIsNative(true);
                     } else {
-                        // Fallback to Embed (WebView)
-                        setVideoUrl(episode.link_embed);
+                        setVideoUrl(episode.link_embed ?? '');
                         setIsNative(false);
                     }
 
-                    // Find next episode
-                    // Find next episode in CURRENT server
-                    const currentIndex = currentServerData.findIndex((e: any) => e.slug === episode.slug);
+                    const epSlug = episode.slug;
+                    const currentIndex = currentServerData.findIndex((e: any) => e.slug === epSlug);
                     if (currentIndex !== -1 && currentIndex < currentServerData.length - 1) {
-                        setNextEpisodeSlug(currentServerData[currentIndex + 1].slug);
+                        setNextEpisodeSlug(currentServerData[currentIndex + 1].slug ?? null);
                     } else {
                         setNextEpisodeSlug(null);
                     }
@@ -101,7 +104,7 @@ export default function PlayerScreen() {
             setLoading(false);
         };
         fetchVideo();
-    }, [slug, ep, selectedServer]);
+    }, [slug, ep, selectedServer, localUriParam]);
 
     const handleProgress = async (currentTime: number, duration: number) => {
         if (!user || !token || !slug || !ep) return;
@@ -137,7 +140,7 @@ export default function PlayerScreen() {
 
     const handleNextEpisode = () => {
         if (nextEpisodeSlug) {
-            router.replace(`/player/${slug}?ep=${nextEpisodeSlug}`);
+            router.replace(`/player/${slug}?ep=${nextEpisodeSlug}&server=${selectedServer}`);
         }
     };
 
@@ -186,10 +189,7 @@ export default function PlayerScreen() {
                     currentServerIndex={selectedServer}
                     currentEpisodeSlug={ep as string}
                     onEpisodeChange={(newSlug) => {
-                        router.replace({
-                            pathname: `/player/${slug}`,
-                            params: { ep: newSlug, server: selectedServer }
-                        });
+                        router.replace({ pathname: `/player/${slug}` as any, params: { ep: newSlug, server: selectedServer } });
                     }}
                     onServerChange={(newServerIndex) => {
                         setSelectedServer(newServerIndex);
@@ -199,10 +199,7 @@ export default function PlayerScreen() {
                         const targetEp = sameEp || newServerData[0];
 
                         if (targetEp) {
-                            router.replace({
-                                pathname: `/player/${slug}`,
-                                params: { ep: targetEp.slug, server: newServerIndex }
-                            });
+                            router.replace({ pathname: `/player/${slug}` as any, params: { ep: targetEp.slug, server: newServerIndex } });
                         }
                     }}
                 />

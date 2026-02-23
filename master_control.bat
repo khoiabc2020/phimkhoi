@@ -43,7 +43,7 @@ goto main_menu
 cls
 echo [ANDROID LOCAL BUILD]
 echo.
-call build_apk.bat
+call scripts\windows\build_apk.bat
 pause
 goto main_menu
 
@@ -51,7 +51,7 @@ goto main_menu
 cls
 echo [ANDROID CLOUD BUILD]
 echo.
-call build_cloud.bat
+call scripts\windows\build_cloud.bat
 pause
 goto main_menu
 
@@ -63,7 +63,7 @@ echo 1. Starting Web Deployment...
 call :deploy_web_sub
 echo.
 echo 2. Starting Local APK Build...
-call build_apk.bat
+call scripts\windows\build_apk.bat
 echo.
 echo [DONE] Web Deployed and APK Built.
 pause

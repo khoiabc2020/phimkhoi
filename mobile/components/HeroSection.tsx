@@ -1,12 +1,14 @@
-import { View, Text, Dimensions, StyleSheet, Platform } from 'react-native';
+import React, { useState, useCallback, useEffect } from 'react';
+import { View, Text, Dimensions, StyleSheet, Platform, Pressable, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Carousel from 'react-native-reanimated-carousel';
 import FocusableButton from './FocusableButton';
 import { Image } from 'expo-image';
-import { Movie, getImageUrl } from '@/services/api';
-import { useState, useCallback } from 'react';
+import { Movie, getImageUrl, toggleFavorite as apiToggleFavorite } from '@/services/api';
 import { COLORS } from '@/constants/theme';
+import { addFavorite, removeFavorite, isFavorite } from '@/lib/favorites';
+import { useAuth } from '@/context/auth';
 
 const { width } = Dimensions.get('window');
 const isTablet = width > 700;
@@ -21,13 +23,74 @@ interface HeroSectionProps {
 
 export default function HeroSection({ movies }: HeroSectionProps) {
     const [activeIndex, setActiveIndex] = useState(0);
+    const [favSlugs, setFavSlugs] = useState<Set<string>>(new Set());
     const router = useRouter();
+    const { user, token, syncFavorites } = useAuth();
+
+    useEffect(() => {
+        (async () => {
+            const next = new Set<string>();
+            for (const m of movies || []) {
+                try {
+                    if (user?.favorites?.some((f: any) => (typeof f === 'string' ? f : f.slug) === m.slug)) next.add(m.slug);
+                    else if (await isFavorite(m.slug)) next.add(m.slug);
+                } catch (_) {}
+            }
+            setFavSlugs(next);
+        })();
+    }, [movies, user?.favorites]);
 
     if (!movies?.length) return null;
 
-    const onSnapToItem = useCallback((index: number) => {
-        setActiveIndex(index);
-    }, []);
+    const onSnapToItem = useCallback((index: number) => setActiveIndex(index), []);
+
+    const toggleFav = useCallback(async (movie: Movie) => {
+        const slug = movie.slug;
+        const currentlyFav = favSlugs.has(slug);
+        const newFav = !currentlyFav;
+        setFavSlugs(prev => {
+            const next = new Set(prev);
+            if (newFav) next.add(slug); else next.delete(slug);
+            return next;
+        });
+        try {
+            if (user && token) {
+                await apiToggleFavorite(movie, currentlyFav, token);
+                syncFavorites?.();
+            } else {
+                if (newFav) await addFavorite({
+                    movieId: (movie as any)._id || '',
+                    movieSlug: movie.slug,
+                    movieName: movie.name,
+                    movieOriginName: movie.origin_name || '',
+                    moviePoster: movie.poster_url || movie.thumb_url || '',
+                    movieYear: movie.year || new Date().getFullYear(),
+                    movieQuality: movie.quality || 'HD',
+                    movieCategories: movie.category ? movie.category.map((c: any) => c.name) : [],
+                    slug: movie.slug,
+                    name: movie.name,
+                    poster_url: movie.poster_url,
+                    thumb_url: movie.thumb_url,
+                });
+                else await removeFavorite(movie.slug);
+            }
+        } catch (e) {
+            setFavSlugs(prev => { const n = new Set(prev); if (newFav) n.delete(slug); else n.add(slug); return n; });
+        }
+    }, [favSlugs, user, token, syncFavorites]);
+
+    const renderItem = useCallback(
+        ({ item, index }: { item: Movie; index: number }) => (
+            <HeroCard
+                movie={item}
+                isActive={index === activeIndex}
+                isFav={favSlugs.has(item.slug)}
+                onToggleFav={() => toggleFav(item)}
+                onPress={() => router.push(`/movie/${item.slug}` as any)}
+            />
+        ),
+        [activeIndex, favSlugs, toggleFav, router]
+    );
 
     return (
         <View style={styles.carouselSection}>
@@ -37,59 +100,45 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                 height={CAROUSEL_HEIGHT}
                 data={movies}
                 autoPlay={true}
-                autoPlayInterval={6000}
+                autoPlayInterval={5500}
                 onSnapToItem={onSnapToItem}
-                scrollAnimationDuration={800}
+                scrollAnimationDuration={320}
                 mode="parallax"
-                modeConfig={{
-                    parallaxScrollingScale: 0.85,
-                    parallaxScrollingOffset: 60,
-                }}
-                renderItem={({ item, index }) => (
-                    <HeroCard
-                        movie={item}
-                        isActive={index === activeIndex}
-                        onPress={() => router.push(`/movie/${item.slug}` as any)}
-                    />
-                )}
+                modeConfig={{ parallaxScrollingScale: 0.92, parallaxScrollingOffset: 40 }}
+                renderItem={renderItem}
             />
         </View>
     );
 }
 
-function HeroCard({ movie, isActive, onPress }: { movie: Movie; isActive: boolean; onPress: () => void }) {
+const HeroCard = React.memo(function HeroCard({ movie, isActive, isFav, onToggleFav, onPress }: {
+    movie: Movie; isActive: boolean; isFav: boolean; onToggleFav: () => void; onPress: () => void;
+}) {
     const router = useRouter();
     const categories = movie.category?.slice(0, 3) || [];
 
     return (
-        <View style={[styles.cardContainer, !isActive && { opacity: 0.4 }]}>
-            {/* 1. Centered Poster */}
+        <View style={[styles.cardContainer, !isActive && { opacity: 0.4 }]} collapsable={false}>
             <FocusableButton style={styles.posterWrapper} onPress={onPress}>
                 <Image
                     source={{ uri: getImageUrl(movie.poster_url || movie.thumb_url) }}
                     style={styles.posterImage}
                     contentFit="cover"
-                    transition={400}
-                    cachePolicy="memory-disk" // Force memory-disk caching for lagless swipes
+                    transition={200}
+                    cachePolicy="memory-disk"
                 />
             </FocusableButton>
 
-            {/* 2. Vertically Stacked Movie Info */}
             <View style={styles.infoWrapper}>
                 <Text style={styles.title} numberOfLines={1}>{movie.name}</Text>
+                {movie.origin_name && <Text style={styles.subtitle} numberOfLines={1}>{movie.origin_name}</Text>}
 
-                {movie.origin_name && (
-                    <Text style={styles.subtitle} numberOfLines={1}>{movie.origin_name}</Text>
-                )}
-
-                {/* 3. Meta Row (Year, Rating, Quality) */}
                 <View style={styles.metaRow}>
                     {movie.year && (
                         <View style={styles.metaBadgeDark}>
                             <Text style={styles.metaTextWhite}>{movie.year}</Text>
                         </View>
                     )}
-                    {/* Placeholder for Rating (since KKPhim might lack TMDB for heroes instantly) */}
                     <View style={styles.metaBadgeDark}>
                         <Ionicons name="star" size={12} color="#fbbf24" style={{ marginRight: 4 }} />
                         <Text style={styles.metaTextYellow}>{(movie as any).tmdb?.vote_average ? Number((movie as any).tmdb.vote_average).toFixed(1) : '7.5'}</Text>
@@ -101,7 +150,6 @@ function HeroCard({ movie, isActive, onPress }: { movie: Movie; isActive: boolea
                     )}
                 </View>
 
-                {/* 4. Genres */}
                 {categories.length > 0 && (
                     <View style={styles.genreRow}>
                         {categories.map((c: any, idx: number) => (
@@ -112,28 +160,31 @@ function HeroCard({ movie, isActive, onPress }: { movie: Movie; isActive: boolea
                     </View>
                 )}
 
-                {/* 5. Action Buttons */}
                 <View style={styles.actionRow}>
                     <FocusableButton
-                        style={styles.playBtn}
+                        style={styles.playBtnIcon}
                         onPress={() => router.push(`/movie/${movie.slug}?autoPlay=true` as any)}
                     >
-                        <Ionicons name="play" size={18} color="black" style={{ marginLeft: 3 }} />
-                        <Text style={styles.playBtnText}>Xem</Text>
+                        <Ionicons name="play" size={24} color="#0B0D12" />
                     </FocusableButton>
 
-                    <FocusableButton style={styles.circleBtn} onPress={onPress}>
-                        <Ionicons name="information-outline" size={22} color="white" />
-                    </FocusableButton>
+                    <Pressable style={styles.circleBtn} onPress={onPress}>
+                        <Ionicons name="information-circle-outline" size={22} color="rgba(255,255,255,0.9)" />
+                    </Pressable>
 
-                    <FocusableButton style={styles.circleBtn} onPress={() => router.push(`/movie/${movie.slug}` as any)}>
-                        <Ionicons name="heart-outline" size={20} color="white" />
-                    </FocusableButton>
+                    <TouchableOpacity
+                        style={[styles.circleBtn, isFav && styles.circleBtnFav]}
+                        onPress={onToggleFav}
+                        activeOpacity={0.8}
+                        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                    >
+                        <Ionicons name={isFav ? 'heart' : 'heart-outline'} size={20} color={isFav ? COLORS.accent : 'rgba(255,255,255,0.9)'} />
+                    </TouchableOpacity>
                 </View>
             </View>
         </View>
     );
-}
+});
 
 const styles = StyleSheet.create({
     carouselSection: {
@@ -252,22 +303,22 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 16,
+        gap: 14,
     },
-    playBtn: {
-        backgroundColor: '#F4C84A',
-        paddingHorizontal: 32,
-        height: 46,
-        borderRadius: 24,
-        flexDirection: 'row',
+    playBtnIcon: {
+        width: 52,
+        height: 52,
+        borderRadius: 26,
+        backgroundColor: 'rgba(244,200,74,0.95)',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.25)',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 6,
-    },
-    playBtnText: {
-        color: '#0B0D12',
-        fontSize: 15,
-        fontWeight: '500',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        elevation: 4,
     },
     circleBtn: {
         width: 46,
@@ -278,5 +329,9 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.15)',
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    circleBtnFav: {
+        backgroundColor: 'rgba(251,191,36,0.18)',
+        borderColor: 'rgba(251,191,36,0.5)',
     },
 });

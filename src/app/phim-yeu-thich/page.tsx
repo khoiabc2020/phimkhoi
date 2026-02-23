@@ -73,7 +73,7 @@ export default async function FavoritesPage() {
                         action={{ label: "Khám phá phim", href: "/" }}
                     />
                 ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 [contain:layout_paint]">
                         {favorites.map((item: any) => (
                             <div key={item._id} className="group relative">
                                 <Link href={`/phim/${item.movieSlug}`}>
@@ -82,6 +82,7 @@ export default async function FavoritesPage() {
                                             src={getImageUrl(item.moviePoster)}
                                             alt={item.movieName}
                                             fill
+                                            loading="lazy"
                                             className="object-cover group-hover:scale-105 transition-transform duration-300"
                                         />
                                         {/* Quality Badge */}

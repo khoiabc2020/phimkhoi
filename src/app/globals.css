@@ -50,6 +50,10 @@
   --foreground: #ffffff;
 }
 
+html {
+  scroll-behavior: auto; /* Giảm CPU khi cuộn (tránh smooth scroll nặng) */
+}
+
 body {
   /* iOS 26 Cinematic Background - Radial Depth */
   background: radial-gradient(circle at 30% 10%, rgba(255, 200, 0, 0.04), transparent 50%),

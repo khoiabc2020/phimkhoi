@@ -69,7 +69,7 @@ export default function ContinueWatchingRow() {
                 ? scrollLeft - clientWidth / 2
                 : scrollLeft + clientWidth / 2;
 
-            rowRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
+            rowRef.current.scrollTo({ left: scrollTo, behavior: "auto" });
         }
     };
 
@@ -97,7 +97,7 @@ export default function ContinueWatchingRow() {
                 {/* Scroll Container */}
                 <div
                     ref={rowRef}
-                    className="flex gap-4 overflow-x-auto pb-4 pt-2 no-scrollbar snap-x scroll-smooth"
+                    className="flex gap-4 overflow-x-auto pb-4 pt-2 no-scrollbar snap-x"
                     style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
                     {movies.map((item) => (

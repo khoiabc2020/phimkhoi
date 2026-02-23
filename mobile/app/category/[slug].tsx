@@ -73,7 +73,10 @@ export default function CategoryScreen() {
         <Pressable onPress={() => router.back()} className="mr-3 p-2 -ml-2 rounded-full active:bg-gray-800">
           <Ionicons name="arrow-back" size={24} color="white" />
         </Pressable>
-        <Text className="text-white text-xl font-bold flex-1 capitalize numberOfLines={1}">
+        <Text
+          className="text-white text-xl font-bold flex-1 capitalize"
+          numberOfLines={1}
+        >
           {categoryName || slug}
         </Text>
       </View>

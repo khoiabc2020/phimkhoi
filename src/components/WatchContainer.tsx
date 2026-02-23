@@ -12,11 +12,12 @@ import { List as ListIcon, Monitor } from "lucide-react";
 
 interface WatchContainerProps {
     movie: Movie;
-    currentEpisode: any; // Initial current episode from page (server 0)
-    episodes: any[]; // Initial episodes from page (server 0) -> we might replace this with servers usage
-    servers: any[]; // New prop
+    currentEpisode: any; // Initial current episode from server chosen in page
+    episodes: any[]; // Initial episodes from that server
+    servers: any[];
     initialProgress: number;
     movieData: any;
+    initialServerName: string;
 }
 
 export default function WatchContainer({
@@ -29,7 +30,9 @@ export default function WatchContainer({
 }: WatchContainerProps) {
     const [isTheaterMode, setIsTheaterMode] = useState(false);
     const [isLightOff, setIsLightOff] = useState(false);
-    const [activeServerName, setActiveServerName] = useState(servers?.[0]?.server_name || "");
+    const [activeServerName, setActiveServerName] = useState(
+        initialServerName || servers?.[0]?.server_name || ""
+    );
 
     // Find the server object matching activeServerName
     const activeServer = servers?.find(s => s.server_name === activeServerName) || servers?.[0];

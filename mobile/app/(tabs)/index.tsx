@@ -1,5 +1,5 @@
 import {
-  ScrollView, View, Text, Pressable,
+  ScrollView, View, Text, Pressable, Image,
   RefreshControl, Platform, StyleSheet, Dimensions
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,6 +9,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import HeroSection from '@/components/HeroSection';
 import MovieRow from '@/components/MovieRow';
@@ -23,6 +24,7 @@ import { useAuth } from '@/context/auth'; // Added imports
 import { COLORS, SPACING, RADIUS, BLUR } from '@/constants/theme';
 
 const { width } = Dimensions.get('window');
+const HOME_CACHE_KEY = 'home_screen_cache_v1';
 
 // Main Nav Pills (Top)
 const NAV_PILLS = [
@@ -90,14 +92,25 @@ export default function HomeScreen() {
         finalHero = heroMixed.slice(0, 8);
       }
 
-      // Hiện nội dung ngay — không chờ section phụ
-      setData(prev => ({
-        ...prev,
+      // Snapshot cơ bản cho hero + section chính
+      const baseSnapshot = {
         heroMovies: finalHero,
         phimLe: homeBasic.phimLe,
         phimBo: homeBasic.phimBo,
         hoatHinh: homeBasic.hoatHinh,
         tvShows: homeBasic.tvShows,
+        phimChieuRap: [] as Movie[],
+        hanQuoc: [] as Movie[],
+        trungQuoc: [] as Movie[],
+        hanhDong: [] as Movie[],
+        tinhCam: [] as Movie[],
+        sapChieu: [] as Movie[],
+      };
+
+      // Hiện nội dung chính ngay — không chờ section phụ
+      setData(prev => ({
+        ...prev,
+        ...baseSnapshot,
       }));
       setLoading(false);
       setRefreshing(false);
@@ -112,15 +125,27 @@ export default function HomeScreen() {
         getMoviesList('phim-sap-chieu', 1, 10)
       ]);
 
-      setData(prev => ({
-        ...prev,
+      const fullSnapshot = {
+        ...baseSnapshot,
         phimChieuRap: chieuRapRes?.items || [],
         hanQuoc: hanQuocRes?.items || [],
         trungQuoc: trungQuocRes?.items || [],
         hanhDong: hanhDongRes?.items || [],
         tinhCam: tinhCamRes?.items || [],
         sapChieu: sapChieuRes?.items || [],
+      };
+
+      setData(prev => ({
+        ...prev,
+        ...fullSnapshot,
       }));
+
+      // Lưu cache cho lần mở app sau
+      try {
+        await AsyncStorage.setItem(HOME_CACHE_KEY, JSON.stringify(fullSnapshot));
+      } catch (e) {
+        console.warn('Cache home screen failed', e);
+      }
 
     } catch (error) {
       console.error(error);
@@ -131,7 +156,27 @@ export default function HomeScreen() {
   }, []);
 
   useEffect(() => {
-    fetchData();
+    let isMounted = true;
+
+    (async () => {
+      try {
+        const cached = await AsyncStorage.getItem(HOME_CACHE_KEY);
+        if (cached && isMounted) {
+          const parsed = JSON.parse(cached);
+          setData(prev => ({ ...prev, ...parsed }));
+          setLoading(false);
+        }
+      } catch (e) {
+        console.warn('Load home cache failed', e);
+      } finally {
+        // Luôn refresh ngầm từ server
+        fetchData();
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
   }, [fetchData]);
 
   useFocusEffect(
@@ -148,7 +193,7 @@ export default function HomeScreen() {
   }, [fetchData]);
 
   return (
-    <View style={[styles.container, Platform.isTV && { paddingLeft: 80 }]}>
+    <View style={styles.container}>
       <StatusBar style="light" />
 
       {/* Background Gradient - Dark Cinematic */}
@@ -158,39 +203,40 @@ export default function HomeScreen() {
         style={StyleSheet.absoluteFill}
       />
 
-      {/* Header Background */}
+      {/* Header — liquid glass */}
       <View style={styles.headerWrapper}>
         <LinearGradient
-          colors={['rgba(11,13,18,0.95)', 'rgba(11,13,18,0.8)', 'transparent']}
+          colors={['rgba(11,13,18,0.92)', 'rgba(11,13,18,0.6)', 'transparent']}
           locations={[0.2, 0.7, 1]}
           style={StyleSheet.absoluteFill}
         />
+        {!Platform.isTV && (
+          <BlurView intensity={BLUR.header} tint="dark" style={StyleSheet.absoluteFill} />
+        )}
         <SafeAreaView edges={['top']} style={styles.headerContent}>
           <View style={styles.headerRow}>
-            {!Platform.isTV && (
-              <>
-                <View style={styles.logoRow}>
-                  {/* Logo chữ M cách điệu dạng Moviebase (Infinity loop look) */}
-                  <View style={styles.logoIcon}>
-                    <View style={styles.logoLoopLeft} />
-                    <View style={styles.logoLoopRight} />
-                  </View>
-                  <Text style={styles.logoText}>MovieBox</Text>
-                </View>
+            <View style={[styles.logoRow, { paddingLeft: 8 }]}>
+              <Image
+                source={require('../../assets/images/logo.webp')}
+                style={{ width: 36, height: 36, resizeMode: 'contain', marginRight: 4 }}
+              />
+              <Text style={styles.logoText}>
+                Movie
+                <Text style={styles.logoTextAccent}>Box</Text>
+              </Text>
+            </View>
 
-                <View style={styles.headerActions}>
-                  <Pressable style={styles.iconBtn} onPress={() => router.push('/search' as any)}>
-                    <Ionicons name="search-outline" size={20} color={COLORS.textPrimary} />
-                  </Pressable>
-                  <Pressable style={styles.iconBtn} onPress={() => router.push('/notifications' as any)}>
-                    <Ionicons name="notifications-outline" size={20} color={COLORS.textPrimary} />
-                    <View style={styles.notifBadge}>
-                      <Text style={styles.notifBadgeText}>4</Text>
-                    </View>
-                  </Pressable>
+            <View style={styles.headerActions}>
+              <Pressable style={styles.iconBtn} onPress={() => router.push('/search' as any)}>
+                <Ionicons name="search-outline" size={20} color={COLORS.textPrimary} />
+              </Pressable>
+              <Pressable style={styles.iconBtn} onPress={() => router.push('/notifications' as any)}>
+                <Ionicons name="notifications-outline" size={20} color={COLORS.textPrimary} />
+                <View style={styles.notifBadge}>
+                  <Text style={styles.notifBadgeText}>4</Text>
                 </View>
-              </>
-            )}
+              </Pressable>
+            </View>
           </View>
 
           {/* Category Pills */}
@@ -351,25 +397,27 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '45deg' }, { translateX: -2 }],
   },
   logoText: { color: COLORS.textPrimary, fontSize: 18, fontWeight: '800', letterSpacing: -0.5 },
+  logoTextAccent: { color: COLORS.accent },
   headerActions: { flexDirection: 'row', gap: 12, alignItems: 'center' },
   iconBtn: {
     width: 36, height: 36, borderRadius: 18,
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'transparent',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)',
   },
   notifBadge: { position: 'absolute', top: 0, right: 0, width: 14, height: 14, borderRadius: 7, backgroundColor: COLORS.accent, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: COLORS.bg0 },
   notifBadgeText: { color: 'black', fontSize: 8, fontWeight: '800' },
 
-  // Text Pills Menu (Under Header)
-  pillsRow: { paddingHorizontal: 20, gap: 16, paddingBottom: 4, paddingTop: 4 },
+  // Text Pills Menu (Under Header) — iOS 26 viền tinh tế
+  pillsRow: { paddingHorizontal: 20, gap: 12, paddingBottom: 4, paddingTop: 4 },
   pill: {
-    height: 30, justifyContent: 'center',
+    height: 34, justifyContent: 'center', paddingHorizontal: 14, borderRadius: 17,
+    backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
   },
   pillActive: {
-    borderBottomWidth: 0,
+    backgroundColor: 'rgba(255,255,255,0.1)', borderColor: 'rgba(255,255,255,0.15)',
   },
-  pillText: { color: 'rgba(255,255,255,0.5)', fontSize: 16, fontWeight: '600' },
+  pillText: { color: 'rgba(255,255,255,0.5)', fontSize: 15, fontWeight: '600' },
   pillTextActive: { color: COLORS.accent, fontWeight: '800' },
 
   // Content
@@ -382,7 +430,7 @@ const styles = StyleSheet.create({
   catPill: {
     flexDirection: 'row', alignItems: 'center', height: 36, paddingHorizontal: 12, borderRadius: 18,
     backgroundColor: 'rgba(255,255,255,0.06)',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)'
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)',
   },
   catDot: { width: 6, height: 6, borderRadius: 3, marginRight: 8 },
   catText: { color: 'rgba(255,255,255,0.8)', fontSize: 13, fontWeight: '500' },

@@ -79,7 +79,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                                 <Link href="/" className="text-[#fbbf24] mt-2 inline-block hover:underline font-medium">Khám phá ngay</Link>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 [contain:layout_paint]">
                                 {favorites.map((movie) => (
                                     <div key={movie._id} className="group relative">
                                         <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-white/5 shadow-lg border border-white/10">
@@ -105,6 +105,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                                                     src={getImageUrl(movie.moviePoster)}
                                                     alt={movie.movieName}
                                                     fill
+                                                    loading="lazy"
                                                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                                                 />
                                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -156,7 +157,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                                 <Link href="/" className="text-[#fbbf24] mt-2 inline-block hover:underline font-medium">Xem phim ngay</Link>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 [contain:layout_paint]">
                                 {history.map((item) => (
                                     <Link
                                         key={item._id}
@@ -168,6 +169,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                                                 src={getImageUrl(item.moviePoster)}
                                                 alt={item.movieName}
                                                 fill
+                                                loading="lazy"
                                                 className="object-cover group-hover:scale-105 transition-transform duration-300"
                                             />
 
@@ -239,7 +241,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                                 </button>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10 [contain:layout_paint]">
                                 {playlists.map(list => (
                                     <div key={list._id} className="bg-white/5 border border-white/10 hover:border-[#fbbf24]/50 p-5 rounded-xl relative group transition-all h-full flex flex-col">
                                         <div className="absolute -inset-0.5 bg-gradient-to-r from-[#fbbf24] to-[#f59e0b] rounded-xl blur opacity-0 group-hover:opacity-10 transition duration-500 pointer-events-none"></div>

@@ -20,7 +20,7 @@ export default async function RelatedMovies({ categorySlug, currentMovieId, mode
 
     if (mode === 'vertical') {
         return (
-            <div className="space-y-3">
+            <div className="space-y-3 [contain:layout_paint]">
                 {movies.slice(0, 5).map((movie: any) => (
                     <Link key={movie._id} href={`/phim/${movie.slug}`}
                         className="flex gap-3 group rounded-xl p-2 transition-all duration-200 hover:bg-white/[0.04]">
@@ -30,6 +30,7 @@ export default async function RelatedMovies({ categorySlug, currentMovieId, mode
                                 src={getImageUrl(movie.poster_url || movie.thumb_url)}
                                 alt={movie.name}
                                 fill
+                                loading="lazy"
                                 className="object-cover group-hover:scale-105 transition-transform duration-300"
                             />
                         </div>

@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import { useRouter, Link, Stack } from 'expo-router';
@@ -62,67 +62,86 @@ export default function LoginScreen() {
             <Stack.Screen options={{ headerShown: false }} />
             <StatusBar style="light" />
 
-            <SafeAreaView className="flex-1 px-6 justify-center">
-                <TouchableOpacity
-                    onPress={() => router.back()}
-                    className="absolute top-12 left-6 z-10 p-2 bg-gray-800 rounded-full"
-                >
-                    <Ionicons name="arrow-back" size={24} color="white" />
-                </TouchableOpacity>
-
-                <View className="items-center mb-10">
-                    <Ionicons name="film-outline" size={64} color="#fbbf24" />
-                    <Text className="text-3xl font-bold text-white mt-4">PhimKhôi</Text>
-                    <Text className="text-gray-400 mt-2">Đăng nhập để đồng bộ phim yêu thích</Text>
-                </View>
-
-                <View className="space-y-4">
-                    <View>
-                        <Text className="text-gray-400 mb-2 ml-1">Tài khoản / Email</Text>
-                        <TextInput
-                            className="bg-gray-800 text-white p-4 rounded-xl"
-                            placeholder="Nhập tài khoản hoặc email"
-                            placeholderTextColor="#6b7280"
-                            value={username}
-                            onChangeText={setUsername}
-                            autoCapitalize="none"
-                        />
-                    </View>
-
-                    <View>
-                        <Text className="text-gray-400 mb-2 ml-1">Mật khẩu</Text>
-                        <TextInput
-                            className="bg-gray-800 text-white p-4 rounded-xl"
-                            placeholder="Nhập mật khẩu"
-                            placeholderTextColor="#6b7280"
-                            value={password}
-                            onChangeText={setPassword}
-                            secureTextEntry
-                        />
-                    </View>
-
-                    <TouchableOpacity
-                        onPress={handleLogin}
-                        disabled={loading}
-                        className={`bg-yellow-500 p-4 rounded-xl items-center mt-4 ${loading ? 'opacity-70' : ''}`}
+            <KeyboardAvoidingView
+                className="flex-1"
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 24}
+            >
+                <SafeAreaView className="flex-1">
+                    <ScrollView
+                        className="flex-1"
+                        contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 32, flexGrow: 1, justifyContent: 'center' }}
+                        keyboardShouldPersistTaps="handled"
                     >
-                        {loading ? (
-                            <ActivityIndicator color="black" />
-                        ) : (
-                            <Text className="text-black font-bold text-lg">Đăng nhập</Text>
-                        )}
-                    </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => router.back()}
+                            className="absolute top-4 left-0 z-10 p-2 bg-gray-800 rounded-full"
+                        >
+                            <Ionicons name="arrow-back" size={24} color="white" />
+                        </TouchableOpacity>
 
-                    <View className="flex-row justify-center mt-6">
-                        <Text className="text-gray-400">Chưa có tài khoản? </Text>
-                        <Link href="/(auth)/register" asChild>
-                            <TouchableOpacity>
-                                <Text className="text-yellow-500 font-bold">Đăng ký ngay</Text>
+                        <View className="items-center mb-10">
+                            <Ionicons name="film-outline" size={64} color="#fbbf24" />
+                            <Text className="text-3xl font-bold text-white mt-4">PhimKhôi</Text>
+                            <Text className="text-gray-400 mt-2 text-center">
+                                Đăng nhập để đồng bộ phim yêu thích trên mọi thiết bị
+                            </Text>
+                        </View>
+
+                        <View className="space-y-4">
+                            <View>
+                                <Text className="text-gray-400 mb-2 ml-1">Tài khoản / Email</Text>
+                                <TextInput
+                                    className="bg-gray-800 text-white p-4 rounded-xl"
+                                    placeholder="Nhập tài khoản hoặc email"
+                                    placeholderTextColor="#6b7280"
+                                    value={username}
+                                    onChangeText={setUsername}
+                                    autoCapitalize="none"
+                                    returnKeyType="next"
+                                    onSubmitEditing={() => {
+                                        // Move focus xuống ô mật khẩu khi bấm Next
+                                    }}
+                                />
+                            </View>
+
+                            <View>
+                                <Text className="text-gray-400 mb-2 ml-1">Mật khẩu</Text>
+                                <TextInput
+                                    className="bg-gray-800 text-white p-4 rounded-xl"
+                                    placeholder="Nhập mật khẩu"
+                                    placeholderTextColor="#6b7280"
+                                    value={password}
+                                    onChangeText={setPassword}
+                                    secureTextEntry
+                                    returnKeyType="done"
+                                />
+                            </View>
+
+                            <TouchableOpacity
+                                onPress={handleLogin}
+                                disabled={loading}
+                                className={`bg-yellow-500 p-4 rounded-xl items-center mt-4 ${loading ? 'opacity-70' : ''}`}
+                            >
+                                {loading ? (
+                                    <ActivityIndicator color="black" />
+                                ) : (
+                                    <Text className="text-black font-bold text-lg">Đăng nhập</Text>
+                                )}
                             </TouchableOpacity>
-                        </Link>
-                    </View>
-                </View>
-            </SafeAreaView>
+
+                            <View className="flex-row justify-center mt-6">
+                                <Text className="text-gray-400">Chưa có tài khoản? </Text>
+                                <Link href="/(auth)/register" asChild>
+                                    <TouchableOpacity>
+                                        <Text className="text-yellow-500 font-bold">Đăng ký ngay</Text>
+                                    </TouchableOpacity>
+                                </Link>
+                            </View>
+                        </View>
+                    </ScrollView>
+                </SafeAreaView>
+            </KeyboardAvoidingView>
         </View>
     );
 }

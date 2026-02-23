@@ -33,7 +33,7 @@ export default function TopTrending({ title, movies, slug, className }: TopTrend
             </div>
 
             {/* List Container */}
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 [contain:layout_paint]">
                 {topMovies.map((movie, index) => (
                     <Link
                         key={movie._id}
@@ -57,6 +57,7 @@ export default function TopTrending({ title, movies, slug, className }: TopTrend
                                 src={getImageUrl(movie.poster_url || movie.thumb_url)}
                                 alt={movie.name}
                                 fill
+                                loading="lazy"
                                 className="object-cover transition-transform duration-300 group-hover:scale-110"
                                 sizes="50px"
                             />

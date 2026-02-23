@@ -6,12 +6,12 @@ import Image from "next/image";
 import { Play, Info, Star, ChevronDown } from "lucide-react";
 import { getImageUrl, decodeHtml } from "@/lib/utils";
 import { Movie } from "@/services/api";
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { getTMDBDataForCard } from "@/app/actions/tmdb";
 import { getTMDBImage } from "@/services/tmdb";
 
-export default function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientation?: 'portrait' | 'landscape' }) {
+function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientation?: 'portrait' | 'landscape' }) {
     const [isHovered, setIsHovered] = useState(false);
     const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
     const [isTouchDevice, setIsTouchDevice] = useState(false);
@@ -322,4 +322,6 @@ function PortalHoverCard({ movie, position, tmdbData, displayPoster, orientation
         document.body
     );
 }
+
+export default React.memo(MovieCard);
 

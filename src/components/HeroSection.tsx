@@ -71,18 +71,19 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
         return () => { desktopApi.off("select", onSelect); };
     }, [desktopApi]);
 
-    // Sync Mobile
+    // Sync Mobile — throttle scroll handler (RAF) để giảm CPU khi cuộn
     useEffect(() => {
         if (!mobileApi) return;
         tweenScale();
-        mobileApi.on("scroll", tweenScale);
+        const onScroll = () => { requestAnimationFrame(tweenScale); };
+        mobileApi.on("scroll", onScroll);
         mobileApi.on("reInit", tweenScale);
 
         const onSelect = () => setSelectedIndex(mobileApi.selectedScrollSnap());
         mobileApi.on("select", onSelect);
         return () => {
             mobileApi.off("select", onSelect);
-            mobileApi.off("scroll", tweenScale);
+            mobileApi.off("scroll", onScroll);
             mobileApi.off("reInit", tweenScale);
         };
     }, [mobileApi, tweenScale]);

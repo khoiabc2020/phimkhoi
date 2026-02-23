@@ -22,7 +22,7 @@ export default function MovieRow({ title, movies, slug, variant = 'default' }: M
                 ? scrollLeft - clientWidth / 2
                 : scrollLeft + clientWidth / 2;
 
-            rowRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
+            rowRef.current.scrollTo({ left: scrollTo, behavior: "auto" });
         }
     };
 
@@ -61,7 +61,7 @@ export default function MovieRow({ title, movies, slug, variant = 'default' }: M
 
                         <div
                             ref={rowRef}
-                            className="flex gap-4 overflow-x-auto pb-4 pt-2 no-scrollbar snap-x scroll-smooth"
+                            className="flex gap-4 overflow-x-auto pb-4 pt-2 no-scrollbar snap-x"
                             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                         >
                             {movies.map((movie) => (
@@ -115,7 +115,7 @@ export default function MovieRow({ title, movies, slug, variant = 'default' }: M
                 {/* Scroll Container - High Density */}
                 <div
                     ref={rowRef}
-                    className="flex gap-2.5 overflow-x-auto px-4 md:px-12 pb-8 pt-2 no-scrollbar snap-x scroll-smooth"
+                    className="flex gap-2.5 overflow-x-auto px-4 md:px-12 pb-8 pt-2 no-scrollbar snap-x"
                     style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
                     {movies.map((movie) => (

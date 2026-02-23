@@ -21,13 +21,21 @@ interface PageProps {
         slug: string;
         episode: string;
     }>;
+    searchParams?: Promise<{
+        server?: string;
+    }>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
     const { slug, episode } = await params;
+    const { server } = (await (searchParams || Promise.resolve({}))) as { server?: string };
     const data = await getMovieDetail(slug);
     const movie = data?.movie;
-    const currentEpisode = data?.episodes?.[0]?.server_data?.find(
+    const servers = data?.episodes || [];
+    const serverIndex = server ? Number(server) || 0 : 0;
+    const usedIndex = servers[serverIndex] ? serverIndex : 0;
+    const episodes = servers[usedIndex]?.server_data || [];
+    const currentEpisode = episodes.find(
         (ep: any) => ep.slug === episode
     );
 
@@ -42,15 +50,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
 }
 
-export default async function WatchPage({ params }: PageProps) {
+export default async function WatchPage({ params, searchParams }: PageProps) {
     const { slug, episode } = await params;
+    const { server } = (await (searchParams || Promise.resolve({}))) as { server?: string };
     const data = await getMovieDetail(slug);
 
     if (!data?.movie) return notFound();
 
     const movie = data.movie as Movie;
     const servers = data.episodes || [];
-    const episodes = servers[0]?.server_data || [];
+    const serverIndex = server ? Number(server) || 0 : 0;
+    const usedIndex = servers[serverIndex] ? serverIndex : 0;
+    const episodes = servers[usedIndex]?.server_data || [];
     const currentEpisode = episodes.find((ep: any) => ep.slug === episode);
 
     let session = null;
@@ -129,6 +140,7 @@ export default async function WatchPage({ params }: PageProps) {
                                 servers={servers}
                                 initialProgress={initialProgress}
                                 movieData={movieData}
+                                initialServerName={servers[usedIndex]?.server_name || servers[0]?.server_name || ""}
                             />
 
                             {/* Movie Content */}

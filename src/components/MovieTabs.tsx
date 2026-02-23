@@ -118,7 +118,7 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
                                         {currentServerData.length} tập
                                     </span>
                                 </div>
-                                <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                                <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar [contain:layout_paint]">
                                     {currentServerData.map((ep: any) => (
                                         <Link
                                             key={ep.slug}
@@ -163,7 +163,7 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
                 {activeTab === "related" && (
                     <div>
                         {relatedMovies.length > 0 ? (
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 [contain:layout_paint]">
                                 {relatedMovies.map((m) => (
                                     <MovieCard key={m._id} movie={m} />
                                 ))}

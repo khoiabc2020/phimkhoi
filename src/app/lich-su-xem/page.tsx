@@ -89,7 +89,7 @@ export default async function WatchHistoryPage() {
                                     <Play className="w-5 h-5 text-[#fbbf24] fill-current" />
                                     Tiếp tục xem
                                 </h2>
-                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 [contain:layout_paint]">
                                     {continueWatching.map((item: any) => (
                                         <Link
                                             key={item._id}
@@ -101,6 +101,7 @@ export default async function WatchHistoryPage() {
                                                     src={getImageUrl(item.moviePoster)}
                                                     alt={item.movieName}
                                                     fill
+                                                    loading="lazy"
                                                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                                                 />
 
@@ -142,7 +143,7 @@ export default async function WatchHistoryPage() {
                                 <History className="w-5 h-5 text-gray-400" />
                                 Tất cả đã xem
                             </h2>
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-x-4 gap-y-8">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-x-4 gap-y-8 [contain:layout_paint]">
                                 {history.map((item: any) => (
                                     <Link
                                         key={item._id}
@@ -154,6 +155,7 @@ export default async function WatchHistoryPage() {
                                                 src={getImageUrl(item.moviePoster)}
                                                 alt={item.movieName}
                                                 fill
+                                                loading="lazy"
                                                 className="object-cover group-hover:scale-105 transition-transform duration-500 grayscale group-hover:grayscale-0"
                                             />
 

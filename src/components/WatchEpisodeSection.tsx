@@ -133,13 +133,13 @@ export default function WatchEpisodeSection({
             {/* Episode grid */}
             {!isCollapsed && (
                 <div className="p-4 pt-0">
-                    <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 max-h-[350px] overflow-y-auto custom-scrollbar pr-2">
+                    <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 max-h-[350px] overflow-y-auto custom-scrollbar pr-2 [contain:layout_paint]">
                         {episodes.map((ep) => {
                             const isActive = ep.slug === currentEpisodeSlug;
                             return (
                                 <Link
                                     key={ep.slug}
-                                    href={`/xem-phim/${movieSlug}/${ep.slug}`}
+                                    href={`/xem-phim/${movieSlug}/${ep.slug}?server=${safeIndex}`}
                                     className={cn(
                                         "h-10 rounded-lg flex items-center justify-center gap-1.5 text-xs sm:text-sm font-bold transition-all border",
                                         isActive

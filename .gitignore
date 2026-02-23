@@ -42,6 +42,7 @@ next-env.d.ts
 
 # mobile
 mobile/android/local.properties
+mobile/credentials.json
 mobile/android/.gradle/
 mobile/android/app/build/
 mobile/ios/Pods/
