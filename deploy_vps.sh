@@ -26,6 +26,8 @@ npm install
 echo "Building application..."
 # Clean old build to prevent caching issues
 rm -rf .next
+# Increase Node heap for Next build on small VPS
+export NODE_OPTIONS="--max_old_space_size=2048"
 npm run build
 
 # FIX: Copy static assets to standalone directory (Critical for CSS/JS/Images to work)
