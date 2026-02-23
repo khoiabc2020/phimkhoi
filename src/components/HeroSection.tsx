@@ -26,6 +26,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [heroMoviesData, setHeroMoviesData] = useState<Record<string, { vote_average: number, backdrop_path?: string, poster_path?: string }>>({});
     const [tweenValues, setTweenValues] = useState<number[]>([]);
+    const [isDesktop, setIsDesktop] = useState(false);
 
     // Embla Tween Scale Logic cho Mobile
     const tweenScale = useCallback(() => {
@@ -88,8 +89,18 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
         };
     }, [mobileApi, tweenScale]);
 
-    // Hydrate TMDB
+    // Detect desktop (client-side) to avoid heavy TMDB enrichment on mobile
     useEffect(() => {
+        if (typeof window === "undefined") return;
+        const check = () => setIsDesktop(window.innerWidth >= 1024);
+        check();
+        window.addEventListener("resize", check);
+        return () => window.removeEventListener("resize", check);
+    }, []);
+
+    // Hydrate TMDB (desktop only to giảm CPU cho mobile)
+    useEffect(() => {
+        if (!isDesktop) return;
         const fetchHeroData = async () => {
             const updates: Record<string, { vote_average: number, backdrop_path?: string, poster_path?: string }> = {};
             await Promise.all(movies.slice(0, 20).map(async (movie) => {
@@ -126,7 +137,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
             setHeroMoviesData(prev => ({ ...prev, ...updates }));
         };
         if (movies?.length > 0) fetchHeroData();
-    }, [movies]);
+    }, [movies, isDesktop]);
 
     const scrollTo = useCallback((index: number) => {
         if (desktopApi) desktopApi.scrollTo(index);
@@ -146,7 +157,8 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
     if (!movies || movies.length === 0) return null;
 
     const stripHtml = (html: string) => html ? html.replace(/<[^>]*>/g, '').trim() : "";
-    const heroMovies = movies.slice(0, 15);
+    // Giảm số lượng slide để nhẹ hơn (đủ đa dạng nhưng không quá nặng)
+    const heroMovies = movies.slice(0, 10);
     const activeMovie = heroMovies[selectedIndex] || heroMovies[0];
     const activeTMDB = heroMoviesData[activeMovie._id];
     const activeRating = activeTMDB?.vote_average ? activeTMDB.vote_average.toFixed(1) : "N/A";
@@ -178,7 +190,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
             {/* ================= TABLET & MOBILE LAYOUT (Portrait/Small Screens) ================= */}
             {/* Shows on < lg screens (approx < 1024px) */}
-            <div className="lg:hidden relative w-full h-auto flex flex-col pt-10 pb-12 bg-[#0B0D12]" ref={mobileRef}>
+            <div className="lg:hidden relative w-full h-auto flex flex-col pt-6 pb-8 bg-[#0B0D12]" ref={mobileRef}>
                 <div className="flex flex-row touch-pan-y h-auto">
                     {heroMovies.map((movie, index) => {
                         const posterImg = getHeroImage(movie, 'poster');
@@ -189,12 +201,12 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                         const textOpacity = Math.max(0, Math.min(1, (tweenValue - 0.95) / 0.05));
 
                         return (
-                            <div key={movie._id} className="relative flex-[0_0_75%] sm:flex-[0_0_60%] max-w-[300px] min-w-0 h-auto flex flex-col items-center pt-8">
+                            <div key={movie._id} className="relative flex-[0_0_72%] sm:flex-[0_0_58%] max-w-[260px] min-w-0 h-auto flex flex-col items-center pt-6">
 
                                 {/* 1. Centered Poster with 3D Tween */}
                                 <Link
                                     href={`/xem-phim/${movie.slug}`}
-                                    className="relative w-[80%] max-w-[240px] mx-auto aspect-[2/3] mb-4 rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 shrink-0 transition-all duration-300 ease-out"
+                                    className="relative w-[78%] max-w-[220px] mx-auto aspect-[2/3] mb-3 rounded-xl overflow-hidden shadow-lg ring-1 ring-white/5 shrink-0 transition-transform duration-300 ease-out"
                                     style={{
                                         transform: `scale(${tweenValue})`,
                                         opacity: posterOpacity
@@ -212,36 +224,36 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
                                 {/* 2. Vertically Stacked Movie Info */}
                                 <div
-                                    className="flex flex-col items-center w-[105%] text-center transition-all duration-300 ease-out mt-1"
+                                    className="flex flex-col items-center w-[100%] text-center transition-all duration-300 ease-out mt-1 px-2"
                                     style={{
                                         opacity: textOpacity,
                                         transform: `translateY(${(1 - tweenValue) * 20}px)`,
                                         visibility: textOpacity <= 0 ? 'hidden' : 'visible'
                                     }}
                                 >
-                                    <h1 className="text-2xl md:text-3xl font-black text-white leading-tight drop-shadow-lg line-clamp-2 px-2 tracking-tight mb-2">
+                                    <h1 className="text-xl md:text-2xl font-black text-white leading-tight drop-shadow-lg line-clamp-2 tracking-tight mb-1">
                                         {movie.name}
                                     </h1>
 
-                                    <h2 className="text-[15px] md:text-base text-[#F4C84A] font-medium line-clamp-1 mb-4">
+                                    <h2 className="text-[13px] md:text-sm text-[#F4C84A] font-medium line-clamp-1 mb-3">
                                         {movie.origin_name}
                                     </h2>
 
                                     {/* Meta Row */}
-                                    <div className="flex items-center justify-center gap-3 mb-4">
+                                    <div className="flex items-center justify-center gap-2 mb-3">
                                         {movie.year && (
                                             <span className="bg-white/10 px-3 py-1 rounded-md text-sm font-bold text-white border border-white/10">{movie.year}</span>
                                         )}
-                                        <span className="bg-white/10 px-3 py-1 rounded-md text-sm font-bold text-[#F4C84A] border border-white/10 flex items-center gap-1">
+                                        <span className="bg-white/10 px-2.5 py-1 rounded-md text-xs font-bold text-[#F4C84A] border border-white/10 flex items-center gap-1">
                                             ★ {rating}
                                         </span>
                                         {movie.quality && (
-                                            <span className="bg-[#F4C84A]/10 text-[#F4C84A] px-3 py-1 rounded-md text-sm font-bold border border-[#F4C84A]/40">{movie.quality}</span>
+                                            <span className="bg-[#F4C84A]/10 text-[#F4C84A] px-2.5 py-1 rounded-md text-xs font-bold border border-[#F4C84A]/40">{movie.quality}</span>
                                         )}
                                     </div>
 
                                     {/* Genres */}
-                                    <div className="flex flex-wrap justify-center gap-2 mb-6">
+                                    <div className="flex flex-wrap justify-center gap-1.5 mb-4">
                                         {movie.category?.slice(0, 3).map(c => (
                                             <span key={c.id} className="text-xs font-semibold text-white/80 px-4 py-1.5 rounded-full bg-black/40 border border-white/10">
                                                 {c.name}
@@ -250,24 +262,24 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                     </div>
 
                                     {/* CTA Buttons */}
-                                    <div className="flex items-center justify-center gap-4 w-full px-4">
+                                    <div className="flex items-center justify-center gap-3 w-full px-2">
                                         <Link
                                             href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                            className="flex flex-1 max-w-[160px] items-center justify-center gap-2 h-12 rounded-full bg-[#F4C84A] text-black font-extrabold shadow-md hover:scale-105 active:scale-95 transition-transform"
+                                            className="flex flex-1 max-w-[150px] items-center justify-center gap-2 h-11 rounded-full bg-[#F4C84A] text-black font-extrabold shadow-md hover:scale-105 active:scale-95 transition-transform"
                                         >
-                                            <Play className="w-5 h-5 fill-black" />
-                                            <span className="text-[15px]">Xem</span>
+                                            <Play className="w-4 h-4 fill-black" />
+                                            <span className="text-[14px]">Xem</span>
                                         </Link>
 
                                         <Link
                                             href={`/phim/${movie.slug}`}
-                                            className="w-12 h-12 flex items-center justify-center rounded-full bg-white/10 border border-white/20 active:scale-95 transition-transform"
+                                            className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 border border-white/15 active:scale-95 transition-transform"
                                         >
-                                            <Info className="w-6 h-6 text-white" />
+                                            <Info className="w-5 h-5 text-white" />
                                         </Link>
 
-                                        <div className="w-12 h-12 flex items-center justify-center rounded-full bg-white/10 border border-white/20 active:scale-95 transition-transform">
-                                            <FavoriteButton movieData={getFavoriteData(movie)} size="md" />
+                                        <div className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 border border-white/15 active:scale-95 transition-transform">
+                                            <FavoriteButton movieData={getFavoriteData(movie)} size="sm" />
                                         </div>
                                     </div>
                                 </div>
