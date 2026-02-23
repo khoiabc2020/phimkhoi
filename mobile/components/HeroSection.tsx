@@ -110,6 +110,8 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                 scrollAnimationDuration={320}
                 mode="parallax"
                 modeConfig={{ parallaxScrollingScale: 0.92, parallaxScrollingOffset: 40 }}
+                // Tăng ngưỡng vuốt ngang để vuốt dọc xuống dưới dễ hơn
+                panGestureHandlerProps={{ activeOffsetX: [-20, 20] }}
                 renderItem={renderItem}
             />
         </View>

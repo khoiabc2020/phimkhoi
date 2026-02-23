@@ -141,6 +141,8 @@ export default function NativePlayer({
         }
     };
 
+    const finishedOnce = useRef(false);
+
     const onPlaybackStatusUpdate = (status: AVPlaybackStatus) => {
         setStatus(status);
         if (status.isLoaded) {
@@ -161,6 +163,14 @@ export default function NativePlayer({
                     if (onProgress) onProgress(currentTime, duration);
                 }
             }
+
+            // Auto next episode when finished
+            if (status.didJustFinish && onNext && !finishedOnce.current) {
+                finishedOnce.current = true;
+                onNext();
+            }
+        } else {
+            finishedOnce.current = false;
         }
     };
 
@@ -333,8 +343,8 @@ export default function NativePlayer({
                     shouldPlay={true}
                 />
 
-                {/* Loading / buffering indicator */}
-                {(!('isLoaded' in status) || !status.isLoaded || (status as any).isBuffering) && !error && (
+                {/* Loading indicator – chỉ khi video chưa load lần đầu, không chớp khi tua 10s */}
+                {(!('isLoaded' in status) || !status.isLoaded) && !error && (
                     <View style={styles.loadingOverlay} pointerEvents="none">
                         <ActivityIndicator size="large" color="#fbbf24" />
                     </View>

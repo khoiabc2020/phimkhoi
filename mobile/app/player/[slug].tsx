@@ -2,8 +2,8 @@ import { View, ActivityIndicator, TouchableOpacity, Text, Dimensions, StatusBar 
 import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import { WebView } from 'react-native-webview';
 import * as ScreenOrientation from 'expo-screen-orientation';
-import { useState, useEffect, useRef } from 'react';
-import { getMovieDetail } from '@/services/api';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { getMovieDetail, saveHistory } from '@/services/api';
 import { getLocalPlayUri } from '@/lib/downloads';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -46,6 +46,39 @@ export default function PlayerScreen() {
         };
     }, []);
 
+    const applyEpisode = useCallback((data: any, serverIndex: number, episodeSlug?: string | string[] | null) => {
+        if (!data || !data.episodes) return;
+        setEpisodes(data.episodes);
+
+        const serverData = data.episodes[serverIndex]?.server_data || [];
+        let epObj: { slug: string; name: string; link_m3u8?: string; link_embed?: string } | undefined;
+
+        if (episodeSlug) {
+            epObj = serverData.find((e: any) => e.slug === episodeSlug) || serverData[0];
+        } else {
+            epObj = serverData[0];
+        }
+
+        if (!epObj) return;
+
+        setEpisodeTitle(epObj.name);
+
+        if (epObj.link_m3u8 && !epObj.link_m3u8.includes('youtube')) {
+            setVideoUrl(epObj.link_m3u8);
+            setIsNative(true);
+        } else {
+            setVideoUrl(epObj.link_embed ?? '');
+            setIsNative(false);
+        }
+
+        const idx = serverData.findIndex((e: any) => e.slug === epObj!.slug);
+        if (idx !== -1 && idx < serverData.length - 1) {
+            setNextEpisodeSlug(serverData[idx + 1].slug ?? null);
+        } else {
+            setNextEpisodeSlug(null);
+        }
+    }, []);
+
     useEffect(() => {
         const fetchVideo = async () => {
             if (!slug) return;
@@ -68,67 +101,20 @@ export default function PlayerScreen() {
             const data = await getMovieDetail(slug as string);
             if (data && data.episodes) {
                 setMovieTitle(data.movie?.name || "");
-
-                setEpisodes(data.episodes);
-
-                let episode: { slug: string; name: string; link_m3u8?: string; link_embed?: string } | undefined;
-                const currentServerData = data.episodes[selectedServer]?.server_data || [];
-
-                if (ep) {
-                    episode = currentServerData.find((e: any) => e.slug === ep);
-                    if (!episode) episode = currentServerData[0];
-                } else {
-                    episode = currentServerData[0];
-                }
-
-                if (episode) {
-                    setEpisodeTitle(episode.name);
-
-                    if (episode.link_m3u8 && !episode.link_m3u8.includes('youtube')) {
-                        setVideoUrl(episode.link_m3u8);
-                        setIsNative(true);
-                    } else {
-                        setVideoUrl(episode.link_embed ?? '');
-                        setIsNative(false);
-                    }
-
-                    const epSlug = episode.slug;
-                    const currentIndex = currentServerData.findIndex((e: any) => e.slug === epSlug);
-                    if (currentIndex !== -1 && currentIndex < currentServerData.length - 1) {
-                        setNextEpisodeSlug(currentServerData[currentIndex + 1].slug ?? null);
-                    } else {
-                        setNextEpisodeSlug(null);
-                    }
-                }
+                applyEpisode(data, selectedServer, ep);
             }
             setLoading(false);
         };
         fetchVideo();
-    }, [slug, ep, selectedServer, localUriParam]);
+    }, [slug, ep, selectedServer, localUriParam, applyEpisode]);
 
     const handleProgress = async (currentTime: number, duration: number) => {
         if (!user || !token || !slug || !ep) return;
 
         try {
-            // Convert to seconds for backend
             const progressSeconds = Math.floor(currentTime / 1000);
             const durationSeconds = Math.floor(duration / 1000);
-
-            await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/history`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    slug,
-                    episode: ep,
-                    progress: progressSeconds, // Backend expects seconds or percentage? API Analysis needed.
-                    duration: durationSeconds
-                })
-            });
-            // Don't call syncHistory() every 5s, it might be too heavy. 
-            // Maybe only on unmount or pause? For now, we rely on backend having truth.
+            await saveHistory(slug as string, ep as string, progressSeconds, durationSeconds, token);
         } catch (e) {
             console.error("Failed to sync history", e);
         }
@@ -139,9 +125,8 @@ export default function PlayerScreen() {
     };
 
     const handleNextEpisode = () => {
-        if (nextEpisodeSlug) {
-            router.replace(`/player/${slug}?ep=${nextEpisodeSlug}&server=${selectedServer}`);
-        }
+        if (!nextEpisodeSlug || !episodes.length) return;
+        applyEpisode({ episodes }, selectedServer, nextEpisodeSlug);
     };
 
     if (loading) {
@@ -189,18 +174,11 @@ export default function PlayerScreen() {
                     currentServerIndex={selectedServer}
                     currentEpisodeSlug={ep as string}
                     onEpisodeChange={(newSlug) => {
-                        router.replace({ pathname: `/player/${slug}` as any, params: { ep: newSlug, server: selectedServer } });
+                        applyEpisode({ episodes }, selectedServer, newSlug);
                     }}
                     onServerChange={(newServerIndex) => {
                         setSelectedServer(newServerIndex);
-                        const currentEpName = episodeTitle;
-                        const newServerData = episodes[newServerIndex]?.server_data || [];
-                        const sameEp = newServerData.find((e: any) => e.name === currentEpName);
-                        const targetEp = sameEp || newServerData[0];
-
-                        if (targetEp) {
-                            router.replace({ pathname: `/player/${slug}` as any, params: { ep: targetEp.slug, server: newServerIndex } });
-                        }
+                        applyEpisode({ episodes }, newServerIndex, ep);
                     }}
                 />
             ) : (
