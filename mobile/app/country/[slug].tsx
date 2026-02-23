@@ -1,5 +1,5 @@
 import { View, Text, FlatList, ActivityIndicator, Pressable } from 'react-native';
-import { useLocalSearchParams, Stack, Link } from 'expo-router';
+import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useState, useEffect } from 'react';
 import { getMoviesByCountry, Movie } from '@/services/api';
@@ -12,6 +12,7 @@ const CARD_WIDTH = (width - 16 * 3) / 2;
 
 export default function CountryScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
+  const router = useRouter();
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [countryName, setCountryName] = useState('');
@@ -33,11 +34,9 @@ export default function CountryScreen() {
       <StatusBar style="light" />
       <Stack.Screen options={{ headerShown: false }} />
       <View className="pt-12 pb-4 px-4 flex-row items-center">
-        <Link href="/explore" asChild>
-          <Pressable className="mr-3 p-2 -ml-2">
-            <Ionicons name="arrow-back" size={24} color="white" />
-          </Pressable>
-        </Link>
+        <Pressable onPress={() => router.back()} className="mr-3 p-2 -ml-2">
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </Pressable>
         <Text className="text-white text-xl font-bold flex-1 capitalize">{countryName}</Text>
       </View>
       {loading ? (

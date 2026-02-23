@@ -149,14 +149,14 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
 
                         {/* Logo */}
                         <Link href="/" className="flex items-center gap-3 group shrink-0 order-2 md:order-none">
-                            <div className="relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center">
+                            <div className="relative w-10 h-10 md:w-11 md:h-11 flex items-center justify-center">
                                 <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                                 <Image
                                     src="/logo.webp"
                                     alt="MovieBox Logo"
-                                    width={40}
-                                    height={40}
-                                    className="relative w-full h-full rounded-2xl object-cover shadow-lg group-hover:scale-105 transition-transform duration-300"
+                                    width={44}
+                                    height={44}
+                                    className="relative w-full h-full rounded-[14px] object-cover shadow-lg ring-1 ring-white/10 group-hover:scale-105 group-hover:ring-white/20 transition-all duration-300"
                                 />
                             </div>
                             <div className="flex flex-col justify-center">

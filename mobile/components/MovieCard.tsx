@@ -12,9 +12,8 @@ interface MovieCardProps {
 }
 
 const MovieCard = memo(({ movie, width = 115, height = 172 }: MovieCardProps) => {
+    if (!movie || !movie.slug) return null;
     const imageUrl = getImageUrl(movie.poster_url || movie.thumb_url);
-
-    if (!movie.slug) return null;
 
     return (
         <Link href={`/movie/${movie.slug}`} asChild>
@@ -39,13 +38,13 @@ const MovieCard = memo(({ movie, width = 115, height = 172 }: MovieCardProps) =>
                             {movie.lang?.includes('Thuyết') ? (
                                 <View style={{ backgroundColor: 'rgba(59,130,246,0.9)', paddingHorizontal: 5, paddingVertical: 2, borderRadius: 4 }}>
                                     <Text style={{ fontSize: 9, fontWeight: 'bold', color: 'white' }}>
-                                        TM.{movie.episode_current.replace(/[^0-9]/g, '') || 'Full'}
+                                        TM.{String(movie.episode_current).replace(/[^0-9]/g, '') || 'Full'}
                                     </Text>
                                 </View>
                             ) : (
                                 <View style={{ backgroundColor: 'rgba(75,85,99,0.9)', paddingHorizontal: 5, paddingVertical: 2, borderRadius: 4 }}>
                                     <Text style={{ fontSize: 9, fontWeight: 'bold', color: 'white' }}>
-                                        PD.{movie.episode_current.replace(/[^0-9]/g, '') || 'Full'}
+                                        PD.{String(movie.episode_current).replace(/[^0-9]/g, '') || 'Full'}
                                     </Text>
                                 </View>
                             )}

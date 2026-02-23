@@ -13,6 +13,7 @@ import {
     Animated,
     Easing,
     Platform,
+    ActivityIndicator,
 } from 'react-native';
 import { Video, AVPlaybackStatus, ResizeMode } from 'expo-av';
 import Slider from '@react-native-community/slider';
@@ -222,8 +223,12 @@ export default function NativePlayer({
         }
     };
 
-    const handleVideoError = (error: string) => {
-        console.log("Video Error:", error);
+    const handleVideoError = (err: any) => {
+        const message = typeof err === 'string'
+            ? err
+            : err?.error || err?.nativeEvent?.error || 'Lỗi phát video';
+        console.log("Video Error:", err);
+        setError(message);
     };
 
     // --- BRIGHTNESS GESTURE (PanResponder) ---
@@ -328,6 +333,41 @@ export default function NativePlayer({
                     shouldPlay={true}
                 />
 
+                {/* Loading / buffering indicator */}
+                {(!('isLoaded' in status) || !status.isLoaded || (status as any).isBuffering) && !error && (
+                    <View style={styles.loadingOverlay} pointerEvents="none">
+                        <ActivityIndicator size="large" color="#fbbf24" />
+                    </View>
+                )}
+
+                {/* Error overlay */}
+                {error && (
+                    <View style={styles.errorOverlay}>
+                        <Text style={styles.errorTitle}>Không phát được video</Text>
+                        <Text style={styles.errorMessage} numberOfLines={3}>
+                            {error}
+                        </Text>
+                        <View style={{ flexDirection: 'row', gap: 12, marginTop: 16 }}>
+                            <TouchableOpacity
+                                style={styles.errorButtonSecondary}
+                                onPress={onClose}
+                            >
+                                <Text style={styles.errorButtonSecondaryText}>Thoát</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.errorButtonPrimary}
+                                onPress={() => {
+                                    setError(null);
+                                    setVideoSource({ uri: url });
+                                    video.current?.replayAsync().catch(() => { });
+                                }}
+                            >
+                                <Text style={styles.errorButtonPrimaryText}>Thử lại</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                )}
+
                 {/* Brightness Overlay (Standard Animated) */}
                 <Animated.View
                     style={[
@@ -374,7 +414,9 @@ export default function NativePlayer({
                                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                                         {episode && <Text style={styles.subTitle}>{episode}</Text>}
                                         <View style={{ width: 3, height: 3, borderRadius: 1.5, backgroundColor: 'rgba(255,255,255,0.5)' }} />
-                                        <Text style={styles.subTitle}>Server {serverList[currentServerIndex]}</Text>
+                                        <Text style={styles.subTitle}>
+                                            Server {serverList[currentServerIndex] || currentServerIndex + 1}
+                                        </Text>
                                     </View>
                                 </View>
                                 <View style={{ flexDirection: 'row', gap: 20, alignItems: 'center' }}>
@@ -619,6 +661,58 @@ const styles = StyleSheet.create({
     backBtn: { padding: 8, marginRight: 6 },
     videoTitle: { color: 'white', fontSize: 15, fontWeight: '700' },
     subTitle: { color: 'rgba(255,255,255,0.7)', fontSize: 12, fontWeight: '500' },
+
+    loadingOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 3,
+        backgroundColor: 'rgba(0,0,0,0.35)',
+    },
+    errorOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 24,
+        backgroundColor: 'rgba(0,0,0,0.75)',
+        zIndex: 4,
+    },
+    errorTitle: {
+        color: 'white',
+        fontSize: 18,
+        fontWeight: '700',
+        marginBottom: 6,
+        textAlign: 'center',
+    },
+    errorMessage: {
+        color: 'rgba(255,255,255,0.8)',
+        fontSize: 14,
+        textAlign: 'center',
+    },
+    errorButtonPrimary: {
+        paddingHorizontal: 18,
+        paddingVertical: 10,
+        borderRadius: 20,
+        backgroundColor: '#fbbf24',
+    },
+    errorButtonPrimaryText: {
+        color: '#111827',
+        fontWeight: '600',
+        fontSize: 14,
+    },
+    errorButtonSecondary: {
+        paddingHorizontal: 18,
+        paddingVertical: 10,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.3)',
+        backgroundColor: 'rgba(0,0,0,0.6)',
+    },
+    errorButtonSecondaryText: {
+        color: 'white',
+        fontWeight: '500',
+        fontSize: 14,
+    },
 
     lockBtn: {
         position: 'absolute',

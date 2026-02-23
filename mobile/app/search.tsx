@@ -8,6 +8,7 @@ import { useRouter, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { CONFIG } from '@/constants/config';
+import { searchMovies } from '@/services/api';
 
 interface SearchResult {
     _id: string;
@@ -36,8 +37,6 @@ export default function SearchScreen() {
         setLoading(true);
         setSearched(true);
         try {
-            // Use standard API service
-            const { searchMovies } = require('@/services/api');
             const items = await searchMovies(text.trim());
             setResults(items);
         } catch (e) {

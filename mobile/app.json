@@ -2,9 +2,9 @@
   "expo": {
     "name": "MovieBox",
     "slug": "phimkhoi-mobile",
-    "version": "1.0.2",
+    "version": "1.0.4",
     "orientation": "default",
-    "icon": "./assets/images/logo.webp",
+    "icon": "./assets/images/icon.png",
     "scheme": "phimkhoi",
     "userInterfaceStyle": "dark",
     "newArchEnabled": false,
@@ -14,7 +14,7 @@
     "android": {
       "permissions": ["android.permission.WRITE_SETTINGS"],
       "adaptiveIcon": {
-        "backgroundColor": "#1a1c23",
+        "backgroundColor": "#0F121A",
         "foregroundImage": "./assets/images/adaptive-icon.png"
       },
       "package": "com.phimkhoi.mobile",

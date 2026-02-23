@@ -28,7 +28,7 @@ const HOME_CACHE_KEY = 'home_screen_cache_v1';
 
 // Main Nav Pills (Top)
 const NAV_PILLS = [
-  { label: 'Đề xuất', href: '/explore', active: true },
+  { label: 'Đề xuất', href: '/(tabs)/explore', active: true },
   { label: 'Phim bộ', href: '/list/phim-bo', active: false },
   { label: 'Phim lẻ', href: '/list/phim-le', active: false },
   { label: 'Hoạt hình', href: '/list/hoat-hinh', active: false },
@@ -92,13 +92,21 @@ export default function HomeScreen() {
         finalHero = heroMixed.slice(0, 8);
       }
 
+      // Nếu backend trả về rỗng thì thoát sớm, tránh crash
+      if (!homeBasic) {
+        setLoading(false);
+        setRefreshing(false);
+        return;
+      }
+
       // Snapshot cơ bản cho hero + section chính
       const baseSnapshot = {
         heroMovies: finalHero,
-        phimLe: homeBasic.phimLe,
-        phimBo: homeBasic.phimBo,
-        hoatHinh: homeBasic.hoatHinh,
-        tvShows: homeBasic.tvShows,
+        // Giới hạn số lượng để nhẹ hơn và tránh cache quá nặng
+        phimLe: (homeBasic.phimLe || []).slice(0, 30),
+        phimBo: (homeBasic.phimBo || []).slice(0, 30),
+        hoatHinh: (homeBasic.hoatHinh || []).slice(0, 30),
+        tvShows: (homeBasic.tvShows || []).slice(0, 30),
         phimChieuRap: [] as Movie[],
         hanQuoc: [] as Movie[],
         trungQuoc: [] as Movie[],
@@ -127,12 +135,12 @@ export default function HomeScreen() {
 
       const fullSnapshot = {
         ...baseSnapshot,
-        phimChieuRap: chieuRapRes?.items || [],
-        hanQuoc: hanQuocRes?.items || [],
-        trungQuoc: trungQuocRes?.items || [],
-        hanhDong: hanhDongRes?.items || [],
-        tinhCam: tinhCamRes?.items || [],
-        sapChieu: sapChieuRes?.items || [],
+        phimChieuRap: (chieuRapRes?.items || []).slice(0, 24),
+        hanQuoc: (hanQuocRes?.items || []).slice(0, 24),
+        trungQuoc: (trungQuocRes?.items || []).slice(0, 24),
+        hanhDong: (hanhDongRes?.items || []).slice(0, 24),
+        tinhCam: (tinhCamRes?.items || []).slice(0, 24),
+        sapChieu: (sapChieuRes?.items || []).slice(0, 24),
       };
 
       setData(prev => ({
@@ -216,10 +224,12 @@ export default function HomeScreen() {
         <SafeAreaView edges={['top']} style={styles.headerContent}>
           <View style={styles.headerRow}>
             <View style={[styles.logoRow, { paddingLeft: 8 }]}>
-              <Image
-                source={require('../../assets/images/logo.webp')}
-                style={{ width: 36, height: 36, resizeMode: 'contain', marginRight: 4 }}
-              />
+              <View style={styles.logoImageWrap}>
+                <Image
+                  source={require('../../assets/images/logo.webp')}
+                  style={styles.logoImage}
+                />
+              </View>
               <Text style={styles.logoText}>
                 Movie
                 <Text style={styles.logoTextAccent}>Box</Text>
@@ -227,10 +237,28 @@ export default function HomeScreen() {
             </View>
 
             <View style={styles.headerActions}>
-              <Pressable style={styles.iconBtn} onPress={() => router.push('/search' as any)}>
+              <Pressable
+                style={styles.iconBtn}
+                onPress={() => {
+                  try {
+                    router.push('/search' as any);
+                  } catch (e) {
+                    console.warn('Nav to search failed', e);
+                  }
+                }}
+              >
                 <Ionicons name="search-outline" size={20} color={COLORS.textPrimary} />
               </Pressable>
-              <Pressable style={styles.iconBtn} onPress={() => router.push('/notifications' as any)}>
+              <Pressable
+                style={styles.iconBtn}
+                onPress={() => {
+                  try {
+                    router.push('/notifications' as any);
+                  } catch (e) {
+                    console.warn('Nav to notifications failed', e);
+                  }
+                }}
+              >
                 <Ionicons name="notifications-outline" size={20} color={COLORS.textPrimary} />
                 <View style={styles.notifBadge}>
                   <Text style={styles.notifBadgeText}>4</Text>
@@ -366,37 +394,27 @@ const styles = StyleSheet.create({
   headerWrapper: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 100 },
   headerContent: { paddingBottom: 10 },
   headerRow: { height: 50, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20 },
-  logoRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  logoIcon: {
-    width: 32,
-    height: 32,
-    backgroundColor: 'transparent',
-    marginRight: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+  logoRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  logoImageWrap: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
-  logoLoopLeft: {
-    width: 14,
-    height: 24,
-    borderRadius: 7,
-    borderWidth: 3.5,
-    borderColor: COLORS.accent,
-    borderBottomWidth: 0,
-    borderRightWidth: 0,
-    transform: [{ rotate: '-45deg' }, { translateX: 2 }],
+  logoImage: {
+    width: 42,
+    height: 42,
+    resizeMode: 'cover',
   },
-  logoLoopRight: {
-    width: 14,
-    height: 24,
-    borderRadius: 7,
-    borderWidth: 3.5,
-    borderColor: COLORS.accent,
-    borderBottomWidth: 0,
-    borderLeftWidth: 0,
-    transform: [{ rotate: '45deg' }, { translateX: -2 }],
-  },
-  logoText: { color: COLORS.textPrimary, fontSize: 18, fontWeight: '800', letterSpacing: -0.5 },
+  logoText: { color: COLORS.textPrimary, fontSize: 20, fontWeight: '800', letterSpacing: -0.5 },
   logoTextAccent: { color: COLORS.accent },
   headerActions: { flexDirection: 'row', gap: 12, alignItems: 'center' },
   iconBtn: {

@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import { useRouter, Stack } from 'expo-router';
@@ -41,7 +41,7 @@ export default function RegisterScreen() {
             }
 
             Alert.alert('Thành công', 'Đăng ký thành công! Vui lòng đăng nhập.', [
-                { text: 'OK', onPress: () => router.replace('/login') }
+                { text: 'OK', onPress: () => router.replace('/(auth)/login') }
             ]);
 
         } catch (error: any) {
@@ -66,9 +66,11 @@ export default function RegisterScreen() {
 
                 <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
                     <View className="items-center my-8">
-                        <Ionicons name="person-add-outline" size={50} color="#fbbf24" />
+                        <View style={{ width: 64, height: 64, borderRadius: 18, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' }}>
+                            <Image source={require('../../assets/images/logo.webp')} style={{ width: 64, height: 64 }} resizeMode="cover" />
+                        </View>
                         <Text className="text-3xl font-bold text-white mt-4">Đăng Ký</Text>
-                        <Text className="text-gray-400 mt-2 text-center">Tạo tài khoản để trải nghiệm tốt hơn</Text>
+                        <Text className="text-gray-400 mt-2 text-center">Tạo tài khoản Movie<Text className="text-yellow-500">Box</Text> để trải nghiệm tốt hơn</Text>
                     </View>
 
                     <View className="space-y-4">
@@ -134,7 +136,7 @@ export default function RegisterScreen() {
 
                         <View className="flex-row justify-center mt-6">
                             <Text className="text-gray-400">Đã có tài khoản? </Text>
-                            <TouchableOpacity onPress={() => router.push('/login')}>
+                            <TouchableOpacity onPress={() => router.push('/(auth)/login')}>
                                 <Text className="text-yellow-500 font-bold">Đăng nhập ngay</Text>
                             </TouchableOpacity>
                         </View>

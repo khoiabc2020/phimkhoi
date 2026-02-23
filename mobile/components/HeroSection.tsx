@@ -80,15 +80,20 @@ export default function HeroSection({ movies }: HeroSectionProps) {
     }, [favSlugs, user, token, syncFavorites]);
 
     const renderItem = useCallback(
-        ({ item, index }: { item: Movie; index: number }) => (
-            <HeroCard
-                movie={item}
-                isActive={index === activeIndex}
-                isFav={favSlugs.has(item.slug)}
-                onToggleFav={() => toggleFav(item)}
-                onPress={() => router.push(`/movie/${item.slug}` as any)}
-            />
-        ),
+        ({ item, index }: { item: Movie; index: number }) => {
+            if (!item?.slug) return <View style={{ flex: 1 }} />;
+            return (
+                <HeroCard
+                    movie={item}
+                    isActive={index === activeIndex}
+                    isFav={favSlugs.has(item.slug)}
+                    onToggleFav={() => toggleFav(item)}
+                    onPress={() => {
+                        try { router.push(`/movie/${item.slug}` as any); } catch (e) { console.warn('Nav failed', e); }
+                    }}
+                />
+            );
+        },
         [activeIndex, favSlugs, toggleFav, router]
     );
 
@@ -163,7 +168,9 @@ const HeroCard = React.memo(function HeroCard({ movie, isActive, isFav, onToggle
                 <View style={styles.actionRow}>
                     <FocusableButton
                         style={styles.playBtnIcon}
-                        onPress={() => router.push(`/movie/${movie.slug}?autoPlay=true` as any)}
+                        onPress={() => {
+                            try { router.push(`/movie/${movie.slug}?autoPlay=true` as any); } catch (e) { console.warn('Nav failed', e); }
+                        }}
                     >
                         <Ionicons name="play" size={24} color="#0B0D12" />
                     </FocusableButton>

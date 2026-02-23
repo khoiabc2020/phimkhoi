@@ -81,9 +81,9 @@ export default function MobileMenu({
                         <Image
                             src="/logo.webp"
                             alt="MovieBox Logo"
-                            width={28}
-                            height={28}
-                            className="w-7 h-7 rounded-lg object-cover shadow-[0_0_12px_rgba(244,200,74,0.2)]"
+                            width={36}
+                            height={36}
+                            className="w-9 h-9 rounded-[12px] object-cover shadow-[0_0_12px_rgba(244,200,74,0.2)] ring-1 ring-white/10"
                         />
                         <span className="text-[17px] font-black text-white tracking-tighter">MOVIE<span className="text-[#F4C84A]">BOX</span></span>
                     </Link>

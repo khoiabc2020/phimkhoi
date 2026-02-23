@@ -1,10 +1,9 @@
 import React, { memo } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet, FlatList } from 'react-native';
 import { Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Movie } from '@/services/api';
 import MovieCard from './MovieCard';
-import { FlashList } from '@shopify/flash-list';
 
 interface MovieRowProps {
     title: string;
@@ -41,12 +40,11 @@ const MovieRow = memo(({ title, movies, slug, subtitle, type = 'list' }: MovieRo
                 )}
             </View>
 
-            {/* Movie List */}
-            <FlashList
-                data={movies}
+            {/* Movie List - FlatList thay FlashList để tránh crash native trên một số máy */}
+            <FlatList
+                data={movies.filter(m => m && m.slug)}
                 renderItem={({ item }) => <MovieCard movie={item} />}
-                estimatedItemSize={130}
-                keyExtractor={(item) => item._id}
+                keyExtractor={(item, index) => item._id || item.slug || `row-${index}`}
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.listContent}

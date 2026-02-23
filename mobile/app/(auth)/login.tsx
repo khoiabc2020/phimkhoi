@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import { useRouter, Link, Stack } from 'expo-router';
@@ -81,8 +81,10 @@ export default function LoginScreen() {
                         </TouchableOpacity>
 
                         <View className="items-center mb-10">
-                            <Ionicons name="film-outline" size={64} color="#fbbf24" />
-                            <Text className="text-3xl font-bold text-white mt-4">PhimKhôi</Text>
+                            <View style={{ width: 72, height: 72, borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' }}>
+                                <Image source={require('../../assets/images/logo.webp')} style={{ width: 72, height: 72 }} resizeMode="cover" />
+                            </View>
+                            <Text className="text-3xl font-bold text-white mt-4">Movie<Text className="text-yellow-500">Box</Text></Text>
                             <Text className="text-gray-400 mt-2 text-center">
                                 Đăng nhập để đồng bộ phim yêu thích trên mọi thiết bị
                             </Text>

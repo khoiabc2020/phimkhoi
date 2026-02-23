@@ -18,6 +18,17 @@ import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
+// Bắt lỗi toàn cục để tránh crash khi bấm (lỗi trong callback không vào ErrorBoundary)
+const g = typeof globalThis !== 'undefined' ? globalThis : (typeof global !== 'undefined' ? global : (typeof window !== 'undefined' ? window : {}));
+const ErrorUtils = (g as any).ErrorUtils;
+if (ErrorUtils && typeof ErrorUtils.setGlobalHandler === 'function') {
+  const prev = ErrorUtils.getGlobalHandler?.();
+  ErrorUtils.setGlobalHandler((error: Error, isFatal?: boolean) => {
+    console.error('[Global]', isFatal ? 'FATAL' : 'ERROR', error?.message || error, error?.stack);
+    if (typeof prev === 'function') prev(error, isFatal);
+  });
+}
+
 // Giữ Splash hiển thị trong khi app đang nạp tài nguyên
 SplashScreen.preventAutoHideAsync();
 
@@ -35,15 +46,20 @@ export default function RootLayout() {
         <AuthProvider>
           <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
             <View style={{ flex: 1 }}>
-              <Stack>
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="(auth)/login" options={{ headerShown: false }} />
-                <Stack.Screen name="(auth)/register" options={{ headerShown: false }} />
-                <Stack.Screen name="movie/[slug]" options={{ headerShown: false }} />
-                <Stack.Screen name="player/[slug]" options={{ headerShown: false }} />
-                <Stack.Screen name="list/[type]" options={{ headerShown: false }} />
-                <Stack.Screen name="category/[slug]" options={{ headerShown: false }} />
-                <Stack.Screen name="country/[slug]" options={{ headerShown: false }} />
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="(auth)/login" />
+                <Stack.Screen name="(auth)/register" />
+                <Stack.Screen name="movie/[slug]" />
+                <Stack.Screen name="player/[slug]" />
+                <Stack.Screen name="list/[type]" />
+                <Stack.Screen name="category/[slug]" />
+                <Stack.Screen name="country/[slug]" />
+                <Stack.Screen name="search" />
+                <Stack.Screen name="notifications/index" />
+                <Stack.Screen name="settings/index" />
+                <Stack.Screen name="history" />
+                <Stack.Screen name="watchlist" />
               </Stack>
             </View>
             <StatusBar style="light" />

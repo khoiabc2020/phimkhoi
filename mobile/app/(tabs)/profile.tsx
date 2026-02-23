@@ -78,7 +78,7 @@ export default function ProfileScreen() {
               <ProfileMenuItem
                 icon="heart"
                 label="Yêu thích"
-                onPress={() => router.push('/favorites' as any)}
+                onPress={() => router.push('/(tabs)/favorites' as any)}
               />
               <ProfileMenuItem
                 icon="tv-outline"
@@ -158,7 +158,7 @@ export default function ProfileScreen() {
             <ProfileMenuItem
               icon="heart-outline"
               label="Yêu thích"
-              onPress={() => router.push('/favorites' as any)}
+              onPress={() => router.push('/(tabs)/favorites' as any)}
             />
           </View>
 
