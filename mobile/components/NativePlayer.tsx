@@ -31,6 +31,7 @@ interface NativePlayerProps {
     episode?: string;
     onClose: () => void;
     onNext?: () => void;
+    onPiP?: () => void;
     onProgress?: (position: number, duration: number) => void;
     episodeList?: any[];
     serverList?: string[];
@@ -44,7 +45,8 @@ interface NativePlayerProps {
 export default function NativePlayer({
     url, title, episode, onClose, onNext, onProgress,
     episodeList = [], serverList = [], currentServerIndex = 0, currentEpisodeSlug, onEpisodeChange, onServerChange,
-    initialTime = 0
+    initialTime = 0,
+    onPiP,
 }: NativePlayerProps) {
     useKeepAwake();
     const video = useRef<Video>(null);
@@ -509,6 +511,11 @@ export default function NativePlayer({
                                     </View>
 
                                     <View style={{ flexDirection: 'row', gap: 20 }}>
+                                        {!!onPiP && (
+                                            <TouchableOpacity onPress={onPiP}>
+                                                <Ionicons name="duplicate-outline" size={22} color="white" />
+                                            </TouchableOpacity>
+                                        )}
                                         <TouchableOpacity onPress={handleResizeMode}>
                                             <Ionicons name={resizeMode === ResizeMode.COVER ? "scan" : "resize"} size={22} color="white" />
                                         </TouchableOpacity>

@@ -10,10 +10,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/context/auth';
 import { CONFIG } from '@/constants/config';
 import NativePlayer from '@/components/NativePlayer';
+import { useMiniPlayer } from '@/context/miniplayer';
 
 export default function PlayerScreen() {
     const { slug, ep, server, localUri: localUriParam } = useLocalSearchParams();
     const router = useRouter();
+    const { openMini } = useMiniPlayer();
     const [loading, setLoading] = useState(true);
     const [videoUrl, setVideoUrl] = useState<string | null>(null);
     const [isNative, setIsNative] = useState(false);
@@ -165,6 +167,10 @@ export default function PlayerScreen() {
                     episode={episodeTitle}
                     onClose={handleClose}
                     onNext={nextEpisodeSlug ? handleNextEpisode : undefined}
+                    onPiP={() => {
+                        openMini({ url: videoUrl, title: movieTitle, episode: episodeTitle });
+                        router.back();
+                    }}
                     onProgress={handleProgress}
                     initialTime={initialTime}
                     // New Props

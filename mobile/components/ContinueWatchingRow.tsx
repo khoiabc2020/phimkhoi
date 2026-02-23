@@ -189,6 +189,7 @@ const styles = StyleSheet.create({
     cardInfo: {
         paddingTop: 8,
         paddingHorizontal: 2,
+        width: CARD_WIDTH,
     },
     movieName: {
         color: '#ffffff',

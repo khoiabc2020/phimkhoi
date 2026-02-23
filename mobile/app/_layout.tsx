@@ -9,6 +9,8 @@ import '../global.css';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { AuthProvider } from '@/context/auth';
+import { MiniPlayerProvider } from '@/context/miniplayer';
+import MiniPlayerOverlay from '@/components/MiniPlayerOverlay';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -44,26 +46,29 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ErrorBoundary>
         <AuthProvider>
-          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-            <View style={{ flex: 1 }}>
-              <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="(tabs)" />
-                <Stack.Screen name="(auth)/login" />
-                <Stack.Screen name="(auth)/register" />
-                <Stack.Screen name="movie/[slug]" />
-                <Stack.Screen name="player/[slug]" />
-                <Stack.Screen name="list/[type]" />
-                <Stack.Screen name="category/[slug]" />
-                <Stack.Screen name="country/[slug]" />
-                <Stack.Screen name="search" />
-                <Stack.Screen name="notifications/index" />
-                <Stack.Screen name="settings/index" />
-                <Stack.Screen name="history" />
-                <Stack.Screen name="watchlist" />
-              </Stack>
-            </View>
-            <StatusBar style="light" />
-          </ThemeProvider>
+          <MiniPlayerProvider>
+            <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+              <View style={{ flex: 1 }}>
+                <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="(tabs)" />
+                  <Stack.Screen name="(auth)/login" />
+                  <Stack.Screen name="(auth)/register" />
+                  <Stack.Screen name="movie/[slug]" />
+                  <Stack.Screen name="player/[slug]" />
+                  <Stack.Screen name="list/[type]" />
+                  <Stack.Screen name="category/[slug]" />
+                  <Stack.Screen name="country/[slug]" />
+                  <Stack.Screen name="search" />
+                  <Stack.Screen name="notifications/index" />
+                  <Stack.Screen name="settings/index" />
+                  <Stack.Screen name="history" />
+                  <Stack.Screen name="watchlist" />
+                </Stack>
+                <MiniPlayerOverlay />
+              </View>
+              <StatusBar style="light" />
+            </ThemeProvider>
+          </MiniPlayerProvider>
         </AuthProvider>
       </ErrorBoundary>
     </GestureHandlerRootView>
