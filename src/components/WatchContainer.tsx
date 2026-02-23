@@ -27,6 +27,7 @@ export default function WatchContainer({
     servers,
     initialProgress,
     movieData,
+    initialServerName,
 }: WatchContainerProps) {
     const [isTheaterMode, setIsTheaterMode] = useState(false);
     const [isLightOff, setIsLightOff] = useState(false);
