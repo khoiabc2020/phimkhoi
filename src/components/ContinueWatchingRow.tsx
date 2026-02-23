@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Play, ChevronLeft, ChevronRight, X } from "lucide-react";
-import { getContinueWatching, removeWatchHistory } from "@/app/actions/watchHistory";
+import { removeWatchHistory } from "@/app/actions/watchHistory";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -31,19 +31,38 @@ export default function ContinueWatchingRow() {
             return;
         }
 
+        let cancelled = false;
+        let interval: any = null;
+
         const fetchData = async () => {
             try {
-                const res = await getContinueWatching();
-                if (res.success && res.data) {
-                    setMovies(res.data);
+                const res = await fetch("/api/user/continue-watching", { cache: "no-store" });
+                if (!res.ok) return;
+                const data = await res.json();
+                if (!cancelled && data?.success && Array.isArray(data.data)) {
+                    setMovies(data.data);
                 }
             } catch (error) {
                 console.error("Failed to fetch continue watching:", error);
             } finally {
-                setLoading(false);
+                if (!cancelled) setLoading(false);
             }
         };
+
         fetchData();
+        // Poll để đồng bộ realtime (web nhận update từ app sau vài giây)
+        interval = setInterval(fetchData, 10000);
+
+        const onVis = () => {
+            if (document.visibilityState === "visible") fetchData();
+        };
+        document.addEventListener("visibilitychange", onVis);
+
+        return () => {
+            cancelled = true;
+            if (interval) clearInterval(interval);
+            document.removeEventListener("visibilitychange", onVis);
+        };
     }, [session]);
 
     const handleRemove = async (e: React.MouseEvent, historyId: string) => {

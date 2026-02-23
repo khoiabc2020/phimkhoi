@@ -41,10 +41,7 @@ cp -r .next/static .next/standalone/.next/static
 
 # Restart PM2 process
 echo "Restarting PM2..."
-if pm2 show phimkhoi > /dev/null; then
-    pm2 restart phimkhoi
-else
-    pm2 start npm --name "phimkhoi" -- start
-fi
+pm2 startOrReload ecosystem.config.cjs --update-env
+pm2 save
 
 echo "Deployment complete!"
