@@ -19,10 +19,7 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    // TMDB Hydration State
     const [tmdbData, setTmdbData] = useState<{ poster_path: string; backdrop_path?: string; vote_average: number } | null>(null);
-
-    // ... (rest of useEffects)
 
     // Determine final display data
     const displayPoster = orientation === 'landscape'

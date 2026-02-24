@@ -468,6 +468,10 @@ export default function NativePlayer({
                                 <TouchableOpacity onPress={() => handleSkip(10000)} style={styles.skipBtn}>
                                     <MaterialIcons name="forward-10" size={48} color="white" />
                                 </TouchableOpacity>
+                                <TouchableOpacity onPress={() => handleSkip(90000)} style={[styles.skipBtn, { marginLeft: 4 }]}>
+                                    <MaterialIcons name="forward-30" size={40} color="white" />
+                                    <Text style={{ color: 'white', fontSize: 10, marginTop: 2 }}>90s</Text>
+                                </TouchableOpacity>
                             </View>
                         )}
 

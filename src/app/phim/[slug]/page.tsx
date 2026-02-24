@@ -49,10 +49,6 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     const { movie, episodes } = data;
     const serverData = episodes?.[0]?.server_data || [];
 
-
-
-    // ... inside MovieDetailPage ...
-
     // Fetch related movies
     let relatedMovies: any[] = [];
     if (movie?.category?.[0]?.slug) {
