@@ -1,4 +1,5 @@
-import { View, ActivityIndicator, TouchableOpacity, Text, Dimensions, StatusBar as RNStatusBar } from 'react-native';
+import { View, ActivityIndicator, TouchableOpacity, Text, Dimensions, StatusBar as RNStatusBar, Platform, Alert } from 'react-native';
+import ExpoPip from 'expo-pip';
 import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import { WebView } from 'react-native-webview';
 import * as ScreenOrientation from 'expo-screen-orientation';
@@ -12,6 +13,10 @@ import { CONFIG } from '@/constants/config';
 import NativePlayer from '@/components/NativePlayer';
 import { useMiniPlayer } from '@/context/miniplayer';
 
+const PIP_SIZES = { small: { w: 200, h: 113 }, medium: { w: 240, h: 135 }, large: { w: 300, h: 169 } } as const;
+const PIP_LABELS: Record<keyof typeof PIP_SIZES, string> = { small: 'Nhỏ', medium: 'Vừa', large: 'Lớn' };
+type PipSizeKey = keyof typeof PIP_SIZES;
+
 export default function PlayerScreen() {
     const { slug, ep, server, localUri: localUriParam } = useLocalSearchParams();
     const router = useRouter();
@@ -24,8 +29,17 @@ export default function PlayerScreen() {
     const [nextEpisodeSlug, setNextEpisodeSlug] = useState<string | null>(null);
     const [episodes, setEpisodes] = useState<any[]>([]);
     const [selectedServer, setSelectedServer] = useState(server ? Number(server) : 0);
+    const [pipSize, setPipSize] = useState<PipSizeKey>('medium');
 
     const { user, token, syncHistory } = useAuth();
+
+    const cyclePipSize = useCallback(() => {
+        setPipSize((prev) => {
+            const next: PipSizeKey = prev === 'small' ? 'medium' : prev === 'medium' ? 'large' : 'small';
+            Alert.alert('Cỡ PiP', `Đã chọn: ${PIP_LABELS[next]}. Bấm nút PiP để áp dụng.`);
+            return next;
+        });
+    }, []);
 
     // Create a stable ref to syncHistory so we can call it on unmount safely without recreating the effect
     const syncHistoryRef = useRef(syncHistory);
@@ -167,10 +181,24 @@ export default function PlayerScreen() {
                     episode={episodeTitle}
                     onClose={handleClose}
                     onNext={nextEpisodeSlug ? handleNextEpisode : undefined}
-                    onPiP={() => {
-                        openMini({ url: videoUrl, title: movieTitle, episode: episodeTitle });
-                        router.back();
+                    onPiP={async () => {
+                        if (Platform.OS === 'android' && ExpoPip.isAvailable()) {
+                            const { w, h } = PIP_SIZES[pipSize];
+                            ExpoPip.setPictureInPictureParams({
+                                title: movieTitle || 'Phim',
+                                subtitle: episodeTitle || '',
+                                width: w,
+                                height: h,
+                                seamlessResizeEnabled: true,
+                            });
+                            await new Promise((r) => setTimeout(r, 150));
+                            await ExpoPip.enterPipMode({ width: w, height: h });
+                        } else {
+                            openMini({ url: videoUrl, title: movieTitle, episode: episodeTitle });
+                            router.back();
+                        }
                     }}
+                    onPipSizeCycle={cyclePipSize}
                     onProgress={handleProgress}
                     initialTime={initialTime}
                     // New Props

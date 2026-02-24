@@ -21,10 +21,12 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
     const [searchQuery, setSearchQuery] = useState("");
     const [searchHistory, setSearchHistory] = useState<string[]>([]);
     const [showHistory, setShowHistory] = useState(false);
+    const [openDropdown, setOpenDropdown] = useState<"categories" | "countries" | null>(null);
     const router = useRouter();
     const pathname = usePathname();
     const { data: session } = useSession();
     const searchInputRef = useRef<HTMLInputElement>(null);
+    const navRef = useRef<HTMLDivElement | null>(null);
 
     const handleSearch = (e?: React.FormEvent | string) => {
         if (e && typeof e === 'object' && 'preventDefault' in e) {
@@ -88,6 +90,23 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
             searchInputRef.current.focus();
         }
     }, [isSearchOpen]);
+
+    // Đóng dropdown khi click ra ngoài (hữu ích cho iPad / touch)
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+            if (!navRef.current) return;
+            const target = event.target as Node | null;
+            if (target && !navRef.current.contains(target)) {
+                setOpenDropdown(null);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener("touchstart", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener("touchstart", handleClickOutside);
+        };
+    }, []);
 
     // Hide Header on specific routes
     if (pathname === "/login" || pathname === "/register" || pathname?.startsWith("/admin")) {
@@ -168,17 +187,39 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                     </div>
 
                     {/* Middle Section: Desktop Nav */}
-                    <nav className="hidden lg:flex items-center gap-1 xl:gap-2 absolute left-1/2 -translate-x-1/2">
+                    <nav
+                        ref={navRef}
+                        className="hidden lg:flex items-center gap-1 xl:gap-2 absolute left-1/2 -translate-x-1/2"
+                    >
                         <Link href="/" className="px-3 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-full transition-all whitespace-nowrap">
                             Trang chủ
                         </Link>
 
                         {/* Categories Dropdown */}
-                        <div className="relative group">
-                            <button className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white/70 group-hover:text-white hover:bg-white/5 rounded-full transition-all whitespace-nowrap">
-                                Thể loại <ChevronDown className="w-3 h-3 transition-transform group-hover:rotate-180" />
+                        <div className="relative">
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setOpenDropdown(prev => (prev === "categories" ? null : "categories"))
+                                }
+                                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-full transition-all whitespace-nowrap"
+                            >
+                                Thể loại{" "}
+                                <ChevronDown
+                                    className={
+                                        "w-3 h-3 transition-transform " +
+                                        (openDropdown === "categories" ? "rotate-180" : "")
+                                    }
+                                />
                             </button>
-                            <div className="absolute top-full left-1/2 -translate-x-1/2 w-[400px] bg-[#0B0D12] border border-white/10 rounded-2xl p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 shadow-[0_20px_40px_rgba(0,0,0,0.8)] grid grid-cols-2 gap-2 z-50 mt-2">
+                            <div
+                                className={
+                                    "absolute top-full left-1/2 -translate-x-1/2 w-[400px] bg-[#0B0D12] border border-white/10 rounded-2xl p-4 transition-all duration-200 transform shadow-[0_20px_40px_rgba(0,0,0,0.8)] grid grid-cols-2 gap-2 z-50 mt-2 " +
+                                    (openDropdown === "categories"
+                                        ? "opacity-100 visible translate-y-0"
+                                        : "opacity-0 invisible translate-y-2 pointer-events-none")
+                                }
+                            >
                                 {displayCategories.map((cat) => (
                                     <Link
                                         key={cat.slug}
@@ -192,11 +233,30 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         </div>
 
                         {/* Countries Dropdown */}
-                        <div className="relative group">
-                            <button className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white/70 group-hover:text-white hover:bg-white/5 rounded-full transition-all whitespace-nowrap">
-                                Quốc gia <ChevronDown className="w-3 h-3 transition-transform group-hover:rotate-180" />
+                        <div className="relative">
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setOpenDropdown(prev => (prev === "countries" ? null : "countries"))
+                                }
+                                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text白/70 hover:text-white hover:bg-white/5 rounded-full transition-all whitespace-nowrap"
+                            >
+                                Quốc gia{" "}
+                                <ChevronDown
+                                    className={
+                                        "w-3 h-3 transition-transform " +
+                                        (openDropdown === "countries" ? "rotate-180" : "")
+                                    }
+                                />
                             </button>
-                            <div className="absolute top-full left-1/2 -translate-x-1/2 w-72 bg-[#0B0D12] border border-white/10 rounded-2xl p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 shadow-[0_20px_40px_rgba(0,0,0,0.8)] grid grid-cols-2 gap-1 z-50 mt-2">
+                            <div
+                                className={
+                                    "absolute top-full left-1/2 -translate-x-1/2 w-72 bg-[#0B0D12] border border-white/10 rounded-2xl p-3 transition-all duration-200 transform shadow-[0_20px_40px_rgba(0,0,0,0.8)] grid grid-cols-2 gap-1 z-50 mt-2 " +
+                                    (openDropdown === "countries"
+                                        ? "opacity-100 visible translate-y-0"
+                                        : "opacity-0 invisible translate-y-2 pointer-events-none")
+                                }
+                            >
                                 {displayCountries.map((country) => (
                                     <Link
                                         key={country.slug}

@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, Text, Dimensions, StyleSheet, Platform, Pressable, TouchableOpacity } from 'react-native';
+import { View, Text, Dimensions, StyleSheet, Platform, Pressable, TouchableOpacity, LayoutAnimation } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Carousel from 'react-native-reanimated-carousel';
@@ -42,7 +42,10 @@ export default function HeroSection({ movies }: HeroSectionProps) {
 
     if (!movies?.length) return null;
 
-    const onSnapToItem = useCallback((index: number) => setActiveIndex(index), []);
+    const onSnapToItem = useCallback((index: number) => {
+        if (Platform.OS !== 'web') LayoutAnimation.configureNext(LayoutAnimation.create(280, 'easeInEaseOut', 'opacity'));
+        setActiveIndex(index);
+    }, []);
 
     const toggleFav = useCallback(async (movie: Movie) => {
         const slug = movie.slug;
@@ -107,10 +110,9 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                 autoPlay={true}
                 autoPlayInterval={5500}
                 onSnapToItem={onSnapToItem}
-                scrollAnimationDuration={320}
+                scrollAnimationDuration={480}
                 mode="parallax"
-                modeConfig={{ parallaxScrollingScale: 0.92, parallaxScrollingOffset: 40 }}
-                // Tăng ngưỡng vuốt ngang để vuốt dọc xuống dưới dễ hơn
+                modeConfig={{ parallaxScrollingScale: 0.94, parallaxScrollingOffset: 32 }}
                 panGestureHandlerProps={{ activeOffsetX: [-20, 20] }}
                 renderItem={renderItem}
             />
@@ -125,7 +127,7 @@ const HeroCard = React.memo(function HeroCard({ movie, isActive, isFav, onToggle
     const categories = movie.category?.slice(0, 3) || [];
 
     return (
-        <View style={[styles.cardContainer, !isActive && { opacity: 0.4 }]} collapsable={false}>
+        <View style={[styles.cardContainer, !isActive && { opacity: 0.82 }]} collapsable={false}>
             <FocusableButton style={styles.posterWrapper} onPress={onPress}>
                 <Image
                     source={{ uri: getImageUrl(movie.poster_url || movie.thumb_url) }}

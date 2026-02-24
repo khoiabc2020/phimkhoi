@@ -22,8 +22,32 @@ import * as ScreenOrientation from 'expo-screen-orientation';
 import * as Brightness from 'expo-brightness';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useKeepAwake } from 'expo-keep-awake';
+import ExpoPip from 'expo-pip';
 
 const { width, height } = Dimensions.get('window');
+
+/** Icon PiP: khung lớn, khung nhỏ góc phải dưới, mũi tên thu nhỏ (giống ảnh bạn gửi) */
+function PipIcon({ size = 24, color = 'white' }: { size?: number; color?: string }) {
+    const s = size;
+    const stroke = Math.max(1.2, s / 16);
+    const small = s * 0.4;
+    const r = s * 0.14;
+    const arrowSize = s * 0.2;
+    return (
+        <View style={[pipIconStyles.outer, { width: s, height: s, borderColor: color, borderRadius: r, borderWidth: stroke }]}>
+            <View style={[pipIconStyles.small, { width: small, height: small, right: stroke, bottom: stroke, borderColor: color, borderRadius: r * 0.7, borderWidth: stroke }]} />
+            <View style={[pipIconStyles.arrowWrap, { left: s * 0.14, top: s * 0.18 }]}>
+                <View style={[pipIconStyles.arrow, { borderTopWidth: arrowSize, borderRightWidth: arrowSize, borderTopColor: 'transparent', borderRightColor: color }]} />
+            </View>
+        </View>
+    );
+}
+const pipIconStyles = StyleSheet.create({
+    outer: { position: 'relative' },
+    small: { position: 'absolute' },
+    arrowWrap: { position: 'absolute', width: 0, height: 0 },
+    arrow: { width: 0, height: 0, transform: [{ rotate: '-45deg' }] },
+});
 
 interface NativePlayerProps {
     url: string;
@@ -32,6 +56,7 @@ interface NativePlayerProps {
     onClose: () => void;
     onNext?: () => void;
     onPiP?: () => void;
+    onPipSizeCycle?: () => void;
     onProgress?: (position: number, duration: number) => void;
     episodeList?: any[];
     serverList?: string[];
@@ -47,8 +72,10 @@ export default function NativePlayer({
     episodeList = [], serverList = [], currentServerIndex = 0, currentEpisodeSlug, onEpisodeChange, onServerChange,
     initialTime = 0,
     onPiP,
+    onPipSizeCycle,
 }: NativePlayerProps) {
     useKeepAwake();
+    const { isInPipMode } = ExpoPip.useIsInPip?.() ?? { isInPipMode: false };
     const video = useRef<Video>(null);
     const [videoSource, setVideoSource] = useState({ uri: url });
 
@@ -380,19 +407,22 @@ export default function NativePlayer({
                     </View>
                 )}
 
-                {/* Brightness Overlay (Standard Animated) */}
+                {/* Brightness Overlay - ẩn trong PiP */}
+                {!isInPipMode && (
                 <Animated.View
                     style={[
                         StyleSheet.absoluteFill,
-                        { backgroundColor: 'black', opacity: brightnessOpacity, zIndex: 1 } // zIndex 1 to sit above video
+                        { backgroundColor: 'black', opacity: brightnessOpacity, zIndex: 1 }
                     ]}
                     pointerEvents="none"
                 />
+                )}
 
-                {/* Touch Area for Controls Toggle */}
-                <Pressable style={[StyleSheet.absoluteFill, { zIndex: 2 }]} onPress={toggleControls} />
+                {/* Touch Area for Controls Toggle - ẩn trong PiP */}
+                {!isInPipMode && <Pressable style={[StyleSheet.absoluteFill, { zIndex: 2 }]} onPress={toggleControls} />}
 
-                {/* VISUAL BRIGHTNESS SLIDER */}
+                {/* VISUAL BRIGHTNESS SLIDER - ẩn trong PiP */}
+                {!isInPipMode && (
                 <Animated.View style={[styles.brightnessBar, { opacity: sliderOpacity }]} pointerEvents="none">
                     <Ionicons name="sunny" size={14} color="rgba(255,255,255,0.9)" />
                     <View style={styles.brightnessTrack}>
@@ -410,9 +440,10 @@ export default function NativePlayer({
                     </View>
                     <Ionicons name="moon" size={12} color="rgba(255,255,255,0.5)" />
                 </Animated.View>
+                )}
 
-                {/* CONTROLS */}
-                {showControls && (
+                {/* CONTROLS - ẩn trong PiP để cửa sổ chỉ hiển thị video */}
+                {showControls && !isInPipMode && (
                     <View style={styles.overlay} pointerEvents="box-none">
 
                         {/* Header */}
@@ -468,10 +499,6 @@ export default function NativePlayer({
                                 <TouchableOpacity onPress={() => handleSkip(10000)} style={styles.skipBtn}>
                                     <MaterialIcons name="forward-10" size={48} color="white" />
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={() => handleSkip(90000)} style={[styles.skipBtn, { marginLeft: 4 }]}>
-                                    <MaterialIcons name="forward-30" size={40} color="white" />
-                                    <Text style={{ color: 'white', fontSize: 10, marginTop: 2 }}>90s</Text>
-                                </TouchableOpacity>
                             </View>
                         )}
 
@@ -516,8 +543,16 @@ export default function NativePlayer({
 
                                     <View style={{ flexDirection: 'row', gap: 20 }}>
                                         {!!onPiP && (
-                                            <TouchableOpacity onPress={onPiP}>
-                                                <Ionicons name="duplicate-outline" size={22} color="white" />
+                                            <TouchableOpacity
+                                                onPress={() => {
+                                                    setShowEpisodes(false);
+                                                    setShowServers(false);
+                                                    setTimeout(() => onPiP?.(), 250);
+                                                }}
+                                                onLongPress={() => onPipSizeCycle?.()}
+                                                delayLongPress={400}
+                                            >
+                                                <PipIcon size={24} color="white" />
                                             </TouchableOpacity>
                                         )}
                                         <TouchableOpacity onPress={handleResizeMode}>
@@ -537,7 +572,8 @@ export default function NativePlayer({
                 )}
             </View>
 
-            {/* Episode Selector Overlay (iOS 26 Style Drawer) - overflow hidden so closed drawer doesn't peek */}
+            {/* Episode Selector Overlay - không hiện trong PiP */}
+            {!isInPipMode && (
             <View style={[StyleSheet.absoluteFill, { zIndex: 100, elevation: 100, overflow: 'hidden' }]} pointerEvents={showEpisodes ? 'auto' : 'none'}>
                 {/* Dark Overlay */}
                 <Animated.View style={[
@@ -627,9 +663,10 @@ export default function NativePlayer({
                     </View>
                 </Animated.View>
             </View>
+            )}
 
-            {/* Server Selector Overlay */}
-            {showServers && (
+            {/* Server Selector Overlay - không hiện trong PiP */}
+            {!isInPipMode && showServers && (
                 <View style={[StyleSheet.absoluteFill, { zIndex: 100, elevation: 100 }]}>
                     <View style={styles.sheetOverlay}>
                         <TouchableOpacity style={{ flex: 1 }} onPress={() => setShowServers(false)} />

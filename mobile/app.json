@@ -12,7 +12,9 @@
       "supportsTablet": true
     },
     "android": {
-      "permissions": ["android.permission.WRITE_SETTINGS"],
+      "permissions": [
+        "android.permission.WRITE_SETTINGS"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#0F121A",
         "foregroundImage": "./assets/images/adaptive-icon.png"
@@ -54,7 +56,8 @@
             "kotlinVersion": "1.9.25"
           }
         }
-      ]
+      ],
+      "expo-pip"
     ],
     "experiments": {
       "typedRoutes": true
