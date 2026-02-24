@@ -129,9 +129,9 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
         <>
             <header
                 className={cn(
-                    "fixed top-0 left-0 right-0 z-40 transition-all duration-500",
+                    "fixed top-0 left-0 right-0 z-40 transition-all duration-200",
                     isScrolled
-                        ? "bg-[#0B0D12]/98 border-b border-white/5 shadow-2xl shadow-black/50"
+                        ? "bg-[#0B0D12]/98 border-b border-white/5"
                         : "bg-gradient-to-b from-black/80 via-black/40 to-transparent"
                 )}
             >
@@ -150,7 +150,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         {/* Logo */}
                         <Link href="/" className="flex items-center gap-3 group shrink-0 order-2 md:order-none">
                             <div className="relative w-10 h-10 md:w-11 md:h-11 flex items-center justify-center">
-                                <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                <div className="absolute inset-0 bg-primary/10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                                 <Image
                                     src="/logo.webp"
                                     alt="MovieBox Logo"
@@ -358,7 +358,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                     </div>
                                 </div>
                             ) : (
-                                <Link href="/login" className="bg-[#F4C84A] hover:bg-[#ffe58a] text-black px-5 py-2 rounded-full font-bold text-sm transition-transform hover:scale-105 active:scale-95 ml-1 whitespace-nowrap shadow-[0_0_15px_rgba(244,200,74,0.3)]">
+                                <Link href="/login" className="bg-[#F4C84A] hover:bg-[#ffe58a] text-black px-5 py-2 rounded-full font-bold text-sm transition-transform duration-200 hover:scale-105 active:scale-95 ml-1 whitespace-nowrap">
                                     Đăng nhập
                                 </Link>
                             )}

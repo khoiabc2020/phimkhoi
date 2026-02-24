@@ -2,7 +2,7 @@
 
 import MovieCard from "./MovieCard";
 import { Movie } from "@/services/api";
-import { useRef } from "react";
+import { useRef, memo } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface MovieRowProps {
@@ -12,7 +12,7 @@ interface MovieRowProps {
     variant?: 'default' | 'sidebar';
 }
 
-export default function MovieRow({ title, movies, slug, variant = 'default' }: MovieRowProps) {
+function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowProps) {
     const rowRef = useRef<HTMLDivElement>(null);
 
     const scroll = (direction: "left" | "right") => {
@@ -46,7 +46,7 @@ export default function MovieRow({ title, movies, slug, variant = 'default' }: M
                                 <ChevronRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
                             </a>
                         )}
-                        <div className="hidden md:block w-16 h-1.5 bg-[#fbbf24] rounded-full mt-4 shadow-[0_0_10px_rgba(251,191,36,0.3)]" />
+                        <div className="hidden md:block w-16 h-1.5 bg-[#fbbf24] rounded-full mt-4" />
                     </div>
 
                     {/* Carousel Section */}
@@ -89,7 +89,7 @@ export default function MovieRow({ title, movies, slug, variant = 'default' }: M
         <div className="space-y-6 group relative py-4">
             <div className="flex items-center justify-between px-4 md:px-12">
                 <h2 className="text-[15px] font-bold text-white flex items-center gap-2 uppercase tracking-wide">
-                    <span className="w-1 h-5 md:h-6 bg-gradient-to-t from-[#fbbf24] to-yellow-200 rounded-sm shadow-[0_0_15px_rgba(251,191,36,0.5)]"></span>
+                    <span className="w-1 h-5 md:h-6 bg-gradient-to-t from-[#fbbf24] to-yellow-200 rounded-sm"></span>
                     <span className="drop-shadow-lg">{title}</span>
                 </h2>
                 {slug && (
@@ -109,7 +109,7 @@ export default function MovieRow({ title, movies, slug, variant = 'default' }: M
                     onClick={() => scroll("left")}
                     className="absolute left-0 top-0 bottom-0 z-40 bg-gradient-to-r from-black/80 to-transparent w-16 flex items-center justify-start pl-4 opacity-0 group-hover/row:opacity-100 transition-all duration-300 pointer-events-none group-hover/row:pointer-events-auto"
                 >
-                    <ChevronLeft className="w-10 h-10 text-white hover:text-[#fbbf24] transition-colors drop-shadow-lg transform hover:scale-110" />
+                    <ChevronLeft className="w-10 h-10 text-white hover:text-[#fbbf24] transition-colors" />
                 </button>
 
                 {/* Scroll Container - High Density */}
@@ -130,9 +130,11 @@ export default function MovieRow({ title, movies, slug, variant = 'default' }: M
                     onClick={() => scroll("right")}
                     className="absolute right-0 top-0 bottom-0 z-40 bg-gradient-to-l from-black/80 to-transparent w-16 flex items-center justify-end pr-4 opacity-0 group-hover/row:opacity-100 transition-all duration-300 pointer-events-none group-hover/row:pointer-events-auto"
                 >
-                    <ChevronRight className="w-10 h-10 text-white hover:text-[#fbbf24] transition-colors drop-shadow-lg transform hover:scale-110" />
+                    <ChevronRight className="w-10 h-10 text-white hover:text-[#fbbf24] transition-colors" />
                 </button>
             </div>
         </div>
     );
 }
+
+export default memo(MovieRowInner);

@@ -30,7 +30,7 @@ export default function QuickNav() {
                             )}
                         >
                             <div className="absolute inset-0 flex items-center justify-center p-2 text-center">
-                                <span className="text-white font-bold text-sm md:text-lg drop-shadow-md group-hover:scale-110 transition-transform">
+                                <span className="text-white font-bold text-sm md:text-lg group-hover:scale-105 transition-transform duration-200">
                                     {item.label}
                                 </span>
                             </div>

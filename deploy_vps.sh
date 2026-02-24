@@ -39,7 +39,6 @@ if [ -f .env.local ]; then
     cp .env.local .next/standalone/.env.production
     cp .env.local .next/standalone/.env
 fi
-cp -r .next/static .next/standalone/.next/static
 
 # Restart PM2 process
 echo "Restarting PM2..."

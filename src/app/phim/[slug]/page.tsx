@@ -1,3 +1,4 @@
+import dynamic from "next/dynamic";
 import MovieCard from "@/components/MovieCard";
 import { getMovieDetail, getMoviesList } from "@/services/api";
 import { Metadata } from "next";
@@ -5,8 +6,12 @@ import Link from "next/link";
 import { Play, Heart, Share2, Star, Clock, Film } from "lucide-react";
 import FavoriteButton from "@/components/FavoriteButton";
 import { getImageUrl } from "@/lib/utils";
-import CommentSection from "@/components/CommentSection";
 import Image from "next/image";
+
+const CommentSection = dynamic(() => import("@/components/CommentSection"), {
+    ssr: true,
+    loading: () => <div className="h-32 rounded-xl bg-white/5 animate-pulse" />,
+});
 import MovieTabs from "@/components/MovieTabs";
 import MovieCast from "@/components/MovieCast";
 import { searchTMDBMovie, getTMDBDetails, getTMDBImage } from "@/services/tmdb";
@@ -79,7 +84,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
             {/* Hero Backdrop - Blur Effect */}
             <div className="relative h-[60vh] w-full overflow-hidden">
                 <div
-                    className="absolute inset-0 bg-cover bg-center scale-105 blur-sm opacity-50 transition-opacity duration-700"
+                    className="absolute inset-0 bg-cover bg-center scale-105 blur-sm opacity-50"
                     style={{ backgroundImage: `url(${backdropUrl})` }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-[#0a0a0a]/40" />
@@ -98,7 +103,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                     alt={movie?.name || "Movie Poster"}
                                     width={260}
                                     height={390}
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
                                     priority
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -153,7 +158,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                 {serverData.length > 0 && (
                                     <Link
                                         href={`/xem-phim/${movie?.slug}/${serverData[0].slug}`}
-                                        className="flex items-center gap-2 bg-gradient-to-r from-yellow-400 to-yellow-600 text-black px-6 py-3 rounded-full font-bold text-base hover:brightness-110 hover:scale-105 transition-all shadow-[0_0_20px_rgba(234,179,8,0.4)]"
+                                        className="flex items-center gap-2 bg-gradient-to-r from-yellow-400 to-yellow-600 text-black px-6 py-3 rounded-full font-bold text-base hover:brightness-110 hover:scale-105 transition-transform duration-200"
                                     >
                                         <Play className="w-4 h-4 fill-current" />
                                         Xem Ngay

@@ -30,7 +30,7 @@ export default async function CountryPage({ params, searchParams }: { params: Pr
             <div className="pt-24 container mx-auto px-4 md:px-12">
                 <div className="mb-8">
                     <h1 className="text-xl md:text-2xl font-bold text-white capitalize flex items-center gap-2">
-                        <span className="w-1 h-6 bg-[#fbbf24] rounded-full shadow-[0_0_10px_#fbbf24]"></span>
+                        <span className="w-1 h-6 bg-[#fbbf24] rounded-full"></span>
                         Quốc gia: <span className="text-primary">{slug.replace(/-/g, " ")}</span>
                     </h1>
                 </div>

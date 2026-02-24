@@ -20,7 +20,7 @@ export default function TopicCloud() {
                     <Link
                         key={tag}
                         href={`/tim-kiem?keyword=${tag}`}
-                        className="bg-white/5 hover:bg-[#fbbf24] hover:text-black px-3 py-1.5 rounded-full transition-colors cursor-pointer border border-white/5 active:scale-95"
+                        className="bg-white/5 hover:bg-[#fbbf24] hover:text-black px-3 py-1.5 rounded-full transition-colors duration-200 cursor-pointer border border-white/5 active:scale-95"
                     >
                         {tag}
                     </Link>

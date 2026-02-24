@@ -1,24 +1,20 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, memo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Play, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { removeWatchHistory } from "@/app/actions/watchHistory";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
 
-// Helper to get image URL
 const getImageUrl = (url: string) => {
     if (!url) return "/placeholder.jpg";
     if (url.startsWith("http")) return url;
-    // OPhim images usually start with http in the API data, but if they are relative, they might need a specific domain.
-    // However, KKPhim data usually has relative paths.
     return `https://phimimg.com/${url}`;
 };
 
-export default function ContinueWatchingRow() {
+function ContinueWatchingRowInner() {
     const { data: session } = useSession();
     const [movies, setMovies] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -179,9 +175,11 @@ export default function ContinueWatchingRow() {
                     onClick={() => scroll("right")}
                     className="absolute right-0 top-0 bottom-0 z-40 bg-gradient-to-l from-black/80 to-transparent w-12 flex items-center justify-end pr-2 opacity-0 group-hover/row:opacity-100 transition-all duration-300 pointer-events-none group-hover/row:pointer-events-auto"
                 >
-                    <ChevronRight className="w-8 h-8 text-white hover:text-[#fbbf24] transition-colors drop-shadow-lg" />
+                    <ChevronRight className="w-8 h-8 text-white hover:text-[#fbbf24] transition-colors" />
                 </button>
             </div>
         </div>
     );
 }
+
+export default memo(ContinueWatchingRowInner);

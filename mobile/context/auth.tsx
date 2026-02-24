@@ -70,8 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                         setUser(prev => prev ? { ...prev, ...updates } : null);
                     }
                 } catch (syncErr) {
-                    // Server offline — dùng data cũ từ AsyncStorage, không crash app
-                    console.log('Background sync skipped (server offline)');
+                    if (__DEV__) console.warn('Background sync skipped (server offline)');
                 }
             }
         } catch (error) {
@@ -87,8 +86,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setUser(newUser);
             await AsyncStorage.setItem('auth_token', newToken);
             await AsyncStorage.setItem('auth_user', JSON.stringify(newUser));
-
-            // router.replace('/(tabs)'); // Optional: Redirect after login
         } catch (error) {
             console.error('Login error', error);
         }

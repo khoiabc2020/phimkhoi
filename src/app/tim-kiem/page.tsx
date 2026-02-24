@@ -29,7 +29,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
             <div className="container mx-auto px-4 pt-24">
                 <div className="mb-6">
                     <h1 className="text-lg md:text-xl font-bold text-white flex items-center gap-2">
-                        <span className="w-1 h-5 bg-[#fbbf24] rounded-full shadow-[0_0_10px_#fbbf24]"></span>
+                        <span className="w-1 h-5 bg-[#fbbf24] rounded-full"></span>
                         Kết quả: <span className="text-primary truncate max-w-[200px] md:max-w-md">"{keyword}"</span>
                     </h1>
                     <p className="text-gray-400 text-sm mt-1">
@@ -43,16 +43,15 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                 </div>
 
                 {filteredMovies.length > 0 ? (
-                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2 sm:gap-3 md:gap-4 animate-in fade-in slide-in-from-bottom-5 duration-500 [contain:layout_paint]">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2 sm:gap-3 md:gap-4 [contain:layout_paint]">
                         {filteredMovies.map((movie: any) => (
                             <MovieCard key={movie._id} movie={movie} />
                         ))}
                     </div>
                 ) : (
-                    <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in zoom-in duration-500">
-                        <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mb-6 relative group">
-                            <div className="absolute inset-0 bg-yellow-500/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                            <SearchX className="w-10 h-10 text-gray-500 group-hover:text-yellow-500 transition-colors duration-300 relative z-10" />
+                    <div className="flex flex-col items-center justify-center py-20 text-center">
+                        <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mb-6">
+                            <SearchX className="w-10 h-10 text-gray-500" />
                         </div>
                         <h2 className="text-xl md:text-2xl font-bold text-white mb-2">Không tìm thấy phim này</h2>
                         <p className="text-gray-400 max-w-md mx-auto">

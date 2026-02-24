@@ -7,14 +7,13 @@ import { Play, ChevronRight, Info } from "lucide-react";
 import { Movie } from "@/services/api";
 import { getImageUrl } from "@/lib/utils";
 import { getTMDBDataForCard } from "@/app/actions/tmdb";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { cn } from "@/lib/utils";
 import FavoriteButton from "./FavoriteButton";
-import Autoplay from "embla-carousel-autoplay";
 
 export default function HeroSection({ movies }: { movies: Movie[] }) {
-    // Desktop Carousel (Laptops & Desktops)
-    const [desktopRef, desktopApi] = useEmblaCarousel({ loop: true, duration: 40 }, [Autoplay({ delay: 8000 })]);
+    // Desktop: không dùng plugin Autoplay để có thể tắt khi tab ẩn → giảm lag
+    const [desktopRef, desktopApi] = useEmblaCarousel({ loop: true, duration: 35 });
 
     const [mobileRef, mobileApi] = useEmblaCarousel({
         loop: true,
@@ -64,25 +63,70 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
         setTweenValues(speeds);
     }, [mobileApi]);
 
-    // Sync Desktop
+    // Sync Desktop + Autoplay chỉ khi tab đang xem (giảm lag khi chuyển tab)
     useEffect(() => {
         if (!desktopApi) return;
         const onSelect = () => setSelectedIndex(desktopApi.selectedScrollSnap());
         desktopApi.on("select", onSelect);
-        return () => { desktopApi.off("select", onSelect); };
+
+        let autoplayTimer: ReturnType<typeof setInterval> | null = null;
+        const startAutoplay = () => {
+            if (autoplayTimer) return;
+            autoplayTimer = setInterval(() => {
+                if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
+                desktopApi.scrollNext();
+            }, 8000);
+        };
+        const stopAutoplay = () => {
+            if (autoplayTimer) {
+                clearInterval(autoplayTimer);
+                autoplayTimer = null;
+            }
+        };
+        const onVisibility = () => {
+            if (document.visibilityState === "visible") startAutoplay();
+            else stopAutoplay();
+        };
+        startAutoplay();
+        document.addEventListener("visibilitychange", onVisibility);
+
+        return () => {
+            stopAutoplay();
+            document.removeEventListener("visibilitychange", onVisibility);
+            desktopApi.off("select", onSelect);
+        };
     }, [desktopApi]);
 
-    // Sync Mobile — throttle scroll handler (RAF) để giảm CPU khi cuộn
+    // Sync Mobile — throttle scroll: cập nhật tween tối đa ~8 lần/giây để giảm CPU (thay vì 60fps)
+    const throttleRef = useRef<number | null>(null);
+    const lastTweenRef = useRef(0);
+    const THROTTLE_MS = 120;
     useEffect(() => {
         if (!mobileApi) return;
         tweenScale();
-        const onScroll = () => { requestAnimationFrame(tweenScale); };
+        const onScroll = () => {
+            const now = Date.now();
+            if (throttleRef.current !== null) return;
+            if (now - lastTweenRef.current < THROTTLE_MS) {
+                if (throttleRef.current === null) {
+                    throttleRef.current = window.setTimeout(() => {
+                        throttleRef.current = null;
+                        lastTweenRef.current = Date.now();
+                        tweenScale();
+                    }, THROTTLE_MS - (now - lastTweenRef.current));
+                }
+                return;
+            }
+            lastTweenRef.current = now;
+            requestAnimationFrame(tweenScale);
+        };
         mobileApi.on("scroll", onScroll);
         mobileApi.on("reInit", tweenScale);
 
         const onSelect = () => setSelectedIndex(mobileApi.selectedScrollSnap());
         mobileApi.on("select", onSelect);
         return () => {
+            if (throttleRef.current !== null) clearTimeout(throttleRef.current);
             mobileApi.off("select", onSelect);
             mobileApi.off("scroll", onScroll);
             mobileApi.off("reInit", tweenScale);
@@ -98,12 +142,13 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
         return () => window.removeEventListener("resize", check);
     }, []);
 
-    // Hydrate TMDB (desktop only to giảm CPU cho mobile)
+    // Hydrate TMDB (desktop only, số lượng = số slide hero để giảm request)
     useEffect(() => {
         if (!isDesktop) return;
         const fetchHeroData = async () => {
             const updates: Record<string, { vote_average: number, backdrop_path?: string, poster_path?: string }> = {};
-            await Promise.all(movies.slice(0, 20).map(async (movie) => {
+            const toFetch = movies.slice(0, 8);
+            await Promise.all(toFetch.map(async (movie) => {
                 const CACHE_VERSION = 'v5_cinematic_hq';
                 const cacheKey = `tmdb_hero_${CACHE_VERSION}_${movie.slug}`;
                 const cached = sessionStorage.getItem(cacheKey);
@@ -157,8 +202,8 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
     if (!movies || movies.length === 0) return null;
 
     const stripHtml = (html: string) => html ? html.replace(/<[^>]*>/g, '').trim() : "";
-    // Giảm số lượng slide để nhẹ hơn (đủ đa dạng nhưng không quá nặng)
-    const heroMovies = movies.slice(0, 10);
+    // Giới hạn 8 slide để giảm DOM + ảnh + CPU (cuộn mượt hơn)
+    const heroMovies = movies.slice(0, 8);
     const activeMovie = heroMovies[selectedIndex] || heroMovies[0];
     const activeTMDB = heroMoviesData[activeMovie._id];
     const activeRating = activeTMDB?.vote_average ? activeTMDB.vote_average.toFixed(1) : "N/A";
@@ -320,12 +365,12 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                     <div className="relative z-30 h-full container max-w-[1600px] mx-auto px-8 flex items-center">
                                         <div className="grid grid-cols-12 gap-12 w-full items-center mt-16">
 
-                                            {/* Left: Info */}
-                                            <div className="col-span-12 xl:col-span-5 lg:col-span-6 space-y-8 animate-in fade-in slide-in-from-left-10 duration-700 delay-100">
+                                            {/* Left: Info — rút ngắn animation để giảm lag desktop */}
+                                            <div className="col-span-12 xl:col-span-5 lg:col-span-6 space-y-8 animate-in fade-in slide-in-from-left-4 duration-300">
 
                                                 {/* Meta Badges */}
                                                 <div className="flex flex-wrap items-center gap-3">
-                                                    <span className="px-3 py-1 rounded bg-[#F4C84A] text-black text-xs font-bold tracking-wider uppercase shadow-[0_0_15px_rgba(244,200,74,0.4)]">
+                                                    <span className="px-3 py-1 rounded bg-[#F4C84A] text-black text-xs font-bold tracking-wider uppercase">
                                                         Phim Hot
                                                     </span>
                                                     <span className="px-3 py-1 rounded border border-white/20 bg-white/5 text-white text-xs font-semibold">
@@ -365,10 +410,10 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                                 </p>
 
                                                 {/* CTA Buttons - Liquid Glass Container (Desktop) */}
-                                                <div className="flex items-center gap-3 p-[6px] rounded-full bg-[#1A1C23] border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] w-max mt-4">
+                                                <div className="flex items-center gap-3 p-[6px] rounded-full bg-[#1A1C23] border border-white/10 w-max mt-4">
                                                     <Link
                                                         href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                                        className="group relative flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-extrabold text-[15px] shadow-[0_0_20px_rgba(244,200,74,0.3)] hover:shadow-[0_0_40px_rgba(244,200,74,0.5)] transition-all duration-300 hover:-translate-y-1 hover:scale-105 active:scale-95 active:translate-y-0"
+                                                        className="group relative flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-extrabold text-[15px] transition-all duration-200 hover:scale-105 active:scale-95"
                                                     >
                                                         <Play className="w-5 h-5 fill-black" />
                                                         <span>Xem Ngay</span>
@@ -390,17 +435,15 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
                                             {/* Right: 3D Tilt Poster Card */}
                                             {/* Only show on very large screens to maintain layout balance */}
-                                            <div className="col-span-12 xl:col-span-7 lg:col-span-6 hidden lg:flex justify-end pr-8 xl:pr-16 perspective-1000">
-                                                <div className="relative w-[340px] xl:w-[400px] aspect-[2/3] rounded-[32px] overflow-hidden shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)] ring-1 ring-white/10 group/poster transition-transform duration-700 ease-out hover:[transform:rotateY(-8deg)_rotateX(5deg)_scale(1.02)] z-30">
+                                            <div className="col-span-12 xl:col-span-7 lg:col-span-6 hidden lg:flex justify-end pr-8 xl:pr-16">
+                                                <div className="relative w-[340px] xl:w-[400px] aspect-[2/3] rounded-[32px] overflow-hidden ring-1 ring-white/10 group/poster transition-transform duration-300 ease-out hover:scale-[1.02] z-30">
                                                     <Image
                                                         src={posterImg}
                                                         alt={movie.name}
                                                         fill
-                                                        className="object-cover transition-transform duration-700 group-hover/poster:scale-110"
+                                                        className="object-cover transition-transform duration-300 group-hover/poster:scale-105"
                                                         priority={index === 0}
                                                     />
-                                                    {/* Shine Effect */}
-                                                    <div className="absolute inset-0 bg-gradient-to-tr from-white/20 via-transparent to-transparent opacity-0 group-hover/poster:opacity-100 transition-opacity duration-700" />
                                                 </div>
                                             </div>
 
@@ -414,23 +457,23 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                 </div>
 
                 {/* Navigation Arrows (Desktop) */}
-                <button onClick={scrollPrev} className="absolute left-8 top-1/2 -translate-y-1/2 z-50 w-16 h-16 rounded-full glass flex items-center justify-center text-white/40 hover:text-black hover:bg-[#F4C84A] hover:border-[#F4C84A] hover:scale-110 transition-all duration-300 group">
-                    <ChevronRight className="w-8 h-8 rotate-180 group-hover:scale-90 transition-transform" />
+                <button onClick={scrollPrev} className="absolute left-8 top-1/2 -translate-y-1/2 z-50 w-16 h-16 rounded-full glass flex items-center justify-center text-white/40 hover:text-black hover:bg-[#F4C84A] hover:border-[#F4C84A] transition-all duration-200 group">
+                    <ChevronRight className="w-8 h-8 rotate-180" />
                 </button>
-                <button onClick={scrollNext} className="absolute right-8 top-1/2 -translate-y-1/2 z-50 w-16 h-16 rounded-full glass flex items-center justify-center text-white/40 hover:text-black hover:bg-[#F4C84A] hover:border-[#F4C84A] hover:scale-110 transition-all duration-300 group">
-                    <ChevronRight className="w-8 h-8 group-hover:scale-90 transition-transform" />
+                <button onClick={scrollNext} className="absolute right-8 top-1/2 -translate-y-1/2 z-50 w-16 h-16 rounded-full glass flex items-center justify-center text-white/40 hover:text-black hover:bg-[#F4C84A] hover:border-[#F4C84A] transition-all duration-200 group">
+                    <ChevronRight className="w-8 h-8" />
                 </button>
 
                 {/* Dots Indicator */}
                 <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-50 flex gap-4">
-                    {heroMovies.slice(0, 10).map((_, idx) => (
+                    {heroMovies.map((_, idx) => (
                         <button
                             key={idx}
                             onClick={() => scrollTo(idx)}
                             className={cn(
                                 "h-2 rounded-full transition-all duration-500 ease-out",
                                 idx === selectedIndex
-                                    ? "w-12 bg-[#F4C84A] shadow-[0_0_15px_#F4C84A]"
+                                    ? "w-12 bg-[#F4C84A]"
                                     : "w-2 bg-white/20 hover:bg-white/50"
                             )}
                         />

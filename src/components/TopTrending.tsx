@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Movie } from "@/services/api";
 import { getImageUrl, decodeHtml, cn } from "@/lib/utils";
+import { memo } from "react";
 
 interface TopTrendingProps {
     title: string;
@@ -13,7 +14,7 @@ interface TopTrendingProps {
     className?: string;
 }
 
-export default function TopTrending({ title, movies, slug, className }: TopTrendingProps) {
+function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) {
     // Top 10 only
     const topMovies = movies.slice(0, 10);
 
@@ -22,7 +23,7 @@ export default function TopTrending({ title, movies, slug, className }: TopTrend
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-bold text-white capitalize flex items-center gap-3">
-                    <span className="w-1 h-5 bg-[#fbbf24] rounded-full shadow-[0_0_15px_#fbbf24]"></span>
+                    <span className="w-1 h-5 bg-[#fbbf24] rounded-full"></span>
                     <span className="leading-tight">{title}</span>
                 </h2>
                 {slug && (
@@ -52,13 +53,13 @@ export default function TopTrending({ title, movies, slug, className }: TopTrend
                         </div>
 
                         {/* Poster */}
-                        <div className="relative w-[50px] aspect-[2/3] rounded-md overflow-hidden flex-shrink-0 shadow-sm group-hover:shadow-[#fbbf24]/20">
+                        <div className="relative w-[50px] aspect-[2/3] rounded-md overflow-hidden flex-shrink-0">
                             <Image
                                 src={getImageUrl(movie.poster_url || movie.thumb_url)}
                                 alt={movie.name}
                                 fill
                                 loading="lazy"
-                                className="object-cover transition-transform duration-300 group-hover:scale-110"
+                                className="object-cover transition-transform duration-200 group-hover:scale-105"
                                 sizes="50px"
                             />
                         </div>
@@ -86,3 +87,5 @@ export default function TopTrending({ title, movies, slug, className }: TopTrend
         </div>
     );
 }
+
+export default memo(TopTrendingInner);

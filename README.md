@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PhimKhoi
 
-## Getting Started
+Dự án xem phim: Web (Next.js) + App mobile (Expo/React Native). Dùng để học tập đầy đủ.
 
-First, run the development server:
+## Cấu trúc dự án
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+phimkhoi/
+├── src/                    # Web Next.js (App Router)
+│   ├── app/                # Routes, API, actions
+│   ├── components/         # Component dùng chung web
+│   ├── lib/                # DB, utils
+│   ├── models/             # Mongoose models
+│   └── services/           # API, TMDB
+├── mobile/                 # App Expo (React Native)
+│   ├── app/                # Expo Router (tabs, stack)
+│   ├── components/         # Component mobile
+│   ├── context/            # Auth, MiniPlayer
+│   └── services/           # API gọi backend
+├── public/                 # Static web + APK
+├── scripts/                # Cron (daily-sync), deploy hỗ trợ
+├── deploy_vps.sh           # Deploy lên VPS (git pull, build, PM2)
+├── ecosystem.config.cjs   # PM2 chạy Next.js standalone
+└── VPS                     # Ghi chú SSH / deploy
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Chạy local
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Web**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+npm run dev
+```
 
-## Learn More
+Mở [http://localhost:3000](http://localhost:3000). Cần `.env.local` (MongoDB, NextAuth, v.v.).
 
-To learn more about Next.js, take a look at the following resources:
+**Mobile**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+cd mobile
+npm install
+npx expo start
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Build APK: xem `mobile/README.md` (EAS hoặc local Gradle).
 
-## Deploy on Vercel
+## Deploy VPS
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. SSH vào server, clone repo vào thư mục (ví dụ `/home/ubuntu/phimkhoi`).
+2. Cấu hình `.env.local` (giống local).
+3. Chạy: `bash deploy_vps.sh` (sẽ `git pull`, `npm run build`, copy standalone + static, PM2 reload).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+PM2 chạy từ `.next/standalone` với `ecosystem.config.cjs`.
+
+## Học tập
+
+- **Web**: Next.js App Router, Server Actions, API routes, NextAuth, Mongoose, Tailwind.
+- **Mobile**: Expo Router, expo-av, context (auth, mini player), đồng bộ lịch sử xem với web qua API.
+- **Chung**: API backend (OPhim/KKPhim), HLS proxy, lưu lịch sử xem, tiếp tục xem đồng bộ.
+
+Xem tài liệu học & tư duy chi tiết tại `LEARNING.md`.

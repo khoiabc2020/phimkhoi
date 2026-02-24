@@ -28,12 +28,12 @@ export default function TopicSection() {
                     <Link
                         key={topic.id}
                         href={`/tim-kiem?keyword=${topic.name}`}
-                        className="group flex-shrink-0 flex items-center gap-3 px-4 py-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-sm transition-all active:scale-95"
+                        className="group flex-shrink-0 flex items-center gap-3 px-4 py-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors duration-200 active:scale-95"
                     >
                         {/* Dot Indicator */}
                         <div
-                            className="w-2 h-2 rounded-full shadow-[0_0_8px_currentColor]"
-                            style={{ backgroundColor: topic.color, color: topic.color }}
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: topic.color }}
                         />
 
                         <span className="text-sm font-medium text-white/90 group-hover:text-white whitespace-nowrap">
