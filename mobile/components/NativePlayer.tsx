@@ -15,7 +15,7 @@ import {
     Platform,
     ActivityIndicator,
 } from 'react-native';
-import { Video, AVPlaybackStatus, ResizeMode } from 'expo-av';
+import { Audio, Video, AVPlaybackStatus, ResizeMode } from 'expo-av';
 import Slider from '@react-native-community/slider';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import * as ScreenOrientation from 'expo-screen-orientation';
@@ -83,6 +83,32 @@ export default function NativePlayer({
     useEffect(() => {
         setVideoSource({ uri: url });
     }, [url]);
+
+    // Cho phép video tiếp tục phát khi app vào nền (cần cho PiP Android)
+    useEffect(() => {
+        (async () => {
+            try {
+                await Audio.setAudioModeAsync({
+                    staysActiveInBackground: true,
+                    playsInSilentModeIOS: true,
+                });
+            } catch {
+                // ignore audio mode errors
+            }
+        })();
+        return () => {
+            (async () => {
+                try {
+                    await Audio.setAudioModeAsync({
+                        staysActiveInBackground: false,
+                        playsInSilentModeIOS: true,
+                    });
+                } catch {
+                    // ignore
+                }
+            })();
+        };
+    }, []);
     const [status, setStatus] = useState<AVPlaybackStatus>({} as AVPlaybackStatus);
     const [showControls, setShowControls] = useState(true);
     const [resizeMode, setResizeMode] = useState(ResizeMode.CONTAIN);
