@@ -13,7 +13,8 @@ import FavoriteButton from "./FavoriteButton";
 
 export default function HeroSection({ movies }: { movies: Movie[] }) {
     // Desktop: không dùng plugin Autoplay để có thể tắt khi tab ẩn → giảm lag
-    const [desktopRef, desktopApi] = useEmblaCarousel({ loop: true, duration: 35 });
+    // duration hơi lớn hơn mặc định để chuyển slide mượt hơn (không "giật")
+    const [desktopRef, desktopApi] = useEmblaCarousel({ loop: true, duration: 45 });
 
     const [mobileRef, mobileApi] = useEmblaCarousel({
         loop: true,
@@ -63,44 +64,21 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
         setTweenValues(speeds);
     }, [mobileApi]);
 
-    // Sync Desktop + Autoplay chỉ khi tab đang xem (giảm lag khi chuyển tab)
+    // Sync Desktop: chỉ theo dõi slide hiện tại, KHÔNG autoplay để giảm CPU/giật trên desktop
     useEffect(() => {
         if (!desktopApi) return;
         const onSelect = () => setSelectedIndex(desktopApi.selectedScrollSnap());
         desktopApi.on("select", onSelect);
-
-        let autoplayTimer: ReturnType<typeof setInterval> | null = null;
-        const startAutoplay = () => {
-            if (autoplayTimer) return;
-            autoplayTimer = setInterval(() => {
-                if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
-                desktopApi.scrollNext();
-            }, 8000);
-        };
-        const stopAutoplay = () => {
-            if (autoplayTimer) {
-                clearInterval(autoplayTimer);
-                autoplayTimer = null;
-            }
-        };
-        const onVisibility = () => {
-            if (document.visibilityState === "visible") startAutoplay();
-            else stopAutoplay();
-        };
-        startAutoplay();
-        document.addEventListener("visibilitychange", onVisibility);
-
         return () => {
-            stopAutoplay();
-            document.removeEventListener("visibilitychange", onVisibility);
             desktopApi.off("select", onSelect);
         };
     }, [desktopApi]);
 
-    // Sync Mobile — throttle scroll: cập nhật tween tối đa ~8 lần/giây để giảm CPU (thay vì 60fps)
+    // Sync Mobile — throttle scroll: cân bằng giữa mượt mà và CPU
     const throttleRef = useRef<number | null>(null);
     const lastTweenRef = useRef(0);
-    const THROTTLE_MS = 120;
+    // 30–35 lần/giây: mượt hơn nhiều so với 8fps nhưng vẫn nhẹ
+    const THROTTLE_MS = 30;
     useEffect(() => {
         if (!mobileApi) return;
         tweenScale();
