@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Image, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import { useRouter, Stack } from 'expo-router';
@@ -56,93 +56,103 @@ export default function RegisterScreen() {
             <Stack.Screen options={{ headerShown: false }} />
             <StatusBar style="light" />
 
-            <SafeAreaView className="flex-1 px-6">
-                <TouchableOpacity
-                    onPress={() => router.back()}
-                    className="mt-4 p-2 bg-gray-800 rounded-full w-10 h-10 items-center justify-center"
-                >
-                    <Ionicons name="arrow-back" size={24} color="white" />
-                </TouchableOpacity>
+            <KeyboardAvoidingView
+                className="flex-1"
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 24}
+            >
+                <SafeAreaView className="flex-1 px-6">
+                    <TouchableOpacity
+                        onPress={() => router.back()}
+                        className="mt-4 p-2 bg-gray-800 rounded-full w-10 h-10 items-center justify-center"
+                    >
+                        <Ionicons name="arrow-back" size={24} color="white" />
+                    </TouchableOpacity>
 
-                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
-                    <View className="items-center my-8">
-                        <View style={{ width: 64, height: 64, borderRadius: 18, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' }}>
-                            <Image source={require('../../assets/images/logo.webp')} style={{ width: 64, height: 64 }} resizeMode="cover" />
-                        </View>
-                        <Text className="text-3xl font-bold text-white mt-4">Đăng Ký</Text>
-                        <Text className="text-gray-400 mt-2 text-center">Tạo tài khoản Movie<Text className="text-yellow-500">Box</Text> để trải nghiệm tốt hơn</Text>
-                    </View>
-
-                    <View className="space-y-4">
-                        <View>
-                            <Text className="text-gray-400 mb-2 ml-1">Tên hiển thị</Text>
-                            <TextInput
-                                className="bg-gray-800 text-white p-4 rounded-xl"
-                                placeholder="Nhập tên của bạn"
-                                placeholderTextColor="#6b7280"
-                                value={name}
-                                onChangeText={setName}
-                            />
+                    <ScrollView
+                        showsVerticalScrollIndicator={false}
+                        keyboardShouldPersistTaps="handled"
+                        contentContainerStyle={{ paddingBottom: 40 }}
+                    >
+                        <View className="items-center my-8">
+                            <View style={{ width: 64, height: 64, borderRadius: 18, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' }}>
+                                <Image source={require('../../assets/images/logo.webp')} style={{ width: 64, height: 64 }} resizeMode="cover" />
+                            </View>
+                            <Text className="text-3xl font-bold text-white mt-4">Đăng Ký</Text>
+                            <Text className="text-gray-400 mt-2 text-center">Tạo tài khoản Movie<Text className="text-yellow-500">Box</Text> để trải nghiệm tốt hơn</Text>
                         </View>
 
-                        <View>
-                            <Text className="text-gray-400 mb-2 ml-1">Email</Text>
-                            <TextInput
-                                className="bg-gray-800 text-white p-4 rounded-xl"
-                                placeholder="Nhập email"
-                                placeholderTextColor="#6b7280"
-                                value={email}
-                                onChangeText={setEmail}
-                                autoCapitalize="none"
-                                keyboardType="email-address"
-                            />
-                        </View>
+                        <View className="space-y-4">
+                            <View>
+                                <Text className="text-gray-400 mb-2 ml-1">Tên hiển thị</Text>
+                                <TextInput
+                                    className="bg-gray-800 text-white p-4 rounded-xl"
+                                    placeholder="Nhập tên của bạn"
+                                    placeholderTextColor="#6b7280"
+                                    value={name}
+                                    onChangeText={setName}
+                                />
+                            </View>
 
-                        <View>
-                            <Text className="text-gray-400 mb-2 ml-1">Mật khẩu</Text>
-                            <TextInput
-                                className="bg-gray-800 text-white p-4 rounded-xl"
-                                placeholder="Nhập mật khẩu"
-                                placeholderTextColor="#6b7280"
-                                value={password}
-                                onChangeText={setPassword}
-                                secureTextEntry
-                            />
-                        </View>
+                            <View>
+                                <Text className="text-gray-400 mb-2 ml-1">Email</Text>
+                                <TextInput
+                                    className="bg-gray-800 text-white p-4 rounded-xl"
+                                    placeholder="Nhập email"
+                                    placeholderTextColor="#6b7280"
+                                    value={email}
+                                    onChangeText={setEmail}
+                                    autoCapitalize="none"
+                                    keyboardType="email-address"
+                                />
+                            </View>
 
-                        <View>
-                            <Text className="text-gray-400 mb-2 ml-1">Xác nhận mật khẩu</Text>
-                            <TextInput
-                                className="bg-gray-800 text-white p-4 rounded-xl"
-                                placeholder="Nhập lại mật khẩu"
-                                placeholderTextColor="#6b7280"
-                                value={confirmPassword}
-                                onChangeText={setConfirmPassword}
-                                secureTextEntry
-                            />
-                        </View>
+                            <View>
+                                <Text className="text-gray-400 mb-2 ml-1">Mật khẩu</Text>
+                                <TextInput
+                                    className="bg-gray-800 text-white p-4 rounded-xl"
+                                    placeholder="Nhập mật khẩu"
+                                    placeholderTextColor="#6b7280"
+                                    value={password}
+                                    onChangeText={setPassword}
+                                    secureTextEntry
+                                />
+                            </View>
 
-                        <TouchableOpacity
-                            onPress={handleRegister}
-                            disabled={loading}
-                            className={`bg-yellow-500 p-4 rounded-xl items-center mt-6 ${loading ? 'opacity-70' : ''}`}
-                        >
-                            {loading ? (
-                                <ActivityIndicator color="black" />
-                            ) : (
-                                <Text className="text-black font-bold text-lg">Đăng Ký</Text>
-                            )}
-                        </TouchableOpacity>
+                            <View>
+                                <Text className="text-gray-400 mb-2 ml-1">Xác nhận mật khẩu</Text>
+                                <TextInput
+                                    className="bg-gray-800 text-white p-4 rounded-xl"
+                                    placeholder="Nhập lại mật khẩu"
+                                    placeholderTextColor="#6b7280"
+                                    value={confirmPassword}
+                                    onChangeText={setConfirmPassword}
+                                    secureTextEntry
+                                />
+                            </View>
 
-                        <View className="flex-row justify-center mt-6">
-                            <Text className="text-gray-400">Đã có tài khoản? </Text>
-                            <TouchableOpacity onPress={() => router.push('/(auth)/login')}>
-                                <Text className="text-yellow-500 font-bold">Đăng nhập ngay</Text>
+                            <TouchableOpacity
+                                onPress={handleRegister}
+                                disabled={loading}
+                                className={`bg-yellow-500 p-4 rounded-xl items-center mt-6 ${loading ? 'opacity-70' : ''}`}
+                            >
+                                {loading ? (
+                                    <ActivityIndicator color="black" />
+                                ) : (
+                                    <Text className="text-black font-bold text-lg">Đăng Ký</Text>
+                                )}
                             </TouchableOpacity>
+
+                            <View className="flex-row justify-center mt-6">
+                                <Text className="text-gray-400">Đã có tài khoản? </Text>
+                                <TouchableOpacity onPress={() => router.push('/(auth)/login')}>
+                                    <Text className="text-yellow-500 font-bold">Đăng nhập ngay</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                    </View>
-                </ScrollView>
-            </SafeAreaView>
+                    </ScrollView>
+                </SafeAreaView>
+            </KeyboardAvoidingView>
         </View>
     );
 }
