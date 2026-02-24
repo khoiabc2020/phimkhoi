@@ -87,11 +87,11 @@ export async function getContinueWatching() {
         await dbConnect();
 
         // Dùng aggregation để chỉ lấy TẬP MỚI NHẤT mỗi phim (group by movieId)
+        // Không lọc progress < 99 nữa để đảm bảo hiển thị đúng tập xem gần nhất (kể cả khi đã xem gần hết/100%)
         const continueWatching = await WatchHistory.aggregate([
             {
                 $match: {
                     userId: session.user.id,
-                    progress: { $lt: 99 },
                 }
             },
             { $sort: { lastWatched: -1 } },
