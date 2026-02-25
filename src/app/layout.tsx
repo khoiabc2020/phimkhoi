@@ -30,7 +30,7 @@ export default async function RootLayout({
   const { categories, countries } = await getMenuData();
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased pb-20 lg:pb-0`}
       >

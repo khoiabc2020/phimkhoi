@@ -1,4 +1,1 @@
-# VPS deploy
-# SSH: dùng key và host của bạn, ví dụ:
-#   ssh -i "path/to/key.pem" ubuntu@your-ec2-host
-# Sau khi SSH vào: cd /home/ubuntu/phimkhoi && bash deploy_vps.sh
+[4/4] SSH - git pull + deploy_vps.sh
