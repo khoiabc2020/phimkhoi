@@ -329,26 +329,20 @@ export const getTrendMovies = async (type: 'movie' | 'tv' | 'all' = 'all') => {
         const trendList = await getTMDBTrending(type);
 
         // 2. Map to PhimApi
-        // Use Promise.all to search in parallel
+        // Dữ lại poster/thumbnail gốc từ PhimAPI để tránh mismatch poster giữa TMDB và nguồn stream
         const movies = await Promise.all(trendList.slice(0, 15).map(async (tmdbItem: any) => {
             // Search by Original Name first (most accurate)
             const query = tmdbItem.original_name || tmdbItem.original_title || tmdbItem.name || tmdbItem.title;
             const searchResults = await searchMovies(query);
 
-            // Find best match in PhimApi results
-            // We can trust the searchMovies result order mostly, but let's check title similarity if possible
             if (searchResults && searchResults.length > 0) {
                 const movie = searchResults[0]; // Take first result
 
-                // Enrich with TMDB metadata immediately for the UI
-                // We can manually attach the TMDB poster/backdrop here if we want to force it
+                // Chỉ thêm metadata (vote_average, tmdb_id...), KHÔNG override poster_url / thumb_url
                 return {
                     ...movie,
-                    // Override with TMDB high-res images if available
-                    poster_url: tmdbItem.poster_path ? `https://image.tmdb.org/t/p/w500${tmdbItem.poster_path}` : movie.poster_url,
-                    thumb_url: tmdbItem.backdrop_path ? `https://image.tmdb.org/t/p/original${tmdbItem.backdrop_path}` : movie.thumb_url,
-                    // Add extra metadata for UI
                     vote_average: tmdbItem.vote_average,
+                    tmdb_id: tmdbItem.id,
                 };
             }
             return null;
