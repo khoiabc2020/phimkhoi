@@ -196,9 +196,9 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
         movieCategories: movie.category?.map(c => c.name) || [],
     });
 
-    // Hero luôn dùng poster/thumbnail từ nguồn phim gốc để tránh trường hợp TMDB match nhầm sang phim/series khác.
+    // Hero luôn dùng poster/thumbnail gốc (không qua CDN proxy) để tránh lỗi fetch CDN + giữ chất lượng tốt nhất
     const getHeroImage = (movie: Movie) => {
-        return getImageUrl(movie.poster_url || movie.thumb_url);
+        return movie.poster_url || movie.thumb_url || "";
     };
 
     return (
