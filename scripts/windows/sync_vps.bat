@@ -26,28 +26,32 @@ if errorlevel 1 (
     exit /b 1
 )
 
-echo [4/4] SSH -> VPS: git pull + deploy_vps.sh
-ssh -i "%PEM%" -o StrictHostKeyChecking=no %HOST% "cd /home/ubuntu/phimkhoi && git pull origin main && bash deploy_vps.sh"
+echo [4/4] SSH -^> VPS: git pull + deploy_vps.sh (cho phep timeout 10 phut)
+ssh -i "%PEM%" -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -o ServerAliveCountMax=20 -o ConnectTimeout=15 %HOST% "cd /home/ubuntu/phimkhoi && git pull origin main && bash deploy_vps.sh"
 
 if errorlevel 1 (
-    echo [LOI] SSH hoac deploy tren VPS that bai.
+    echo [LOI] SSH hoac deploy tren VPS that bai. Kiem tra mang, PEM, VPS dang chay.
     pause
     exit /b 1
 )
 
 echo.
-echo [XONG] VPS da duoc dong bo. Kiem tra: http://18.141.25.244
+echo [XONG] VPS da duoc dong bo. Kiem tra: http://18.141.25.244 hoac https://khoiphim.io.vn
 pause
 exit /b 0
 
 :no_commit
-echo Khong co thay doi de commit. Ban co muon van chay pull + deploy tren VPS? (Y/N)
-set /p confirm=
-if /i "%confirm%"=="Y" goto :deploy_only
-exit /b 0
+echo Khong co thay doi de commit. Van chay pull + deploy tren VPS...
+goto :deploy_only
 
 :deploy_only
-echo SSH -> VPS: git pull + deploy_vps.sh
-ssh -i "%PEM%" -o StrictHostKeyChecking=no %HOST% "cd /home/ubuntu/phimkhoi && git pull origin main && bash deploy_vps.sh"
+echo SSH -^> VPS: git pull + deploy_vps.sh
+ssh -i "%PEM%" -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -o ServerAliveCountMax=20 -o ConnectTimeout=15 %HOST% "cd /home/ubuntu/phimkhoi && git pull origin main && bash deploy_vps.sh"
+if errorlevel 1 (
+    echo [LOI] SSH/deploy that bai.
+    pause
+    exit /b 1
+)
+echo [XONG] VPS da deploy xong.
 pause
 exit /b 0
