@@ -323,34 +323,47 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
 // ... existing code ...
 import { getTMDBTrending } from "./tmdb";
 
+// Kiểm tra năm TMDB vs phim nguồn có khớp (cùng phim) để dùng ảnh TMDB chất lượng cao
+function isSameMovieByYear(tmdbItem: any, movie: any): boolean {
+    const tmdbYear = tmdbItem.release_date
+        ? parseInt(String(tmdbItem.release_date).substring(0, 4), 10)
+        : tmdbItem.first_air_date
+            ? parseInt(String(tmdbItem.first_air_date).substring(0, 4), 10)
+            : null;
+    const sourceYear = movie.year ? parseInt(String(movie.year).substring(0, 4), 10) : null;
+    if (tmdbYear == null || sourceYear == null) return false;
+    return Math.abs(tmdbYear - sourceYear) <= 2;
+}
+
 export const getTrendMovies = async (type: 'movie' | 'tv' | 'all' = 'all') => {
     try {
-        // 1. Get Top Trending from TMDB
         const trendList = await getTMDBTrending(type);
 
-        // 2. Map to PhimApi
-        // Dữ lại poster/thumbnail gốc từ PhimAPI để tránh mismatch poster giữa TMDB và nguồn stream
         const movies = await Promise.all(trendList.slice(0, 15).map(async (tmdbItem: any) => {
-            // Search by Original Name first (most accurate)
             const query = tmdbItem.original_name || tmdbItem.original_title || tmdbItem.name || tmdbItem.title;
             const searchResults = await searchMovies(query);
 
             if (searchResults && searchResults.length > 0) {
-                const movie = searchResults[0]; // Take first result
+                const movie = searchResults[0];
+                const useTmdbImages = isSameMovieByYear(tmdbItem, movie);
 
-                // Chỉ thêm metadata (vote_average, tmdb_id...), KHÔNG override poster_url / thumb_url
                 return {
                     ...movie,
                     vote_average: tmdbItem.vote_average,
                     tmdb_id: tmdbItem.id,
+                    // Chỉ override bằng ảnh TMDB khi đã xác định cùng phim (năm khớp) → ảnh chất lượng cao và chính xác
+                    poster_url: useTmdbImages && tmdbItem.poster_path
+                        ? `https://image.tmdb.org/t/p/w500${tmdbItem.poster_path}`
+                        : (movie.poster_url || movie.thumb_url || ""),
+                    thumb_url: useTmdbImages && tmdbItem.backdrop_path
+                        ? `https://image.tmdb.org/t/p/original${tmdbItem.backdrop_path}`
+                        : (movie.thumb_url || movie.poster_url || ""),
                 };
             }
             return null;
         }));
 
-        // 3. Filter nulls and return valid movies
-        return movies.filter((m: any) => m !== null); // Return all valid matches (max 20 from 1 TMDB page)
-
+        return movies.filter((m: any) => m !== null);
     } catch (error) {
         console.error("Error fetching trend movies:", error);
         return [];
