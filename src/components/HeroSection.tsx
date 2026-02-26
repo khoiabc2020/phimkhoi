@@ -5,10 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { Play, ChevronRight, Info } from "lucide-react";
 import { Movie } from "@/services/api";
-import { getImageUrl } from "@/lib/utils";
+import { getImageUrl, decodeHtml, cn } from "@/lib/utils";
 import { getTMDBDataForCard } from "@/app/actions/tmdb";
 import { useState, useEffect, useCallback, useRef } from "react";
-import { cn } from "@/lib/utils";
 import FavoriteButton from "./FavoriteButton";
 
 export default function HeroSection({ movies }: { movies: Movie[] }) {
@@ -197,14 +196,8 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
         movieCategories: movie.category?.map(c => c.name) || [],
     });
 
-    const getHeroImage = (movie: Movie, type: 'backdrop' | 'poster' = 'backdrop') => {
-        const tmdbData = heroMoviesData[movie._id];
-        if (type === 'backdrop' && tmdbData?.backdrop_path) {
-            return `https://image.tmdb.org/t/p/original${tmdbData.backdrop_path}`;
-        }
-        if (type === 'poster' && tmdbData?.poster_path) {
-            return `https://image.tmdb.org/t/p/original${tmdbData.poster_path}`;
-        }
+    // Hero luôn dùng poster/thumbnail từ nguồn phim gốc để tránh trường hợp TMDB match nhầm sang phim/series khác.
+    const getHeroImage = (movie: Movie) => {
         return getImageUrl(movie.poster_url || movie.thumb_url);
     };
 
@@ -216,7 +209,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
             <div className="lg:hidden relative w-full h-auto flex flex-col pt-6 pb-8 bg-[#0B0D12]" ref={mobileRef}>
                 <div className="flex flex-row touch-pan-y h-auto">
                     {heroMovies.map((movie, index) => {
-                        const posterImg = getHeroImage(movie, 'poster');
+                        const posterImg = getHeroImage(movie);
                         const rating = heroMoviesData[movie._id]?.vote_average ? heroMoviesData[movie._id].vote_average.toFixed(1) : "N/A";
 
                         const tweenValue = tweenValues.length ? tweenValues[index] : 1;
@@ -237,7 +230,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                 >
                                     <Image
                                         src={posterImg}
-                                        alt={movie.name}
+                                        alt={decodeHtml(movie.name)}
                                         fill
                                         className="object-cover"
                                         priority={index === 0}
@@ -255,11 +248,11 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                     }}
                                 >
                                     <h1 className="text-xl md:text-2xl font-black text-white leading-tight drop-shadow-lg line-clamp-2 tracking-tight mb-1">
-                                        {movie.name}
+                                        {decodeHtml(movie.name)}
                                     </h1>
 
                                     <h2 className="text-[13px] md:text-sm text-[#F4C84A] font-medium line-clamp-1 mb-3">
-                                        {movie.origin_name}
+                                        {decodeHtml(movie.origin_name || "")}
                                     </h2>
 
                                     {/* Meta Row */}
@@ -318,8 +311,8 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                 <div className="absolute inset-0 h-full" ref={desktopRef}>
                     <div className="flex h-full touch-pan-y">
                         {heroMovies.map((movie, index) => {
-                            const posterImg = getHeroImage(movie, 'poster');
-                            const backdropImg = getHeroImage(movie, 'backdrop');
+                            const posterImg = getHeroImage(movie);
+                            const backdropImg = getHeroImage(movie);
 
                             return (
                                 <div key={movie._id} className="relative flex-[0_0_100%] min-w-0 h-full bg-[#0B0D12] overflow-hidden">
@@ -366,12 +359,14 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                                 <h1
                                                     className="text-lg md:text-xl font-bold text-white leading-tight tracking-tight drop-shadow-2xl line-clamp-2 mb-3 px-1"
                                                 >
-                                                    {movie.name}
+                                                    {decodeHtml(movie.name)}
                                                 </h1>
 
                                                 {/* Origin Name & Categories */}
                                                 <div className="flex items-center gap-4 mb-5">
-                                                    <h2 className="text-[16px] text-[#F4C84A] font-medium tracking-wide opacity-90">{movie.origin_name}</h2>
+                                                    <h2 className="text-[16px] text-[#F4C84A] font-medium tracking-wide opacity-90">
+                                                        {decodeHtml(movie.origin_name || "")}
+                                                    </h2>
                                                     <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
                                                     <div className="flex gap-3">
                                                         {movie.category?.slice(0, 3).map(c => (
@@ -384,7 +379,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
                                                 {/* Description */}
                                                 <p className="text-white/60 text-base leading-relaxed line-clamp-3 font-normal max-w-2xl text-shadow-sm">
-                                                    {stripHtml(movie.content)}
+                                                    {decodeHtml(stripHtml(movie.content || ""))}
                                                 </p>
 
                                                 {/* CTA Buttons - Liquid Glass Container (Desktop) */}
@@ -417,7 +412,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                                 <div className="relative w-[340px] xl:w-[400px] aspect-[2/3] rounded-[32px] overflow-hidden ring-1 ring-white/10 group/poster transition-transform duration-300 ease-out hover:scale-[1.02] z-30">
                                                     <Image
                                                         src={posterImg}
-                                                        alt={movie.name}
+                                                        alt={decodeHtml(movie.name)}
                                                         fill
                                                         className="object-cover transition-transform duration-300 group-hover/poster:scale-105"
                                                         priority={index === 0}
