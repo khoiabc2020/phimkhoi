@@ -217,26 +217,18 @@ export default function WatchContainer({
             {servers && servers.length > 0 && (
                 <div
                     className={cn(
-                        "mt-5 rounded-2xl border border-white/[0.06] relative mx-auto",
-                        isTheaterMode ? "max-w-[1500px]" : "w-full"
+                        "relative mx-auto w-full",
+                        isTheaterMode ? "max-w-[1500px]" : "w-full lg:max-w-none"
                     )}
-                    style={{ background: "rgba(15,18,26,0.8)", backdropFilter: "blur(20px)" }}
                 >
-                    <div className="px-5 pt-4 pb-3 border-b border-white/[0.06]">
-                        <h3 className="text-white font-semibold text-sm flex items-center gap-2 uppercase tracking-wide">
-                            <ListIcon className="w-4 h-4 text-yellow-400" /> Danh sách tập
-                        </h3>
-                    </div>
-                    <div className="p-5">
-                        <WatchEpisodeSection
-                            movieSlug={movie.slug}
-                            movieName={movie.name}
-                            servers={servers}
-                            currentEpisodeSlug={currentEpisodeSlug}
-                            activeServerName={activeServerName}
-                            onServerChange={setActiveServerName}
-                        />
-                    </div>
+                    <WatchEpisodeSection
+                        movieSlug={movie.slug}
+                        movieName={movie.name}
+                        servers={servers}
+                        currentEpisodeSlug={currentEpisodeSlug}
+                        activeServerName={activeServerName}
+                        onServerChange={setActiveServerName}
+                    />
                 </div>
             )}
         </div>

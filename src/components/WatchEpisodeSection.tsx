@@ -54,26 +54,34 @@ export default function WatchEpisodeSection({
     const serverName = activeServerName || servers[0]?.server_name || "VIP";
 
     return (
-        <div className="bg-[#0d0d0d] border-b border-white/5">
-            {/* Header: Xem phim [title] with back */}
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-white/5">
-                <Link
-                    href={`/phim/${movieSlug}`}
-                    className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-white/10 transition-colors -ml-1"
-                    aria-label="Quay lại"
-                >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                </Link>
-                <span className="text-sm font-medium text-white truncate flex-1">Xem phim {movieName}</span>
+        <div className="bg-[#0B0E14] rounded-2xl border border-white/5 overflow-hidden mb-8 mt-4 mx-4 md:mx-0">
+            {/* Header: DANH SÁCH TẬP */}
+            <div className="flex items-center gap-3 px-6 py-4 border-b border-white/5">
+                <List className="w-[18px] h-[18px] text-[#F4C84A]" />
+                <h3 className="text-[14px] font-bold text-white uppercase tracking-wider text-shadow-sm">
+                    Danh Sách Tập
+                </h3>
             </div>
 
-            {/* Server selector (Pill Design) */}
-            <div className="px-4 py-6 space-y-6">
-                <div className="flex flex-col items-center">
-                    {/* Servers List - Sleek Pill Container */}
-                    <div className="inline-flex items-center gap-1 p-1 rounded-full bg-[#18181A] border border-white/[0.04]">
+            <div className="px-6 pt-6 pb-8">
+                {/* Back Link */}
+                <div className="mb-8">
+                    <Link
+                        href={`/phim/${movieSlug}`}
+                        className="inline-flex items-center gap-3 group"
+                    >
+                        <span className="w-8 h-8 rounded-full bg-[#1A1D24] border border-white/5 group-hover:bg-[#28282B] flex items-center justify-center text-white transition-colors">
+                            <ChevronLeft className="w-4 h-4 ml-[-2px]" />
+                        </span>
+                        <span className="text-[15px] font-bold text-white group-hover:text-[#F4C84A] transition-colors">
+                            Xem phim {movieName}
+                        </span>
+                    </Link>
+                </div>
+
+                {/* Server selector (Pill Design) */}
+                <div className="flex flex-col items-center mb-10">
+                    <div className="inline-flex items-center p-1 rounded-full bg-[#111113] border border-white/[0.04]">
                         {servers.length > 0 ? (
                             servers.map((s, i) => {
                                 const isServerActive = s.server_name === activeServerName;
@@ -83,9 +91,9 @@ export default function WatchEpisodeSection({
                                         type="button"
                                         onClick={() => onServerChange(s.server_name)}
                                         className={cn(
-                                            "px-6 py-2.5 rounded-full text-[15px] font-semibold transition-all duration-300",
+                                            "px-8 py-2.5 rounded-full text-[14px] font-bold transition-all duration-300",
                                             isServerActive
-                                                ? "bg-[#28282B] text-white shadow-sm"
+                                                ? "bg-[#1A1D24] text-[#E4E4E5] shadow-sm border border-white/[0.04]" // Darker active pill
                                                 : "bg-transparent text-[#71717A] hover:text-white"
                                         )}
                                     >
@@ -94,7 +102,7 @@ export default function WatchEpisodeSection({
                                 );
                             })
                         ) : (
-                            <button className="px-6 py-2.5 rounded-full text-[15px] font-semibold bg-[#28282B] text-white shadow-sm">
+                            <button className="px-8 py-2.5 rounded-full text-[14px] font-bold bg-[#1A1D24] text-[#E4E4E5] shadow-sm border border-white/[0.04]">
                                 {serverName}
                             </button>
                         )}
@@ -102,36 +110,35 @@ export default function WatchEpisodeSection({
                 </div>
 
                 {/* Toggle Collapse */}
-                <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-xs text-gray-400">Hiện ảnh</span>
+                <div className="flex items-center gap-3 mb-6">
+                    <span className="text-[13px] text-gray-400 font-medium">Hiện ảnh</span>
                     <button
                         type="button"
                         role="switch"
                         aria-checked={!isCollapsed}
                         onClick={() => setIsCollapsed(!isCollapsed)}
                         className={cn(
-                            "w-9 h-5 rounded-full transition-colors relative",
-                            isCollapsed ? "bg-white/10" : "bg-gray-400"
+                            "w-10 h-6 rounded-full transition-colors relative border border-white/10",
+                            isCollapsed ? "bg-white/10" : "bg-white/30" // Active looks whitish
                         )}
                     >
                         <span
                             className={cn(
-                                "absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all",
-                                isCollapsed ? "left-0.5" : "left-4.5 translate-x-1"
+                                "absolute top-[2px] w-[18px] h-[18px] rounded-full bg-white shadow transition-all",
+                                isCollapsed ? "left-[3px]" : "left-[19px]"
                             )}
                         />
                     </button>
                 </div>
-            </div>
 
-            {/* Subtitle count */}
-            <div className="text-sm text-gray-400">
-                Danh sách tập ( <span className="text-white font-medium">{episodes.length}</span> / <span className="text-[#F4C84A] font-bold">{episodes.length}</span> )
-            </div>
-            {/* Episode grid */}
-            {!isCollapsed && (
-                <div className="p-4 pt-0">
-                    <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-3 max-h-[400px] overflow-y-auto custom-scrollbar pr-2 [contain:layout_paint]">
+                {/* Subtitle count */}
+                <div className="text-[13px] text-[#71717A] mb-4">
+                    Danh sách tập ( <span className="text-white font-bold">{episodes.length}</span> / <span className="text-[#F4C84A] font-bold">{episodes.length}</span> )
+                </div>
+
+                {/* Episode grid */}
+                {!isCollapsed && (
+                    <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-3 max-h-[500px] overflow-y-auto custom-scrollbar pr-3 [contain:layout_paint]">
                         {episodes.map((ep) => {
                             const isActive = ep.slug === currentEpisodeSlug;
 
@@ -149,10 +156,10 @@ export default function WatchEpisodeSection({
                                     key={ep.slug}
                                     href={`/xem-phim/${movieSlug}/${ep.slug}?server=${safeIndex}`}
                                     className={cn(
-                                        "h-12 rounded-2xl flex items-center justify-center text-[15px] font-bold transition-all border",
+                                        "h-[42px] rounded-xl flex items-center justify-center text-[15px] font-bold transition-all border",
                                         isActive
-                                            ? "bg-[#F4C84A] border-[#F4C84A] text-black shadow-none scale-105"
-                                            : "bg-[#111113] border-white/[0.05] text-white hover:bg-[#1C1C1E] hover:border-white/10"
+                                            ? "bg-[#F4C84A] border-[#F4C84A] text-[#111113] shadow-none scale-100"
+                                            : "bg-[#15151A] border-transparent text-[#E4E4E5] hover:bg-[#1A1D24] hover:border-white/5"
                                     )}
                                 >
                                     {displayName}
@@ -160,8 +167,8 @@ export default function WatchEpisodeSection({
                             );
                         })}
                     </div>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 }
