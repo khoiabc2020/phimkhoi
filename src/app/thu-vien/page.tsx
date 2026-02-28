@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import {
-    Clock, Bookmark, Heart, Play, X, Loader2
+    Clock, Bookmark, Heart, Play, X, Loader2, ChevronLeft
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { removeFromWatchlist } from "@/app/actions/watchlist";
@@ -98,19 +98,19 @@ export default function ThuvienPage() {
             <div className="relative z-10 max-w-[1400px] mx-auto px-4 md:px-8 lg:px-12 py-10">
 
                 {/* Header row */}
-                <div className="flex items-center justify-between mb-8">
+                <div className="mb-8">
+                    <button onClick={() => router.back()} className="inline-flex items-center gap-1.5 text-sm text-white/50 hover:text-white transition-colors mb-5 font-semibold">
+                        <ChevronLeft className="w-4 h-4" /> Quay lại
+                    </button>
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
                             Thư viện của bạn
                         </h1>
-                        <p className="text-sm text-white/40 mt-1">
-                            {session?.user?.name && `@${session.user.name}`}
-                        </p>
                     </div>
                 </div>
 
                 {/* Tabs */}
-                <div className="flex items-center gap-1 mb-8 border-b border-white/[0.08]">
+                <div className="flex items-center gap-2 mb-8 border-b border-white/[0.08]">
                     {tabs.map((tab) => {
                         const Icon = tab.icon;
                         const isActive = activeTab === tab.id;
@@ -121,20 +121,12 @@ export default function ThuvienPage() {
                                 className={cn(
                                     "flex items-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 transition-all relative",
                                     isActive
-                                        ? "text-white border-yellow-400"
+                                        ? "text-white border-white"
                                         : "text-white/40 border-transparent hover:text-white/70 hover:border-white/20"
                                 )}
                             >
-                                <Icon className={cn("w-4 h-4", isActive && tab.id === "yeu-thich" ? "text-red-400 fill-red-400/30" : "")} />
+                                <Icon className={cn("w-4 h-4", isActive && tab.id === "yeu-thich" ? "text-white" : "")} />
                                 {tab.label}
-                                {tab.count > 0 && (
-                                    <span className={cn(
-                                        "text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center",
-                                        isActive ? "bg-yellow-400/20 text-yellow-400" : "bg-white/10 text-white/40"
-                                    )}>
-                                        {tab.count}
-                                    </span>
-                                )}
                             </button>
                         );
                     })}

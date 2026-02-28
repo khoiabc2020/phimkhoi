@@ -25,13 +25,20 @@ export const authOptions = {
                     ]
                 });
 
-                // 2. Mock Admin for initial setup if DB is empty/first run
+                // 2. Setup real Admin if DB is empty/first run
                 if (!user && credentials.username === "admin" && credentials.password === "admin123") {
-                    return {
-                        id: "admin_mock_id",
+                    const hashed = await bcrypt.hash("admin123", 10);
+                    const newAdmin = await User.create({
                         name: "Admin User",
                         email: "admin@khoiphim.com",
+                        password: hashed,
                         role: "admin",
+                    });
+                    return {
+                        id: newAdmin._id.toString(),
+                        name: newAdmin.name,
+                        email: newAdmin.email,
+                        role: newAdmin.role,
                     };
                 }
 

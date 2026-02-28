@@ -94,29 +94,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
 
             <div className="relative z-10 pt-20 md:pt-24 pb-16">
 
-                {/* ── FULL WIDTH PLAYER ZONE ── */}
-                <div className="w-full px-0 md:px-4 lg:px-8 xl:px-12 max-w-[1800px] mx-auto mb-6">
 
-                    {/* Breadcrumb */}
-                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-4 font-medium px-4 md:px-0">
-                        <Link href="/" className="hover:text-yellow-400 transition-colors">Trang chủ</Link>
-                        <span className="text-gray-700">/</span>
-                        <Link href={`/phim/${movie.slug}`} className="hover:text-yellow-400 transition-colors truncate max-w-[180px]">{movie.name}</Link>
-                        <span className="text-gray-700">/</span>
-                        <span className="text-yellow-400">{displayEpisodeName(currentEpisode?.name || episode)}</span>
-                    </div>
-
-                    {/* Player — full width */}
-                    <WatchContainer
-                        movie={movie}
-                        currentEpisode={currentEpisode}
-                        episodes={episodes}
-                        servers={servers}
-                        initialProgress={initialProgress}
-                        movieData={movieData}
-                        initialServerName={servers[usedIndex]?.server_name || servers[0]?.server_name || ""}
-                    />
-                </div>
 
                 {/* ── CONTENT GRID (9+3) ── */}
                 <div className="container mx-auto px-4 lg:px-8 max-w-[1600px]">
@@ -124,6 +102,27 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
 
                         {/* Left (9 cols) */}
                         <div className="lg:col-span-9 space-y-5">
+
+                            {/* Breadcrumb */}
+                            <div className="flex items-center gap-2 text-xs text-gray-500 font-medium px-1">
+                                <Link href="/" className="hover:text-yellow-400 transition-colors">Trang chủ</Link>
+                                <span className="text-gray-700">/</span>
+                                <Link href={`/phim/${movie.slug}`} className="hover:text-yellow-400 transition-colors truncate max-w-[180px]">{movie.name}</Link>
+                                <span className="text-gray-700">/</span>
+                                <span className="text-yellow-400">{displayEpisodeName(currentEpisode?.name || episode)}</span>
+                            </div>
+
+                            {/* Player */}
+                            <WatchContainer
+                                movie={movie}
+                                currentEpisode={currentEpisode}
+                                episodes={episodes}
+                                servers={servers}
+                                initialProgress={initialProgress}
+                                movieData={movieData}
+                                initialServerName={servers[usedIndex]?.server_name || servers[0]?.server_name || ""}
+                            />
+
 
                             {/* Movie description */}
                             <div className="rounded-2xl border border-white/[0.06] overflow-hidden"

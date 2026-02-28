@@ -143,17 +143,24 @@ export default function VideoPlayer({
                     i18n: { "vi": VI_LOCALE },
                     lang: "vi",
                     moreVideoAttr: { crossOrigin: "anonymous" },
-                    // Controls: skip -10, skip +10, then default, then next-ep custom
+                    icons: {
+                        play: `<div style="display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:50%; border:2px solid rgba(255,255,255,0.3); margin: 0 4px; transition:border 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:2px"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>`,
+                        pause: `<div style="display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:50%; border:2px solid rgba(255,255,255,0.3); margin: 0 4px; transition:border 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></div>`,
+                    },
+                    // Controls: skip -10, skip +10
                     controls: [
                         // Skip back 10s
                         {
                             position: "left",
                             name: "skip-back",
                             index: 1,
-                            html: `<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" style="opacity:0.85">
-                                <path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/>
-                                <text x="5" y="22" font-size="5" fill="currentColor" font-family="sans-serif">10</text>
-                            </svg>`,
+                            html: `<div style="display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:50%; border:2px solid rgba(255,255,255,0.3); margin: 0 4px; transition:border 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'">
+                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                                    <path d="M3 3v5h5" />
+                                    <text x="12" y="16.5" font-size="8.5" font-family="sans-serif" font-weight="700" text-anchor="middle" fill="white" stroke="none">10</text>
+                                </svg>
+                            </div>`,
                             tooltip: "Tua lùi 10s",
                             click: () => { if (art) art.currentTime = Math.max(0, art.currentTime - 10); },
                         },
@@ -162,10 +169,13 @@ export default function VideoPlayer({
                             position: "left",
                             name: "skip-forward",
                             index: 2,
-                            html: `<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" style="opacity:0.85">
-                                <path d="M13 6v12l8.5-6L13 6zm-1.5 6L3 6v12l8.5-6z"/>
-                                <text x="12" y="22" font-size="5" fill="currentColor" font-family="sans-serif">10</text>
-                            </svg>`,
+                            html: `<div style="display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:50%; border:2px solid rgba(255,255,255,0.3); margin: 0 4px; transition:border 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'">
+                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                                    <path d="M21 3v5h-5" />
+                                    <text x="12" y="16.5" font-size="8.5" font-family="sans-serif" font-weight="700" text-anchor="middle" fill="white" stroke="none">10</text>
+                                </svg>
+                            </div>`,
                             tooltip: "Tua tiếp 10s",
                             click: () => { if (art) art.currentTime = Math.min(art.duration, art.currentTime + 10); },
                         },
