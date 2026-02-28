@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Search, Bell, User, LogOut, Shield, Trash2, Clock, History, Heart, Settings, Menu, X, ChevronDown, Play, Film, Video, LayoutGrid, Download, Loader2 } from "lucide-react";
+import { Search, Bell, User, LogOut, Shield, Trash2, Clock, History, Heart, Settings, Menu, X, ChevronDown, Play, Film, Video, LayoutGrid, Download, Loader2, Bookmark } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
@@ -481,6 +481,9 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         <div className="hidden lg:flex items-center gap-3">
                             <Link href="/lich-su-xem" className="w-10 h-10 flex items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.08] transition-all hover:scale-105 active:scale-95 group" title="Lịch sử xem">
                                 <History className="w-4.5 h-4.5 text-white/70 group-hover:text-white transition-colors" />
+                            </Link>
+                            <Link href="/xem-sau" className="w-10 h-10 flex items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.08] transition-all hover:scale-105 active:scale-95 group" title="Danh sách xem sau">
+                                <Bookmark className="w-4.5 h-4.5 text-white/70 group-hover:text-primary transition-colors" />
                             </Link>
                             <Link href="/phim-yeu-thich" className="w-10 h-10 flex items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.08] transition-all hover:scale-105 active:scale-95 group" title="Phim yêu thích">
                                 <Heart className="w-4.5 h-4.5 text-white/70 group-hover:text-red-500 transition-colors" />
