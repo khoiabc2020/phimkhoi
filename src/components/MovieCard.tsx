@@ -237,6 +237,8 @@ function OnflixHoverCard({
                             {/* Watchlist button */}
                             <WatchlistInlineButton
                                 slug={movie.slug}
+                                movieName={movie.name}
+                                moviePoster={movie.poster_url || movie.thumb_url}
                                 size="md"
                                 className="!w-9 !h-9"
                             />

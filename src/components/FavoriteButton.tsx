@@ -4,6 +4,7 @@ import { Heart } from "lucide-react";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useFavorites } from "@/context/FavoritesContext";
+import { useToast } from "@/context/ToastContext";
 
 interface FavoriteButtonProps {
     movieData: {
@@ -22,6 +23,7 @@ interface FavoriteButtonProps {
 
 export default function FavoriteButton({ movieData, size = "md", className = "" }: FavoriteButtonProps) {
     const { isFavorite, toggleFavorite, isLoading } = useFavorites();
+    const { showToast } = useToast();
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
 
@@ -46,6 +48,21 @@ export default function FavoriteButton({ movieData, size = "md", className = "" 
         startTransition(async () => {
             await toggleFavorite(movieData);
             router.refresh();
+
+            if (!isFav) {
+                showToast({
+                    type: "favorite",
+                    title: movieData.movieName,
+                    description: "Đã thêm vào danh sách yêu thích",
+                    poster: movieData.moviePoster,
+                });
+            } else {
+                showToast({
+                    type: "success",
+                    title: "Đã xóa khỏi yêu thích",
+                    description: movieData.movieName,
+                });
+            }
         });
     };
 

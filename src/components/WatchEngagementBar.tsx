@@ -1,8 +1,8 @@
 "use client";
 
-import { Heart, Plus, Share2, Users, MessageSquare, Monitor, Moon, Zap, Flag } from "lucide-react";
+import { Heart, Share2, Users, MessageSquare, Monitor, Moon, Zap, Flag } from "lucide-react";
 import FavoriteButton from "./FavoriteButton";
-import AddToPlaylistButton from "./AddToPlaylistButton";
+import WatchlistInlineButton from "./WatchlistInlineButton";
 import Image from "next/image";
 import { getImageUrl } from "@/lib/utils";
 import { cn } from "@/lib/utils";
@@ -56,10 +56,13 @@ export default function WatchEngagementBar({
                         className="!bg-transparent !border-0 text-gray-400 hover:text-yellow-400 flex items-center gap-2 !w-auto !h-auto !p-0 transition-colors"
                     />
                     <div className="h-4 w-[1px] bg-white/10" />
-                    <AddToPlaylistButton
-                        movieData={movieData}
-                        variant="text"
-                        className="text-gray-400 hover:text-white text-xs font-semibold uppercase tracking-wide"
+                    <WatchlistInlineButton
+                        slug={movie.slug}
+                        movieName={movie.name}
+                        moviePoster={movie.poster_url || movie.thumb_url}
+                        showLabel={true}
+                        size="sm"
+                        className="!bg-transparent !border-0 !rounded-none !w-auto text-gray-400 hover:text-primary gap-1.5 px-0 text-xs font-semibold uppercase tracking-wide"
                     />
                     <div className="h-4 w-[1px] bg-white/10" />
                     <div className="flex items-center gap-2 text-xs font-semibold text-gray-500">
