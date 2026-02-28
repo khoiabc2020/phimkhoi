@@ -56,13 +56,19 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
         setShowHistory(false);
     };
 
+    const isScrolledRef = useRef(false);
+
     useEffect(() => {
         let ticking = false;
         const handleScroll = () => {
             if (ticking) return;
             ticking = true;
             requestAnimationFrame(() => {
-                setIsScrolled(window.scrollY > 0);
+                const scrolled = window.scrollY > 0;
+                if (scrolled !== isScrolledRef.current) {
+                    isScrolledRef.current = scrolled;
+                    setIsScrolled(scrolled);
+                }
                 ticking = false;
             });
         };

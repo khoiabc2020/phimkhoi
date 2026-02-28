@@ -70,11 +70,11 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
         <>
             <div
                 ref={cardRef}
-                className="relative block h-full w-full cursor-pointer z-10 group/static-card"
+                className={`relative block h-full w-full cursor-pointer z-10 group/static-card hover:z-20 will-change-transform transform-gpu ${orientation === 'landscape' ? '[content-visibility:auto] [contain-intrinsic-size:250px_140px]' : '[content-visibility:auto] [contain-intrinsic-size:160px_240px]'}`}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
-                <div className={`relative ${orientation === 'landscape' ? 'aspect-video' : 'aspect-[2/3]'} rounded-xl overflow-hidden bg-[#1a1a1a] shadow-lg`}>
+                <div className={`relative ${orientation === 'landscape' ? 'aspect-video' : 'aspect-[2/3]'} rounded-xl overflow-hidden bg-[#1a1a1a] shadow-lg contain-paint`}>
                     <Link href={`/phim/${movie.slug}`} className="block h-full w-full absolute inset-0 z-0">
                         <Image
                             src={displayPoster || "/placeholder.jpg"}
@@ -91,7 +91,7 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                     {/* Badges */}
                     <div className="absolute top-2 left-2 flex flex-col gap-1 z-10 pointer-events-none">
                         {movie.quality && (
-                            <span className="bg-black/70 backdrop-blur-sm border border-white/10 text-white/90 text-[9px] font-bold px-1.5 py-0.5 rounded tracking-wide">
+                            <span className="bg-black/80 shadow-md border border-white/10 text-white/90 text-[9px] font-bold px-1.5 py-0.5 rounded tracking-wide">
                                 {movie.quality}
                             </span>
                         )}
@@ -204,7 +204,7 @@ function OnflixHoverCard({
                             {/* Play button (Green) */}
                             <Link
                                 href={`/xem-phim/${movie.slug}`}
-                                className="flex items-center justify-center gap-1.5 bg-[#00A65F] hover:bg-[#00c26f] text-white font-semibold text-[13px] h-9 px-4 rounded transition-colors"
+                                className="flex items-center justify-center gap-1.5 bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-extrabold text-[13px] h-9 px-4 rounded transition-colors"
                             >
                                 <Play className="w-4 h-4 fill-current" />
                                 Xem ngay

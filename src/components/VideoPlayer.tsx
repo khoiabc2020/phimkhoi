@@ -192,7 +192,7 @@ export default function VideoPlayer({
                             index: 10,
                             html: `<div style="display:flex; align-items:center; margin-right: 8px; cursor: pointer; opacity: 0.9;" id="auto-next-toggle">
                                 <span style="font-size: 13px; color: rgba(255,255,255,0.8); margin-right: 8px; font-weight: 500;">Chuyển tập</span>
-                                <div style="width: 32px; height: 18px; background: #00A65F; border-radius: 9px; position: relative; transition: background 0.2s;" id="auto-next-bg">
+                                <div style="width: 32px; height: 18px; background: #F4C84A; border-radius: 9px; position: relative; transition: background 0.2s;" id="auto-next-bg">
                                     <div style="width: 14px; height: 14px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 16px; transition: left 0.2s;" id="auto-next-dot"></div>
                                 </div>
                             </div>`,
@@ -201,13 +201,13 @@ export default function VideoPlayer({
                                 const bg = document.getElementById("auto-next-bg");
                                 const dot = document.getElementById("auto-next-dot");
                                 if (bg && dot) {
-                                    const isAuto = bg.style.background === "rgb(0, 166, 95)" || bg.style.background === "#00A65F" || bg.style.background === "#00a65f";
+                                    const isAuto = bg.style.background === "rgb(244, 200, 74)" || bg.style.background === "#F4C84A" || bg.style.background === "#f4c84a";
                                     if (isAuto) {
                                         bg.style.background = "rgba(255,255,255,0.3)";
                                         dot.style.left = "2px";
                                         localStorage.setItem("autoNextEpisode", "false");
                                     } else {
-                                        bg.style.background = "#00A65F";
+                                        bg.style.background = "#F4C84A";
                                         dot.style.left = "16px";
                                         localStorage.setItem("autoNextEpisode", "true");
                                     }
@@ -219,7 +219,7 @@ export default function VideoPlayer({
                                 const dot = document.getElementById("auto-next-dot");
                                 if (bg && dot) {
                                     if (isAuto) {
-                                        bg.style.background = "#00A65F";
+                                        bg.style.background = "#F4C84A";
                                         dot.style.left = "16px";
                                     } else {
                                         bg.style.background = "rgba(255,255,255,0.3)";

@@ -91,10 +91,10 @@ export default function WatchEpisodeSection({
                                             type="button"
                                             onClick={() => onServerChange(s.server_name)}
                                             className={cn(
-                                                "px-3 py-1.5 rounded text-xs font-medium whitespace-nowrap transition-all border",
+                                                "px-3 py-1.5 rounded text-xs whitespace-nowrap transition-all border",
                                                 isServerActive
-                                                    ? "bg-[#00c26f] text-white border-[#00c26f] shadow-[0_0_10px_rgba(0,194,111,0.3)]"
-                                                    : "bg-[#1a1a1a] text-gray-400 border-white/10 hover:bg-[#2a2a2a] hover:text-white"
+                                                    ? "bg-[#F4C84A] text-black border-[#F4C84A] shadow-[0_0_12px_rgba(244,200,74,0.4)] font-extrabold"
+                                                    : "bg-[#1a1a1a] text-gray-400 border-white/10 hover:bg-[#2a2a2a] hover:text-white font-medium"
                                             )}
                                         >
                                             {s.server_name}
@@ -102,7 +102,7 @@ export default function WatchEpisodeSection({
                                     );
                                 })
                             ) : (
-                                <button className="px-3 py-1.5 rounded text-xs font-medium bg-[#00c26f] text-white border border-[#00c26f]">
+                                <button className="px-3 py-1.5 rounded text-xs font-extrabold bg-[#F4C84A] text-black border border-[#F4C84A] shadow-[0_0_12px_rgba(244,200,74,0.4)]">
                                     {serverName}
                                 </button>
                             )}
@@ -134,7 +134,7 @@ export default function WatchEpisodeSection({
 
                 {/* Subtitle count */}
                 <div className="text-sm text-gray-400">
-                    Danh sách tập ( <span className="text-white font-medium">{episodes.length}</span> / <span className="text-[#00c26f] font-medium">{episodes.length}</span> )
+                    Danh sách tập ( <span className="text-white font-medium">{episodes.length}</span> / <span className="text-[#F4C84A] font-bold">{episodes.length}</span> )
                 </div>
             </div>
 
@@ -151,11 +151,11 @@ export default function WatchEpisodeSection({
                                     className={cn(
                                         "h-11 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-all border",
                                         isActive
-                                            ? "bg-[#1a1a1a] border-[#00c26f] text-[#00c26f]"
+                                            ? "bg-[#1a1a1a] border-[#F4C84A] text-[#F4C84A] shadow-[0_0_10px_rgba(244,200,74,0.1)]"
                                             : "bg-[#1a1a1a] border-transparent text-gray-300 hover:bg-[#2a2a2a] hover:text-white"
                                     )}
                                 >
-                                    <Play className={cn("w-3.5 h-3.5", isActive ? "fill-current text-[#00c26f]" : "text-gray-500")} />
+                                    <Play className={cn("w-3.5 h-3.5", isActive ? "fill-current text-[#F4C84A]" : "text-gray-500")} />
                                     {ep.name.replace("Tập ", "")}
                                 </Link>
                             );
