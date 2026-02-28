@@ -134,7 +134,10 @@ export const searchMovies = async (keyword: string) => {
 
         if (ophimRes.status === 'fulfilled') {
             const data = ophimRes.value;
-            const pathImage = data.pathImage || data.data?.APP_DOMAIN_CDN_IMAGE || "https://img.ophim.live/uploads/movies/";
+            let pathImage = data.pathImage || data.data?.APP_DOMAIN_CDN_IMAGE || "https://img.ophim.live/uploads/movies/";
+            if (pathImage === "https://img.ophim.live" || pathImage === "https://img.ophim.live/") {
+                pathImage = "https://img.ophim.live/uploads/movies/";
+            }
             const items = (data.data?.items || []).map((item: any) => normalizeOphimItem(item, pathImage));
             results = [...results, ...items];
         }
@@ -211,7 +214,10 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
         // Process OPhim Data
         if (ophimRes.status === 'fulfilled' && ophimRes.value?.data?.items) {
             const data = ophimRes.value;
-            const pathImage = data.pathImage || data.data?.pathImage || "https://img.ophim.live/uploads/movies/";
+            let pathImage = data.pathImage || data.data?.pathImage || "https://img.ophim.live/uploads/movies/";
+            if (pathImage === "https://img.ophim.live" || pathImage === "https://img.ophim.live/") {
+                pathImage = "https://img.ophim.live/uploads/movies/";
+            }
             const ophimItems = getItems(data).map(item => normalizeOphimItem(item, pathImage));
             items = [...items, ...ophimItems];
         }
@@ -259,7 +265,10 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
 
         if (ophimRes.status === 'fulfilled') {
             const data = ophimRes.value;
-            const pathImage = data.pathImage || "https://img.ophim.live/uploads/movies/";
+            let pathImage = data.pathImage || "https://img.ophim.live/uploads/movies/";
+            if (pathImage === "https://img.ophim.live" || pathImage === "https://img.ophim.live/") {
+                pathImage = "https://img.ophim.live/uploads/movies/";
+            }
             const ophimItems = getItems(data).map(item => normalizeOphimItem(item, pathImage));
             items = [...items, ...ophimItems];
         }
@@ -306,7 +315,10 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
 
         if (ophimRes.status === 'fulfilled') {
             const data = ophimRes.value;
-            const pathImage = data.pathImage || "https://img.ophim.live/uploads/movies/";
+            let pathImage = data.pathImage || "https://img.ophim.live/uploads/movies/";
+            if (pathImage === "https://img.ophim.live" || pathImage === "https://img.ophim.live/") {
+                pathImage = "https://img.ophim.live/uploads/movies/";
+            }
             const ophimItems = getItems(data).map(item => normalizeOphimItem(item, pathImage));
             items = [...items, ...ophimItems];
         }
