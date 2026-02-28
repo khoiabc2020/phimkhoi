@@ -56,6 +56,15 @@ const getItems = (data: any): Movie[] => {
     return [];
 };
 
+// Safe URI concatenation
+const combineUrl = (base: string, path: string) => {
+    if (!base) return path;
+    if (!path) return base;
+    const cleanBase = base.endsWith('/') ? base.slice(0, -1) : base;
+    const cleanPath = path.startsWith('/') ? path : `/${path}`;
+    return `${cleanBase}${cleanPath}`;
+};
+
 export const getHomeData = async () => {
     try {
         const [phimLe, phimBo, hoatHinh, tvShows] = await Promise.all([
@@ -117,8 +126,8 @@ export const searchMovies = async (keyword: string) => {
             // Ensure we construct full URL if strictly needed, though search endpoint sometimes gives full url
             const items = (data.data?.items || []).map((item: any) => ({
                 ...item,
-                thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : `${pathImage}${item.thumb_url}`,
-                poster_url: item.poster_url?.startsWith('http') ? item.poster_url : `${pathImage}${item.poster_url}`
+                thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : combineUrl(pathImage, item.thumb_url),
+                poster_url: item.poster_url?.startsWith('http') ? item.poster_url : combineUrl(pathImage, item.poster_url)
             }));
             results = [...results, ...items];
         }
@@ -154,8 +163,8 @@ const normalizeOphimItem = (item: any, pathImage: string): Movie => {
         name: item.name,
         slug: item.slug,
         origin_name: item.origin_name,
-        thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : `${pathImage}${item.thumb_url}`,
-        poster_url: item.poster_url?.startsWith('http') ? item.poster_url : `${pathImage}${item.poster_url}`,
+        thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : combineUrl(pathImage, item.thumb_url),
+        poster_url: item.poster_url?.startsWith('http') ? item.poster_url : combineUrl(pathImage, item.poster_url),
         type: item.type || 'unknown',
         sub_docquyen: item.sub_docquyen || false,
         chieurap: item.chieurap || false,
@@ -192,8 +201,8 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
             const pathImage = data.pathImage || data.data?.pathImage || "";
             const kkItems = getItems(data).map(item => ({
                 ...item,
-                thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : `${pathImage}${item.thumb_url}`,
-                poster_url: item.poster_url?.startsWith('http') ? item.poster_url : `${pathImage}${item.poster_url}`
+                thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : combineUrl(pathImage, item.thumb_url),
+                poster_url: item.poster_url?.startsWith('http') ? item.poster_url : combineUrl(pathImage, item.poster_url)
             }));
             items = [...items, ...kkItems];
             kkPagination = data.data?.params?.pagination || kkPagination;
@@ -241,8 +250,8 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
             const pathImage = data.pathImage || data.data?.pathImage || "";
             const kkItems = getItems(data).map(item => ({
                 ...item,
-                thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : `${pathImage}${item.thumb_url}`,
-                poster_url: item.poster_url?.startsWith('http') ? item.poster_url : `${pathImage}${item.poster_url}`
+                thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : combineUrl(pathImage, item.thumb_url),
+                poster_url: item.poster_url?.startsWith('http') ? item.poster_url : combineUrl(pathImage, item.poster_url)
             }));
             items = [...items, ...kkItems];
             kkPagination = data.data?.params?.pagination || kkPagination;
@@ -288,8 +297,8 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
             const pathImage = data.pathImage || data.data?.pathImage || "";
             const kkItems = getItems(data).map(item => ({
                 ...item,
-                thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : `${pathImage}${item.thumb_url}`,
-                poster_url: item.poster_url?.startsWith('http') ? item.poster_url : `${pathImage}${item.poster_url}`
+                thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : combineUrl(pathImage, item.thumb_url),
+                poster_url: item.poster_url?.startsWith('http') ? item.poster_url : combineUrl(pathImage, item.poster_url)
             }));
             items = [...items, ...kkItems];
             kkPagination = data.data?.params?.pagination || kkPagination;
