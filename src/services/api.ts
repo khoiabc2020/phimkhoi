@@ -411,3 +411,84 @@ export const getMenuData = async () => {
         return { categories: [], countries: [] };
     }
 };
+
+export const getMoviesByActor = async (actorName: string, page: number = 1, limit: number = 24) => {
+    try {
+        // Search by actor using the standard keyword search since there is no direct actor endpoint
+        // Then manually filter the array to ensure the actor is actually in the cast list
+        const keyword = encodeURIComponent(actorName);
+        const [kkRes, ophimRes] = await Promise.allSettled([
+            fetch(`${API_URL}/v1/api/tim-kiem?keyword=${keyword}&limit=100`, { next: { revalidate: 3600 } }).then(r => r.json()),
+            fetch(`${OPHIM_API}/v1/api/tim-kiem?keyword=${keyword}&limit=100`, { next: { revalidate: 3600 } }).then(r => r.json())
+        ]);
+
+        let items: Movie[] = [];
+
+        // Process KKPhim Data
+        if (kkRes.status === 'fulfilled' && kkRes.value?.status) {
+            const data = kkRes.value;
+            const pathImage = data.pathImage || data.data?.pathImage || "";
+            const kkItems = getItems(data).map(item => ({
+                ...item,
+                thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : combineUrl(pathImage, item.thumb_url),
+                poster_url: item.poster_url?.startsWith('http') ? item.poster_url : combineUrl(pathImage, item.poster_url)
+            }));
+            items = [...items, ...kkItems];
+        }
+
+        // Process OPhim Data
+        if (ophimRes.status === 'fulfilled' && ophimRes.value?.status) {
+            const data = ophimRes.value;
+            let pathImage = data.pathImage || data.data?.pathImage || "https://img.ophim.live/uploads/movies/";
+            if (pathImage === "https://img.ophim.live" || pathImage === "https://img.ophim.live/") {
+                pathImage = "https://img.ophim.live/uploads/movies/";
+            }
+            const ophimItems = getItems(data).map(item => normalizeOphimItem(item, pathImage));
+            items = [...items, ...ophimItems];
+        }
+
+        // Filter and Deduplicate
+        const seen = new Set();
+        const normalizeString = (str: string) => str.toLowerCase().replace(/\s+/g, ' ').trim();
+        const searchActor = normalizeString(actorName);
+
+        const filteredItems = items.filter(item => {
+            if (seen.has(item.slug)) return false;
+
+            // Check if actor exists in the actor list
+            if (item.actor && Array.isArray(item.actor)) {
+                const hasActor = item.actor.some((a: string) => normalizeString(a).includes(searchActor));
+                if (hasActor) {
+                    seen.add(item.slug);
+                    return true;
+                }
+            } else if (typeof item.actor === 'string') {
+                // Sometime actor is a comma separated string
+                if (normalizeString(item.actor).includes(searchActor)) {
+                    seen.add(item.slug);
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        // Pagination manually since we have aggregated results
+        const totalItems = filteredItems.length;
+        const totalPages = Math.max(1, Math.ceil(totalItems / limit));
+        const safePage = Math.min(page, totalPages);
+        const startIndex = (safePage - 1) * limit;
+        const paginatedItems = filteredItems.slice(startIndex, startIndex + limit);
+
+        return {
+            items: paginatedItems,
+            pagination: {
+                totalItems,
+                totalPages,
+                currentPage: safePage
+            }
+        };
+    } catch (error) {
+        console.error(`Error fetching movies by actor [${actorName}]:`, error);
+        return { items: [], pagination: { currentPage: 1, totalPages: 1, totalItems: 0 } };
+    }
+};

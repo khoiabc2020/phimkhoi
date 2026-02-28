@@ -102,6 +102,23 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
     }
 };
 
+export const searchTMDBPerson = async (query: string) => {
+    try {
+        if (!TMDB_API_KEY) return [];
+
+        const cleanQuery = cleanQueryString(query);
+        const url = `${TMDB_API_URL}/search/person?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanQuery)}&language=vi-VN`;
+
+        const res = await fetch(url, { next: { revalidate: 3600 } });
+        const data = await res.json();
+
+        return data.results?.slice(0, 5) || [];
+    } catch (error) {
+        console.error("TMDB Person Search Error:", error);
+        return [];
+    }
+};
+
 export const getTMDBDetails = async (tmdbId: number, type: 'movie' | 'tv' = 'movie') => {
     try {
         if (!TMDB_API_KEY) return null;

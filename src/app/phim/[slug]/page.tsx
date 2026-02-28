@@ -183,7 +183,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                             />
                                             <AddToPlaylistButton
                                                 movieData={{
-                                                    movieId: movie._id,
+                                                    movieId: movie._id || "",
                                                     movieSlug: movie.slug,
                                                     movieName: movie.name,
                                                     movieOriginName: movie.origin_name || "",

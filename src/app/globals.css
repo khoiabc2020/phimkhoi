@@ -51,7 +51,8 @@
 }
 
 html {
-  scroll-behavior: auto; /* Giảm CPU khi cuộn (tránh smooth scroll nặng) */
+  scroll-behavior: auto;
+  /* Giảm CPU khi cuộn (tránh smooth scroll nặng) */
 }
 
 body {
@@ -141,4 +142,17 @@ h2 {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Performance Rendering Classes */
+.optimize-gpu {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.smooth-render {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

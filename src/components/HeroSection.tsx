@@ -186,7 +186,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
     const activeRating = activeTMDB?.vote_average ? activeTMDB.vote_average.toFixed(1) : "N/A";
 
     const getFavoriteData = (movie: Movie) => ({
-        movieId: movie._id,
+        movieId: movie._id || "",
         movieSlug: movie.slug,
         movieName: movie.name,
         movieOriginName: movie.origin_name,
@@ -232,9 +232,9 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                 {/* 1. Centered Poster with 3D Tween */}
                                 <Link
                                     href={`/xem-phim/${movie.slug}`}
-                                    className="relative w-[78%] max-w-[220px] mx-auto aspect-[2/3] mb-3 rounded-xl overflow-hidden shadow-lg ring-1 ring-white/5 shrink-0 transition-transform duration-300 ease-out"
+                                    className="relative w-[78%] max-w-[220px] mx-auto aspect-[2/3] mb-3 rounded-xl overflow-hidden shadow-lg ring-1 ring-white/5 shrink-0 transition-transform duration-300 ease-out will-change-transform transform-gpu"
                                     style={{
-                                        transform: `scale(${tweenValue})`,
+                                        transform: `scale(${tweenValue}) translateZ(0)`,
                                         opacity: posterOpacity
                                     }}
                                 >
@@ -250,10 +250,10 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
                                 {/* 2. Vertically Stacked Movie Info */}
                                 <div
-                                    className="flex flex-col items-center w-[100%] text-center transition-all duration-300 ease-out mt-1 px-2"
+                                    className="flex flex-col items-center w-[100%] text-center transition-all duration-300 ease-out mt-1 px-2 will-change-transform transform-gpu"
                                     style={{
                                         opacity: textOpacity,
-                                        transform: `translateY(${(1 - tweenValue) * 20}px)`,
+                                        transform: `translate3d(0, ${(1 - tweenValue) * 20}px, 0)`,
                                         visibility: textOpacity <= 0 ? 'hidden' : 'visible'
                                     }}
                                 >
@@ -419,12 +419,12 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                             {/* Right: 3D Tilt Poster Card */}
                                             {/* Only show on very large screens to maintain layout balance */}
                                             <div className="col-span-12 xl:col-span-7 lg:col-span-6 hidden lg:flex justify-end pr-8 xl:pr-16">
-                                                <div className="relative w-[340px] xl:w-[400px] aspect-[2/3] rounded-[32px] overflow-hidden ring-1 ring-white/10 group/poster transition-transform duration-300 ease-out hover:scale-[1.02] z-30">
+                                                <div className="relative w-[340px] xl:w-[400px] aspect-[2/3] rounded-[32px] overflow-hidden ring-1 ring-white/10 group/poster transition-transform duration-300 ease-out hover:scale-[1.02] z-30 will-change-transform transform-gpu">
                                                     <Image
                                                         src={posterImg}
                                                         alt={decodeHtml(movie.name)}
                                                         fill
-                                                        className="object-cover transition-transform duration-300 group-hover/poster:scale-105"
+                                                        className="object-cover transition-transform duration-300 group-hover/poster:scale-105 will-change-transform"
                                                         priority={index === 0}
                                                     />
                                                 </div>

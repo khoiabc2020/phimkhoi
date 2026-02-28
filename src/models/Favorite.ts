@@ -23,6 +23,7 @@ const FavoriteSchema = new Schema<IFavorite>(
         },
         movieId: {
             type: String,
+            required: false, // Make it optional since some APIs don't have it consistently
             default: "",
         },
         movieSlug: {

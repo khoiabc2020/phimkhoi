@@ -86,7 +86,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                                             <div className="absolute top-2 right-2 z-20">
                                                 <FavoriteButton
                                                     movieData={{
-                                                        movieId: movie.movieId,
+                                                        movieId: movie.movieId || "",
                                                         movieSlug: movie.movieSlug,
                                                         movieName: movie.movieName,
                                                         movieOriginName: movie.movieOriginName,

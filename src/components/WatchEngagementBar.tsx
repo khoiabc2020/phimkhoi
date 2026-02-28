@@ -23,7 +23,7 @@ export default function WatchEngagementBar({
     toggleLight
 }: WatchEngagementBarProps) {
     const movieData = {
-        movieId: movie._id,
+        movieId: movie._id || "",
         movieSlug: movie.slug,
         movieName: movie.name,
         movieOriginName: movie.origin_name || "",

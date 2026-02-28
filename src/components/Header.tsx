@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Search, Bell, User, LogOut, Shield, Trash2, Clock, History, Heart, Settings, Menu, X, ChevronDown, Play, Film, Video, LayoutGrid, Download } from "lucide-react";
+import { Search, Bell, User, LogOut, Shield, Trash2, Clock, History, Heart, Settings, Menu, X, ChevronDown, Play, Film, Video, LayoutGrid, Download, Loader2 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import MobileMenu from "./MobileMenu";
+import { getRealtimeSearch } from "@/app/actions/search";
 
 interface HeaderProps {
     categories?: { name: string; slug: string }[];
@@ -21,6 +22,8 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
     const [searchQuery, setSearchQuery] = useState("");
     const [searchHistory, setSearchHistory] = useState<string[]>([]);
     const [showHistory, setShowHistory] = useState(false);
+    const [isSearching, setIsSearching] = useState(false);
+    const [searchResults, setSearchResults] = useState<{ movies: any[], actors: any[] } | null>(null);
     const [openDropdown, setOpenDropdown] = useState<"categories" | "countries" | null>(null);
     const router = useRouter();
     const pathname = usePathname();
@@ -72,6 +75,26 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
     useEffect(() => {
         setMounted(true);
     }, []);
+
+    // Debounced realtime search
+    useEffect(() => {
+        const timer = setTimeout(async () => {
+            if (searchQuery.trim().length >= 2) {
+                setIsSearching(true);
+                try {
+                    const results = await getRealtimeSearch(searchQuery);
+                    setSearchResults(results);
+                } catch (e) {
+                    console.error(e);
+                } finally {
+                    setIsSearching(false);
+                }
+            } else {
+                setSearchResults(null);
+            }
+        }, 400);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
 
     // Load search history from localStorage
     useEffect(() => {
@@ -338,29 +361,107 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                         </button>
                                     )}
 
-                                    {/* History Dropdown */}
-                                    {showHistory && searchHistory.length > 0 && isSearchOpen && (
-                                        <div className="absolute top-full left-0 right-0 mt-2 bg-[#0B0D12] border border-white/10 rounded-2xl p-2 shadow-2xl z-50 animate-in fade-in slide-in-from-top-2">
-                                            <div className="flex items-center justify-between px-3 pb-2 pt-1 border-b border-white/10 mb-2">
-                                                <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Lịch sử tìm kiếm</span>
-                                                <button type="button" onClick={clearHistory} className="text-xs text-red-400 hover:text-red-300 transition-colors">Xóa</button>
-                                            </div>
-                                            <div className="flex flex-col gap-1 max-h-[300px] overflow-y-auto custom-scrollbar">
-                                                {searchHistory.map((item, idx) => (
+                                    {/* Realtime Search & History Dropdown */}
+                                    {isSearchOpen && (showHistory || searchQuery.length > 0) && (
+                                        <div className="absolute top-full left-0 right-0 mt-2 bg-[#0B0D12] border border-white/10 rounded-2xl shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 overflow-hidden">
+                                            {searchQuery.length > 0 ? (
+                                                <div className="flex flex-col max-h-[400px] overflow-y-auto custom-scrollbar p-2">
+                                                    <div className="px-3 pb-2 pt-1 border-b border-white/10 flex justify-between items-center mb-2">
+                                                        <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Kết quả tìm kiếm</span>
+                                                        {isSearching && <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />}
+                                                    </div>
+
+                                                    {/* Actors */}
+                                                    {searchResults?.actors && searchResults.actors.length > 0 && (
+                                                        <div className="mb-3">
+                                                            <div className="px-3 py-1 text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Diễn viên</div>
+                                                            {searchResults.actors.map((actor: any) => (
+                                                                <Link
+                                                                    href={`/dien-vien/${encodeURIComponent(actor.name)}`}
+                                                                    key={actor.id}
+                                                                    onClick={() => { setIsSearchOpen(false); setSearchQuery(""); }}
+                                                                    className="flex items-center gap-3 px-3 py-2 hover:bg-white/10 rounded-xl transition-colors group"
+                                                                >
+                                                                    <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-800 shrink-0 border border-white/10 group-hover:border-primary/50 transition-colors">
+                                                                        {actor.profile_url ? (
+                                                                            <Image src={actor.profile_url} alt={actor.name} width={40} height={40} className="w-full h-full object-cover" unoptimized />
+                                                                        ) : (
+                                                                            <User className="w-5 h-5 m-2.5 text-gray-500" />
+                                                                        )}
+                                                                    </div>
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <div className="text-sm font-bold text-white group-hover:text-primary transition-colors truncate">{actor.name}</div>
+                                                                    </div>
+                                                                </Link>
+                                                            ))}
+                                                        </div>
+                                                    )}
+
+                                                    {/* Movies */}
+                                                    {searchResults?.movies && searchResults.movies.length > 0 && (
+                                                        <div className="mb-1">
+                                                            <div className="px-3 py-1 text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Phim</div>
+                                                            {searchResults.movies.map((movie: any) => (
+                                                                <Link
+                                                                    href={`/xem-phim/${movie.slug}`}
+                                                                    key={movie._id || movie.slug}
+                                                                    onClick={() => { setIsSearchOpen(false); setSearchQuery(""); }}
+                                                                    className="flex items-center gap-3 px-3 py-2 hover:bg-white/10 rounded-xl transition-colors group"
+                                                                >
+                                                                    <div className="w-10 h-14 rounded-md overflow-hidden bg-gray-800 shrink-0 border border-white/10 group-hover:border-primary/50 transition-colors">
+                                                                        <Image src={movie.poster_url || movie.thumb_url} alt={movie.name} width={40} height={56} className="w-full h-full object-cover" unoptimized />
+                                                                    </div>
+                                                                    <div className="flex-1 min-w-0 flex flex-col justify-center">
+                                                                        <div className="text-sm font-bold text-white group-hover:text-primary transition-colors truncate">{movie.name}</div>
+                                                                        <div className="text-xs text-gray-400 truncate">{movie.origin_name} {movie.year ? `(${movie.year})` : ''}</div>
+                                                                    </div>
+                                                                </Link>
+                                                            ))}
+                                                        </div>
+                                                    )}
+
+                                                    {/* No results or still searching */}
+                                                    {!isSearching && searchResults && searchResults.actors.length === 0 && searchResults.movies.length === 0 && (
+                                                        <div className="px-4 py-6 text-center text-sm text-gray-400">
+                                                            Không tìm thấy kết quả phù hợp cho "{searchQuery}"
+                                                        </div>
+                                                    )}
+
+                                                    {/* Xem tat ca btn */}
                                                     <button
-                                                        key={idx}
                                                         type="button"
-                                                        onClick={() => {
-                                                            setSearchQuery(item);
-                                                            handleSearch(item);
-                                                        }}
-                                                        className="flex items-center gap-3 px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-colors text-left"
+                                                        onClick={(e) => { e.preventDefault(); handleSearch(); }}
+                                                        className="mt-2 text-sm text-primary hover:text-white text-center py-2 border-t border-white/5 font-medium transition-colors w-full"
                                                     >
-                                                        <Clock className="w-3.5 h-3.5 text-white/40 shrunk-0" />
-                                                        <span className="truncate">{item}</span>
+                                                        Xem tất cả kết quả cho "{searchQuery}"
                                                     </button>
-                                                ))}
-                                            </div>
+                                                </div>
+                                            ) : (
+                                                searchHistory.length > 0 && (
+                                                    <div className="p-2">
+                                                        <div className="flex items-center justify-between px-3 pb-2 pt-1 border-b border-white/10 mb-2">
+                                                            <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Lịch sử tìm kiếm</span>
+                                                            <button type="button" onClick={clearHistory} className="text-xs text-red-400 hover:text-red-300 transition-colors">Xóa</button>
+                                                        </div>
+                                                        <div className="flex flex-col gap-1 max-h-[300px] overflow-y-auto custom-scrollbar">
+                                                            {searchHistory.map((item, idx) => (
+                                                                <button
+                                                                    key={idx}
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        setSearchQuery(item);
+                                                                        handleSearch(item);
+                                                                    }}
+                                                                    className="flex items-center gap-3 px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-colors text-left"
+                                                                >
+                                                                    <Clock className="w-3.5 h-3.5 text-white/40 shrink-0" />
+                                                                    <span className="truncate">{item}</span>
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )
+                                            )}
                                         </div>
                                     )}
                                 </div>

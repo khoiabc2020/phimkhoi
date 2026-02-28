@@ -25,7 +25,7 @@ export default function FavoriteButton({ movieData, size = "md", className = "" 
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
 
-    const isFav = isFavorite(movieData.movieId);
+    const isFav = isFavorite(movieData.movieSlug);
 
     const sizeClasses = {
         sm: "w-8 h-8",

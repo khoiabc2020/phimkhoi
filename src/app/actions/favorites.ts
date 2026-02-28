@@ -7,7 +7,7 @@ import Favorite from "@/models/Favorite";
 import { revalidatePath } from "next/cache";
 
 export async function addFavorite(movieData: {
-    movieId: string;
+    movieId?: string;
     movieSlug: string;
     movieName: string;
     movieOriginName: string;
@@ -42,7 +42,7 @@ export async function addFavorite(movieData: {
     }
 }
 
-export async function removeFavorite(movieId: string) {
+export async function removeFavorite(movieSlug: string) {
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user?.id) {
@@ -53,7 +53,7 @@ export async function removeFavorite(movieId: string) {
 
         const deleted = await Favorite.findOneAndDelete({
             userId: session.user.id,
-            movieId,
+            movieSlug,
         });
 
         if (deleted) {
@@ -88,7 +88,7 @@ export async function getFavorites() {
     }
 }
 
-export async function isFavorite(movieId: string) {
+export async function isFavorite(movieSlug: string) {
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user?.id) {
@@ -99,7 +99,7 @@ export async function isFavorite(movieId: string) {
 
         const favorite = await Favorite.findOne({
             userId: session.user.id,
-            movieId,
+            movieSlug,
         });
 
         return { success: true, isFavorite: !!favorite };

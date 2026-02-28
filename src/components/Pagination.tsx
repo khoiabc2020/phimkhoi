@@ -8,9 +8,10 @@ import { cn } from "@/lib/utils";
 interface PaginationProps {
     currentPage: number;
     totalPages: number;
+    baseUrl?: string;
 }
 
-export default function Pagination({ currentPage, totalPages }: PaginationProps) {
+export default function Pagination({ currentPage, totalPages, baseUrl }: PaginationProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();

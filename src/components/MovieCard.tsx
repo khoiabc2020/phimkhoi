@@ -130,7 +130,7 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                         <div className="bg-[#1A1C23]/90 rounded-full p-1 shadow-sm">
                             <FavoriteButton
                                 movieData={{
-                                    movieId: movie._id,
+                                    movieId: movie._id || "",
                                     movieSlug: movie.slug,
                                     movieName: movie.name,
                                     movieOriginName: movie.origin_name,
@@ -272,7 +272,7 @@ function PortalHoverCard({ movie, position, tmdbData, displayPoster, orientation
                             <div className="w-6 h-6 flex items-center justify-center rounded-full border border-white/20 bg-white/10 hover:bg-white/20 cursor-pointer transition-all duration-300 ease-out hover:scale-110 active:scale-95">
                                 <FavoriteButton
                                     movieData={{
-                                        movieId: movie._id,
+                                        movieId: movie._id || "",
                                         movieSlug: movie.slug,
                                         movieName: movie.name,
                                         movieOriginName: movie.origin_name,

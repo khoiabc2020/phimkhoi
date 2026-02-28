@@ -61,7 +61,7 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
 
                         <div
                             ref={rowRef}
-                            className="flex gap-4 overflow-x-auto pb-4 pt-2 no-scrollbar snap-x"
+                            className="flex gap-4 overflow-x-auto pb-4 pt-2 no-scrollbar snap-x optimize-gpu contain-paint"
                             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                         >
                             {movies.map((movie) => (
@@ -115,7 +115,7 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
                 {/* Scroll Container - High Density */}
                 <div
                     ref={rowRef}
-                    className="flex gap-2.5 overflow-x-auto px-4 md:px-12 pb-8 pt-2 no-scrollbar snap-x"
+                    className="flex gap-2.5 overflow-x-auto px-4 md:px-12 pb-8 pt-2 no-scrollbar snap-x optimize-gpu contain-paint"
                     style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
                     {movies.map((movie) => (

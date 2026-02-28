@@ -1,5 +1,6 @@
 import { getTMDBDetails, getTMDBImage, searchTMDBMovie } from "@/services/tmdb";
 import Image from "next/image";
+import Link from "next/link";
 
 export default async function MovieCast({ movieName, originName, year }: { movieName: string; originName: string; year: number }) {
     // 1. Search for the movie to get TMDB ID
@@ -23,7 +24,7 @@ export default async function MovieCast({ movieName, originName, year }: { movie
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {cast.map((actor: any) => (
-                    <div key={actor.id} className="bg-white/5 rounded-lg p-2 text-center group hover:bg-white/10 transition-colors">
+                    <Link href={`/dien-vien/${encodeURIComponent(actor.name)}`} key={actor.id} className="bg-white/5 rounded-lg p-2 text-center group hover:bg-white/10 transition-colors block">
                         <div className="relative w-24 h-24 mx-auto mb-2 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-yellow-500 transition-colors">
                             {actor.profile_path ? (
                                 <Image
@@ -38,9 +39,9 @@ export default async function MovieCast({ movieName, originName, year }: { movie
                                 </div>
                             )}
                         </div>
-                        <p className="text-white text-sm font-medium truncate">{actor.name}</p>
+                        <p className="text-white text-sm font-medium truncate group-hover:text-yellow-500 transition-colors">{actor.name}</p>
                         <p className="text-gray-400 text-xs truncate">{actor.character}</p>
-                    </div>
+                    </Link>
                 ))}
             </div>
         </div>
