@@ -172,7 +172,7 @@ function OnflixHoverCard({
                 <div className="relative bg-[#141414] rounded-xl overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.9),0_0_0_1px_rgba(255,255,255,0.08)]">
 
                     {/* Backdrop Image - 16:9 */}
-                    <div className="relative aspect-video w-full overflow-hidden">
+                    <div className="relative aspect-video w-full overflow-hidden bg-[#1a1a1a]">
                         <Image
                             src={displayBackdrop || "/placeholder.jpg"}
                             alt={movie.name}
@@ -182,55 +182,31 @@ function OnflixHoverCard({
                         />
 
                         {/* Gradient fading into card body */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-[#141414]/20 to-transparent" />
-
-                        {/* Play button overlay */}
-                        <Link
-                            href={`/xem-phim/${movie.slug}`}
-                            className="absolute inset-0 flex items-center justify-center group/play"
-                        >
-                            <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center opacity-0 group-hover/play:opacity-100 transition-all duration-200 hover:bg-white/30 hover:scale-110">
-                                <Play className="w-5 h-5 text-white fill-white pl-0.5" />
-                            </div>
-                        </Link>
-
-                        {/* Quality + Episode badges */}
-                        <div className="absolute top-2 left-2 flex gap-1">
-                            {movie.quality && (
-                                <span className="bg-black/70 backdrop-blur-sm border border-white/10 text-white text-[10px] font-bold px-2 py-0.5 rounded">
-                                    {movie.quality}
-                                </span>
-                            )}
-                            {movie.episode_current && (
-                                <span className="bg-primary text-black text-[10px] font-bold px-2 py-0.5 rounded">
-                                    {movie.episode_current}
-                                </span>
-                            )}
-                        </div>
+                        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#141414] via-[#141414]/80 to-transparent" />
                     </div>
 
                     {/* Card body */}
-                    <div className="px-3 pb-3 pt-1.5 space-y-2.5">
-                        {/* Title */}
+                    <div className="px-4 pb-4 pt-0 space-y-3 relative z-10 -mt-4">
+                        {/* Title and Subtitle */}
                         <div>
-                            <h3 className="text-white font-extrabold text-sm leading-tight truncate">
+                            <h3 className="text-white font-bold text-lg leading-tight truncate">
                                 {decodeHtml(movie.name)}
                             </h3>
                             {movie.origin_name && (
-                                <p className="text-white/40 text-[10px] leading-tight truncate mt-0.5 font-medium italic">
+                                <p className="text-white/50 text-[13px] leading-tight truncate mt-0.5">
                                     {decodeHtml(movie.origin_name)}
                                 </p>
                             )}
                         </div>
 
-                        {/* Action Buttons row - ONFLIX style */}
+                        {/* Action Buttons row */}
                         <div className="flex items-center gap-2">
-                            {/* Play button */}
+                            {/* Play button (Green) */}
                             <Link
                                 href={`/xem-phim/${movie.slug}`}
-                                className="flex-1 flex items-center justify-center gap-1.5 bg-white hover:bg-gray-100 text-black font-bold text-[12px] h-9 rounded-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg"
+                                className="flex items-center justify-center gap-1.5 bg-[#00A65F] hover:bg-[#00c26f] text-white font-semibold text-[13px] h-9 px-4 rounded transition-colors"
                             >
-                                <Play className="w-3.5 h-3.5 fill-current" />
+                                <Play className="w-4 h-4 fill-current" />
                                 Xem ngay
                             </Link>
 
@@ -240,11 +216,11 @@ function OnflixHoverCard({
                                 movieName={movie.name}
                                 moviePoster={movie.poster_url || movie.thumb_url}
                                 size="md"
-                                className="!w-9 !h-9"
+                                className="!w-9 !h-9 text-white/80 hover:text-white bg-transparent border-white/30 hover:border-white"
                             />
 
                             {/* Favorite button */}
-                            <div className="w-9 h-9 flex items-center justify-center rounded-full border border-white/20 bg-white/10 hover:bg-white/20 cursor-pointer transition-all duration-200 hover:scale-110 active:scale-95">
+                            <div className="w-9 h-9 flex items-center justify-center rounded-full border border-white/30 hover:border-white text-white/80 hover:text-white bg-transparent cursor-pointer transition-colors">
                                 <FavoriteButton
                                     movieData={{
                                         movieId: movie._id || "",
@@ -261,43 +237,37 @@ function OnflixHoverCard({
                                 />
                             </div>
 
-                            {/* Detail link */}
+                            {/* Detail link (Right aligned) */}
                             <Link
                                 href={`/phim/${movie.slug}`}
-                                className="w-9 h-9 flex items-center justify-center rounded-full border border-white/20 bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-all duration-200 hover:scale-110 active:scale-95"
+                                className="w-9 h-9 flex items-center justify-center rounded-full border border-white/30 hover:border-white text-white/80 hover:text-white bg-transparent transition-colors ml-auto"
                                 title="Chi tiết"
                             >
-                                <Info className="w-4 h-4" />
+                                <ChevronDown className="w-5 h-5" />
                             </Link>
                         </div>
 
-                        {/* Metadata */}
-                        <div className="flex items-center gap-1.5 flex-wrap text-[11px]">
-                            <span className="text-green-400 font-bold">{movie.match || "98%"}</span>
-                            <span className="w-1 h-1 rounded-full bg-white/20" />
-                            <span className="border border-white/15 bg-white/5 px-1.5 py-0.5 rounded text-white/70 font-medium">
-                                {movie.quality || "HD"}
-                            </span>
+                        {/* Info: Year & Quality */}
+                        <div className="flex items-center gap-2 text-[13px] mt-2">
                             {movie.year && (
-                                <>
-                                    <span className="w-1 h-1 rounded-full bg-white/20" />
-                                    <span className="text-white/50">{movie.year}</span>
-                                </>
+                                <span className="text-white/70 font-medium">{movie.year}</span>
+                            )}
+                            {movie.quality && (
+                                <span className="border border-white/30 text-white/80 px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider">
+                                    {movie.quality}
+                                </span>
+                            )}
+                            {movie.episode_current && (
+                                <span className="border border-white/30 text-white/80 px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider">
+                                    {movie.episode_current}
+                                </span>
                             )}
                         </div>
 
                         {/* Genres */}
                         {movie.category && movie.category.length > 0 && (
-                            <div className="flex flex-wrap gap-1">
-                                {movie.category.slice(0, 3).map((cat) => (
-                                    <Link
-                                        key={cat.id}
-                                        href={`/the-loai/${cat.slug}`}
-                                        className="text-[10px] text-white/40 hover:text-primary transition-colors border border-white/10 px-1.5 py-0.5 rounded-full hover:border-primary/30"
-                                    >
-                                        {cat.name}
-                                    </Link>
-                                ))}
+                            <div className="text-[13px] text-white/70 font-medium truncate mt-1">
+                                {movie.category.slice(0, 4).map((cat) => cat.name).join(' • ')}
                             </div>
                         )}
                     </div>
