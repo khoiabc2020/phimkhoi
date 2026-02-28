@@ -128,44 +128,40 @@ export default function WatchEpisodeSection({
             <div className="text-sm text-gray-400">
                 Danh sách tập ( <span className="text-white font-medium">{episodes.length}</span> / <span className="text-[#F4C84A] font-bold">{episodes.length}</span> )
             </div>
-        </div>
+            {/* Episode grid */}
+            {!isCollapsed && (
+                <div className="p-4 pt-0">
+                    <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-3 max-h-[400px] overflow-y-auto custom-scrollbar pr-2 [contain:layout_paint]">
+                        {episodes.map((ep) => {
+                            const isActive = ep.slug === currentEpisodeSlug;
 
-            {/* Episode grid */ }
-    {
-        !isCollapsed && (
-            <div className="p-4 pt-0">
-                <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-3 max-h-[400px] overflow-y-auto custom-scrollbar pr-2 [contain:layout_paint]">
-                    {episodes.map((ep) => {
-                        const isActive = ep.slug === currentEpisodeSlug;
+                            // Extract just the number if it's "Tập X" for a cleaner look
+                            let displayName = ep.name;
+                            const match = ep.name.match(/Tập\s+(\d+)/i);
+                            if (match) {
+                                displayName = match[1].padStart(2, '0');
+                            } else if (/^\d+$/.test(ep.name)) {
+                                displayName = ep.name.padStart(2, '0');
+                            }
 
-                        // Extract just the number if it's "Tập X" for a cleaner look
-                        let displayName = ep.name;
-                        const match = ep.name.match(/Tập\s+(\d+)/i);
-                        if (match) {
-                            displayName = match[1].padStart(2, '0');
-                        } else if (/^\d+$/.test(ep.name)) {
-                            displayName = ep.name.padStart(2, '0');
-                        }
-
-                        return (
-                            <Link
-                                key={ep.slug}
-                                href={`/xem-phim/${movieSlug}/${ep.slug}?server=${safeIndex}`}
-                                className={cn(
-                                    "h-12 rounded-2xl flex items-center justify-center text-[15px] font-bold transition-all border",
-                                    isActive
-                                        ? "bg-[#F4C84A] border-[#F4C84A] text-black shadow-none scale-105"
-                                        : "bg-[#111113] border-white/[0.05] text-white hover:bg-[#1C1C1E] hover:border-white/10"
-                                )}
-                            >
-                                {displayName}
-                            </Link>
-                        );
-                    })}
+                            return (
+                                <Link
+                                    key={ep.slug}
+                                    href={`/xem-phim/${movieSlug}/${ep.slug}?server=${safeIndex}`}
+                                    className={cn(
+                                        "h-12 rounded-2xl flex items-center justify-center text-[15px] font-bold transition-all border",
+                                        isActive
+                                            ? "bg-[#F4C84A] border-[#F4C84A] text-black shadow-none scale-105"
+                                            : "bg-[#111113] border-white/[0.05] text-white hover:bg-[#1C1C1E] hover:border-white/10"
+                                    )}
+                                >
+                                    {displayName}
+                                </Link>
+                            );
+                        })}
+                    </div>
                 </div>
-            </div>
-        )
-    }
-        </div >
+            )}
+        </div>
     );
 }
