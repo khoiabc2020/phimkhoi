@@ -6,7 +6,7 @@ import { Search, Bell, User, LogOut, Shield, Trash2, Clock, History, Heart, Sett
 import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { cn } from "@/lib/utils";
+import { cn, getImageUrl } from "@/lib/utils";
 import MobileMenu from "./MobileMenu";
 import { getRealtimeSearch } from "@/app/actions/search";
 
@@ -390,7 +390,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                                 >
                                                                     <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-800 shrink-0 border border-white/10 group-hover:border-primary/50 transition-colors">
                                                                         {actor.profile_url ? (
-                                                                            <Image src={actor.profile_url} alt={actor.name} width={40} height={40} className="w-full h-full object-cover" unoptimized />
+                                                                            <Image src={getImageUrl(actor.profile_url)} alt={actor.name} width={40} height={40} className="w-full h-full object-cover" unoptimized />
                                                                         ) : (
                                                                             <User className="w-5 h-5 m-2.5 text-gray-500" />
                                                                         )}
@@ -415,7 +415,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                                     className="flex items-center gap-3 px-3 py-2 hover:bg-white/10 rounded-xl transition-colors group"
                                                                 >
                                                                     <div className="w-10 h-14 rounded-md overflow-hidden bg-gray-800 shrink-0 border border-white/10 group-hover:border-primary/50 transition-colors">
-                                                                        <Image src={movie.poster_url || movie.thumb_url} alt={movie.name} width={40} height={56} className="w-full h-full object-cover" unoptimized />
+                                                                        <Image src={getImageUrl(movie.poster_url || movie.thumb_url)} alt={movie.name} width={40} height={56} className="w-full h-full object-cover" unoptimized />
                                                                     </div>
                                                                     <div className="flex-1 min-w-0 flex flex-col justify-center">
                                                                         <div className="text-sm font-bold text-white group-hover:text-primary transition-colors truncate">{movie.name}</div>

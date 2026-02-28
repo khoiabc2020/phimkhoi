@@ -6,7 +6,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 const topics = [
     { id: 'marvel', name: 'Marvel', color: '#ef4444', slug: 'marvel' },
     { id: '4k', name: '4K', color: '#a855f7', slug: '4k' },
-    { id: 'sitcom', name: 'Sitcom', color: '#22c55e', slug: 'sitcom' },
+    { id: 'sitcom', name: 'Sitcom', color: '#F4C84A', slug: 'sitcom' },
     { id: 'long-tieng', name: 'Lồng Tiếng', color: '#6366f1', slug: 'long-tieng' },
     { id: 'xuyen-khong', name: 'Xuyên Không', color: '#f97316', slug: 'xuyen-khong' },
     { id: 'co-trang', name: 'Cổ Trang', color: '#dc2626', slug: 'co-trang' },
