@@ -44,9 +44,9 @@ function LoginForm() {
     };
 
     return (
-        <div className="relative z-10 w-full max-w-[450px] p-8 md:p-12 bg-[#141414]/95 rounded-xl shadow-2xl flex flex-col">
-            <h1 className="text-3xl font-bold text-white mb-2">Chào mừng trở lại</h1>
-            <p className="text-[#a3a3a3] text-[15px] mb-8">Cùng thưởng thức những bộ phim tuyệt vời nhất.</p>
+        <div className="relative z-10 w-full max-w-[450px] p-8 md:p-12 bg-[#0a0a0a]/95 rounded-xl shadow-2xl flex flex-col items-center border border-white/5">
+            <h1 className="text-3xl font-bold text-white mb-2 text-center w-full">Chào mừng trở lại</h1>
+            <p className="text-[#a3a3a3] text-[15px] mb-8 text-center w-full">Cùng thưởng thức những bộ phim tuyệt vời nhất.</p>
 
             {registered && (
                 <div className="mb-6 p-4 bg-green-500/20 border border-green-500/50 rounded text-green-400 text-center font-medium animate-in fade-in slide-in-from-top-4">
@@ -67,7 +67,7 @@ function LoginForm() {
                         type="text"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        className="w-full h-[54px] bg-[#333333] border-none rounded outline-none px-12 text-white text-base focus:bg-[#454545] transition-colors peer placeholder:text-[#8c8c8c]"
+                        className="w-full h-[54px] bg-[#222222] border border-transparent rounded outline-none px-12 text-white text-base focus:bg-[#333] focus:border-[#444] transition-colors peer placeholder:text-[#8c8c8c]"
                         placeholder="Email hoặc Tên đăng nhập"
                         required
                     />
@@ -79,7 +79,7 @@ function LoginForm() {
                         type={showPassword ? "text" : "password"}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full h-[54px] bg-[#333333] border-none rounded outline-none px-12 text-white text-base focus:bg-[#454545] transition-colors peer placeholder:text-[#8c8c8c]"
+                        className="w-full h-[54px] bg-[#222222] border border-transparent rounded outline-none px-12 text-white text-base focus:bg-[#333] focus:border-[#444] transition-colors peer placeholder:text-[#8c8c8c]"
                         placeholder="Mật khẩu"
                         required
                     />
@@ -95,7 +95,7 @@ function LoginForm() {
                 {/* Giả lập Cloudflare Turnstile box */}
                 <div className="mt-2 mb-2 w-full h-[65px] bg-[#222222] border border-[#333] rounded-[3px] flex items-center justify-between px-4">
                     <div className="flex items-center gap-3">
-                        <CheckCircle2 className="w-6 h-6 text-[#00c853] fill-[#00c853] text-white rounded-full bg-white" />
+                        <CheckCircle2 className="w-6 h-6 text-[#eab308] fill-[#eab308] text-black rounded-full bg-white" />
                         <span className="text-[#e2e2e2] text-sm">Thành công!</span>
                     </div>
                     <div className="flex flex-col items-end">
@@ -117,14 +117,14 @@ function LoginForm() {
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-[#00c853] hover:bg-[#00e676] text-white font-bold h-12 rounded transition-colors flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.2)] disabled:opacity-70 disabled:cursor-not-allowed mt-1"
+                    className="w-full bg-[#eab308] hover:bg-[#d9a307] text-black font-bold h-12 rounded transition-colors flex items-center justify-center shadow-[0_2px_10px_rgba(234,179,8,0.2)] disabled:opacity-70 disabled:cursor-not-allowed mt-1"
                 >
                     {isLoading ? "Đang xử lý..." : "Đăng nhập"}
                 </button>
 
-                <div className="text-[#8c8c8c] text-[15px] mt-8">
+                <div className="text-[#8c8c8c] text-[15px] mt-8 text-center w-full pb-2">
                     Chưa có tài khoản?{" "}
-                    <Link href="/register" className="text-white hover:underline font-medium ml-1">
+                    <Link href="/register" className="text-[#eab308] hover:underline font-bold ml-1">
                         Đăng ký ngay
                     </Link>
                 </div>
@@ -135,12 +135,12 @@ function LoginForm() {
 
 export default function LoginPage() {
     return (
-        <main className="min-h-screen flex items-center justify-center bg-black relative overflow-hidden font-sans">
-            {/* Logo */}
-            <div className="absolute top-6 left-6 md:top-8 md:left-12 z-20">
+        <main className="min-h-screen flex flex-col items-center justify-center bg-black relative overflow-hidden font-sans pt-16 pb-16">
+            {/* Logo centered above the form */}
+            <div className="relative z-20 mb-8 mt-4">
                 <Link href="/" className="flex items-center group">
-                    <span className="text-3xl md:text-4xl font-black text-white tracking-tighter uppercase font-sans">
-                        ONFLIX<span className="text-[#00c853]">.</span>
+                    <span className="text-4xl md:text-[44px] font-black text-white tracking-tighter uppercase font-sans drop-shadow-lg">
+                        MovieBox<span className="text-[#eab308]">.</span>
                     </span>
                 </Link>
             </div>
@@ -155,10 +155,10 @@ export default function LoginPage() {
                     className="object-cover opacity-50"
                     unoptimized
                 />
-                <div className="absolute inset-0 bg-black/40 bg-gradient-to-t from-black via-transparent to-black" />
+                <div className="absolute inset-0 bg-black/50 bg-gradient-to-t from-black via-black/20 to-black/60" />
             </div>
 
-            <Suspense fallback={<div className="text-white relative z-10 w-full max-w-[450px] p-12 bg-[#141414]/95 rounded-xl h-[400px] flex items-center justify-center">Loading...</div>}>
+            <Suspense fallback={<div className="text-white relative z-10 w-full max-w-[450px] p-12 bg-[#0a0a0a]/95 rounded-xl h-[400px] flex items-center justify-center border border-white/5">Loading...</div>}>
                 <LoginForm />
             </Suspense>
         </main>
