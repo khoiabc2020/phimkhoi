@@ -6,7 +6,9 @@ export interface IComment extends Document {
     userImage?: string;
     movieId: string;
     movieSlug: string;
+    episodeName?: string;
     content: string;
+    userRole?: string;
     rating?: number; // 1-10 stars (optional)
     parentId?: mongoose.Types.ObjectId; // For replies
     likes: number;
@@ -27,7 +29,9 @@ const CommentSchema: Schema<IComment> = new Schema(
         userImage: { type: String },
         movieId: { type: String, required: true, index: true },
         movieSlug: { type: String, required: true, index: true },
+        episodeName: { type: String },
         content: { type: String, required: true, maxlength: 1000 },
+        userRole: { type: String },
         rating: { type: Number, min: 1, max: 10 },
         parentId: { type: Schema.Types.ObjectId, ref: "Comment", index: true },
         likes: { type: Number, default: 0 },

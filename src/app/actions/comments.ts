@@ -10,6 +10,7 @@ import { revalidatePath } from "next/cache";
 export async function addComment(data: {
     movieId: string;
     movieSlug: string;
+    episodeName?: string;
     content: string;
     rating?: number;
     parentId?: string;
@@ -22,13 +23,20 @@ export async function addComment(data: {
 
         await dbConnect();
 
+        let roleDisplay = "Thành viên";
+        if (session.user.role === "admin") roleDisplay = "Quản trị viên";
+        // Mock a Fan cứng badge for some users for UI purposes (optional)
+        if (session.user.email?.includes("fan")) roleDisplay = "Top 65 - Fan cứng";
+
         const comment = await Comment.create({
             userId: session.user.id,
             userName: session.user.name || "Anonymous",
             userImage: session.user.image || "",
             movieId: data.movieId,
             movieSlug: data.movieSlug,
+            episodeName: data.episodeName,
             content: data.content.trim(),
+            userRole: roleDisplay,
             rating: data.rating,
             parentId: data.parentId || undefined,
             likes: 0,

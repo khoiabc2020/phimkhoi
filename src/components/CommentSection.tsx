@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { Send, ThumbsUp, ThumbsDown, Reply, Flag, Trash2, Edit2, Star, Loader2 } from "lucide-react";
+import { Send, ThumbsUp, ThumbsDown, Reply, Flag, Trash2, Edit2, Star, Loader2, MessageCircle, Smile } from "lucide-react";
 import { addComment, getComments, likeComment, dislikeComment, deleteComment, reportComment } from "@/app/actions/comments";
 import Image from "next/image";
 
@@ -12,6 +12,8 @@ interface CommentData {
     userName: string;
     userImage?: string;
     content: string;
+    episodeName?: string;
+    userRole?: string;
     rating?: number;
     likes: number;
     dislikes: number;
@@ -25,6 +27,7 @@ interface CommentData {
 interface CommentSectionProps {
     movieId: string;
     movieSlug: string;
+    episodeName?: string;
 }
 
 // Simple time ago formatter
@@ -46,7 +49,7 @@ function formatTimeAgo(date: string): string {
     return `${years} năm trước`;
 }
 
-export default function CommentSection({ movieId, movieSlug }: CommentSectionProps) {
+export default function CommentSection({ movieId, movieSlug, episodeName }: CommentSectionProps) {
     const { data: session } = useSession();
     const [comments, setComments] = useState<CommentData[]>([]);
     const [newComment, setNewComment] = useState("");
@@ -79,6 +82,7 @@ export default function CommentSection({ movieId, movieSlug }: CommentSectionPro
         const result = await addComment({
             movieId,
             movieSlug,
+            episodeName,
             content: newComment.trim(),
             rating: rating > 0 ? rating : undefined,
         });
@@ -117,74 +121,56 @@ export default function CommentSection({ movieId, movieSlug }: CommentSectionPro
     };
 
     return (
-        <div className="bg-[#1a1a1a] p-4 pb-24 md:pb-6 rounded border border-white/10 scroll-mt-24">
-            <h3 className="text-lg font-bold text-white mb-4 uppercase tracking-wide">
-                Bình luận ({total})
-            </h3>
+        <div className="bg-[#0b0b0b] p-4 md:p-6 rounded-2xl border border-white/5 scroll-mt-24">
+            <div className="flex items-center gap-2 mb-6">
+                <MessageCircle className="w-6 h-6 text-[#1ce783] fill-[#1ce783]/20" />
+                <h3 className="text-xl font-bold text-white tracking-wide">
+                    Bình luận <span className="text-gray-500 text-sm font-normal">({total})</span>
+                </h3>
+            </div>
 
             {/* Comment Form */}
             {session ? (
-                <form onSubmit={handleSubmit} className="mb-6">
-                    <div className="flex gap-3 mb-3">
-                        <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-700 flex-shrink-0">
-                            {session.user?.image ? (
-                                <Image src={session.user.image} alt="User" width={32} height={32} className="w-full h-full object-cover" />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center text-white text-xs font-bold">
-                                    {session.user?.name?.[0]?.toUpperCase() || "U"}
-                                </div>
-                            )}
-                        </div>
-                        <div className="flex-1">
-                            <textarea
-                                value={newComment}
-                                onChange={(e) => setNewComment(e.target.value)}
-                                placeholder="Viết bình luận của bạn..."
-                                className="w-full bg-black/30 border border-white/10 rounded p-2 text-white focus:border-[#fbbf24] focus:outline-none min-h-[80px] text-sm resize-none placeholder:text-gray-600"
-                                maxLength={1000}
-                                style={{ fontSize: '14px' }}
-                            />
-                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mt-2">
-                                <div className="flex flex-wrap items-center gap-2">
-                                    <span className="text-[10px] text-gray-500 uppercase font-bold">Đánh giá:</span>
-                                    <div className="flex gap-0.5">
-                                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
-                                            <button
-                                                key={star}
-                                                type="button"
-                                                onClick={() => setRating(star)}
-                                                onMouseEnter={() => setHoverRating(star)}
-                                                onMouseLeave={() => setHoverRating(0)}
-                                                className="transition-colors min-w-[20px] min-h-[20px] flex items-center justify-center"
-                                            >
-                                                <Star
-                                                    className={`w-3.5 h-3.5 ${star <= (hoverRating || rating)
-                                                        ? "fill-[#fbbf24] text-[#fbbf24]"
-                                                        : "text-gray-700"
-                                                        }`}
-                                                />
-                                            </button>
-                                        ))}
+                <form onSubmit={handleSubmit} className="mb-8">
+                    <div className="bg-[#121212] rounded-xl border border-white/5 p-4 relative">
+                        <div className="flex gap-4">
+                            <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-800 flex-shrink-0">
+                                {session.user?.image ? (
+                                    <Image src={session.user.image} alt="User" width={40} height={40} className="w-full h-full object-cover" />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-white text-sm font-bold bg-[#1f1f1f]">
+                                        {session.user?.name?.[0]?.toUpperCase() || "U"}
                                     </div>
-                                    {rating > 0 && (
-                                        <span className="text-[10px] text-[#fbbf24] font-bold">{rating}/10</span>
-                                    )}
-                                </div>
-                                <button
-                                    type="submit"
-                                    disabled={submitting || !newComment.trim()}
-                                    className="w-full sm:w-auto flex items-center justify-center gap-1.5 bg-[#fbbf24] text-black px-4 py-1.5 rounded hover:bg-[#f59e0b] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-bold text-xs"
-                                >
-                                    {submitting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
-                                    Gửi
-                                </button>
+                                )}
                             </div>
+                            <div className="flex-1 relative">
+                                <textarea
+                                    value={newComment}
+                                    onChange={(e) => setNewComment(e.target.value)}
+                                    placeholder="Viết bình luận của bạn..."
+                                    className="w-full bg-transparent border-none text-white focus:outline-none min-h-[60px] text-[15px] resize-none placeholder:text-gray-500"
+                                    maxLength={1000}
+                                />
+                                <div className="absolute right-0 bottom-2 text-gray-500 hover:text-white cursor-pointer transition-colors">
+                                    <Smile className="w-5 h-5" />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex justify-end mt-2 pt-3">
+                            <button
+                                type="submit"
+                                disabled={submitting || !newComment.trim()}
+                                className="bg-[#16a34a] hover:bg-[#15803d] text-white px-5 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold text-sm"
+                            >
+                                {submitting ? <Loader2 className="w-4 h-4 animate-spin inline mr-1" /> : null}
+                                Gửi bình luận
+                            </button>
                         </div>
                     </div>
                 </form>
             ) : (
-                <div className="bg-blue-900/10 text-blue-200 p-3 rounded mb-6 text-center border border-blue-500/10 text-xs">
-                    Vui lòng <a href="/login" className="text-[#fbbf24] hover:underline font-bold">đăng nhập</a> để bình luận.
+                <div className="bg-white/5 text-gray-400 p-4 rounded-xl mb-8 text-center border border-white/10 text-sm">
+                    Vui lòng <a href="/login" className="text-[#1ce783] hover:underline font-bold">đăng nhập</a> để bình luận.
                 </div>
             )}
 
@@ -194,77 +180,73 @@ export default function CommentSection({ movieId, movieSlug }: CommentSectionPro
                     <Loader2 className="w-6 h-6 text-[#fbbf24] animate-spin" />
                 </div>
             ) : (
-                <div className="space-y-4">
+                <div className="space-y-8">
                     {comments.map((comment) => (
-                        <div key={comment._id} className="flex gap-3 group">
-                            <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-800 flex-shrink-0 mt-0.5">
+                        <div key={comment._id} className="flex gap-4 group">
+                            <div className="w-11 h-11 rounded-full overflow-hidden bg-gray-800 flex-shrink-0 mt-1">
                                 {comment.userImage ? (
                                     <img src={comment.userImage} alt={comment.userName} className="w-full h-full object-cover" />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-white text-xs font-bold">
+                                    <div className="w-full h-full flex items-center justify-center text-white text-[15px] font-bold bg-[#1f1f1f]">
                                         {comment.userName[0]?.toUpperCase() || "U"}
                                     </div>
                                 )}
                             </div>
                             <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-0.5">
-                                    <h4 className="font-bold text-white text-xs">{comment.userName}</h4>
-                                    <span className="text-[10px] text-gray-600">
-                                        {formatTimeAgo(comment.createdAt)}
-                                    </span>
-                                    {comment.rating && (
-                                        <div className="flex items-center gap-0.5 bg-[#fbbf24]/10 px-1.5 py-px rounded-[2px]">
-                                            <Star className="w-2.5 h-2.5 fill-[#fbbf24] text-[#fbbf24]" />
-                                            <span className="text-[10px] text-[#fbbf24] font-bold">{comment.rating}</span>
-                                        </div>
-                                    )}
+                                <div className="flex flex-col mb-1.5">
+                                    <div className="flex items-center gap-2">
+                                        <h4 className="font-bold text-white text-[15px]">{comment.userName}</h4>
+                                        <span className="text-[13px] text-gray-500 font-medium">
+                                            {formatTimeAgo(comment.createdAt)}
+                                        </span>
+                                        {/* Dynamic Episode Tag */}
+                                        {comment.episodeName && (
+                                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-500/20 text-[#1ce783] font-medium tracking-wide">
+                                                {comment.episodeName.startsWith("Tập") ? comment.episodeName : `Tập ${comment.episodeName}`}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="text-[11px] text-[#1ce783] font-bold mt-0.5 tracking-wide">
+                                        {comment.userRole || "Thành viên"}
+                                    </div>
                                 </div>
-                                <p className="text-gray-300 text-[13px] leading-relaxed mb-1.5">{comment.content}</p>
+                                <p className="text-gray-200 text-[15px] leading-relaxed mb-3 whitespace-pre-wrap">{comment.content}</p>
 
                                 {/* Actions */}
-                                <div className="flex items-center gap-6 mt-2 touch-manipulation">
+                                <div className="flex items-center gap-5 touch-manipulation">
                                     <button
                                         onClick={() => handleLike(comment._id)}
                                         disabled={!session}
-                                        className={`flex items-center gap-1.5 text-xs font-medium p-2 -ml-2 rounded-lg transition-colors ${session && comment.likedBy.includes(session.user?.id as string)
-                                            ? "text-primary bg-primary/10"
-                                            : "text-gray-400 hover:text-primary hover:bg-white/5"
+                                        className={`flex items-center gap-1.5 text-[13px] font-medium transition-colors ${session && comment.likedBy.includes(session.user?.id as string)
+                                            ? "text-[#1ce783]"
+                                            : "text-gray-400 hover:text-white"
                                             } disabled:opacity-50`}
                                     >
                                         <ThumbsUp className="w-4 h-4" />
-                                        {comment.likes > 0 && <span>{comment.likes}</span>}
-                                        <span className="sr-only">Like</span>
                                     </button>
                                     <button
                                         onClick={() => handleDislike(comment._id)}
                                         disabled={!session}
-                                        className={`flex items-center gap-1.5 text-xs font-medium p-2 rounded-lg transition-colors ${session && comment.dislikedBy.includes(session.user?.id as string)
-                                            ? "text-red-400 bg-red-500/10"
-                                            : "text-gray-400 hover:text-red-400 hover:bg-white/5"
+                                        className={`flex items-center gap-1.5 text-[13px] font-medium transition-colors ${session && comment.dislikedBy.includes(session.user?.id as string)
+                                            ? "text-red-400"
+                                            : "text-gray-400 hover:text-white"
                                             } disabled:opacity-50`}
                                     >
                                         <ThumbsDown className="w-4 h-4" />
-                                        {comment.dislikes > 0 && <span>{comment.dislikes}</span>}
-                                        <span className="sr-only">Dislike</span>
+                                    </button>
+
+                                    <button className="flex items-center gap-1.5 text-[13px] text-gray-400 font-medium hover:text-white transition-colors">
+                                        <Reply className="w-4 h-4" />
+                                        <span>Trả lời</span>
                                     </button>
 
                                     {session && comment.userId === session.user?.id && (
                                         <button
                                             onClick={() => handleDelete(comment._id)}
-                                            className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-red-400 p-2 rounded-lg hover:bg-white/5 transition-colors ml-auto md:ml-0"
+                                            className="flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-red-400 transition-colors ml-2"
                                         >
-                                            <Trash2 className="w-4 h-4" />
+                                            <Trash2 className="w-3.5 h-3.5" />
                                             <span className="hidden md:inline">Xóa</span>
-                                        </button>
-                                    )}
-
-                                    {session && comment.userId !== session.user?.id && (
-                                        <button
-                                            onClick={() => handleReport(comment._id)}
-                                            className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-yellow-400 p-2 rounded-lg hover:bg-white/5 transition-colors ml-auto md:ml-0"
-                                        >
-                                            <Flag className="w-4 h-4" />
-                                            <span className="hidden md:inline">Báo cáo</span>
                                         </button>
                                     )}
                                 </div>

@@ -183,7 +183,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
                                     </h3>
                                 </div>
                                 <div className="p-5">
-                                    <CommentSection movieId={movie._id} movieSlug={movie.slug} />
+                                    <CommentSection movieId={movie._id} movieSlug={movie.slug} episodeName={movieData.episodeName} />
                                 </div>
                             </div>
                         </div>
