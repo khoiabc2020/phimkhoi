@@ -144,8 +144,8 @@ export default function VideoPlayer({
                     lang: "vi",
                     moreVideoAttr: { crossOrigin: "anonymous" },
                     icons: {
-                        play: `<div style="display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:50%; border:2px solid rgba(255,255,255,0.3); margin: 0 4px; transition:border 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:2px"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>`,
-                        pause: `<div style="display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:50%; border:2px solid rgba(255,255,255,0.3); margin: 0 4px; transition:border 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></div>`,
+                        play: `<div style="display:flex; align-items:center; justify-content:center; width:36px; height:36px; margin: 0 4px;"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8" fill="white" stroke="none"></polygon></svg></div>`,
+                        pause: `<div style="display:flex; align-items:center; justify-content:center; width:36px; height:36px; margin: 0 4px;"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><rect x="9" y="8" width="2" height="8" fill="white" stroke="none"></rect><rect x="13" y="8" width="2" height="8" fill="white" stroke="none"></rect></svg></div>`,
                     },
                     // Controls: skip -10, skip +10
                     controls: [
@@ -154,11 +154,11 @@ export default function VideoPlayer({
                             position: "left",
                             name: "skip-back",
                             index: 1,
-                            html: `<div style="display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:50%; border:2px solid rgba(255,255,255,0.3); margin: 0 4px; transition:border 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'">
-                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            html: `<div style="display:flex; align-items:center; justify-content:center; width:36px; height:36px; margin: 0 4px; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
+                                <svg viewBox="0 0 24 24" width="24" height="24" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                                     <path d="M3 3v5h5" />
-                                    <text x="12" y="16.5" font-size="8.5" font-family="sans-serif" font-weight="700" text-anchor="middle" fill="white" stroke="none">10</text>
+                                    <text x="12" y="16.5" font-size="9" font-family="sans-serif" font-weight="600" text-anchor="middle" fill="white" stroke="none">10</text>
                                 </svg>
                             </div>`,
                             tooltip: "Tua lùi 10s",
@@ -169,15 +169,90 @@ export default function VideoPlayer({
                             position: "left",
                             name: "skip-forward",
                             index: 2,
-                            html: `<div style="display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:50%; border:2px solid rgba(255,255,255,0.3); margin: 0 4px; transition:border 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.7)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'">
-                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            html: `<div style="display:flex; align-items:center; justify-content:center; width:36px; height:36px; margin: 0 4px; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
+                                <svg viewBox="0 0 24 24" width="24" height="24" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
                                     <path d="M21 3v5h-5" />
-                                    <text x="12" y="16.5" font-size="8.5" font-family="sans-serif" font-weight="700" text-anchor="middle" fill="white" stroke="none">10</text>
+                                    <text x="12" y="16.5" font-size="9" font-family="sans-serif" font-weight="600" text-anchor="middle" fill="white" stroke="none">10</text>
                                 </svg>
                             </div>`,
                             tooltip: "Tua tiếp 10s",
                             click: () => { if (art) art.currentTime = Math.min(art.duration, art.currentTime + 10); },
+                        },
+                        // Auto Next Episode Toggle
+                        {
+                            position: "right",
+                            name: "auto-next",
+                            index: 10,
+                            html: `<div style="display:flex; align-items:center; margin-right: 8px; cursor: pointer; opacity: 0.9;" id="auto-next-toggle">
+                                <span style="font-size: 13px; color: rgba(255,255,255,0.8); margin-right: 8px; font-weight: 500;">Chuyển tập</span>
+                                <div style="width: 32px; height: 18px; background: #00A65F; border-radius: 9px; position: relative; transition: background 0.2s;" id="auto-next-bg">
+                                    <div style="width: 14px; height: 14px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 16px; transition: left 0.2s;" id="auto-next-dot"></div>
+                                </div>
+                            </div>`,
+                            tooltip: "Tự động chuyển tập",
+                            click: function () {
+                                const bg = document.getElementById("auto-next-bg");
+                                const dot = document.getElementById("auto-next-dot");
+                                if (bg && dot) {
+                                    const isAuto = bg.style.background === "rgb(0, 166, 95)" || bg.style.background === "#00A65F" || bg.style.background === "#00a65f";
+                                    if (isAuto) {
+                                        bg.style.background = "rgba(255,255,255,0.3)";
+                                        dot.style.left = "2px";
+                                        localStorage.setItem("autoNextEpisode", "false");
+                                    } else {
+                                        bg.style.background = "#00A65F";
+                                        dot.style.left = "16px";
+                                        localStorage.setItem("autoNextEpisode", "true");
+                                    }
+                                }
+                            },
+                            mounted: function () {
+                                const isAuto = localStorage.getItem("autoNextEpisode") !== "false";
+                                const bg = document.getElementById("auto-next-bg");
+                                const dot = document.getElementById("auto-next-dot");
+                                if (bg && dot) {
+                                    if (isAuto) {
+                                        bg.style.background = "#00A65F";
+                                        dot.style.left = "16px";
+                                    } else {
+                                        bg.style.background = "rgba(255,255,255,0.3)";
+                                        dot.style.left = "2px";
+                                    }
+                                }
+                            }
+                        },
+                        // Next Episode Button
+                        {
+                            position: "right",
+                            name: "next-episode",
+                            index: 11,
+                            html: `<div style="display:flex; align-items:center; justify-content:center; width:36px; height:36px; margin: 0 4px; opacity: 0.8; transition: opacity 0.2s; cursor: pointer;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="5 4 15 12 5 20 5 4" fill="white" stroke="none"/>
+                                    <line x1="19" y1="5" x2="19" y2="19" />
+                                </svg>
+                            </div>`,
+                            tooltip: "Tập tiếp theo",
+                            click: () => {
+                                const currentActiveStr = window.location.pathname;
+                                const episodeLinks = document.querySelectorAll('a[href^="/xem-phim/"]');
+                                let foundCurrent = false;
+                                let nextUrl = null;
+                                for (let i = 0; i < episodeLinks.length; i++) {
+                                    const link = episodeLinks[i] as HTMLAnchorElement;
+                                    const href = link.getAttribute('href');
+                                    if (href === currentActiveStr || href === decodeURIComponent(currentActiveStr)) {
+                                        foundCurrent = true;
+                                    } else if (foundCurrent && href && href.split('/').length >= 4) {
+                                        nextUrl = href;
+                                        break;
+                                    }
+                                }
+                                if (nextUrl) {
+                                    window.location.href = nextUrl;
+                                }
+                            },
                         },
                     ],
                     customType: {

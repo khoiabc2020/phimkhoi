@@ -16,12 +16,12 @@ export default function UserLists() {
         if (session?.user) {
             const fetchData = async () => {
                 try {
-                    const [historyRes, favoritesRes] = await Promise.all([
-                        fetch("/api/user/history"),
+                    const [continueWatchingRes, favoritesRes] = await Promise.all([
+                        fetch("/api/user/continue-watching"),
                         fetch("/api/user/favorites")
                     ]);
 
-                    const historyData = await historyRes.json();
+                    const continueWatchingData = await continueWatchingRes.json();
                     const favoritesData = await favoritesRes.json();
 
                     // Fetch full movie details for history items if needed, 
@@ -32,13 +32,14 @@ export default function UserLists() {
                     // For optimization, we should probably update the API to return populated data.
                     // But to keep it simple for now, we will fetch details for the first 10 items.
 
-                    const historyMovies = await Promise.all(
-                        historyData.history.slice(0, 10).map(async (item: any) => {
-                            const res = await fetch(`https://phimapi.com/phim/${item.slug}`);
-                            const data = await res.json();
-                            return data.movie;
-                        })
-                    );
+                    // Continue watching data already contains poster and name from the DB
+                    const continueWatchingMovies = (continueWatchingData.data || []).slice(0, 10).map((item: any) => ({
+                        slug: item.movieSlug,
+                        name: item.movieName,
+                        poster_url: item.moviePoster,
+                        origin_name: item.movieOriginName,
+                        episode_current: item.episodeName
+                    }));
 
                     const favoriteMovies = await Promise.all(
                         favoritesData.favorites.slice(0, 10).map(async (slug: string) => {
@@ -48,7 +49,7 @@ export default function UserLists() {
                         })
                     );
 
-                    setHistory(historyMovies.filter(Boolean));
+                    setHistory(continueWatchingMovies);
                     setFavorites(favoriteMovies.filter(Boolean));
                 } catch (error) {
                     console.error("Failed to fetch user lists", error);

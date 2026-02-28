@@ -200,10 +200,6 @@ export default function WatchContainer({
                         )}
                     </div>
                 </div>
-
-                <p className="mt-1 text-center text-white/30 text-xs">
-                    Nguồn phim miễn phí có thể chứa quảng cáo. Hãy thử đổi server nếu lỗi.
-                </p>
             </div>
 
             {/* Engagement Bar */}

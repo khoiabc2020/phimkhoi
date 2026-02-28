@@ -1,6 +1,6 @@
 "use server";
 
-import { searchTMDBMovie, getTMDBDetails } from "@/services/tmdb";
+import { searchTMDBMovie, getTMDBDetails, getTMDBPersonDetails } from "@/services/tmdb";
 
 export async function getTMDBDataForCard(
     query: string,
@@ -43,5 +43,23 @@ export async function getMovieCast(query: string, year?: number, type: 'movie' |
     } catch (error) {
         console.error("TMDB Cast Action Error:", error);
         return [];
+    }
+}
+
+export async function getActorDetailsFromTMDB(actorName: string) {
+    try {
+        // We need to search for the person first to get their ID
+        const searchUrl = `${process.env.TMDB_API_URL || "https://api.themoviedb.org/3"}/search/person?api_key=${process.env.TMDB_API_KEY}&query=${encodeURIComponent(actorName)}&language=vi-VN`;
+        const searchRes = await fetch(searchUrl, { next: { revalidate: 86400 } });
+        const searchData = await searchRes.json();
+
+        if (searchData.results && searchData.results.length > 0) {
+            const personId = searchData.results[0].id;
+            return await getTMDBPersonDetails(personId);
+        }
+        return null;
+    } catch (error) {
+        console.error("Fetch Actor Details Error:", error);
+        return null;
     }
 }

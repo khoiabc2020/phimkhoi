@@ -119,6 +119,30 @@ export const searchTMDBPerson = async (query: string) => {
     }
 };
 
+export const getTMDBPersonDetails = async (personId: number) => {
+    try {
+        if (!TMDB_API_KEY) return null;
+
+        const url = `${TMDB_API_URL}/person/${personId}?api_key=${TMDB_API_KEY}&language=vi-VN`;
+        const res = await fetch(url, { next: { revalidate: 86400 } });
+        if (!res.ok) return null;
+        const data = await res.json();
+
+        // Sometimes vi-VN biography is empty, fallback to en-US if needed
+        if (!data.biography) {
+            const enRes = await fetch(`${TMDB_API_URL}/person/${personId}?api_key=${TMDB_API_KEY}&language=en-US`, { next: { revalidate: 86400 } });
+            if (enRes.ok) {
+                const enData = await enRes.json();
+                data.biography = enData.biography;
+            }
+        }
+        return data;
+    } catch (error) {
+        console.error("TMDB Person Details Error:", error);
+        return null;
+    }
+};
+
 export const getTMDBDetails = async (tmdbId: number, type: 'movie' | 'tv' = 'movie') => {
     try {
         if (!TMDB_API_KEY) return null;

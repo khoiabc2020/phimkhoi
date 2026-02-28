@@ -63,10 +63,14 @@ export async function GET(req: Request) {
             .limit(100)
             .lean();
 
-        // Định dạng map theo mảng cũ của UserList Component
+        // Return full metadata to render movie cards without refetching
         const formattedHistory = histories.map(h => ({
             slug: h.movieSlug,
-            episode: h.episodeSlug,
+            name: h.movieName || h.movieSlug,
+            poster: h.moviePoster,
+            origin_name: h.movieOriginName || h.movieName,
+            episodeSlug: h.episodeSlug,
+            episodeName: h.episodeName,
             progress: h.progress,
             timestamp: new Date(h.lastWatched).getTime()
         }));

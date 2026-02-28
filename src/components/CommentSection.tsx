@@ -123,7 +123,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
     return (
         <div className="bg-[#0b0b0b] p-4 md:p-6 rounded-2xl border border-white/5 scroll-mt-24">
             <div className="flex items-center gap-2 mb-6">
-                <MessageCircle className="w-6 h-6 text-[#1ce783] fill-[#1ce783]/20" />
+                <MessageCircle className="w-6 h-6 text-[#fbbf24] fill-[#fbbf24]/20" />
                 <h3 className="text-xl font-bold text-white tracking-wide">
                     Bình luận <span className="text-gray-500 text-sm font-normal">({total})</span>
                 </h3>
