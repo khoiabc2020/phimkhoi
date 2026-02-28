@@ -6,6 +6,7 @@ import QuickNav from "@/components/QuickNav";
 import ContinueWatchingRow from "@/components/ContinueWatchingRow";
 import TopicSection from "@/components/TopicSection";
 import TopicCloud from "@/components/TopicCloud";
+import { LazyLoadWrapper } from "@/components/LazyLoadWrapper";
 import { getMoviesList, getTrendMovies, getMoviesByCountry, getMoviesByCategory } from "@/services/api";
 
 export const revalidate = 3600;
@@ -93,41 +94,59 @@ export default async function Home() {
           <div className="xl:col-span-9 space-y-16">
             <ContinueWatchingRow />
 
-            <Suspense fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
-              <AsyncMovieRow title="Phim Chiếu Rạp Mới" slug="phim-chieu-rap" />
-            </Suspense>
+            <LazyLoadWrapper fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
+              <Suspense fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
+                <AsyncMovieRow title="Phim Chiếu Rạp Mới" slug="phim-chieu-rap" />
+              </Suspense>
+            </LazyLoadWrapper>
 
-            <Suspense fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
-              <AsyncMovieRow title="Phim Hàn Quốc Mới" country="han-quoc" />
-            </Suspense>
+            <LazyLoadWrapper fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
+              <Suspense fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
+                <AsyncMovieRow title="Phim Hàn Quốc" country="han-quoc" />
+              </Suspense>
+            </LazyLoadWrapper>
 
-            <Suspense fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
-              <AsyncMovieRow title="Phim Trung Quốc Mới" country="trung-quoc" />
-            </Suspense>
+            <LazyLoadWrapper fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
+              <Suspense fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
+                <AsyncMovieRow title="Phim Trung Quốc" country="trung-quoc" />
+              </Suspense>
+            </LazyLoadWrapper>
 
-            <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-              <AsyncMovieRow title="Phim Sắp Chiếu" type="phim-sap-chieu" />
-            </Suspense>
+            <LazyLoadWrapper fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
+              <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
+                <AsyncMovieRow title="Phim Sắp Chiếu" type="phim-sap-chieu" />
+              </Suspense>
+            </LazyLoadWrapper>
 
-            <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-              <AsyncMovieRow title="Phim Lẻ Mới Cập Nhật" type="phim-le" />
-            </Suspense>
+            <LazyLoadWrapper fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
+              <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
+                <AsyncMovieRow title="Phim Lẻ Mới" type="phim-le" />
+              </Suspense>
+            </LazyLoadWrapper>
 
-            <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-              <AsyncMovieRow title="Phim Bộ Mới Cập Nhật" type="phim-bo" />
-            </Suspense>
+            <LazyLoadWrapper fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
+              <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
+                <AsyncMovieRow title="Phim Bộ Mới" type="phim-bo" />
+              </Suspense>
+            </LazyLoadWrapper>
 
-            <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-              <AsyncMovieRow title="Phim Hành Động Hot" slug="hanh-dong" />
-            </Suspense>
+            <LazyLoadWrapper fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
+              <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
+                <AsyncMovieRow title="Phim Hành Động" slug="hanh-dong" />
+              </Suspense>
+            </LazyLoadWrapper>
 
-            <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-              <AsyncMovieRow title="Hoạt Hình - Anime" type="hoat-hinh" />
-            </Suspense>
+            <LazyLoadWrapper fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
+              <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
+                <AsyncMovieRow title="Hoạt Hình" type="hoat-hinh" />
+              </Suspense>
+            </LazyLoadWrapper>
 
-            <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-              <AsyncMovieRow title="TV Shows" type="tv-shows" />
-            </Suspense>
+            <LazyLoadWrapper fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
+              <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
+                <AsyncMovieRow title="TV Shows" type="tv-shows" />
+              </Suspense>
+            </LazyLoadWrapper>
           </div>
 
           {/* SIDEBAR */}

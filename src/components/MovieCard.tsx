@@ -7,7 +7,7 @@ import Image from "next/image";
 import { Play, Info, Star, ChevronDown } from "lucide-react";
 import { getImageUrl, decodeHtml } from "@/lib/utils";
 import { Movie } from "@/services/api";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { getTMDBImage } from "@/services/tmdb";
 
@@ -65,6 +65,18 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
         if (leaveTimeoutRef.current) clearTimeout(leaveTimeoutRef.current);
         leaveTimeoutRef.current = setTimeout(() => setIsHovered(false), 200);
     };
+
+    // Close overlay immediately on scroll to prevent it from sticking to the screen
+    useEffect(() => {
+        if (!isHovered) return;
+
+        const handleScroll = () => {
+            setIsHovered(false);
+        };
+
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [isHovered]);
 
     return (
         <>
@@ -200,51 +212,53 @@ function OnflixHoverCard({
                         </div>
 
                         {/* Action Buttons row */}
-                        <div className="flex items-center gap-2">
-                            {/* Play button (Green) */}
+                        <div className="flex items-center gap-2.5">
+                            {/* Play button (Yellow) */}
                             <Link
-                                href={`/xem-phim/${movie.slug}`}
-                                className="flex items-center justify-center gap-1.5 bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-extrabold text-[13px] h-9 px-4 rounded transition-colors"
+                                href={`/xem-phim/${movie.slug}?autoPlay=true`}
+                                className="flex-1 flex items-center justify-center gap-2 bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-extrabold text-[14px] h-10 px-4 rounded-full transition-all hover:scale-105"
                             >
                                 <Play className="w-4 h-4 fill-current" />
                                 Xem ngay
                             </Link>
 
-                            {/* Watchlist button */}
-                            <WatchlistInlineButton
-                                slug={movie.slug}
-                                movieName={movie.name}
-                                moviePoster={movie.poster_url || movie.thumb_url}
-                                size="md"
-                                className="!w-9 !h-9 text-white/80 hover:text-white bg-transparent border-white/30 hover:border-white"
-                            />
-
-                            {/* Favorite button */}
-                            <div className="w-9 h-9 flex items-center justify-center rounded-full border border-white/30 hover:border-white text-white/80 hover:text-white bg-transparent cursor-pointer transition-colors">
-                                <FavoriteButton
-                                    movieData={{
-                                        movieId: movie._id || "",
-                                        movieSlug: movie.slug,
-                                        movieName: movie.name,
-                                        movieOriginName: movie.origin_name,
-                                        moviePoster: movie.poster_url || movie.thumb_url,
-                                        movieYear: movie.year,
-                                        movieQuality: movie.quality,
-                                        movieCategories: movie.category?.map((c) => c.name) || [],
-                                    }}
-                                    size="sm"
-                                    className="w-4 h-4"
+                            <div className="flex items-center gap-2 shrink-0">
+                                {/* Watchlist button */}
+                                <WatchlistInlineButton
+                                    slug={movie.slug}
+                                    movieName={movie.name}
+                                    moviePoster={movie.poster_url || movie.thumb_url}
+                                    size="md"
+                                    className="!w-10 !h-10 rounded-full text-white/80 hover:text-white bg-white/5 hover:bg-white/15 border border-white/20 hover:border-white transition-all hover:scale-105 flex items-center justify-center"
                                 />
-                            </div>
 
-                            {/* Detail link (Right aligned) */}
-                            <Link
-                                href={`/phim/${movie.slug}`}
-                                className="w-9 h-9 flex items-center justify-center rounded-full border border-white/30 hover:border-white text-white/80 hover:text-white bg-transparent transition-colors ml-auto"
-                                title="Chi tiết"
-                            >
-                                <ChevronDown className="w-5 h-5" />
-                            </Link>
+                                {/* Favorite button */}
+                                <div className="w-10 h-10 flex items-center justify-center rounded-full border border-white/20 hover:border-white text-white/80 hover:text-white bg-white/5 hover:bg-white/15 cursor-pointer transition-all hover:scale-105">
+                                    <FavoriteButton
+                                        movieData={{
+                                            movieId: movie._id || "",
+                                            movieSlug: movie.slug,
+                                            movieName: movie.name,
+                                            movieOriginName: movie.origin_name,
+                                            moviePoster: movie.poster_url || movie.thumb_url,
+                                            movieYear: movie.year,
+                                            movieQuality: movie.quality,
+                                            movieCategories: movie.category?.map((c) => c.name) || [],
+                                        }}
+                                        size="sm"
+                                        className="w-4 h-4"
+                                    />
+                                </div>
+
+                                {/* Detail link */}
+                                <Link
+                                    href={`/phim/${movie.slug}`}
+                                    className="w-10 h-10 flex items-center justify-center rounded-full border border-white/20 hover:border-white text-white/80 hover:text-white bg-white/5 hover:bg-white/15 transition-all hover:scale-105"
+                                    title="Chi tiết"
+                                >
+                                    <ChevronDown className="w-5 h-5" />
+                                </Link>
+                            </div>
                         </div>
 
                         {/* Info: Year & Quality */}
