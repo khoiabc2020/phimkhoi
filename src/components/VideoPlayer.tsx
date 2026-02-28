@@ -3,6 +3,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import { addWatchHistory } from "@/app/actions/watchHistory";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface VideoPlayerProps {
     url: string;
@@ -20,9 +21,13 @@ interface VideoPlayerProps {
         duration?: number;
     };
     initialProgress?: number;
+    // Auto-next episode support
+    autoNext?: boolean;
+    nextEpisodeUrl?: string; // Route path for next episode, e.g. /xem-phim/slug/ep-02
+    onEnded?: () => void;
 }
 
-// Custom Vietnamese locale for ArtPlayer
+// Vietnamese i18n for ArtPlayer
 const VI_LOCALE = {
     "Video Info": "Thông tin video",
     "Close": "Đóng",
@@ -38,10 +43,9 @@ const VI_LOCALE = {
     "Web Fullscreen": "Toàn cửa sổ",
     "Exit Web Fullscreen": "Thoát toàn cửa sổ",
     "Setting": "Cài đặt",
-    "Normal": "Mặc định",
-    "Please try to switch the video source": "Vui lòng đổi server",
-    "No video yet, please check back later": "Chưa có video, thử lại sau",
-    "ArtPlayer is destroyed": "ArtPlayer đã bị huỷ",
+    "Normal": "Thường",
+    "Please try to switch the video source": "Vui lòng đổi server khác",
+    "No video yet, please check back later": "Chưa có video",
     "Subtitle Offset": "Độ lệch phụ đề",
     "Last Seen": "Đã xem",
     "PNG Screenshot": "Chụp màn hình",
@@ -52,6 +56,11 @@ const VI_LOCALE = {
     "Horizontal": "Ngang",
     "Vertical": "Dọc",
     "Reconnect": "Kết nối lại",
+    "0.5x": "0.5x (Chậm)",
+    "1.0x": "Bình thường",
+    "1.25x": "1.25x",
+    "1.5x": "1.5x (Nhanh)",
+    "2.0x": "2.0x (Rất nhanh)",
 };
 
 function isDirectStream(url: string): boolean {
@@ -66,33 +75,44 @@ export default function VideoPlayer({
     episode,
     movieData,
     initialProgress = 0,
+    autoNext = false,
+    nextEpisodeUrl,
+    onEnded,
 }: VideoPlayerProps) {
     const artRef = useRef<HTMLDivElement>(null);
     const artInstance = useRef<any>(null);
     const { data: session } = useSession();
+    const router = useRouter();
     const lastSavedRef = useRef<number>(0);
+    const autoNextRef = useRef(autoNext);
+    const nextEpisodeUrlRef = useRef(nextEpisodeUrl);
+
+    // Keep refs in sync so closure captures latest values
+    useEffect(() => { autoNextRef.current = autoNext; }, [autoNext]);
+    useEffect(() => { nextEpisodeUrlRef.current = nextEpisodeUrl; }, [nextEpisodeUrl]);
 
     const streamUrl = m3u8 || url;
     const shouldUseArtPlayer = isDirectStream(streamUrl);
 
-    // Realtime history save — debounced every 15s based on actual video time
+    // Realtime watch history save — throttled every 15s
     const saveHistory = useCallback(async (currentTime: number, duration: number) => {
         if (!movieData || !session?.user) return;
-        if (currentTime - lastSavedRef.current < 15) return; // throttle
+        if (currentTime - lastSavedRef.current < 15) return;
         lastSavedRef.current = currentTime;
         try {
-            await addWatchHistory({
-                ...movieData,
-                duration,
-                currentTime,
-            });
+            await addWatchHistory({ ...movieData, duration, currentTime });
         } catch { /* silent */ }
     }, [movieData, session]);
 
-    // ArtPlayer init for direct HLS/MP4
+    const handleVideoEnd = useCallback(() => {
+        onEnded?.();
+        if (autoNextRef.current && nextEpisodeUrlRef.current) {
+            router.push(nextEpisodeUrlRef.current);
+        }
+    }, [onEnded, router]);
+
     useEffect(() => {
         if (!shouldUseArtPlayer || !artRef.current) return;
-
         let art: any = null;
 
         const initArtPlayer = async () => {
@@ -118,10 +138,38 @@ export default function VideoPlayer({
                     fullscreenWeb: true,
                     subtitleOffset: true,
                     miniProgressBar: true,
+                    screenshot: true,
                     theme: "#F4C84A",
                     i18n: { "vi": VI_LOCALE },
                     lang: "vi",
                     moreVideoAttr: { crossOrigin: "anonymous" },
+                    // Controls: skip -10, skip +10, then default, then next-ep custom
+                    controls: [
+                        // Skip back 10s
+                        {
+                            position: "left",
+                            name: "skip-back",
+                            index: 1,
+                            html: `<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" style="opacity:0.85">
+                                <path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/>
+                                <text x="5" y="22" font-size="5" fill="currentColor" font-family="sans-serif">10</text>
+                            </svg>`,
+                            tooltip: "Tua lùi 10s",
+                            click: () => { if (art) art.currentTime = Math.max(0, art.currentTime - 10); },
+                        },
+                        // Skip forward 10s
+                        {
+                            position: "left",
+                            name: "skip-forward",
+                            index: 2,
+                            html: `<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" style="opacity:0.85">
+                                <path d="M13 6v12l8.5-6L13 6zm-1.5 6L3 6v12l8.5-6z"/>
+                                <text x="12" y="22" font-size="5" fill="currentColor" font-family="sans-serif">10</text>
+                            </svg>`,
+                            tooltip: "Tua tiếp 10s",
+                            click: () => { if (art) art.currentTime = Math.min(art.duration, art.currentTime + 10); },
+                        },
+                    ],
                     customType: {
                         m3u8: async (video: HTMLVideoElement, src: string) => {
                             const HlsModule = await import("hls.js");
@@ -130,7 +178,10 @@ export default function VideoPlayer({
                                 const hls = new Hls({
                                     maxBufferLength: 30,
                                     maxMaxBufferLength: 60,
-                                    startLevel: -1, // Auto quality
+                                    startLevel: -1,
+                                    xhrSetup: (xhr: XMLHttpRequest) => {
+                                        xhr.withCredentials = false;
+                                    },
                                 });
                                 hls.loadSource(src);
                                 hls.attachMedia(video);
@@ -147,32 +198,40 @@ export default function VideoPlayer({
 
                 // Seek to saved progress on ready
                 art.on("ready", () => {
-                    const totalDuration = art.duration;
-                    if (initialProgress > 0 && totalDuration > 0) {
-                        art.seek = Math.floor((initialProgress / 100) * totalDuration);
+                    if (initialProgress > 0 && art.duration > 0) {
+                        const seekTo = Math.floor((initialProgress / 100) * art.duration);
+                        if (seekTo > 10) art.seek = seekTo;
                     }
                 });
 
-                // Realtime history save every 15s of actual playback
+                // Realtime history save
                 art.on("timeupdate", () => {
-                    const currentTime = art.currentTime;
-                    const duration = art.duration;
-                    if (currentTime > 0 && duration > 0) {
-                        saveHistory(currentTime, duration);
-                    }
+                    saveHistory(art.currentTime, art.duration);
                 });
 
-                // Save on pause and before destroy
-                const saveOnPause = () => {
-                    const ct = art.currentTime;
-                    const dur = art.duration;
+                // Auto-next on video end
+                art.on("video:ended", () => {
+                    handleVideoEnd();
+                });
+
+                // Save on pause/destroy
+                const forceHistorySave = () => {
+                    const ct = art?.currentTime;
+                    const dur = art?.duration;
                     if (ct > 0 && dur > 0 && movieData && session?.user) {
-                        lastSavedRef.current = ct; // force save
+                        lastSavedRef.current = ct;
                         addWatchHistory({ ...movieData, duration: dur, currentTime: ct }).catch(() => { });
                     }
                 };
-                art.on("pause", saveOnPause);
-                art.on("destroy", saveOnPause);
+                art.on("pause", forceHistorySave);
+                art.on("destroy", forceHistorySave);
+
+                // Keyboard shortcuts
+                document.addEventListener("keydown", (e) => {
+                    if (!art || document.activeElement?.tagName === "INPUT") return;
+                    if (e.key === "ArrowLeft") { art.currentTime = Math.max(0, art.currentTime - 10); e.preventDefault(); }
+                    if (e.key === "ArrowRight") { art.currentTime = Math.min(art.duration, art.currentTime + 10); e.preventDefault(); }
+                });
 
             } catch (err) {
                 console.error("ArtPlayer init error:", err);
@@ -190,7 +249,7 @@ export default function VideoPlayer({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [streamUrl]);
 
-    // Iframe fallback — for embed URLs + history tracking via elapsed time
+    // Iframe fallback
     if (!shouldUseArtPlayer) {
         return (
             <IframePlayer
@@ -200,21 +259,17 @@ export default function VideoPlayer({
                 movieData={movieData}
                 initialProgress={initialProgress}
                 session={session}
+                onEnded={handleVideoEnd}
             />
         );
     }
 
     return (
-        <div
-            ref={artRef}
-            className="w-full h-full bg-black"
-            style={{ minHeight: "200px" }}
-        />
+        <div ref={artRef} className="w-full h-full bg-black" style={{ minHeight: "200px" }} />
     );
 }
 
-// Separated iframe player keeps elapsed-based history tracking
-function IframePlayer({ url, slug, episode, movieData, initialProgress, session }: any) {
+function IframePlayer({ url, slug, episode, movieData, initialProgress, session, onEnded }: any) {
     useEffect(() => {
         if (!movieData || !session?.user) return;
         const startTime = Date.now();
@@ -240,6 +295,7 @@ function IframePlayer({ url, slug, episode, movieData, initialProgress, session 
             clearTimeout(firstSave);
             clearInterval(interval);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [movieData, session, initialProgress]);
 
     return (

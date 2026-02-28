@@ -1,19 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import VideoPlayer from "@/components/VideoPlayer";
 import WatchEngagementBar from "@/components/WatchEngagementBar";
 import WatchEpisodeSection from "@/components/WatchEpisodeSection";
 import { Movie } from "@/services/api";
-import { List as ListIcon, Monitor } from "lucide-react";
+import { List as ListIcon, Monitor, ChevronLeft, ChevronRight, SkipForward } from "lucide-react";
 
 interface WatchContainerProps {
     movie: Movie;
-    currentEpisode: any; // Initial current episode from server chosen in page
-    episodes: any[]; // Initial episodes from that server
+    currentEpisode: any;
+    episodes: any[];
     servers: any[];
     initialProgress: number;
     movieData: any;
@@ -31,30 +30,35 @@ export default function WatchContainer({
 }: WatchContainerProps) {
     const [isTheaterMode, setIsTheaterMode] = useState(false);
     const [isLightOff, setIsLightOff] = useState(false);
+    const [autoNext, setAutoNext] = useState(true);
     const [activeServerName, setActiveServerName] = useState(
         initialServerName || servers?.[0]?.server_name || ""
     );
 
-    // Find the server object matching activeServerName
-    const activeServer = servers?.find(s => s.server_name === activeServerName) || servers?.[0];
-    // Episodes list for the active server
+    const activeServer = servers?.find((s) => s.server_name === activeServerName) || servers?.[0];
     const currentServerEpisodes = activeServer?.server_data || initialEpisodes || [];
 
-    // Find the current episode in the ACTIVE server's list. 
-    // We match by slug. If not found (e.g. server doesn't have this episode), fallback to something reasonable 
-    // or keep the initial one if it matches.
-    // NOTE: initialCurrentEpisode is from the FIRST server. 
-    // If we switch server, we want the SAME episode (same slug) but with the NEW link.
     const currentEpisodeSlug = initialCurrentEpisode?.slug;
-    const activeEpisode = currentServerEpisodes.find((ep: any) => ep.slug === currentEpisodeSlug) || initialCurrentEpisode;
+    const activeEpisode =
+        currentServerEpisodes.find((ep: any) => ep.slug === currentEpisodeSlug) || initialCurrentEpisode;
 
-    const displayEpisodeName = (name: string) => name?.startsWith('Tập') ? name : `Tập ${name}`;
+    // Compute prev/next episode index
+    const currentIdx = currentServerEpisodes.findIndex((ep: any) => ep.slug === currentEpisodeSlug);
+    const prevEpisode = currentIdx > 0 ? currentServerEpisodes[currentIdx - 1] : null;
+    const nextEpisode = currentIdx >= 0 && currentIdx < currentServerEpisodes.length - 1
+        ? currentServerEpisodes[currentIdx + 1]
+        : null;
 
-    // Khóa cuộn trang khi bật chế độ rạp phim
+    const nextEpisodeUrl = nextEpisode ? `/xem-phim/${movie.slug}/${nextEpisode.slug}` : undefined;
+    const prevEpisodeUrl = prevEpisode ? `/xem-phim/${movie.slug}/${prevEpisode.slug}` : undefined;
+
+    const displayEpisodeName = (name: string) => name?.startsWith("Tập") ? name : `Tập ${name}`;
+
+    // Lock scroll in theater mode
     useEffect(() => {
         if (isTheaterMode) {
-            document.body.style.overflow = 'hidden';
-            return () => { document.body.style.overflow = ''; };
+            document.body.style.overflow = "hidden";
+            return () => { document.body.style.overflow = ""; };
         }
     }, [isTheaterMode]);
 
@@ -69,42 +73,50 @@ export default function WatchContainer({
                 />
             )}
 
-            {/* Cinematic Glow Aura */}
-            <div className="absolute -inset-8 pointer-events-none z-0"
+            {/* Glow Aura */}
+            <div
+                className="absolute -inset-8 pointer-events-none z-0"
                 style={{
-                    background: 'radial-gradient(ellipse at center, rgba(251,191,36,0.06) 0%, transparent 65%)',
-                    filter: 'blur(20px)',
-                }} />
+                    background: "radial-gradient(ellipse at center, rgba(251,191,36,0.06) 0%, transparent 65%)",
+                    filter: "blur(20px)",
+                }}
+            />
 
-            {/* Placeholder khi Bật Rạp Phim để tránh giật khung hình */}
+            {/* Placeholder when theater mode on */}
             {isTheaterMode && <div className="w-full aspect-video hidden md:block" />}
 
-            {/* Container Bao Bọc Rạp Phim (Focus Mode) */}
-            <div className={cn(
-                "transition-all duration-500",
-                isTheaterMode
-                    ? "fixed top-[70px] md:top-[80px] left-0 right-0 bottom-0 z-[100] bg-[#080b12] overflow-y-auto w-full px-4 md:px-10 lg:px-20 py-6 pb-32"
-                    : "relative z-10 w-full"
-            )}>
-
-                {/* Nút Đóng Rạp Phim trên cùng */}
+            {/* Theater Mode Container */}
+            <div
+                className={cn(
+                    "transition-all duration-500",
+                    isTheaterMode
+                        ? "fixed top-[70px] md:top-[80px] left-0 right-0 bottom-0 z-[100] bg-[#080b12] overflow-y-auto w-full px-4 md:px-10 lg:px-20 py-6 pb-32"
+                        : "relative z-10 w-full"
+                )}
+            >
+                {/* Theater Mode Close Button */}
                 {isTheaterMode && (
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-white text-lg font-semibold tracking-wide flex items-center gap-2">
-                            <Monitor className="w-5 h-5 text-yellow-500" /> BẬT RẠP PHIM
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-white text-base font-semibold tracking-wide flex items-center gap-2">
+                            <Monitor className="w-4 h-4 text-yellow-500" /> CHẾ ĐỘ RẠP PHIM
                         </h2>
-                        <button onClick={() => setIsTheaterMode(false)} className="text-gray-400 hover:text-white px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors font-medium text-sm flex gap-2 items-center tracking-wider uppercase">
-                            Đóng <span className="text-xl leading-none">&times;</span>
+                        <button
+                            onClick={() => setIsTheaterMode(false)}
+                            className="text-gray-400 hover:text-white px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-sm"
+                        >
+                            Đóng ×
                         </button>
                     </div>
                 )}
 
                 {/* Player Card */}
-                <div className={cn(
-                    "rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.6)] ring-1 ring-white/[0.08] relative z-10 mx-auto transition-all duration-500",
-                    isTheaterMode ? "w-full max-w-[1500px] aspect-video md:aspect-[21/9] h-auto" : "w-full aspect-video"
-                )}
-                    style={{ background: 'rgba(15,18,26,0.95)' }}>
+                <div
+                    className={cn(
+                        "rounded-xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.6)] ring-1 ring-white/[0.08] relative z-10 mx-auto transition-all duration-500",
+                        isTheaterMode ? "w-full max-w-[1500px] aspect-video md:aspect-[21/9] h-auto" : "w-full aspect-video"
+                    )}
+                    style={{ background: "rgba(15,18,26,0.95)" }}
+                >
                     {activeEpisode ? (
                         <VideoPlayer
                             url={activeEpisode.link_embed}
@@ -113,18 +125,84 @@ export default function WatchContainer({
                             episode={displayEpisodeName(activeEpisode.name)}
                             movieData={movieData}
                             initialProgress={initialProgress}
+                            autoNext={autoNext}
+                            nextEpisodeUrl={nextEpisodeUrl}
                         />
                     ) : (
                         <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-white gap-3">
-                            <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center">
-                                <span className="text-3xl">🎬</span>
-                            </div>
+                            <span className="text-4xl">🎬</span>
                             <p className="text-gray-400 text-sm">Tập phim không khả dụng.</p>
                         </div>
                     )}
                 </div>
-                <p className="mt-2 text-center text-white/40 text-xs">
-                    Nguồn phim miễn phí có thể chứa quảng cáo. Bạn có thể thử đổi server hoặc dùng nút tua trên player.
+
+                {/* Info Bar below player (onflix-style) */}
+                <div className="mt-2 px-1 flex items-center justify-between gap-3 flex-wrap">
+                    {/* Left: Title + Episode */}
+                    <div className="flex items-center gap-2 min-w-0">
+                        <Link
+                            href={`/phim/${movie.slug}`}
+                            className="text-gray-400 hover:text-white transition-colors"
+                        >
+                            <ChevronLeft className="w-4 h-4" />
+                        </Link>
+                        <div className="min-w-0">
+                            <p className="text-white font-semibold text-sm truncate leading-tight">
+                                {movie.name}
+                            </p>
+                            <p className="text-yellow-400/70 text-xs">
+                                {activeEpisode ? displayEpisodeName(activeEpisode.name) : ""}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Right: controls */}
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                        {/* Prev episode */}
+                        {prevEpisodeUrl && (
+                            <Link
+                                href={prevEpisodeUrl}
+                                className="flex items-center gap-1 text-xs text-gray-400 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10"
+                            >
+                                <ChevronLeft className="w-3.5 h-3.5" />
+                                Tập trước
+                            </Link>
+                        )}
+
+                        {/* Auto-next toggle */}
+                        <button
+                            onClick={() => setAutoNext(!autoNext)}
+                            className="flex items-center gap-2 text-xs font-semibold transition-colors"
+                        >
+                            <SkipForward className={cn("w-4 h-4", autoNext ? "text-yellow-400" : "text-gray-500")} />
+                            <span className={autoNext ? "text-yellow-400" : "text-gray-500"}>Tự chuyển tập</span>
+                            <span
+                                className={cn(
+                                    "px-1.5 py-0.5 rounded text-[10px] font-bold border",
+                                    autoNext
+                                        ? "bg-yellow-400/15 text-yellow-400 border-yellow-400/30"
+                                        : "bg-white/5 text-gray-500 border-white/10"
+                                )}
+                            >
+                                {autoNext ? "ON" : "OFF"}
+                            </span>
+                        </button>
+
+                        {/* Next episode */}
+                        {nextEpisodeUrl && (
+                            <Link
+                                href={nextEpisodeUrl}
+                                className="flex items-center gap-1 text-xs font-semibold text-gray-300 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10"
+                            >
+                                Tập sau
+                                <ChevronRight className="w-3.5 h-3.5" />
+                            </Link>
+                        )}
+                    </div>
+                </div>
+
+                <p className="mt-1 text-center text-white/30 text-xs">
+                    Nguồn phim miễn phí có thể chứa quảng cáo. Hãy thử đổi server nếu lỗi.
                 </p>
             </div>
 
@@ -139,19 +217,21 @@ export default function WatchContainer({
                 />
             </div>
 
-            {/* Episodes List (Moved inside WatchContainer) */}
+            {/* Episodes Section */}
             {servers && servers.length > 0 && (
-                <div className={cn(
-                    "mt-6 rounded-2xl border border-white/[0.06] relative mx-auto",
-                    isTheaterMode ? "max-w-[1500px]" : "w-full"
-                )}
-                    style={{ background: 'rgba(15,18,26,0.8)', backdropFilter: 'blur(20px)' }}>
-                    <div className="px-6 pt-5 pb-4 border-b border-white/[0.06]">
-                        <h3 className="text-white font-semibold text-base flex items-center gap-2 uppercase tracking-wide">
+                <div
+                    className={cn(
+                        "mt-5 rounded-2xl border border-white/[0.06] relative mx-auto",
+                        isTheaterMode ? "max-w-[1500px]" : "w-full"
+                    )}
+                    style={{ background: "rgba(15,18,26,0.8)", backdropFilter: "blur(20px)" }}
+                >
+                    <div className="px-5 pt-4 pb-3 border-b border-white/[0.06]">
+                        <h3 className="text-white font-semibold text-sm flex items-center gap-2 uppercase tracking-wide">
                             <ListIcon className="w-4 h-4 text-yellow-400" /> Danh sách tập
                         </h3>
                     </div>
-                    <div className="p-6">
+                    <div className="p-5">
                         <WatchEpisodeSection
                             movieSlug={movie.slug}
                             movieName={movie.name}
@@ -163,8 +243,6 @@ export default function WatchContainer({
                     </div>
                 </div>
             )}
-
-            {/* Đóng thẻ container focus mode */}
         </div>
     );
 }
