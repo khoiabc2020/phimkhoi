@@ -177,7 +177,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         : "bg-gradient-to-b from-black/80 via-black/40 to-transparent"
                 )}
             >
-                <div className="max-w-[1600px] mx-auto px-4 lg:px-8 h-[72px] flex items-center justify-between gap-4 flex-nowrap">
+                <div className="max-w-[1600px] mx-auto px-4 lg:px-8 h-[52px] flex items-center justify-between gap-4 flex-nowrap">
 
                     {/* Left Section: Logo & Mobile Menu */}
                     <div className="flex items-center gap-4 shrink-0">
@@ -190,19 +190,19 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         </button>
 
                         {/* Logo */}
-                        <Link href="/" className="flex items-center gap-3 group shrink-0 order-2 md:order-none">
-                            <div className="relative w-10 h-10 md:w-11 md:h-11 flex items-center justify-center">
+                        <Link href="/" className="flex items-center gap-2 group shrink-0 order-2 md:order-none">
+                            <div className="relative w-8 h-8 flex items-center justify-center">
                                 <div className="absolute inset-0 bg-primary/10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                                 <Image
                                     src="/logo.webp"
                                     alt="MovieBox Logo"
-                                    width={44}
-                                    height={44}
-                                    className="relative w-full h-full rounded-[14px] object-cover shadow-lg ring-1 ring-white/10 group-hover:scale-105 group-hover:ring-white/20 transition-all duration-300"
+                                    width={34}
+                                    height={34}
+                                    className="relative w-full h-full rounded-[10px] object-cover shadow-lg ring-1 ring-white/10 group-hover:scale-105 group-hover:ring-white/20 transition-all duration-300"
                                 />
                             </div>
                             <div className="flex flex-col justify-center">
-                                <span className="text-lg md:text-xl lg:text-2xl font-bold text-white tracking-tight leading-none font-sans whitespace-nowrap">
+                                <span className="text-base md:text-lg font-bold text-white tracking-tight leading-none font-sans whitespace-nowrap">
                                     Movie<span className="text-primary">Box</span>
                                 </span>
                             </div>
@@ -477,16 +477,15 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             )}
                         </div>
 
-                        {/* Desktop Actions */}
+                        {/* Desktop Actions — single Library button */}
                         <div className="hidden lg:flex items-center gap-3">
-                            <Link href="/lich-su-xem" className="w-10 h-10 flex items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.08] transition-all hover:scale-105 active:scale-95 group" title="Lịch sử xem">
-                                <History className="w-4.5 h-4.5 text-white/70 group-hover:text-white transition-colors" />
-                            </Link>
-                            <Link href="/xem-sau" className="w-10 h-10 flex items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.08] transition-all hover:scale-105 active:scale-95 group" title="Danh sách xem sau">
-                                <Bookmark className="w-4.5 h-4.5 text-white/70 group-hover:text-primary transition-colors" />
-                            </Link>
-                            <Link href="/phim-yeu-thich" className="w-10 h-10 flex items-center justify-center rounded-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.08] transition-all hover:scale-105 active:scale-95 group" title="Phim yêu thích">
-                                <Heart className="w-4.5 h-4.5 text-white/70 group-hover:text-red-500 transition-colors" />
+                            <Link
+                                href="/thu-vien"
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.08] transition-all hover:scale-105 active:scale-95 group text-sm font-medium text-white/70 hover:text-white"
+                                title="Thư viện của bạn"
+                            >
+                                <Bookmark className="w-4 h-4 text-white/60 group-hover:text-primary transition-colors" />
+                                <span>Thư viện</span>
                             </Link>
                         </div>
 
