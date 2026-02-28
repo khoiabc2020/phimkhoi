@@ -44,7 +44,7 @@ function LoginForm() {
     };
 
     return (
-        <div className="relative z-10 w-full max-w-[450px] p-8 md:p-12 bg-[#0a0a0a]/95 rounded-xl shadow-2xl flex flex-col items-center border border-white/5">
+        <div className="relative z-10 w-full max-w-[450px] p-8 md:p-12 bg-black/70 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl flex flex-col items-center transform -translate-y-8">
             <h1 className="text-3xl font-bold text-white mb-2 text-center w-full">Chào mừng trở lại</h1>
             <p className="text-[#a3a3a3] text-[15px] mb-8 text-center w-full">Cùng thưởng thức những bộ phim tuyệt vời nhất.</p>
 
@@ -61,25 +61,25 @@ function LoginForm() {
                     </div>
                 )}
 
-                <div className="relative group">
+                <div className="relative group w-full">
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8c8c8c] peer-focus:text-white transition-colors" />
                     <input
                         type="text"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        className="w-full h-[54px] bg-[#222222] border border-transparent rounded outline-none px-12 text-white text-base focus:bg-[#333] focus:border-[#444] transition-colors peer placeholder:text-[#8c8c8c]"
+                        className="w-full h-[54px] bg-white/5 border border-white/10 rounded outline-none px-12 text-white text-base focus:bg-white/10 focus:border-white/20 transition-colors peer placeholder:text-[#8c8c8c]"
                         placeholder="Email hoặc Tên đăng nhập"
                         required
                     />
                 </div>
 
-                <div className="relative group">
+                <div className="relative group w-full">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8c8c8c] peer-focus:text-white transition-colors" />
                     <input
                         type={showPassword ? "text" : "password"}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full h-[54px] bg-[#222222] border border-transparent rounded outline-none px-12 text-white text-base focus:bg-[#333] focus:border-[#444] transition-colors peer placeholder:text-[#8c8c8c]"
+                        className="w-full h-[54px] bg-white/5 border border-white/10 rounded outline-none px-12 text-white text-base focus:bg-white/10 focus:border-white/20 transition-colors peer placeholder:text-[#8c8c8c]"
                         placeholder="Mật khẩu"
                         required
                     />
@@ -93,10 +93,10 @@ function LoginForm() {
                 </div>
 
                 {/* Giả lập Cloudflare Turnstile box */}
-                <div className="mt-2 mb-2 w-full h-[65px] bg-[#222222] border border-[#333] rounded-[3px] flex items-center justify-between px-4">
+                <div className="mt-2 mb-2 w-full h-[65px] bg-white/5 border border-white/10 rounded-[3px] flex items-center justify-between px-4">
                     <div className="flex items-center gap-3">
                         <CheckCircle2 className="w-6 h-6 text-[#eab308] fill-[#eab308] text-black rounded-full bg-white" />
-                        <span className="text-[#e2e2e2] text-sm">Thành công!</span>
+                        <span className="text-[#e2e2e2] text-sm font-medium">Thành công!</span>
                     </div>
                     <div className="flex flex-col items-end">
                         <div className="flex items-center gap-1 opacity-80">
@@ -135,13 +135,25 @@ function LoginForm() {
 
 export default function LoginPage() {
     return (
-        <main className="min-h-screen flex flex-col items-center justify-center bg-black relative overflow-hidden font-sans pt-16 pb-16">
-            {/* Logo centered above the form */}
-            <div className="relative z-20 mb-8 mt-4">
-                <Link href="/" className="flex items-center group">
-                    <span className="text-4xl md:text-[44px] font-black text-white tracking-tighter uppercase font-sans drop-shadow-lg">
-                        MovieBox<span className="text-[#eab308]">.</span>
-                    </span>
+        <main className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0a] relative overflow-hidden font-sans">
+            {/* Logo absolute top-left aligned with system design */}
+            <div className="absolute top-6 left-6 md:top-8 md:left-12 z-20">
+                <Link href="/" className="flex items-center gap-3 group shrink-0">
+                    <div className="relative w-10 h-10 md:w-12 md:h-12 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-primary/10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                        <Image
+                            src="/logo.webp"
+                            alt="MovieBox Logo"
+                            width={48}
+                            height={48}
+                            className="relative w-full h-full rounded-[14px] object-cover shadow-lg ring-1 ring-white/10 group-hover:scale-105 group-hover:ring-white/20 transition-all duration-300"
+                        />
+                    </div>
+                    <div className="flex flex-col justify-center">
+                        <span className="text-xl md:text-2xl lg:text-3xl font-bold text-white tracking-tight leading-none font-sans whitespace-nowrap">
+                            Movie<span className="text-primary">Box</span>
+                        </span>
+                    </div>
                 </Link>
             </div>
 
@@ -158,7 +170,7 @@ export default function LoginPage() {
                 <div className="absolute inset-0 bg-black/50 bg-gradient-to-t from-black via-black/20 to-black/60" />
             </div>
 
-            <Suspense fallback={<div className="text-white relative z-10 w-full max-w-[450px] p-12 bg-[#0a0a0a]/95 rounded-xl h-[400px] flex items-center justify-center border border-white/5">Loading...</div>}>
+            <Suspense fallback={<div className="text-white relative z-10 w-full max-w-[450px] p-12 bg-black/70 backdrop-blur-2xl rounded-xl h-[400px] flex items-center justify-center border border-white/10 transform -translate-y-8">Đang tải...</div>}>
                 <LoginForm />
             </Suspense>
         </main>
