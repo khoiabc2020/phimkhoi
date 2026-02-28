@@ -88,20 +88,51 @@ export const getHomeData = async () => {
 
 export const getMovieDetail = async (slug: string) => {
     try {
-        // Try KKPhim first
-        const res = await fetch(`${API_URL}/phim/${slug}`, { next: { revalidate: 60 } });
+        const [kkRes, ophimRes] = await Promise.allSettled([
+            fetch(`${API_URL}/phim/${slug}`, { next: { revalidate: 60 } }).then(r => r.json()),
+            fetch(`https://ophim1.com/phim/${slug}`, { next: { revalidate: 60 } }).then(r => r.json())
+        ]);
 
-        if (res.ok) {
-            const data = await res.json();
-            if (data.status) return data;
+        let combinedData: any = null;
+
+        // Base movie data prefers KKPhim, fallback to OPhim
+        if (kkRes.status === 'fulfilled' && kkRes.value?.status) {
+            combinedData = { ...kkRes.value };
+            // Tag servers from KKPhim
+            if (combinedData.episodes) {
+                combinedData.episodes = combinedData.episodes.map((epGroup: any) => ({
+                    ...epGroup,
+                    server_name: `KKPhim #${epGroup.server_name || "1"}`
+                }));
+            }
+        } else if (ophimRes.status === 'fulfilled' && ophimRes.value?.status) {
+            combinedData = { ...ophimRes.value };
+            // Ophim structures movie data slightly differently, might need normalization here if used as base
+            if (!combinedData.movie?.thumb_url?.startsWith('http') && combinedData.pathImage) {
+                combinedData.movie.thumb_url = combineUrl(combinedData.pathImage, combinedData.movie.thumb_url);
+                combinedData.movie.poster_url = combineUrl(combinedData.pathImage, combinedData.movie.poster_url);
+            }
+            // Tag servers from OPhim
+            if (combinedData.episodes) {
+                combinedData.episodes = combinedData.episodes.map((epGroup: any) => ({
+                    ...epGroup,
+                    server_name: `OPhim #${epGroup.server_name || "1"}`
+                }));
+            }
         }
 
-        // Fallback to OPhim
-        const ophimRes = await fetch(`https://ophim1.com/phim/${slug}`, { next: { revalidate: 60 } });
-
-        if (ophimRes.ok) {
-            const data = await ophimRes.json();
-            return data; // OPhim detail structure is usually compatible
+        // If we found a base, and the OTHER source also succeeded, merge its episodes
+        if (combinedData) {
+            if (kkRes.status === 'fulfilled' && kkRes.value?.status && ophimRes.status === 'fulfilled' && ophimRes.value?.status) {
+                const ophimEpisodes = ophimRes.value.episodes || [];
+                const taggedOphimEpisodes = ophimEpisodes.map((epGroup: any) => ({
+                    ...epGroup,
+                    server_name: `OPhim #${epGroup.server_name || "1"}`
+                }));
+                // Prevent duplicate if names happen to match exactly (rare with our tags, but safe)
+                combinedData.episodes = [...(combinedData.episodes || []), ...taggedOphimEpisodes];
+            }
+            return combinedData;
         }
 
         return null;
