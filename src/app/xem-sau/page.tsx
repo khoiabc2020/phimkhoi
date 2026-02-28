@@ -10,6 +10,7 @@ import dbConnect from "@/lib/db";
 import User from "@/models/User";
 import EmptyState from "@/components/EmptyState";
 import { removeFromWatchlist } from "@/app/actions/watchlist";
+import mongoose from "mongoose";
 
 function getImageUrl(url: string) {
     if (!url) return "/placeholder.jpg";
@@ -52,6 +53,14 @@ export default async function WatchlistPage() {
     if (!session) redirect("/login");
 
     await dbConnect();
+    // Guard against non-ObjectId session IDs (e.g. admin mock)
+    if (!mongoose.isValidObjectId(session.user.id)) {
+        return (
+            <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+                <p className="text-white/40 text-sm">Không thể tải danh sách. Vui lòng đăng nhập lại.</p>
+            </div>
+        );
+    }
     const user = await User.findById(session.user.id).select("watchlist").lean();
     const watchlistSlugs: string[] = (user as any)?.watchlist?.slice().reverse() || [];
 

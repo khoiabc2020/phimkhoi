@@ -5,17 +5,22 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
 import { revalidatePath } from "next/cache";
+import mongoose from "mongoose";
+
+function isValidId(id: string | undefined | null): boolean {
+    return !!id && mongoose.isValidObjectId(id);
+}
 
 export async function addToWatchlist(slug: string) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
+        if (!isValidId(session?.user?.id)) {
             return { success: false, error: "Unauthorized" };
         }
 
         await dbConnect();
 
-        const user = await User.findById(session.user.id);
+        const user = await User.findById(session!.user.id);
         if (!user) return { success: false, error: "User not found" };
 
         if (!user.watchlist.includes(slug)) {
@@ -34,19 +39,20 @@ export async function addToWatchlist(slug: string) {
 export async function removeFromWatchlist(slug: string) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
+        if (!isValidId(session?.user?.id)) {
             return { success: false, error: "Unauthorized" };
         }
 
         await dbConnect();
 
-        const user = await User.findById(session.user.id);
+        const user = await User.findById(session!.user.id);
         if (!user) return { success: false, error: "User not found" };
 
         user.watchlist = user.watchlist.filter((s: string) => s !== slug);
         await user.save();
 
         revalidatePath(`/phim/${slug}`);
+        revalidatePath("/xem-sau");
         return { success: true };
     } catch (error) {
         console.error("Remove watchlist error:", error);
@@ -57,13 +63,13 @@ export async function removeFromWatchlist(slug: string) {
 export async function isInWatchlist(slug: string) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
+        if (!isValidId(session?.user?.id)) {
             return { success: true, isInWatchlist: false };
         }
 
         await dbConnect();
 
-        const user = await User.findById(session.user.id);
+        const user = await User.findById(session!.user.id);
         const exists = user && user.watchlist ? user.watchlist.includes(slug) : false;
 
         return { success: true, isInWatchlist: exists };

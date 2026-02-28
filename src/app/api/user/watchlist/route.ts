@@ -3,11 +3,16 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
+import mongoose from "mongoose";
 
 export async function GET() {
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user?.id) {
+            return NextResponse.json({ slugs: [] });
+        }
+        // Guard against non-ObjectId mock IDs (e.g. admin accounts)
+        if (!mongoose.isValidObjectId(session.user.id)) {
             return NextResponse.json({ slugs: [] });
         }
 
