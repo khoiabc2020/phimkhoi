@@ -197,8 +197,18 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
     });
 
     // Hero dùng poster/thumbnail từ API (TMDB khi đã match năm, hoặc nguồn PhimAPI). Fallback placeholder để không bao giờ slide đen.
-    const getHeroImage = (movie: Movie) => {
-        return movie.poster_url || movie.thumb_url || "/placeholder.jpg";
+    const getHeroImage = (movie: Movie, type: 'poster' | 'backdrop' = 'poster') => {
+        const tmdbData = heroMoviesData[movie._id];
+        if (tmdbData) {
+            if (type === 'poster' && tmdbData.poster_path) {
+                return `https://image.tmdb.org/t/p/original${tmdbData.poster_path}`;
+            }
+            if (type === 'backdrop' && tmdbData.backdrop_path) {
+                return `https://image.tmdb.org/t/p/original${tmdbData.backdrop_path}`;
+            }
+        }
+        const apiPath = type === 'backdrop' ? (movie.thumb_url || movie.poster_url) : (movie.poster_url || movie.thumb_url);
+        return apiPath ? getImageUrl(apiPath) : "/placeholder.jpg";
     };
 
     return (
@@ -209,7 +219,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
             <div className="lg:hidden relative w-full h-auto flex flex-col pt-6 pb-8 bg-[#0B0D12]" ref={mobileRef}>
                 <div className="flex flex-row touch-pan-y h-auto">
                     {heroMovies.map((movie, index) => {
-                        const posterImg = getHeroImage(movie);
+                        const posterImg = getHeroImage(movie, 'poster');
                         const rating = heroMoviesData[movie._id]?.vote_average ? heroMoviesData[movie._id].vote_average.toFixed(1) : "N/A";
 
                         const tweenValue = tweenValues.length ? tweenValues[index] : 1;
@@ -311,8 +321,8 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                 <div className="absolute inset-0 h-full" ref={desktopRef}>
                     <div className="flex h-full touch-pan-y">
                         {heroMovies.map((movie, index) => {
-                            const posterImg = getHeroImage(movie);
-                            const backdropImg = getHeroImage(movie);
+                            const posterImg = getHeroImage(movie, 'poster');
+                            const backdropImg = getHeroImage(movie, 'backdrop');
 
                             return (
                                 <div key={movie._id} className="relative flex-[0_0_100%] min-w-0 h-full bg-[#0B0D12] overflow-hidden">
@@ -333,7 +343,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                     </div>
 
                                     {/* 2. Content Container */}
-                                    <div className="relative z-30 h-full container max-w-[1600px] mx-auto px-8 flex items-center">
+                                    <div className="relative z-30 h-full container max-w-[1600px] mx-auto px-8 lg:px-24 xl:px-32 flex items-center">
                                         <div className="grid grid-cols-12 gap-12 w-full items-center mt-16">
 
                                             {/* Left: Info — rút ngắn animation để giảm lag desktop */}
