@@ -30,12 +30,7 @@ rm -rf .next
 export NODE_OPTIONS="--max_old_space_size=2048"
 npm run build
 
-# FIX: Explicitly nuke the standalone dir before copying fresh assets
-# This avoids 'rm: cannot remove .next/standalone: Directory not empty' errors
-echo "Clearing old standalone directory..."
-rm -rf .next/standalone || true
-
-# Recreate standalone + copy fresh static assets
+# Copy fresh static assets into standalone (will force-overwrite if already exists)
 echo "Copying static assets to standalone..."
 cp -rf public .next/standalone/public
 cp -rf .next/static .next/standalone/.next/static
