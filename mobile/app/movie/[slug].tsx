@@ -1,6 +1,6 @@
 import {
     View, Text, ScrollView, ActivityIndicator, Pressable, Dimensions,
-    StyleSheet, Platform, Animated, Modal, StatusBar as RNStatusBar, useWindowDimensions
+    StyleSheet, Platform, Animated, Modal, StatusBar as RNStatusBar, useWindowDimensions, Share
 } from 'react-native';
 import { useLocalSearchParams, Stack, Link, useRouter } from 'expo-router';
 import { Image } from 'expo-image';
@@ -8,6 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { StatusBar } from 'expo-status-bar';
+
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getMovieDetail, getImageUrl, getRelatedMovies, Movie, getTMDBRating, getTMDBCast, toggleFavorite as apiToggleFavorite } from '@/services/api';
@@ -246,6 +247,21 @@ export default function MovieDetailScreen() {
         }
     };
 
+    // Share feature
+    const handleShare = async () => {
+        if (!movie) return;
+        try {
+            await Share.share({
+                title: movie.name,
+                message: `🎬 ${movie.name} (${movie.origin_name || ''})\n\nXem ngay tại: https://khoiphim.io.vn/phim/${movie.slug}`,
+                url: `https://khoiphim.io.vn/phim/${movie.slug}`,
+            });
+        } catch (e) {
+            console.warn('Share failed', e);
+        }
+    };
+
+
     // Loading State
     if (loading) {
         return (
@@ -281,7 +297,7 @@ export default function MovieDetailScreen() {
                             <Ionicons name="arrow-back" size={24} color="white" />
                         </Pressable>
                         <View style={{ flex: 1 }} />
-                        <Pressable style={styles.iconBtn}>
+                        <Pressable style={styles.iconBtn} onPress={handleShare}>
                             <Ionicons name="share-social-outline" size={22} color="white" />
                         </Pressable>
                     </View>

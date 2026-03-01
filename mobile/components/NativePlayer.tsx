@@ -154,6 +154,54 @@ export default function NativePlayer({
     const lastProgressUpdate = useRef(0);
     const initialSeekDone = useRef(false);
 
+    // Sleep Timer
+    const SLEEP_OPTIONS = [null, 15, 30, 60, 90]; // minutes, null = off
+    const [sleepMinuteIdx, setSleepMinuteIdx] = useState(0);
+    const [sleepSecondsLeft, setSleepSecondsLeft] = useState<number | null>(null);
+    const sleepTimerRef = useRef<any>(null);
+
+    // Cycle to next sleep option
+    const cycleSleepTimer = useCallback(() => {
+        const nextIdx = (sleepMinuteIdx + 1) % SLEEP_OPTIONS.length;
+        setSleepMinuteIdx(nextIdx);
+        const mins = SLEEP_OPTIONS[nextIdx];
+        if (sleepTimerRef.current) clearInterval(sleepTimerRef.current);
+        if (mins === null) {
+            setSleepSecondsLeft(null);
+        } else {
+            setSleepSecondsLeft(mins * 60);
+        }
+    }, [sleepMinuteIdx]);
+
+    useEffect(() => {
+        if (sleepTimerRef.current) clearInterval(sleepTimerRef.current);
+        if (sleepSecondsLeft === null || sleepSecondsLeft <= 0) {
+            if (sleepSecondsLeft === 0) {
+                video.current?.pauseAsync().catch(() => { });
+                setSleepSecondsLeft(null);
+                setSleepMinuteIdx(0);
+            }
+            return;
+        }
+        sleepTimerRef.current = setInterval(() => {
+            setSleepSecondsLeft(prev => {
+                if (prev === null || prev <= 1) {
+                    clearInterval(sleepTimerRef.current);
+                    video.current?.pauseAsync().catch(() => { });
+                    setSleepMinuteIdx(0);
+                    return null;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+        return () => { if (sleepTimerRef.current) clearInterval(sleepTimerRef.current); };
+    }, [sleepSecondsLeft]);
+
+    const formatSleep = (secs: number) => {
+        const m = Math.floor(secs / 60), s = secs % 60;
+        return `${m}:${s.toString().padStart(2, '0')}`;
+    };
+
     // Brightness: system brightness while in player, restore on exit
     const brightnessValue = useRef(1.0);
     const brightnessStart = useRef(1.0);
@@ -608,8 +656,22 @@ export default function NativePlayer({
                                         )}
                                     </View>
                                 </View>
+
+                                {/* Sleep Timer row */}
+                                <TouchableOpacity style={[styles.actionItem, { alignSelf: 'flex-start', marginTop: 2 }]} onPress={cycleSleepTimer}>
+                                    <Ionicons
+                                        name="moon-outline"
+                                        size={20}
+                                        color={sleepSecondsLeft !== null ? '#fbbf24' : 'white'}
+                                    />
+                                    <Text style={[styles.actionText, sleepSecondsLeft !== null && { color: '#fbbf24' }]}>
+                                        {sleepSecondsLeft !== null ? `Tắt sau ${formatSleep(sleepSecondsLeft)}` : 'Hẹn giờ'}
+                                    </Text>
+                                </TouchableOpacity>
+
                             </LinearGradient>
                         )}
+
                     </View>
                 )}
             </View>
