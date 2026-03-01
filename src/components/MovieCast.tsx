@@ -23,7 +23,7 @@ export default async function MovieCast({ movieName, originName, year, isCompact
                 {cast.slice(0, 8).map((actor: any) => {
                     const imgSrc = actor.profile_path ? getTMDBImage(actor.profile_path, "w185") : null;
                     return (
-                        <Link href={`/dien-vien/${encodeURIComponent(actor.name)}`} key={actor.id} className="flex flex-col items-center gap-2 w-[4.5rem] group" title={actor.name}>
+                        <Link href={`/dien-vien/${encodeURIComponent(String(actor.name))}`} key={actor.id} className="flex flex-col items-center gap-2 w-[4.5rem] group" title={actor.name}>
                             <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border border-white/10 group-hover:border-[#00B14F] transition-colors relative bg-white/5">
                                 {imgSrc ? (
                                     <Image src={imgSrc as string} alt={actor.name || "Actor"} fill className="object-cover" />
@@ -48,7 +48,7 @@ export default async function MovieCast({ movieName, originName, year, isCompact
                 {cast.map((actor: any) => {
                     const imgSrc = actor.profile_path ? getTMDBImage(actor.profile_path, "w500") : null;
                     return (
-                        <Link href={`/dien-vien/${encodeURIComponent(actor.name)}`} key={actor.id} className="bg-white/5 rounded-lg p-2 text-center group hover:bg-white/10 transition-colors block">
+                        <Link href={`/dien-vien/${encodeURIComponent(String(actor.name))}`} key={actor.id} className="bg-white/5 rounded-lg p-2 text-center group hover:bg-white/10 transition-colors block">
                             <div className="relative w-24 h-24 mx-auto mb-2 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-yellow-500 transition-colors">
                                 {imgSrc ? (
                                     <Image
