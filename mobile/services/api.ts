@@ -557,3 +557,28 @@ export const getTMDBCast = async (query: string, year?: number, type: 'movie' | 
         return [];
     }
 };
+
+// --- Ophim Native Extensions ---
+
+export const getOphimCast = async (slug: string) => {
+    try {
+        if (!slug) return [];
+        const res = await fetch(`${OPHIM_API}/phim/${slug}/peoples`);
+        const data = await res.json();
+        return data.cast || [];
+    } catch (error) {
+        console.error(`OPhim Cast Error [${slug}]:`, error);
+        return [];
+    }
+};
+
+export const getOphimImages = async (slug: string) => {
+    try {
+        if (!slug) return null;
+        const res = await fetch(`${OPHIM_API}/phim/${slug}/images`);
+        return await res.json();
+    } catch (error) {
+        console.error(`OPhim Images Error [${slug}]:`, error);
+        return null;
+    }
+};

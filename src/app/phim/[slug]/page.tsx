@@ -187,7 +187,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         {/* Diễn viên */}
                         <div>
                             <div className="text-[11px] font-medium text-gray-500 uppercase tracking-widest mb-3">Diễn viên</div>
-                            <MovieCast movieName={movie.name} originName={movie.origin_name} year={movie.year} isCompact={true} />
+                            <MovieCast slug={movie.slug} isCompact={true} />
                         </div>
 
                         {/* Thể loại */}
