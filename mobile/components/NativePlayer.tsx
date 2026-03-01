@@ -120,6 +120,21 @@ export default function NativePlayer({
     // Modals
     const [showEpisodes, setShowEpisodes] = useState(false);
     const [showServers, setShowServers] = useState(false);
+    const [serverLangTab, setServerLangTab] = useState('');
+
+    // Language group helpers for server modal
+    const LANG_COLORS: Record<string, string> = { 'Phụ Đề': '#D1D5DB', 'Lồng Tiếng': '#00C853', 'Thuyết Minh': '#3B82F6' };
+    const getLanguageGroup = (name: string) => {
+        const lower = name.toLowerCase();
+        if (lower.includes('lồng tiếng') || lower.includes('longtieng')) return 'Lồng Tiếng';
+        if (lower.includes('thuyết minh') || lower.includes('thuyetminh')) return 'Thuyết Minh';
+        return 'Phụ Đề';
+    };
+    // Group only non-empty servers by language
+    const filteredServerList = serverList.filter((_, i) => (episodeList?.length ?? 0) > 0 || true); // kept for shape
+    const groupedServers: Record<string, number[]> = { 'Phụ Đề': [], 'Lồng Tiếng': [], 'Thuyết Minh': [] };
+    serverList.forEach((name, idx) => { if (name) groupedServers[getLanguageGroup(name)].push(idx); });
+    const activeLangGroups = Object.keys(groupedServers).filter(k => groupedServers[k].length > 0);
 
     useEffect(() => { lockedRef.current = locked; }, [locked]);
     useEffect(() => { showEpisodesRef.current = showEpisodes; }, [showEpisodes]);
@@ -160,7 +175,7 @@ export default function NativePlayer({
                 brightness.setValue(current);
                 const opacity = (1 - current) * 0.75;
                 brightnessOpacity.setValue(opacity);
-            } catch (_) {}
+            } catch (_) { }
         })();
         return () => {
             mounted = false;
@@ -172,7 +187,7 @@ export default function NativePlayer({
                         const saved = savedSystemBrightness.current;
                         if (saved != null) await Brightness.setBrightnessAsync(saved);
                     }
-                } catch (_) {}
+                } catch (_) { }
             })();
         };
     }, []);
@@ -307,7 +322,7 @@ export default function NativePlayer({
         brightnessOpacity.setValue(opacity);
         brightness.setValue(newVal);
 
-        Brightness.setBrightnessAsync(newVal).catch(() => {});
+        Brightness.setBrightnessAsync(newVal).catch(() => { });
     };
 
     const panResponder = useRef(
@@ -381,7 +396,7 @@ export default function NativePlayer({
                         break;
                 }
             });
-        } catch (_) {}
+        } catch (_) { }
     }
 
     return (
@@ -435,13 +450,13 @@ export default function NativePlayer({
 
                 {/* Brightness Overlay - ẩn trong PiP */}
                 {!isInPipMode && (
-                <Animated.View
-                    style={[
-                        StyleSheet.absoluteFill,
-                        { backgroundColor: 'black', opacity: brightnessOpacity, zIndex: 1 }
-                    ]}
-                    pointerEvents="none"
-                />
+                    <Animated.View
+                        style={[
+                            StyleSheet.absoluteFill,
+                            { backgroundColor: 'black', opacity: brightnessOpacity, zIndex: 1 }
+                        ]}
+                        pointerEvents="none"
+                    />
                 )}
 
                 {/* Touch Area for Controls Toggle - ẩn trong PiP */}
@@ -449,23 +464,23 @@ export default function NativePlayer({
 
                 {/* VISUAL BRIGHTNESS SLIDER - ẩn trong PiP */}
                 {!isInPipMode && (
-                <Animated.View style={[styles.brightnessBar, { opacity: sliderOpacity }]} pointerEvents="none">
-                    <Ionicons name="sunny" size={14} color="rgba(255,255,255,0.9)" />
-                    <View style={styles.brightnessTrack}>
-                        <Animated.View
-                            style={[
-                                styles.brightnessFill,
-                                {
-                                    height: brightness.interpolate({
-                                        inputRange: [0, 1],
-                                        outputRange: ['0%', '100%']
-                                    })
-                                }
-                            ]}
-                        />
-                    </View>
-                    <Ionicons name="moon" size={12} color="rgba(255,255,255,0.5)" />
-                </Animated.View>
+                    <Animated.View style={[styles.brightnessBar, { opacity: sliderOpacity }]} pointerEvents="none">
+                        <Ionicons name="sunny" size={14} color="rgba(255,255,255,0.9)" />
+                        <View style={styles.brightnessTrack}>
+                            <Animated.View
+                                style={[
+                                    styles.brightnessFill,
+                                    {
+                                        height: brightness.interpolate({
+                                            inputRange: [0, 1],
+                                            outputRange: ['0%', '100%']
+                                        })
+                                    }
+                                ]}
+                            />
+                        </View>
+                        <Ionicons name="moon" size={12} color="rgba(255,255,255,0.5)" />
+                    </Animated.View>
                 )}
 
                 {/* CONTROLS - ẩn trong PiP để cửa sổ chỉ hiển thị video */}
@@ -600,95 +615,95 @@ export default function NativePlayer({
 
             {/* Episode Selector Overlay - không hiện trong PiP */}
             {!isInPipMode && (
-            <View style={[StyleSheet.absoluteFill, { zIndex: 100, elevation: 100, overflow: 'hidden' }]} pointerEvents={showEpisodes ? 'auto' : 'none'}>
-                {/* Dark Overlay */}
-                <Animated.View style={[
-                    StyleSheet.absoluteFill,
-                    { backgroundColor: 'black', opacity: slideAnim.interpolate({ inputRange: [0, width + 100], outputRange: [0.6, 0] }) }
-                ]}>
-                    <Pressable style={{ flex: 1 }} onPress={() => setShowEpisodes(false)} />
-                </Animated.View>
+                <View style={[StyleSheet.absoluteFill, { zIndex: 100, elevation: 100, overflow: 'hidden' }]} pointerEvents={showEpisodes ? 'auto' : 'none'}>
+                    {/* Dark Overlay */}
+                    <Animated.View style={[
+                        StyleSheet.absoluteFill,
+                        { backgroundColor: 'black', opacity: slideAnim.interpolate({ inputRange: [0, width + 100], outputRange: [0.6, 0] }) }
+                    ]}>
+                        <Pressable style={{ flex: 1 }} onPress={() => setShowEpisodes(false)} />
+                    </Animated.View>
 
-                {/* Animated Glass Drawer - translate fully off so no strip visible when closed */}
-                <Animated.View style={[
-                    styles.drawerContent,
-                    { position: 'absolute', right: 0, top: 0, bottom: 0 },
-                    { transform: [{ translateX: slideAnim }] }
-                ]}>
-                    <View style={styles.drawerHeader}>
-                        <Text style={styles.drawerTitle}>Danh sách tập</Text>
-                        <TouchableOpacity
-                            onPress={() => setShowEpisodes(false)}
-                            style={styles.closeBtn}
-                        >
-                            <Ionicons name="close" size={20} color="white" />
-                        </TouchableOpacity>
-                    </View>
-                    <View style={{ flex: 1 }}>
+                    {/* Animated Glass Drawer - translate fully off so no strip visible when closed */}
+                    <Animated.View style={[
+                        styles.drawerContent,
+                        { position: 'absolute', right: 0, top: 0, bottom: 0 },
+                        { transform: [{ translateX: slideAnim }] }
+                    ]}>
+                        <View style={styles.drawerHeader}>
+                            <Text style={styles.drawerTitle}>Danh sách tập</Text>
+                            <TouchableOpacity
+                                onPress={() => setShowEpisodes(false)}
+                                style={styles.closeBtn}
+                            >
+                                <Ionicons name="close" size={20} color="white" />
+                            </TouchableOpacity>
+                        </View>
+                        <View style={{ flex: 1 }}>
 
-                        {/* Range Picker — chiều cao cố định, không kéo dài */}
-                        {episodeList.length > EP_CHUNK && (
-                            <View style={{ height: 44, marginBottom: 4 }}>
-                                <ScrollView
-                                    horizontal
-                                    showsHorizontalScrollIndicator={false}
-                                    contentContainerStyle={{ paddingHorizontal: 20, gap: 8, alignItems: 'center' }}
-                                >
-                                    {Array.from({ length: Math.ceil(episodeList.length / EP_CHUNK) }).map((_, i) => {
-                                        const from = i * EP_CHUNK + 1;
-                                        const to = Math.min((i + 1) * EP_CHUNK, episodeList.length);
-                                        const isActive = epRange === i;
-                                        return (
-                                            <TouchableOpacity
-                                                key={i}
-                                                onPress={() => setEpRange(i)}
-                                                style={[styles.rangeChip, isActive && styles.rangeChipActive]}
-                                            >
-                                                <Text style={[styles.rangeChipText, isActive && styles.rangeChipTextActive]} numberOfLines={1}>
-                                                    {from}–{to}
-                                                </Text>
-                                            </TouchableOpacity>
-                                        );
-                                    })}
-                                </ScrollView>
-                            </View>
-                        )}
-
-                        {/* Optimized FlatList for episodes */}
-                        <FlatList
-                            style={{ flex: 1 }}
-                            data={episodeList.slice(epRange * EP_CHUNK, (epRange + 1) * EP_CHUNK)}
-                            keyExtractor={(item) => item.slug}
-                            numColumns={5}
-                            columnWrapperStyle={{ gap: 8, paddingHorizontal: 12, marginBottom: 8 }}
-                            contentContainerStyle={{ paddingVertical: 18, paddingBottom: 100 }}
-                            showsVerticalScrollIndicator={true}
-                            nestedScrollEnabled={true}
-                            scrollEnabled={true}
-                            keyboardShouldPersistTaps="handled"
-                            renderItem={({ item }) => {
-                                const isActive = item.slug === currentEpisodeSlug;
-                                return (
-                                    <TouchableOpacity
-                                        style={[styles.epGridItem, { width: EP_ITEM_WIDTH }, isActive && styles.activeEpGridItem]}
-                                        onPress={() => {
-                                            onEpisodeChange?.(item.slug);
-                                            setShowEpisodes(false);
-                                        }}
+                            {/* Range Picker — chiều cao cố định, không kéo dài */}
+                            {episodeList.length > EP_CHUNK && (
+                                <View style={{ height: 44, marginBottom: 4 }}>
+                                    <ScrollView
+                                        horizontal
+                                        showsHorizontalScrollIndicator={false}
+                                        contentContainerStyle={{ paddingHorizontal: 20, gap: 8, alignItems: 'center' }}
                                     >
-                                        <Text style={[styles.epGridText, isActive && styles.activeEpGridText]} numberOfLines={1}>
-                                            {item.name.replace('Tập ', '')}
-                                        </Text>
-                                        {isActive && (
-                                            <View style={{ position: 'absolute', bottom: 8, width: 4, height: 4, borderRadius: 2, backgroundColor: '#fbbf24' }} />
-                                        )}
-                                    </TouchableOpacity>
-                                );
-                            }}
-                        />
-                    </View>
-                </Animated.View>
-            </View>
+                                        {Array.from({ length: Math.ceil(episodeList.length / EP_CHUNK) }).map((_, i) => {
+                                            const from = i * EP_CHUNK + 1;
+                                            const to = Math.min((i + 1) * EP_CHUNK, episodeList.length);
+                                            const isActive = epRange === i;
+                                            return (
+                                                <TouchableOpacity
+                                                    key={i}
+                                                    onPress={() => setEpRange(i)}
+                                                    style={[styles.rangeChip, isActive && styles.rangeChipActive]}
+                                                >
+                                                    <Text style={[styles.rangeChipText, isActive && styles.rangeChipTextActive]} numberOfLines={1}>
+                                                        {from}–{to}
+                                                    </Text>
+                                                </TouchableOpacity>
+                                            );
+                                        })}
+                                    </ScrollView>
+                                </View>
+                            )}
+
+                            {/* Optimized FlatList for episodes */}
+                            <FlatList
+                                style={{ flex: 1 }}
+                                data={episodeList.slice(epRange * EP_CHUNK, (epRange + 1) * EP_CHUNK)}
+                                keyExtractor={(item) => item.slug}
+                                numColumns={5}
+                                columnWrapperStyle={{ gap: 8, paddingHorizontal: 12, marginBottom: 8 }}
+                                contentContainerStyle={{ paddingVertical: 18, paddingBottom: 100 }}
+                                showsVerticalScrollIndicator={true}
+                                nestedScrollEnabled={true}
+                                scrollEnabled={true}
+                                keyboardShouldPersistTaps="handled"
+                                renderItem={({ item }) => {
+                                    const isActive = item.slug === currentEpisodeSlug;
+                                    return (
+                                        <TouchableOpacity
+                                            style={[styles.epGridItem, { width: EP_ITEM_WIDTH }, isActive && styles.activeEpGridItem]}
+                                            onPress={() => {
+                                                onEpisodeChange?.(item.slug);
+                                                setShowEpisodes(false);
+                                            }}
+                                        >
+                                            <Text style={[styles.epGridText, isActive && styles.activeEpGridText]} numberOfLines={1}>
+                                                {item.name.replace('Tập ', '')}
+                                            </Text>
+                                            {isActive && (
+                                                <View style={{ position: 'absolute', bottom: 8, width: 4, height: 4, borderRadius: 2, backgroundColor: '#fbbf24' }} />
+                                            )}
+                                        </TouchableOpacity>
+                                    );
+                                }}
+                            />
+                        </View>
+                    </Animated.View>
+                </View>
             )}
 
             {/* Server Selector Overlay - không hiện trong PiP */}
@@ -703,8 +718,39 @@ export default function NativePlayer({
                                     <Ionicons name="close-circle" size={28} color="#4b5563" />
                                 </TouchableOpacity>
                             </View>
+
+                            {/* Language tabs */}
+                            {activeLangGroups.length > 1 && (
+                                <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+                                    {activeLangGroups.map(lang => {
+                                        const isActive = serverLangTab === lang || (!serverLangTab && activeLangGroups[0] === lang);
+                                        const dotColor = LANG_COLORS[lang] || '#9ca3af'; // dot keeps language color
+                                        return (
+                                            <TouchableOpacity
+                                                key={lang}
+                                                onPress={() => setServerLangTab(lang)}
+                                                style={{
+                                                    flexDirection: 'row', alignItems: 'center', gap: 6,
+                                                    paddingHorizontal: 14, paddingVertical: 7,
+                                                    borderRadius: 20,
+                                                    backgroundColor: isActive ? 'rgba(244,200,74,0.15)' : 'rgba(255,255,255,0.06)',
+                                                    borderWidth: 1,
+                                                    borderColor: isActive ? '#F4C84A' : 'rgba(255,255,255,0.1)',
+                                                }}
+                                            >
+                                                <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: isActive ? dotColor : 'rgba(255,255,255,0.25)' }} />
+                                                <Text style={{ color: isActive ? '#F4C84A' : 'rgba(255,255,255,0.55)', fontSize: 13, fontWeight: isActive ? '700' : '500' }}>
+                                                    {lang}
+                                                </Text>
+                                            </TouchableOpacity>
+                                        );
+                                    })}
+                                </View>
+                            )}
+
+                            {/* Servers for the active lang tab */}
                             <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
-                                {serverList.map((server, index) => (
+                                {(groupedServers[serverLangTab || activeLangGroups[0]] || serverList.map((_, i) => i)).map((index) => (
                                     <TouchableOpacity
                                         key={index}
                                         style={[styles.serverRow, index === currentServerIndex && styles.activeServerRow]}
@@ -716,7 +762,7 @@ export default function NativePlayer({
                                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                                             <Ionicons name="server-outline" size={20} color={index === currentServerIndex ? '#fbbf24' : 'gray'} />
                                             <Text style={[styles.serverRowText, index === currentServerIndex && styles.activeServerRowText]}>
-                                                {server}
+                                                {serverList[index]}
                                             </Text>
                                         </View>
                                         {index === currentServerIndex && <Ionicons name="checkmark" size={20} color="#fbbf24" />}

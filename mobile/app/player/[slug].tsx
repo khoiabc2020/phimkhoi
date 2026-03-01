@@ -27,9 +27,12 @@ export default function PlayerScreen() {
     const [movieTitle, setMovieTitle] = useState("");
     const [episodeTitle, setEpisodeTitle] = useState("");
     const [nextEpisodeSlug, setNextEpisodeSlug] = useState<string | null>(null);
-    const [episodes, setEpisodes] = useState<any[]>([]);
+    const [episodes, setEpisodes] = useState<any[]>([]); // all servers including empty
     const [selectedServer, setSelectedServer] = useState(server ? Number(server) : 0);
     const [pipSize, setPipSize] = useState<PipSizeKey>('medium');
+
+    // Derived: only non-empty servers for the player UI
+    const nonEmptyEpisodes = episodes.filter(s => s.server_data && s.server_data.length > 0);
 
     const { user, token, syncHistory } = useAuth();
 
@@ -204,15 +207,19 @@ export default function PlayerScreen() {
                     // New Props
 
                     episodeList={episodes[selectedServer]?.server_data || []}
-                    serverList={episodes.map((s: any) => s.server_name)}
-                    currentServerIndex={selectedServer}
+                    serverList={nonEmptyEpisodes.map((s: any) => s.server_name)}
+                    currentServerIndex={nonEmptyEpisodes.findIndex((s: any) => s.server_name === (episodes[selectedServer]?.server_name || ''))}
                     currentEpisodeSlug={ep as string}
                     onEpisodeChange={(newSlug) => {
                         applyEpisode({ episodes }, selectedServer, newSlug);
                     }}
-                    onServerChange={(newServerIndex) => {
-                        setSelectedServer(newServerIndex);
-                        applyEpisode({ episodes }, newServerIndex, ep);
+                    onServerChange={(newServerIndexInFiltered) => {
+                        // Map back from filtered index to original episodes array index
+                        const serverName = nonEmptyEpisodes[newServerIndexInFiltered]?.server_name;
+                        const originalIdx = episodes.findIndex(e => e.server_name === serverName);
+                        const idx = originalIdx !== -1 ? originalIdx : newServerIndexInFiltered;
+                        setSelectedServer(idx);
+                        applyEpisode({ episodes }, idx, ep);
                     }}
                 />
             ) : (

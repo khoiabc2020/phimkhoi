@@ -133,8 +133,6 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
                                         {activeLanguageGroups.map((lang) => {
                                             const isActive = activeLangTab === lang;
                                             const Icon = lang === "Lồng Tiếng" ? Mic : lang === "Thuyết Minh" ? Volume2 : Subtitles;
-                                            const colorClass = lang === "Lồng Tiếng" ? "text-[#00c853]" : lang === "Thuyết Minh" ? "text-blue-500" : "text-gray-300";
-                                            const activeBorderClass = lang === "Lồng Tiếng" ? "bg-[#00c853] shadow-[0_0_10px_#00c853]" : lang === "Thuyết Minh" ? "bg-blue-500 shadow-[0_0_10px_#3b82f6]" : "bg-gray-300 shadow-[0_0_10px_#d1d5db]";
 
                                             return (
                                                 <button
@@ -142,13 +140,13 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
                                                     onClick={() => setActiveLangTab(lang)}
                                                     className={cn(
                                                         "flex items-center gap-2 pb-3 text-[13px] font-bold transition-all relative whitespace-nowrap uppercase tracking-wide",
-                                                        isActive ? colorClass : "text-gray-500 hover:text-gray-300"
+                                                        isActive ? "text-[#F4C84A]" : "text-gray-500 hover:text-gray-300"
                                                     )}
                                                 >
-                                                    <Icon className={cn("w-[15px] h-[15px]", isActive ? colorClass : "text-gray-500")} />
+                                                    <Icon className={cn("w-[15px] h-[15px]", isActive ? "text-[#F4C84A]" : "text-gray-500")} />
                                                     {lang}
                                                     {isActive && (
-                                                        <span className={cn("absolute bottom-[-1px] left-0 right-0 h-0.5", activeBorderClass)} />
+                                                        <span className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-[#F4C84A] shadow-[0_0_10px_#F4C84A]" />
                                                     )}
                                                 </button>
                                             );
@@ -168,9 +166,7 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
                                             const globalIndex = episodes.findIndex(e => e.server_name === server.server_name);
                                             const isActive = activeServer === globalIndex;
 
-                                            const isLongTieng = activeLangTab === "Lồng Tiếng";
-                                            const isThuyetMinh = activeLangTab === "Thuyết Minh";
-                                            const activeBgClass = isLongTieng ? "bg-[#00c853] border-[#00c853] text-white" : isThuyetMinh ? "bg-blue-600 border-blue-600 text-white" : "bg-[#28282B] border-[#3f3f46] text-white";
+                                            const activeBgClass = "bg-[#F4C84A] border-[#F4C84A] text-[#0B0D12]";
 
                                             const displayName = server.server_name
                                                 .replace("Lồng Tiếng", "").replace("lồng tiếng", "").replace("longtieng", "")

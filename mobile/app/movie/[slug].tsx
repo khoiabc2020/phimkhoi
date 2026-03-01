@@ -26,6 +26,20 @@ const EP_BOX_HEIGHT = 40;
 
 const { width: dimWidth, height } = Dimensions.get('window');
 
+// Language group colors (matching web version)
+const LANG_COLORS: Record<string, string> = {
+    "Phụ Đề": '#D1D5DB',
+    "Lồng Tiếng": '#00C853',
+    "Thuyết Minh": '#3B82F6',
+};
+
+const getLanguageGroup = (name: string): string => {
+    const lower = name.toLowerCase();
+    if (lower.includes('lồng tiếng') || lower.includes('longtieng')) return 'Lồng Tiếng';
+    if (lower.includes('thuyết minh') || lower.includes('thuyetminh')) return 'Thuyết Minh';
+    return 'Phụ Đề';
+};
+
 // Tab options
 const TABS = [
     { id: 'episodes', label: 'Tập phim' },
@@ -52,7 +66,8 @@ export default function MovieDetailScreen() {
 
     // UI State
     const [selectedTab, setSelectedTab] = useState('episodes');
-    const [selectedServer, setSelectedServer] = useState(0);
+    const [selectedServer, setSelectedServer] = useState(0); // global index into `episodes`
+    const [activeLangTab, setActiveLangTab] = useState('');
     const [rating, setRating] = useState<number | null>(null);
     const [cast, setCast] = useState<any[]>([]);
     const [selectedEpRange, setSelectedEpRange] = useState(0);
@@ -60,6 +75,12 @@ export default function MovieDetailScreen() {
     const [downloadEpSlugs, setDownloadEpSlugs] = useState<Set<string>>(new Set());
     const [localUriByEp, setLocalUriByEp] = useState<Record<string, string>>({});
     const EP_CHUNK = 50;
+
+    // Group non-empty servers by language
+    const filteredEpisodes = episodes.filter(s => s.server_data && s.server_data.length > 0);
+    const groupedEpisodes: Record<string, any[]> = { 'Phụ Đề': [], 'Lồng Tiếng': [], 'Thuyết Minh': [] };
+    filteredEpisodes.forEach(s => groupedEpisodes[getLanguageGroup(s.server_name)].push(s));
+    const activeLangGroups = Object.keys(groupedEpisodes).filter(k => groupedEpisodes[k].length > 0);
 
     const { user, token, syncFavorites, syncWatchList } = useAuth();
 
@@ -81,7 +102,8 @@ export default function MovieDetailScreen() {
             const data = await getMovieDetail(slug as string);
             if (data?.movie) {
                 setMovie(data.movie);
-                setEpisodes(data.episodes || []);
+                const eps = data.episodes || [];
+                setEpisodes(eps);
                 const related = await getRelatedMovies(data.movie.category?.[0]?.slug || '');
                 setRelatedMovies(related);
 
@@ -90,11 +112,17 @@ export default function MovieDetailScreen() {
                 const tmdbCast = await getTMDBCast(data.movie.name, data.movie.year);
                 if (tmdbCast) setCast(tmdbCast.slice(0, 15));
 
+                // Initialize first non-empty server and its language group
+                const firstNonEmpty = eps.findIndex((s: any) => s.server_data && s.server_data.length > 0);
+                const initIndex = firstNonEmpty !== -1 ? firstNonEmpty : 0;
+                setSelectedServer(initIndex);
+                setActiveLangTab(getLanguageGroup(eps[initIndex]?.server_name || ''));
+
                 // Handle AutoPlay flag immediately after data fetches
                 const isAutoPlay = Array.isArray(autoPlay) ? autoPlay[0] === 'true' : autoPlay === 'true';
-                if (isAutoPlay && data.episodes?.[selectedServer]?.server_data?.[0]) {
-                    const firstEp = data.episodes[selectedServer].server_data[0].slug;
-                    router.replace(`/player/${data.movie.slug}?ep=${firstEp}&server=${selectedServer}` as any);
+                if (isAutoPlay && eps[initIndex]?.server_data?.[0]) {
+                    const firstEp = eps[initIndex].server_data[0].slug;
+                    router.replace(`/player/${data.movie.slug}?ep=${firstEp}&server=${initIndex}` as any);
                 }
             }
         } catch (error) {
@@ -102,7 +130,7 @@ export default function MovieDetailScreen() {
         } finally {
             setLoading(false);
         }
-    }, [slug, autoPlay, selectedServer, router]);
+    }, [slug, autoPlay, router]);
 
     useEffect(() => {
         fetchData();
@@ -337,21 +365,81 @@ export default function MovieDetailScreen() {
                         )}
                     </View>
 
-                    {/* Server Selector */}
-                    {episodes.length > 1 && (
-                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 20 }}>
-                            {episodes.map((server, idx) => (
-                                <Pressable
-                                    key={idx}
-                                    style={[styles.selectorPill, selectedServer === idx && styles.selectorPillActive]}
-                                    onPress={() => setSelectedServer(idx)}
-                                >
-                                    <Text style={[styles.selectorText, selectedServer === idx && styles.selectorTextActive]}>
-                                        {server.server_name}
-                                    </Text>
-                                </Pressable>
-                            ))}
-                        </ScrollView>
+                    {/* Language Tabs + Server Selector */}
+                    {activeLangGroups.length > 0 && (
+                        <View style={{ marginBottom: 20 }}>
+                            {/* Lang tabs row */}
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
+                                <View style={{ flexDirection: 'row', gap: 8, paddingHorizontal: 0 }}>
+                                    {activeLangGroups.map(lang => {
+                                        const isActive = activeLangTab === lang;
+                                        // Small dot keeps language color; active highlight = system yellow
+                                        const dotColor = LANG_COLORS[lang] || '#9ca3af';
+                                        return (
+                                            <Pressable
+                                                key={lang}
+                                                onPress={() => {
+                                                    setActiveLangTab(lang);
+                                                    const firstInGroup = groupedEpisodes[lang][0];
+                                                    if (firstInGroup) {
+                                                        const globalIdx = episodes.findIndex(e => e.server_name === firstInGroup.server_name);
+                                                        if (globalIdx !== -1) setSelectedServer(globalIdx);
+                                                    }
+                                                    setSelectedEpRange(0);
+                                                }}
+                                                style={{
+                                                    flexDirection: 'row',
+                                                    alignItems: 'center',
+                                                    gap: 6,
+                                                    paddingHorizontal: 14,
+                                                    paddingVertical: 8,
+                                                    borderRadius: 20,
+                                                    backgroundColor: isActive ? 'rgba(244,200,74,0.15)' : 'rgba(255,255,255,0.05)',
+                                                    borderWidth: 1,
+                                                    borderColor: isActive ? '#F4C84A' : 'rgba(255,255,255,0.08)',
+                                                }}
+                                            >
+                                                <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: isActive ? dotColor : 'rgba(255,255,255,0.25)' }} />
+                                                <Text style={{ color: isActive ? '#F4C84A' : 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: isActive ? '700' : '500' }}>
+                                                    {lang}
+                                                </Text>
+                                            </Pressable>
+                                        );
+                                    })}
+                                </View>
+                            </ScrollView>
+
+                            {/* Server pills for current lang tab */}
+                            {activeLangTab && groupedEpisodes[activeLangTab]?.length > 1 && (
+                                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                                    <View style={{ flexDirection: 'row', gap: 8 }}>
+                                        {groupedEpisodes[activeLangTab].map((server: any) => {
+                                            const globalIdx = episodes.findIndex(e => e.server_name === server.server_name);
+                                            const isActive = selectedServer === globalIdx;
+                                            const displayName = server.server_name
+                                                .replace('Lồng Tiếng', '').replace('lồng tiếng', '')
+                                                .replace('Thuyết Minh', '').replace('thuyết minh', '')
+                                                .replace('Vietsub', '').replace('vietsub', '')
+                                                .replace(/\(\)/g, '').replace(/\[\]/g, '').trim() || server.server_name;
+                                            return (
+                                                <Pressable
+                                                    key={globalIdx}
+                                                    onPress={() => { setSelectedServer(globalIdx); setSelectedEpRange(0); }}
+                                                    style={[
+                                                        styles.selectorPill,
+                                                        isActive && { backgroundColor: 'rgba(244,200,74,0.15)', borderColor: '#F4C84A' }
+                                                    ]}
+                                                >
+                                                    <Text style={[styles.selectorText, isActive && { color: '#F4C84A', fontWeight: '600' }]}>
+                                                        {displayName}
+                                                    </Text>
+                                                </Pressable>
+                                            );
+                                        })}
+                                    </View>
+                                </ScrollView>
+                            )}
+                        </View>
                     )}
 
                     {/* TABS — liquid glass */}
@@ -391,29 +479,29 @@ export default function MovieDetailScreen() {
                                                 style={{ flexGrow: 0 }}
                                                 contentContainerStyle={{ paddingHorizontal: 16, gap: 8, alignItems: 'center', flexGrow: 0 }}
                                             >
-                                            {Array.from({ length: totalGroups }).map((_, i) => {
-                                                const from = i * EP_CHUNK + 1;
-                                                const to = Math.min((i + 1) * EP_CHUNK, currentServerData.length);
-                                                return (
-                                                    <Pressable
-                                                        key={i}
-                                                        onPress={() => setSelectedEpRange(i)}
-                                                        style={[
-                                                            styles.rangeBtn,
-                                                            selectedEpRange === i && styles.rangeBtnActive
-                                                        ]}
-                                                    >
-                                                        <Text
-                                                            style={[styles.rangeBtnText, selectedEpRange === i && styles.rangeBtnTextActive]}
-                                                            numberOfLines={1}
-                                                            adjustsFontSizeToFit
-                                                            minimumFontScale={0.85}
+                                                {Array.from({ length: totalGroups }).map((_, i) => {
+                                                    const from = i * EP_CHUNK + 1;
+                                                    const to = Math.min((i + 1) * EP_CHUNK, currentServerData.length);
+                                                    return (
+                                                        <Pressable
+                                                            key={i}
+                                                            onPress={() => setSelectedEpRange(i)}
+                                                            style={[
+                                                                styles.rangeBtn,
+                                                                selectedEpRange === i && styles.rangeBtnActive
+                                                            ]}
                                                         >
-                                                            {from}–{to}
-                                                        </Text>
-                                                    </Pressable>
-                                                );
-                                            })}
+                                                            <Text
+                                                                style={[styles.rangeBtnText, selectedEpRange === i && styles.rangeBtnTextActive]}
+                                                                numberOfLines={1}
+                                                                adjustsFontSizeToFit
+                                                                minimumFontScale={0.85}
+                                                            >
+                                                                {from}–{to}
+                                                            </Text>
+                                                        </Pressable>
+                                                    );
+                                                })}
                                             </ScrollView>
                                         </View>
                                     );
