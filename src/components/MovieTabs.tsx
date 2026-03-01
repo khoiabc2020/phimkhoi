@@ -124,7 +124,7 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
             <div className="animate-in fade-in duration-300">
                 {/* EPISODES TAB */}
                 {activeTab === "episodes" && (
-                    <div className="bg-[#0B0E14] border border-white/[0.04] rounded-2xl p-6">
+                    <div className="bg-[#08090C] border border-white/[0.05] rounded-[24px] p-6 shadow-2xl">
                         {episodes && episodes.length > 0 ? (
                             <div className="space-y-6">
                                 {/* Language Tabs Row */}
@@ -148,14 +148,14 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
                                                         }
                                                     }}
                                                     className={cn(
-                                                        "flex items-center gap-2 pb-3 text-[13px] font-bold transition-all relative whitespace-nowrap uppercase tracking-wide",
+                                                        "flex items-center gap-2 pb-3 text-[14px] font-bold transition-all relative whitespace-nowrap uppercase tracking-wider",
                                                         isActive ? "text-[#F4C84A]" : "text-gray-500 hover:text-gray-300"
                                                     )}
                                                 >
-                                                    <Icon className={cn("w-[15px] h-[15px]", isActive ? "text-[#F4C84A]" : "text-gray-500")} />
+                                                    <Icon className={cn("w-[16px] h-[16px]", isActive ? "text-[#F4C84A]" : "text-gray-500")} />
                                                     {lang}
                                                     {isActive && (
-                                                        <span className="absolute bottom-[-1px] left-0 right-0 h-[2px] bg-[#F4C84A] shadow-[0_0_8px_rgba(244,200,74,0.5)]" />
+                                                        <span className="absolute bottom-[-1px] left-0 right-0 h-[3px] rounded-t-full bg-[#F4C84A] shadow-[0_0_12px_rgba(244,200,74,0.6)]" />
                                                     )}
                                                 </button>
                                             );
@@ -164,9 +164,9 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
                                 )}
 
                                 {/* Servers Row */}
-                                <div className="flex flex-col sm:flex-row sm:items-center gap-4 border-b border-white/[0.04] pb-6">
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-5 border-b border-white/[0.05] pb-6">
                                     <div className="flex items-center gap-2 text-gray-500 text-[12px] font-bold uppercase tracking-widest min-w-[90px] shrink-0">
-                                        <Database className="w-4 h-4 text-gray-600" />
+                                        <Database className="w-[15px] h-[15px] text-gray-600" strokeWidth={2.5} />
                                         MÁY CHỦ :
                                     </div>
                                     <div className="flex flex-wrap items-center gap-2">
@@ -192,22 +192,22 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
                                                         setCurrentChunk(0);
                                                     }}
                                                     className={cn(
-                                                        "h-[34px] px-4 rounded-lg text-[12px] font-medium transition-all duration-300 border flex items-center gap-3 shadow-sm",
+                                                        "h-[38px] px-5 rounded-full text-[13px] font-bold transition-all duration-300 border flex items-center gap-3 shadow-sm backdrop-blur-md",
                                                         isActive
-                                                            ? "bg-[#F4C84A] border-[#F4C84A] text-[#0B0D12]"
-                                                            : "bg-[#111319] border-white/5 text-gray-400 hover:text-white hover:border-white/10 hover:bg-[#1A1D24]"
+                                                            ? "bg-[#F4C84A] border-[#F4C84A] text-[#08090C] shadow-[0_4px_14px_rgba(244,200,74,0.25)] scale-105 transform"
+                                                            : "bg-white/[0.03] border-white/[0.08] text-[#A1A1AA] hover:text-white hover:border-white/[0.15] hover:bg-white/[0.06] active:scale-95"
                                                     )}
                                                 >
                                                     <span className="truncate max-w-[150px]">{displayName}</span>
                                                     {isActive ? (
                                                         <>
-                                                            <span className="w-[1px] h-3 bg-black/20" />
-                                                            <span className="font-bold">{server.server_data.length}</span>
+                                                            <span className="w-[2px] h-3.5 bg-black/20 rounded-full" />
+                                                            <span className="font-extrabold">{server.server_data.length}</span>
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <span className="w-[1px] h-3 bg-white/10" />
-                                                            <span className="font-medium text-gray-500">#{indexInTab + 1}</span>
+                                                            <span className="w-[2px] h-3.5 bg-white/10 rounded-full" />
+                                                            <span className="font-semibold text-gray-500">#{indexInTab + 1}</span>
                                                         </>
                                                     )}
                                                 </button>
@@ -258,10 +258,10 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
                                             <Link
                                                 key={ep.slug}
                                                 href={`/xem-phim/${slug}/${ep.slug}`}
-                                                className="h-[40px] rounded-lg text-[13px] sm:text-[14px] font-medium flex items-center justify-center gap-2 transition-all border bg-[#111319] border-white/5 text-[#9CA3AF] hover:text-[#E4E4E5] hover:bg-[#15171E] hover:border-white/10 active:scale-95 px-2 truncate"
+                                                className="h-[44px] rounded-[14px] text-[14px] font-semibold flex items-center justify-center gap-2.5 transition-all duration-300 border bg-white/[0.03] border-white/[0.06] backdrop-blur-md text-[#A1A1AA] hover:text-[#E4E4E5] hover:bg-white/[0.08] hover:border-white/[0.12] hover:-translate-y-[1px] active:scale-95 px-2 truncate shadow-sm touch-manipulation"
                                                 title={ep.name}
                                             >
-                                                <PlayCircle className="w-[14px] h-[14px] text-gray-500 shrink-0" strokeWidth={2.5} />
+                                                <PlayCircle className="w-[15px] h-[15px] text-gray-400/70 shrink-0" strokeWidth={2.5} />
                                                 <span>Tập {displayName}</span>
                                             </Link>
                                         );

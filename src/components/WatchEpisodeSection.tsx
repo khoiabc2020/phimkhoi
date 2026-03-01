@@ -94,11 +94,11 @@ export default function WatchEpisodeSection({
     const serverName = activeServerName || servers[0]?.server_name || "VIP";
 
     return (
-        <div className="bg-[#0B0E14] rounded-2xl border border-white/5 overflow-hidden mb-6 sm:mb-8 mt-4 mx-3 sm:mx-4 md:mx-0">
+        <div className="bg-[#08090C] rounded-[24px] border border-white/[0.05] overflow-hidden mb-6 sm:mb-8 mt-4 mx-3 sm:mx-4 md:mx-0 shadow-2xl">
             {/* Header: DANH SÁCH TẬP */}
-            <div className="flex items-center gap-3 px-6 py-4 border-b border-white/5">
+            <div className="flex items-center gap-3 px-6 py-5 border-b border-white/[0.05] bg-white/[0.01]">
                 <List className="w-[18px] h-[18px] text-[#F4C84A]" />
-                <h3 className="text-[14px] font-bold text-white uppercase tracking-wider text-shadow-sm">
+                <h3 className="text-[14px] font-bold text-white uppercase tracking-wider">
                     Danh Sách Tập
                 </h3>
             </div>
@@ -140,14 +140,14 @@ export default function WatchEpisodeSection({
                                         }
                                     }}
                                     className={cn(
-                                        "flex items-center gap-2 pb-3 text-[13px] font-bold transition-all relative whitespace-nowrap uppercase tracking-wide",
+                                        "flex items-center gap-2 pb-3 text-[14px] font-bold transition-all relative whitespace-nowrap uppercase tracking-wider",
                                         isActive ? "text-[#F4C84A]" : "text-gray-500 hover:text-gray-300"
                                     )}
                                 >
-                                    <Icon className={cn("w-[15px] h-[15px]", isActive ? "text-[#F4C84A]" : "text-gray-500")} />
+                                    <Icon className={cn("w-[16px] h-[16px]", isActive ? "text-[#F4C84A]" : "text-gray-500")} />
                                     {lang}
                                     {isActive && (
-                                        <span className="absolute bottom-[-1px] left-0 right-0 h-[2px] bg-[#F4C84A] shadow-[0_0_8px_rgba(244,200,74,0.5)]" />
+                                        <span className="absolute bottom-[-1px] left-0 right-0 h-[3px] rounded-t-full bg-[#F4C84A] shadow-[0_0_12px_rgba(244,200,74,0.6)]" />
                                     )}
                                 </button>
                             );
@@ -156,9 +156,9 @@ export default function WatchEpisodeSection({
                 )}
 
                 {/* Server selector Left-Aligned with Database Icon */}
-                <div className="flex flex-col md:flex-row items-start md:items-center gap-4 mb-8">
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-5 mb-8">
                     <div className="flex items-center gap-2 text-gray-500 text-[12px] font-bold uppercase tracking-widest min-w-[90px] shrink-0">
-                        <Database className="w-4 h-4 text-gray-600" />
+                        <Database className="w-[15px] h-[15px] text-gray-600" strokeWidth={2.5} />
                         Máy Chủ :
                     </div>
 
@@ -186,32 +186,32 @@ export default function WatchEpisodeSection({
                                             setCurrentChunk(0);
                                         }}
                                         className={cn(
-                                            "h-[34px] px-4 rounded-lg text-[12px] font-medium transition-all duration-300 border flex items-center justify-center gap-3 shadow-sm",
+                                            "h-[38px] px-5 rounded-full text-[13px] font-bold transition-all duration-300 border flex items-center justify-center gap-3 shadow-sm backdrop-blur-md",
                                             isServerActive
-                                                ? "bg-[#F4C84A] border-[#F4C84A] text-[#0B0D12]"
-                                                : "bg-[#111319] border-white/5 text-gray-400 hover:text-white hover:border-white/10 hover:bg-[#1A1D24]"
+                                                ? "bg-[#F4C84A] border-[#F4C84A] text-[#08090C] shadow-[0_4px_14px_rgba(244,200,74,0.25)] scale-105 transform"
+                                                : "bg-white/[0.03] border-white/[0.08] text-[#A1A1AA] hover:text-white hover:border-white/[0.15] hover:bg-white/[0.06] active:scale-95"
                                         )}
                                     >
                                         <span className="truncate max-w-[150px]">{displayName}</span>
                                         {isServerActive ? (
                                             <>
-                                                <span className="w-[1px] h-3 bg-black/20"></span>
-                                                <span className="font-bold">{s.server_data.length}</span>
+                                                <span className="w-[2px] h-3.5 bg-black/20 rounded-full" />
+                                                <span className="font-extrabold">{s.server_data.length}</span>
                                             </>
                                         ) : (
                                             <>
-                                                <span className="w-[1px] h-3 bg-white/10"></span>
-                                                <span className="font-medium text-gray-500">#{i + 1}</span>
+                                                <span className="w-[2px] h-3.5 bg-white/10 rounded-full" />
+                                                <span className="font-semibold text-gray-500">{s.server_data.length}</span>
                                             </>
                                         )}
                                     </button>
                                 );
                             })
                         ) : (
-                            <button className="h-[34px] px-4 rounded-lg text-[12px] font-medium bg-[#111319] border border-white/5 text-gray-400 shadow-sm flex items-center justify-center gap-3">
+                            <button className="h-[38px] px-5 rounded-full text-[13px] font-bold bg-white/[0.03] border border-white/[0.08] text-[#A1A1AA] shadow-sm flex items-center justify-center gap-3 backdrop-blur-md">
                                 {serverName}
-                                <span className="w-[1px] h-3 bg-white/10"></span>
-                                <span className="font-medium text-gray-500">#1</span>
+                                <span className="w-[2px] h-3.5 bg-white/10 rounded-full" />
+                                <span className="font-semibold text-gray-500">{episodes.length}</span>
                             </button>
                         )}
                     </div>
@@ -229,7 +229,7 @@ export default function WatchEpisodeSection({
                         {episodes.length > EPISODES_PER_CHUNK && (
                             <div className="relative">
                                 <select
-                                    className="appearance-none bg-[#1A1D24] border border-white/5 text-[#E4E4E5] font-semibold text-[13px] rounded-lg pl-3 pr-9 py-1.5 focus:outline-none focus:border-[#F4C84A]/50 transition-colors cursor-pointer"
+                                    className="appearance-none bg-[#111319] border border-white/[0.08] text-[#E4E4E5] font-semibold text-[13px] rounded-lg pl-4 pr-10 py-2 focus:outline-none focus:border-[#F4C84A]/50 transition-colors cursor-pointer shadow-sm"
                                     value={currentChunk}
                                     onChange={(e) => setCurrentChunk(Number(e.target.value))}
                                 >
@@ -243,7 +243,7 @@ export default function WatchEpisodeSection({
                                         );
                                     })}
                                 </select>
-                                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                                <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                             </div>
                         )}
                     </div>
@@ -286,13 +286,13 @@ export default function WatchEpisodeSection({
                                     key={ep.slug}
                                     href={`/xem-phim/${movieSlug}/${ep.slug}?server=${safeIndex}`}
                                     className={cn(
-                                        "h-[40px] rounded-lg flex items-center justify-center gap-2 text-[13px] sm:text-[14px] font-medium transition-all border touch-manipulation",
+                                        "h-[44px] rounded-[14px] flex items-center justify-center gap-2.5 text-[14px] font-semibold transition-all duration-300 border backdrop-blur-md touch-manipulation",
                                         isActive
-                                            ? "bg-[#111319] border-[#F4C84A] text-[#F4C84A] shadow-[0_0_10px_rgba(244,200,74,0.1)]"
-                                            : "bg-[#111319] border-white/5 text-[#9CA3AF] hover:text-[#E4E4E5] hover:bg-[#15171E] hover:border-white/10 active:scale-95"
+                                            ? "bg-[#F4C84A]/[0.12] border-[#F4C84A]/50 text-[#F4C84A] shadow-[0_4px_20px_rgba(244,200,74,0.1)] scale-100"
+                                            : "bg-white/[0.03] border-white/[0.06] text-[#A1A1AA] hover:text-[#E4E4E5] hover:bg-white/[0.08] hover:border-white/[0.12] hover:-translate-y-[1px] active:scale-95"
                                     )}
                                 >
-                                    <PlayCircle className={isActive ? "w-[14px] h-[14px] text-[#F4C84A]" : "w-[14px] h-[14px] text-gray-500"} strokeWidth={2.5} />
+                                    <PlayCircle className={isActive ? "w-[15px] h-[15px] text-[#F4C84A]" : "w-[15px] h-[15px] text-gray-400/70"} strokeWidth={2.5} />
                                     <span>Tập {displayNum}</span>
                                 </Link>
                             );

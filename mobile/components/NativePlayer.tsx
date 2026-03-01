@@ -951,7 +951,7 @@ const styles = StyleSheet.create({
     epGridItem: {
         height: 40,
         backgroundColor: '#111319',
-        borderRadius: 8,
+        borderRadius: 14,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',

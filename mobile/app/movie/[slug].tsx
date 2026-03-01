@@ -811,7 +811,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 0,
     },
     epCardWrap: {
-        borderRadius: 8,
+        borderRadius: 14,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.05)',
         backgroundColor: '#111319',
