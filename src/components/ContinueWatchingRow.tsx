@@ -92,9 +92,9 @@ function ContinueWatchingRowInner() {
     if (!session || !movies || movies.length === 0) return null;
 
     return (
-        <div className="space-y-4 group relative py-4 container mx-auto px-4 md:px-12">
+        <div className="space-y-4 group relative py-4">
             <div className="flex items-center justify-between">
-                <h2 className="text-lg md:text-xl font-bold text-white flex items-center gap-2">
+                <h2 className="text-lg md:text-xl font-[800] text-white flex items-center gap-2">
                     Xem tiếp của bạn
                     <ChevronRight className="w-4 h-4 text-gray-500" />
                 </h2>

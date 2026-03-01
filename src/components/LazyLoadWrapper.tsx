@@ -43,7 +43,7 @@ export function LazyLoadWrapper({
     }, [threshold, rootMargin]);
 
     return (
-        <div ref={ref} className={cn("min-h-[150px] transition-all duration-500 ease-out", isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4", className)}>
+        <div ref={ref} className={cn("transition-all duration-500 ease-out empty:hidden", isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 min-h-[150px]", className)}>
             {isVisible ? children : (fallback || null)}
         </div>
     );
