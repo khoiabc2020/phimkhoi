@@ -1,9 +1,8 @@
 import dynamic from "next/dynamic";
-import MovieCard from "@/components/MovieCard";
 import { getMovieDetail, getMoviesList } from "@/services/api";
 import { Metadata } from "next";
 import Link from "next/link";
-import { Play, Heart, Share2, Star, Clock, Film } from "lucide-react";
+import { Play, PlayCircle, Share2, Star, Clock, Film } from "lucide-react";
 import FavoriteButton from "@/components/FavoriteButton";
 import { getImageUrl } from "@/lib/utils";
 import Image from "next/image";
@@ -18,9 +17,6 @@ import { searchTMDBMovie, getTMDBDetails, getTMDBImage } from "@/services/tmdb";
 import { isFavorite } from "@/app/actions/favorites";
 import { isInWatchlist } from "@/app/actions/watchlist";
 import WatchlistButton from "@/components/WatchlistButton";
-import AddToPlaylistButton from "@/components/AddToPlaylistButton";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 // Revalidate every 60 seconds for real-time TMDB rating updates
 export const revalidate = 60;
