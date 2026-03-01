@@ -16,7 +16,8 @@ const isTablet = width > 700;
 
 const POSTER_WIDTH = Platform.isTV ? width * 0.35 : (isTablet ? width * 0.4 : width * 0.6);
 const POSTER_HEIGHT = POSTER_WIDTH * 1.30;
-const CAROUSEL_HEIGHT = POSTER_HEIGHT + (Platform.isTV ? 120 : 180);
+// Increased CAROUSEL_HEIGHT to fully encapsulate the poster + infoWrapper (which has -45 margin) + shadows
+const CAROUSEL_HEIGHT = POSTER_HEIGHT + (Platform.isTV ? 120 : 200);
 
 interface HeroSectionProps {
     movies: Movie[];
@@ -242,12 +243,15 @@ const styles = StyleSheet.create({
         height: CAROUSEL_HEIGHT,
         width: '100%',
         marginTop: 20,
+        overflow: 'visible',
     },
     cardContainer: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
         paddingTop: 10,
+        paddingBottom: 25, // Extends space below infoWrapper so drop shadows aren't clipped
+        overflow: 'visible',
     },
     posterWrapper: {
         width: POSTER_WIDTH,

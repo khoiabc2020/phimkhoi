@@ -65,6 +65,31 @@ const combineUrl = (base: string, path: string) => {
     return `${cleanBase}${cleanPath}`;
 };
 
+// --- Ophim Native Extensions ---
+
+export const getOphimCast = async (slug: string) => {
+    try {
+        if (!slug) return [];
+        const res = await fetch(`https://ophim1.com/phim/${slug}/peoples`, { next: { revalidate: 86400 } });
+        const data = await res.json();
+        return data.cast || [];
+    } catch (error) {
+        console.error(`OPhim Web Cast Error [${slug}]:`, error);
+        return [];
+    }
+};
+
+export const getOphimImages = async (slug: string) => {
+    try {
+        if (!slug) return null;
+        const res = await fetch(`https://ophim1.com/phim/${slug}/images`, { next: { revalidate: 86400 } });
+        return await res.json();
+    } catch (error) {
+        console.error(`OPhim Web Images Error [${slug}]:`, error);
+        return null;
+    }
+};
+
 export const getHomeData = async () => {
     try {
         const [phimLe, phimBo, hoatHinh, tvShows] = await Promise.all([

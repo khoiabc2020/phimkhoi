@@ -11,7 +11,7 @@ import { StatusBar } from 'expo-status-bar';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { getMovieDetail, getImageUrl, getRelatedMovies, Movie, getTMDBRating, getTMDBCast, toggleFavorite as apiToggleFavorite } from '@/services/api';
+import { getMovieDetail, getImageUrl, getRelatedMovies, Movie, getTMDBRating, getOphimCast, toggleFavorite as apiToggleFavorite } from '@/services/api';
 import { addFavorite, removeFavorite, isFavorite } from '@/lib/favorites';
 import { addToWatchList, removeFromWatchList, isInWatchList } from '@/lib/watchList';
 import { useAuth } from '@/context/auth';
@@ -125,7 +125,7 @@ export default function MovieDetailScreen() {
                 const [relatedResult, ratingResult, castResult] = await Promise.allSettled([
                     getRelatedMovies(data.movie.category?.[0]?.slug || ''),
                     getTMDBRating(data.movie.name, data.movie.year),
-                    getTMDBCast(data.movie.name, data.movie.year),
+                    getOphimCast(data.movie.slug),
                 ]);
 
                 if (relatedResult.status === 'fulfilled') setRelatedMovies(relatedResult.value);
@@ -591,14 +591,14 @@ export default function MovieDetailScreen() {
                         {selectedTab === 'actors' && (
                             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
                                 {cast.map((actor: any) => (
-                                    <View key={actor.id} style={{ width: '31%', marginBottom: 12 }}>
+                                    <View key={actor.id || actor.name} style={{ width: '31%', marginBottom: 12 }}>
                                         <Image
-                                            source={{ uri: actor.profile_path || 'https://ui-avatars.com/api/?name=' + actor.name }}
+                                            source={{ uri: actor.profile_url || (actor.profile_path ? `https://image.tmdb.org/t/p/w185${actor.profile_path}` : 'https://ui-avatars.com/api/?name=' + actor.name) }}
                                             style={{ width: '100%', aspectRatio: 2 / 3, borderRadius: 8, marginBottom: 4, backgroundColor: '#333' }}
                                             contentFit="cover"
                                         />
                                         <Text numberOfLines={1} style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>{actor.name}</Text>
-                                        <Text numberOfLines={1} style={{ color: 'gray', fontSize: 10 }}>{actor.character}</Text>
+                                        <Text numberOfLines={1} style={{ color: 'gray', fontSize: 11 }}>{actor.character}</Text>
                                     </View>
                                 ))}
                                 {cast.length === 0 && <Text style={{ color: 'gray', textAlign: 'center', width: '100%', marginTop: 20 }}>Đang cập nhật diễn viên...</Text>}

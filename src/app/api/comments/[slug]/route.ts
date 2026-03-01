@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { getToken } from "next-auth/jwt";
 import dbConnect from "@/lib/db";
 import Comment from "@/models/Comment";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -21,8 +22,25 @@ export async function GET(req: Request, { params }: { params: Promise<{ slug: st
 export async function POST(req: Request, { params }: { params: Promise<{ slug: string }> }) {
     try {
         const { slug } = await params;
+
+        // 1. Try session (Web)
         const session = await getServerSession(authOptions);
-        if (!session || !session.user) {
+        let user = session?.user;
+
+        // 2. Try JWT Bearer flow (Mobile)
+        if (!user) {
+            const token = await getToken({ req: req as any, secret: process.env.NEXTAUTH_SECRET });
+            if (token) {
+                user = {
+                    id: token.id as string,
+                    name: token.name as string,
+                    image: token.picture as string,
+                    email: token.email as string
+                };
+            }
+        }
+
+        if (!user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
@@ -33,9 +51,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
 
         await dbConnect();
         const comment = await Comment.create({
-            userId: session.user.id, // Ensure your session callback adds 'id' to user
-            userName: session.user.name,
-            userImage: session.user.image,
+            userId: user.id || user.email, // fallback if id is somehow missing
+            userName: user.name,
+            userImage: user.image,
             movieSlug: slug,
             content,
         });
