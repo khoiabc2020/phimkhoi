@@ -1,14 +1,13 @@
 import React, { useState, useCallback } from 'react';
 import {
     View, Text, TextInput, FlatList, TouchableOpacity,
-    StyleSheet, ActivityIndicator, Image, Pressable
+    StyleSheet, ActivityIndicator, Image, Pressable, ScrollView
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import { CONFIG } from '@/constants/config';
-import { searchMovies } from '@/services/api';
+import { searchMovies, searchActors, getImageUrl } from '@/services/api';
 
 interface SearchResult {
     _id: string;
@@ -24,6 +23,7 @@ export default function SearchScreen() {
     const router = useRouter();
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<SearchResult[]>([]);
+    const [actorResults, setActorResults] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [searched, setSearched] = useState(false);
 
@@ -31,16 +31,22 @@ export default function SearchScreen() {
         setQuery(text);
         if (text.trim().length < 2) {
             setResults([]);
+            setActorResults([]);
             setSearched(false);
             return;
         }
         setLoading(true);
         setSearched(true);
         try {
-            const items = await searchMovies(text.trim());
+            const [items, actors] = await Promise.all([
+                searchMovies(text.trim()),
+                searchActors(text.trim())
+            ]);
             setResults(items);
+            setActorResults(actors);
         } catch (e) {
             setResults([]);
+            setActorResults([]);
         } finally {
             setLoading(false);
         }
@@ -108,7 +114,7 @@ export default function SearchScreen() {
                 <View style={styles.center}>
                     <ActivityIndicator size="large" color="#fbbf24" />
                 </View>
-            ) : searched && results.length === 0 ? (
+            ) : searched && results.length === 0 && actorResults.length === 0 ? (
                 <View style={styles.center}>
                     <Ionicons name="search-outline" size={56} color="rgba(255,255,255,0.15)" />
                     <Text style={styles.emptyTitle}>Không tìm thấy kết quả</Text>
@@ -128,8 +134,43 @@ export default function SearchScreen() {
                     contentContainerStyle={{ paddingBottom: 40, paddingTop: 8 }}
                     showsVerticalScrollIndicator={false}
                     ItemSeparatorComponent={() => <View style={styles.separator} />}
+                    ListHeaderComponent={actorResults.length > 0 ? (
+                        <View style={{ paddingHorizontal: 16, paddingTop: 12, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)', marginBottom: 4 }}>
+                            <Text style={{ color: '#F4C84A', fontSize: 11, fontWeight: '700', letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 12 }}>
+                                Diễn viên / Đạo diễn
+                            </Text>
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 16 }}>
+                                {actorResults.map((actor) => {
+                                    const profileImg = actor.profile_path
+                                        ? `https://image.tmdb.org/t/p/w185${actor.profile_path}`
+                                        : null;
+                                    return (
+                                        <TouchableOpacity
+                                            key={actor.id}
+                                            onPress={() => router.push(`/movie/${encodeURIComponent(actor.name)}` as any)}
+                                            style={{ alignItems: 'center', width: 68 }}
+                                        >
+                                            <View style={{ width: 60, height: 60, borderRadius: 30, overflow: 'hidden', borderWidth: 2, borderColor: 'rgba(244,200,74,0.4)', backgroundColor: '#1e293b', marginBottom: 6 }}>
+                                                {profileImg ? (
+                                                    <Image source={{ uri: profileImg }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+                                                ) : (
+                                                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                                                        <Ionicons name="person" size={24} color="#475569" />
+                                                    </View>
+                                                )}
+                                            </View>
+                                            <Text numberOfLines={2} style={{ color: 'rgba(255,255,255,0.8)', fontSize: 10, fontWeight: '600', textAlign: 'center' }}>
+                                                {actor.name}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    );
+                                })}
+                            </ScrollView>
+                        </View>
+                    ) : null}
                 />
             )}
+
         </SafeAreaView>
     );
 }

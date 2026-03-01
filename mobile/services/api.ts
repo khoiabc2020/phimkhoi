@@ -499,8 +499,7 @@ export const toggleFavorite = async (movie: Movie, isFav: boolean, token?: strin
     }
 };
 
-// TMDB Integration
-const TMDB_API_KEY = "dae5842ebb3cb34367b94550aae10cf3"; // Direct use for mobile to avoid env issues
+// TMDB Integration (key defined above)
 
 export const getTMDBRating = async (query: string, year?: number, type: 'movie' | 'tv' = 'movie') => {
     try {

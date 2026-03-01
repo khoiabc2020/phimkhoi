@@ -24,7 +24,8 @@ const ProfileMenuItem = ({ icon, label, onPress, isDestructive = false }: any) =
 );
 
 export default function ProfileScreen() {
-  const webUrl = 'http://18.141.25.244';
+  const webUrl = 'https://khoiphim.io.vn';
+
   const { user, logout } = useAuth();
   const router = useRouter();
 

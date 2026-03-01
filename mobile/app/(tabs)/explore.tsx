@@ -1,4 +1,5 @@
-import { View, Text, TextInput, Pressable, Dimensions, FlatList, Modal, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, Pressable, Dimensions, FlatList, Modal, ScrollView, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
@@ -268,36 +269,52 @@ export default function ExploreScreen() {
     );
 
     return (
-      <View className="px-4 pb-24">
+      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 120 }}>
         {searchHistory.length > 0 && (
-          <View className="mb-6 mt-2">
-            <View className="flex-row justify-between items-center mb-3">
-              <Text className="text-white text-base font-bold">Lịch sử tìm kiếm</Text>
-              <Pressable onPress={clearHistory}>
-                <Text className="text-gray-400 text-xs">Xóa lịch sử</Text>
+          <View style={{ marginBottom: 24, marginTop: 4 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' }}>
+                Lịch sử tìm kiếm
+              </Text>
+              <Pressable onPress={clearHistory} hitSlop={10}>
+                <Text style={{ color: '#F4C84A', fontSize: 12, fontWeight: '600' }}>Xóa tất cả</Text>
               </Pressable>
             </View>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-              {searchHistory.map((item, index) => (
+            {searchHistory.map((item, index) => (
+              <Pressable
+                key={index}
+                onPress={() => setSearch(item)}
+                style={({ pressed }) => ({
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingVertical: 12,
+                  paddingHorizontal: 4,
+                  borderBottomWidth: StyleSheet.hairlineWidth,
+                  borderBottomColor: 'rgba(255,255,255,0.06)',
+                  opacity: pressed ? 0.6 : 1,
+                })}
+              >
+                <Ionicons name="time-outline" size={16} color="#475569" style={{ marginRight: 12 }} />
+                <Text style={{ flex: 1, color: 'rgba(255,255,255,0.75)', fontSize: 14 }}>{item}</Text>
                 <Pressable
-                  key={index}
                   onPress={() => setSearch(item)}
-                  className="bg-[#1e293b] px-4 py-2 rounded-full border border-gray-700 flex-row items-center gap-2"
+                  hitSlop={10}
                 >
-                  <Ionicons name="time-outline" size={14} color="#94a3b8" />
-                  <Text className="text-gray-300 text-sm">{item}</Text>
+                  <Ionicons name="arrow-up-outline" size={16} color="#475569" style={{ transform: [{ rotate: '45deg' }] }} />
                 </Pressable>
-              ))}
-            </View>
+              </Pressable>
+            ))}
           </View>
         )}
-        <Text className="text-white text-base font-bold mb-4 mt-2">Được tìm kiếm nhiều</Text>
+        <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 12, marginTop: 4 }}>
+          Đề xuất phổ biến
+        </Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: ITEM_SPACING }}>
           {hotMovies.map((item, index) => (
             <HotMovieItem key={item._id || index} item={item} index={index} />
           ))}
         </View>
-      </View>
+      </ScrollView>
     );
   };
 
