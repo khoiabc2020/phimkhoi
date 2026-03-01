@@ -260,6 +260,23 @@ export const searchMovies = async (keyword: string, limit = 20) => {
     }
 };
 
+const TMDB_API_KEY = "dae5842ebb3cb34367b94550aae10cf3";
+
+export const searchActors = async (keyword: string): Promise<any[]> => {
+    if (!keyword || keyword.trim().length < 2) return [];
+    try {
+        const res = await fetch(
+            `https://api.themoviedb.org/3/search/person?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(keyword)}&language=vi-VN&page=1`
+        );
+        if (!res.ok) return [];
+        const data = await res.json();
+        return (data.results || []).slice(0, 8);
+    } catch (error) {
+        console.error("Error searching actors:", error);
+        return [];
+    }
+};
+
 export const getImageUrl = (url?: string) => {
     if (!url) return 'https://via.placeholder.com/300x450?text=No+Image';
 

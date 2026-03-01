@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { searchMovies, Movie, getHomeData, getImageUrl, getMenuData } from '@/services/api';
+import { searchMovies, searchActors, Movie, getHomeData, getImageUrl, getMenuData } from '@/services/api';
 import { Image } from 'expo-image';
 import { StatusBar } from 'expo-status-bar';
 
@@ -57,6 +57,7 @@ export default function ExploreScreen() {
   const router = useRouter();
   const [search, setSearch] = useState('');
   const [searchResults, setSearchResults] = useState<Movie[]>([]);
+  const [actorResults, setActorResults] = useState<any[]>([]);
   const [searching, setSearching] = useState(false);
   const [hotMovies, setHotMovies] = useState<Movie[]>([]);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
@@ -88,13 +89,19 @@ export default function ExploreScreen() {
   useEffect(() => {
     if (!search.trim()) {
       setSearchResults([]);
+      setActorResults([]);
       return;
     }
     const timer = setTimeout(async () => {
       setSearching(true);
       const query = search.trim();
-      const results = await searchMovies(query, 40); // Fetch more to allow aggressive client-side filtering
+      // Fetch movies and actors concurrently for best performance
+      const [results, actors] = await Promise.all([
+        searchMovies(query, 40),
+        searchActors(query)
+      ]);
       setSearchResults(results);
+      setActorResults(actors);
       setSearching(false);
 
       if (query.length > 1) {
@@ -102,7 +109,7 @@ export default function ExploreScreen() {
           let history = data ? JSON.parse(data) : [];
           history = history.filter((item: string) => item.toLowerCase() !== query.toLowerCase());
           history.unshift(query);
-          if (history.length > 10) history.pop(); // Keep top 10
+          if (history.length > 10) history.pop();
           setSearchHistory(history);
           AsyncStorage.setItem('search_history', JSON.stringify(history));
         });
@@ -138,10 +145,61 @@ export default function ExploreScreen() {
 
   const renderHeader = () => (
     <View className="px-4 mb-4">
-      <Text className="text-white text-lg font-bold mb-1">Kết quả tìm kiếm</Text>
-      <Text className="text-gray-400 text-xs mb-4">
-        Tìm thấy {filteredResults.length} kết quả {searchResults.length !== filteredResults.length && `(từ ${searchResults.length} phim gốc)`}
+      {/* Actor results horizontal row */}
+      {actorResults.length > 0 && (
+        <View className="mb-5">
+          <Text className="text-white text-sm font-bold mb-3" style={{ color: '#F4C84A' }}>
+            Diễn viên / Đạo diễn
+          </Text>
+          <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            data={actorResults}
+            keyExtractor={(actor) => actor.id?.toString()}
+            contentContainerStyle={{ gap: 14 }}
+            renderItem={({ item: actor }) => {
+              const profileImg = actor.profile_path
+                ? `https://image.tmdb.org/t/p/w185${actor.profile_path}`
+                : null;
+              return (
+                <Pressable
+                  onPress={() => router.push(`/movie/${encodeURIComponent(actor.name)}` as any)}
+                  style={{ alignItems: 'center', width: 72 }}
+                >
+                  <View style={{
+                    width: 64, height: 64, borderRadius: 32,
+                    overflow: 'hidden', borderWidth: 2,
+                    borderColor: 'rgba(244,200,74,0.4)',
+                    backgroundColor: '#1e293b', marginBottom: 6
+                  }}>
+                    {profileImg ? (
+                      <Image source={{ uri: profileImg }} style={{ width: '100%', height: '100%' }} contentFit="cover" />
+                    ) : (
+                      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                        <Ionicons name="person" size={28} color="#475569" />
+                      </View>
+                    )}
+                  </View>
+                  <Text numberOfLines={2} style={{ color: 'white', fontSize: 10, fontWeight: '600', textAlign: 'center' }}>
+                    {actor.name}
+                  </Text>
+                  <Text numberOfLines={1} style={{ color: '#94a3b8', fontSize: 9, textAlign: 'center' }}>
+                    {actor.known_for_department === 'Acting' ? 'Diễn viên' : actor.known_for_department}
+                  </Text>
+                </Pressable>
+              );
+            }}
+          />
+        </View>
+      )}
+      <Text className="text-white text-sm font-bold mb-1">
+        {filteredResults.length > 0 ? 'Phim' : 'Kết quả tìm kiếm'}
       </Text>
+      {filteredResults.length > 0 && (
+        <Text className="text-gray-400 text-xs mb-3">
+          Tìm thấy {filteredResults.length} phim {searchResults.length !== filteredResults.length && `(từ ${searchResults.length} gốc)`}
+        </Text>
+      )}
     </View>
   );
 
@@ -153,11 +211,59 @@ export default function ExploreScreen() {
       </View>
     );
 
-    if (search.trim() && filteredResults.length === 0) return (
+    if (search.trim() && filteredResults.length === 0 && actorResults.length === 0) return (
       <View className="items-center justify-center mt-20 px-6">
         <Ionicons name="search-outline" size={60} color="#334155" />
         <Text className="text-white text-lg font-bold mt-4 mb-2">Không tìm thấy kết quả</Text>
         <Text className="text-gray-400 text-center">Thử thay đổi từ khóa hoặc điều chỉnh bộ lọc để xem các phim khác xem sao nhé.</Text>
+      </View>
+    );
+
+    // Only actors found but no movies - show actor section with empty movie note
+    if (search.trim() && filteredResults.length === 0 && actorResults.length > 0) return (
+      <View className="px-4 mt-4">
+        <Text style={{ color: '#F4C84A', fontSize: 13, fontWeight: '700', marginBottom: 12 }}>Diễn viên / Đạo diễn</Text>
+        <FlatList
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          data={actorResults}
+          keyExtractor={(actor) => actor.id?.toString()}
+          contentContainerStyle={{ gap: 14, paddingBottom: 12 }}
+          renderItem={({ item: actor }) => {
+            const profileImg = actor.profile_path
+              ? `https://image.tmdb.org/t/p/w185${actor.profile_path}`
+              : null;
+            return (
+              <Pressable
+                onPress={() => router.push(`/movie/${encodeURIComponent(actor.name)}` as any)}
+                style={{ alignItems: 'center', width: 80 }}
+              >
+                <View style={{
+                  width: 72, height: 72, borderRadius: 36, overflow: 'hidden',
+                  borderWidth: 2, borderColor: 'rgba(244,200,74,0.5)',
+                  backgroundColor: '#1e293b', marginBottom: 8
+                }}>
+                  {profileImg ? (
+                    <Image source={{ uri: profileImg }} style={{ width: '100%', height: '100%' }} contentFit="cover" />
+                  ) : (
+                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                      <Ionicons name="person" size={32} color="#475569" />
+                    </View>
+                  )}
+                </View>
+                <Text numberOfLines={2} style={{ color: 'white', fontSize: 11, fontWeight: '600', textAlign: 'center' }}>
+                  {actor.name}
+                </Text>
+                <Text numberOfLines={1} style={{ color: '#94a3b8', fontSize: 9, textAlign: 'center', marginTop: 2 }}>
+                  {actor.known_for_department === 'Acting' ? 'Diễn viên' : actor.known_for_department}
+                </Text>
+              </Pressable>
+            );
+          }}
+        />
+        <Text style={{ color: '#475569', fontSize: 12, marginTop: 12, textAlign: 'center' }}>
+          Không có phim khớp với từ khóa này
+        </Text>
       </View>
     );
 
@@ -242,7 +348,7 @@ export default function ExploreScreen() {
         </View>
 
         {/* Content: Either Search Results FlatList or Default Views */}
-        {search.trim() && filteredResults.length > 0 ? (
+        {search.trim() && (filteredResults.length > 0 || actorResults.length > 0) ? (
           <FlatList
             data={filteredResults}
             keyExtractor={(item, index) => item._id || index.toString()}
