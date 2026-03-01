@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
 import Movie from "@/models/Movie";
@@ -19,14 +19,35 @@ const verifyToken = (req: Request) => {
     }
 };
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
     try {
-        const userPayload = verifyToken(req);
+        const userPayload = verifyToken(req as any);
         if (!userPayload) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
         await dbConnect();
+
+        const searchParams = req.nextUrl.searchParams;
+        const movieSlug = searchParams.get("movieSlug");
+        const episodeSlug = searchParams.get("episodeSlug");
+
+        if (movieSlug && episodeSlug) {
+            // Fetch history for a specific episode to auto-resume
+            const history = await WatchHistory.findOne({
+                userId: userPayload.id,
+                movieSlug: movieSlug,
+                episodeSlug: episodeSlug,
+            }).lean();
+
+            return NextResponse.json({
+                history: history ? {
+                    progress: history.progress,
+                    currentTime: history.currentTime || 0,
+                    duration: history.duration || 0,
+                } : null
+            });
+        }
 
         // Dùng aggregation để dedupe: chỉ lấy tập mới nhất mỗi phim (giống web getContinueWatching)
         const history = await WatchHistory.aggregate([

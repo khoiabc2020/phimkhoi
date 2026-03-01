@@ -18,6 +18,7 @@ import { CONFIG } from '@/constants/config';
 import { COLORS, BLUR } from '@/constants/theme';
 import { BlurView } from 'expo-blur';
 import { addDownload, getDownloads } from '@/lib/downloads';
+import CommentSection from '@/components/CommentSection';
 
 // Episode grid — iOS 26: gap 6dp, 5 cột, box 40dp, viền 1dp tinh tế
 const EP_GAP = 6;
@@ -45,6 +46,7 @@ const TABS = [
     { id: 'episodes', label: 'Tập phim' },
     { id: 'related', label: 'Đề xuất' },
     { id: 'actors', label: 'Diễn viên' },
+    { id: 'comments', label: 'Bình luận' },
 ];
 
 export default function MovieDetailScreen() {
@@ -576,6 +578,12 @@ export default function MovieDetailScreen() {
                                     </View>
                                 ))}
                                 {cast.length === 0 && <Text style={{ color: 'gray', textAlign: 'center', width: '100%', marginTop: 20 }}>Đang cập nhật diễn viên...</Text>}
+                            </View>
+                        )}
+
+                        {selectedTab === 'comments' && (
+                            <View style={{ paddingBottom: 20 }}>
+                                <CommentSection movieSlug={slug as string} />
                             </View>
                         )}
 

@@ -1,145 +1,251 @@
-import { View, Text, TextInput, Pressable, FlatList, Image, Alert, ActivityIndicator } from 'react-native';
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/context/auth';
-import { CONFIG } from '@/constants/config';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { format } from 'date-fns';
+import { getComments, postComment } from '@/services/api';
+import { useAuth } from '@/context/auth';
+import { COLORS } from '@/constants/theme';
+import { useRouter } from 'expo-router';
 
 interface Comment {
     _id: string;
-    userId: {
-        _id: string;
-        name: string;
-        image?: string;
-    };
+    userId: string;
+    userName: string;
+    userImage?: string;
     content: string;
     createdAt: string;
 }
 
-interface CommentSectionProps {
-    slug: string;
-}
-
-export default function CommentSection({ slug }: CommentSectionProps) {
-    const { user, token } = useAuth();
+export default function CommentSection({ movieSlug }: { movieSlug: string }) {
     const [comments, setComments] = useState<Comment[]>([]);
-    const [content, setContent] = useState('');
     const [loading, setLoading] = useState(true);
-    const [submitting, setSubmitting] = useState(false);
+    const [posting, setPosting] = useState(false);
+    const [content, setContent] = useState('');
+    const { user, token } = useAuth();
+    const router = useRouter();
 
     const fetchComments = async () => {
-        try {
-            const res = await fetch(`${CONFIG.BACKEND_URL}/api/comments/${slug}`);
-            const data = await res.json();
-            if (data.success) {
-                setComments(data.data);
-            }
-        } catch (error) {
-            console.error("Fetch comments error:", error);
-        } finally {
-            setLoading(false);
-        }
+        setLoading(true);
+        const data = await getComments(movieSlug);
+        setComments(data);
+        setLoading(false);
     };
 
     useEffect(() => {
-        fetchComments();
-    }, [slug]);
+        if (movieSlug) fetchComments();
+    }, [movieSlug]);
 
-    const handlePostComment = async () => {
-        if (!user || !token) {
-            Alert.alert("Thông báo", "Vui lòng đăng nhập để bình luận");
-            return;
-        }
+    const handlePost = async () => {
         if (!content.trim()) return;
-
-        setSubmitting(true);
-        try {
-            const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/comments`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({ slug, content: content.trim() })
-            });
-            const data = await res.json();
-            if (data.success) {
-                setContent('');
-                fetchComments(); // Refresh
-            } else {
-                Alert.alert("Lỗi", data.message || "Không thể gửi bình luận");
-            }
-        } catch (error) {
-            Alert.alert("Lỗi", "Có lỗi xảy ra");
-        } finally {
-            setSubmitting(false);
+        setPosting(true);
+        const res = await postComment(movieSlug, content, token);
+        if (res.error) {
+            alert(res.error);
+        } else if (res.comment) {
+            setComments([res.comment, ...comments]);
+            setContent('');
         }
+        setPosting(false);
     };
 
-    return (
-        <View className="mt-6 px-4 pb-10">
-            <Text className="text-white text-lg font-bold mb-4">Bình luận ({comments.length})</Text>
+    const formatDate = (dateString: string) => {
+        const d = new Date(dateString);
+        return d.toLocaleDateString('vi-VN') + ' ' + d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    };
 
-            {/* Input */}
-            <View className="flex-row items-center mb-6">
-                <View className="w-10 h-10 rounded-full bg-gray-700 justify-center items-center overflow-hidden mr-3">
-                    {user?.image ? (
-                        <Image source={{ uri: user.image }} style={{ width: '100%', height: '100%' }} />
-                    ) : (
-                        <Ionicons name="person" size={20} color="#9ca3af" />
-                    )}
-                </View>
-                <View className="flex-1 flex-row bg-gray-900 rounded-full px-4 py-2 border border-gray-800 focus:border-yellow-500 items-center">
-                    <TextInput
-                        value={content}
-                        onChangeText={setContent}
-                        placeholder={user ? "Viết bình luận..." : "Đăng nhập để bình luận"}
-                        placeholderTextColor="#6b7280"
-                        className="flex-1 text-white py-2"
-                        editable={!!user}
-                        multiline
-                    />
-                    {content.length > 0 && (
-                        <Pressable onPress={handlePostComment} disabled={submitting}>
-                            {submitting ? (
-                                <ActivityIndicator size="small" color="#fbbf24" />
-                            ) : (
-                                <Ionicons name="send" size={20} color="#fbbf24" />
-                            )}
-                        </Pressable>
-                    )}
-                </View>
+    if (loading) {
+        return (
+            <View style={{ padding: 20, alignItems: 'center' }}>
+                <ActivityIndicator size="small" color={COLORS.accent} />
             </View>
+        );
+    }
 
-            {/* List */}
-            {loading ? (
-                <ActivityIndicator color="#fbbf24" />
-            ) : comments.length > 0 ? (
-                <View>
-                    {comments.map((item) => (
-                        <View key={item._id} className="flex-row mb-4">
-                            <View className="w-10 h-10 rounded-full bg-gray-800 justify-center items-center overflow-hidden mr-3 border border-gray-700">
-                                {item.userId?.image ? (
-                                    <Image source={{ uri: item.userId.image }} style={{ width: '100%', height: '100%' }} />
-                                ) : (
-                                    <Text className="text-gray-400 font-bold text-xs">
-                                        {item.userId?.name?.charAt(0).toUpperCase() || '?'}
-                                    </Text>
-                                )}
-                            </View>
-                            <View className="flex-1">
-                                <View className="flex-row items-center mb-1">
-                                    <Text className="text-gray-300 font-bold text-sm mr-2">{item.userId?.name || 'Vô danh'}</Text>
-                                    <Text className="text-gray-500 text-xs">{format(new Date(item.createdAt), 'dd/MM/yyyy HH:mm')}</Text>
-                                </View>
-                                <Text className="text-gray-400 text-sm leading-5">{item.content}</Text>
-                            </View>
-                        </View>
-                    ))}
+    return (
+        <View style={styles.container}>
+            {user ? (
+                <View style={styles.inputContainer}>
+                    <Image
+                        source={{ uri: user.avatar || 'https://ui-avatars.com/api/?name=' + user.fullName || user.username }}
+                        style={styles.avatar}
+                    />
+                    <View style={styles.inputWrapper}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Thêm bình luận..."
+                            placeholderTextColor="#9CA3AF"
+                            value={content}
+                            onChangeText={setContent}
+                            multiline
+                            maxLength={500}
+                        />
+                        <TouchableOpacity
+                            style={[styles.postButton, (!content.trim() || posting) && styles.postButtonDisabled]}
+                            onPress={handlePost}
+                            disabled={!content.trim() || posting}
+                        >
+                            {posting ? <ActivityIndicator size="small" color="#000" /> : <Ionicons name="send" size={16} color="#000" />}
+                        </TouchableOpacity>
+                    </View>
                 </View>
             ) : (
-                <Text className="text-gray-500 text-center italic">Chưa có bình luận nào. Hãy là người đầu tiên!</Text>
+                <View style={styles.loginPrompt}>
+                    <Text style={styles.loginText}>Vui lòng đăng nhập để bình luận</Text>
+                    <TouchableOpacity style={styles.loginButton} onPress={() => router.push('/login')}>
+                        <Text style={styles.loginButtonText}>Đăng nhập</Text>
+                    </TouchableOpacity>
+                </View>
             )}
+
+            <View style={styles.commentList}>
+                <Text style={styles.commentCount}>{comments.length} bình luận</Text>
+                {comments.length === 0 ? (
+                    <Text style={styles.noComments}>Chưa có bình luận nào. Hãy là người đầu tiên!</Text>
+                ) : (
+                    comments.map(comment => (
+                        <View key={comment._id} style={styles.commentItem}>
+                            <Image
+                                source={{ uri: comment.userImage || 'https://ui-avatars.com/api/?name=' + comment.userName }}
+                                style={styles.commentAvatar}
+                            />
+                            <View style={styles.commentContent}>
+                                <View style={styles.commentHeader}>
+                                    <Text style={styles.commentName}>{comment.userName}</Text>
+                                    <Text style={styles.commentDate}>{formatDate(comment.createdAt)}</Text>
+                                </View>
+                                <Text style={styles.commentText}>{comment.content}</Text>
+                            </View>
+                        </View>
+                    ))
+                )}
+            </View>
         </View>
     );
 }
+
+const styles = StyleSheetcreate({
+    container: {
+        marginTop: 10,
+    },
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        marginBottom: 20,
+        gap: 12,
+    },
+    avatar: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: '#333',
+    },
+    inputWrapper: {
+        flex: 1,
+        backgroundColor: '#1C1C1E',
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+        paddingRight: 8,
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    input: {
+        flex: 1,
+        minHeight: 44,
+        maxHeight: 120,
+        color: 'white',
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        fontSize: 14,
+    },
+    postButton: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        backgroundColor: COLORS.accent,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    postButtonDisabled: {
+        backgroundColor: '#4B5563',
+    },
+    loginPrompt: {
+        backgroundColor: '#1C1C1E',
+        padding: 16,
+        borderRadius: 12,
+        alignItems: 'center',
+        marginBottom: 20,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+    },
+    loginText: {
+        color: '#D1D5DB',
+        marginBottom: 12,
+        fontSize: 14,
+    },
+    loginButton: {
+        backgroundColor: COLORS.accent,
+        paddingHorizontal: 20,
+        paddingVertical: 8,
+        borderRadius: 8,
+    },
+    loginButtonText: {
+        color: '#000',
+        fontWeight: 'bold',
+        fontSize: 14,
+    },
+    commentList: {
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(255,255,255,0.1)',
+        paddingTop: 16,
+    },
+    commentCount: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 16,
+        marginBottom: 16,
+    },
+    noComments: {
+        color: '#9CA3AF',
+        textAlign: 'center',
+        fontStyle: 'italic',
+        marginTop: 20,
+    },
+    commentItem: {
+        flexDirection: 'row',
+        marginBottom: 20,
+        gap: 12,
+    },
+    commentAvatar: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: '#333',
+    },
+    commentContent: {
+        flex: 1,
+        backgroundColor: '#1C1C1E',
+        padding: 12,
+        borderRadius: 12,
+        borderTopLeftRadius: 0,
+    },
+    commentHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'baseline',
+        marginBottom: 6,
+    },
+    commentName: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 14,
+    },
+    commentDate: {
+        color: '#6B7280',
+        fontSize: 11,
+    },
+    commentText: {
+        color: '#D1D5DB',
+        fontSize: 14,
+        lineHeight: 20,
+    },
+});

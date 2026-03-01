@@ -219,6 +219,52 @@ export const getHistory = async (token?: string) => {
     }
 };
 
+export const getHistoryForEpisode = async (movieSlug: string, episodeSlug: string, token?: string) => {
+    try {
+        if (!token) return null;
+        const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/history?movieSlug=${movieSlug}&episodeSlug=${episodeSlug}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) return null;
+        const data = await res.json();
+        return data.history || null; // Returns { progress, currentTime, duration }
+    } catch (error) {
+        console.error("Error getting episode history:", error);
+        return null;
+    }
+};
+
+export const getComments = async (slug: string) => {
+    try {
+        const res = await fetch(`${CONFIG.BACKEND_URL}/api/comments/${slug}`);
+        if (!res.ok) return [];
+        const data = await res.json();
+        return data.comments || [];
+    } catch (error) {
+        console.error(`Error fetching comments for [${slug}]:`, error);
+        return [];
+    }
+};
+
+export const postComment = async (slug: string, content: string, token?: string) => {
+    try {
+        if (!token) return { error: "Unauthorized" };
+        const res = await fetch(`${CONFIG.BACKEND_URL}/api/comments/${slug}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ content })
+        });
+        const data = await res.json();
+        return data;
+    } catch (error) {
+        console.error(`Error posting comment for [${slug}]:`, error);
+        return { error: "Lỗi kết nối" };
+    }
+};
+
 export const getFavorites = async (token?: string) => {
     try {
         if (!token) return [];

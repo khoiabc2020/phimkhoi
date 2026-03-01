@@ -82,6 +82,7 @@ export default function NativePlayer({
     // Update video source when prop changes
     useEffect(() => {
         setVideoSource({ uri: url });
+        initialSeekDone.current = false;
     }, [url]);
 
     // Cho phép video tiếp tục phát khi app vào nền (cần cho PiP Android)

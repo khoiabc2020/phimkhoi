@@ -4,7 +4,7 @@ import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import { WebView } from 'react-native-webview';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { getMovieDetail, saveHistory } from '@/services/api';
+import { getMovieDetail, saveHistory, getHistoryForEpisode } from '@/services/api';
 import { getLocalPlayUri } from '@/lib/downloads';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -30,6 +30,7 @@ export default function PlayerScreen() {
     const [episodes, setEpisodes] = useState<any[]>([]); // all servers including empty
     const [selectedServer, setSelectedServer] = useState(server ? Number(server) : 0);
     const [pipSize, setPipSize] = useState<PipSizeKey>('medium');
+    const [initialTime, setInitialTime] = useState(0);
 
     // Derived: only non-empty servers for the player UI
     const nonEmptyEpisodes = episodes.filter(s => s.server_data && s.server_data.length > 0);
@@ -122,10 +123,17 @@ export default function PlayerScreen() {
                 setMovieTitle(data.movie?.name || "");
                 applyEpisode(data, selectedServer, ep);
             }
+
+            // Fetch initial resume time if logged in
+            if (token && slug && ep && !useLocal) {
+                const hist = await getHistoryForEpisode(slug as string, ep as string, token);
+                setInitialTime(hist?.currentTime ? hist.currentTime * 1000 : 0);
+            }
+
             setLoading(false);
         };
         fetchVideo();
-    }, [slug, ep, selectedServer, localUriParam, applyEpisode]);
+    }, [slug, ep, selectedServer, localUriParam, applyEpisode, token]);
 
     const handleProgress = async (currentTime: number, duration: number) => {
         if (!user || !token || !slug || !ep) return;
@@ -169,8 +177,7 @@ export default function PlayerScreen() {
         );
     }
 
-    const currentHistory = user?.history?.find((h: any) => h.slug === slug && h.episode === ep);
-    const initialTime = currentHistory?.currentTime ? currentHistory.currentTime * 1000 : 0;
+    // Remove the old synchronous calculation since we now have `initialTime` state from `getHistoryForEpisode`
 
     return (
         <View className="flex-1 bg-black relative">
