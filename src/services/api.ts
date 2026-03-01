@@ -572,81 +572,138 @@ export const getMenuData = async () => {
 
 export const getMoviesByActor = async (actorName: string, page: number = 1, limit: number = 24) => {
     try {
-        // Search by actor using the standard keyword search since there is no direct actor endpoint
-        // Then manually filter the array to ensure the actor is actually in the cast list
-        const keyword = encodeURIComponent(actorName);
-        const [kkRes, ophimRes] = await Promise.allSettled([
-            fetch(`${API_URL}/v1/api/tim-kiem?keyword=${keyword}&limit=100`, { next: { revalidate: 3600 } }).then(r => r.json()),
-            fetch(`${OPHIM_API}/v1/api/tim-kiem?keyword=${keyword}&limit=100`, { next: { revalidate: 3600 } }).then(r => r.json())
-        ]);
+        const TMDB_KEY = process.env.TMDB_API_KEY;
+        let searchNames: string[] = [actorName];
+        let tmdbCreditTitles: string[] = [];
 
-        let items: Movie[] = [];
+        // Phase 1: Try to get TMDB person to get English/original name + credit list
+        if (TMDB_KEY) {
+            try {
+                const personSearchUrl = `https://api.themoviedb.org/3/search/person?api_key=${TMDB_KEY}&query=${encodeURIComponent(actorName)}&language=vi-VN`;
+                const personRes = await fetch(personSearchUrl, { next: { revalidate: 3600 } });
+                const personData = await personRes.json();
 
-        // Process KKPhim Data
-        if (kkRes.status === 'fulfilled' && kkRes.value?.status) {
-            const data = kkRes.value;
-            const pathImage = data.pathImage || data.data?.pathImage || "";
-            const kkItems = getItems(data).map(item => ({
-                ...item,
-                thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : combineUrl(pathImage, item.thumb_url),
-                poster_url: item.poster_url?.startsWith('http') ? item.poster_url : combineUrl(pathImage, item.poster_url)
-            }));
-            items = [...items, ...kkItems];
+                if (personData.results?.length > 0) {
+                    const person = personData.results[0];
+                    // Add original_name and known_as names to our search pool
+                    if (person.name && !searchNames.includes(person.name)) searchNames.push(person.name);
+                    if (person.original_name && !searchNames.includes(person.original_name)) searchNames.push(person.original_name);
+                    if (person.also_known_as) {
+                        person.also_known_as.slice(0, 3).forEach((aka: string) => {
+                            if (aka && !searchNames.includes(aka)) searchNames.push(aka);
+                        });
+                    }
+
+                    // Phase 1b: Get their combined credits from TMDB
+                    const creditsUrl = `https://api.themoviedb.org/3/person/${person.id}/combined_credits?api_key=${TMDB_KEY}&language=vi-VN`;
+                    const creditsRes = await fetch(creditsUrl, { next: { revalidate: 3600 } });
+                    const creditsData = await creditsRes.json();
+
+                    // Collect known Vietnamese + original titles of their biggest movies
+                    const castCredits = (creditsData.cast || [])
+                        .sort((a: any, b: any) => (b.popularity || 0) - (a.popularity || 0))
+                        .slice(0, 30);
+
+                    castCredits.forEach((credit: any) => {
+                        const title = credit.title || credit.name;
+                        const origTitle = credit.original_title || credit.original_name;
+                        if (title) tmdbCreditTitles.push(title);
+                        if (origTitle && origTitle !== title) tmdbCreditTitles.push(origTitle);
+                    });
+                }
+            } catch (e) {
+                console.warn("TMDB person lookup failed, falling back to keyword search:", e);
+            }
         }
 
-        // Process OPhim Data
-        if (ophimRes.status === 'fulfilled' && ophimRes.value?.status) {
-            const data = ophimRes.value;
-            let pathImage = data.pathImage || data.data?.pathImage || "https://img.ophim.live/uploads/movies/";
-            if (pathImage === "https://img.ophim.live" || pathImage === "https://img.ophim.live/") {
-                pathImage = "https://img.ophim.live/uploads/movies/";
-            }
-            const ophimItems = getItems(data).map(item => normalizeOphimItem(item, pathImage));
-            items = [...items, ...ophimItems];
-        }
-
-        // Filter and Deduplicate
-        const seen = new Set();
-        const normalizeString = (str: string) => str.toLowerCase().replace(/\s+/g, ' ').trim();
-        const searchActor = normalizeString(actorName);
-
-        const filteredItems = items.filter(item => {
-            if (seen.has(item.slug)) return false;
-
-            // Check if actor exists in the actor list
-            if (item.actor && Array.isArray(item.actor)) {
-                const hasActor = item.actor.some((a: string) => normalizeString(a).includes(searchActor));
-                if (hasActor) {
-                    seen.add(item.slug);
-                    return true;
-                }
-            } else if (typeof item.actor === 'string') {
-                // Sometime actor is a comma separated string
-                if (normalizeString(item.actor).includes(searchActor)) {
-                    seen.add(item.slug);
-                    return true;
-                }
-            }
-            return false;
+        // Phase 2: Search KKPhim with all actor name variants in parallel
+        const nameSearchPromises = searchNames.slice(0, 3).flatMap(name => {
+            const keyword = encodeURIComponent(name);
+            return [
+                fetch(`${API_URL}/v1/api/tim-kiem?keyword=${keyword}&limit=100`, { next: { revalidate: 3600 } })
+                    .then(r => r.json()).catch(() => null),
+                fetch(`${OPHIM_API}/v1/api/tim-kiem?keyword=${keyword}&limit=100`, { next: { revalidate: 3600 } })
+                    .then(r => r.json()).catch(() => null),
+            ];
         });
 
-        // Pagination manually since we have aggregated results
-        const totalItems = filteredItems.length;
+        // Phase 3: Also search KKPhim for top TMDB credit titles (limited batch)
+        const creditSearchPromises = tmdbCreditTitles.slice(0, 10).map(title => {
+            const keyword = encodeURIComponent(title);
+            return fetch(`${API_URL}/v1/api/tim-kiem?keyword=${keyword}&limit=10`, { next: { revalidate: 3600 } })
+                .then(r => r.json()).catch(() => null);
+        });
+
+        const allResults = await Promise.allSettled([...nameSearchPromises, ...creditSearchPromises]);
+
+        let items: Movie[] = [];
+        const seen = new Set<string>();
+
+        for (const result of allResults) {
+            if (result.status !== 'fulfilled' || !result.value) continue;
+            const data = result.value;
+
+            if (!data?.status && !data?.data) continue;
+
+            const pathImage = data.pathImage || data.data?.pathImage || data.data?.APP_DOMAIN_CDN_IMAGE || "";
+
+            const rawItems = (data.data?.items || data.items || []);
+            for (const item of rawItems) {
+                if (seen.has(item.slug)) continue;
+
+                // Normalize: ensure the image URLs are absolute
+                if (pathImage) {
+                    if (item.thumb_url && !item.thumb_url.startsWith('http')) {
+                        item.thumb_url = combineUrl(pathImage, item.thumb_url);
+                    }
+                    if (item.poster_url && !item.poster_url.startsWith('http')) {
+                        item.poster_url = combineUrl(pathImage, item.poster_url);
+                    }
+                }
+
+                // For name-searches: check actor list for match
+                // For title-searches: movie itself may not have actor list, include it
+                const normalizeStr = (s: string) => s.toLowerCase().replace(/\s+/g, ' ').trim();
+                const isActorMatch = searchNames.some(name => {
+                    const searchActorNorm = normalizeStr(name);
+                    if (item.actor && Array.isArray(item.actor)) {
+                        return item.actor.some((a: string) => normalizeStr(a).includes(searchActorNorm) || searchActorNorm.includes(normalizeStr(a)));
+                    }
+                    if (typeof item.actor === 'string') {
+                        return normalizeStr(item.actor).includes(searchActorNorm);
+                    }
+                    return false;
+                });
+
+                const isTitleMatch = tmdbCreditTitles.some(title => {
+                    const norm = normalizeStr(title);
+                    return normalizeStr(item.name || '').includes(norm) || normalizeStr(item.origin_name || '').includes(norm) || norm.includes(normalizeStr(item.name || ''));
+                });
+
+                if (isActorMatch || isTitleMatch) {
+                    seen.add(item.slug);
+                    items.push(item);
+                }
+            }
+        }
+
+        // Sort by year descending
+        items.sort((a, b) => (b.year || 0) - (a.year || 0));
+
+        // Pagination
+        const totalItems = items.length;
         const totalPages = Math.max(1, Math.ceil(totalItems / limit));
         const safePage = Math.min(page, totalPages);
         const startIndex = (safePage - 1) * limit;
-        const paginatedItems = filteredItems.slice(startIndex, startIndex + limit);
+        const paginatedItems = items.slice(startIndex, startIndex + limit);
 
         return {
             items: paginatedItems,
-            pagination: {
-                totalItems,
-                totalPages,
-                currentPage: safePage
-            }
+            pagination: { totalItems, totalPages, currentPage: safePage }
         };
     } catch (error) {
         console.error(`Error fetching movies by actor [${actorName}]:`, error);
         return { items: [], pagination: { currentPage: 1, totalPages: 1, totalItems: 0 } };
+
     }
 };
