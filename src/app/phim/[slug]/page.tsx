@@ -77,151 +77,147 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
 
     return (
         <main className="min-h-screen pb-20 bg-[#0a0a0a]">
-            {/* Hero Backdrop - Blur Effect */}
-            <div className="relative h-[60vh] w-full overflow-hidden">
+            {/* Hero Section (Backdrop + Info Overlay) */}
+            <div className="relative w-full pt-32 pb-8 px-4 md:px-8 xl:px-16 flex items-end min-h-[500px]">
                 <div
-                    className="absolute inset-0 bg-cover bg-center scale-105 blur-sm opacity-50"
+                    className="absolute inset-0 bg-cover bg-center"
                     style={{ backgroundImage: `url(${backdropUrl})` }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-[#0a0a0a]/40" />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-[#0a0a0a]/20" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
+
+                {/* Hero Info Content aligned left/bottom */}
+                <div className="relative z-10 w-full max-w-[1600px] mx-auto space-y-4">
+                    <span className="inline-block bg-[#00B14F] text-white px-2 py-0.5 text-[10px] font-bold rounded shadow-sm mb-2 uppercase">{movie?.quality || "FHD"} {movie?.year}</span>
+                    <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight drop-shadow-2xl">{movie?.name}</h1>
+                    <h2 className="text-lg md:text-2xl text-gray-300 font-medium tracking-wide drop-shadow-md">{movie?.origin_name}</h2>
+
+                    <div className="flex items-center gap-2 text-yellow-500 font-bold text-sm mt-3 drop-shadow-md">
+                        <PlayCircle className="w-4 h-4 fill-current" />
+                        Đang chiếu tập {movie?.episode_current || "1"} / {movie?.episode_total || "?"}
+                    </div>
+
+                    <div className="text-sm text-gray-300 flex flex-wrap items-center gap-4 py-2 drop-shadow-md">
+                        <span><span className="text-gray-500">Đạo diễn:</span> {movie?.director?.join(", ") || "Đang cập nhật"}</span>
+                        <span className="w-1 h-1 bg-gray-600 rounded-full hidden sm:block" />
+                        <span><span className="text-gray-500">Thời lượng:</span> {movie?.time || "N/A"}</span>
+                    </div>
+                    <div className="text-sm text-gray-300 mb-6 line-clamp-1 max-w-3xl drop-shadow-md">
+                        <span className="text-gray-500">Diễn viên:</span> {movie?.actor?.join(", ") || "Đang cập nhật"}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-wrap items-center gap-3 pt-4">
+                        {serverData.length > 0 && (
+                            <Link
+                                href={`/xem-phim/${movie?.slug}/${serverData[0].slug}`}
+                                className="flex items-center gap-2 bg-[#00B14F] text-white px-6 py-2.5 rounded font-bold text-sm md:text-base hover:brightness-110 hover:scale-105 transition-all shadow-lg"
+                            >
+                                <Play className="w-4 h-4 fill-current" />
+                                CHIẾU PHÁT
+                            </Link>
+                        )}
+
+                        {movie && (
+                            <>
+                                <FavoriteButton
+                                    movieData={{
+                                        movieId: movie._id,
+                                        movieSlug: movie.slug,
+                                        movieName: movie.name,
+                                        movieOriginName: movie.origin_name || "",
+                                        moviePoster: movie.poster_url || movie.thumb_url,
+                                        movieYear: Number(movie.year) || new Date().getFullYear(),
+                                        movieQuality: movie.quality || "HD",
+                                        movieCategories: movie.category?.map((c: any) => c.name) || [],
+                                    }}
+                                    className="!bg-transparent hover:!bg-white/5 text-gray-300 hover:text-white border border-transparent hover:border-white/10"
+                                    showLabel={true}
+                                />
+                                <WatchlistButton
+                                    slug={movie.slug}
+                                    initialInWatchlist={(await isInWatchlist(movie.slug)).isInWatchlist}
+                                    className="!bg-transparent hover:!bg-white/5 text-gray-300 hover:text-white border border-transparent hover:border-white/10"
+                                    showLabel={true}
+                                />
+                                {/* Share Button Placeholder */}
+                                <button className="flex items-center gap-2 px-4 py-2 min-h-[40px] rounded-lg bg-transparent hover:bg-white/5 text-gray-300 hover:text-white font-medium text-sm transition-all border border-transparent hover:border-white/10 group">
+                                    <Share2 className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors shrink-0" />
+                                    <span>Chia sẻ</span>
+                                </button>
+                            </>
+                        )}
+                    </div>
+                </div>
             </div>
 
-            {/* Main Content */}
-            <div className="container mx-auto px-4 md:px-8 -mt-80 relative z-10">
-                <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8">
-                    {/* Left: Poster (Sticky) */}
-                    <div className="block">
-                        <div className="relative -mt-20 lg:mt-0 lg:sticky lg:top-24 mx-auto w-48 md:w-56 lg:w-full max-w-[260px] mb-6 lg:mb-0 z-20">
-                            <div className="rounded-xl overflow-hidden shadow-2xl border border-white/10 aspect-[2/3] bg-black/50 relative group">
-                                <Image
-                                    src={posterUrl!}
-                                    alt={movie?.name || "Movie Poster"}
-                                    width={260}
-                                    height={390}
-                                    className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
-                                    priority
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            {/* Bottom Content: 2 Columns */}
+            <div className="max-w-[1600px] mx-auto px-4 md:px-8 xl:px-16 mt-12 relative z-10">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+                    {/* LEFT COLUMN: NỘI DUNG, ĐẠO DIỄN, DIỄN VIÊN, THỂ LOẠI, THÔNG TIN THÊM */}
+                    <div className="lg:col-span-4 xl:col-span-3 space-y-8 pr-4 lg:border-r lg:border-white/[0.04]">
+                        {/* Nội dung */}
+                        <div>
+                            <div className="flex items-center gap-2 mb-4 border-l-2 border-[#00B14F] pl-3">
+                                <h3 className="text-[15px] font-bold text-white uppercase tracking-widest">Nội dung</h3>
+                            </div>
+                            <div className="text-[13px] text-gray-400 leading-relaxed font-light text-justify line-clamp-[12]" dangerouslySetInnerHTML={{ __html: movie?.content }} />
+                        </div>
+
+                        {/* Đạo diễn */}
+                        <div>
+                            <div className="text-[11px] font-medium text-gray-500 uppercase tracking-widest mb-2">Đạo diễn</div>
+                            <div className="text-[13px] font-bold text-white">{movie?.director?.join(", ") || "Đang cập nhật"}</div>
+                        </div>
+
+                        {/* Diễn viên */}
+                        <div>
+                            <div className="text-[11px] font-medium text-gray-500 uppercase tracking-widest mb-3">Diễn viên</div>
+                            <MovieCast movieName={movie.name} originName={movie.origin_name} year={movie.year} isCompact={true} />
+                        </div>
+
+                        {/* Thể loại */}
+                        <div>
+                            <div className="text-[11px] font-medium text-gray-500 uppercase tracking-widest mb-3">Thể loại</div>
+                            <div className="flex flex-wrap gap-2">
+                                {movie?.category?.map((c: any) => (
+                                    <Link key={c.id} href={`/the-loai/${c.slug}`} className="text-[11px] font-medium text-gray-400 bg-[#111113] border border-white/5 py-1.5 px-3 rounded hover:text-white hover:border-[#00B14F]/50 transition-colors uppercase tracking-wider">{c.name}</Link>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Thông tin thêm */}
+                        <div>
+                            <div className="text-[11px] font-medium text-gray-500 uppercase tracking-widest mb-3">Thông tin thêm</div>
+                            <div className="space-y-2 text-[13px]">
+                                <div className="flex justify-between border-b border-white/[0.04] pb-2"><span className="text-gray-500">Quốc gia:</span><span className="text-gray-300 font-medium">{movie?.country?.[0]?.name || "Đang cập nhật"}</span></div>
+                                <div className="flex justify-between border-b border-white/[0.04] pb-2"><span className="text-gray-500">Năm:</span><span className="text-gray-300 font-medium">{movie?.year || "Đang cập nhật"}</span></div>
+                                <div className="flex justify-between border-b border-white/[0.04] pb-2"><span className="text-gray-500">Chất lượng:</span><span className="text-gray-300 font-medium">{movie?.quality || "HD"}</span></div>
+                                <div className="flex justify-between"><span className="text-gray-500">Ngôn ngữ:</span><span className="text-gray-300 font-medium">{movie?.lang || "Đang cập nhật"}</span></div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Right: Info & Tabs */}
-                    <div className="space-y-6">
-                        {/* Header Info */}
-                        <div className="space-y-3">
-                            <h1 className="text-2xl md:text-4xl font-black text-white leading-tight drop-shadow-2xl">
-                                {movie?.name}
-                            </h1>
-                            <h2 className="text-base md:text-xl text-yellow-500 font-medium tracking-wide drop-shadow-md">
-                                {movie?.origin_name} ({movie?.year})
-                            </h2>
-
-                            {/* Metadata Tags */}
-                            <div className="flex flex-wrap items-center gap-2 pt-2">
-                                <span className="flex items-center gap-1 bg-yellow-500 text-black px-2.5 py-1 rounded font-bold text-xs shadow-lg shadow-yellow-500/20">
-                                    <Star className="w-3 h-3 fill-black" /> {rating}
-                                </span>
-                                <span className="px-2.5 py-1 border border-white/10 rounded bg-white/5 backdrop-blur-md text-gray-200 text-xs font-medium">
-                                    {movie?.quality || "HD"}
-                                </span>
-                                <span className="px-2.5 py-1 border border-white/10 rounded bg-white/5 backdrop-blur-md text-gray-200 text-xs font-medium flex items-center gap-1.5">
-                                    <Clock className="w-3 h-3" />
-                                    {movie?.time || "N/A"}
-                                </span>
-                                <span className="px-2.5 py-1 border border-white/10 rounded bg-white/5 backdrop-blur-md text-gray-200 text-xs font-medium flex items-center gap-1.5">
-                                    <Film className="w-3 h-3" />
-                                    {movie?.country?.[0]?.name || "N/A"}
-                                </span>
-                            </div>
-
-                            {/* Categories */}
-                            <div className="flex flex-wrap gap-2 pt-1">
-                                {movie?.category?.map((c: any) => (
-                                    <Link
-                                        key={c.id}
-                                        href={`/the-loai/${c.slug}`}
-                                        className="text-[10px] uppercase font-bold text-gray-400 hover:text-white border border-white/10 hover:border-yellow-500 bg-white/5 px-3 py-1 rounded-full transition-all"
-                                    >
-                                        {c.name}
-                                    </Link>
-                                ))}
-                            </div>
-
-                            {/* Action Buttons (Compact) */}
-                            <div className="flex flex-wrap items-center gap-3 pt-4">
-                                {serverData.length > 0 && (
-                                    <Link
-                                        href={`/xem-phim/${movie?.slug}/${serverData[0].slug}`}
-                                        className="flex items-center gap-2 bg-gradient-to-r from-yellow-400 to-yellow-600 text-black px-6 py-3 rounded-full font-bold text-base hover:brightness-110 hover:scale-105 transition-transform duration-200"
-                                    >
-                                        <Play className="w-4 h-4 fill-current" />
-                                        Xem Ngay
-                                    </Link>
-                                )}
-                                <div className="flex gap-2">
-                                    {movie && (
-                                        <>
-                                            <FavoriteButton
-                                                movieData={{
-                                                    movieId: movie._id,
-                                                    movieSlug: movie.slug,
-                                                    movieName: movie.name,
-                                                    movieOriginName: movie.origin_name || "",
-                                                    moviePoster: movie.poster_url || movie.thumb_url,
-                                                    movieYear: Number(movie.year) || new Date().getFullYear(),
-                                                    movieQuality: movie.quality || "HD",
-                                                    movieCategories: movie.category?.map((c: any) => c.name) || [],
-                                                }}
-                                                className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10"
-                                            />
-                                            <WatchlistButton
-                                                slug={movie.slug}
-                                                initialInWatchlist={(await isInWatchlist(movie.slug)).isInWatchlist}
-                                                className="w-10 h-10 rounded-full bg-white/5 hover:bg-only border border-white/10"
-                                            />
-                                            <AddToPlaylistButton
-                                                movieData={{
-                                                    movieId: movie._id || "",
-                                                    movieSlug: movie.slug,
-                                                    movieName: movie.name,
-                                                    movieOriginName: movie.origin_name || "",
-                                                    moviePoster: movie.poster_url || movie.thumb_url,
-                                                    movieYear: Number(movie.year) || new Date().getFullYear(),
-                                                    movieQuality: movie.quality || "HD",
-                                                }}
-                                                variant="icon"
-                                                className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 border border-white/10"
-                                            />
-                                        </>
-                                    )}
-                                    <button className="flex items-center justify-center w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-all group" title="Chia sẻ">
-                                        <Share2 className="w-5 h-5 text-gray-400 group-hover:text-blue-400 transition-colors" />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* TABS - Compact Margin */}
-                        {/* TABS - Dynamic Content */}
+                    {/* RIGHT COLUMN: Tabs */}
+                    <div className="lg:col-span-8 xl:col-span-9">
                         <MovieTabs
                             movie={movie}
                             relatedMovies={relatedMovies}
                             episodes={episodes}
                             slug={slug}
                         />
-
-                        {/* TMDB Cast */}
-                        <MovieCast movieName={movie.name} originName={movie.origin_name} year={movie.year} />
-
-                        {/* Comment Section */}
-                        <div className="mt-8">
+                        {/* Comment Section below tabs */}
+                        <div className="mt-12">
+                            <div className="flex items-center gap-2 mb-6 border-l-2 border-[#00B14F] pl-3">
+                                <h3 className="text-[15px] font-bold text-white uppercase tracking-widest">Bình luận</h3>
+                            </div>
                             <CommentSection movieId={movie._id} movieSlug={movie.slug} />
                         </div>
                     </div>
+
                 </div>
             </div>
-        </main >
+        </main>
     );
 }

@@ -19,9 +19,11 @@ interface FavoriteButtonProps {
     };
     size?: "sm" | "md" | "lg";
     className?: string;
+    showLabel?: boolean;
+    label?: string;
 }
 
-export default function FavoriteButton({ movieData, size = "md", className = "" }: FavoriteButtonProps) {
+export default function FavoriteButton({ movieData, size = "md", className = "", showLabel = false, label = "Thích" }: FavoriteButtonProps) {
     const { isFavorite, toggleFavorite, isLoading } = useFavorites();
     const { showToast } = useToast();
     const router = useRouter();
@@ -30,9 +32,9 @@ export default function FavoriteButton({ movieData, size = "md", className = "" 
     const isFav = isFavorite(movieData.movieSlug);
 
     const sizeClasses = {
-        sm: "w-8 h-8",
-        md: "w-10 h-10",
-        lg: "w-12 h-12",
+        sm: showLabel ? "px-3 py-1.5 min-h-[32px]" : "w-8 h-8",
+        md: showLabel ? "px-4 py-2 min-h-[40px]" : "w-10 h-10",
+        lg: showLabel ? "px-6 py-3 min-h-[48px]" : "w-12 h-12",
     };
 
     const iconSizes = {
@@ -68,7 +70,7 @@ export default function FavoriteButton({ movieData, size = "md", className = "" 
 
     if (isLoading) {
         return (
-            <div className={`${sizeClasses[size]} rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center animate-pulse ${className}`} />
+            <div className={`${sizeClasses[size]} ${showLabel ? "rounded-lg" : "rounded-full"} bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center animate-pulse ${className}`} />
         );
     }
 
@@ -76,15 +78,20 @@ export default function FavoriteButton({ movieData, size = "md", className = "" 
         <button
             onClick={handleToggle}
             disabled={isPending}
-            className={`${sizeClasses[size]} rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/20 hover:scale-110 transition-all group disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+            className={`${sizeClasses[size]} ${showLabel ? "rounded-lg gap-2" : "rounded-full"} bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/20 transition-all group disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
             title={isFav ? "Bỏ yêu thích" : "Thêm vào yêu thích"}
         >
             <Heart
-                className={`${iconSizes[size]} transition-all ${isFav
+                className={`${iconSizes[size]} transition-all shrink-0 ${isFav
                     ? "text-red-500 fill-red-500"
                     : "text-white group-hover:text-red-400"
                     } ${isPending ? "animate-pulse" : ""}`}
             />
+            {showLabel && (
+                <span className="text-sm font-medium text-white whitespace-nowrap">
+                    {label}
+                </span>
+            )}
         </button>
     );
 }

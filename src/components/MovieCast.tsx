@@ -2,7 +2,7 @@ import { getTMDBDetails, getTMDBImage, searchTMDBMovie } from "@/services/tmdb";
 import Image from "next/image";
 import Link from "next/link";
 
-export default async function MovieCast({ movieName, originName, year }: { movieName: string; originName: string; year: number }) {
+export default async function MovieCast({ movieName, originName, year, isCompact = false }: { movieName: string; originName: string; year: number; isCompact?: boolean }) {
     // 1. Search for the movie to get TMDB ID
     // 2. Fetch details including credits
 
@@ -16,6 +16,25 @@ export default async function MovieCast({ movieName, originName, year }: { movie
     // const director = details.credits.crew.find((p: any) => p.job === "Director");
 
     if (cast.length === 0) return null;
+
+    if (isCompact) {
+        return (
+            <div className="flex flex-wrap gap-4 pt-1">
+                {cast.slice(0, 8).map((actor: any) => (
+                    <Link href={`/dien-vien/${encodeURIComponent(actor.name)}`} key={actor.id} className="flex flex-col items-center gap-2 w-[4.5rem] group" title={actor.name}>
+                        <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border border-white/10 group-hover:border-[#00B14F] transition-colors relative bg-white/5">
+                            {actor.profile_path ? (
+                                <Image src={getTMDBImage(actor.profile_path, "w185")!} alt={actor.name} fill className="object-cover" />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-[10px] text-gray-500 text-center leading-tight">N/A</div>
+                            )}
+                        </div>
+                        <p className="text-[11px] text-gray-400 group-hover:text-white transition-colors text-center font-medium leading-tight line-clamp-2 w-full">{actor.name}</p>
+                    </Link>
+                ))}
+            </div>
+        );
+    }
 
     return (
         <div className="mt-8">
