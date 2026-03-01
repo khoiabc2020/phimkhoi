@@ -40,7 +40,7 @@ const MovieRow = memo(({ title, movies, slug, subtitle, type = 'list' }: MovieRo
                 )}
             </View>
 
-            {/* Movie List - FlatList thay FlashList để tránh crash native trên một số máy */}
+            {/* Movie List - Optimized FlatList */}
             <FlatList
                 data={movies.filter(m => m && m.slug)}
                 renderItem={({ item }) => <MovieCard movie={item} />}
@@ -48,6 +48,10 @@ const MovieRow = memo(({ title, movies, slug, subtitle, type = 'list' }: MovieRo
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.listContent}
+                initialNumToRender={4}
+                maxToRenderPerBatch={4}
+                windowSize={3}
+                removeClippedSubviews={true}
             />
         </View>
     );

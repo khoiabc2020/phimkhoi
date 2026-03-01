@@ -178,12 +178,82 @@ export const getMovieDetail = async (slug: string) => {
     }
 };
 
+// Normalize OPhim Item
+const normalizeOphimItem = (item: any, pathImage: string) => {
+    return {
+        ...item,
+        _id: item._id,
+        name: item.name,
+        slug: item.slug,
+        origin_name: item.origin_name,
+        thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : combineUrl(pathImage, item.thumb_url),
+        poster_url: item.poster_url?.startsWith('http') ? item.poster_url : combineUrl(pathImage, item.poster_url),
+        type: item.type || 'unknown',
+        sub_docquyen: item.sub_docquyen || false,
+        chieurap: item.chieurap || false,
+        time: item.time || '',
+        episode_current: item.episode_current || '',
+        quality: item.quality || '',
+        lang: item.lang || '',
+        year: item.year || new Date().getFullYear(),
+        category: item.category || [],
+        country: item.country || [],
+    };
+};
+
 export const searchMovies = async (keyword: string, limit = 20) => {
     try {
-        const res = await fetch(`${API_URL}/v1/api/tim-kiem?keyword=${encodeURIComponent(keyword)}&limit=${limit}`);
-        if (!res.ok) return [];
-        const data = await res.json();
-        return getItems(data);
+        const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
+            fetch(`${API_URL}/v1/api/tim-kiem?keyword=${encodeURIComponent(keyword)}&limit=${limit}`).then(r => r.json()),
+            fetch(`${OPHIM_API}/v1/api/tim-kiem?keyword=${encodeURIComponent(keyword)}&limit=${limit}`).then(r => r.json()),
+            fetch(`${NGUONC_API}/api/films/search?keyword=${encodeURIComponent(keyword)}`).then(r => r.json())
+        ]);
+
+        let results: Movie[] = [];
+
+        if (kkRes.status === 'fulfilled') {
+            const data = kkRes.value;
+            const pathImage = data.pathImage || data.data?.pathImage || "";
+            const items = (data.data?.items || []).map((item: any) => ({
+                ...item,
+                thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : combineUrl(pathImage, item.thumb_url),
+                poster_url: item.poster_url?.startsWith('http') ? item.poster_url : combineUrl(pathImage, item.poster_url)
+            }));
+            results = [...results, ...items];
+        }
+
+        if (ophimRes.status === 'fulfilled') {
+            const data = ophimRes.value;
+            let pathImage = data.pathImage || data.data?.APP_DOMAIN_CDN_IMAGE || "https://img.ophim.live/uploads/movies/";
+            if (pathImage === "https://img.ophim.live" || pathImage === "https://img.ophim.live/") {
+                pathImage = "https://img.ophim.live/uploads/movies/";
+            }
+            const items = (data.data?.items || []).map((item: any) => normalizeOphimItem(item, pathImage));
+            results = [...results, ...items];
+        }
+
+        if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
+            const items = (nguoncRes.value.items || []).map((item: any) => ({
+                _id: item.id || item.slug,
+                name: item.name,
+                slug: item.slug,
+                origin_name: item.original_name || item.name,
+                thumb_url: item.thumb_url,
+                poster_url: item.poster_url,
+                year: parseInt(item.year) || new Date().getFullYear(),
+                quality: item.quality || 'FHD',
+            }));
+            results = [...results, ...items];
+        }
+
+        // Deduplicate by slug
+        const seen = new Set();
+        return results.filter(item => {
+            const duplicate = seen.has(item.slug);
+            seen.add(item.slug);
+            return !duplicate;
+        });
+
     } catch (error) {
         console.error("Error searching movies:", error);
         return [];
@@ -204,14 +274,15 @@ export const getImageUrl = (url?: string) => {
 
 export const getMenuData = async () => {
     try {
-        const [categoriesRes, countriesRes] = await Promise.all([
-            fetch(`${API_URL}/the-loai`).then(r => r.json()).catch(() => []),
-            fetch(`${API_URL}/quoc-gia`).then(r => r.json()).catch(() => []),
+        const [categoriesRes, countriesRes] = await Promise.allSettled([
+            fetch(`${API_URL}/the-loai`).then(r => r.json()),
+            fetch(`${API_URL}/quoc-gia`).then(r => r.json()),
         ]);
-        return {
-            categories: Array.isArray(categoriesRes) ? categoriesRes : [],
-            countries: Array.isArray(countriesRes) ? countriesRes : [],
-        };
+
+        const categories = categoriesRes.status === 'fulfilled' && Array.isArray(categoriesRes.value) ? categoriesRes.value : [];
+        const countries = countriesRes.status === 'fulfilled' && Array.isArray(countriesRes.value) ? countriesRes.value : [];
+
+        return { categories, countries };
     } catch (error) {
         console.error('Error fetching menu:', error);
         return { categories: [], countries: [] };

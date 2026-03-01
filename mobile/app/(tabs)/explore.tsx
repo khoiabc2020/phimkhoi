@@ -1,13 +1,12 @@
-import { View, Text, TextInput, ScrollView, Pressable, Dimensions, Image as RNImage, FlatList } from 'react-native';
+import { View, Text, TextInput, Pressable, Dimensions, FlatList, Modal, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useState, useEffect } from 'react';
-import { searchMovies, Movie, getHomeData, getImageUrl } from '@/services/api';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { searchMovies, Movie, getHomeData, getImageUrl, getMenuData } from '@/services/api';
 import { Image } from 'expo-image';
 import { StatusBar } from 'expo-status-bar';
-import { LinearGradient } from 'expo-linear-gradient';
 
 const { width } = Dimensions.get('window');
 const COLUMN_COUNT = 3;
@@ -15,8 +14,7 @@ const ITEM_SPACING = 10;
 const ITEM_WIDTH = (width - 32 - (ITEM_SPACING * (COLUMN_COUNT - 1))) / COLUMN_COUNT;
 
 const HotMovieItem = ({ item, index }: { item: Movie, index: number }) => {
-  const isTop = index < 3;
-  const badgeColor = index % 2 === 0 ? '#0ea5e9' : '#64748b'; // Blue (TM) or Grey (PĐ)
+  const badgeColor = index % 2 === 0 ? '#0ea5e9' : '#64748b';
   const badgeLabel = index % 2 === 0 ? `TM.${item.year || 24}` : `PĐ.${index + 1}`;
 
   return (
@@ -28,8 +26,8 @@ const HotMovieItem = ({ item, index }: { item: Movie, index: number }) => {
             style={{ width: '100%', height: '100%' }}
             contentFit="cover"
             transition={300}
+            cachePolicy="memory-disk"
           />
-          {/* Rank Badge - RoPhim Style */}
           <View style={{
             position: 'absolute',
             top: 6,
@@ -63,16 +61,27 @@ export default function ExploreScreen() {
   const [hotMovies, setHotMovies] = useState<Movie[]>([]);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
 
+  // Filters State
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [countries, setCountries] = useState<any[]>([]);
+
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCountry, setSelectedCountry] = useState<string>('all');
+  const [selectedYear, setSelectedYear] = useState<string>('all');
+
+  const years = Array.from(new Array(15), (val, index) => (new Date().getFullYear()) - index);
+
   useEffect(() => {
-    // Load search history
     AsyncStorage.getItem('search_history').then(data => {
       if (data) setSearchHistory(JSON.parse(data));
     });
-    // Fetch mock "Hot" movies (using Phim Le)
     getHomeData().then((data) => {
-      if (data.phimLe) {
-        setHotMovies(data.phimLe.slice(0, 9)); // Show top 9
-      }
+      if (data.phimLe) setHotMovies(data.phimLe.slice(0, 9));
+    });
+    getMenuData().then((data) => {
+      setCategories(data.categories);
+      setCountries(data.countries);
     });
   }, []);
 
@@ -84,15 +93,13 @@ export default function ExploreScreen() {
     const timer = setTimeout(async () => {
       setSearching(true);
       const query = search.trim();
-      const results = await searchMovies(query, 20);
+      const results = await searchMovies(query, 40); // Fetch more to allow aggressive client-side filtering
       setSearchResults(results);
       setSearching(false);
 
-      // Save to history if we got results (or even if we didn't, to track intent)
       if (query.length > 1) {
         AsyncStorage.getItem('search_history').then(data => {
           let history = data ? JSON.parse(data) : [];
-          // Remove if exists to push to front
           history = history.filter((item: string) => item.toLowerCase() !== query.toLowerCase());
           history.unshift(query);
           if (history.length > 10) history.pop(); // Keep top 10
@@ -100,7 +107,6 @@ export default function ExploreScreen() {
           AsyncStorage.setItem('search_history', JSON.stringify(history));
         });
       }
-
     }, 800);
     return () => clearTimeout(timer);
   }, [search]);
@@ -110,10 +116,94 @@ export default function ExploreScreen() {
     AsyncStorage.removeItem('search_history');
   };
 
+  // Client-side filtering logic
+  const filteredResults = useMemo(() => {
+    return searchResults.filter((movie) => {
+      if (selectedCategory !== 'all') {
+        const hasCategory = movie.category?.some((c: any) => c.slug === selectedCategory);
+        if (!hasCategory) return false;
+      }
+      if (selectedCountry !== 'all') {
+        const hasCountry = movie.country?.some((c: any) => c.slug === selectedCountry);
+        if (!hasCountry) return false;
+      }
+      if (selectedYear !== 'all') {
+        if (movie.year !== parseInt(selectedYear)) return false;
+      }
+      return true;
+    });
+  }, [searchResults, selectedCategory, selectedCountry, selectedYear]);
+
+  const activeFiltersCount = (selectedCategory !== 'all' ? 1 : 0) + (selectedCountry !== 'all' ? 1 : 0) + (selectedYear !== 'all' ? 1 : 0);
+
+  const renderHeader = () => (
+    <View className="px-4 mb-4">
+      <Text className="text-white text-lg font-bold mb-1">Kết quả tìm kiếm</Text>
+      <Text className="text-gray-400 text-xs mb-4">
+        Tìm thấy {filteredResults.length} kết quả {searchResults.length !== filteredResults.length && `(từ ${searchResults.length} phim gốc)`}
+      </Text>
+    </View>
+  );
+
+  const renderEmptySearch = () => {
+    if (searching) return (
+      <View className="flex-1 items-center justify-center mt-20">
+        <ActivityIndicator size="large" color="#F4C84A" />
+        <Text className="text-gray-400 text-center mt-4">Đang tìm...</Text>
+      </View>
+    );
+
+    if (search.trim() && filteredResults.length === 0) return (
+      <View className="items-center justify-center mt-20 px-6">
+        <Ionicons name="search-outline" size={60} color="#334155" />
+        <Text className="text-white text-lg font-bold mt-4 mb-2">Không tìm thấy kết quả</Text>
+        <Text className="text-gray-400 text-center">Thử thay đổi từ khóa hoặc điều chỉnh bộ lọc để xem các phim khác xem sao nhé.</Text>
+      </View>
+    );
+
+    return (
+      <View className="px-4 pb-24">
+        {searchHistory.length > 0 && (
+          <View className="mb-6 mt-2">
+            <View className="flex-row justify-between items-center mb-3">
+              <Text className="text-white text-base font-bold">Lịch sử tìm kiếm</Text>
+              <Pressable onPress={clearHistory}>
+                <Text className="text-gray-400 text-xs">Xóa lịch sử</Text>
+              </Pressable>
+            </View>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+              {searchHistory.map((item, index) => (
+                <Pressable
+                  key={index}
+                  onPress={() => setSearch(item)}
+                  className="bg-[#1e293b] px-4 py-2 rounded-full border border-gray-700 flex-row items-center gap-2"
+                >
+                  <Ionicons name="time-outline" size={14} color="#94a3b8" />
+                  <Text className="text-gray-300 text-sm">{item}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+        )}
+        <Text className="text-white text-base font-bold mb-4 mt-2">Được tìm kiếm nhiều</Text>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: ITEM_SPACING }}>
+          {hotMovies.map((item, index) => (
+            <HotMovieItem key={item._id || index} item={item} index={index} />
+          ))}
+        </View>
+      </View>
+    );
+  };
+
+  const renderItem = useCallback(({ item, index }: { item: Movie, index: number }) => (
+    <HotMovieItem item={item} index={index} />
+  ), []);
+
   return (
     <View className="flex-1 bg-[#0f172a]">
       <StatusBar style="light" />
       <SafeAreaView edges={['top']} className="flex-1">
+
         {/* Search Header */}
         <View className="px-4 pb-4 pt-2">
           <View className="flex-row items-center gap-3">
@@ -122,74 +212,122 @@ export default function ExploreScreen() {
               <TextInput
                 value={search}
                 onChangeText={setSearch}
-                placeholder="Tìm kiếm phim, diễn viên"
+                placeholder="Tìm kiếm phim, diễn viên..."
                 placeholderTextColor="#64748b"
                 className="flex-1 ml-3 text-white text-base font-medium"
                 autoCapitalize="none"
                 returnKeyType="search"
               />
               {search.length > 0 && (
-                <Pressable onPress={() => setSearch('')}>
+                <Pressable onPress={() => { setSearch(''); setSelectedCategory('all'); setSelectedCountry('all'); setSelectedYear('all'); }}>
                   <Ionicons name="close-circle" size={18} color="#94a3b8" />
                 </Pressable>
               )}
             </View>
-            {/* Filter Icon */}
-            <Pressable className="bg-[#1e293b] w-12 h-12 rounded-full items-center justify-center border border-gray-800">
-              <Ionicons name="options-outline" size={22} color="white" />
+
+            {/* Filter Toggle */}
+            <Pressable
+              onPress={() => setIsFilterVisible(true)}
+              className="bg-[#1e293b] w-12 h-12 rounded-full items-center justify-center border border-gray-800 relative shadow-sm"
+              style={{ elevation: 2 }}
+            >
+              <Ionicons name="options-outline" size={22} color={activeFiltersCount > 0 ? "#F4C84A" : "white"} />
+              {activeFiltersCount > 0 && (
+                <View className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 border-2 border-[#0f172a] items-center justify-center">
+                  <Text className="text-white text-[9px] font-bold">{activeFiltersCount}</Text>
+                </View>
+              )}
             </Pressable>
           </View>
         </View>
 
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
-          {search.length > 0 ? (
-            /* Search Results */
-            <View className="px-4">
-              <Text className="text-white text-lg font-bold mb-4">Kết quả tìm kiếm</Text>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: ITEM_SPACING }}>
-                {searchResults.map((item, index) => (
-                  <HotMovieItem key={item._id || index} item={item} index={index} />
-                ))}
-              </View>
-              {searching && <Text className="text-gray-400 text-center mt-4">Đang tìm...</Text>}
-            </View>
-          ) : (
-            <View className="px-4">
-              {/* Search History Section */}
-              {searchHistory.length > 0 && (
-                <View className="mb-6 mt-2">
-                  <View className="flex-row justify-between items-center mb-3">
-                    <Text className="text-white text-base font-bold">Lịch sử tìm kiếm</Text>
-                    <Pressable onPress={clearHistory}>
-                      <Text className="text-gray-400 text-xs">Xóa lịch sử</Text>
-                    </Pressable>
-                  </View>
-                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-                    {searchHistory.map((item, index) => (
-                      <Pressable
-                        key={index}
-                        onPress={() => setSearch(item)}
-                        className="bg-[#1e293b] px-4 py-2 rounded-full border border-gray-700 flex-row items-center gap-2"
-                      >
-                        <Ionicons name="time-outline" size={14} color="#94a3b8" />
-                        <Text className="text-gray-300 text-sm">{item}</Text>
-                      </Pressable>
-                    ))}
-                  </View>
-                </View>
-              )}
-
-              {/* Hot Search Section */}
-              <Text className="text-white text-base font-bold mb-4 mt-2">Được tìm kiếm nhiều</Text>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-                {hotMovies.map((item, index) => (
-                  <HotMovieItem key={item._id || index} item={item} index={index} />
-                ))}
-              </View>
-            </View>
-          )}
-        </ScrollView>
+        {/* Content: Either Search Results FlatList or Default Views */}
+        {search.trim() && filteredResults.length > 0 ? (
+          <FlatList
+            data={filteredResults}
+            keyExtractor={(item, index) => item._id || index.toString()}
+            numColumns={COLUMN_COUNT}
+            ListHeaderComponent={renderHeader}
+            columnWrapperStyle={{ gap: ITEM_SPACING, paddingHorizontal: 16 }}
+            contentContainerStyle={{ paddingBottom: 100 }}
+            renderItem={renderItem}
+            showsVerticalScrollIndicator={false}
+            initialNumToRender={12}
+            maxToRenderPerBatch={12}
+            windowSize={5}
+            removeClippedSubviews={true}
+          />
+        ) : (
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
+            {renderEmptySearch()}
+          </ScrollView>
+        )}
       </SafeAreaView>
+
+      {/* Filter Modal */}
+      <Modal visible={isFilterVisible} animationType="slide" transparent={true} onRequestClose={() => setIsFilterVisible(false)}>
+        <View className="flex-1 justify-end bg-black/60">
+          <View className="bg-[#111319] w-full rounded-t-3xl border-t border-white/10 p-4 pb-8 max-h-[85%]">
+            <View className="flex-row items-center justify-between mb-4 px-2 pt-2">
+              <Text className="text-white text-xl font-bold">Bộ lọc tìm kiếm</Text>
+              <TouchableOpacity onPress={() => setIsFilterVisible(false)} className="bg-white/10 rounded-full p-2">
+                <Ionicons name="close" size={20} color="white" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false} className="mb-4">
+              {/* Thể loại */}
+              <Text className="text-white font-semibold mb-3 ml-2 text-lg">Thể Loại</Text>
+              <View className="flex-row flex-wrap gap-2 px-2 pb-6">
+                <TouchableOpacity onPress={() => setSelectedCategory('all')} className={`px-4 py-2.5 border rounded-full ${selectedCategory === 'all' ? 'bg-[#F4C84A] border-[#F4C84A]' : 'bg-transparent border-white/20'}`}>
+                  <Text className={selectedCategory === 'all' ? 'text-black font-semibold' : 'text-gray-300'}>Tất cả</Text>
+                </TouchableOpacity>
+                {categories.map((c: any) => (
+                  <TouchableOpacity key={c.slug} onPress={() => setSelectedCategory(c.slug)} className={`px-4 py-2.5 border rounded-full ${selectedCategory === c.slug ? 'bg-[#F4C84A] border-[#F4C84A]' : 'bg-transparent border-white/20'}`}>
+                    <Text className={selectedCategory === c.slug ? 'text-black font-semibold' : 'text-gray-300'}>{c.name}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {/* Quốc Gia */}
+              <Text className="text-white font-semibold mb-3 ml-2 text-lg">Quốc Gia</Text>
+              <View className="flex-row flex-wrap gap-2 px-2 pb-6">
+                <TouchableOpacity onPress={() => setSelectedCountry('all')} className={`px-4 py-2.5 border rounded-full ${selectedCountry === 'all' ? 'bg-[#F4C84A] border-[#F4C84A]' : 'bg-transparent border-white/20'}`}>
+                  <Text className={selectedCountry === 'all' ? 'text-black font-semibold' : 'text-gray-300'}>Tất cả</Text>
+                </TouchableOpacity>
+                {countries.map((c: any) => (
+                  <TouchableOpacity key={c.slug} onPress={() => setSelectedCountry(c.slug)} className={`px-4 py-2.5 border rounded-full ${selectedCountry === c.slug ? 'bg-[#F4C84A] border-[#F4C84A]' : 'bg-transparent border-white/20'}`}>
+                    <Text className={selectedCountry === c.slug ? 'text-black font-semibold' : 'text-gray-300'}>{c.name}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {/* Năm Phát Hành */}
+              <Text className="text-white font-semibold mb-3 ml-2 text-lg">Năm Phát Hành</Text>
+              <View className="flex-row flex-wrap gap-2 px-2 pb-6">
+                <TouchableOpacity onPress={() => setSelectedYear('all')} className={`px-4 py-2.5 border rounded-full ${selectedYear === 'all' ? 'bg-[#F4C84A] border-[#F4C84A]' : 'bg-transparent border-white/20'}`}>
+                  <Text className={selectedYear === 'all' ? 'text-black font-semibold' : 'text-gray-300'}>Tất cả</Text>
+                </TouchableOpacity>
+                {years.map((y) => (
+                  <TouchableOpacity key={y} onPress={() => setSelectedYear(y.toString())} className={`px-4 py-2.5 border rounded-full ${selectedYear === y.toString() ? 'bg-[#F4C84A] border-[#F4C84A]' : 'bg-transparent border-white/20'}`}>
+                    <Text className={selectedYear === y.toString() ? 'text-black font-semibold' : 'text-gray-300'}>{y}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </ScrollView>
+
+            <View className="flex-row gap-4 mt-auto pt-2">
+              <TouchableOpacity onPress={() => { setSelectedCategory('all'); setSelectedCountry('all'); setSelectedYear('all'); }} className="flex-1 py-4 bg-white/5 rounded-2xl items-center border border-white/10">
+                <Text className="text-white font-bold text-base">Xóa Bô Lọc</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setIsFilterVisible(false)} className="flex-[1.5] py-4 bg-[#F4C84A] rounded-2xl items-center shadow-[0_4px_14px_rgba(244,200,74,0.39)]">
+                <Text className="text-black font-bold text-base">Áp Dụng</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
     </View>
   );
 }
