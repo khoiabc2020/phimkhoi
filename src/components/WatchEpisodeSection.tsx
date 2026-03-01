@@ -94,7 +94,7 @@ export default function WatchEpisodeSection({
     const serverName = activeServerName || servers[0]?.server_name || "VIP";
 
     return (
-        <div className="bg-[#0B0E14] rounded-2xl border border-white/5 overflow-hidden mb-8 mt-4 mx-4 md:mx-0">
+        <div className="bg-[#0B0E14] rounded-2xl border border-white/5 overflow-hidden mb-6 sm:mb-8 mt-4 mx-3 sm:mx-4 md:mx-0">
             {/* Header: DANH SÁCH TẬP */}
             <div className="flex items-center gap-3 px-6 py-4 border-b border-white/5">
                 <List className="w-[18px] h-[18px] text-[#F4C84A]" />
@@ -213,10 +213,10 @@ export default function WatchEpisodeSection({
                 </div>
 
                 {/* Subtitle count & Pagination Controls Row */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-                    <div className="flex items-center gap-4 flex-wrap">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
+                    <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
                         {/* Subtitle count */}
-                        <div className="text-[14px] text-gray-400">
+                        <div className="text-[13px] sm:text-[14px] text-gray-400">
                             Danh sách tập ( <span className="text-[#E4E4E5] font-bold">{episodes.length}</span> / <span className="text-[#F4C84A] font-bold">{episodes.length}</span> )
                         </div>
 
@@ -224,7 +224,7 @@ export default function WatchEpisodeSection({
                         {episodes.length > EPISODES_PER_CHUNK && (
                             <div className="relative">
                                 <select
-                                    className="appearance-none bg-[#1A1D24] border border-white/5 text-[#E4E4E5] font-semibold text-[13px] rounded-lg pl-4 pr-10 py-2 focus:outline-none focus:border-[#F4C84A]/50 transition-colors cursor-pointer"
+                                    className="appearance-none bg-[#1A1D24] border border-white/5 text-[#E4E4E5] font-semibold text-[13px] rounded-lg pl-3 pr-9 py-1.5 focus:outline-none focus:border-[#F4C84A]/50 transition-colors cursor-pointer"
                                     value={currentChunk}
                                     onChange={(e) => setCurrentChunk(Number(e.target.value))}
                                 >
@@ -238,14 +238,14 @@ export default function WatchEpisodeSection({
                                         );
                                     })}
                                 </select>
-                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                             </div>
                         )}
                     </div>
 
                     {/* Toggle Collapse */}
                     <div className="flex items-center gap-3 shrink-0">
-                        <span className="text-[13px] text-gray-400 font-medium">Hiện ảnh</span>
+                        <span className="text-[12px] sm:text-[13px] text-gray-400 font-medium">Hiện ảnh</span>
                         <button
                             type="button"
                             role="switch"
@@ -268,7 +268,7 @@ export default function WatchEpisodeSection({
 
                 {/* Episode grid */}
                 {!isCollapsed && (
-                    <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-3 max-h-[500px] overflow-y-auto custom-scrollbar pr-3 [contain:layout_paint]">
+                    <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-8 xl:grid-cols-10 gap-2 sm:gap-3 max-h-[450px] sm:max-h-[500px] overflow-y-auto custom-scrollbar pr-1 sm:pr-3 [contain:layout_paint]">
                         {episodes.slice(currentChunk * EPISODES_PER_CHUNK, (currentChunk + 1) * EPISODES_PER_CHUNK).map((ep) => {
                             const isActive = ep.slug === currentEpisodeSlug;
 
@@ -286,10 +286,10 @@ export default function WatchEpisodeSection({
                                     key={ep.slug}
                                     href={`/xem-phim/${movieSlug}/${ep.slug}?server=${safeIndex}`}
                                     className={cn(
-                                        "h-[42px] rounded-xl flex items-center justify-center text-[15px] font-bold transition-all border",
+                                        "h-[44px] rounded-xl flex items-center justify-center text-[14px] sm:text-[15px] font-bold transition-all border touch-manipulation",
                                         isActive
-                                            ? "bg-[#F4C84A] border-[#F4C84A] text-black shadow-none scale-100" // System yellow
-                                            : "bg-[#15151A] border-transparent text-[#E4E4E5] hover:bg-[#1A1D24] hover:border-white/5"
+                                            ? "bg-[#F4C84A] border-[#F4C84A] text-black shadow-none scale-100"
+                                            : "bg-[#15151A] border-transparent text-[#E4E4E5] hover:bg-[#1A1D24] hover:border-white/5 active:scale-95"
                                     )}
                                 >
                                     {displayName}

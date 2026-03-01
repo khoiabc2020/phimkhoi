@@ -1,1 +1,1 @@
-feat: sync mobile+web - lang tabs yellow active color realtime sync empty server filter
+feat: mobile iPad responsive - hero mobile padding, column order, touch targets, episode grid

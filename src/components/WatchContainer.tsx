@@ -137,45 +137,45 @@ export default function WatchContainer({
                 </div>
 
                 {/* Info Bar below player (onflix-style) */}
-                <div className="mt-2 px-1 flex items-center justify-between gap-3 flex-wrap">
+                <div className="mt-2 px-1 flex items-center justify-between gap-2 sm:gap-3 flex-wrap">
                     {/* Left: Title + Episode */}
                     <div className="flex items-center gap-2 min-w-0">
                         <Link
                             href={`/phim/${movie.slug}`}
-                            className="text-gray-400 hover:text-white transition-colors"
+                            className="text-gray-400 hover:text-white transition-colors flex-shrink-0"
                         >
                             <ChevronLeft className="w-4 h-4" />
                         </Link>
                         <div className="min-w-0">
-                            <p className="text-white font-semibold text-sm truncate leading-tight">
+                            <p className="text-white font-semibold text-xs sm:text-sm truncate leading-tight">
                                 {movie.name}
                             </p>
-                            <p className="text-yellow-400/70 text-xs">
+                            <p className="text-yellow-400/70 text-[11px] sm:text-xs">
                                 {activeEpisode ? displayEpisodeName(activeEpisode.name) : ""}
                             </p>
                         </div>
                     </div>
 
                     {/* Right: controls */}
-                    <div className="flex items-center gap-3 flex-shrink-0">
+                    <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                         {/* Prev episode */}
                         {prevEpisodeUrl && (
                             <Link
                                 href={prevEpisodeUrl}
-                                className="flex items-center gap-1 text-xs text-gray-400 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10"
+                                className="flex items-center gap-1 text-xs text-gray-400 hover:text-white transition-colors px-2 sm:px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 touch-manipulation"
                             >
                                 <ChevronLeft className="w-3.5 h-3.5" />
-                                Tập trước
+                                <span className="hidden sm:inline">Tập trước</span>
                             </Link>
                         )}
 
                         {/* Auto-next toggle */}
                         <button
                             onClick={() => setAutoNext(!autoNext)}
-                            className="flex items-center gap-2 text-xs font-semibold transition-colors"
+                            className="flex items-center gap-1.5 text-xs font-semibold transition-colors"
                         >
                             <SkipForward className={cn("w-4 h-4", autoNext ? "text-yellow-400" : "text-gray-500")} />
-                            <span className={autoNext ? "text-yellow-400" : "text-gray-500"}>Tự chuyển tập</span>
+                            <span className={cn("hidden sm:inline", autoNext ? "text-yellow-400" : "text-gray-500")}>Tự chuyển tập</span>
                             <span
                                 className={cn(
                                     "px-1.5 py-0.5 rounded text-[10px] font-bold border",
@@ -192,9 +192,9 @@ export default function WatchContainer({
                         {nextEpisodeUrl && (
                             <Link
                                 href={nextEpisodeUrl}
-                                className="flex items-center gap-1 text-xs font-semibold text-gray-300 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10"
+                                className="flex items-center gap-1 text-xs font-semibold text-gray-300 hover:text-white transition-colors px-2 sm:px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 touch-manipulation"
                             >
-                                Tập sau
+                                <span className="hidden sm:inline">Tập sau</span>
                                 <ChevronRight className="w-3.5 h-3.5" />
                             </Link>
                         )}

@@ -74,40 +74,40 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     return (
         <main className="min-h-screen pb-20 bg-[#0a0a0a]">
             {/* Hero Section (Backdrop + Info Overlay) */}
-            <div className="relative w-full pt-32 pb-8 px-4 md:px-8 xl:px-16 flex items-end min-h-[500px]">
+            <div className="relative w-full pt-20 sm:pt-28 md:pt-32 pb-8 px-4 md:px-8 xl:px-16 flex items-end min-h-[420px] sm:min-h-[500px]">
                 <div
-                    className="absolute inset-0 bg-cover bg-center"
+                    className="absolute inset-0 bg-cover bg-center bg-top"
                     style={{ backgroundImage: `url(${backdropUrl})` }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-[#0a0a0a]/20" />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/70 to-transparent" />
 
                 {/* Hero Info Content aligned left/bottom */}
-                <div className="relative z-10 w-full max-w-[1600px] mx-auto space-y-4">
-                    <span className="inline-block bg-[#F4C84A] text-black px-2 py-0.5 text-[10px] font-bold rounded shadow-sm mb-2 uppercase">{movie?.quality || "FHD"} {movie?.year}</span>
-                    <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight drop-shadow-2xl">{movie?.name}</h1>
-                    <h2 className="text-lg md:text-2xl text-gray-300 font-medium tracking-wide drop-shadow-md">{movie?.origin_name}</h2>
+                <div className="relative z-10 w-full max-w-[1600px] mx-auto space-y-2 sm:space-y-4">
+                    <span className="inline-block bg-[#F4C84A] text-black px-2 py-0.5 text-[10px] font-bold rounded shadow-sm mb-1 uppercase">{movie?.quality || "FHD"} {movie?.year}</span>
+                    <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight drop-shadow-2xl">{movie?.name}</h1>
+                    <h2 className="hidden sm:block text-base md:text-2xl text-gray-300 font-medium tracking-wide drop-shadow-md">{movie?.origin_name}</h2>
 
-                    <div className="flex items-center gap-2 text-yellow-500 font-bold text-sm mt-3 drop-shadow-md">
+                    <div className="flex items-center gap-2 text-yellow-500 font-bold text-sm mt-2 drop-shadow-md">
                         <PlayCircle className="w-4 h-4 fill-current" />
                         Đang chiếu tập {movie?.episode_current || "1"} / {movie?.episode_total || "?"}
                     </div>
 
-                    <div className="text-sm text-gray-300 flex flex-wrap items-center gap-4 py-2 drop-shadow-md">
+                    <div className="text-xs sm:text-sm text-gray-300 flex flex-wrap items-center gap-2 sm:gap-4 py-1 sm:py-2 drop-shadow-md">
                         <span><span className="text-gray-500">Đạo diễn:</span> {movie?.director?.join(", ") || "Đang cập nhật"}</span>
                         <span className="w-1 h-1 bg-gray-600 rounded-full hidden sm:block" />
                         <span><span className="text-gray-500">Thời lượng:</span> {movie?.time || "N/A"}</span>
                     </div>
-                    <div className="text-sm text-gray-300 mb-6 line-clamp-1 max-w-3xl drop-shadow-md">
+                    <div className="text-xs sm:text-sm text-gray-300 mb-3 sm:mb-6 line-clamp-2 max-w-3xl drop-shadow-md">
                         <span className="text-gray-500">Diễn viên:</span> {movie?.actor?.join(", ") || "Đang cập nhật"}
                     </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex flex-wrap items-center gap-3 pt-4">
+                    {/* Action Buttons -- bigger touch targets on mobile */}
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-2 sm:pt-4">
                         {serverData.length > 0 && (
                             <Link
                                 href={`/xem-phim/${movie?.slug}/${serverData[0].slug}`}
-                                className="flex items-center gap-2 bg-[#F4C84A] text-black px-6 py-2.5 rounded-full font-bold text-sm md:text-base hover:brightness-110 hover:scale-105 transition-all shadow-[0_4px_14px_0_rgba(244,200,74,0.39)]"
+                                className="flex items-center gap-2 bg-[#F4C84A] text-black px-5 sm:px-6 py-2.5 rounded-full font-bold text-sm hover:brightness-110 hover:scale-105 transition-all shadow-[0_4px_14px_0_rgba(244,200,74,0.39)]"
                             >
                                 <Play className="w-4 h-4 fill-current" />
                                 CHIẾU PHÁT
@@ -136,8 +136,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                     className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/5 rounded-full"
                                     showLabel={true}
                                 />
-                                {/* Share Button Placeholder */}
-                                <button className="flex items-center gap-2 px-4 py-2 min-h-[40px] rounded-full bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white font-medium text-sm transition-all border border-white/5 group">
+                                <button className="hidden sm:flex items-center gap-2 px-4 py-2 min-h-[40px] rounded-full bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white font-medium text-sm transition-all border border-white/5 group">
                                     <Share2 className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors shrink-0" />
                                     <span>Chia sẻ</span>
                                 </button>
@@ -147,18 +146,36 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 </div>
             </div>
 
-            {/* Bottom Content: 2 Columns */}
-            <div className="max-w-[1600px] mx-auto px-4 md:px-8 xl:px-16 mt-12 relative z-10">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Bottom Content: responsive — stacked on mobile, 2-col on desktop */}
+            <div className="max-w-[1600px] mx-auto px-4 md:px-8 xl:px-16 mt-6 sm:mt-10 lg:mt-12 relative z-10">
+                {/* On mobile/tablet: RIGHT column (tabs) first, then sidebar info below */}
+                <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-8 items-start">
 
-                    {/* LEFT COLUMN: NỘI DUNG, ĐẠO DIỄN, DIỄN VIÊN, THỂ LOẠI, THÔNG TIN THÊM */}
-                    <div className="lg:col-span-4 xl:col-span-3 space-y-8 pr-4 lg:border-r lg:border-white/[0.04]">
+                    {/* RIGHT COLUMN (shown first on mobile) */}
+                    <div className="w-full lg:col-span-8 xl:col-span-9 order-1 lg:order-2">
+                        <MovieTabs
+                            movie={movie}
+                            relatedMovies={relatedMovies}
+                            episodes={episodes}
+                            slug={slug}
+                        />
+                        {/* Comment Section below tabs */}
+                        <div className="mt-8 sm:mt-12">
+                            <div className="flex items-center gap-2 mb-6 border-l-2 border-[#F4C84A] pl-3">
+                                <h3 className="text-[15px] font-bold text-white uppercase tracking-widest">Bình luận</h3>
+                            </div>
+                            <CommentSection movieId={movie._id} movieSlug={movie.slug} />
+                        </div>
+                    </div>
+
+                    {/* LEFT SIDEBAR (shown after tabs on mobile, beside on desktop) */}
+                    <div className="w-full lg:col-span-4 xl:col-span-3 order-2 lg:order-1 space-y-6 sm:space-y-8 lg:pr-4 lg:border-r lg:border-white/[0.04]">
                         {/* Nội dung */}
                         <div>
-                            <div className="flex items-center gap-2 mb-4 border-l-2 border-[#F4C84A] pl-3">
-                                <h3 className="text-[15px] font-bold text-white uppercase tracking-widest">Nội dung</h3>
+                            <div className="flex items-center gap-2 mb-3 sm:mb-4 border-l-2 border-[#F4C84A] pl-3">
+                                <h3 className="text-[14px] sm:text-[15px] font-bold text-white uppercase tracking-widest">Nội dung</h3>
                             </div>
-                            <div className="text-[13px] text-gray-400 leading-relaxed font-light text-justify line-clamp-[12]" dangerouslySetInnerHTML={{ __html: movie?.content }} />
+                            <div className="text-[13px] text-gray-400 leading-relaxed font-light text-justify line-clamp-6 sm:line-clamp-[12]" dangerouslySetInnerHTML={{ __html: movie?.content }} />
                         </div>
 
                         {/* Đạo diễn */}
@@ -192,23 +209,6 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                 <div className="flex justify-between border-b border-white/[0.04] pb-2"><span className="text-gray-500">Chất lượng:</span><span className="text-gray-300 font-medium">{movie?.quality || "HD"}</span></div>
                                 <div className="flex justify-between"><span className="text-gray-500">Ngôn ngữ:</span><span className="text-gray-300 font-medium">{movie?.lang || "Đang cập nhật"}</span></div>
                             </div>
-                        </div>
-                    </div>
-
-                    {/* RIGHT COLUMN: Tabs */}
-                    <div className="lg:col-span-8 xl:col-span-9">
-                        <MovieTabs
-                            movie={movie}
-                            relatedMovies={relatedMovies}
-                            episodes={episodes}
-                            slug={slug}
-                        />
-                        {/* Comment Section below tabs */}
-                        <div className="mt-12">
-                            <div className="flex items-center gap-2 mb-6 border-l-2 border-[#F4C84A] pl-3">
-                                <h3 className="text-[15px] font-bold text-white uppercase tracking-widest">Bình luận</h3>
-                            </div>
-                            <CommentSection movieId={movie._id} movieSlug={movie.slug} />
                         </div>
                     </div>
 
