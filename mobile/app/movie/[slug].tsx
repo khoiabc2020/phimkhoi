@@ -536,7 +536,10 @@ export default function MovieDetailScreen() {
                                                             >
                                                                 <Link href={playerHref as any} asChild>
                                                                     <Pressable style={styles.epCardInner}>
-                                                                        <Text style={styles.epText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>{ep.name.replace('Tập ', '')}</Text>
+                                                                        <Ionicons name="play-circle" size={14} color="rgba(255,255,255,0.4)" />
+                                                                        <Text style={styles.epText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
+                                                                            Tập {ep.name.replace('Tập ', '').padStart(2, '0')}
+                                                                        </Text>
                                                                         {localUri && <Ionicons name="cloud-done" size={12} color={COLORS.accent} style={{ position: 'absolute', top: 4, right: 4 }} />}
                                                                     </Pressable>
                                                                 </Link>
@@ -799,7 +802,7 @@ const styles = StyleSheet.create({
     tabText: { color: 'rgba(255,255,255,0.45)', fontSize: 14, fontWeight: '500' },
     tabTextActive: { color: 'white', fontWeight: '600' },
 
-    // Episode Grid — iOS 26: gọn, tinh tế, mềm
+    // Episode Grid — dark premium, iOS 26
     episodeGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
@@ -808,26 +811,28 @@ const styles = StyleSheet.create({
         paddingHorizontal: 0,
     },
     epCardWrap: {
-        borderRadius: 14,
+        borderRadius: 8,
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.12)',
-        backgroundColor: 'rgba(255,255,255,0.04)',
+        borderColor: 'rgba(255,255,255,0.05)',
+        backgroundColor: '#111319',
         overflow: 'hidden',
-        minHeight: EP_BOX_HEIGHT,
+        minHeight: 40,
     },
     epCardWrapOffline: { borderColor: '#F5C451', backgroundColor: 'rgba(245,196,81,0.10)' },
     epCardInner: {
         flex: 1,
-        minHeight: EP_BOX_HEIGHT,
+        flexDirection: 'row',
+        minHeight: 40,
         alignItems: 'center',
         justifyContent: 'center',
         paddingHorizontal: 4,
+        gap: 4,
     },
     epText: {
-        color: 'rgba(255,255,255,0.95)',
+        color: '#9CA3AF',
         fontWeight: '500',
         textAlign: 'center',
-        fontSize: 14,
+        fontSize: 13,
         letterSpacing: 0.5,
         ...(Platform.OS === 'android' && { includeFontPadding: false }),
     },

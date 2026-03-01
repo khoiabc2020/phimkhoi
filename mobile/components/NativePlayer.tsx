@@ -692,12 +692,10 @@ export default function NativePlayer({
                                                 setShowEpisodes(false);
                                             }}
                                         >
+                                            <Ionicons name="play-circle" size={14} color={isActive ? "#fbbf24" : "rgba(255,255,255,0.4)"} />
                                             <Text style={[styles.epGridText, isActive && styles.activeEpGridText]} numberOfLines={1}>
-                                                {item.name.replace('Tập ', '')}
+                                                Tập {item.name.replace('Tập ', '').padStart(2, '0')}
                                             </Text>
-                                            {isActive && (
-                                                <View style={{ position: 'absolute', bottom: 8, width: 4, height: 4, borderRadius: 2, backgroundColor: '#fbbf24' }} />
-                                            )}
                                         </TouchableOpacity>
                                     );
                                 }}
@@ -949,27 +947,28 @@ const styles = StyleSheet.create({
         alignItems: 'center', justifyContent: 'center'
     },
 
-    // --- EPISODE GRID (iOS 26, đồng bộ với trang phim) ---
+    // --- EPISODE GRID (dark premium, iOS 26) ---
     epGridItem: {
         height: 40,
-        backgroundColor: 'rgba(255,255,255,0.04)',
-        borderRadius: 14,
+        backgroundColor: '#111319',
+        borderRadius: 8,
+        flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.12)',
+        borderColor: 'rgba(255,255,255,0.05)',
         paddingHorizontal: 4,
+        gap: 4,
     },
     activeEpGridItem: {
         backgroundColor: 'rgba(245,196,81,0.10)',
         borderColor: '#F5C451',
     },
     epGridText: {
-        color: 'rgba(255,255,255,0.7)',
+        color: '#9CA3AF',
         fontSize: 13,
         fontWeight: '500',
         textAlign: 'center',
-        marginBottom: 2, // nudge up slightly to make room for dot
     },
     activeEpGridText: {
         color: '#F5C451',

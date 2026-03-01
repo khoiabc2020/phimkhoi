@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { ChevronDown, List, ChevronLeft, Database, Mic, Subtitles, Volume2 } from "lucide-react";
+import { ChevronDown, List, ChevronLeft, Database, Mic, Subtitles, Volume2, PlayCircle, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Episode {
@@ -147,7 +147,7 @@ export default function WatchEpisodeSection({
                                     <Icon className={cn("w-[15px] h-[15px]", isActive ? "text-[#F4C84A]" : "text-gray-500")} />
                                     {lang}
                                     {isActive && (
-                                        <span className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-[#F4C84A] shadow-[0_0_10px_#F4C84A]" />
+                                        <span className="absolute bottom-[-1px] left-0 right-0 h-[2px] bg-[#F4C84A] shadow-[0_0_8px_rgba(244,200,74,0.5)]" />
                                     )}
                                 </button>
                             );
@@ -186,27 +186,32 @@ export default function WatchEpisodeSection({
                                             setCurrentChunk(0);
                                         }}
                                         className={cn(
-                                            "h-[34px] px-3 rounded-md text-[12px] font-medium transition-all duration-300 border flex items-center justify-center gap-2",
+                                            "h-[34px] px-4 rounded-lg text-[12px] font-medium transition-all duration-300 border flex items-center justify-center gap-3 shadow-sm",
                                             isServerActive
-                                                ? activeBgClass
-                                                : "bg-[#111113]/50 border-white/5 text-gray-400 hover:text-white hover:border-white/20 hover:bg-[#1A1D24]"
+                                                ? "bg-[#F4C84A] border-[#F4C84A] text-[#0B0D12]"
+                                                : "bg-[#111319] border-white/5 text-gray-400 hover:text-white hover:border-white/10 hover:bg-[#1A1D24]"
                                         )}
                                     >
                                         <span className="truncate max-w-[150px]">{displayName}</span>
-                                        {isServerActive && (
+                                        {isServerActive ? (
                                             <>
-                                                <span className="w-[1px] h-3 bg-white/20"></span>
+                                                <span className="w-[1px] h-3 bg-black/20"></span>
                                                 <span className="font-bold">{s.server_data.length}</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span className="w-[1px] h-3 bg-white/10"></span>
+                                                <span className="font-medium text-gray-500">#{i + 1}</span>
                                             </>
                                         )}
                                     </button>
                                 );
                             })
                         ) : (
-                            <button className="h-[34px] px-3 rounded-md text-[12px] font-medium bg-[#28282B] border-[#3f3f46] text-white shadow-sm flex items-center justify-center gap-2">
+                            <button className="h-[34px] px-4 rounded-lg text-[12px] font-medium bg-[#111319] border border-white/5 text-gray-400 shadow-sm flex items-center justify-center gap-3">
                                 {serverName}
-                                <span className="w-[1px] h-3 bg-white/30"></span>
-                                <span>{episodes.length}</span>
+                                <span className="w-[1px] h-3 bg-white/10"></span>
+                                <span className="font-medium text-gray-500">#1</span>
                             </button>
                         )}
                     </div>
@@ -268,31 +273,27 @@ export default function WatchEpisodeSection({
 
                 {/* Episode grid */}
                 {!isCollapsed && (
-                    <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-8 xl:grid-cols-10 gap-2 sm:gap-3 max-h-[450px] sm:max-h-[500px] overflow-y-auto custom-scrollbar pr-1 sm:pr-3 [contain:layout_paint]">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3 sm:gap-4 max-h-[500px] overflow-y-auto custom-scrollbar pr-1 sm:pr-3 [contain:layout_paint]">
                         {episodes.slice(currentChunk * EPISODES_PER_CHUNK, (currentChunk + 1) * EPISODES_PER_CHUNK).map((ep) => {
                             const isActive = ep.slug === currentEpisodeSlug;
 
                             // Extract just the number if it's "Tập X" for a cleaner look
-                            let displayName = ep.name;
                             const match = ep.name.match(/Tập\s+(\d+)/i);
-                            if (match) {
-                                displayName = match[1].padStart(2, '0');
-                            } else if (/^\d+$/.test(ep.name)) {
-                                displayName = ep.name.padStart(2, '0');
-                            }
+                            const displayNum = match ? match[1].padStart(2, '0') : (/^\d+$/.test(ep.name) ? ep.name.padStart(2, '0') : ep.name);
 
                             return (
                                 <Link
                                     key={ep.slug}
                                     href={`/xem-phim/${movieSlug}/${ep.slug}?server=${safeIndex}`}
                                     className={cn(
-                                        "h-[44px] rounded-xl flex items-center justify-center text-[14px] sm:text-[15px] font-bold transition-all border touch-manipulation",
+                                        "h-[40px] rounded-lg flex items-center justify-center gap-2 text-[13px] sm:text-[14px] font-medium transition-all border touch-manipulation",
                                         isActive
-                                            ? "bg-[#F4C84A] border-[#F4C84A] text-black shadow-none scale-100"
-                                            : "bg-[#15151A] border-transparent text-[#E4E4E5] hover:bg-[#1A1D24] hover:border-white/5 active:scale-95"
+                                            ? "bg-[#111319] border-[#F4C84A] text-[#F4C84A] shadow-[0_0_10px_rgba(244,200,74,0.1)]"
+                                            : "bg-[#111319] border-white/5 text-[#9CA3AF] hover:text-[#E4E4E5] hover:bg-[#15171E] hover:border-white/10 active:scale-95"
                                     )}
                                 >
-                                    {displayName}
+                                    <PlayCircle className={isActive ? "w-[14px] h-[14px] text-[#F4C84A]" : "w-[14px] h-[14px] text-gray-500"} strokeWidth={2.5} />
+                                    <span>Tập {displayNum}</span>
                                 </Link>
                             );
                         })}
