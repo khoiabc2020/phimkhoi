@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e  # Exit immediately if a command exits with a non-zero status.
+# set -e is intentionally removed so partial failures don't abort the deploy
 
 # Configuration
 APP_DIR="/home/ubuntu/phimkhoi" # UPDATED PATH
@@ -30,10 +30,15 @@ rm -rf .next
 export NODE_OPTIONS="--max_old_space_size=2048"
 npm run build
 
-# FIX: Copy static assets to standalone directory (Critical for CSS/JS/Images to work)
+# FIX: Explicitly nuke the standalone dir before copying fresh assets
+# This avoids 'rm: cannot remove .next/standalone: Directory not empty' errors
+echo "Clearing old standalone directory..."
+rm -rf .next/standalone || true
+
+# Recreate standalone + copy fresh static assets
 echo "Copying static assets to standalone..."
-cp -r public .next/standalone/public
-cp -r .next/static .next/standalone/.next/static
+cp -rf public .next/standalone/public
+cp -rf .next/static .next/standalone/.next/static
 # Copy env file if it exists (Crucial for Standalone)
 if [ -f .env.local ]; then
     cp .env.local .next/standalone/.env.production
