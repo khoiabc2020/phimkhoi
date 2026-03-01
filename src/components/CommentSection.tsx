@@ -160,7 +160,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                             <button
                                 type="submit"
                                 disabled={submitting || !newComment.trim()}
-                                className="bg-[#16a34a] hover:bg-[#15803d] text-white px-5 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold text-sm"
+                                className="bg-[#F4C84A] hover:bg-[#d0a736] text-black px-5 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold text-sm"
                             >
                                 {submitting ? <Loader2 className="w-4 h-4 animate-spin inline mr-1" /> : null}
                                 Gửi bình luận
@@ -170,7 +170,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                 </form>
             ) : (
                 <div className="bg-white/5 text-gray-400 p-4 rounded-xl mb-8 text-center border border-white/10 text-sm">
-                    Vui lòng <a href="/login" className="text-[#1ce783] hover:underline font-bold">đăng nhập</a> để bình luận.
+                    Vui lòng <a href="/login" className="text-[#F4C84A] hover:underline font-bold">đăng nhập</a> để bình luận.
                 </div>
             )}
 
@@ -201,12 +201,12 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                                         </span>
                                         {/* Dynamic Episode Tag */}
                                         {comment.episodeName && (
-                                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-500/20 text-[#1ce783] font-medium tracking-wide">
+                                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#F4C84A]/20 text-[#F4C84A] font-medium tracking-wide">
                                                 {comment.episodeName.startsWith("Tập") ? comment.episodeName : `Tập ${comment.episodeName}`}
                                             </span>
                                         )}
                                     </div>
-                                    <div className="text-[11px] text-[#1ce783] font-bold mt-0.5 tracking-wide">
+                                    <div className="text-[11px] text-[#F4C84A] font-bold mt-0.5 tracking-wide">
                                         {comment.userRole || "Thành viên"}
                                     </div>
                                 </div>
@@ -218,7 +218,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                                         onClick={() => handleLike(comment._id)}
                                         disabled={!session}
                                         className={`flex items-center gap-1.5 text-[13px] font-medium transition-colors ${session && comment.likedBy.includes(session.user?.id as string)
-                                            ? "text-[#1ce783]"
+                                            ? "text-[#F4C84A]"
                                             : "text-gray-400 hover:text-white"
                                             } disabled:opacity-50`}
                                     >

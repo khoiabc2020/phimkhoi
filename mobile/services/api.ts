@@ -66,12 +66,112 @@ export const getHomeData = async () => {
     }
 };
 
+export const OPHIM_API = "https://ophim1.com";
+export const NGUONC_API = "https://phim.nguonc.com";
+
+// Safe URI concatenation
+const combineUrl = (base: string, path: string) => {
+    if (!base) return path;
+    if (!path) return base;
+    const cleanBase = base.endsWith('/') ? base.slice(0, -1) : base;
+    const cleanPath = path.startsWith('/') ? path : `/${path}`;
+    return `${cleanBase}${cleanPath}`;
+};
+
 export const getMovieDetail = async (slug: string) => {
     try {
-        const res = await fetch(`${API_URL}/phim/${slug}`);
-        if (!res.ok) return null;
-        const data = await res.json();
-        return data; // Returns { status, msg, movie, episodes }
+        const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
+            fetch(`${API_URL}/phim/${slug}`).then(r => r.json()),
+            fetch(`${OPHIM_API}/phim/${slug}`).then(r => r.json()),
+            fetch(`${NGUONC_API}/api/film/${slug}`).then(r => r.json())
+        ]);
+
+        let combinedData: any = null;
+
+        // Base movie data prefers KKPhim, fallback to OPhim
+        if (kkRes.status === 'fulfilled' && kkRes.value?.status) {
+            combinedData = { ...kkRes.value };
+            // Tag servers from KKPhim
+            if (combinedData.episodes) {
+                combinedData.episodes = combinedData.episodes.map((epGroup: any) => ({
+                    ...epGroup,
+                    server_name: `KKPhim #${epGroup.server_name || "1"}`
+                }));
+            }
+        } else if (ophimRes.status === 'fulfilled' && ophimRes.value?.status) {
+            combinedData = { ...ophimRes.value };
+            // Ophim structures movie data slightly differently, might need normalization here if used as base
+            if (!combinedData.movie?.thumb_url?.startsWith('http') && combinedData.pathImage) {
+                combinedData.movie.thumb_url = combineUrl(combinedData.pathImage, combinedData.movie.thumb_url);
+                combinedData.movie.poster_url = combineUrl(combinedData.pathImage, combinedData.movie.poster_url);
+            }
+            // Tag servers from OPhim
+            if (combinedData.episodes) {
+                combinedData.episodes = combinedData.episodes.map((epGroup: any) => ({
+                    ...epGroup,
+                    server_name: `OPhim #${epGroup.server_name || "1"}`
+                }));
+            }
+        }
+
+        // If we found a base, and the OTHER source also succeeded, merge its episodes
+        if (combinedData) {
+            if (kkRes.status === 'fulfilled' && kkRes.value?.status && ophimRes.status === 'fulfilled' && ophimRes.value?.status) {
+                const ophimEpisodes = ophimRes.value.episodes || [];
+                const taggedOphimEpisodes = ophimEpisodes.map((epGroup: any) => ({
+                    ...epGroup,
+                    server_name: `OPhim #${epGroup.server_name || "1"}`
+                }));
+                combinedData.episodes = [...(combinedData.episodes || []), ...taggedOphimEpisodes];
+            }
+
+            // Also merge NguonC episodes if available
+            if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
+                const nguoncEpisodes = nguoncRes.value.movie?.episodes || [];
+                const taggedNguoncEpisodes = nguoncEpisodes.map((epGroup: any) => ({
+                    ...epGroup,
+                    server_name: `NguonC #${epGroup.server_name || "1"}`
+                }));
+                combinedData.episodes = [...(combinedData.episodes || []), ...taggedNguoncEpisodes];
+            }
+            return combinedData;
+        }
+
+        // What if KK and Ophim failed but NguonC succeeded?
+        if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
+            const data = nguoncRes.value.movie;
+            return {
+                status: true,
+                movie: {
+                    _id: data.id || data.slug,
+                    name: data.name,
+                    slug: data.slug,
+                    origin_name: data.original_name,
+                    content: data.description,
+                    type: data.type === 'single' ? 'single' : 'series',
+                    status: data.current_episode,
+                    thumb_url: data.thumb_url,
+                    poster_url: data.poster_url,
+                    time: data.time || "",
+                    episode_current: data.current_episode,
+                    episode_total: data.total_episodes,
+                    quality: data.quality || "FHD",
+                    lang: data.language || "Vietsub",
+                    year: parseInt(data.category?.[3]?.list?.[0]?.name || new Date().getFullYear()),
+                    actor: data.casts?.split(',') || [],
+                    director: data.director?.split(',') || [],
+                    category: data.category?.['1']?.list || [],
+                    country: data.category?.['4']?.list || [],
+                    trailer_url: data.trailer_url || "",
+                },
+                episodes: (data.episodes || []).map((epGroup: any) => ({
+                    ...epGroup,
+                    server_name: `NguonC #${epGroup.server_name || "1"}`
+                }))
+            };
+        }
+
+        return null;
     } catch (error) {
         console.error(`Error fetching movie detail [${slug}]:`, error);
         return null;
