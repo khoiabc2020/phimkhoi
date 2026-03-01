@@ -78,13 +78,31 @@ const combineUrl = (base: string, path: string) => {
     return `${cleanBase}${cleanPath}`;
 };
 
+// ── In-memory cache (session-scoped, 5-minute TTL) ──────────────────────────
+const _cache = new Map<string, { data: any; ts: number }>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+function cacheGet(key: string): any | null {
+    const hit = _cache.get(key);
+    if (!hit) return null;
+    if (Date.now() - hit.ts > CACHE_TTL) { _cache.delete(key); return null; }
+    return hit.data;
+}
+function cacheSet(key: string, data: any) { _cache.set(key, { data, ts: Date.now() }); }
+// ────────────────────────────────────────────────────────────────────────────
+
 export const getMovieDetail = async (slug: string) => {
+    const cacheKey = `movie:${slug}`;
+    const cached = cacheGet(cacheKey);
+    if (cached) return cached;   // ← instant return on repeat visits
+
     try {
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
             fetch(`${API_URL}/phim/${slug}`).then(r => r.json()),
             fetch(`${OPHIM_API}/phim/${slug}`).then(r => r.json()),
             fetch(`${NGUONC_API}/api/film/${slug}`).then(r => r.json())
         ]);
+
 
         let combinedData: any = null;
 

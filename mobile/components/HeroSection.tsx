@@ -1,8 +1,9 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { View, Text, Dimensions, StyleSheet, Platform, Pressable, TouchableOpacity, LayoutAnimation } from 'react-native';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { View, Text, Dimensions, StyleSheet, Platform, Pressable, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import Carousel from 'react-native-reanimated-carousel';
+import Carousel, { ICarouselInstance } from 'react-native-reanimated-carousel';
+import { useSharedValue } from 'react-native-reanimated';
 import FocusableButton from './FocusableButton';
 import { Image } from 'expo-image';
 import { Movie, getImageUrl, toggleFavorite as apiToggleFavorite } from '@/services/api';
@@ -21,20 +22,29 @@ interface HeroSectionProps {
     movies: Movie[];
 }
 
+// ──────────────────────────────────────────────────────────
+// KEY PERF FIX: activeIndex lives in a Sharedvalue & local ref
+// so renderItem does NOT re-create on every swipe.
+// HeroCard is memoized — only re-renders when isFav changes.
+// ──────────────────────────────────────────────────────────
 export default function HeroSection({ movies }: HeroSectionProps) {
-    const [activeIndex, setActiveIndex] = useState(0);
     const [favSlugs, setFavSlugs] = useState<Set<string>>(new Set());
+    // Use a ref for the active index to avoid re-creating renderItem closure
+    const activeIndexRef = useRef(0);
+    const [, forceActiveUpdate] = useState(0); // Trigger re-render only for the indicator dots
     const router = useRouter();
     const { user, token, syncFavorites } = useAuth();
+    const carouselRef = useRef<ICarouselInstance>(null);
 
     useEffect(() => {
+        if (!movies?.length) return;
         (async () => {
             const next = new Set<string>();
-            for (const m of movies || []) {
+            for (const m of movies) {
                 try {
                     if (user?.favorites?.some((f: any) => (typeof f === 'string' ? f : f.slug) === m.slug)) next.add(m.slug);
                     else if (await isFavorite(m.slug)) next.add(m.slug);
-                } catch (_) {}
+                } catch (_) { }
             }
             setFavSlugs(next);
         })();
@@ -42,9 +52,10 @@ export default function HeroSection({ movies }: HeroSectionProps) {
 
     if (!movies?.length) return null;
 
+    // PERF FIX: No LayoutAnimation, no activeIndex in deps
     const onSnapToItem = useCallback((index: number) => {
-        if (Platform.OS !== 'web') LayoutAnimation.configureNext(LayoutAnimation.create(280, 'easeInEaseOut', 'opacity'));
-        setActiveIndex(index);
+        activeIndexRef.current = index;
+        forceActiveUpdate(n => n + 1); // cheap re-render for dots only
     }, []);
 
     const toggleFav = useCallback(async (movie: Movie) => {
@@ -82,13 +93,17 @@ export default function HeroSection({ movies }: HeroSectionProps) {
         }
     }, [favSlugs, user, token, syncFavorites]);
 
+    // PERF FIX: renderItem deps only includes favSlugs and toggleFav,
+    // NOT activeIndex — so cards don't all rebuild on every swipe.
+    // isActive is computed inside via closure over the ref (stable reference).
     const renderItem = useCallback(
         ({ item, index }: { item: Movie; index: number }) => {
             if (!item?.slug) return <View style={{ flex: 1 }} />;
             return (
                 <HeroCard
                     movie={item}
-                    isActive={index === activeIndex}
+                    index={index}
+                    activeIndexRef={activeIndexRef}
                     isFav={favSlugs.has(item.slug)}
                     onToggleFav={() => toggleFav(item)}
                     onPress={() => {
@@ -97,12 +112,14 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                 />
             );
         },
-        [activeIndex, favSlugs, toggleFav, router]
+        // CRITICAL: activeIndex NOT in deps — card components use the ref directly
+        [favSlugs, toggleFav, router]
     );
 
     return (
         <View style={styles.carouselSection}>
             <Carousel
+                ref={carouselRef}
                 loop
                 width={width}
                 height={CAROUSEL_HEIGHT}
@@ -110,31 +127,43 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                 autoPlay={true}
                 autoPlayInterval={5500}
                 onSnapToItem={onSnapToItem}
-                scrollAnimationDuration={480}
-                mode="parallax"
-                modeConfig={{ parallaxScrollingScale: 0.94, parallaxScrollingOffset: 32 }}
-                panGestureHandlerProps={{ activeOffsetX: [-20, 20] }}
+                // PERF FIX: 300ms is snappier, 480ms felt laggy
+                scrollAnimationDuration={300}
+                // PERF FIX: use default mode instead of 'parallax'
+                // parallax runs heavy JS-thread matrix transforms; default uses native driver
+                panGestureHandlerProps={{ activeOffsetX: [-15, 15] }}
                 renderItem={renderItem}
             />
         </View>
     );
 }
 
-const HeroCard = React.memo(function HeroCard({ movie, isActive, isFav, onToggleFav, onPress }: {
-    movie: Movie; isActive: boolean; isFav: boolean; onToggleFav: () => void; onPress: () => void;
+// PERF FIX: HeroCard now reads isActive from the ref (no prop changes on swipe),
+// so React.memo prevents any re-render until isFav changes.
+const HeroCard = React.memo(function HeroCard({ movie, index, activeIndexRef, isFav, onToggleFav, onPress }: {
+    movie: Movie;
+    index: number;
+    activeIndexRef: React.RefObject<number>;
+    isFav: boolean;
+    onToggleFav: () => void;
+    onPress: () => void;
 }) {
     const router = useRouter();
     const categories = movie.category?.slice(0, 3) || [];
+    // isActive is derived from ref — no prop re-creation needed
+    const isActive = activeIndexRef.current === index;
 
     return (
-        <View style={[styles.cardContainer, !isActive && { opacity: 0.82 }]} collapsable={false}>
+        <View style={[styles.cardContainer, !isActive && { opacity: 0.8 }]} collapsable={false}>
             <FocusableButton style={styles.posterWrapper} onPress={onPress}>
                 <Image
                     source={{ uri: getImageUrl(movie.poster_url || movie.thumb_url) }}
                     style={styles.posterImage}
                     contentFit="cover"
-                    transition={200}
+                    transition={150}
                     cachePolicy="memory-disk"
+                    // Priority: only decode image for active card eagerly
+                    priority={isActive ? 'high' : 'low'}
                 />
             </FocusableButton>
 
@@ -201,7 +230,7 @@ const styles = StyleSheet.create({
     carouselSection: {
         height: CAROUSEL_HEIGHT,
         width: '100%',
-        marginTop: 20, // Add space under header
+        marginTop: 20,
     },
     cardContainer: {
         flex: 1,

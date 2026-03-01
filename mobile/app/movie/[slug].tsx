@@ -106,15 +106,8 @@ export default function MovieDetailScreen() {
                 setMovie(data.movie);
                 const eps = data.episodes || [];
                 setEpisodes(eps);
-                const related = await getRelatedMovies(data.movie.category?.[0]?.slug || '');
-                setRelatedMovies(related);
 
-                const tmdbRating = await getTMDBRating(data.movie.name, data.movie.year);
-                if (tmdbRating) setRating(tmdbRating);
-                const tmdbCast = await getTMDBCast(data.movie.name, data.movie.year);
-                if (tmdbCast) setCast(tmdbCast.slice(0, 15));
-
-                // Initialize first non-empty server and its language group
+                // Initialize first non-empty server and its language group immediately
                 const firstNonEmpty = eps.findIndex((s: any) => s.server_data && s.server_data.length > 0);
                 const initIndex = firstNonEmpty !== -1 ? firstNonEmpty : 0;
                 setSelectedServer(initIndex);
@@ -126,6 +119,17 @@ export default function MovieDetailScreen() {
                     const firstEp = eps[initIndex].server_data[0].slug;
                     router.replace(`/player/${data.movie.slug}?ep=${firstEp}&server=${initIndex}` as any);
                 }
+
+                // PERF FIX: Run all secondary fetches in parallel — no more sequential awaits
+                const [relatedResult, ratingResult, castResult] = await Promise.allSettled([
+                    getRelatedMovies(data.movie.category?.[0]?.slug || ''),
+                    getTMDBRating(data.movie.name, data.movie.year),
+                    getTMDBCast(data.movie.name, data.movie.year),
+                ]);
+
+                if (relatedResult.status === 'fulfilled') setRelatedMovies(relatedResult.value);
+                if (ratingResult.status === 'fulfilled' && ratingResult.value) setRating(ratingResult.value);
+                if (castResult.status === 'fulfilled' && castResult.value) setCast(castResult.value.slice(0, 15));
             }
         } catch (error) {
             console.error(error);
@@ -133,6 +137,7 @@ export default function MovieDetailScreen() {
             setLoading(false);
         }
     }, [slug, autoPlay, router]);
+
 
     useEffect(() => {
         fetchData();
