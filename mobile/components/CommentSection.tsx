@@ -122,7 +122,7 @@ export default function CommentSection({ movieSlug }: { movieSlug: string }) {
     );
 }
 
-const styles = StyleSheetcreate({
+const styles = StyleSheet.create({
     container: {
         marginTop: 10,
     },
