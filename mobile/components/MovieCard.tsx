@@ -19,11 +19,11 @@ const MovieCard = memo(({ movie, width = 115, height = 172 }: MovieCardProps) =>
         <Link href={`/movie/${movie.slug}`} asChild>
             <FocusableButton
                 className="mr-3 transition-opacity"
-                style={{ width, borderRadius: 8, padding: 2 }}
+                style={{ width, borderRadius: 14, padding: 2 }}
                 focusStyle={{ borderWidth: 2, borderColor: '#fbbf24', transform: [{ scale: 1.05 }] }}
             >
                 {/* Image + Overlay Badges */}
-                <View style={{ width, height, borderRadius: 8, overflow: 'hidden', position: 'relative' }}>
+                <View style={{ width, height, borderRadius: 14, overflow: 'hidden', position: 'relative' }}>
                     <Image
                         source={{ uri: imageUrl }}
                         style={{ width, height }}
@@ -36,13 +36,13 @@ const MovieCard = memo(({ movie, width = 115, height = 172 }: MovieCardProps) =>
                     {(movie.episode_current != null && String(movie.episode_current).trim() !== '') && (
                         <View style={{ position: 'absolute', bottom: 6, left: 6, flexDirection: 'row', gap: 4 }}>
                             {movie.lang?.includes('Thuyết') ? (
-                                <View style={{ backgroundColor: 'rgba(59,130,246,0.9)', paddingHorizontal: 5, paddingVertical: 2, borderRadius: 4 }}>
+                                <View style={{ backgroundColor: 'rgba(59,130,246,0.9)', paddingHorizontal: 6, paddingVertical: 3, borderRadius: 6 }}>
                                     <Text style={{ fontSize: 9, fontWeight: 'bold', color: 'white' }}>
                                         TM.{String(movie.episode_current).replace(/[^0-9]/g, '') || 'Full'}
                                     </Text>
                                 </View>
                             ) : (
-                                <View style={{ backgroundColor: 'rgba(75,85,99,0.9)', paddingHorizontal: 5, paddingVertical: 2, borderRadius: 4 }}>
+                                <View style={{ backgroundColor: 'rgba(75,85,99,0.9)', paddingHorizontal: 6, paddingVertical: 3, borderRadius: 6 }}>
                                     <Text style={{ fontSize: 9, fontWeight: 'bold', color: 'white' }}>
                                         PD.{String(movie.episode_current).replace(/[^0-9]/g, '') || 'Full'}
                                     </Text>
@@ -53,7 +53,7 @@ const MovieCard = memo(({ movie, width = 115, height = 172 }: MovieCardProps) =>
 
                     {/* Quality Badge - Inside image, top-right */}
                     {movie.quality && (
-                        <View style={{ position: 'absolute', top: 6, right: 6, backgroundColor: '#fbbf24', paddingHorizontal: 5, paddingVertical: 2, borderRadius: 4 }}>
+                        <View style={{ position: 'absolute', top: 8, right: 8, backgroundColor: '#fbbf24', paddingHorizontal: 6, paddingVertical: 3, borderRadius: 6, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84, elevation: 5 }}>
                             <Text style={{ fontSize: 9, fontWeight: 'bold', color: 'black' }}>{movie.quality}</Text>
                         </View>
                     )}

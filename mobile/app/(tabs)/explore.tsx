@@ -22,7 +22,7 @@ const HotMovieItem = ({ item, index }: { item: Movie, index: number }) => {
   return (
     <Link href={`/movie/${item.slug}`} asChild>
       <Pressable style={{ width: ITEM_WIDTH, marginBottom: 16 }}>
-        <View style={{ borderRadius: 8, overflow: 'hidden', height: ITEM_WIDTH * 1.5, marginBottom: 8 }}>
+        <View style={{ borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)', overflow: 'hidden', height: ITEM_WIDTH * 1.5, marginBottom: 8 }}>
           <Image
             source={{ uri: getImageUrl(item.poster_url || item.thumb_url) }}
             style={{ width: '100%', height: '100%' }}
