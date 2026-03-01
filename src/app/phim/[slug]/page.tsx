@@ -122,7 +122,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                         movieSlug: movie.slug,
                                         movieName: movie.name,
                                         movieOriginName: movie.origin_name || "",
-                                        moviePoster: movie.poster_url || movie.thumb_url,
+                                        moviePoster: posterUrl || "/fallback.png",
                                         movieYear: Number(movie.year) || new Date().getFullYear(),
                                         movieQuality: movie.quality || "HD",
                                         movieCategories: movie.category?.map((c: any) => c.name) || [],
