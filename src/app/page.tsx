@@ -53,8 +53,11 @@ async function AsyncTopTrending({ title, slug, type }: { title: string, slug: st
 }
 
 export default async function Home() {
-  // Chỉ fetch dữ liệu của Hero để trang render FCP lẹ nhất
-  const heroTrending = await getTrendMovies('all').catch(() => []);
+  // Fetch Hero + first above-fold row concurrently for faster FCP
+  const [heroTrending, cinemaData] = await Promise.all([
+    getTrendMovies('all').catch(() => []),
+    getMoviesByCategory('phim-chieu-rap', 1, 12).catch(() => ({ items: [] })),
+  ]);
 
   let finalHeroData: any[] = heroTrending.slice(0, 20);
 
@@ -94,11 +97,10 @@ export default async function Home() {
           <div className="xl:col-span-9 space-y-16">
             <ContinueWatchingRow />
 
-            <LazyLoadWrapper fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
-              <Suspense fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
-                <AsyncMovieRow title="Phim Chiếu Rạp Mới" slug="phim-chieu-rap" />
-              </Suspense>
-            </LazyLoadWrapper>
+            {/* First row: already fetched above-fold — NO LazyLoadWrapper, renders immediately */}
+            {cinemaData?.items?.length ? (
+              <MovieRow title="Phim Chiếu Rạp Mới" movies={cinemaData.items} slug="/the-loai/phim-chieu-rap" />
+            ) : null}
 
             <LazyLoadWrapper fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
               <Suspense fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
@@ -166,3 +168,4 @@ export default async function Home() {
     </main>
   );
 }
+

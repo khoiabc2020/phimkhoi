@@ -68,10 +68,10 @@ const combineUrl = (base: string, path: string) => {
 export const getHomeData = async () => {
     try {
         const [phimLe, phimBo, hoatHinh, tvShows] = await Promise.all([
-            fetch(`${API_URL}/v1/api/danh-sach/phim-le?limit=12`, { next: { revalidate: 60 } }).then((res) => res.json()),
-            fetch(`${API_URL}/v1/api/danh-sach/phim-bo?limit=12`, { next: { revalidate: 60 } }).then((res) => res.json()),
-            fetch(`${API_URL}/v1/api/danh-sach/hoat-hinh?limit=12`, { next: { revalidate: 60 } }).then((res) => res.json()),
-            fetch(`${API_URL}/v1/api/danh-sach/tv-shows?limit=12`, { next: { revalidate: 60 } }).then((res) => res.json()),
+            fetch(`${API_URL}/v1/api/danh-sach/phim-le?limit=12`, { next: { revalidate: 3600 } }).then((res) => res.json()),
+            fetch(`${API_URL}/v1/api/danh-sach/phim-bo?limit=12`, { next: { revalidate: 3600 } }).then((res) => res.json()),
+            fetch(`${API_URL}/v1/api/danh-sach/hoat-hinh?limit=12`, { next: { revalidate: 3600 } }).then((res) => res.json()),
+            fetch(`${API_URL}/v1/api/danh-sach/tv-shows?limit=12`, { next: { revalidate: 3600 } }).then((res) => res.json()),
         ]);
 
         return {
@@ -284,9 +284,9 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
 
         // Fetch from BOTH sources in parallel
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
-            fetch(`${API_URL}/v1/api/danh-sach/${type}${query}`, { next: { revalidate: 60 } }).then(r => r.json()),
-            fetch(`${OPHIM_API}/v1/api/danh-sach/${type}${query}`, { next: { revalidate: 60 } }).then(r => r.json()), // Ignore cache for testing or separate key
-            fetch(`${NGUONC_API}/api/films/danh-sach/${type}?page=${page}`).then(r => r.json())
+            fetch(`${API_URL}/v1/api/danh-sach/${type}${query}`, { next: { revalidate: 3600 } }).then(r => r.json()),
+            fetch(`${OPHIM_API}/v1/api/danh-sach/${type}${query}`, { next: { revalidate: 3600 } }).then(r => r.json()),
+            fetch(`${NGUONC_API}/api/films/danh-sach/${type}?page=${page}`, { next: { revalidate: 3600 } }).then(r => r.json())
         ]);
 
         let items: Movie[] = [];
@@ -355,7 +355,7 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
             fetch(`${API_URL}/v1/api/the-loai/${slug}?page=${page}&limit=${limit}`, { next: { revalidate: 3600 } }).then(r => r.json()),
             fetch(`${OPHIM_API}/v1/api/the-loai/${slug}?page=${page}&limit=${limit}`, { next: { revalidate: 3600 } }).then(r => r.json()),
-            fetch(`${NGUONC_API}/api/films/the-loai/${slug}?page=${page}`).then(r => r.json())
+            fetch(`${NGUONC_API}/api/films/the-loai/${slug}?page=${page}`, { next: { revalidate: 3600 } }).then(r => r.json())
         ]);
 
         let items: Movie[] = [];
@@ -420,8 +420,9 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
             fetch(`${API_URL}/v1/api/quoc-gia/${slug}?page=${page}&limit=${limit}`, { next: { revalidate: 3600 } }).then(r => r.json()),
             fetch(`${OPHIM_API}/v1/api/quoc-gia/${slug}?page=${page}&limit=${limit}`, { next: { revalidate: 3600 } }).then(r => r.json()),
-            fetch(`${NGUONC_API}/api/films/quoc-gia/${slug}?page=${page}`).then(r => r.json())
+            fetch(`${NGUONC_API}/api/films/quoc-gia/${slug}?page=${page}`, { next: { revalidate: 3600 } }).then(r => r.json())
         ]);
+
 
         let items: Movie[] = [];
         let kkPagination = { currentPage: 1, totalPages: 1 };
