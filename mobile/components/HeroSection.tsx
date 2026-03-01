@@ -127,13 +127,24 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                 autoPlay={true}
                 autoPlayInterval={5500}
                 onSnapToItem={onSnapToItem}
-                // PERF FIX: 300ms is snappier, 480ms felt laggy
                 scrollAnimationDuration={300}
-                // PERF FIX: use default mode instead of 'parallax'
-                // parallax runs heavy JS-thread matrix transforms; default uses native driver
                 panGestureHandlerProps={{ activeOffsetX: [-15, 15] }}
                 renderItem={renderItem}
             />
+            {/* Indicator dots — lightweight, only re-render when activeIndex changes */}
+            {movies.length > 1 && (
+                <View style={styles.dotsRow}>
+                    {movies.map((_, i) => (
+                        <View
+                            key={i}
+                            style={[
+                                styles.dot,
+                                i === activeIndexRef.current ? styles.dotActive : styles.dotInactive
+                            ]}
+                        />
+                    ))}
+                </View>
+            )}
         </View>
     );
 }
@@ -373,5 +384,25 @@ const styles = StyleSheet.create({
     circleBtnFav: {
         backgroundColor: 'rgba(251,191,36,0.18)',
         borderColor: 'rgba(251,191,36,0.5)',
+    },
+    // Indicator dots
+    dotsRow: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 10,
+        gap: 6,
+    },
+    dot: {
+        height: 6,
+        borderRadius: 3,
+    },
+    dotActive: {
+        width: 20,
+        backgroundColor: 'rgba(244, 200, 74, 0.95)',
+    },
+    dotInactive: {
+        width: 6,
+        backgroundColor: 'rgba(255, 255, 255, 0.3)',
     },
 });
