@@ -91,7 +91,7 @@ export default function WatchEpisodeSection({
                                         type="button"
                                         onClick={() => onServerChange(s.server_name)}
                                         className={cn(
-                                            "px-8 py-2.5 rounded-full text-[14px] font-bold transition-all duration-300",
+                                            "px-5 py-2 rounded-full text-[13px] font-bold transition-all duration-300",
                                             isServerActive
                                                 ? "bg-[#1A1D24] text-[#E4E4E5] shadow-sm border border-white/[0.04]" // Darker active pill
                                                 : "bg-transparent text-[#71717A] hover:text-white"
@@ -102,7 +102,7 @@ export default function WatchEpisodeSection({
                                 );
                             })
                         ) : (
-                            <button className="px-8 py-2.5 rounded-full text-[14px] font-bold bg-[#1A1D24] text-[#E4E4E5] shadow-sm border border-white/[0.04]">
+                            <button className="px-5 py-2 rounded-full text-[13px] font-bold bg-[#1A1D24] text-[#E4E4E5] shadow-sm border border-white/[0.04]">
                                 {serverName}
                             </button>
                         )}
