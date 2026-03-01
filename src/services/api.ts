@@ -88,9 +88,10 @@ export const getHomeData = async () => {
 
 export const getMovieDetail = async (slug: string) => {
     try {
-        const [kkRes, ophimRes] = await Promise.allSettled([
+        const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
             fetch(`${API_URL}/phim/${slug}`, { next: { revalidate: 60 } }).then(r => r.json()),
-            fetch(`https://ophim1.com/phim/${slug}`, { next: { revalidate: 60 } }).then(r => r.json())
+            fetch(`https://ophim1.com/phim/${slug}`, { next: { revalidate: 60 } }).then(r => r.json()),
+            fetch(`${NGUONC_API}/api/film/${slug}`, { next: { revalidate: 60 } }).then(r => r.json())
         ]);
 
         let combinedData: any = null;
@@ -132,7 +133,51 @@ export const getMovieDetail = async (slug: string) => {
                 // Prevent duplicate if names happen to match exactly (rare with our tags, but safe)
                 combinedData.episodes = [...(combinedData.episodes || []), ...taggedOphimEpisodes];
             }
+
+            // Also merge NguonC episodes if available
+            if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
+                const nguoncEpisodes = nguoncRes.value.movie?.episodes || [];
+                const taggedNguoncEpisodes = nguoncEpisodes.map((epGroup: any) => ({
+                    ...epGroup,
+                    server_name: `NguonC #${epGroup.server_name || "1"}`
+                }));
+                combinedData.episodes = [...(combinedData.episodes || []), ...taggedNguoncEpisodes];
+            }
             return combinedData;
+        }
+
+        // What if KK and Ophim failed but NguonC succeeded?
+        if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
+            const data = nguoncRes.value.movie;
+            return {
+                status: true,
+                movie: {
+                    _id: data.id || data.slug,
+                    name: data.name,
+                    slug: data.slug,
+                    origin_name: data.original_name,
+                    content: data.description,
+                    type: data.type === 'single' ? 'single' : 'series',
+                    status: data.current_episode,
+                    thumb_url: data.thumb_url,
+                    poster_url: data.poster_url,
+                    time: data.time || "",
+                    episode_current: data.current_episode,
+                    episode_total: data.total_episodes,
+                    quality: data.quality || "FHD",
+                    lang: data.language || "Vietsub",
+                    year: parseInt(data.category?.[3]?.list?.[0]?.name || new Date().getFullYear()),
+                    actor: data.casts?.split(',') || [],
+                    director: data.director?.split(',') || [],
+                    category: data.category?.['1']?.list || [],
+                    country: data.category?.['4']?.list || [],
+                    trailer_url: data.trailer_url || "",
+                },
+                episodes: (data.episodes || []).map((epGroup: any) => ({
+                    ...epGroup,
+                    server_name: `NguonC #${epGroup.server_name || "1"}`
+                }))
+            };
         }
 
         return null;
@@ -142,11 +187,15 @@ export const getMovieDetail = async (slug: string) => {
     }
 };
 
+export const OPHIM_API = "https://ophim1.com";
+export const NGUONC_API = "https://phim.nguonc.com";
+
 export const searchMovies = async (keyword: string) => {
     try {
-        const [kkRes, ophimRes] = await Promise.allSettled([
+        const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
             fetch(`${API_URL}/v1/api/tim-kiem?keyword=${keyword}&limit=20`).then(r => r.json()),
-            fetch(`${OPHIM_API}/v1/api/tim-kiem?keyword=${keyword}&limit=20`).then(r => r.json())
+            fetch(`${OPHIM_API}/v1/api/tim-kiem?keyword=${keyword}&limit=20`).then(r => r.json()),
+            fetch(`${NGUONC_API}/api/films/search?keyword=${keyword}`).then(r => r.json())
         ]);
 
         let results: Movie[] = [];
@@ -173,6 +222,20 @@ export const searchMovies = async (keyword: string) => {
             results = [...results, ...items];
         }
 
+        if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
+            const items = (nguoncRes.value.items || []).map((item: any) => ({
+                _id: item.id || item.slug,
+                name: item.name,
+                slug: item.slug,
+                origin_name: item.original_name || item.name,
+                thumb_url: item.thumb_url,
+                poster_url: item.poster_url,
+                year: parseInt(item.year) || new Date().getFullYear(),
+                quality: item.quality || 'FHD',
+            }));
+            results = [...results, ...items];
+        }
+
         // Deduplicate
         const seen = new Set();
         return results.filter(item => {
@@ -187,7 +250,6 @@ export const searchMovies = async (keyword: string) => {
     }
 };
 
-export const OPHIM_API = "https://ophim1.com";
 
 // Helper to normalize OPhim data to match our Movie interface
 const normalizeOphimItem = (item: any, pathImage: string): Movie => {
@@ -221,9 +283,10 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
         if (country) query += `&country=${country}`;
 
         // Fetch from BOTH sources in parallel
-        const [kkRes, ophimRes] = await Promise.allSettled([
+        const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
             fetch(`${API_URL}/v1/api/danh-sach/${type}${query}`, { next: { revalidate: 60 } }).then(r => r.json()),
-            fetch(`${OPHIM_API}/v1/api/danh-sach/${type}${query}`, { next: { revalidate: 60 } }).then(r => r.json()) // Ignore cache for testing or separate key
+            fetch(`${OPHIM_API}/v1/api/danh-sach/${type}${query}`, { next: { revalidate: 60 } }).then(r => r.json()), // Ignore cache for testing or separate key
+            fetch(`${NGUONC_API}/api/films/danh-sach/${type}?page=${page}`).then(r => r.json())
         ]);
 
         let items: Movie[] = [];
@@ -253,6 +316,20 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
             items = [...items, ...ophimItems];
         }
 
+        if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
+            const nguoncItems = (nguoncRes.value.items || []).map((item: any) => ({
+                _id: item.id || item.slug,
+                name: item.name,
+                slug: item.slug,
+                origin_name: item.original_name || item.name,
+                thumb_url: item.thumb_url,
+                poster_url: item.poster_url,
+                year: parseInt(item.year) || new Date().getFullYear(),
+                quality: item.quality || 'FHD',
+            }));
+            items = [...items, ...nguoncItems];
+        }
+
         // Deduplicate by Slug
         const seen = new Set();
         const uniqueItems = items.filter(item => {
@@ -274,9 +351,11 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
 export const getMoviesByCategory = async (slug: string, page: number = 1, limit: number = 24) => {
     try {
         // Hybrid fetch for categories too
-        const [kkRes, ophimRes] = await Promise.allSettled([
+        // Hybrid fetch for categories too
+        const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
             fetch(`${API_URL}/v1/api/the-loai/${slug}?page=${page}&limit=${limit}`, { next: { revalidate: 3600 } }).then(r => r.json()),
-            fetch(`${OPHIM_API}/v1/api/the-loai/${slug}?page=${page}&limit=${limit}`, { next: { revalidate: 3600 } }).then(r => r.json())
+            fetch(`${OPHIM_API}/v1/api/the-loai/${slug}?page=${page}&limit=${limit}`, { next: { revalidate: 3600 } }).then(r => r.json()),
+            fetch(`${NGUONC_API}/api/films/the-loai/${slug}?page=${page}`).then(r => r.json())
         ]);
 
         let items: Movie[] = [];
@@ -302,6 +381,20 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
             }
             const ophimItems = getItems(data).map(item => normalizeOphimItem(item, pathImage));
             items = [...items, ...ophimItems];
+        }
+
+        if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
+            const nguoncItems = (nguoncRes.value.items || []).map((item: any) => ({
+                _id: item.id || item.slug,
+                name: item.name,
+                slug: item.slug,
+                origin_name: item.original_name || item.name,
+                thumb_url: item.thumb_url,
+                poster_url: item.poster_url,
+                year: parseInt(item.year) || new Date().getFullYear(),
+                quality: item.quality || 'FHD',
+            }));
+            items = [...items, ...nguoncItems];
         }
 
         // Deduplicate
@@ -324,9 +417,10 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
 
 export const getMoviesByCountry = async (slug: string, page: number = 1, limit: number = 24) => {
     try {
-        const [kkRes, ophimRes] = await Promise.allSettled([
+        const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
             fetch(`${API_URL}/v1/api/quoc-gia/${slug}?page=${page}&limit=${limit}`, { next: { revalidate: 3600 } }).then(r => r.json()),
-            fetch(`${OPHIM_API}/v1/api/quoc-gia/${slug}?page=${page}&limit=${limit}`, { next: { revalidate: 3600 } }).then(r => r.json())
+            fetch(`${OPHIM_API}/v1/api/quoc-gia/${slug}?page=${page}&limit=${limit}`, { next: { revalidate: 3600 } }).then(r => r.json()),
+            fetch(`${NGUONC_API}/api/films/quoc-gia/${slug}?page=${page}`).then(r => r.json())
         ]);
 
         let items: Movie[] = [];
@@ -352,6 +446,20 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
             }
             const ophimItems = getItems(data).map(item => normalizeOphimItem(item, pathImage));
             items = [...items, ...ophimItems];
+        }
+
+        if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
+            const nguoncItems = (nguoncRes.value.items || []).map((item: any) => ({
+                _id: item.id || item.slug,
+                name: item.name,
+                slug: item.slug,
+                origin_name: item.original_name || item.name,
+                thumb_url: item.thumb_url,
+                poster_url: item.poster_url,
+                year: parseInt(item.year) || new Date().getFullYear(),
+                quality: item.quality || 'FHD',
+            }));
+            items = [...items, ...nguoncItems];
         }
 
         const seen = new Set();
@@ -423,19 +531,38 @@ export const getTrendMovies = async (type: 'movie' | 'tv' | 'all' = 'all') => {
 };
 
 export const getMenuData = async () => {
-    // ... existing code ...
     try {
-        const [categoriesRes, countriesRes] = await Promise.all([
-            fetch(`${API_URL}/the-loai`, { next: { revalidate: 86400 } }), // Cache for 24h
-            fetch(`${API_URL}/quoc-gia`, { next: { revalidate: 86400 } })
+        // Fetch from both KKPhim and OPhim to maximize coverage
+        const [kkCatRes, kkCountRes, ophimCountRes] = await Promise.all([
+            fetch(`${API_URL}/the-loai`, { next: { revalidate: 86400 } }),
+            fetch(`${API_URL}/quoc-gia`, { next: { revalidate: 86400 } }),
+            fetch(`${OPHIM_API}/v1/api/quoc-gia`, { next: { revalidate: 86400 } })
         ]);
 
-        const categories = await categoriesRes.json();
-        const countries = await countriesRes.json();
+        const kkCategories = await kkCatRes.json().catch(() => []);
+        const kkCountries = await kkCountRes.json().catch(() => []);
+        const ophimCountriesData = await ophimCountRes.json().catch(() => null);
+        const ophimCountries = ophimCountriesData?.data?.items || [];
+
+        // Deduplicate functions
+        const uniqueBySlug = (arr: any[]) => {
+            const seen = new Set();
+            return arr.filter(item => {
+                if (!item || !item.slug) return false;
+                const duplicate = seen.has(item.slug);
+                seen.add(item.slug);
+                return !duplicate;
+            });
+        };
+
+        const mergedCountries = uniqueBySlug([...(Array.isArray(kkCountries) ? kkCountries : []), ...ophimCountries]);
+
+        // Clean up weird HTML entities from API (e.g. Cote D&#039;Ivoire)
+        const cleanName = (name: string) => name.replace(/&#039;/g, "'").replace(/&amp;/g, "&");
 
         return {
-            categories: Array.isArray(categories) ? categories : [],
-            countries: Array.isArray(countries) ? countries : []
+            categories: (Array.isArray(kkCategories) ? kkCategories : []).map(c => ({ ...c, name: cleanName(c.name) })),
+            countries: mergedCountries.map(c => ({ ...c, name: cleanName(c.name) }))
         };
     } catch (error) {
         console.error("Error fetching menu data:", error);
