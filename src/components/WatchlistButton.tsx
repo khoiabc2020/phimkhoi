@@ -40,7 +40,7 @@ export default function WatchlistButton({ slug, initialInWatchlist, className, s
         <button
             onClick={handleToggle}
             disabled={isPending}
-            className={`flex items-center justify-center ${showLabel ? "px-4 py-2 min-h-[40px] rounded-lg gap-2" : "w-10 h-10 rounded-full"} bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md transition-all group ${className}`}
+            className={`flex items-center justify-center ${showLabel ? "px-4 py-2 min-h-[40px] rounded-full gap-2" : "w-10 h-10 rounded-full"} bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md transition-all group ${className}`}
             title={inWatchlist ? "Xóa khỏi danh sách" : "Thêm vào danh sách"}
         >
             {inWatchlist ? (

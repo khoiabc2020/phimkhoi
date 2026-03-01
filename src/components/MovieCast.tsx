@@ -22,7 +22,7 @@ export default async function MovieCast({ movieName, originName, year, isCompact
             <div className="flex flex-wrap gap-4 pt-1">
                 {cast.slice(0, 8).map((actor: any) => (
                     <Link href={`/dien-vien/${encodeURIComponent(String(actor.name))}`} key={actor.id} className="flex flex-col items-center gap-2 w-[4.5rem] group" title={actor.name}>
-                        <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border border-white/10 group-hover:border-[#00B14F] transition-colors relative bg-white/5">
+                        <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border border-white/10 group-hover:border-[#F4C84A] transition-colors relative bg-white/5">
                             {actor.profile_path ? (
                                 <Image src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`} alt={actor.name || "Actor"} fill className="object-cover" />
                             ) : (

@@ -116,7 +116,7 @@ export default function WatchEpisodeSection({
                                         className={cn(
                                             "h-[38px] px-4 rounded-lg text-[13px] font-bold transition-all duration-300 border flex items-center justify-center gap-2",
                                             isServerActive
-                                                ? "bg-[#00B14F] border-[#00B14F] text-white shadow-sm" // Matching user's exact Ophim green preference!
+                                                ? "bg-[#F4C84A] border-[#F4C84A] text-black shadow-sm" // Matching user's exact preference!
                                                 : "bg-[#111113] border-[#111113] text-[#71717A] hover:text-[#E4E4E5] hover:bg-[#1A1D24]"
                                         )}
                                     >
@@ -131,7 +131,7 @@ export default function WatchEpisodeSection({
                                 );
                             })
                         ) : (
-                            <button className="h-[38px] px-4 rounded-lg text-[13px] font-bold bg-[#00B14F] border-[#00B14F] text-white shadow-sm flex items-center justify-center gap-2">
+                            <button className="h-[38px] px-4 rounded-lg text-[13px] font-bold bg-[#F4C84A] border-[#F4C84A] text-black shadow-sm flex items-center justify-center gap-2">
                                 {serverName}
                                 <span className="w-[1px] h-3 bg-white/30"></span>
                                 <span>{episodes.length}</span>
@@ -145,7 +145,7 @@ export default function WatchEpisodeSection({
                     <div className="flex items-center gap-4 flex-wrap">
                         {/* Subtitle count */}
                         <div className="text-[14px] text-gray-400">
-                            Danh sách tập ( <span className="text-[#E4E4E5] font-bold">{episodes.length}</span> / <span className="text-[#00B14F] font-bold">{episodes.length}</span> )
+                            Danh sách tập ( <span className="text-[#E4E4E5] font-bold">{episodes.length}</span> / <span className="text-[#F4C84A] font-bold">{episodes.length}</span> )
                         </div>
 
                         {/* Pagination Dropdown */}
@@ -216,7 +216,7 @@ export default function WatchEpisodeSection({
                                     className={cn(
                                         "h-[42px] rounded-xl flex items-center justify-center text-[15px] font-bold transition-all border",
                                         isActive
-                                            ? "bg-[#00B14F] border-[#00B14F] text-white shadow-none scale-100" // Match Ophim
+                                            ? "bg-[#F4C84A] border-[#F4C84A] text-black shadow-none scale-100" // System yellow
                                             : "bg-[#15151A] border-transparent text-[#E4E4E5] hover:bg-[#1A1D24] hover:border-white/5"
                                     )}
                                 >

@@ -70,7 +70,7 @@ export default function FavoriteButton({ movieData, size = "md", className = "",
 
     if (isLoading) {
         return (
-            <div className={`${sizeClasses[size]} ${showLabel ? "rounded-lg" : "rounded-full"} bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center animate-pulse ${className}`} />
+            <div className={`${sizeClasses[size]} ${showLabel ? "rounded-full" : "rounded-full"} bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center animate-pulse ${className}`} />
         );
     }
 
@@ -78,7 +78,7 @@ export default function FavoriteButton({ movieData, size = "md", className = "",
         <button
             onClick={handleToggle}
             disabled={isPending}
-            className={`${sizeClasses[size]} ${showLabel ? "rounded-lg gap-2" : "rounded-full"} bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/20 transition-all group disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+            className={`${sizeClasses[size]} ${showLabel ? "rounded-full gap-2" : "rounded-full"} bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/20 transition-all group disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
             title={isFav ? "Bỏ yêu thích" : "Thêm vào yêu thích"}
         >
             <Heart

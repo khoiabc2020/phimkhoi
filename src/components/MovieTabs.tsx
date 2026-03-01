@@ -47,13 +47,13 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id as any)}
-                            className={`flex items-center gap-2 pb-3 text-sm font-bold transition-all relative whitespace-nowrap ${isActive ? "text-[#00B14F]" : "text-gray-400 hover:text-white"
+                            className={`flex items-center gap-2 pb-3 text-sm font-bold transition-all relative whitespace-nowrap ${isActive ? "text-[#F4C84A]" : "text-gray-400 hover:text-white"
                                 }`}
                         >
-                            <Icon className={`w-4 h-4 ${isActive ? "text-[#00B14F]" : "hidden"}`} />
+                            <Icon className={`w-4 h-4 ${isActive ? "text-[#F4C84A]" : "hidden"}`} />
                             {tab.label}
                             {isActive && (
-                                <span className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-[#00B14F] shadow-[0_0_10px_#00B14F]" />
+                                <span className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-[#F4C84A] shadow-[0_0_10px_#F4C84A]" />
                             )}
                         </button>
                     );
@@ -81,8 +81,8 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
                                                     key={index}
                                                     onClick={() => setActiveServer(index)}
                                                     className={`px-4 py-2 rounded text-sm font-bold transition-all flex items-center gap-2 ${isActive
-                                                        ? "bg-[#00B14F] text-white shadow-lg"
-                                                        : "bg-[#111113] border border-white/5 text-gray-400 hover:text-white hover:border-white/20"
+                                                        ? "bg-[#F4C84A] text-black shadow-lg"
+                                                        : "bg-[#111113] border border-white/5 text-gray-400 hover:text-white hover:border-[#F4C84A]/50"
                                                         }`}
                                                 >
                                                     {server.server_name}
@@ -102,13 +102,13 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
                                 {totalChunks > 1 && (
                                     <div className="flex items-center justify-between">
                                         <div className="text-sm font-bold text-gray-300">
-                                            Danh sách tập <span className="text-[#00B14F]">({currentServerData.length})</span>
+                                            Danh sách tập <span className="text-[#F4C84A]">({currentServerData.length})</span>
                                         </div>
                                         <div className="relative">
                                             <select
                                                 value={currentChunk}
                                                 onChange={(e) => setCurrentChunk(Number(e.target.value))}
-                                                className="appearance-none bg-[#111113] border border-white/[0.05] text-white text-sm font-medium py-2 px-4 pr-10 rounded-lg outline-none focus:border-[#00B14F]/50 transition-colors cursor-pointer"
+                                                className="appearance-none bg-[#111113] border border-white/[0.05] text-white text-sm font-medium py-2 px-4 pr-10 rounded-lg outline-none focus:border-[#F4C84A]/50 transition-colors cursor-pointer"
                                             >
                                                 {Array.from({ length: totalChunks }).map((_, idx) => {
                                                     const start = idx * EPISODES_PER_CHUNK + 1;
@@ -140,7 +140,7 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
                                             <Link
                                                 key={ep.slug}
                                                 href={`/xem-phim/${slug}/${ep.slug}`}
-                                                className="h-10 rounded text-sm font-bold flex items-center justify-center transition-all border bg-[#111113] border-white/5 text-gray-300 hover:text-white hover:border-[#00B14F] hover:bg-[#00B14F]/10 px-2 truncate"
+                                                className="h-10 rounded text-sm font-bold flex items-center justify-center transition-all border bg-[#111113] border-white/5 text-gray-300 hover:text-white hover:border-[#F4C84A] hover:bg-[#F4C84A]/10 px-2 truncate"
                                                 title={ep.name}
                                             >
                                                 <PlayCircle className="w-3 h-3 mr-1 opacity-50 shrink-0" />
