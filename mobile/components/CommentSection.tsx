@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getComments, postComment } from '@/services/api';
 import { useAuth } from '@/context/auth';
@@ -36,10 +36,22 @@ export default function CommentSection({ movieSlug }: { movieSlug: string }) {
 
     const handlePost = async () => {
         if (!content.trim()) return;
+        // Guard: require login before posting
+        if (!user || !token) {
+            Alert.alert(
+                'Yêu cầu đăng nhập',
+                'Bạn cần đăng nhập để bình luận.',
+                [
+                    { text: 'Hủy', style: 'cancel' },
+                    { text: 'Đăng nhập', onPress: () => router.push('/(auth)/login' as any) },
+                ]
+            );
+            return;
+        }
         setPosting(true);
         const res = await postComment(movieSlug, content, token);
         if (res.error) {
-            alert(res.error);
+            Alert.alert('Lỗi', res.error);
         } else if (res.comment) {
             setComments([res.comment, ...comments]);
             setContent('');
@@ -65,7 +77,7 @@ export default function CommentSection({ movieSlug }: { movieSlug: string }) {
             {user ? (
                 <View style={styles.inputContainer}>
                     <Image
-                        source={{ uri: user.avatar || 'https://ui-avatars.com/api/?name=' + user.fullName || user.username }}
+                        source={{ uri: user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName || user.username || 'U')}` }}
                         style={styles.avatar}
                     />
                     <View style={styles.inputWrapper}>
