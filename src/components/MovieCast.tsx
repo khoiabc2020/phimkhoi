@@ -24,7 +24,7 @@ export default async function MovieCast({ movieName, originName, year, isCompact
                     <Link href={`/dien-vien/${encodeURIComponent(String(actor.name))}`} key={actor.id} className="flex flex-col items-center gap-2 w-[4.5rem] group" title={actor.name}>
                         <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border border-white/10 group-hover:border-[#00B14F] transition-colors relative bg-white/5">
                             {actor.profile_path ? (
-                                <Image src={getTMDBImage(actor.profile_path, "w185") as string} alt={actor.name || "Actor"} fill className="object-cover" />
+                                <Image src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`} alt={actor.name || "Actor"} fill className="object-cover" />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center text-[10px] text-gray-500 text-center leading-tight">N/A</div>
                             )}
@@ -47,7 +47,7 @@ export default async function MovieCast({ movieName, originName, year, isCompact
                         <div className="relative w-24 h-24 mx-auto mb-2 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-yellow-500 transition-colors">
                             {actor.profile_path ? (
                                 <Image
-                                    src={getTMDBImage(actor.profile_path, "w500") as string}
+                                    src={`https://image.tmdb.org/t/p/w500${actor.profile_path}`}
                                     alt={actor.name || "Actor"}
                                     fill
                                     className="object-cover"
