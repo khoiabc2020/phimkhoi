@@ -15,36 +15,48 @@ export function LazyLoadWrapper({
     children,
     fallback,
     threshold = 0,
-    rootMargin = "200px",
+    rootMargin = "400px",   // Increased: start fetching 400px before element enters viewport
     className
 }: LazyLoadWrapperProps) {
     const [isVisible, setIsVisible] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        const el = ref.current;
+        if (!el) return;
+
+        // If already in viewport (e.g. server-side), mark visible immediately
+        const rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight + 400) {
+            setIsVisible(true);
+            return;
+        }
+
         const observer = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting) {
                     setIsVisible(true);
-                    // Once visible, stop observing to keep it loaded
-                    if (ref.current) observer.unobserve(ref.current);
+                    observer.unobserve(entry.target);
                 }
             },
             { threshold, rootMargin }
         );
 
-        if (ref.current) {
-            observer.observe(ref.current);
-        }
-
-        return () => {
-            if (ref.current) observer.unobserve(ref.current);
-        };
+        observer.observe(el);
+        return () => observer.disconnect();
     }, [threshold, rootMargin]);
 
     return (
-        <div ref={ref} className={cn("transition-all duration-500 ease-out empty:hidden", isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 min-h-[150px]", className)}>
-            {isVisible ? children : (fallback || null)}
+        // Use opacity-only fade (no translate) to avoid Cumulative Layout Shift
+        <div
+            ref={ref}
+            className={cn(
+                "transition-opacity duration-500 ease-out empty:hidden",
+                isVisible ? "opacity-100" : "opacity-0 min-h-[150px]",
+                className
+            )}
+        >
+            {isVisible ? children : (fallback ?? null)}
         </div>
     );
 }
