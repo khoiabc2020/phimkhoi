@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { ChevronDown, List, Play, ChevronLeft, Database, Mic, Subtitles, Volume2 } from "lucide-react";
+import { ChevronDown, List, ChevronLeft, Database, Mic, Subtitles, Volume2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Episode {
@@ -33,10 +33,8 @@ export default function WatchEpisodeSection({
     onServerChange,
 }: WatchEpisodeSectionProps) {
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const [showServerDropdown, setShowServerDropdown] = useState(false);
     const [currentChunk, setCurrentChunk] = useState(0);
     const [activeLangTab, setActiveLangTab] = useState<string>("");
-    const dropdownRef = useRef<HTMLDivElement>(null);
 
     // Parse language from server name
     const getLanguageGroup = (name: string) => {
@@ -92,15 +90,6 @@ export default function WatchEpisodeSection({
         }
     }, [currentEpisodeSlug, episodes]);
 
-    useEffect(() => {
-        const handleClickOutside = (e: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-                setShowServerDropdown(false);
-            }
-        };
-        document.addEventListener("click", handleClickOutside);
-        return () => document.removeEventListener("click", handleClickOutside);
-    }, []);
 
     const serverName = activeServerName || servers[0]?.server_name || "VIP";
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { PlayCircle, Film, Users, Video, LayoutGrid, ChevronDown, Database, Subtitles, Mic, Volume2 } from "lucide-react";
+import { PlayCircle, Video, LayoutGrid, ChevronDown, Database, Subtitles, Mic, Volume2 } from "lucide-react";
 import { Movie } from "@/services/api";
 import MovieCard from "./MovieCard";
 import { cn } from "@/lib/utils";
