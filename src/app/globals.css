@@ -66,18 +66,34 @@ html {
 }
 
 body {
-  /* iOS 26 Cinematic Background - Radial Depth */
-  background: radial-gradient(circle at 30% 10%, rgba(255, 200, 0, 0.04), transparent 50%),
-    radial-gradient(circle at 70% 60%, rgba(56, 189, 248, 0.04), transparent 50%),
-    linear-gradient(to bottom, #0B0D12, #121826);
-  background-attachment: fixed;
-  /* Parallax feel */
+  /* Solid dark base — No background-attachment:fixed which causes full-page repaint on scroll */
+  background-color: #0B0D12;
   color: var(--foreground);
   font-family: var(--font-sans);
   font-size: 16px;
   line-height: 1.5;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  /* Promote to GPU compositing layer */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none;
+}
+
+/* Cinematic background as a fixed pseudo-element on a separate GPU layer */
+/* Using ::before avoids background-attachment:fixed which causes repaints */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 30% 10%, rgba(255, 200, 0, 0.04), transparent 50%),
+    radial-gradient(circle at 70% 60%, rgba(56, 189, 248, 0.04), transparent 50%),
+    linear-gradient(to bottom, #0B0D12, #121826);
+  /* Composite on GPU — no repaint on scroll */
+  will-change: transform;
+  transform: translateZ(0);
+  pointer-events: none;
 }
 
 /* Fluid Typography - Apple Style (Removed to allow component-level control) */
@@ -94,18 +110,19 @@ h2 {
   letter-spacing: -0.02em;
 } */
 
-/* iOS 26 Glassmorphism Utilities */
+/* iOS 26 Glassmorphism Utilities — reduced blur for better scroll perf */
 @layer utilities {
   .glass {
-    @apply backdrop-blur-[20px] bg-white/[0.06] border-b border-white/[0.08];
+    /* blur(12px) instead of blur(20px) — 40% cheaper for GPU compositing */
+    @apply backdrop-blur-[12px] bg-white/[0.06] border-b border-white/[0.08];
   }
 
   .glass-panel {
-    @apply backdrop-blur-[30px] bg-[#1c1c1e]/60 border border-white/[0.08] shadow-2xl rounded-[24px];
+    @apply backdrop-blur-[16px] bg-[#1c1c1e]/60 border border-white/[0.08] shadow-2xl rounded-[24px];
   }
 
   .glass-pill {
-    @apply backdrop-blur-[15px] bg-white/[0.08] border border-white/[0.1] rounded-full;
+    @apply backdrop-blur-[10px] bg-white/[0.08] border border-white/[0.1] rounded-full;
   }
 
   /* Premium Text Glow */
@@ -117,13 +134,15 @@ h2 {
     text-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
   }
 
-  /* 3D Card Hover Effect */
+  /* 3D Card Hover Effect — use transform only (no box-shadow transition) for perf */
   .card-hover-3d {
-    @apply transition-all duration-300 ease-out;
+    @apply transition-transform duration-300 ease-out;
+    will-change: transform;
   }
 
   .card-hover-3d:hover {
-    transform: scale(1.03) translateY(-4px);
+    transform: scale(1.03) translateY(-4px) translateZ(0);
+    /* box-shadow paint is kept off transition to avoid repaint triggering */
     box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
   }
 
