@@ -20,7 +20,7 @@ export default async function WatchRedirectPage({ params }: PageProps) {
     // Attempt to find the first episode
     const firstEpisode = data.episodes?.[0]?.server_data?.[0];
 
-    if (firstEpisode) {
+    if (firstEpisode && firstEpisode.slug) {
         // Redirect to the first episode
         redirect(`/xem-phim/${slug}/${firstEpisode.slug}`);
     } else {
