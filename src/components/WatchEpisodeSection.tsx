@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
-import { ChevronDown, List, Play, ChevronLeft, Database } from "lucide-react";
+import { ChevronDown, List, Play, ChevronLeft, Database, Mic, Subtitles, Volume2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Episode {
@@ -35,7 +35,43 @@ export default function WatchEpisodeSection({
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [showServerDropdown, setShowServerDropdown] = useState(false);
     const [currentChunk, setCurrentChunk] = useState(0);
+    const [activeLangTab, setActiveLangTab] = useState<string>("");
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Parse language from server name
+    const getLanguageGroup = (name: string) => {
+        const lower = name.toLowerCase();
+        if (lower.includes("lồng tiếng") || lower.includes("longtieng")) return "Lồng Tiếng";
+        if (lower.includes("thuyết minh") || lower.includes("thuyetminh")) return "Thuyết Minh";
+        return "Phụ Đề";
+    };
+
+    // Group servers — only include servers that actually have episode data
+    const groupedServers = useMemo(() => {
+        const groups: Record<string, Server[]> = {
+            "Phụ Đề": [],
+            "Lồng Tiếng": [],
+            "Thuyết Minh": []
+        };
+        servers
+            .filter(s => s.server_data && s.server_data.length > 0) // only non-empty servers
+            .forEach(s => {
+                groups[getLanguageGroup(s.server_name)].push(s);
+            });
+        return groups;
+    }, [servers]);
+
+    const activeLanguageGroups = Object.keys(groupedServers).filter(k => groupedServers[k].length > 0);
+
+    // Initial load: identify which tab the activeServerName belongs to
+    useEffect(() => {
+        if (activeServerName) {
+            const group = getLanguageGroup(activeServerName);
+            setActiveLangTab(group);
+        } else if (activeLanguageGroups.length > 0) {
+            setActiveLangTab(activeLanguageGroups[0]);
+        }
+    }, [activeServerName, activeLanguageGroups.length]);
 
     // Find active server index based on name
     const activeServerIndex = servers.findIndex(s => s.server_name === activeServerName);
@@ -94,17 +130,68 @@ export default function WatchEpisodeSection({
                     </Link>
                 </div>
 
+                {/* Language Tabs Row */}
+                {activeLanguageGroups.length > 0 && (
+                    <div className="flex items-center gap-6 border-b border-white/[0.04] mb-6 overflow-x-auto no-scrollbar pb-1">
+                        {activeLanguageGroups.map((lang) => {
+                            const isActive = activeLangTab === lang;
+                            const Icon = lang === "Lồng Tiếng" ? Mic : lang === "Thuyết Minh" ? Volume2 : Subtitles;
+                            const colorClass = lang === "Lồng Tiếng" ? "text-[#00c853]" : lang === "Thuyết Minh" ? "text-blue-500" : "text-gray-300";
+                            const activeBorderClass = lang === "Lồng Tiếng" ? "bg-[#00c853] shadow-[0_0_10px_#00c853]" : lang === "Thuyết Minh" ? "bg-blue-500 shadow-[0_0_10px_#3b82f6]" : "bg-gray-300 shadow-[0_0_10px_#d1d5db]";
+
+                            return (
+                                <button
+                                    key={lang}
+                                    onClick={() => {
+                                        setActiveLangTab(lang);
+                                        // Auto-switch to the first server in this new tab
+                                        const firstServerInGroup = groupedServers[lang][0];
+                                        if (firstServerInGroup) {
+                                            onServerChange(firstServerInGroup.server_name);
+                                            setCurrentChunk(0);
+                                        }
+                                    }}
+                                    className={cn(
+                                        "flex items-center gap-2 pb-3 text-[13px] font-bold transition-all relative whitespace-nowrap uppercase tracking-wide",
+                                        isActive ? colorClass : "text-gray-500 hover:text-gray-300"
+                                    )}
+                                >
+                                    <Icon className={cn("w-[15px] h-[15px]", isActive ? colorClass : "text-gray-500")} />
+                                    {lang}
+                                    {isActive && (
+                                        <span className={cn("absolute bottom-[-1px] left-0 right-0 h-0.5", activeBorderClass)} />
+                                    )}
+                                </button>
+                            );
+                        })}
+                    </div>
+                )}
+
                 {/* Server selector Left-Aligned with Database Icon */}
                 <div className="flex flex-col md:flex-row items-start md:items-center gap-4 mb-8">
-                    <div className="flex items-center gap-2 text-gray-400 text-[13px] font-bold uppercase tracking-wider min-w-[100px] shrink-0">
-                        <Database className="w-5 h-5 text-gray-500" />
+                    <div className="flex items-center gap-2 text-gray-500 text-[12px] font-bold uppercase tracking-widest min-w-[90px] shrink-0">
+                        <Database className="w-4 h-4 text-gray-600" />
                         Máy Chủ :
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">
-                        {servers.length > 0 ? (
-                            servers.map((s, i) => {
+                        {activeLangTab && groupedServers[activeLangTab]?.length > 0 ? (
+                            groupedServers[activeLangTab].map((s, i) => {
                                 const isServerActive = s.server_name === activeServerName;
+                                const isLongTieng = activeLangTab === "Lồng Tiếng";
+                                const isThuyetMinh = activeLangTab === "Thuyết Minh";
+
+                                // Color variables based on language type
+                                const activeBgClass = isLongTieng ? "bg-[#00c853] border-[#00c853] text-white" : isThuyetMinh ? "bg-blue-600 border-blue-600 text-white" : "bg-[#28282B] border-[#3f3f46] text-white";
+
+                                // Clean up server name for display
+                                const displayName = s.server_name
+                                    .replace("Lồng Tiếng", "").replace("lồng tiếng", "").replace("longtieng", "")
+                                    .replace("Thuyết Minh", "").replace("thuyết minh", "").replace("thuyetminh", "")
+                                    .replace("Vietsub", "").replace("vietsub", "")
+                                    .replace(/\(\)/g, "").replace(/\[\]/g, "").replace(/--/g, "-").trim()
+                                    || s.server_name; // fallback to original if completely empty
+
                                 return (
                                     <button
                                         key={i}
@@ -114,24 +201,24 @@ export default function WatchEpisodeSection({
                                             setCurrentChunk(0);
                                         }}
                                         className={cn(
-                                            "h-[38px] px-4 rounded-lg text-[13px] font-bold transition-all duration-300 border flex items-center justify-center gap-2",
+                                            "h-[34px] px-3 rounded-md text-[12px] font-medium transition-all duration-300 border flex items-center justify-center gap-2",
                                             isServerActive
-                                                ? "bg-[#F4C84A] border-[#F4C84A] text-black shadow-sm" // Matching user's exact preference!
-                                                : "bg-[#111113] border-[#111113] text-[#71717A] hover:text-[#E4E4E5] hover:bg-[#1A1D24]"
+                                                ? activeBgClass
+                                                : "bg-[#111113]/50 border-white/5 text-gray-400 hover:text-white hover:border-white/20 hover:bg-[#1A1D24]"
                                         )}
                                     >
-                                        {s.server_name}
+                                        <span className="truncate max-w-[150px]">{displayName}</span>
                                         {isServerActive && (
                                             <>
-                                                <span className="w-[1px] h-3 bg-white/30"></span>
-                                                <span>{episodes.length}</span>
+                                                <span className="w-[1px] h-3 bg-white/20"></span>
+                                                <span className="font-bold">{s.server_data.length}</span>
                                             </>
                                         )}
                                     </button>
                                 );
                             })
                         ) : (
-                            <button className="h-[38px] px-4 rounded-lg text-[13px] font-bold bg-[#F4C84A] border-[#F4C84A] text-black shadow-sm flex items-center justify-center gap-2">
+                            <button className="h-[34px] px-3 rounded-md text-[12px] font-medium bg-[#28282B] border-[#3f3f46] text-white shadow-sm flex items-center justify-center gap-2">
                                 {serverName}
                                 <span className="w-[1px] h-3 bg-white/30"></span>
                                 <span>{episodes.length}</span>
