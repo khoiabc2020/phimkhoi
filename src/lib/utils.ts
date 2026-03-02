@@ -13,9 +13,8 @@ export function getImageUrl(url: string) {
         finalUrl = `https://phimimg.com/${url}`;
     }
 
-    // Sử dụng Image CDN Proxy (wsrv.nl) với định dạng WebP để tối đa hóa tốc độ load ảnh toàn cầu
-    // Cực kỳ hữu ích với mạng chập chờn hoặc thiết bị yếu
-    return `https://wsrv.nl/?url=${encodeURIComponent(finalUrl)}&output=webp&q=80`;
+    // Bypass wsrv image CDN to provide the most original, full quality image as requested by user.
+    return finalUrl;
 }
 
 export function decodeHtml(html: string) {

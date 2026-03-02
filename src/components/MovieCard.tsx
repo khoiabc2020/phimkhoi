@@ -86,17 +86,23 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
             <div
                 ref={cardRef}
                 className={`relative block h-full w-full cursor-pointer z-10 group/static-card hover:z-20 will-change-transform transform-gpu`}
+                style={{
+                    contentVisibility: 'auto',
+                    containIntrinsicSize: orientation === 'landscape' ? 'auto 200px' : 'auto 300px'
+                }}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
                 <div className={`relative ${orientation === 'landscape' ? 'aspect-video' : 'aspect-[2/3]'} rounded-xl overflow-hidden bg-[#1a1a1a] shadow-lg contain-paint`}>
-                    <Link href={`/phim/${movie.slug}`} className="block h-full w-full absolute inset-0 z-0">
+                    <Link href={`/phim/${movie.slug}`} className="block h-full w-full absolute inset-0 z-0" prefetch={false}>
                         <Image
                             src={displayPoster || "/placeholder.jpg"}
                             alt={movie.name}
                             fill
                             className="object-cover transition-transform duration-500 ease-out group-hover/static-card:scale-105"
                             sizes={orientation === 'landscape' ? "(max-width: 768px) 60vw, 30vw" : "(max-width: 768px) 40vw, 15vw"}
+                            loading="lazy"
+                            decoding="async"
                             unoptimized
                         />
                         <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
