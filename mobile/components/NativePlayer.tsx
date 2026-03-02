@@ -1019,11 +1019,14 @@ export default function NativePlayer({
                             <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
                                 {(groupedServers[serverLangTab || activeLangGroups[0]] || serverList.map((_, i) => i)).map((index) => {
                                     const sNameRaw = serverList[index] || '';
-                                    const sDisplayName = sNameRaw
+                                    const parts = sNameRaw.split('##');
+                                    const sDisplayName = parts[0]
                                         .replace('Lồng Tiếng', '').replace('lồng tiếng', '')
                                         .replace('Thuyết Minh', '').replace('thuyết minh', '')
                                         .replace('Vietsub', '').replace('vietsub', '')
-                                        .replace(/\(\)/g, '').replace(/\[\]/g, '').trim() || sNameRaw;
+                                        .replace(/\(\)/g, '').replace(/\[\]/g, '').trim() || parts[0].trim();
+
+                                    const sourceName = parts.length > 1 ? parts[1].trim() : 'Server';
 
                                     return (
                                         <TouchableOpacity
@@ -1037,7 +1040,7 @@ export default function NativePlayer({
                                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                                                 <Ionicons name="server-outline" size={20} color={index === currentServerIndex ? '#fbbf24' : 'gray'} />
                                                 <Text style={[styles.serverRowText, index === currentServerIndex && styles.activeServerRowText]}>
-                                                    {sDisplayName}
+                                                    {sDisplayName} • {sourceName}
                                                 </Text>
                                             </View>
                                             {index === currentServerIndex && <Ionicons name="checkmark" size={20} color="#fbbf24" />}

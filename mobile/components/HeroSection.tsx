@@ -16,8 +16,8 @@ import Animated, { useAnimatedStyle, withTiming, FadeIn } from 'react-native-rea
 
 const { width } = Dimensions.get('window');
 
-// Chiều cao Carousel (gấp khoảng 1.35 lần chiều rộng để hiển thị poster dọc)
-const CAROUSEL_HEIGHT = width * 1.35;
+// Chiều cao Carousel gọn lại để đẩy lên cao, tiết kiệm diện tích
+const CAROUSEL_HEIGHT = width * 1.15;
 
 interface HeroSectionProps {
     movies: Movie[];
@@ -89,24 +89,24 @@ export default function HeroSection({ movies }: HeroSectionProps) {
 
     return (
         <View style={styles.wrapper}>
-            {/* Background Image Blurred (Animated crossfade could be implemented, but simple is fine for now) */}
+            {/* Background Image Blurred */}
             <View style={StyleSheet.absoluteFill}>
                 <Image
                     key={activeBackdropUri}
                     source={{ uri: activeBackdropUri }}
                     style={StyleSheet.absoluteFill}
                     contentFit="cover"
-                    blurRadius={Platform.OS === 'ios' ? 20 : 10}
-                    transition={500}
+                    blurRadius={Platform.OS === 'ios' ? 15 : 3}
+                    transition={Platform.OS === 'ios' ? 300 : 0}
                 />
-                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(11,13,24,0.65)' }]} />
+                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(11,13,24,0.7)' }]} />
                 <LinearGradient
                     colors={['transparent', '#0B0D18']}
-                    style={[StyleSheet.absoluteFill, { top: '50%' }]}
+                    style={[StyleSheet.absoluteFill, { top: '30%' }]}
                 />
             </View>
 
-            <View style={{ marginTop: 20 }}>
+            <View style={{ marginTop: 15 }}>
                 <Carousel
                     width={width}
                     height={CAROUSEL_HEIGHT}
@@ -118,8 +118,11 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                     onSnapToItem={(index) => setActiveIndex(index)}
                     mode="parallax"
                     modeConfig={{
-                        parallaxScrollingScale: 0.82,
-                        parallaxScrollingOffset: 65,
+                        parallaxScrollingScale: 0.85,
+                        parallaxScrollingOffset: 55,
+                    }}
+                    panGestureHandlerProps={{
+                        activeOffsetX: [-10, 10], // Allow vertical scrolling to pass through
                     }}
                     renderItem={({ item, index }) => (
                         <HeroSlide
@@ -165,7 +168,7 @@ const HeroSlide = React.memo(function HeroSlide({ movie, index, isFav, onToggleF
                     cachePolicy="memory-disk"
                 />
                 <LinearGradient
-                    colors={['transparent', 'rgba(0,0,0,0.2)', 'rgba(0,0,0,0.95)']}
+                    colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.95)']}
                     style={StyleSheet.absoluteFill}
                 />
 
@@ -195,6 +198,7 @@ const HeroSlide = React.memo(function HeroSlide({ movie, index, isFav, onToggleF
                     </View>
 
                     <View style={styles.actionRow}>
+                        {/* Nút Xem Phim */}
                         <Pressable
                             style={styles.playBtn}
                             onPress={(e) => {
@@ -203,9 +207,22 @@ const HeroSlide = React.memo(function HeroSlide({ movie, index, isFav, onToggleF
                             }}
                         >
                             <Ionicons name="play" size={18} color="#0B0D12" />
-                            <Text style={styles.playBtnText}>XEM PHIM</Text>
+                            <Text style={styles.playBtnText}>XEM</Text>
                         </Pressable>
 
+                        {/* Nút Chi Tiết */}
+                        <Pressable
+                            style={styles.detailBtn}
+                            onPress={(e) => {
+                                e.stopPropagation();
+                                router.push(`/movie/${movie.slug}` as any);
+                            }}
+                        >
+                            <Ionicons name="information-circle-outline" size={18} color="#FFFFFF" />
+                            <Text style={styles.detailBtnText}>CHI TIẾT</Text>
+                        </Pressable>
+
+                        {/* Nút Yêu Thích */}
                         <TouchableOpacity
                             style={[styles.circleBtn, isFav && styles.circleBtnFav]}
                             onPress={(e) => {

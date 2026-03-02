@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 import { CONFIG } from '@/constants/config';
 
 const APP_VERSION = '1.0.3';
-const APP_BUILD = 4;
+const APP_BUILD = 0;
 
 interface UpdateInfo {
   version: string;
