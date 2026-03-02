@@ -118,6 +118,45 @@ export default function NativePlayer({
     const showEpisodesRef = useRef(false);
     const showServersRef = useRef(false);
 
+    // ── DOUBLE-TAP TO SEEK ±10s ──────────────────────────────
+    const doubleTapTimer = useRef<any>(null);
+    const lastTapSide = useRef<'left' | 'right' | null>(null);
+    const tapCount = useRef(0);
+    const [seekFlash, setSeekFlash] = useState<{ side: 'left' | 'right'; amount: number } | null>(null);
+    const seekFlashTimer = useRef<any>(null);
+
+    const handleTap = useCallback((side: 'left' | 'right') => {
+        if (locked) {
+            // Khi locked: single tap hiện controls, không seek
+            setShowControls(true);
+            resetControlsTimer();
+            return;
+        }
+        tapCount.current += 1;
+        if (doubleTapTimer.current) clearTimeout(doubleTapTimer.current);
+
+        doubleTapTimer.current = setTimeout(() => {
+            if (tapCount.current === 1) {
+                // Single tap → toggle controls
+                setShowControls(prev => !prev);
+                if (!showControls) resetControlsTimer();
+            } else if (tapCount.current >= 2) {
+                // Double (or more) tap → seek
+                const seekMs = (tapCount.current - 1) * 10000;
+                const direction = side === 'left' ? -1 : 1;
+                handleSkip(direction * seekMs);
+                // Show flash feedback
+                if (seekFlashTimer.current) clearTimeout(seekFlashTimer.current);
+                setSeekFlash({ side, amount: (tapCount.current - 1) * 10 });
+                seekFlashTimer.current = setTimeout(() => setSeekFlash(null), 800);
+            }
+            tapCount.current = 0;
+            lastTapSide.current = null;
+        }, 280);
+
+        lastTapSide.current = side;
+    }, [locked, showControls]);
+
     // Modals
     const [showEpisodes, setShowEpisodes] = useState(false);
     const [showServers, setShowServers] = useState(false);
@@ -512,8 +551,56 @@ export default function NativePlayer({
                     />
                 )}
 
-                {/* Touch Area for Controls Toggle - ẩn trong PiP */}
-                {!isInPipMode && <Pressable style={[StyleSheet.absoluteFill, { zIndex: 2 }]} onPress={toggleControls} />}
+                {/* Touch Areas — left half = seek -10s (double), right half = seek +10s (double), all = toggle controls */}
+                {!isInPipMode && (
+                    <>
+                        {/* Left half */}
+                        <Pressable
+                            style={[StyleSheet.absoluteFill, { zIndex: 2, right: '50%' }]}
+                            onPress={() => handleTap('left')}
+                        />
+                        {/* Right half */}
+                        <Pressable
+                            style={[StyleSheet.absoluteFill, { zIndex: 2, left: '50%' }]}
+                            onPress={() => handleTap('right')}
+                        />
+
+                        {/* Seek Flash Overlay (YouTube/Netflix style) */}
+                        {seekFlash && (
+                            <View
+                                pointerEvents="none"
+                                style={[
+                                    StyleSheet.absoluteFill,
+                                    {
+                                        zIndex: 3,
+                                        alignItems: seekFlash.side === 'left' ? 'flex-start' : 'flex-end',
+                                        justifyContent: 'center',
+                                    }
+                                ]}
+                            >
+                                <View style={{
+                                    backgroundColor: 'rgba(255,255,255,0.15)',
+                                    borderRadius: 999,
+                                    width: '45%',
+                                    aspectRatio: 1,
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    marginHorizontal: '-12%',
+                                }}>
+                                    <Ionicons
+                                        name={seekFlash.side === 'left' ? 'play-back' : 'play-forward'}
+                                        size={36}
+                                        color="white"
+                                    />
+                                    <Text style={{ color: 'white', fontSize: 13, fontWeight: '700', marginTop: 4 }}>
+                                        {seekFlash.side === 'left' ? '-' : '+'}{seekFlash.amount}s
+                                    </Text>
+                                </View>
+                            </View>
+                        )}
+                    </>
+                )}
+
 
                 {/* VISUAL BRIGHTNESS SLIDER - ẩn trong PiP */}
                 {!isInPipMode && (
@@ -580,12 +667,15 @@ export default function NativePlayer({
                             </LinearGradient>
                         )}
 
-                        {/* Lock Button */}
+                        {/* Lock Button – dịch xuống giữa bên PHẢI, không đè header */}
                         <TouchableOpacity
-                            style={[styles.lockBtn, locked ? { backgroundColor: '#fbbf24', borderColor: '#fbbf24' } : { backgroundColor: 'rgba(0,0,0,0.5)' }]}
+                            style={[
+                                styles.lockBtn,
+                                locked ? { backgroundColor: '#fbbf24', borderColor: '#fbbf24' } : { backgroundColor: 'rgba(0,0,0,0.5)' }
+                            ]}
                             onPress={() => setLocked(!locked)}
                         >
-                            <Ionicons name={locked ? "lock-closed" : "lock-open-outline"} size={22} color={locked ? "black" : "white"} />
+                            <Ionicons name={locked ? "lock-closed" : "lock-open-outline"} size={20} color={locked ? "black" : "white"} />
                         </TouchableOpacity>
 
                         {/* Center Controls */}
@@ -929,11 +1019,11 @@ const styles = StyleSheet.create({
 
     lockBtn: {
         position: 'absolute',
-        top: 20,
-        right: 60,
+        top: '45%',           // Chính giữa theo chiều dọc
+        right: 16,            // Mép phải, không đè cạnh header
         zIndex: 50,
-        padding: 8,
-        borderRadius: 20,
+        padding: 10,
+        borderRadius: 22,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.2)',
     },
