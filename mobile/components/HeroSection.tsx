@@ -1,42 +1,35 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { View, Text, Dimensions, StyleSheet, Platform, Pressable, TouchableOpacity } from 'react-native';
+import {
+    View, Text, Dimensions, StyleSheet, Pressable,
+    TouchableOpacity, NativeScrollEvent, NativeSyntheticEvent, ScrollView
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import Carousel, { ICarouselInstance } from 'react-native-reanimated-carousel';
-import { useSharedValue } from 'react-native-reanimated';
-import FocusableButton from './FocusableButton';
 import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Movie, getImageUrl, toggleFavorite as apiToggleFavorite } from '@/services/api';
 import { COLORS } from '@/constants/theme';
 import { addFavorite, removeFavorite, isFavorite } from '@/lib/favorites';
 import { useAuth } from '@/context/auth';
 
 const { width } = Dimensions.get('window');
-const isTablet = width > 700;
 
-const POSTER_WIDTH = Platform.isTV ? width * 0.35 : (isTablet ? width * 0.4 : width * 0.6);
-const POSTER_HEIGHT = POSTER_WIDTH * 1.30;
-// Increased CAROUSEL_HEIGHT to fully encapsulate the poster + infoWrapper (which has -45 margin) + shadows
-const CAROUSEL_HEIGHT = POSTER_HEIGHT + (Platform.isTV ? 120 : 200);
+// Compact horizontal hero — backdrop fullwidth 220px + poster nhỏ góc trái dưới + info
+const HERO_BACKDROP_HEIGHT = 220;
 
 interface HeroSectionProps {
     movies: Movie[];
 }
 
-// ──────────────────────────────────────────────────────────
-// KEY PERF FIX: activeIndex lives in a Sharedvalue & local ref
-// so renderItem does NOT re-create on every swipe.
-// HeroCard is memoized — only re-renders when isFav changes.
-// ──────────────────────────────────────────────────────────
 export default function HeroSection({ movies }: HeroSectionProps) {
+    const [activeIndex, setActiveIndex] = useState(0);
     const [favSlugs, setFavSlugs] = useState<Set<string>>(new Set());
-    // Use a ref for the active index to avoid re-creating renderItem closure
-    const activeIndexRef = useRef(0);
-    const [, forceActiveUpdate] = useState(0); // Trigger re-render only for the indicator dots
     const router = useRouter();
     const { user, token, syncFavorites } = useAuth();
-    const carouselRef = useRef<ICarouselInstance>(null);
+    const scrollRef = useRef<ScrollView>(null);
+    const autoTimer = useRef<any>(null);
 
+    // Load favorites
     useEffect(() => {
         if (!movies?.length) return;
         (async () => {
@@ -51,21 +44,39 @@ export default function HeroSection({ movies }: HeroSectionProps) {
         })();
     }, [movies, user?.favorites]);
 
-    if (!movies?.length) return null;
+    // Auto scroll
+    const scrollTo = useCallback((idx: number) => {
+        const clamped = Math.max(0, Math.min(movies.length - 1, idx));
+        scrollRef.current?.scrollTo({ x: clamped * width, animated: true });
+        setActiveIndex(clamped);
+    }, [movies.length]);
 
-    // PERF FIX: No LayoutAnimation, no activeIndex in deps
-    const onSnapToItem = useCallback((index: number) => {
-        activeIndexRef.current = index;
-        forceActiveUpdate(n => n + 1); // cheap re-render for dots only
-    }, []);
+    useEffect(() => {
+        if (!movies?.length || movies.length < 2) return;
+        autoTimer.current = setInterval(() => {
+            setActiveIndex(prev => {
+                const next = (prev + 1) % movies.length;
+                scrollRef.current?.scrollTo({ x: next * width, animated: true });
+                return next;
+            });
+        }, 5000);
+        return () => clearInterval(autoTimer.current);
+    }, [movies.length]);
+
+    const handleScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
+        const idx = Math.round(e.nativeEvent.contentOffset.x / width);
+        if (idx !== activeIndex) {
+            setActiveIndex(idx);
+            clearInterval(autoTimer.current);
+        }
+    }, [activeIndex]);
 
     const toggleFav = useCallback(async (movie: Movie) => {
         const slug = movie.slug;
         const currentlyFav = favSlugs.has(slug);
-        const newFav = !currentlyFav;
         setFavSlugs(prev => {
             const next = new Set(prev);
-            if (newFav) next.add(slug); else next.delete(slug);
+            currentlyFav ? next.delete(slug) : next.add(slug);
             return next;
         });
         try {
@@ -73,7 +84,7 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                 await apiToggleFavorite(movie, currentlyFav, token);
                 syncFavorites?.();
             } else {
-                if (newFav) await addFavorite({
+                if (!currentlyFav) await addFavorite({
                     movieId: (movie as any)._id || '',
                     movieSlug: movie.slug,
                     movieName: movie.name,
@@ -87,63 +98,134 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                     poster_url: movie.poster_url,
                     thumb_url: movie.thumb_url,
                 });
-                else await removeFavorite(movie.slug);
+                else await removeFavorite(slug);
             }
-        } catch (e) {
-            setFavSlugs(prev => { const n = new Set(prev); if (newFav) n.delete(slug); else n.add(slug); return n; });
+        } catch {
+            setFavSlugs(prev => {
+                const n = new Set(prev);
+                currentlyFav ? n.add(slug) : n.delete(slug);
+                return n;
+            });
         }
     }, [favSlugs, user, token, syncFavorites]);
 
-    // PERF FIX: renderItem deps only includes favSlugs and toggleFav,
-    // NOT activeIndex — so cards don't all rebuild on every swipe.
-    // isActive is computed inside via closure over the ref (stable reference).
-    const renderItem = useCallback(
-        ({ item, index }: { item: Movie; index: number }) => {
-            if (!item?.slug) return <View style={{ flex: 1 }} />;
-            return (
-                <HeroCard
-                    movie={item}
-                    index={index}
-                    activeIndexRef={activeIndexRef}
-                    isFav={favSlugs.has(item.slug)}
-                    onToggleFav={() => toggleFav(item)}
-                    onPress={() => {
-                        try { router.push(`/movie/${item.slug}` as any); } catch (e) { console.warn('Nav failed', e); }
-                    }}
-                />
-            );
-        },
-        // CRITICAL: activeIndex NOT in deps — card components use the ref directly
-        [favSlugs, toggleFav, router]
-    );
+    if (!movies?.length) return null;
 
     return (
-        <View style={styles.carouselSection}>
-            <Carousel
-                ref={carouselRef}
-                loop
-                width={width}
-                height={CAROUSEL_HEIGHT}
-                data={movies}
-                autoPlay={true}
-                autoPlayInterval={6000}
-                onSnapToItem={onSnapToItem}
-                scrollAnimationDuration={250}
-                panGestureHandlerProps={{ activeOffsetX: [-10, 10] }}
-                withAnimation={{ type: 'spring', config: { damping: 18, mass: 0.8, stiffness: 120 } }}
-                renderItem={renderItem}
-            />
-            {/* Indicator dots — lightweight, only re-render when activeIndex changes */}
+        <View style={styles.wrapper}>
+            <ScrollView
+                ref={scrollRef}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                scrollEventThrottle={16}
+                onMomentumScrollEnd={handleScroll}
+                decelerationRate="fast"
+            >
+                {movies.map((movie, index) => {
+                    const backdropUri = getImageUrl(movie.thumb_url || movie.poster_url);
+                    const posterUri = getImageUrl(movie.poster_url || movie.thumb_url);
+                    const isFav = favSlugs.has(movie.slug);
+                    const rating = (movie as any).tmdbData?.vote_average
+                        ? Number((movie as any).tmdbData.vote_average).toFixed(1)
+                        : null;
+
+                    return (
+                        <View key={movie.slug} style={{ width }}>
+                            {/* Backdrop */}
+                            <View style={styles.backdropContainer}>
+                                <Image
+                                    source={{ uri: backdropUri }}
+                                    style={StyleSheet.absoluteFill}
+                                    contentFit="cover"
+                                    contentPosition="top"
+                                    priority={index === 0 ? 'high' : 'normal'}
+                                    cachePolicy="memory-disk"
+                                />
+                                {/* Gradient overlay */}
+                                <LinearGradient
+                                    colors={['rgba(11,13,18,0)', 'rgba(11,13,18,0.5)', '#0B0D18']}
+                                    style={StyleSheet.absoluteFill}
+                                />
+                                {/* Quality + rating badges */}
+                                <View style={styles.badgesRow}>
+                                    {movie.quality && (
+                                        <View style={styles.badgeQuality}>
+                                            <Text style={styles.badgeQualityText}>{movie.quality}</Text>
+                                        </View>
+                                    )}
+                                    {rating && (
+                                        <View style={styles.badgeRating}>
+                                            <Ionicons name="star" size={10} color="#F4C84A" />
+                                            <Text style={styles.badgeRatingText}>{rating}</Text>
+                                        </View>
+                                    )}
+                                </View>
+                                {/* Small poster — bottom-left */}
+                                <Pressable
+                                    style={styles.posterSmall}
+                                    onPress={() => router.push(`/movie/${movie.slug}` as any)}
+                                >
+                                    <Image
+                                        source={{ uri: posterUri }}
+                                        style={{ width: '100%', height: '100%', borderRadius: 14 }}
+                                        contentFit="cover"
+                                        cachePolicy="memory-disk"
+                                    />
+                                </Pressable>
+                            </View>
+
+                            {/* Info block */}
+                            <View style={styles.infoBlock}>
+                                {/* Title area — aligned kế bên poster */}
+                                <View style={styles.titleArea}>
+                                    <Text style={styles.title} numberOfLines={2}>{movie.name}</Text>
+                                    <View style={styles.metaRow}>
+                                        {movie.year && <Text style={styles.metaText}>{movie.year}</Text>}
+                                        {movie.category?.slice(0, 2).map((c: any) => (
+                                            <Text key={c.id || c.name} style={styles.metaDot}>· {c.name}</Text>
+                                        ))}
+                                    </View>
+                                </View>
+
+                                {/* Action buttons */}
+                                <View style={styles.actionRow}>
+                                    <Pressable
+                                        style={styles.playBtn}
+                                        onPress={() => router.push(`/movie/${movie.slug}?autoPlay=true` as any)}
+                                    >
+                                        <Ionicons name="play" size={18} color="#0B0D12" />
+                                        <Text style={styles.playBtnText}>Xem ngay</Text>
+                                    </Pressable>
+
+                                    <Pressable
+                                        style={styles.circleBtn}
+                                        onPress={() => router.push(`/movie/${movie.slug}` as any)}
+                                    >
+                                        <Ionicons name="information-circle-outline" size={22} color="rgba(255,255,255,0.9)" />
+                                    </Pressable>
+
+                                    <TouchableOpacity
+                                        style={[styles.circleBtn, isFav && styles.circleBtnFav]}
+                                        onPress={() => toggleFav(movie)}
+                                        activeOpacity={0.8}
+                                    >
+                                        <Ionicons name={isFav ? 'heart' : 'heart-outline'} size={20} color={isFav ? COLORS.accent : 'rgba(255,255,255,0.9)'} />
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    );
+                })}
+            </ScrollView>
+
+            {/* Dot indicators */}
             {movies.length > 1 && (
                 <View style={styles.dotsRow}>
                     {movies.map((_, i) => (
-                        <View
-                            key={i}
-                            style={[
-                                styles.dot,
-                                i === activeIndexRef.current ? styles.dotActive : styles.dotInactive
-                            ]}
-                        />
+                        <Pressable key={i} onPress={() => scrollTo(i)}>
+                            <View style={[styles.dot, i === activeIndex ? styles.dotActive : styles.dotInactive]} />
+                        </Pressable>
                     ))}
                 </View>
             )}
@@ -151,238 +233,125 @@ export default function HeroSection({ movies }: HeroSectionProps) {
     );
 }
 
-// PERF FIX: HeroCard now reads isActive from the ref (no prop changes on swipe),
-// so React.memo prevents any re-render until isFav changes.
-const HeroCard = React.memo(function HeroCard({ movie, index, activeIndexRef, isFav, onToggleFav, onPress }: {
-    movie: Movie;
-    index: number;
-    activeIndexRef: React.RefObject<number>;
-    isFav: boolean;
-    onToggleFav: () => void;
-    onPress: () => void;
-}) {
-    const router = useRouter();
-    const categories = movie.category?.slice(0, 3) || [];
-    // isActive is derived from ref — no prop re-creation needed
-    const isActive = activeIndexRef.current === index;
-
-    return (
-        <View style={[styles.cardContainer, !isActive && { opacity: 0.8 }]} collapsable={false}>
-            <FocusableButton style={styles.posterWrapper} onPress={onPress}>
-                <Image
-                    source={{ uri: getImageUrl(movie.poster_url || movie.thumb_url) }}
-                    style={styles.posterImage}
-                    contentFit="cover"
-                    transition={200}
-                    cachePolicy="memory-disk"
-                    priority={isActive ? 'high' : 'normal'}
-                    recyclingKey={movie.slug}
-                />
-            </FocusableButton>
-
-            <View style={styles.infoWrapper}>
-                <Text style={styles.title} numberOfLines={1}>{movie.name}</Text>
-                {movie.origin_name && <Text style={styles.subtitle} numberOfLines={1}>{movie.origin_name}</Text>}
-
-                <View style={styles.metaRow}>
-                    {movie.year && (
-                        <View style={styles.metaBadgeDark}>
-                            <Text style={styles.metaTextWhite}>{movie.year}</Text>
-                        </View>
-                    )}
-                    <View style={styles.metaBadgeDark}>
-                        <Ionicons name="star" size={12} color="#fbbf24" style={{ marginRight: 4 }} />
-                        <Text style={styles.metaTextYellow}>{(movie as any).tmdb?.vote_average ? Number((movie as any).tmdb.vote_average).toFixed(1) : '7.5'}</Text>
-                    </View>
-                    {(movie.quality || movie.lang) && (
-                        <View style={styles.metaBadgeOutline}>
-                            <Text style={styles.metaTextYellow}>{movie.quality || 'HD'}</Text>
-                        </View>
-                    )}
-                </View>
-
-                {categories.length > 0 && (
-                    <View style={styles.genreRow}>
-                        {categories.map((c: any, idx: number) => (
-                            <View key={idx} style={styles.genreBadge}>
-                                <Text style={styles.genreText}>{c.name}</Text>
-                            </View>
-                        ))}
-                    </View>
-                )}
-
-                <View style={styles.actionRow}>
-                    <FocusableButton
-                        style={styles.playBtnIcon}
-                        onPress={() => {
-                            try { router.push(`/movie/${movie.slug}?autoPlay=true` as any); } catch (e) { console.warn('Nav failed', e); }
-                        }}
-                    >
-                        <Ionicons name="play" size={24} color="#0B0D12" />
-                    </FocusableButton>
-
-                    <Pressable style={styles.circleBtn} onPress={onPress}>
-                        <Ionicons name="information-circle-outline" size={22} color="rgba(255,255,255,0.9)" />
-                    </Pressable>
-
-                    <TouchableOpacity
-                        style={[styles.circleBtn, isFav && styles.circleBtnFav]}
-                        onPress={onToggleFav}
-                        activeOpacity={0.8}
-                        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-                    >
-                        <Ionicons name={isFav ? 'heart' : 'heart-outline'} size={20} color={isFav ? COLORS.accent : 'rgba(255,255,255,0.9)'} />
-                    </TouchableOpacity>
-                </View>
-            </View>
-        </View>
-    );
-});
-
 const styles = StyleSheet.create({
-    carouselSection: {
-        height: CAROUSEL_HEIGHT,
+    wrapper: {
         width: '100%',
-        marginTop: 20,
-        overflow: 'visible',
+        backgroundColor: '#0B0D18',
+        marginTop: 4,
     },
-    cardContainer: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingTop: 10,
-        paddingBottom: 25, // Extends space below infoWrapper so drop shadows aren't clipped
-        overflow: 'visible',
-    },
-    posterWrapper: {
-        width: POSTER_WIDTH,
-        height: POSTER_HEIGHT,
-        borderRadius: 28,
-        backgroundColor: '#1f2937',
-        zIndex: 1,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.15,
-        shadowRadius: 10,
-        elevation: 5,
-    },
-    posterImage: {
+    backdropContainer: {
         width: '100%',
-        height: '100%',
-        borderRadius: 28,
+        height: HERO_BACKDROP_HEIGHT,
+        overflow: 'hidden',
+        position: 'relative',
     },
-    infoWrapper: {
+    badgesRow: {
+        position: 'absolute',
+        top: 12,
+        right: 12,
+        flexDirection: 'row',
+        gap: 6,
+        zIndex: 2,
+    },
+    badgeQuality: {
+        backgroundColor: '#F4C84A',
+        paddingHorizontal: 8,
+        paddingVertical: 3,
+        borderRadius: 4,
+    },
+    badgeQualityText: {
+        color: '#0B0D12',
+        fontSize: 10,
+        fontWeight: '800',
+    },
+    badgeRating: {
+        backgroundColor: 'rgba(0,0,0,0.65)',
+        paddingHorizontal: 7,
+        paddingVertical: 3,
+        borderRadius: 4,
+        flexDirection: 'row',
         alignItems: 'center',
-        width: '88%',
-        marginTop: -45,
-        backgroundColor: 'rgba(15, 18, 26, 0.82)',
-        borderRadius: 24,
-        padding: 20,
-        paddingTop: 55,
-        paddingHorizontal: 20,
-        borderWidth: StyleSheet.hairlineWidth,
-        borderColor: 'rgba(255, 255, 255, 0.12)',
-        borderTopColor: 'rgba(255, 255, 255, 0.25)',
-        zIndex: 0,
+        gap: 3,
+    },
+    badgeRatingText: {
+        color: '#F4C84A',
+        fontSize: 10,
+        fontWeight: '700',
+    },
+    posterSmall: {
+        position: 'absolute',
+        bottom: 12,
+        left: 14,
+        width: 70,
+        height: 98,
+        borderRadius: 14,
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.5,
+        shadowRadius: 8,
+        elevation: 8,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.12)',
+        zIndex: 2,
+    },
+    infoBlock: {
+        paddingHorizontal: 14,
+        paddingTop: 2,
+        paddingBottom: 4,
+        flexDirection: 'column',
+        gap: 8,
+    },
+    titleArea: {
+        paddingLeft: 84,   // kế bên poster nhỏ
+        minHeight: 60,
     },
     title: {
         color: '#FFFFFF',
-        fontSize: 20,
-        fontWeight: '600',
-        textAlign: 'center',
-        marginBottom: 6,
-        letterSpacing: -0.3,
-    },
-    subtitle: {
-        color: 'rgba(255,255,255,0.75)',
-        fontSize: 15,
-        fontWeight: '500',
-        textAlign: 'center',
-        marginBottom: 14,
+        fontSize: 16,
+        fontWeight: '800',
+        lineHeight: 22,
+        marginBottom: 4,
     },
     metaRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
-        gap: 10,
-        marginBottom: 12,
-    },
-    metaBadgeDark: {
-        backgroundColor: 'rgba(255,255,255,0.06)',
-        paddingHorizontal: 10,
-        paddingVertical: 6,
-        borderRadius: 14,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    metaBadgeOutline: {
-        backgroundColor: 'rgba(244,200,74,0.08)',
-        paddingHorizontal: 10,
-        paddingVertical: 6,
-        borderRadius: 14,
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: 'rgba(244,200,74,0.5)'
-    },
-    metaTextWhite: {
-        color: 'white',
-        fontSize: 12,
-        fontWeight: '700',
-    },
-    metaTextYellow: {
-        color: '#F4C84A',
-        fontSize: 12,
-        fontWeight: '700',
-    },
-    genreRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
         flexWrap: 'wrap',
-        gap: 8,
-        marginBottom: 18,
+        gap: 4,
     },
-    genreBadge: {
-        backgroundColor: 'rgba(0,0,0,0.4)',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 16,
-    },
-    genreText: {
-        color: 'rgba(255,255,255,0.7)',
+    metaText: {
+        color: 'rgba(255,255,255,0.5)',
         fontSize: 12,
-        fontWeight: '600',
+    },
+    metaDot: {
+        color: 'rgba(255,255,255,0.35)',
+        fontSize: 12,
     },
     actionRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
-        gap: 16,
-        marginTop: 4,
-        paddingHorizontal: 16,
+        gap: 8,
+        marginTop: 2,
     },
-    playBtnIcon: {
-        width: 52,
-        height: 52,
-        borderRadius: 26,
-        backgroundColor: 'rgba(244,200,74,0.95)',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.25)',
+    playBtn: {
+        flex: 1,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: '#F4C84A',
+        flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-        elevation: 4,
+        gap: 6,
+    },
+    playBtnText: {
+        color: '#0B0D12',
+        fontWeight: '800',
+        fontSize: 13,
     },
     circleBtn: {
-        width: 46,
-        height: 46,
-        borderRadius: 23,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
         backgroundColor: 'rgba(255,255,255,0.08)',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.15)',
@@ -390,27 +359,18 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     circleBtnFav: {
-        backgroundColor: 'rgba(251,191,36,0.18)',
-        borderColor: 'rgba(251,191,36,0.5)',
+        backgroundColor: 'rgba(244,200,74,0.18)',
+        borderColor: 'rgba(244,200,74,0.5)',
     },
-    // Indicator dots
     dotsRow: {
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 10,
-        gap: 6,
+        paddingBottom: 6,
+        paddingTop: 4,
+        gap: 5,
     },
-    dot: {
-        height: 6,
-        borderRadius: 3,
-    },
-    dotActive: {
-        width: 20,
-        backgroundColor: 'rgba(244, 200, 74, 0.95)',
-    },
-    dotInactive: {
-        width: 6,
-        backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    },
+    dot: { height: 5, borderRadius: 3 },
+    dotActive: { width: 18, backgroundColor: '#F4C84A' },
+    dotInactive: { width: 5, backgroundColor: 'rgba(255,255,255,0.25)' },
 });
