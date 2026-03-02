@@ -177,12 +177,12 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
 
                                             const activeBgClass = "bg-[#F4C84A] border-[#F4C84A] text-[#0B0D12]";
 
-                                            const displayName = server.server_name
+                                            const displayName = server.server_name.split("##")[0]
                                                 .replace("Lồng Tiếng", "").replace("lồng tiếng", "").replace("longtieng", "")
                                                 .replace("Thuyết Minh", "").replace("thuyết minh", "").replace("thuyetminh", "")
                                                 .replace("Vietsub", "").replace("vietsub", "")
                                                 .replace(/\(\)/g, "").replace(/\[\]/g, "").replace(/--/g, "-").trim()
-                                                || server.server_name;
+                                                || server.server_name.split("##")[0].trim();
 
                                             return (
                                                 <button

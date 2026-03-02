@@ -214,7 +214,7 @@ export default function PlayerScreen() {
                     // New Props
 
                     episodeList={episodes[selectedServer]?.server_data || []}
-                    serverList={nonEmptyEpisodes.map((s: any) => s.server_name)}
+                    serverList={nonEmptyEpisodes.map((s: any) => s.server_name.split('##')[0].trim())}
                     currentServerIndex={nonEmptyEpisodes.findIndex((s: any) => s.server_name === (episodes[selectedServer]?.server_name || ''))}
                     currentEpisodeSlug={ep as string}
                     onEpisodeChange={(newSlug) => {
