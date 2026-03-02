@@ -5,8 +5,8 @@ module.exports = {
       cwd: ".next/standalone",
       script: "server.js",
       args: "--port 3000",
-      exec_mode: "fork",
-      instances: 1,
+      exec_mode: "cluster",
+      instances: "max",
       env: {
         NODE_ENV: "production",
         PORT: "3000",
