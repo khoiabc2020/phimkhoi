@@ -23,47 +23,10 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
     });
 
     const [selectedIndex, setSelectedIndex] = useState(0);
-    const [heroMoviesData, setHeroMoviesData] = useState<Record<string, { vote_average: number, backdrop_path?: string, poster_path?: string }>>({});
     const [tweenValues, setTweenValues] = useState<number[]>([]);
     const [isDesktop, setIsDesktop] = useState(false);
 
-    // Embla Tween Scale Logic cho Mobile
-    const tweenScale = useCallback(() => {
-        if (!mobileApi) return;
-        const engine = mobileApi.internalEngine();
-        const scrollProgress = mobileApi.scrollProgress();
-        const slidesInView = mobileApi.slidesInView();
-        const isScrollEvent = mobileApi.scrollSnapList().length > 1;
-
-        if (!isScrollEvent) return;
-
-        const TWEEN_FACTOR = 0.9; // Slide bên sẽ thụt xuống 90% thay vì 85% để tránh lõm sâu
-
-        const speeds = mobileApi.scrollSnapList().map((scrollSnap, index) => {
-            let diffToTarget = scrollSnap - scrollProgress;
-            if (engine.options.loop) {
-                engine.slideLooper.loopPoints.forEach((loopItem) => {
-                    const target = loopItem.target();
-                    if (index === loopItem.index && target !== 0) {
-                        const sign = Math.sign(target);
-                        if (sign === -1) {
-                            diffToTarget = scrollSnap - (1 + scrollProgress);
-                        }
-                        if (sign === 1) {
-                            diffToTarget = scrollSnap + (1 - scrollProgress);
-                        }
-                    }
-                });
-            }
-
-            const tweenValue = 1 - Math.abs(diffToTarget * 1.5);
-            return Math.max(0, Math.min(Math.max(tweenValue, TWEEN_FACTOR), 1));
-        });
-
-        setTweenValues(speeds);
-    }, [mobileApi]);
-
-    // Sync Desktop: chỉ theo dõi slide hiện tại, KHÔNG autoplay để giảm CPU/giật trên desktop
+    // Sync Desktop: theo dõi slide hiện tại, KHÔNG autoplay để giảm CPU
     useEffect(() => {
         if (!desktopApi) return;
         const onSelect = () => setSelectedIndex(desktopApi.selectedScrollSnap());
@@ -73,94 +36,19 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
         };
     }, [desktopApi]);
 
-    // Sync Mobile — throttle scroll: cân bằng giữa mượt mà và CPU
-    const throttleRef = useRef<number | null>(null);
-    const lastTweenRef = useRef(0);
-    // 30–35 lần/giây: mượt hơn nhiều so với 8fps nhưng vẫn nhẹ
-    const THROTTLE_MS = 30;
+    // Sync Mobile: Loại bỏ hoàn toàn vòng lặp requestAnimationFrame tính toán tỉ lệ scale nặng nề gây lag.
+    // CSS thuần túy và Embla core sẽ đảm nhận việc lướt.
     useEffect(() => {
         if (!mobileApi) return;
-        tweenScale();
-        const onScroll = () => {
-            const now = Date.now();
-            if (throttleRef.current !== null) return;
-            if (now - lastTweenRef.current < THROTTLE_MS) {
-                if (throttleRef.current === null) {
-                    throttleRef.current = window.setTimeout(() => {
-                        throttleRef.current = null;
-                        lastTweenRef.current = Date.now();
-                        tweenScale();
-                    }, THROTTLE_MS - (now - lastTweenRef.current));
-                }
-                return;
-            }
-            lastTweenRef.current = now;
-            requestAnimationFrame(tweenScale);
-        };
-        mobileApi.on("scroll", onScroll);
-        mobileApi.on("reInit", tweenScale);
-
         const onSelect = () => setSelectedIndex(mobileApi.selectedScrollSnap());
         mobileApi.on("select", onSelect);
         return () => {
-            if (throttleRef.current !== null) clearTimeout(throttleRef.current);
             mobileApi.off("select", onSelect);
-            mobileApi.off("scroll", onScroll);
-            mobileApi.off("reInit", tweenScale);
         };
-    }, [mobileApi, tweenScale]);
+    }, [mobileApi]);
 
-    // Detect desktop (client-side) to avoid heavy TMDB enrichment on mobile
-    useEffect(() => {
-        if (typeof window === "undefined") return;
-        const check = () => setIsDesktop(window.innerWidth >= 1024);
-        check();
-        window.addEventListener("resize", check);
-        return () => window.removeEventListener("resize", check);
-    }, []);
-
-    // Hydrate TMDB (desktop only, số lượng = số slide hero để giảm request)
-    useEffect(() => {
-        if (!isDesktop) return;
-        const fetchHeroData = async () => {
-            const updates: Record<string, { vote_average: number, backdrop_path?: string, poster_path?: string }> = {};
-            const toFetch = movies.slice(0, 8);
-            await Promise.all(toFetch.map(async (movie) => {
-                const CACHE_VERSION = 'v5_cinematic_hq';
-                const cacheKey = `tmdb_hero_${CACHE_VERSION}_${movie.slug}`;
-                const cached = sessionStorage.getItem(cacheKey);
-
-                if (cached) {
-                    updates[movie._id] = JSON.parse(cached);
-                    return;
-                }
-
-                const year = movie.year ? parseInt(movie.year.toString().split("-")[0]) : undefined;
-                let type: 'movie' | 'tv' = 'movie';
-                if (movie.type === 'phim-bo' || movie.type === 'tv-shows' || movie.type === 'hoat-hinh') type = 'tv';
-
-                const data = await getTMDBDataForCard(
-                    movie.origin_name || movie.name,
-                    isNaN(year!) ? undefined : year,
-                    type,
-                    { originalName: movie.origin_name, countrySlug: movie.country?.[0]?.slug }
-                );
-
-                if (data) {
-                    const mappedData = {
-                        vote_average: data.vote_average,
-                        backdrop_path: data.backdrop_path,
-                        poster_path: data.poster_path
-                    };
-                    updates[movie._id] = mappedData;
-                    sessionStorage.setItem(cacheKey, JSON.stringify(mappedData));
-                }
-            }));
-            setHeroMoviesData(prev => ({ ...prev, ...updates }));
-        };
-        if (movies?.length > 0) fetchHeroData();
-    }, [movies, isDesktop]);
-
+    // Lấy dữ liệu TMDB từ Server Props (page.tsx) thay vì fetch Client-Side để tăng hiệu năng tối đa
+    // Dữ liệu đã có sẵn trong HTML ban đầu, không gây giật lag do hiệu ứng tải lại trên Mobile & Desktop
     const scrollTo = useCallback((index: number) => {
         if (desktopApi) desktopApi.scrollTo(index);
         if (mobileApi) mobileApi.scrollTo(index);
@@ -179,11 +67,11 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
     if (!movies || movies.length === 0) return null;
 
     const stripHtml = (html: string) => html ? html.replace(/<[^>]*>/g, '').trim() : "";
-    // Giới hạn 8 slide để giảm DOM + ảnh + CPU (cuộn mượt hơn)
-    const heroMovies = movies.slice(0, 8);
+    // Giới hạn 5 slide để giảm lượng DOM + ảnh + CPU tính toán tối đa (cuộn siêu mượt)
+    const heroMovies = movies.slice(0, 5);
     const activeMovie = heroMovies[selectedIndex] || heroMovies[0];
-    const activeTMDB = heroMoviesData[activeMovie._id];
-    const activeRating = activeTMDB?.vote_average ? activeTMDB.vote_average.toFixed(1) : "N/A";
+    const enhancedTMDB = activeMovie?.tmdbData;
+    const activeRating = enhancedTMDB?.vote_average ? enhancedTMDB.vote_average.toFixed(1) : "N/A";
 
     const getFavoriteData = (movie: Movie) => ({
         movieId: movie._id || "",
@@ -196,9 +84,9 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
         movieCategories: movie.category?.map(c => c.name) || [],
     });
 
-    // Hero dùng poster/thumbnail từ API (TMDB khi đã match năm, hoặc nguồn PhimAPI). Fallback placeholder để không bao giờ slide đen.
-    const getHeroImage = (movie: Movie, type: 'poster' | 'backdrop' = 'poster') => {
-        const tmdbData = heroMoviesData[movie._id];
+    // Hero dùng poster/thumbnail từ API (TMDB Server Side khi đã match năm, hoặc nguồn PhimAPI). Fallback placeholder để không bao giờ slide đen.
+    const getHeroImage = (movie: any, type: 'poster' | 'backdrop' = 'poster') => {
+        const tmdbData = movie.tmdbData;
         if (tmdbData) {
             if (type === 'poster' && tmdbData.poster_path) {
                 return `https://image.tmdb.org/t/p/original${tmdbData.poster_path}`;
@@ -218,24 +106,19 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
             {/* Shows on < lg screens (approx < 1024px) */}
             <div className="lg:hidden relative w-full h-auto flex flex-col pt-6 pb-8 bg-[#0B0D12]" ref={mobileRef}>
                 <div className="flex flex-row touch-pan-y h-auto">
-                    {heroMovies.map((movie, index) => {
+                    {heroMovies.map((movie: any, index) => {
                         const posterImg = getHeroImage(movie, 'poster');
-                        const rating = heroMoviesData[movie._id]?.vote_average ? heroMoviesData[movie._id].vote_average.toFixed(1) : "N/A";
-
-                        const tweenValue = tweenValues.length ? tweenValues[index] : 1;
-                        const posterOpacity = Math.min(1, Math.max(0.4, (tweenValue - 0.9) / 0.1));
-                        const textOpacity = Math.max(0, Math.min(1, (tweenValue - 0.95) / 0.05));
+                        const rating = movie.tmdbData?.vote_average ? movie.tmdbData.vote_average.toFixed(1) : "N/A";
 
                         return (
-                            <div key={movie._id} className="relative flex-[0_0_72%] sm:flex-[0_0_58%] max-w-[260px] min-w-0 h-auto flex flex-col items-center pt-6">
+                            <div key={movie._id} className="relative flex-[0_0_80%] sm:flex-[0_0_60%] max-w-[300px] min-w-0 h-auto flex flex-col items-center pt-2 transition-opacity duration-300" style={{ opacity: index === selectedIndex ? 1 : 0.4 }}>
 
-                                {/* 1. Centered Poster with 3D Tween */}
+                                {/* 1. Centered Poster */}
                                 <Link
                                     href={`/xem-phim/${movie.slug}`}
-                                    className="relative w-[78%] max-w-[220px] mx-auto aspect-[2/3] mb-3 rounded-xl overflow-hidden shadow-lg ring-1 ring-white/5 shrink-0 transition-transform duration-300 ease-out will-change-transform transform-gpu"
+                                    className="relative w-[85%] max-w-[260px] mx-auto aspect-[2/3] mb-4 rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 shrink-0 transition-all duration-300 ease-out"
                                     style={{
-                                        transform: `scale(${tweenValue}) translateZ(0)`,
-                                        opacity: posterOpacity
+                                        transform: index === selectedIndex ? 'scale(1)' : 'scale(0.9)',
                                     }}
                                 >
                                     <Image
@@ -244,20 +127,20 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                         fill
                                         className="object-cover"
                                         priority={index === 0}
-                                        sizes="(max-width: 768px) 60vw, (max-width: 1200px) 30vw, 20vw"
+                                        sizes="(max-width: 768px) 70vw, 50vw"
                                     />
                                 </Link>
 
                                 {/* 2. Vertically Stacked Movie Info */}
                                 <div
-                                    className="flex flex-col items-center w-[100%] text-center transition-all duration-300 ease-out mt-1 px-2 will-change-transform transform-gpu"
+                                    className="flex flex-col items-center w-[100%] text-center px-2 transition-all duration-300 ease-out"
                                     style={{
-                                        opacity: textOpacity,
-                                        transform: `translate3d(0, ${(1 - tweenValue) * 20}px, 0)`,
-                                        visibility: textOpacity <= 0 ? 'hidden' : 'visible'
+                                        opacity: index === selectedIndex ? 1 : 0,
+                                        transform: index === selectedIndex ? 'translateY(0)' : 'translateY(15px)',
+                                        pointerEvents: index === selectedIndex ? 'auto' : 'none'
                                     }}
                                 >
-                                    <h1 className="text-xl md:text-2xl font-black text-white leading-tight drop-shadow-lg line-clamp-2 tracking-tight mb-1">
+                                    <h1 className="text-2xl font-black text-white leading-tight drop-shadow-lg line-clamp-2 tracking-tight mb-1.5">
                                         {decodeHtml(movie.name)}
                                     </h1>
 
@@ -280,7 +163,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
                                     {/* Genres */}
                                     <div className="flex flex-wrap justify-center gap-1.5 mb-4">
-                                        {movie.category?.slice(0, 3).map(c => (
+                                        {movie.category?.slice(0, 3).map((c: any) => (
                                             <span key={c.id} className="text-xs font-semibold text-white/80 px-4 py-1.5 rounded-full bg-black/40 border border-white/10">
                                                 {c.name}
                                             </span>
@@ -361,7 +244,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                                         {movie.quality}
                                                     </span>
                                                     <span className="flex items-center gap-1 text-white/80 text-xs font-medium">
-                                                        <span className="text-[#F4C84A]">★</span> {heroMoviesData[movie._id]?.vote_average?.toFixed(1) || "N/A"}
+                                                        <span className="text-[#F4C84A]">★</span> {movie.tmdbData?.vote_average?.toFixed(1) || "N/A"}
                                                     </span>
                                                 </div>
 

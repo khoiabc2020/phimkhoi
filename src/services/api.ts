@@ -31,6 +31,7 @@ export interface Movie {
     category: { id: string; name: string; slug: string }[];
     country: { id: string; name: string; slug: string }[];
     episodes: { server_name: string; server_data: { name: string; slug: string; filename: string; link_embed: string; link_m3u8: string }[] }[];
+    tmdbData?: { vote_average?: number; poster_path?: string; backdrop_path?: string } | null;
 }
 
 interface ListResponse {
