@@ -339,7 +339,38 @@ export default function MovieDetailScreen() {
                                 </View>
                             )}
                         </View>
+
+                        {/* Status Badge — Hoàn Tất vs Đang chiếu */}
+                        {(() => {
+                            const ep = movie.episode_current || '';
+                            const isCompleted = ep.toLowerCase().includes('hoàn tất') || ep.toLowerCase().includes('full');
+                            const total = movie.episode_total || '?';
+                            const epNum = ep.replace(/hoàn tất/gi, '').replace(/\(.*?\)/g, '').trim() || '1';
+                            return (
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 }}>
+                                    <View style={{
+                                        flexDirection: 'row', alignItems: 'center', gap: 6,
+                                        paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20,
+                                        backgroundColor: isCompleted ? 'rgba(34,197,94,0.15)' : 'rgba(234,179,8,0.15)',
+                                        borderWidth: 1,
+                                        borderColor: isCompleted ? 'rgba(34,197,94,0.4)' : 'rgba(234,179,8,0.4)',
+                                    }}>
+                                        <View style={{
+                                            width: 6, height: 6, borderRadius: 3,
+                                            backgroundColor: isCompleted ? '#22c55e' : '#eab308',
+                                        }} />
+                                        <Text style={{ color: isCompleted ? '#22c55e' : '#eab308', fontSize: 12, fontWeight: '700' }}>
+                                            {isCompleted ? 'Hoàn Tất' : 'Đang chiếu'}
+                                        </Text>
+                                    </View>
+                                    <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>
+                                        {isCompleted ? `${total} tập` : `Tập ${epNum} / ${total}`}
+                                    </Text>
+                                </View>
+                            );
+                        })()}
                     </View>
+
                 </View>
 
                 {/* BODY — Xem phim, Yêu thích, Thêm danh sách, Tải xuống cùng 1 hàng, nút Xem thu gọn */}

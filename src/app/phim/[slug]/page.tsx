@@ -88,10 +88,34 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                     <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight drop-shadow-2xl">{movie?.name}</h1>
                     <h2 className="hidden sm:block text-base md:text-2xl text-gray-300 font-medium tracking-wide drop-shadow-md">{movie?.origin_name}</h2>
 
-                    <div className="flex items-center gap-2 text-yellow-500 font-bold text-sm mt-2 drop-shadow-md">
-                        <PlayCircle className="w-4 h-4 fill-current" />
-                        Đang chiếu tập {movie?.episode_current || "1"} / {movie?.episode_total || "?"}
-                    </div>
+                    {(() => {
+                        const epCurrent = movie?.episode_current || "";
+                        const isCompleted = epCurrent.toLowerCase().includes("hoàn tất") || epCurrent.toLowerCase().includes("full");
+                        const total = movie?.episode_total || "?";
+                        // Extract episode number from "Tập X" or raw number
+                        const epNum = epCurrent.replace(/hoàn tất/gi, "").replace(/\(.*?\)/g, "").trim() || "1";
+                        return (
+                            <div className="flex items-center gap-2 font-bold text-sm mt-2 drop-shadow-md">
+                                {isCompleted ? (
+                                    <>
+                                        <span className="inline-flex items-center gap-1.5 bg-green-500/20 text-green-400 border border-green-500/30 px-2.5 py-0.5 rounded-full text-xs font-bold">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
+                                            Hoàn Tất
+                                        </span>
+                                        <span className="text-gray-400 text-xs font-medium">{total} Tập</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span className="inline-flex items-center gap-1.5 bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-2.5 py-0.5 rounded-full text-xs font-bold">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse inline-block" />
+                                            Đang chiếu
+                                        </span>
+                                        <span className="text-gray-300 text-xs font-medium">Tập {epNum} / {total}</span>
+                                    </>
+                                )}
+                            </div>
+                        );
+                    })()}
 
                     <div className="text-xs sm:text-sm text-gray-300 flex flex-wrap items-center gap-2 sm:gap-4 py-1 sm:py-2 drop-shadow-md">
                         <span><span className="text-gray-500">Đạo diễn:</span> {movie?.director?.join(", ") || "Đang cập nhật"}</span>

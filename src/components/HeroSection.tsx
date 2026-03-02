@@ -102,92 +102,88 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
     return (
         <div className="relative w-full h-auto bg-[#0B0D12] overflow-hidden flex flex-col font-sans">
 
-            {/* ================= TABLET & MOBILE LAYOUT (Portrait/Small Screens) ================= */}
-            {/* Shows on < lg screens (approx < 1024px) */}
-            <div className="lg:hidden relative w-full h-auto flex flex-col pt-6 pb-8 bg-[#0B0D12]" ref={mobileRef}>
-                <div className="flex flex-row touch-pan-y h-auto">
+            {/* ================= MOBILE LAYOUT compact — chiều cao tiết kiệm ================= */}
+            <div className="lg:hidden relative w-full bg-[#0B0D12]" ref={mobileRef}>
+                <div className="flex flex-row touch-pan-y">
                     {heroMovies.map((movie: any, index) => {
                         const posterImg = getHeroImage(movie, 'poster');
-                        const rating = movie.tmdbData?.vote_average ? movie.tmdbData.vote_average.toFixed(1) : "N/A";
+                        const backdropImg = getHeroImage(movie, 'backdrop');
+                        const rating = movie.tmdbData?.vote_average ? movie.tmdbData.vote_average.toFixed(1) : null;
+                        const isActive = index === selectedIndex;
 
                         return (
-                            <div key={movie._id} className="relative flex-[0_0_80%] sm:flex-[0_0_60%] max-w-[300px] min-w-0 h-auto flex flex-col items-center pt-2 transition-opacity duration-300" style={{ opacity: index === selectedIndex ? 1 : 0.4 }}>
-
-                                {/* 1. Centered Poster */}
-                                <Link
-                                    href={`/xem-phim/${movie.slug}`}
-                                    className="relative w-[85%] max-w-[260px] mx-auto aspect-[2/3] mb-4 rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 shrink-0 transition-all duration-300 ease-out"
-                                    style={{
-                                        transform: index === selectedIndex ? 'scale(1)' : 'scale(0.9)',
-                                    }}
-                                >
+                            <div
+                                key={movie._id}
+                                className="relative flex-[0_0_100%] min-w-0 flex flex-col"
+                                style={{ opacity: isActive ? 1 : 0.3 }}
+                            >
+                                {/* Backdrop — fixed height 200px, phủ toàn chiều rộng */}
+                                <div className="relative w-full h-[200px] sm:h-[260px] shrink-0 overflow-hidden">
                                     <Image
-                                        src={posterImg}
+                                        src={backdropImg}
                                         alt={decodeHtml(movie.name)}
                                         fill
-                                        className="object-cover"
+                                        className="object-cover object-top"
                                         priority={index === 0}
-                                        sizes="(max-width: 768px) 70vw, 50vw"
+                                        sizes="100vw"
                                     />
-                                </Link>
+                                    {/* Gradient bottom */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D12] via-[#0B0D12]/40 to-transparent" />
+                                    {/* Poster nhỏ góc trái dưới */}
+                                    <Link href={`/phim/${movie.slug}`} className="absolute bottom-3 left-3 w-[72px] h-[100px] rounded-xl overflow-hidden shadow-xl ring-1 ring-white/15 shrink-0">
+                                        <Image src={posterImg} alt="" fill className="object-cover" sizes="80px" />
+                                    </Link>
+                                    {/* Badges góc phải trên */}
+                                    <div className="absolute top-3 right-3 flex gap-1.5">
+                                        {movie.quality && (
+                                            <span className="bg-[#F4C84A] text-black text-[10px] font-black px-2 py-0.5 rounded">{movie.quality}</span>
+                                        )}
+                                        {rating && (
+                                            <span className="bg-black/70 text-[#F4C84A] text-[10px] font-bold px-2 py-0.5 rounded backdrop-blur-sm">★ {rating}</span>
+                                        )}
+                                    </div>
+                                </div>
 
-                                {/* 2. Vertically Stacked Movie Info */}
+                                {/* Info block — compact */}
                                 <div
-                                    className="flex flex-col items-center w-[100%] text-center px-2 transition-all duration-300 ease-out"
+                                    className="px-4 pt-2 pb-4 flex flex-col gap-2 transition-all duration-300"
                                     style={{
-                                        opacity: index === selectedIndex ? 1 : 0,
-                                        transform: index === selectedIndex ? 'translateY(0)' : 'translateY(15px)',
-                                        pointerEvents: index === selectedIndex ? 'auto' : 'none'
+                                        opacity: isActive ? 1 : 0,
+                                        transform: isActive ? 'translateY(0)' : 'translateY(8px)',
+                                        pointerEvents: isActive ? 'auto' : 'none',
                                     }}
                                 >
-                                    <h1 className="text-2xl font-black text-white leading-tight drop-shadow-lg line-clamp-2 tracking-tight mb-1.5">
-                                        {decodeHtml(movie.name)}
-                                    </h1>
-
-                                    <h2 className="text-[13px] md:text-sm text-[#F4C84A] font-medium line-clamp-1 mb-3">
-                                        {decodeHtml(movie.origin_name || "")}
-                                    </h2>
-
-                                    {/* Meta Row */}
-                                    <div className="flex items-center justify-center gap-2 mb-3">
-                                        {movie.year && (
-                                            <span className="bg-white/10 px-3 py-1 rounded-md text-sm font-bold text-white border border-white/10">{movie.year}</span>
-                                        )}
-                                        <span className="bg-white/10 px-2.5 py-1 rounded-md text-xs font-bold text-[#F4C84A] border border-white/10 flex items-center gap-1">
-                                            ★ {rating}
-                                        </span>
-                                        {movie.quality && (
-                                            <span className="bg-[#F4C84A]/10 text-[#F4C84A] px-2.5 py-1 rounded-md text-xs font-bold border border-[#F4C84A]/40">{movie.quality}</span>
-                                        )}
+                                    {/* Title + year */}
+                                    <div className="pl-[84px]"> {/* align kế bên poster */}
+                                        <h1 className="text-[17px] font-black text-white leading-snug line-clamp-2">
+                                            {decodeHtml(movie.name)}
+                                        </h1>
+                                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                            {movie.year && <span className="text-[11px] text-gray-400">{movie.year}</span>}
+                                            {movie.category?.slice(0, 2).map((c: any) => (
+                                                <span key={c.id} className="text-[11px] text-gray-500">· {c.name}</span>
+                                            ))}
+                                        </div>
                                     </div>
 
-                                    {/* Genres */}
-                                    <div className="flex flex-wrap justify-center gap-1.5 mb-4">
-                                        {movie.category?.slice(0, 3).map((c: any) => (
-                                            <span key={c.id} className="text-xs font-semibold text-white/80 px-4 py-1.5 rounded-full bg-black/40 border border-white/10">
-                                                {c.name}
-                                            </span>
-                                        ))}
-                                    </div>
-
-                                    {/* CTA Buttons */}
-                                    <div className="flex items-center justify-center gap-3 w-full px-2">
+                                    {/* Buttons */}
+                                    <div className="flex items-center gap-2 mt-1">
                                         <Link
                                             href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                            className="flex flex-1 max-w-[150px] items-center justify-center gap-2 h-11 rounded-full bg-[#F4C84A] text-black font-extrabold shadow-md hover:scale-105 active:scale-95 transition-transform"
+                                            className="flex flex-1 items-center justify-center gap-2 h-10 rounded-full bg-[#F4C84A] text-black font-extrabold active:scale-95 transition-transform"
                                         >
                                             <Play className="w-4 h-4 fill-black" />
-                                            <span className="text-[14px]">Xem</span>
+                                            <span className="text-[13px]">Xem ngay</span>
                                         </Link>
 
                                         <Link
                                             href={`/phim/${movie.slug}`}
-                                            className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 border border-white/15 active:scale-95 transition-transform"
+                                            className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 border border-white/15 active:scale-95 transition-transform shrink-0"
                                         >
-                                            <Info className="w-5 h-5 text-white" />
+                                            <Info className="w-4 h-4 text-white" />
                                         </Link>
 
-                                        <div className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 border border-white/15 active:scale-95 transition-transform">
+                                        <div className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 border border-white/15 active:scale-95 transition-transform shrink-0">
                                             <FavoriteButton movieData={getFavoriteData(movie)} size="sm" />
                                         </div>
                                     </div>
@@ -196,11 +192,27 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                         );
                     })}
                 </div>
+
+                {/* Dot indicators */}
+                <div className="flex justify-center gap-1.5 pb-3">
+                    {heroMovies.map((_, i) => (
+                        <button
+                            key={i}
+                            onClick={() => scrollTo(i)}
+                            className={`h-1.5 rounded-full transition-all duration-300 ${i === selectedIndex
+                                ? 'w-5 bg-[#F4C84A]'
+                                : 'w-1.5 bg-white/20'
+                                }`}
+                        />
+                    ))}
+                </div>
             </div>
+
 
             {/* ================= DESKTOP LAYOUT (Large Screens) ================= */}
             {/* Shows on lg screens (approx >= 1024px) */}
             <div className="hidden lg:block relative w-full h-[60vh] lg:h-[70vh] xl:h-screen">
+
                 <div className="absolute inset-0 h-full" ref={desktopRef}>
                     <div className="flex h-full touch-pan-y">
                         {heroMovies.map((movie, index) => {
@@ -346,6 +358,6 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                     ))}
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
