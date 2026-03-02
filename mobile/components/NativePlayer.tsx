@@ -441,18 +441,35 @@ export default function NativePlayer({
     };
 
     // --- BRIGHTNESS GESTURE (PanResponder) ---
-    const updateBrightness = (totalDy: number) => {
-        const delta = -totalDy / 300;
-        let newVal = brightnessStart.current + delta;
-        newVal = Math.max(0, Math.min(1, newVal));
+    // Tối ưu: Animated.Value cập nhật mỗi frame (UI ngay lập tức)
+    //         setBrightnessAsync được throttle bằng RAF — chỉ gọi khi frame sẵn sàng
+    const brightnessRAF = useRef<number | null>(null);
+    const pendingBrightness = useRef<number | null>(null);
+
+    const flushBrightness = useCallback(() => {
+        brightnessRAF.current = null;
+        if (pendingBrightness.current !== null) {
+            Brightness.setBrightnessAsync(pendingBrightness.current).catch(() => { });
+            pendingBrightness.current = null;
+        }
+    }, []);
+
+    const updateBrightness = useCallback((totalDy: number) => {
+        // Sensitivity: /200 thay vì /300 → nhạy hơn, cần ít quẹt hơn
+        const delta = -totalDy / 200;
+        let newVal = Math.max(0.05, Math.min(1, brightnessStart.current + delta));
         brightnessValue.current = newVal;
 
-        const opacity = (1 - newVal) * 0.75;
-        brightnessOpacity.setValue(opacity);
+        // 1) UI overlay + Animated.Value: cập nhật NGAY LẬP TỨC không cần chờ
+        brightnessOpacity.setValue((1 - newVal) * 0.7);
         brightness.setValue(newVal);
 
-        Brightness.setBrightnessAsync(newVal).catch(() => { });
-    };
+        // 2) Hệ thống brightness: throttle bằng RAF — max 60 lần/giây
+        pendingBrightness.current = newVal;
+        if (brightnessRAF.current === null) {
+            brightnessRAF.current = requestAnimationFrame(flushBrightness);
+        }
+    }, [flushBrightness]);
 
     const panResponder = useRef(
         PanResponder.create({
@@ -460,26 +477,46 @@ export default function NativePlayer({
                 return !lockedRef.current && !showEpisodesRef.current && !showServersRef.current && evt.nativeEvent.pageX < width / 3;
             },
             onMoveShouldSetPanResponder: (evt, gestureState) => {
-                return !lockedRef.current && !showEpisodesRef.current && !showServersRef.current && Math.abs(gestureState.dy) > 8 && evt.nativeEvent.pageX < width / 3;
+                // Yêu cầu dy > 5 (nhạy hơn) và dx nhỏ hơn dy (để phân biệt swipe ngang)
+                return !lockedRef.current && !showEpisodesRef.current && !showServersRef.current
+                    && Math.abs(gestureState.dy) > 5
+                    && Math.abs(gestureState.dy) > Math.abs(gestureState.dx)
+                    && evt.nativeEvent.pageX < width / 3;
             },
             onPanResponderGrant: () => {
-                // Snapshot brightness at gesture start
                 brightnessStart.current = brightnessValue.current;
-                Animated.timing(sliderOpacity, {
-                    toValue: 1, duration: 200, useNativeDriver: true
-                }).start();
+                if (brightnessRAF.current !== null) {
+                    cancelAnimationFrame(brightnessRAF.current);
+                    brightnessRAF.current = null;
+                }
+                // Hiện thanh bar ngay lập tức (không delay)
+                sliderOpacity.stopAnimation();
+                sliderOpacity.setValue(1);
             },
-            onPanResponderMove: (evt, gestureState) => {
-                // Pass cumulative dy from gesture start
+            onPanResponderMove: (_evt, gestureState) => {
                 updateBrightness(gestureState.dy);
             },
             onPanResponderRelease: () => {
+                // Flush pending brightness update nếu còn
+                if (brightnessRAF.current !== null) {
+                    cancelAnimationFrame(brightnessRAF.current);
+                    brightnessRAF.current = null;
+                }
+                if (pendingBrightness.current !== null) {
+                    Brightness.setBrightnessAsync(pendingBrightness.current).catch(() => { });
+                    pendingBrightness.current = null;
+                }
+                // Ẩn thanh bar sau 1.2s
                 Animated.timing(sliderOpacity, {
-                    toValue: 0, duration: 1000, delay: 500, useNativeDriver: true
+                    toValue: 0, duration: 600, delay: 800, useNativeDriver: true
                 }).start();
-            }
+            },
+            onPanResponderTerminate: () => {
+                sliderOpacity.setValue(0);
+            },
         })
     ).current;
+
 
     // Drawer Animation — when closed, translate fully off so no strip peeks (width + drawer width)
     const DRAWER_OFF_SCREEN = width + 400;
