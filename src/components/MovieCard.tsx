@@ -82,7 +82,7 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
         <>
             <div
                 ref={cardRef}
-                className={`relative block h-full w-full cursor-pointer z-10 group/static-card hover:z-20 will-change-transform transform-gpu ${orientation === 'landscape' ? '[content-visibility:auto] [contain-intrinsic-size:250px_140px]' : '[content-visibility:auto] [contain-intrinsic-size:160px_240px]'}`}
+                className={`relative block h-full w-full cursor-pointer z-10 group/static-card hover:z-20 will-change-transform transform-gpu`}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
@@ -93,7 +93,6 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                             alt={movie.name}
                             fill
                             className="object-cover transition-transform duration-500 ease-out group-hover/static-card:scale-105"
-                            loading="lazy"
                             sizes={orientation === 'landscape' ? "(max-width: 768px) 60vw, 30vw" : "(max-width: 768px) 40vw, 15vw"}
                             unoptimized
                         />
@@ -130,17 +129,19 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                 </div>
             </div>
 
-            {isHovered && typeof window !== "undefined" && createPortal(
-                <OnflixHoverCard
-                    movie={movie}
-                    position={position}
-                    displayBackdrop={displayBackdrop}
-                    orientation={orientation}
-                    onMouseEnter={handlePortalMouseEnter}
-                    onMouseLeave={handlePortalMouseLeave}
-                />,
-                document.body
-            )}
+            {
+                isHovered && typeof window !== "undefined" && createPortal(
+                    <OnflixHoverCard
+                        movie={movie}
+                        position={position}
+                        displayBackdrop={displayBackdrop}
+                        orientation={orientation}
+                        onMouseEnter={handlePortalMouseEnter}
+                        onMouseLeave={handlePortalMouseLeave}
+                    />,
+                    document.body
+                )
+            }
         </>
     );
 }

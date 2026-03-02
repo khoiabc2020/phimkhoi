@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 const topics = [
     { id: 'marvel', name: 'Marvel', color: '#ef4444', slug: 'marvel' },
@@ -16,8 +16,8 @@ export default function TopicSection() {
     return (
         <section className="container mx-auto px-4 md:px-12 py-6">
             <div className="flex items-center gap-2 mb-4 px-2">
-                <Sparkles className="w-4 h-4 text-[#fbbf24]" />
-                <h2 className="text-[18px] font-semibold text-white tracking-tight">
+                <span className="w-1 h-5 bg-gradient-to-t from-[#F4C84A] to-yellow-200 rounded-sm inline-block" />
+                <h2 className="text-[17px] font-bold text-white">
                     Khám phá nhanh
                 </h2>
             </div>
