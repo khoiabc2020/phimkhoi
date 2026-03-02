@@ -42,7 +42,7 @@ fi
 
 # Restart PM2 process
 echo "Restarting PM2..."
-pm2 startOrReload ecosystem.config.cjs --update-env
-pm2 save
+npx pm2 startOrReload ecosystem.config.cjs --update-env
+npx pm2 save
 
 echo "Deployment complete!"
