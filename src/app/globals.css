@@ -53,6 +53,40 @@
       width: 0%;
     }
   }
+
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes glow-pulse {
+
+    0%,
+    100% {
+      box-shadow: 0 0 8px rgba(244, 200, 74, 0.3);
+    }
+
+    50% {
+      box-shadow: 0 0 20px rgba(244, 200, 74, 0.6);
+    }
+  }
 }
 
 :root {
@@ -171,6 +205,19 @@ h2 {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Animate-in utilities (lightweight alternative to tailwind-animate) */
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out both;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out both;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
 }
 
 /* Global Custom Scrollbar (iOS/macOS Style) */

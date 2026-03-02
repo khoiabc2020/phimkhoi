@@ -381,7 +381,7 @@ export default function VideoPlayer({
                     margin-bottom: 0px !important;
                 }
                 .art-ios-theme.art-video-player .art-progress-played {
-                    background: #fff !important;
+                    background: #F4C84A !important;
                 }
                 .art-ios-theme.art-video-player .art-progress-indicator {
                     background: white !important;
@@ -391,6 +391,29 @@ export default function VideoPlayer({
                 }
                 .art-ios-theme.art-video-player .art-progress-loaded {
                     background: rgba(255,255,255,0.3) !important;
+                }
+                /* Bigger bottom controls on mobile for touch */
+                @media (max-width: 768px) {
+                    .art-ios-theme.art-video-player .art-bottom {
+                        padding: 6px 10px 14px 10px !important;
+                    }
+                    .art-ios-theme.art-video-player .art-progress {
+                        height: 6px !important;
+                    }
+                    .art-ios-theme.art-video-player .art-progress-indicator {
+                        width: 20px !important;
+                        height: 20px !important;
+                    }
+                    .art-ios-theme.art-video-player .art-icon {
+                        width: 38px !important;
+                        height: 38px !important;
+                    }
+                    .art-ios-theme.art-video-player .art-icon svg {
+                        width: 22px !important;
+                        height: 22px !important;
+                    }
+                    /* Hide less important controls on tiny screens */
+                    .art-ios-theme.art-video-player .art-screenshot { display: none !important; }
                 }
             `}</style>
         </>
