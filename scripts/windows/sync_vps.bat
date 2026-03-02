@@ -7,21 +7,21 @@ title PhimKhoi - Dong bo VPS
 :: ============================================================
 ::  PEM  : Duong dan tuyet doi den file SSH private key (.pem)
 ::         Vi du: C:\Users\TenUser\Downloads\key.pem
-set "PEM=C:\Users\LE HUY KHOI\Downloads\huykhoi1.pem"
+set "PEM=C:\Users\LE HUY KHOI\Downloads\khoiphim.pem"
 
 ::  HOST : User va dia chi SSH cua may chu VPS
 ::         EC2:          ubuntu@ec2-xx-xx-xx-xx.ap-southeast-1.compute.amazonaws.com
 ::         DigitalOcean: root@xxx.xxx.xxx.xxx
-set "HOST=ubuntu@ec2-18-141-25-244.ap-southeast-1.compute.amazonaws.com"
+set "HOST=bitnami@13.212.99.28"
 
 ::  DIR  : Duong dan thu muc du an tren VPS (tuyet doi)
-set "DIR=/home/ubuntu/phimkhoi"
+set "DIR=/home/bitnami/phimkhoi"
 :: ============================================================
 
 cd /d "%~dp0..\.."
 echo.
 echo ==========================================
-echo    DONG BO CODE LEN VPS (18.141.25.244)
+echo    DONG BO CODE LEN VPS (13.212.99.28)
 echo ==========================================
 echo    SSH Key: %PEM%
 echo    Host   : %HOST%

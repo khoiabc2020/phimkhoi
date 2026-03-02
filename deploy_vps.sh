@@ -2,7 +2,7 @@
 # set -e is intentionally removed so partial failures don't abort the deploy
 
 # Configuration
-APP_DIR="/home/ubuntu/phimkhoi" # UPDATED PATH
+APP_DIR="/home/bitnami/phimkhoi" # UPDATED PATH
 REPO_URL="https://github.com/khoiabc2020/phimkhoi.git"
 
 echo "Deploying PhimKhoi to VPS..."
