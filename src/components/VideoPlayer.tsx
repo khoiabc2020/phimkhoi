@@ -415,6 +415,26 @@ export default function VideoPlayer({
                     /* Hide less important controls on tiny screens */
                     .art-ios-theme.art-video-player .art-screenshot { display: none !important; }
                 }
+                /* Hide "Chuyển tập" text on small mobile, only keep toggle */
+                @media (max-width: 540px) {
+                    #auto-next-toggle > span:first-child {
+                        display: none !important;
+                    }
+                    #auto-next-toggle {
+                        margin-right: 4px !important;
+                    }
+                    /* Shrink skip buttons on very small screens */
+                    .art-ios-theme.art-video-player .art-controls-left [name="skip-back"] > div,
+                    .art-ios-theme.art-video-player .art-controls-left [name="skip-forward"] > div {
+                        width: 30px !important;
+                        height: 30px !important;
+                    }
+                    /* Reduce time display font size */
+                    .art-ios-theme.art-video-player .art-time {
+                        font-size: 11px !important;
+                        margin: 0 4px !important;
+                    }
+                }
             `}</style>
         </>
     );
