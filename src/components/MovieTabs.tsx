@@ -124,12 +124,12 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
             <div className="animate-in fade-in duration-300">
                 {/* EPISODES TAB */}
                 {activeTab === "episodes" && (
-                    <div className="bg-[#08090C] border border-white/[0.05] rounded-[24px] p-6 shadow-2xl">
+                    <div className="bg-[#08090C] border border-white/[0.05] rounded-[24px] p-3 sm:p-6 shadow-2xl">
                         {episodes && episodes.length > 0 ? (
                             <div className="space-y-6">
                                 {/* Language Tabs Row */}
                                 {activeLanguageGroups.length > 0 && (
-                                    <div className="flex items-center gap-6 border-b border-white/[0.04] mb-6 overflow-x-auto no-scrollbar pb-1">
+                                    <div className="flex items-center gap-3 sm:gap-6 border-b border-white/[0.04] mb-3 sm:mb-5 overflow-x-auto no-scrollbar pb-1">
                                         {activeLanguageGroups.map((lang) => {
                                             const isActive = activeLangTab === lang;
                                             const Icon = lang === "Lồng Tiếng" ? Mic : lang === "Thuyết Minh" ? Volume2 : Subtitles;
@@ -139,7 +139,6 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
                                                     key={lang}
                                                     onClick={() => {
                                                         setActiveLangTab(lang);
-                                                        // Find the first server in this language group and set it as active
                                                         const firstServerInGroup = groupedServers[lang][0];
                                                         const firstServerInGroupIdx = episodes.findIndex(s => s.server_name === firstServerInGroup.server_name);
                                                         if (firstServerInGroupIdx !== -1) {
@@ -148,11 +147,11 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
                                                         }
                                                     }}
                                                     className={cn(
-                                                        "flex items-center gap-2 pb-3 text-[14px] font-bold transition-all relative whitespace-nowrap uppercase tracking-wider",
+                                                        "flex items-center gap-1.5 sm:gap-2 pb-2 sm:pb-3 text-[12px] sm:text-[14px] font-bold transition-all relative whitespace-nowrap uppercase tracking-wider",
                                                         isActive ? "text-[#F4C84A]" : "text-gray-500 hover:text-gray-300"
                                                     )}
                                                 >
-                                                    <Icon className={cn("w-[16px] h-[16px]", isActive ? "text-[#F4C84A]" : "text-gray-500")} />
+                                                    <Icon className={cn("w-[14px] h-[14px] sm:w-[16px] sm:h-[16px]", isActive ? "text-[#F4C84A]" : "text-gray-500")} />
                                                     {lang}
                                                     {isActive && (
                                                         <span className="absolute bottom-[-1px] left-0 right-0 h-[3px] rounded-t-full bg-[#F4C84A] shadow-[0_0_12px_rgba(244,200,74,0.6)]" />
@@ -163,19 +162,16 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
                                     </div>
                                 )}
 
-                                {/* Servers Row */}
-                                <div className="flex flex-col sm:flex-row sm:items-center gap-5 border-b border-white/[0.05] pb-6">
-                                    <div className="flex items-center gap-2 text-gray-500 text-[12px] font-bold uppercase tracking-widest min-w-[90px] shrink-0">
-                                        <Database className="w-[15px] h-[15px] text-gray-600" strokeWidth={2.5} />
-                                        MÁY CHỦ :
+                                {/* Servers Row - compact inline */}
+                                <div className="flex flex-row items-center gap-2 sm:gap-3 border-b border-white/[0.05] pb-3 sm:pb-5 flex-wrap">
+                                    <div className="flex items-center gap-1.5 text-gray-500 text-[11px] sm:text-[12px] font-bold uppercase tracking-widest shrink-0">
+                                        <Database className="w-[13px] h-[13px] sm:w-[15px] sm:h-[15px] text-gray-600" strokeWidth={2.5} />
+                                        Máy Chủ:
                                     </div>
                                     <div className="flex flex-wrap items-center gap-2">
                                         {activeLangTab && groupedServers[activeLangTab]?.map((server, indexInTab) => {
-                                            // Find its actual global index inside `episodes`
                                             const globalIndex = episodes.findIndex(e => e.server_name === server.server_name);
                                             const isActive = activeServer === globalIndex;
-
-                                            const activeBgClass = "bg-[#F4C84A] border-[#F4C84A] text-[#0B0D12]";
 
                                             const displayName = server.server_name.split("##")[0]
                                                 .replace("Lồng Tiếng", "").replace("lồng tiếng", "").replace("longtieng", "")
@@ -192,7 +188,7 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
                                                         setCurrentChunk(0);
                                                     }}
                                                     className={cn(
-                                                        "h-[38px] px-5 rounded-full text-[13px] font-bold transition-all duration-300 border flex items-center gap-3 shadow-sm backdrop-blur-md",
+                                                        "h-[32px] sm:h-[38px] px-3 sm:px-5 rounded-full text-[12px] sm:text-[13px] font-bold transition-all duration-300 border flex items-center gap-2 shadow-sm",
                                                         isActive
                                                             ? "bg-[#F4C84A] border-[#F4C84A] text-[#08090C] shadow-[0_4px_14px_rgba(244,200,74,0.25)] scale-105 transform"
                                                             : "bg-white/[0.03] border-white/[0.08] text-[#A1A1AA] hover:text-white hover:border-white/[0.15] hover:bg-white/[0.06] active:scale-95"
