@@ -1,15 +1,56 @@
 "use client";
 
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
-    { label: "Hàn Quốc", emoji: "🇰🇷", href: "/quoc-gia/han-quoc", from: "#1d4ed8", to: "#60a5fa", glow: "rgba(96,165,250,0.4)" },
-    { label: "Trung Quốc", emoji: "🇨🇳", href: "/quoc-gia/trung-quoc", from: "#b91c1c", to: "#f87171", glow: "rgba(248,113,113,0.4)" },
-    { label: "Thuyết Minh", emoji: "🎙️", href: "/danh-sach/thuyet-minh", from: "#7c3aed", to: "#c084fc", glow: "rgba(192,132,252,0.4)" },
-    { label: "Phim Bộ", emoji: "📺", href: "/danh-sach/phim-bo", from: "#c2410c", to: "#fb923c", glow: "rgba(251,146,60,0.4)" },
-    { label: "Phim Lẻ", emoji: "🎬", href: "/danh-sach/phim-le", from: "#065f46", to: "#34d399", glow: "rgba(52,211,153,0.4)" },
-    { label: "Hoạt Hình", emoji: "✨", href: "/danh-sach/hoat-hinh", from: "#9d174d", to: "#f472b6", glow: "rgba(244,114,182,0.4)" },
+    {
+        label: "Hàn Quốc",
+        sub: "K-Drama",
+        href: "/quoc-gia/han-quoc",
+        bg: "linear-gradient(135deg, #1a3a6b 0%, #2563eb 60%, #3b82f6 100%)",
+        accent: "#60a5fa",
+        tag: "KR",
+    },
+    {
+        label: "Trung Quốc",
+        sub: "C-Drama",
+        href: "/quoc-gia/trung-quoc",
+        bg: "linear-gradient(135deg, #7f1d1d 0%, #dc2626 60%, #ef4444 100%)",
+        accent: "#fca5a5",
+        tag: "CN",
+    },
+    {
+        label: "Thuyết Minh",
+        sub: "Vietsub",
+        href: "/danh-sach/thuyet-minh",
+        bg: "linear-gradient(135deg, #4c1d95 0%, #7c3aed 60%, #a78bfa 100%)",
+        accent: "#c4b5fd",
+        tag: "VM",
+    },
+    {
+        label: "Phim Bộ",
+        sub: "Series",
+        href: "/danh-sach/phim-bo",
+        bg: "linear-gradient(135deg, #7c2d12 0%, #ea580c 60%, #fb923c 100%)",
+        accent: "#fdba74",
+        tag: "TV",
+    },
+    {
+        label: "Phim Lẻ",
+        sub: "Movie",
+        href: "/danh-sach/phim-le",
+        bg: "linear-gradient(135deg, #064e3b 0%, #059669 60%, #34d399 100%)",
+        accent: "#6ee7b7",
+        tag: "4K",
+    },
+    {
+        label: "Hoạt Hình",
+        sub: "Animation",
+        href: "/danh-sach/hoat-hinh",
+        bg: "linear-gradient(135deg, #831843 0%, #db2777 60%, #f472b6 100%)",
+        accent: "#fbcfe8",
+        tag: "AN",
+    },
 ];
 
 export default function QuickNav() {
@@ -26,24 +67,42 @@ export default function QuickNav() {
                         <Link
                             key={index}
                             href={item.href}
-                            className="flex-[0_0_35%] md:flex-[0_0_15%] aspect-[1.4/1] relative rounded-2xl overflow-hidden shadow-lg snap-start group transition-transform duration-300 hover:-translate-y-1 hover:scale-[1.03]"
-                            style={{ background: `linear-gradient(135deg, ${item.from}, ${item.to})` }}
+                            className="flex-[0_0_36%] md:flex-[0_0_16%] aspect-[1.5/1] relative rounded-2xl overflow-hidden snap-start group transition-all duration-300 hover:-translate-y-1 hover:scale-[1.04] shadow-lg"
+                            style={{ background: item.bg }}
                         >
-                            {/* Shimmer overlay on hover */}
-                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                                style={{ background: 'linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%)', backgroundSize: '200%', animation: 'shimmer 1.5s ease-in-out' }}
+                            {/* Noise texture overlay */}
+                            <div
+                                className="absolute inset-0 opacity-[0.08] mix-blend-overlay pointer-events-none"
+                                style={{
+                                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+                                }}
                             />
-                            {/* Glow shadow on hover */}
-                            <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                                style={{ boxShadow: `0 0 20px ${item.glow}` }}
+
+                            {/* Glow on hover */}
+                            <div
+                                className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                                style={{ boxShadow: `inset 0 0 0 1px ${item.accent}40, 0 0 24px ${item.accent}50` }}
                             />
-                            <div className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center gap-1">
-                                <span className="text-2xl md:text-3xl group-hover:scale-110 transition-transform duration-200 drop-shadow-md">
-                                    {item.emoji}
-                                </span>
-                                <span className="text-white font-bold text-sm md:text-base drop-shadow-md leading-tight">
+
+                            {/* Badge tag top-right */}
+                            <span
+                                className="absolute top-2 right-2.5 text-[10px] font-black tracking-[0.12em] px-1.5 py-0.5 rounded"
+                                style={{ background: "rgba(0,0,0,0.3)", color: item.accent, backdropFilter: "blur(4px)" }}
+                            >
+                                {item.tag}
+                            </span>
+
+                            {/* Content */}
+                            <div className="absolute inset-0 flex flex-col justify-end p-3">
+                                <p className="text-white font-black text-[15px] md:text-[16px] leading-tight drop-shadow-sm group-hover:translate-x-0.5 transition-transform duration-200">
                                     {item.label}
-                                </span>
+                                </p>
+                                <p
+                                    className="text-[11px] font-semibold tracking-wider uppercase mt-0.5 opacity-70"
+                                    style={{ color: item.accent }}
+                                >
+                                    {item.sub}
+                                </p>
                             </div>
                         </Link>
                     ))}
