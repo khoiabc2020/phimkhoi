@@ -4,8 +4,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
-import { Play, Film, Video, LayoutGrid, Download, History, Heart, LogOut, Globe, X, ChevronDown, Home, Tv } from "lucide-react";
+import {
+    Film, Video, LayoutGrid, Download, History, Heart, LogOut, Globe,
+    X, ChevronDown, Home, Tv, Search, Star, MonitorPlay, Smartphone, Clapperboard
+} from "lucide-react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface MobileMenuProps {
     isOpen: boolean;
@@ -14,6 +18,10 @@ interface MobileMenuProps {
     countries?: { name: string; slug: string }[];
 }
 
+// URL APK qua API route — server sẽ phục vụ file trực tiếp từ public/downloads/
+const APK_DOWNLOAD_URL = "/api/download/apk";
+
+
 export default function MobileMenu({
     isOpen,
     onClose,
@@ -21,6 +29,10 @@ export default function MobileMenu({
     countries = []
 }: MobileMenuProps) {
     const { data: session } = useSession();
+    const router = useRouter();
+    const [searchQ, setSearchQ] = useState("");
+    const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
+    const [isCountriesOpen, setIsCountriesOpen] = useState(false);
 
     const displayCategories = categories.length > 0 ? categories : [
         { name: "Hành Động", slug: "hanh-dong" },
@@ -32,138 +44,153 @@ export default function MobileMenu({
         { name: "Chiến Tranh", slug: "chien-tranh" },
         { name: "Viễn Tưởng", slug: "vien-tuong" },
         { name: "Kinh Dị", slug: "kinh-di" },
-        { name: "Hoạt Hình", slug: "hoat-hinh" }
+        { name: "Hoạt Hình", slug: "hoat-hinh" },
     ];
 
     const displayCountries = countries.length > 0 ? countries : [
-        { name: "Trung Quốc", slug: "trung-quoc" },
         { name: "Hàn Quốc", slug: "han-quoc" },
+        { name: "Trung Quốc", slug: "trung-quoc" },
         { name: "Nhật Bản", slug: "nhat-ban" },
-        { name: "Mỹ", slug: "my" },
+        { name: "Âu Mỹ", slug: "au-my" },
         { name: "Thái Lan", slug: "thai-lan" },
-        { name: "Việt Nam", slug: "viet-nam" }
+        { name: "Việt Nam", slug: "viet-nam" },
     ];
-
-    const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
-    const [isCountriesOpen, setIsCountriesOpen] = useState(false);
 
     const navLinks = [
         { href: "/", label: "Trang Chủ", icon: Home },
         { href: "/danh-sach/phim-le", label: "Phim Lẻ", icon: Film },
         { href: "/danh-sach/phim-bo", label: "Phim Bộ", icon: Video },
         { href: "/danh-sach/tv-shows", label: "TV Shows", icon: Tv },
+        { href: "/danh-sach/hoat-hinh", label: "Hoạt Hình", icon: Clapperboard },
+        { href: "/danh-sach/phim-chieu-rap", label: "Chiếu Rạp", id: "cinema", icon: MonitorPlay, badge: "HOT" },
     ];
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (searchQ.trim()) {
+            onClose();
+            router.push(`/tim-kiem?q=${encodeURIComponent(searchQ.trim())}`);
+        }
+    };
 
     return (
         <>
-            {/* Backdrop overlay */}
+            {/* Backdrop */}
             {isOpen && (
-                <div
-                    className="fixed inset-0 z-[9999] lg:hidden bg-black/80"
-                    onClick={onClose}
-                />
+                <div className="fixed inset-0 z-[9999] lg:hidden bg-black/80 backdrop-blur-sm" onClick={onClose} />
             )}
 
             {/* Drawer */}
             <div
                 className={cn(
-                    "fixed top-0 left-0 bottom-0 z-[10000] lg:hidden w-[310px] flex flex-col transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
+                    "fixed top-0 left-0 bottom-0 z-[10000] lg:hidden w-[320px] flex flex-col transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
                     "border-r border-white/[0.06]",
                     isOpen ? "translate-x-0" : "-translate-x-full"
                 )}
-                style={{
-                    background: "#0D101A",
-                }}
+                style={{ background: "linear-gradient(180deg, #0e1118 0%, #0a0d14 100%)" }}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 h-[72px] shrink-0 border-b border-white/[0.06]">
+                <div className="flex items-center justify-between px-5 h-[68px] shrink-0 border-b border-white/[0.06]">
                     <Link href="/" onClick={onClose} className="flex items-center gap-2.5">
                         <Image
                             src="/logo.webp"
                             alt="MovieBox Logo"
-                            width={36}
-                            height={36}
-                            className="w-9 h-9 rounded-[12px] object-cover shadow-[0_0_12px_rgba(244,200,74,0.2)] ring-1 ring-white/10"
+                            width={34}
+                            height={34}
+                            className="w-[34px] h-[34px] rounded-[10px] object-cover shadow-[0_0_12px_rgba(244,200,74,0.25)] ring-1 ring-white/10"
                         />
                         <span className="text-[17px] font-black text-white tracking-tighter">MOVIE<span className="text-[#F4C84A]">BOX</span></span>
                     </Link>
                     <button
                         onClick={onClose}
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.08] transition-all"
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-white/40 hover:text-white hover:bg-white/[0.08] transition-all"
                         aria-label="Đóng menu"
                     >
-                        <X className="w-5 h-5" strokeWidth={1.5} />
+                        <X className="w-4 h-4" strokeWidth={2} />
                     </button>
                 </div>
 
                 {/* Scrollable Content */}
-                <div className="flex-1 overflow-y-auto min-h-0 px-4 py-5 space-y-5">
+                <div className="flex-1 overflow-y-auto min-h-0 px-4 py-4 space-y-4">
+
+                    {/* Search Bar */}
+                    <form onSubmit={handleSearch} className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" strokeWidth={2} />
+                        <input
+                            type="text"
+                            value={searchQ}
+                            onChange={e => setSearchQ(e.target.value)}
+                            placeholder="Tìm phim, diễn viên..."
+                            className="w-full bg-white/[0.06] border border-white/[0.08] rounded-[12px] pl-9 pr-4 py-2.5 text-[14px] text-white placeholder:text-white/30 outline-none focus:border-[#F4C84A]/40 focus:bg-white/[0.08] transition-all"
+                        />
+                    </form>
 
                     {/* User Card */}
                     {session ? (
-                        <div
-                            className="rounded-[20px] p-4 border border-white/[0.07]"
-                            style={{ background: "rgba(255,255,255,0.05)" }}
-                        >
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="w-12 h-12 rounded-full overflow-hidden border border-white/20 shrink-0">
+                        <div className="rounded-[18px] p-4 border border-white/[0.07]" style={{ background: "rgba(255,255,255,0.04)" }}>
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="w-11 h-11 rounded-full overflow-hidden border border-[#F4C84A]/30 shrink-0 ring-2 ring-[#F4C84A]/10">
                                     <img
-                                        src={session.user?.image || `https://ui-avatars.com/api/?name=${session.user?.name}&background=2a2d3a&color=F4C84A&bold=true`}
+                                        src={session.user?.image || `https://ui-avatars.com/api/?name=${session.user?.name}&background=1e2235&color=F4C84A&bold=true`}
                                         alt={session.user?.name || "User"}
                                         className="w-full h-full object-cover"
                                     />
                                 </div>
                                 <div className="min-w-0">
-                                    <p className="font-semibold text-white text-[16px] truncate">{session.user?.name}</p>
-                                    <p className="text-[13px] text-white/50">Thành viên</p>
+                                    <p className="font-bold text-white text-[15px] truncate">{session.user?.name}</p>
+                                    <div className="flex items-center gap-1.5 mt-0.5">
+                                        <Star className="w-3 h-3 text-[#F4C84A]" fill="#F4C84A" />
+                                        <p className="text-[12px] text-[#F4C84A]/80 font-medium">Thành viên</p>
+                                    </div>
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-2">
-                                <Link
-                                    href="/lich-su-xem"
-                                    onClick={onClose}
-                                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-[13px] text-white/60 hover:text-white transition-colors"
+                                <Link href="/lich-su-xem" onClick={onClose}
+                                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-[13px] text-white/60 hover:text-white transition-colors"
                                     style={{ background: "rgba(255,255,255,0.05)" }}
                                 >
-                                    <History className="w-4 h-4" strokeWidth={1.5} /> Lịch sử
+                                    <History className="w-3.5 h-3.5" strokeWidth={1.5} /> Lịch sử
                                 </Link>
-                                <Link
-                                    href="/phim-yeu-thich"
-                                    onClick={onClose}
-                                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-[13px] text-white/60 hover:text-white transition-colors"
+                                <Link href="/phim-yeu-thich" onClick={onClose}
+                                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-[13px] text-white/60 hover:text-white transition-colors"
                                     style={{ background: "rgba(255,255,255,0.05)" }}
                                 >
-                                    <Heart className="w-4 h-4" strokeWidth={1.5} /> Yêu thích
+                                    <Heart className="w-3.5 h-3.5" strokeWidth={1.5} /> Yêu thích
                                 </Link>
                             </div>
                         </div>
                     ) : (
-                        <div
-                            className="rounded-[20px] p-5 border border-[#F4C84A]/15 text-center"
-                            style={{ background: "rgba(244,200,74,0.07)" }}
-                        >
-                            <p className="text-white/50 mb-4 text-[13px] leading-relaxed">Đăng nhập để lưu phim yêu thích và lịch sử xem</p>
-                            <Link
-                                href="/login"
-                                onClick={onClose}
-                                className="block w-full bg-[#F4C84A] text-black font-bold py-2.5 rounded-[14px] text-[14px] hover:brightness-110 transition-all"
+                        <div className="rounded-[18px] p-4 border border-[#F4C84A]/15 text-center" style={{ background: "rgba(244,200,74,0.06)" }}>
+                            <p className="text-white/45 mb-3 text-[13px] leading-relaxed">Đăng nhập để lưu phim yêu thích và lịch sử xem</p>
+                            <Link href="/login" onClick={onClose}
+                                className="block w-full bg-[#F4C84A] text-black font-bold py-2.5 rounded-[12px] text-[14px] hover:brightness-105 transition-all"
                             >
                                 Đăng Nhập / Đăng Ký
                             </Link>
                         </div>
                     )}
 
+                    {/* Divider */}
+                    <div className="flex items-center gap-3">
+                        <div className="flex-1 h-px bg-white/[0.06]" />
+                        <span className="text-[11px] text-white/20 font-medium uppercase tracking-wider">Khám phá</span>
+                        <div className="flex-1 h-px bg-white/[0.06]" />
+                    </div>
+
                     {/* Navigation */}
                     <nav className="space-y-0.5">
-                        {navLinks.map(({ href, label, icon: Icon }) => (
+                        {navLinks.map(({ href, label, icon: Icon, badge }) => (
                             <Link
                                 key={href}
                                 href={href}
                                 onClick={onClose}
-                                className="flex items-center gap-3 px-3 py-3 rounded-[14px] text-[15px] font-medium text-white/75 hover:text-white hover:bg-white/[0.06] transition-all"
+                                className="flex items-center gap-3 px-3 py-2.5 rounded-[12px] text-[14px] font-medium text-white/70 hover:text-white hover:bg-white/[0.06] transition-all group"
                             >
-                                <Icon className="w-[18px] h-[18px] text-white/40" strokeWidth={1.5} />
-                                {label}
+                                <Icon className="w-[17px] h-[17px] text-white/35 group-hover:text-[#F4C84A]/80 transition-colors" strokeWidth={1.5} />
+                                <span className="flex-1">{label}</span>
+                                {badge && (
+                                    <span className="text-[9px] font-black text-[#0a0d14] bg-[#F4C84A] px-1.5 py-0.5 rounded-md">{badge}</span>
+                                )}
                             </Link>
                         ))}
 
@@ -171,39 +198,34 @@ export default function MobileMenu({
                         <div>
                             <button
                                 onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
-                                className="w-full flex items-center justify-between px-3 py-3 rounded-[14px] text-[15px] font-medium text-white/75 hover:text-white hover:bg-white/[0.06] transition-all"
+                                className="w-full flex items-center justify-between px-3 py-2.5 rounded-[12px] text-[14px] font-medium text-white/70 hover:text-white hover:bg-white/[0.06] transition-all group"
                             >
                                 <span className="flex items-center gap-3">
-                                    <LayoutGrid className="w-[18px] h-[18px] text-white/40" strokeWidth={1.5} />
+                                    <LayoutGrid className="w-[17px] h-[17px] text-white/35 group-hover:text-[#F4C84A]/80 transition-colors" strokeWidth={1.5} />
                                     Thể Loại
                                 </span>
                                 <ChevronDown
-                                    className="w-4 h-4 text-white/30 transition-transform duration-200"
+                                    className="w-4 h-4 text-white/25 transition-transform duration-200"
                                     style={{ transform: isCategoriesOpen ? "rotate(180deg)" : "rotate(0deg)" }}
                                     strokeWidth={1.5}
                                 />
                             </button>
                             {isCategoriesOpen && (
-                                <div
-                                    className="mx-1 mt-1 mb-1 rounded-[16px] p-3 grid grid-cols-2 gap-1.5"
-                                    style={{ background: "rgba(255,255,255,0.04)" }}
-                                >
+                                <div className="mx-1 mt-1 mb-1 rounded-[14px] p-3 grid grid-cols-2 gap-1" style={{ background: "rgba(255,255,255,0.03)" }}>
                                     {displayCategories.slice(0, 10).map((cat) => (
                                         <Link
                                             key={cat.slug}
                                             href={`/the-loai/${cat.slug}`}
                                             onClick={onClose}
-                                            className="text-white/55 text-[13px] hover:text-white px-3 py-2 rounded-xl text-center transition-colors hover:bg-white/[0.06]"
+                                            className="text-white/50 text-[13px] hover:text-white px-3 py-2 rounded-[10px] text-center transition-colors hover:bg-white/[0.06]"
                                         >
                                             {cat.name}
                                         </Link>
                                     ))}
-                                    <Link
-                                        href="/danh-sach/tat-ca-the-loai"
-                                        onClick={onClose}
-                                        className="text-[#F4C84A]/80 text-[13px] hover:text-[#F4C84A] px-3 py-2 rounded-xl text-center transition-colors col-span-2"
+                                    <Link href="/the-loai" onClick={onClose}
+                                        className="text-[#F4C84A]/70 text-[12px] hover:text-[#F4C84A] px-3 py-2 rounded-[10px] text-center transition-colors col-span-2 font-medium"
                                     >
-                                        Xem tất cả →
+                                        Xem tất cả thể loại →
                                     </Link>
                                 </div>
                             )}
@@ -213,31 +235,28 @@ export default function MobileMenu({
                         <div>
                             <button
                                 onClick={() => setIsCountriesOpen(!isCountriesOpen)}
-                                className="w-full flex items-center justify-between px-3 py-3 rounded-[14px] text-[15px] font-medium text-white/75 hover:text-white hover:bg-white/[0.06] transition-all"
+                                className="w-full flex items-center justify-between px-3 py-2.5 rounded-[12px] text-[14px] font-medium text-white/70 hover:text-white hover:bg-white/[0.06] transition-all group"
                             >
                                 <span className="flex items-center gap-3">
-                                    <Globe className="w-[18px] h-[18px] text-white/40" strokeWidth={1.5} />
+                                    <Globe className="w-[17px] h-[17px] text-white/35 group-hover:text-[#F4C84A]/80 transition-colors" strokeWidth={1.5} />
                                     Quốc Gia
                                 </span>
                                 <ChevronDown
-                                    className="w-4 h-4 text-white/30 transition-transform duration-200"
+                                    className="w-4 h-4 text-white/25 transition-transform duration-200"
                                     style={{ transform: isCountriesOpen ? "rotate(180deg)" : "rotate(0deg)" }}
                                     strokeWidth={1.5}
                                 />
                             </button>
                             {isCountriesOpen && (
-                                <div
-                                    className="mx-1 mt-1 mb-1 rounded-[16px] p-3 grid grid-cols-2 gap-1.5"
-                                    style={{ background: "rgba(255,255,255,0.04)" }}
-                                >
-                                    {displayCountries.map((country) => (
+                                <div className="mx-1 mt-1 mb-1 rounded-[14px] p-3 grid grid-cols-2 gap-1" style={{ background: "rgba(255,255,255,0.03)" }}>
+                                    {displayCountries.map((c) => (
                                         <Link
-                                            key={country.slug}
-                                            href={`/quoc-gia/${country.slug}`}
+                                            key={c.slug}
+                                            href={`/quoc-gia/${c.slug}`}
                                             onClick={onClose}
-                                            className="text-white/55 text-[13px] hover:text-white px-3 py-2 rounded-xl text-center transition-colors hover:bg-white/[0.06]"
+                                            className="text-white/50 text-[13px] hover:text-white px-3 py-2 rounded-[10px] text-center transition-colors hover:bg-white/[0.06]"
                                         >
-                                            {country.name}
+                                            {c.name}
                                         </Link>
                                     ))}
                                 </div>
@@ -245,24 +264,39 @@ export default function MobileMenu({
                         </div>
                     </nav>
 
-                    {/* Download App Button */}
-                    <a
-                        href="/app-release.apk"
-                        target="_blank"
-                        download
-                        className="flex items-center justify-center gap-2 w-full py-3 rounded-[16px] text-[14px] font-semibold text-black bg-[#F4C84A] hover:brightness-105 transition-all shadow-[0_0_20px_rgba(244,200,74,0.2)]"
-                    >
-                        <Download className="w-4 h-4" strokeWidth={2} />
-                        Tải Ứng Dụng Mobile
-                    </a>
+                    {/* Divider */}
+                    <div className="h-px bg-white/[0.05]" />
+
+                    {/* Download App Banner */}
+                    <div className="rounded-[18px] overflow-hidden border border-[#F4C84A]/20" style={{ background: "linear-gradient(135deg, rgba(244,200,74,0.12) 0%, rgba(244,200,74,0.04) 100%)" }}>
+                        <div className="p-4">
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="w-10 h-10 rounded-[12px] bg-[#F4C84A]/15 flex items-center justify-center border border-[#F4C84A]/20">
+                                    <Smartphone className="w-5 h-5 text-[#F4C84A]" strokeWidth={1.5} />
+                                </div>
+                                <div>
+                                    <p className="text-white font-semibold text-[14px]">Ứng Dụng MovieBox</p>
+                                    <p className="text-white/40 text-[12px]">Xem phim mọi lúc, mọi nơi</p>
+                                </div>
+                            </div>
+                            <a
+                                href={APK_DOWNLOAD_URL}
+                                download="PhimKhoi-Release.apk"
+                                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-[12px] text-[13px] font-bold text-[#0a0d14] bg-[#F4C84A] hover:brightness-105 transition-all shadow-[0_4px_16px_rgba(244,200,74,0.2)]"
+                            >
+                                <Download className="w-4 h-4" strokeWidth={2.5} />
+                                Tải APK Android
+                            </a>
+                        </div>
+                    </div>
 
                     {/* Logout */}
                     {session && (
-                        <div className="pb-8">
+                        <div className="pb-6">
                             <button
                                 onClick={() => signOut({ callbackUrl: "/login" })}
-                                className="w-full flex items-center justify-center gap-2 py-3 rounded-[16px] text-[14px] font-medium transition-all"
-                                style={{ color: "#ff5555", background: "rgba(255,60,60,0.08)" }}
+                                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[12px] text-[14px] font-medium transition-all"
+                                style={{ color: "#ff5a5a", background: "rgba(255,60,60,0.07)", border: "1px solid rgba(255,60,60,0.12)" }}
                             >
                                 <LogOut className="w-4 h-4" strokeWidth={1.5} />
                                 Đăng Xuất
