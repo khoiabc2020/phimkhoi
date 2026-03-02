@@ -394,18 +394,8 @@ export default function MovieDetailScreen() {
                                         const isActive = activeLangTab === lang;
                                         const dotColor = LANG_COLORS[lang] || '#9ca3af';
 
-                                        // If only 1 server in this group, we might want to show source name in the tab
                                         const serversInGroup = groupedEpisodes[lang];
                                         let label = lang;
-                                        if (serversInGroup.length === 1) {
-                                            const s = serversInGroup[0];
-                                            const sName = s.server_name.split('##')[0]
-                                                .replace('Lồng Tiếng', '').replace('lồng tiếng', '')
-                                                .replace('Thuyết Minh', '').replace('thuyết minh', '')
-                                                .replace('Vietsub', '').replace('vietsub', '')
-                                                .replace(/\(\)/g, '').replace(/\[\]/g, '').trim() || s.server_name.split('##')[0].trim();
-                                            label = `${lang} • ${sName}`;
-                                        }
 
                                         return (
                                             <Pressable

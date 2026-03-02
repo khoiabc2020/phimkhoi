@@ -1,8 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import {
     View, Text, TextInput, FlatList, TouchableOpacity,
-    StyleSheet, ActivityIndicator, Image, Pressable, ScrollView
+    StyleSheet, ActivityIndicator, Pressable, ScrollView
 } from 'react-native';
+import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -59,9 +60,11 @@ export default function SearchScreen() {
             activeOpacity={0.75}
         >
             <Image
-                source={{ uri: item.thumb_url?.startsWith('http') ? item.thumb_url : `https://img.ophim.live/uploads/movies/${item.thumb_url}` }}
+                source={{ uri: getImageUrl(item.thumb_url) }}
                 style={styles.thumb}
-                resizeMode="cover"
+                contentFit="cover"
+                transition={200}
+                cachePolicy="memory-disk"
             />
             <View style={styles.resultInfo}>
                 <Text style={styles.resultTitle} numberOfLines={2}>{item.name}</Text>
@@ -152,7 +155,7 @@ export default function SearchScreen() {
                                         >
                                             <View style={{ width: 60, height: 60, borderRadius: 30, overflow: 'hidden', borderWidth: 2, borderColor: 'rgba(244,200,74,0.4)', backgroundColor: '#1e293b', marginBottom: 6 }}>
                                                 {profileImg ? (
-                                                    <Image source={{ uri: profileImg }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+                                                    <Image source={{ uri: profileImg }} style={{ width: '100%', height: '100%' }} contentFit="cover" />
                                                 ) : (
                                                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                                                         <Ionicons name="person" size={24} color="#475569" />

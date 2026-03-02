@@ -58,9 +58,7 @@
             "compileSdkVersion": 35,
             "targetSdkVersion": 35,
             "usesCleartextTraffic": true,
-            "kotlinVersion": "1.9.25",
-            "enableProguardInRelease": true,
-            "enableShrinkResourcesInRelease": true
+            "kotlinVersion": "1.9.25"
           }
         }
       ],
