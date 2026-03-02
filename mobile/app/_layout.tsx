@@ -11,6 +11,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { AuthProvider } from '@/context/auth';
 import { MiniPlayerProvider } from '@/context/miniplayer';
 import MiniPlayerOverlay from '@/components/MiniPlayerOverlay';
+import UpdateChecker from '@/components/UpdateChecker';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -65,6 +66,7 @@ export default function RootLayout() {
                   <Stack.Screen name="watchlist" />
                 </Stack>
                 <MiniPlayerOverlay />
+                <UpdateChecker silent />
               </View>
               <StatusBar style="light" />
             </ThemeProvider>
