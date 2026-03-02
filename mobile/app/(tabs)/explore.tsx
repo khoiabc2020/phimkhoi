@@ -402,7 +402,7 @@ export default function ExploreScreen() {
       {/* Filter Modal */}
       <Modal visible={isFilterVisible} animationType="slide" transparent={true} onRequestClose={() => setIsFilterVisible(false)}>
         <View className="flex-1 justify-end">
-          <BlurView intensity={Platform.OS === 'ios' ? 40 : 80} tint="dark" style={StyleSheet.absoluteFill} />
+          <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.6)' }]} />
           <View className="bg-[#111319] w-full rounded-t-[32px] border-t border-white/10 p-4 pb-8 max-h-[85%] shadow-lg">
             <View className="flex-row items-center justify-between mb-4 px-2 pt-2">
               <Text className="text-white text-xl font-bold">Bộ lọc tìm kiếm</Text>
