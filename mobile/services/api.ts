@@ -287,15 +287,10 @@ export const searchActors = async (keyword: string): Promise<any[]> => {
 };
 
 export const getImageUrl = (url?: string) => {
-    if (!url) return 'https://via.placeholder.com/300x450?text=No+Image';
+    if (!url) return '';
 
-    let finalUrl = url;
-    if (!url.startsWith('http')) {
-        finalUrl = `https://phimimg.com/${url}`;
-    }
-
-    // Tối ưu ảnh siêu tốc qua Global CDN (Cloudflare/Wsrv) với thiết lập WebP nén
-    return `https://wsrv.nl/?url=${encodeURIComponent(finalUrl)}&output=webp&q=80`;
+    if (url.startsWith('http')) return url;
+    return `https://phimimg.com/${url}`;
 };
 
 export const getMenuData = async () => {

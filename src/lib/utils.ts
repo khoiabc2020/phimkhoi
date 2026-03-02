@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-export function getImageUrl(url: string) {
+export function getImageUrl(url: string, proxy = true): string {
     if (!url) return "";
 
     let finalUrl = url;
@@ -13,9 +13,15 @@ export function getImageUrl(url: string) {
         finalUrl = `https://phimimg.com/${url}`;
     }
 
-    // Bypass wsrv image CDN to provide the most original, full quality image as requested by user.
+    // Route qua VPS Image Proxy để được Cache & phục vụ nhanh hơn
+    // Proxy server sẽ tải ảnh về, cache 4 giờ và serve từ VPS (loại bỏ màn đen)
+    if (proxy && finalUrl.startsWith("http")) {
+        return `/api/img-proxy?url=${encodeURIComponent(finalUrl)}`;
+    }
+
     return finalUrl;
 }
+
 
 export function decodeHtml(html: string) {
     if (!html) return "";

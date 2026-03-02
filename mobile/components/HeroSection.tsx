@@ -126,10 +126,11 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                 height={CAROUSEL_HEIGHT}
                 data={movies}
                 autoPlay={true}
-                autoPlayInterval={5500}
+                autoPlayInterval={6000}
                 onSnapToItem={onSnapToItem}
-                scrollAnimationDuration={300}
-                panGestureHandlerProps={{ activeOffsetX: [-15, 15] }}
+                scrollAnimationDuration={250}
+                panGestureHandlerProps={{ activeOffsetX: [-10, 10] }}
+                withAnimation={{ type: 'spring', config: { damping: 18, mass: 0.8, stiffness: 120 } }}
                 renderItem={renderItem}
             />
             {/* Indicator dots — lightweight, only re-render when activeIndex changes */}
@@ -172,10 +173,10 @@ const HeroCard = React.memo(function HeroCard({ movie, index, activeIndexRef, is
                     source={{ uri: getImageUrl(movie.poster_url || movie.thumb_url) }}
                     style={styles.posterImage}
                     contentFit="cover"
-                    transition={150}
+                    transition={200}
                     cachePolicy="memory-disk"
-                    // Priority: only decode image for active card eagerly
-                    priority={isActive ? 'high' : 'low'}
+                    priority={isActive ? 'high' : 'normal'}
+                    recyclingKey={movie.slug}
                 />
             </FocusableButton>
 
@@ -278,6 +279,7 @@ const styles = StyleSheet.create({
         borderRadius: 24,
         padding: 20,
         paddingTop: 55,
+        paddingHorizontal: 20,
         borderWidth: StyleSheet.hairlineWidth,
         borderColor: 'rgba(255, 255, 255, 0.12)',
         borderTopColor: 'rgba(255, 255, 255, 0.25)',
@@ -358,7 +360,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 14,
+        gap: 16,
+        marginTop: 4,
+        paddingHorizontal: 16,
     },
     playBtnIcon: {
         width: 52,
