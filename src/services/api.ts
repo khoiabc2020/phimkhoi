@@ -91,12 +91,23 @@ export const getOphimImages = async (slug: string) => {
     }
 };
 
+let homeCache: any = null;
+let homeCacheTime = 0;
+
 export const getHomeData = async () => {
+    // 5 phút Memory Cache siêu tốc giúp bảo vệ Next.js VPS
+    if (homeCache && Date.now() - homeCacheTime < 5 * 60 * 1000) {
+        return homeCache;
+    }
+
     try {
-        const fetchCategory = async (type: string) => {
+        const fetchCategory = async (slug: string, endpoint: 'danh-sach' | 'the-loai' | 'quoc-gia' = 'danh-sach') => {
+            let nguoncUrl = `${NGUONC_API}/api/films/${endpoint}/${slug}?page=1`;
+            if (slug === 'phim-moi-cap-nhat') nguoncUrl = `${NGUONC_API}/api/films/phim-moi-cap-nhat?page=1`;
+
             const [kkRes, nguoncRes] = await Promise.allSettled([
-                fetch(`${API_URL}/v1/api/danh-sach/${type}?limit=12`, { next: { revalidate: 3600 } }).then((res) => res.json()),
-                fetch(`${NGUONC_API}/api/films/${type === 'phim-moi-cap-nhat' ? '' : 'danh-sach/'}${type}?page=1`, { next: { revalidate: 3600 } }).then((res) => res.json())
+                fetch(`${API_URL}/v1/api/${endpoint}/${slug}?limit=12`, { next: { revalidate: 3600 } }).then((res) => res.json()),
+                fetch(nguoncUrl, { next: { revalidate: 3600 } }).then((res) => res.json())
             ]);
             let items: Movie[] = [];
             if (kkRes.status === 'fulfilled' && kkRes.value?.data?.items) {
@@ -121,7 +132,6 @@ export const getHomeData = async () => {
                 }));
                 items = [...items, ...nguoncItems];
             }
-            // Deduplicate
             const seen = new Set();
             return items.filter(item => {
                 const duplicate = seen.has(item.slug);
@@ -130,24 +140,36 @@ export const getHomeData = async () => {
             });
         };
 
-        const [phimMoi, phimLe, phimBo, hoatHinh, tvShows] = await Promise.all([
+        const [
+            phimMoi, phimLe, phimBo, hoatHinh, tvShows,
+            phimChieuRap, phimSapChieu, hanQuoc, trungQuoc,
+            hanhDong, tinhCam
+        ] = await Promise.all([
             fetchCategory('phim-moi-cap-nhat'),
             fetchCategory('phim-le'),
             fetchCategory('phim-bo'),
             fetchCategory('hoat-hinh'),
-            fetchCategory('tv-shows')
+            fetchCategory('tv-shows'),
+            fetchCategory('phim-chieu-rap', 'the-loai'),
+            fetchCategory('phim-sap-chieu'),
+            fetchCategory('han-quoc', 'quoc-gia'),
+            fetchCategory('trung-quoc', 'quoc-gia'),
+            fetchCategory('hanh-dong', 'the-loai'),
+            fetchCategory('tinh-cam', 'the-loai')
         ]);
 
-        return {
-            phimMoi,
-            phimLe,
-            phimBo,
-            hoatHinh,
-            tvShows,
+        const data = {
+            phimMoi, phimLe, phimBo, hoatHinh, tvShows,
+            phimChieuRap, phimSapChieu, hanQuoc, trungQuoc,
+            hanhDong, tinhCam
         };
+
+        homeCache = data;
+        homeCacheTime = Date.now();
+        return data;
     } catch (error) {
         console.error("Error fetching home data:", error);
-        return { phimLe: [], phimBo: [], hoatHinh: [], tvShows: [] };
+        return { phimMoi: [], phimLe: [], phimBo: [], hoatHinh: [], tvShows: [], phimChieuRap: [], phimSapChieu: [], hanQuoc: [], trungQuoc: [], hanhDong: [], tinhCam: [] };
     }
 };
 

@@ -6,30 +6,10 @@ import QuickNav from "@/components/QuickNav";
 import ContinueWatchingRow from "@/components/ContinueWatchingRow";
 import TopicSection from "@/components/TopicSection";
 import TopicCloud from "@/components/TopicCloud";
-import { LazyLoadWrapper } from "@/components/LazyLoadWrapper";
-import { getMoviesList, getTrendMovies, getMoviesByCountry, getMoviesByCategory } from "@/services/api";
+import { getMoviesList, getTrendMovies, getHomeData } from "@/services/api";
+import { getTMDBDataForCard } from "@/app/actions/tmdb";
 
 export const revalidate = 3600;
-
-// Reusable Async component for Rows
-async function AsyncMovieRow({ title, type, slug, country, variant = 'default' }: { title: string, type?: string, slug?: string, country?: string, variant?: 'default' | 'sidebar' }) {
-  let data: any = null;
-  let viewAllSlug = "#";
-
-  if (country) {
-    data = await getMoviesByCountry(country, 1, 12);
-    viewAllSlug = `/quoc-gia/${country}`;
-  } else if (slug) {
-    data = await getMoviesByCategory(slug, 1, 12);
-    viewAllSlug = `/the-loai/${slug}`;
-  } else if (type) {
-    data = await getMoviesList(type, { limit: 12 });
-    viewAllSlug = `/danh-sach/${type}`;
-  }
-
-  if (!data?.items?.length) return null;
-  return <MovieRow title={title} movies={data.items} slug={viewAllSlug} variant={variant} />;
-}
 
 // Wrapper cho Sidebar Trending
 async function AsyncTopTrending({ title, slug, type }: { title: string, slug: string, type: 'tv' | 'movie' }) {
@@ -52,28 +32,24 @@ async function AsyncTopTrending({ title, slug, type }: { title: string, slug: st
   return <TopTrending title={title} movies={data.slice(0, 10)} slug={slug} className={type === 'movie' ? "mt-8" : ""} />;
 }
 
-import { getTMDBDataForCard } from "@/app/actions/tmdb";
-
 export default async function Home() {
-  // Fetch Hero + first above-fold row concurrently for faster FCP
-  const [heroTrending, cinemaData] = await Promise.all([
+  // Fetch Hero + Home Data concurrently for faster FCP
+  const [heroTrending, homeData] = await Promise.all([
     getTrendMovies('all').catch(() => []),
-    getMoviesByCategory('phim-chieu-rap', 1, 12).catch(() => ({ items: [] })),
+    getHomeData(),
   ]);
 
   let finalHeroData: any[] = heroTrending.slice(0, 5); // Limit hero to 5 items early on
 
   if (finalHeroData.length < 4) {
-    // Nếu Hero fail, gọi fallback
-    const [phimBo, phimLe] = await Promise.all([
-      getMoviesList('phim-bo', { limit: 5 }),
-      getMoviesList('phim-le', { limit: 5 })
-    ]);
+    // Nếu Hero fail, gọi fallback từ homeData
     const heroMixed: any[] = [];
-    const maxLen = Math.max(phimBo.items?.length || 0, phimLe.items?.length || 0);
+    const phimBoItems = homeData.phimBo || [];
+    const phimLeItems = homeData.phimLe || [];
+    const maxLen = Math.max(phimBoItems.length, phimLeItems.length);
     for (let i = 0; i < maxLen; i++) {
-      if (phimBo.items?.[i]) heroMixed.push(phimBo.items[i]);
-      if (phimLe.items?.[i]) heroMixed.push(phimLe.items[i]);
+      if (phimBoItems[i]) heroMixed.push(phimBoItems[i]);
+      if (phimLeItems[i]) heroMixed.push(phimLeItems[i]);
     }
     finalHeroData = heroMixed.slice(0, 5);
   }
@@ -122,64 +98,46 @@ export default async function Home() {
           <div className="xl:col-span-9 space-y-16">
             <ContinueWatchingRow />
 
-            {/* First row: already fetched above-fold — NO LazyLoadWrapper, renders immediately */}
-            {cinemaData?.items?.length ? (
-              <MovieRow title="Phim Chiếu Rạp Mới" movies={cinemaData.items} slug="/the-loai/phim-chieu-rap" />
+            {/* Render rows directly from pre-fetched homeData (mượt mà, không giật lag, chuẩn SEO) */}
+            {homeData.phimChieuRap?.length ? (
+              <MovieRow title="Phim Chiếu Rạp Mới" movies={homeData.phimChieuRap} slug="/the-loai/phim-chieu-rap" />
             ) : null}
 
-            <LazyLoadWrapper fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
-              <Suspense fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
-                <AsyncMovieRow title="Phim Mới Cập Nhật" type="phim-moi-cap-nhat" />
-              </Suspense>
-            </LazyLoadWrapper>
+            {homeData.phimMoi?.length ? (
+              <MovieRow title="Phim Mới Cập Nhật" movies={homeData.phimMoi.slice(0, 12)} slug="/danh-sach/phim-moi-cap-nhat" />
+            ) : null}
 
-            <LazyLoadWrapper fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
-              <Suspense fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
-                <AsyncMovieRow title="Phim Hàn Quốc" country="han-quoc" />
-              </Suspense>
-            </LazyLoadWrapper>
+            {homeData.hanQuoc?.length ? (
+              <MovieRow title="Phim Hàn Quốc" movies={homeData.hanQuoc.slice(0, 12)} slug="/quoc-gia/han-quoc" />
+            ) : null}
 
-            <LazyLoadWrapper fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
-              <Suspense fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
-                <AsyncMovieRow title="Phim Trung Quốc" country="trung-quoc" />
-              </Suspense>
-            </LazyLoadWrapper>
+            {homeData.trungQuoc?.length ? (
+              <MovieRow title="Phim Trung Quốc" movies={homeData.trungQuoc.slice(0, 12)} slug="/quoc-gia/trung-quoc" />
+            ) : null}
 
-            <LazyLoadWrapper fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-              <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-                <AsyncMovieRow title="Phim Sắp Chiếu" type="phim-sap-chieu" />
-              </Suspense>
-            </LazyLoadWrapper>
+            {homeData.phimSapChieu?.length ? (
+              <MovieRow title="Phim Sắp Chiếu" movies={homeData.phimSapChieu.slice(0, 12)} slug="/danh-sach/phim-sap-chieu" />
+            ) : null}
 
-            <LazyLoadWrapper fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-              <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-                <AsyncMovieRow title="Phim Lẻ Mới" type="phim-le" />
-              </Suspense>
-            </LazyLoadWrapper>
+            {homeData.phimLe?.length ? (
+              <MovieRow title="Phim Lẻ Mới" movies={homeData.phimLe.slice(0, 12)} slug="/danh-sach/phim-le" />
+            ) : null}
 
-            <LazyLoadWrapper fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-              <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-                <AsyncMovieRow title="Phim Bộ Mới" type="phim-bo" />
-              </Suspense>
-            </LazyLoadWrapper>
+            {homeData.phimBo?.length ? (
+              <MovieRow title="Phim Bộ Mới" movies={homeData.phimBo.slice(0, 12)} slug="/danh-sach/phim-bo" />
+            ) : null}
 
-            <LazyLoadWrapper fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-              <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-                <AsyncMovieRow title="Phim Hành Động" slug="hanh-dong" />
-              </Suspense>
-            </LazyLoadWrapper>
+            {homeData.hanhDong?.length ? (
+              <MovieRow title="Phim Hành Động" movies={homeData.hanhDong.slice(0, 12)} slug="/the-loai/hanh-dong" />
+            ) : null}
 
-            <LazyLoadWrapper fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-              <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-                <AsyncMovieRow title="Hoạt Hình" type="hoat-hinh" />
-              </Suspense>
-            </LazyLoadWrapper>
+            {homeData.hoatHinh?.length ? (
+              <MovieRow title="Hoạt Hình" movies={homeData.hoatHinh.slice(0, 12)} slug="/danh-sach/hoat-hinh" />
+            ) : null}
 
-            <LazyLoadWrapper fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-              <Suspense fallback={<div className="h-64 bg-white/5 rounded-xl animate-pulse" />}>
-                <AsyncMovieRow title="TV Shows" type="tv-shows" />
-              </Suspense>
-            </LazyLoadWrapper>
+            {homeData.tvShows?.length ? (
+              <MovieRow title="TV Shows" movies={homeData.tvShows.slice(0, 12)} slug="/danh-sach/tv-shows" />
+            ) : null}
           </div>
 
           {/* SIDEBAR */}
