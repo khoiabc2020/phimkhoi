@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
-import { View, Text, Pressable, StyleSheet, FlatList } from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Movie } from '@/services/api';
@@ -40,18 +41,15 @@ const MovieRow = memo(({ title, movies, slug, subtitle, type = 'list' }: MovieRo
                 )}
             </View>
 
-            {/* Movie List - Optimized FlatList */}
-            <FlatList
+            {/* Movie List - Optimized FlashList */}
+            <FlashList
                 data={movies.filter(m => m && m.slug)}
                 renderItem={({ item }) => <MovieCard movie={item} />}
                 keyExtractor={(item, index) => item._id || item.slug || `row-${index}`}
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.listContent}
-                initialNumToRender={4}
-                maxToRenderPerBatch={4}
-                windowSize={3}
-                removeClippedSubviews={true}
+                estimatedItemSize={115} // Based on MovieCard default width
             />
         </View>
     );

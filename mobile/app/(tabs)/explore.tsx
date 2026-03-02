@@ -1,4 +1,5 @@
-import { View, Text, TextInput, Pressable, Dimensions, FlatList, Modal, ScrollView, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Pressable, Dimensions, Modal, ScrollView, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -152,12 +153,14 @@ export default function ExploreScreen() {
           <Text className="text-white text-sm font-bold mb-3" style={{ color: '#F4C84A' }}>
             Diễn viên / Đạo diễn
           </Text>
-          <FlatList
+          <FlashList
             horizontal
             showsHorizontalScrollIndicator={false}
             data={actorResults}
-            keyExtractor={(actor) => actor.id?.toString()}
-            contentContainerStyle={{ gap: 14 }}
+            keyExtractor={(actor) => actor.id?.toString() || Math.random().toString()}
+            contentContainerStyle={{ paddingRight: 20 }}
+            ItemSeparatorComponent={() => <View style={{ width: 14 }} />}
+            estimatedItemSize={72}
             renderItem={({ item: actor }) => {
               const profileImg = actor.profile_path
                 ? `https://image.tmdb.org/t/p/w185${actor.profile_path}`
@@ -224,12 +227,14 @@ export default function ExploreScreen() {
     if (search.trim() && filteredResults.length === 0 && actorResults.length > 0) return (
       <View className="px-4 mt-4">
         <Text style={{ color: '#F4C84A', fontSize: 13, fontWeight: '700', marginBottom: 12 }}>Diễn viên / Đạo diễn</Text>
-        <FlatList
+        <FlashList
           horizontal
           showsHorizontalScrollIndicator={false}
           data={actorResults}
-          keyExtractor={(actor) => actor.id?.toString()}
-          contentContainerStyle={{ gap: 14, paddingBottom: 12 }}
+          keyExtractor={(actor) => actor.id?.toString() || Math.random().toString()}
+          contentContainerStyle={{ paddingRight: 20, paddingBottom: 12 }}
+          ItemSeparatorComponent={() => <View style={{ width: 14 }} />}
+          estimatedItemSize={80}
           renderItem={({ item: actor }) => {
             const profileImg = actor.profile_path
               ? `https://image.tmdb.org/t/p/w185${actor.profile_path}`
@@ -366,19 +371,26 @@ export default function ExploreScreen() {
 
         {/* Content: Either Search Results FlatList or Default Views */}
         {search.trim() && (filteredResults.length > 0 || actorResults.length > 0) ? (
-          <FlatList
-            data={filteredResults}
-            keyExtractor={(item, index) => item._id || index.toString()}
+          <FlashList
+            data={filteredResults.map((item, index) => {
+              if (item.empty) return item;
+              return item;
+            })}
+            keyExtractor={item => item._id || item.slug || Math.random().toString()}
             numColumns={COLUMN_COUNT}
-            ListHeaderComponent={renderHeader}
-            columnWrapperStyle={{ gap: ITEM_SPACING, paddingHorizontal: 16 }}
-            contentContainerStyle={{ paddingBottom: 100 }}
-            renderItem={renderItem}
+            estimatedItemSize={ITEM_WIDTH * 1.5 + 40}
+            contentContainerStyle={{ paddingBottom: 20 }}
             showsVerticalScrollIndicator={false}
-            initialNumToRender={12}
-            maxToRenderPerBatch={12}
-            windowSize={5}
-            removeClippedSubviews={true}
+            renderItem={({ item, index }) => {
+              if (item.empty) {
+                return <View style={{ width: ITEM_WIDTH, height: ITEM_WIDTH * 1.5, marginLeft: index % 3 !== 0 ? ITEM_SPACING : 0, backgroundColor: 'transparent' }} />;
+              }
+              return (
+                <View style={{ marginLeft: index % 3 !== 0 ? ITEM_SPACING : 0, marginBottom: ITEM_SPACING + 4 }}>
+                  <HotMovieItem item={item} index={index} />
+                </View>
+              );
+            }}
           />
         ) : (
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
@@ -389,8 +401,9 @@ export default function ExploreScreen() {
 
       {/* Filter Modal */}
       <Modal visible={isFilterVisible} animationType="slide" transparent={true} onRequestClose={() => setIsFilterVisible(false)}>
-        <View className="flex-1 justify-end bg-black/60">
-          <View className="bg-[#111319] w-full rounded-t-3xl border-t border-white/10 p-4 pb-8 max-h-[85%]">
+        <View className="flex-1 justify-end">
+          <BlurView intensity={Platform.OS === 'ios' ? 40 : 80} tint="dark" style={StyleSheet.absoluteFill} />
+          <View className="bg-[#111319] w-full rounded-t-[32px] border-t border-white/10 p-4 pb-8 max-h-[85%] shadow-lg">
             <View className="flex-row items-center justify-between mb-4 px-2 pt-2">
               <Text className="text-white text-xl font-bold">Bộ lọc tìm kiếm</Text>
               <TouchableOpacity onPress={() => setIsFilterVisible(false)} className="bg-white/10 rounded-full p-2">

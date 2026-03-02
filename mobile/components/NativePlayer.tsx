@@ -754,7 +754,6 @@ export default function NativePlayer({
                                                 setShowEpisodes(false);
                                             }}
                                         >
-                                            <Ionicons name="play-circle" size={14} color={isActive ? "#fbbf24" : "rgba(255,255,255,0.4)"} />
                                             <Text style={[styles.epGridText, isActive && styles.activeEpGridText]} numberOfLines={1}>
                                                 Tập {item.name.replace('Tập ', '').padStart(2, '0')}
                                             </Text>
@@ -811,24 +810,33 @@ export default function NativePlayer({
 
                             {/* Servers for the active lang tab */}
                             <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
-                                {(groupedServers[serverLangTab || activeLangGroups[0]] || serverList.map((_, i) => i)).map((index) => (
-                                    <TouchableOpacity
-                                        key={index}
-                                        style={[styles.serverRow, index === currentServerIndex && styles.activeServerRow]}
-                                        onPress={() => {
-                                            onServerChange?.(index);
-                                            setShowServers(false);
-                                        }}
-                                    >
-                                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                                            <Ionicons name="server-outline" size={20} color={index === currentServerIndex ? '#fbbf24' : 'gray'} />
-                                            <Text style={[styles.serverRowText, index === currentServerIndex && styles.activeServerRowText]}>
-                                                {serverList[index]}
-                                            </Text>
-                                        </View>
-                                        {index === currentServerIndex && <Ionicons name="checkmark" size={20} color="#fbbf24" />}
-                                    </TouchableOpacity>
-                                ))}
+                                {(groupedServers[serverLangTab || activeLangGroups[0]] || serverList.map((_, i) => i)).map((index) => {
+                                    const sNameRaw = serverList[index] || '';
+                                    const sDisplayName = sNameRaw
+                                        .replace('Lồng Tiếng', '').replace('lồng tiếng', '')
+                                        .replace('Thuyết Minh', '').replace('thuyết minh', '')
+                                        .replace('Vietsub', '').replace('vietsub', '')
+                                        .replace(/\(\)/g, '').replace(/\[\]/g, '').trim() || sNameRaw;
+
+                                    return (
+                                        <TouchableOpacity
+                                            key={index}
+                                            style={[styles.serverRow, index === currentServerIndex && styles.activeServerRow]}
+                                            onPress={() => {
+                                                onServerChange?.(index);
+                                                setShowServers(false);
+                                            }}
+                                        >
+                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                                                <Ionicons name="server-outline" size={20} color={index === currentServerIndex ? '#fbbf24' : 'gray'} />
+                                                <Text style={[styles.serverRowText, index === currentServerIndex && styles.activeServerRowText]}>
+                                                    {sDisplayName}
+                                                </Text>
+                                            </View>
+                                            {index === currentServerIndex && <Ionicons name="checkmark" size={20} color="#fbbf24" />}
+                                        </TouchableOpacity>
+                                    );
+                                })}
                             </ScrollView>
                         </View>
                     </View>

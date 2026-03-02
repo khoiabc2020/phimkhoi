@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, Pressable, FlatList, RefreshControl, Animated } from 'react-native';
+import { View, Text, StyleSheet, Pressable, RefreshControl, Animated } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
@@ -173,22 +174,25 @@ export default function ScheduleScreen() {
                         ))}
                     </View>
                 ) : (
-                    <FlatList
-                        data={data}
-                        keyExtractor={(item) => item._id || item.slug}
-                        renderItem={({ item }) => <MovieRow item={item} />}
-                        refreshControl={
-                            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F4C84A" />
-                        }
-                        contentContainerStyle={styles.listContent}
-                        showsVerticalScrollIndicator={false}
-                        ListEmptyComponent={
-                            <View style={styles.emptyWrap}>
-                                <Ionicons name="film-outline" size={56} color="rgba(255,255,255,0.2)" />
-                                <Text style={styles.emptyText}>Không có dữ liệu</Text>
-                            </View>
-                        }
-                    />
+                    <View style={{ flex: 1, paddingHorizontal: 16 }}>
+                        <FlashList
+                            data={data}
+                            keyExtractor={(item) => item._id || item.slug}
+                            renderItem={({ item }) => <MovieRow item={item} />}
+                            refreshControl={
+                                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F4C84A" />
+                            }
+                            contentContainerStyle={{ paddingBottom: 120 }}
+                            showsVerticalScrollIndicator={false}
+                            estimatedItemSize={150} // Approximate height of MovieRow card + margin
+                            ListEmptyComponent={
+                                <View style={styles.emptyWrap}>
+                                    <Ionicons name="film-outline" size={56} color="rgba(255,255,255,0.2)" />
+                                    <Text style={styles.emptyText}>Không có dữ liệu</Text>
+                                </View>
+                            }
+                        />
+                    </View>
                 )}
             </SafeAreaView>
         </View>
