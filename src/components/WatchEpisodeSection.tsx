@@ -105,30 +105,28 @@ export default function WatchEpisodeSection({
                 </div>
             </div>
 
-            <div className="px-6 pt-6 pb-8">
-                {/* Back Link */}
-                <div className="mb-8">
+            <div className="px-3 sm:px-6 pt-3 sm:pt-5 pb-4 sm:pb-8">
+                {/* Back Link - compact on mobile */}
+                <div className="mb-4 sm:mb-6">
                     <Link
                         href={`/phim/${movieSlug}`}
-                        className="inline-flex items-center gap-3 group"
+                        className="inline-flex items-center gap-2 group"
                     >
-                        <span className="w-8 h-8 rounded-full bg-[#1A1D24] border border-white/5 group-hover:bg-[#28282B] flex items-center justify-center text-white transition-colors">
-                            <ChevronLeft className="w-4 h-4 ml-[-2px]" />
+                        <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#1A1D24] border border-white/5 group-hover:bg-[#28282B] flex items-center justify-center text-white transition-colors">
+                            <ChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-[-1px]" />
                         </span>
-                        <span className="text-[15px] font-bold text-white group-hover:text-[#F4C84A] transition-colors">
-                            Xem phim {movieName}
+                        <span className="text-[13px] sm:text-[15px] font-bold text-white group-hover:text-[#F4C84A] transition-colors truncate max-w-[240px] sm:max-w-none">
+                            {movieName}
                         </span>
                     </Link>
                 </div>
 
                 {/* Language Tabs Row */}
                 {activeLanguageGroups.length > 0 && (
-                    <div className="flex items-center gap-6 border-b border-white/[0.04] mb-6 overflow-x-auto no-scrollbar pb-1">
+                    <div className="flex items-center gap-3 sm:gap-6 border-b border-white/[0.04] mb-3 sm:mb-5 overflow-x-auto no-scrollbar pb-1">
                         {activeLanguageGroups.map((lang) => {
                             const isActive = activeLangTab === lang;
                             const Icon = lang === "Lồng Tiếng" ? Mic : lang === "Thuyết Minh" ? Volume2 : Subtitles;
-                            // Small dot keeps language color for visual id; active highlight = yellow
-                            const dotColor = lang === "Lồng Tiếng" ? "#00c853" : lang === "Thuyết Minh" ? "#3b82f6" : "#9ca3af";
 
                             return (
                                 <button
@@ -142,11 +140,11 @@ export default function WatchEpisodeSection({
                                         }
                                     }}
                                     className={cn(
-                                        "flex items-center gap-2 pb-3 text-[14px] font-bold transition-all relative whitespace-nowrap uppercase tracking-wider",
+                                        "flex items-center gap-1.5 sm:gap-2 pb-2 sm:pb-3 text-[12px] sm:text-[14px] font-bold transition-all relative whitespace-nowrap uppercase tracking-wider",
                                         isActive ? "text-[#F4C84A]" : "text-gray-500 hover:text-gray-300"
                                     )}
                                 >
-                                    <Icon className={cn("w-[16px] h-[16px]", isActive ? "text-[#F4C84A]" : "text-gray-500")} />
+                                    <Icon className={cn("w-[14px] h-[14px] sm:w-[16px] sm:h-[16px]", isActive ? "text-[#F4C84A]" : "text-gray-500")} />
                                     {lang}
                                     {isActive && (
                                         <span className="absolute bottom-[-1px] left-0 right-0 h-[3px] rounded-t-full bg-[#F4C84A] shadow-[0_0_12px_rgba(244,200,74,0.6)]" />
@@ -157,19 +155,17 @@ export default function WatchEpisodeSection({
                     </div>
                 )}
 
-                {/* Server selector Left-Aligned with Database Icon */}
-                <div className="flex flex-col md:flex-row items-start md:items-center gap-5 mb-8">
-                    <div className="flex items-center gap-2 text-gray-500 text-[12px] font-bold uppercase tracking-widest min-w-[90px] shrink-0">
-                        <Database className="w-[15px] h-[15px] text-gray-600" strokeWidth={2.5} />
-                        Máy Chủ :
+                {/* Server selector - compact inline on all sizes */}
+                <div className="flex flex-row items-center gap-2 sm:gap-3 mb-3 sm:mb-6 flex-wrap">
+                    <div className="flex items-center gap-1.5 text-gray-500 text-[11px] sm:text-[12px] font-bold uppercase tracking-widest shrink-0">
+                        <Database className="w-[13px] h-[13px] sm:w-[15px] sm:h-[15px] text-gray-600" strokeWidth={2.5} />
+                        Máy Chủ:
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-2">
                         {activeLangTab && groupedServers[activeLangTab]?.length > 0 ? (
                             groupedServers[activeLangTab].map((s, i) => {
                                 const isServerActive = s.server_name === activeServerName;
-                                // Color variables based on language type — active always = yellow
-                                const activeBgClass = "bg-[#F4C84A] border-[#F4C84A] text-[#0B0D12]";
 
                                 // Clean up server name for display
                                 const displayName = s.server_name.split("##")[0]
@@ -177,7 +173,7 @@ export default function WatchEpisodeSection({
                                     .replace("Thuyết Minh", "").replace("thuyết minh", "").replace("thuyetminh", "")
                                     .replace("Vietsub", "").replace("vietsub", "")
                                     .replace(/\(\)/g, "").replace(/\[\]/g, "").replace(/--/g, "-").trim()
-                                    || s.server_name.split("##")[0].trim(); // fallback to original if completely empty
+                                    || s.server_name.split("##")[0].trim();
 
                                 return (
                                     <button
@@ -188,31 +184,22 @@ export default function WatchEpisodeSection({
                                             setCurrentChunk(0);
                                         }}
                                         className={cn(
-                                            "h-[38px] px-5 rounded-full text-[13px] font-bold transition-all duration-300 border flex items-center justify-center gap-3 shadow-sm backdrop-blur-md",
+                                            "h-[32px] sm:h-[38px] px-3 sm:px-5 rounded-full text-[12px] sm:text-[13px] font-bold transition-all duration-300 border flex items-center justify-center gap-2 shadow-sm",
                                             isServerActive
                                                 ? "bg-[#F4C84A] border-[#F4C84A] text-[#08090C] shadow-[0_4px_14px_rgba(244,200,74,0.25)] scale-105 transform"
                                                 : "bg-white/[0.03] border-white/[0.08] text-[#A1A1AA] hover:text-white hover:border-white/[0.15] hover:bg-white/[0.06] active:scale-95"
                                         )}
                                     >
-                                        <span className="truncate max-w-[150px]">{displayName}</span>
-                                        {isServerActive ? (
-                                            <>
-                                                <span className="w-[2px] h-3.5 bg-black/20 rounded-full" />
-                                                <span className="font-extrabold">{s.server_data.length}</span>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <span className="w-[2px] h-3.5 bg-white/10 rounded-full" />
-                                                <span className="font-semibold text-gray-500">{s.server_data.length}</span>
-                                            </>
-                                        )}
+                                        <span className="truncate max-w-[120px] sm:max-w-[150px]">{displayName}</span>
+                                        <span className={cn("w-[2px] h-3 rounded-full", isServerActive ? "bg-black/20" : "bg-white/10")} />
+                                        <span className={cn("font-bold", isServerActive ? "" : "text-gray-500")}>{s.server_data.length}</span>
                                     </button>
                                 );
                             })
                         ) : (
-                            <button className="h-[38px] px-5 rounded-full text-[13px] font-bold bg-white/[0.03] border border-white/[0.08] text-[#A1A1AA] shadow-sm flex items-center justify-center gap-3 backdrop-blur-md">
+                            <button className="h-[32px] sm:h-[38px] px-3 sm:px-5 rounded-full text-[12px] sm:text-[13px] font-bold bg-white/[0.03] border border-white/[0.08] text-[#A1A1AA] shadow-sm flex items-center justify-center gap-2">
                                 {serverName}
-                                <span className="w-[2px] h-3.5 bg-white/10 rounded-full" />
+                                <span className="w-[2px] h-3 bg-white/10 rounded-full" />
                                 <span className="font-semibold text-gray-500">{episodes.length}</span>
                             </button>
                         )}
