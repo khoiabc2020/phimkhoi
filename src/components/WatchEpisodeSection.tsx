@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { ChevronDown, List, ChevronLeft, Database, Mic, Subtitles, Volume2, PlayCircle, Play } from "lucide-react";
+import { ChevronDown, List, ChevronLeft, Database, Mic, Subtitles, Volume2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Episode {
@@ -262,7 +262,7 @@ export default function WatchEpisodeSection({
 
                 {/* Episode grid */}
                 {!isCollapsed && (
-                    <div className="grid grid-cols-3 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-3 max-h-[420px] sm:max-h-[500px] overflow-y-auto custom-scrollbar pr-1 sm:pr-3 [contain:layout_paint]">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-3 max-h-[360px] sm:max-h-[440px] overflow-y-auto custom-scrollbar pr-1 sm:pr-2 [contain:layout_paint]">
                         {episodes.slice(currentChunk * EPISODES_PER_CHUNK, (currentChunk + 1) * EPISODES_PER_CHUNK).map((ep) => {
                             const isActive = ep.slug === currentEpisodeSlug;
 
@@ -275,13 +275,13 @@ export default function WatchEpisodeSection({
                                     key={ep.slug}
                                     href={`/xem-phim/${movieSlug}/${ep.slug}?server=${safeIndex}`}
                                     className={cn(
-                                        "h-[44px] rounded-[14px] flex items-center justify-center gap-2.5 text-[14px] font-semibold transition-all duration-300 border backdrop-blur-md touch-manipulation",
+                                        "h-[40px] sm:h-[44px] rounded-[12px] flex items-center justify-center gap-1.5 text-[13px] sm:text-[14px] font-semibold transition-all duration-200 border backdrop-blur-md touch-manipulation",
                                         isActive
-                                            ? "bg-[#F4C84A]/[0.12] border-[#F4C84A]/50 text-[#F4C84A] shadow-[0_4px_20px_rgba(244,200,74,0.1)] scale-100"
+                                            ? "bg-[#F4C84A]/[0.15] border-[#F4C84A]/60 text-[#F4C84A] shadow-[0_0_16px_rgba(244,200,74,0.12)]"
                                             : "bg-white/[0.03] border-white/[0.06] text-[#A1A1AA] hover:text-[#E4E4E5] hover:bg-white/[0.08] hover:border-white/[0.12] hover:-translate-y-[1px] active:scale-95"
                                     )}
                                 >
-                                    <PlayCircle className={isActive ? "w-[15px] h-[15px] text-[#F4C84A]" : "w-[15px] h-[15px] text-gray-400/70"} strokeWidth={2.5} />
+                                    {isActive && <span className="w-1.5 h-1.5 rounded-full bg-[#F4C84A] flex-shrink-0" />}
                                     <span>Tập {displayNum}</span>
                                 </Link>
                             );

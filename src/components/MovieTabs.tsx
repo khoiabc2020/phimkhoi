@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { PlayCircle, Video, LayoutGrid, ChevronDown, Database, Subtitles, Mic, Volume2 } from "lucide-react";
+import { Video, LayoutGrid, ChevronDown, Database, Subtitles, Mic, Volume2 } from "lucide-react";
 import { Movie } from "@/services/api";
 import MovieCard from "./MovieCard";
 import { cn } from "@/lib/utils";
@@ -82,9 +82,9 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
     }, [activeLangTab, activeServer, episodes, groupedServers, activeLanguageGroups.length]);
 
     const tabs = [
-        { id: "episodes", label: "DANH SÁCH TẬP", icon: PlayCircle },
-        { id: "related", label: "ĐỀ XUẤT", icon: LayoutGrid },
-        { id: "trailer", label: "TRAILER", icon: Video },
+        { id: "episodes", label: "DANH SÁCH TẬP" },
+        { id: "related", label: "ĐỀ XUẤT" },
+        { id: "trailer", label: "TRAILER" },
     ];
 
     const currentServerData = episodes?.[activeServer]?.server_data || [];
@@ -98,19 +98,17 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
 
     return (
         <div className="w-full">
-            {/* Tab Navigation - Minimalist */}
-            <div className="flex items-center gap-8 border-b border-white/[0.04] mb-6 overflow-x-auto no-scrollbar pb-1">
+            {/* Tab Navigation */}
+            <div className="flex items-center gap-5 sm:gap-8 border-b border-white/[0.04] mb-4 sm:mb-6 overflow-x-auto no-scrollbar pb-1">
                 {tabs.map((tab) => {
                     const isActive = activeTab === tab.id;
-                    const Icon = tab.icon;
                     return (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id as any)}
-                            className={`flex items-center gap-2 pb-3 text-sm font-bold transition-all relative whitespace-nowrap ${isActive ? "text-[#F4C84A]" : "text-gray-400 hover:text-white"
+                            className={`flex items-center gap-2 pb-3 text-[12px] sm:text-sm font-bold transition-all relative whitespace-nowrap ${isActive ? "text-[#F4C84A]" : "text-gray-400 hover:text-white"
                                 }`}
                         >
-                            <Icon className={`w-4 h-4 ${isActive ? "text-[#F4C84A]" : "hidden"}`} />
                             {tab.label}
                             {isActive && (
                                 <span className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-[#F4C84A] shadow-[0_0_10px_#F4C84A]" />
@@ -240,7 +238,7 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
                                 )}
 
                                 {/* Episode Grid */}
-                                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+                                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-3 max-h-[360px] sm:max-h-[440px] overflow-y-auto custom-scrollbar pr-1 sm:pr-2 pb-1 [contain:layout_paint]">
                                     {paginatedEpisodes.map((ep: any) => {
                                         let displayName = ep.name;
                                         const match = ep.name.match(/Tập\s+(\d+)/i);
@@ -254,10 +252,9 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
                                             <Link
                                                 key={ep.slug}
                                                 href={`/xem-phim/${slug}/${ep.slug}`}
-                                                className="h-[44px] rounded-[14px] text-[14px] font-semibold flex items-center justify-center gap-2.5 transition-all duration-300 border bg-white/[0.03] border-white/[0.06] backdrop-blur-md text-[#A1A1AA] hover:text-[#E4E4E5] hover:bg-white/[0.08] hover:border-white/[0.12] hover:-translate-y-[1px] active:scale-95 px-2 truncate shadow-sm touch-manipulation"
+                                                className="h-[40px] sm:h-[44px] rounded-[12px] text-[13px] sm:text-[14px] font-semibold flex items-center justify-center gap-1.5 transition-all duration-200 border bg-white/[0.03] border-white/[0.06] text-[#A1A1AA] hover:text-[#E4E4E5] hover:bg-white/[0.08] hover:border-white/[0.12] hover:-translate-y-[1px] active:scale-95 truncate shadow-sm touch-manipulation px-2"
                                                 title={ep.name}
                                             >
-                                                <PlayCircle className="w-[15px] h-[15px] text-gray-400/70 shrink-0" strokeWidth={2.5} />
                                                 <span>Tập {displayName}</span>
                                             </Link>
                                         );
