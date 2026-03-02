@@ -170,12 +170,12 @@ export default function WatchEpisodeSection({
                                 const activeBgClass = "bg-[#F4C84A] border-[#F4C84A] text-[#0B0D12]";
 
                                 // Clean up server name for display
-                                const displayName = s.server_name
+                                const displayName = s.server_name.split("##")[0]
                                     .replace("Lồng Tiếng", "").replace("lồng tiếng", "").replace("longtieng", "")
                                     .replace("Thuyết Minh", "").replace("thuyết minh", "").replace("thuyetminh", "")
                                     .replace("Vietsub", "").replace("vietsub", "")
                                     .replace(/\(\)/g, "").replace(/\[\]/g, "").replace(/--/g, "-").trim()
-                                    || s.server_name; // fallback to original if completely empty
+                                    || s.server_name.split("##")[0].trim(); // fallback to original if completely empty
 
                                 return (
                                     <button
