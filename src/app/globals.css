@@ -87,6 +87,40 @@
       box-shadow: 0 0 20px rgba(244, 200, 74, 0.6);
     }
   }
+
+  @keyframes piano-pop {
+    0% {
+      transform: translateY(0) scaleY(1);
+    }
+
+    25% {
+      transform: translateY(-10px) scaleY(0.97);
+    }
+
+    55% {
+      transform: translateY(-14px) scaleY(1.02);
+    }
+
+    75% {
+      transform: translateY(-10px) scaleY(0.99);
+    }
+
+    100% {
+      transform: translateY(-10px) scaleY(1);
+    }
+  }
+
+  @keyframes shine-sweep {
+    0% {
+      transform: translateX(-120%) skewX(-20deg);
+      opacity: 0.4;
+    }
+
+    100% {
+      transform: translateX(220%) skewX(-20deg);
+      opacity: 0;
+    }
+  }
 }
 
 :root {
@@ -264,4 +298,33 @@ h2 {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* QuickNav Piano Key Pop Animation */
+.quick-nav-card {
+  transition: box-shadow 0.3s ease;
+  will-change: transform;
+}
+
+.quick-nav-card:hover {
+  animation: piano-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.quick-nav-card:not(:hover) {
+  animation: none;
+  transform: translateY(0);
+}
+
+.quick-nav-shine {
+  background: linear-gradient(105deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.18) 50%,
+      transparent 70%);
+  transform: translateX(-120%) skewX(-20deg);
+  transition: none;
+}
+
+.quick-nav-card:hover .quick-nav-shine {
+  animation: shine-sweep 0.55s ease-out forwards;
 }
