@@ -118,44 +118,81 @@ export default function NativePlayer({
     const showEpisodesRef = useRef(false);
     const showServersRef = useRef(false);
 
-    // ── DOUBLE-TAP TO SEEK ±10s ──────────────────────────────
+    // ── DOUBLE-TAP TO SEEK ±10s — Zero-lag version ──────────────
+    // Cách hoạt động:
+    //   Tap 1: đặt cờ "chờ double" 220ms. Nếu hết timeout → single tap (toggle controls)
+    //   Tap 2+ (trong 220ms): SEEK NGAY TỨC THÌ + flash, không chờ thêm.
+    //   Tap 3, 4... liên tiếp: mỗi lần cộng thêm 10s và cập nhật flash realtime.
     const doubleTapTimer = useRef<any>(null);
-    const lastTapSide = useRef<'left' | 'right' | null>(null);
+    const tapSideRef = useRef<'left' | 'right' | null>(null);
+    const seekAccum = useRef(0);       // đang tích lũy bao nhiêu giây seek
     const tapCount = useRef(0);
     const [seekFlash, setSeekFlash] = useState<{ side: 'left' | 'right'; amount: number } | null>(null);
     const seekFlashTimer = useRef<any>(null);
 
+    const fireSingleTap = useCallback(() => {
+        setShowControls(prev => !prev);
+        if (!showControls) resetControlsTimer();
+    }, [showControls]);
+
     const handleTap = useCallback((side: 'left' | 'right') => {
         if (locked) {
-            // Khi locked: single tap hiện controls, không seek
             setShowControls(true);
             resetControlsTimer();
             return;
         }
+
         tapCount.current += 1;
-        if (doubleTapTimer.current) clearTimeout(doubleTapTimer.current);
+        const isFirstTap = tapCount.current === 1;
 
-        doubleTapTimer.current = setTimeout(() => {
-            if (tapCount.current === 1) {
-                // Single tap → toggle controls
-                setShowControls(prev => !prev);
-                if (!showControls) resetControlsTimer();
-            } else if (tapCount.current >= 2) {
-                // Double (or more) tap → seek
-                const seekMs = (tapCount.current - 1) * 10000;
-                const direction = side === 'left' ? -1 : 1;
-                handleSkip(direction * seekMs);
-                // Show flash feedback
-                if (seekFlashTimer.current) clearTimeout(seekFlashTimer.current);
-                setSeekFlash({ side, amount: (tapCount.current - 1) * 10 });
-                seekFlashTimer.current = setTimeout(() => setSeekFlash(null), 800);
+        if (isFirstTap) {
+            // === Tap đầu tiên ===
+            tapSideRef.current = side;
+            seekAccum.current = 0;
+            // Chờ 220ms xem có tap tiếp không
+            doubleTapTimer.current = setTimeout(() => {
+                if (tapCount.current === 1) {
+                    // Vẫn 1 tap → single tap, toggle controls
+                    fireSingleTap();
+                }
+                // Nếu tapCount > 1 nghĩa là đã seek ngay trong tap 2+ rồi, không cần làm gì thêm
+                tapCount.current = 0;
+                tapSideRef.current = null;
+                seekAccum.current = 0;
+            }, 220);
+        } else {
+            // === Tap 2+ — SEEK NGAY KHÔNG CHỜ ===
+            if (doubleTapTimer.current) {
+                clearTimeout(doubleTapTimer.current);
+                doubleTapTimer.current = null;
             }
-            tapCount.current = 0;
-            lastTapSide.current = null;
-        }, 280);
 
-        lastTapSide.current = side;
-    }, [locked, showControls]);
+            // Side có thể đổi giữa các tap — dùng side hiện tại
+            const direction = side === 'left' ? -1 : 1;
+            handleSkip(direction * 10000); // Seek 10s ngay lập tức
+
+            seekAccum.current += 10;
+
+            // Show/update flash feedback ngay
+            if (seekFlashTimer.current) clearTimeout(seekFlashTimer.current);
+            setSeekFlash({ side, amount: seekAccum.current });
+            seekFlashTimer.current = setTimeout(() => {
+                setSeekFlash(null);
+            }, 700);
+
+            // Reset nếu không tap thêm trong 400ms
+            doubleTapTimer.current = setTimeout(() => {
+                tapCount.current = 0;
+                tapSideRef.current = null;
+                seekAccum.current = 0;
+                doubleTapTimer.current = null;
+            }, 400);
+        }
+
+        tapSideRef.current = side;
+    }, [locked, showControls, fireSingleTap]);
+
+
 
     // Modals
     const [showEpisodes, setShowEpisodes] = useState(false);
