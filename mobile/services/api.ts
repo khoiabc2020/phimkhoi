@@ -47,22 +47,13 @@ const getItems = (data: any): Movie[] => {
 
 export const getHomeData = async () => {
     try {
-        const [phimLe, phimBo, hoatHinh, tvShows] = await Promise.all([
-            fetch(`${API_URL}/v1/api/danh-sach/phim-le?limit=12`).then((res) => res.json()).catch(() => null),
-            fetch(`${API_URL}/v1/api/danh-sach/phim-bo?limit=12`).then((res) => res.json()).catch(() => null),
-            fetch(`${API_URL}/v1/api/danh-sach/hoat-hinh?limit=12`).then((res) => res.json()).catch(() => null),
-            fetch(`${API_URL}/v1/api/danh-sach/tv-shows?limit=12`).then((res) => res.json()).catch(() => null),
-        ]);
-
-        return {
-            phimLe: getItems(phimLe),
-            phimBo: getItems(phimBo),
-            hoatHinh: getItems(hoatHinh),
-            tvShows: getItems(tvShows),
-        };
+        const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/home`);
+        if (!res.ok) return { phimMoi: [], phimLe: [], phimBo: [], hoatHinh: [], tvShows: [] };
+        const json = await res.json();
+        return json.data || { phimMoi: [], phimLe: [], phimBo: [], hoatHinh: [], tvShows: [] };
     } catch (error) {
         console.error("Error fetching home data:", error);
-        return { phimLe: [], phimBo: [], hoatHinh: [], tvShows: [] };
+        return { phimMoi: [], phimLe: [], phimBo: [], hoatHinh: [], tvShows: [] };
     }
 };
 
@@ -326,10 +317,47 @@ export const getMenuData = async () => {
 
 export const getMoviesList = async (type: string, page = 1, limit = 24) => {
     try {
-        const res = await fetch(`${API_URL}/v1/api/danh-sach/${type}?page=${page}&limit=${limit}`);
-        if (!res.ok) return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
-        const data = await res.json();
-        return { items: getItems(data), pagination: data.data?.params?.pagination || { currentPage: 1, totalPages: 1 } };
+        const [kkRes, nguoncRes] = await Promise.allSettled([
+            fetch(`${API_URL}/v1/api/danh-sach/${type}?page=${page}&limit=${limit}`).then(r => r.json()),
+            fetch(`${NGUONC_API}/api/films/danh-sach/${type}?page=${page}`).then(r => r.json())
+        ]);
+
+        let items: Movie[] = [];
+        let pagination = { currentPage: 1, totalPages: 1 };
+
+        if (kkRes.status === 'fulfilled' && kkRes.value?.data?.items) {
+            const data = kkRes.value;
+            const pathImage = data.pathImage || data.data?.pathImage || "";
+            items = [...items, ...getItems(data).map((item: any) => ({
+                ...item,
+                thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : combineUrl(pathImage, item.thumb_url),
+                poster_url: item.poster_url?.startsWith('http') ? item.poster_url : combineUrl(pathImage, item.poster_url)
+            }))];
+            pagination = data.data?.params?.pagination || pagination;
+        }
+
+        if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
+            const nguoncItems = (nguoncRes.value.items || []).map((item: any) => ({
+                _id: item.id || item.slug,
+                name: item.name,
+                slug: item.slug,
+                origin_name: item.original_name || item.name,
+                thumb_url: item.thumb_url,
+                poster_url: item.poster_url,
+                year: parseInt(item.year) || new Date().getFullYear(),
+                quality: item.quality || 'FHD',
+            }));
+            items = [...items, ...nguoncItems];
+        }
+
+        const seen = new Set();
+        const uniqueItems = items.filter(item => {
+            const duplicate = seen.has(item.slug);
+            seen.add(item.slug);
+            return !duplicate;
+        });
+
+        return { items: uniqueItems, pagination };
     } catch (error) {
         console.error(`Error fetching list [${type}]:`, error);
         return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
@@ -338,10 +366,47 @@ export const getMoviesList = async (type: string, page = 1, limit = 24) => {
 
 export const getMoviesByCategory = async (slug: string, page = 1, limit = 24) => {
     try {
-        const res = await fetch(`${API_URL}/v1/api/the-loai/${slug}?page=${page}&limit=${limit}`);
-        if (!res.ok) return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
-        const data = await res.json();
-        return { items: getItems(data), pagination: data.data?.params?.pagination || { currentPage: 1, totalPages: 1 } };
+        const [kkRes, nguoncRes] = await Promise.allSettled([
+            fetch(`${API_URL}/v1/api/the-loai/${slug}?page=${page}&limit=${limit}`).then(r => r.json()),
+            fetch(`${NGUONC_API}/api/films/the-loai/${slug}?page=${page}`).then(r => r.json())
+        ]);
+
+        let items: Movie[] = [];
+        let pagination = { currentPage: 1, totalPages: 1 };
+
+        if (kkRes.status === 'fulfilled' && kkRes.value?.data?.items) {
+            const data = kkRes.value;
+            const pathImage = data.pathImage || data.data?.pathImage || "";
+            items = [...items, ...getItems(data).map((item: any) => ({
+                ...item,
+                thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : combineUrl(pathImage, item.thumb_url),
+                poster_url: item.poster_url?.startsWith('http') ? item.poster_url : combineUrl(pathImage, item.poster_url)
+            }))];
+            pagination = data.data?.params?.pagination || pagination;
+        }
+
+        if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
+            const nguoncItems = (nguoncRes.value.items || []).map((item: any) => ({
+                _id: item.id || item.slug,
+                name: item.name,
+                slug: item.slug,
+                origin_name: item.original_name || item.name,
+                thumb_url: item.thumb_url,
+                poster_url: item.poster_url,
+                year: parseInt(item.year) || new Date().getFullYear(),
+                quality: item.quality || 'FHD',
+            }));
+            items = [...items, ...nguoncItems];
+        }
+
+        const seen = new Set();
+        const uniqueItems = items.filter(item => {
+            const duplicate = seen.has(item.slug);
+            seen.add(item.slug);
+            return !duplicate;
+        });
+
+        return { items: uniqueItems, pagination };
     } catch (error) {
         console.error(`Error fetching category [${slug}]:`, error);
         return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
@@ -350,10 +415,47 @@ export const getMoviesByCategory = async (slug: string, page = 1, limit = 24) =>
 
 export const getMoviesByCountry = async (slug: string, page = 1, limit = 24) => {
     try {
-        const res = await fetch(`${API_URL}/v1/api/quoc-gia/${slug}?page=${page}&limit=${limit}`);
-        if (!res.ok) return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
-        const data = await res.json();
-        return { items: getItems(data), pagination: data.data?.params?.pagination || { currentPage: 1, totalPages: 1 } };
+        const [kkRes, nguoncRes] = await Promise.allSettled([
+            fetch(`${API_URL}/v1/api/quoc-gia/${slug}?page=${page}&limit=${limit}`).then(r => r.json()),
+            fetch(`${NGUONC_API}/api/films/quoc-gia/${slug}?page=${page}`).then(r => r.json())
+        ]);
+
+        let items: Movie[] = [];
+        let pagination = { currentPage: 1, totalPages: 1 };
+
+        if (kkRes.status === 'fulfilled' && kkRes.value?.data?.items) {
+            const data = kkRes.value;
+            const pathImage = data.pathImage || data.data?.pathImage || "";
+            items = [...items, ...getItems(data).map((item: any) => ({
+                ...item,
+                thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : combineUrl(pathImage, item.thumb_url),
+                poster_url: item.poster_url?.startsWith('http') ? item.poster_url : combineUrl(pathImage, item.poster_url)
+            }))];
+            pagination = data.data?.params?.pagination || pagination;
+        }
+
+        if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
+            const nguoncItems = (nguoncRes.value.items || []).map((item: any) => ({
+                _id: item.id || item.slug,
+                name: item.name,
+                slug: item.slug,
+                origin_name: item.original_name || item.name,
+                thumb_url: item.thumb_url,
+                poster_url: item.poster_url,
+                year: parseInt(item.year) || new Date().getFullYear(),
+                quality: item.quality || 'FHD',
+            }));
+            items = [...items, ...nguoncItems];
+        }
+
+        const seen = new Set();
+        const uniqueItems = items.filter(item => {
+            const duplicate = seen.has(item.slug);
+            seen.add(item.slug);
+            return !duplicate;
+        });
+
+        return { items: uniqueItems, pagination };
     } catch (error) {
         console.error(`Error fetching country [${slug}]:`, error);
         return { items: [], pagination: { currentPage: 1, totalPages: 1 } };

@@ -323,7 +323,11 @@ export default function NativePlayer({
     };
 
     const handleResizeMode = () => {
-        setResizeMode(prev => prev === ResizeMode.CONTAIN ? ResizeMode.COVER : ResizeMode.CONTAIN);
+        setResizeMode(prev => {
+            if (prev === ResizeMode.CONTAIN) return ResizeMode.COVER;
+            if (prev === ResizeMode.COVER) return ResizeMode.STRETCH;
+            return ResizeMode.CONTAIN;
+        });
     };
 
     // Seek State
@@ -545,16 +549,32 @@ export default function NativePlayer({
                                 <View style={{ flex: 1 }}>
                                     <Text style={styles.videoTitle} numberOfLines={1}>{title}</Text>
                                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                                        {episode && <Text style={styles.subTitle}>{episode}</Text>}
+                                        {episode && (
+                                            <Text style={styles.subTitle}>
+                                                {episode.toLowerCase().includes('tập') || episode.toLowerCase().includes('phần') ? episode : `Tập ${episode}`}
+                                            </Text>
+                                        )}
                                         <View style={{ width: 3, height: 3, borderRadius: 1.5, backgroundColor: 'rgba(255,255,255,0.5)' }} />
                                         <Text style={styles.subTitle}>
                                             Server {serverList[currentServerIndex] || currentServerIndex + 1}
                                         </Text>
                                     </View>
                                 </View>
-                                <View style={{ flexDirection: 'row', gap: 20, alignItems: 'center' }}>
+                                <View style={{ flexDirection: 'row', gap: 20, alignItems: 'center', marginRight: 8 }}>
+                                    <TouchableOpacity onPress={cycleSleepTimer} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                                        <Ionicons
+                                            name={sleepSecondsLeft !== null ? "moon" : "moon-outline"}
+                                            size={22}
+                                            color={sleepSecondsLeft !== null ? '#fbbf24' : 'white'}
+                                        />
+                                        {sleepSecondsLeft !== null && (
+                                            <Text style={{ color: '#fbbf24', fontSize: 13, fontWeight: '700' }}>
+                                                {formatSleep(sleepSecondsLeft)}
+                                            </Text>
+                                        )}
+                                    </TouchableOpacity>
                                     <TouchableOpacity onPress={() => setShowServers(true)}>
-                                        <Ionicons name="server-outline" size={22} color="white" />
+                                        <Ionicons name="server-outline" size={24} color="white" />
                                     </TouchableOpacity>
                                 </View>
                             </LinearGradient>
@@ -645,8 +665,12 @@ export default function NativePlayer({
                                                 <PipIcon size={24} color="white" />
                                             </TouchableOpacity>
                                         )}
-                                        <TouchableOpacity onPress={handleResizeMode}>
-                                            <Ionicons name={resizeMode === ResizeMode.COVER ? "scan" : "resize"} size={22} color="white" />
+                                        <TouchableOpacity onPress={handleResizeMode} style={{ padding: 4 }}>
+                                            <Ionicons
+                                                name={resizeMode === ResizeMode.CONTAIN ? "resize" : resizeMode === ResizeMode.COVER ? "scan" : "expand"}
+                                                size={24}
+                                                color="white"
+                                            />
                                         </TouchableOpacity>
 
                                         {onNext && (
@@ -657,17 +681,7 @@ export default function NativePlayer({
                                     </View>
                                 </View>
 
-                                {/* Sleep Timer row */}
-                                <TouchableOpacity style={[styles.actionItem, { alignSelf: 'flex-start', marginTop: 2 }]} onPress={cycleSleepTimer}>
-                                    <Ionicons
-                                        name="moon-outline"
-                                        size={20}
-                                        color={sleepSecondsLeft !== null ? '#fbbf24' : 'white'}
-                                    />
-                                    <Text style={[styles.actionText, sleepSecondsLeft !== null && { color: '#fbbf24' }]}>
-                                        {sleepSecondsLeft !== null ? `Tắt sau ${formatSleep(sleepSecondsLeft)}` : 'Hẹn giờ'}
-                                    </Text>
-                                </TouchableOpacity>
+                                {/* Removed Sleep Timer row, moved to header */}
 
                             </LinearGradient>
                         )}

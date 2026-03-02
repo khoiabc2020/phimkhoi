@@ -86,10 +86,6 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
             <div
                 ref={cardRef}
                 className={`relative block h-full w-full cursor-pointer z-10 group/static-card hover:z-20 will-change-transform transform-gpu`}
-                style={{
-                    contentVisibility: 'auto',
-                    containIntrinsicSize: orientation === 'landscape' ? 'auto 200px' : 'auto 300px'
-                }}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >

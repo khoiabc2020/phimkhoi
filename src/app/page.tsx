@@ -129,6 +129,12 @@ export default async function Home() {
 
             <LazyLoadWrapper fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
               <Suspense fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
+                <AsyncMovieRow title="Phim Mới Cập Nhật" type="phim-moi-cap-nhat" />
+              </Suspense>
+            </LazyLoadWrapper>
+
+            <LazyLoadWrapper fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
+              <Suspense fallback={<div className="h-64 bg-white/5 rounded-3xl animate-pulse" />}>
                 <AsyncMovieRow title="Phim Hàn Quốc" country="han-quoc" />
               </Suspense>
             </LazyLoadWrapper>

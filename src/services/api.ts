@@ -93,18 +93,57 @@ export const getOphimImages = async (slug: string) => {
 
 export const getHomeData = async () => {
     try {
-        const [phimLe, phimBo, hoatHinh, tvShows] = await Promise.all([
-            fetch(`${API_URL}/v1/api/danh-sach/phim-le?limit=12`, { next: { revalidate: 3600 } }).then((res) => res.json()),
-            fetch(`${API_URL}/v1/api/danh-sach/phim-bo?limit=12`, { next: { revalidate: 3600 } }).then((res) => res.json()),
-            fetch(`${API_URL}/v1/api/danh-sach/hoat-hinh?limit=12`, { next: { revalidate: 3600 } }).then((res) => res.json()),
-            fetch(`${API_URL}/v1/api/danh-sach/tv-shows?limit=12`, { next: { revalidate: 3600 } }).then((res) => res.json()),
+        const fetchCategory = async (type: string) => {
+            const [kkRes, nguoncRes] = await Promise.allSettled([
+                fetch(`${API_URL}/v1/api/danh-sach/${type}?limit=12`, { next: { revalidate: 3600 } }).then((res) => res.json()),
+                fetch(`${NGUONC_API}/api/films/${type === 'phim-moi-cap-nhat' ? '' : 'danh-sach/'}${type}?page=1`, { next: { revalidate: 3600 } }).then((res) => res.json())
+            ]);
+            let items: Movie[] = [];
+            if (kkRes.status === 'fulfilled' && kkRes.value?.data?.items) {
+                const data = kkRes.value;
+                const pathImage = data.pathImage || data.data?.pathImage || "";
+                items = [...items, ...getItems(data).map(item => ({
+                    ...item,
+                    thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : combineUrl(pathImage, item.thumb_url),
+                    poster_url: item.poster_url?.startsWith('http') ? item.poster_url : combineUrl(pathImage, item.poster_url)
+                }))];
+            }
+            if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
+                const nguoncItems = (nguoncRes.value.items || []).map((item: any) => ({
+                    _id: item.id || item.slug,
+                    name: item.name,
+                    slug: item.slug,
+                    origin_name: item.original_name || item.name,
+                    thumb_url: item.thumb_url,
+                    poster_url: item.poster_url,
+                    year: parseInt(item.year) || new Date().getFullYear(),
+                    quality: item.quality || 'FHD',
+                }));
+                items = [...items, ...nguoncItems];
+            }
+            // Deduplicate
+            const seen = new Set();
+            return items.filter(item => {
+                const duplicate = seen.has(item.slug);
+                seen.add(item.slug);
+                return !duplicate;
+            });
+        };
+
+        const [phimMoi, phimLe, phimBo, hoatHinh, tvShows] = await Promise.all([
+            fetchCategory('phim-moi-cap-nhat'),
+            fetchCategory('phim-le'),
+            fetchCategory('phim-bo'),
+            fetchCategory('hoat-hinh'),
+            fetchCategory('tv-shows')
         ]);
 
         return {
-            phimLe: getItems(phimLe),
-            phimBo: getItems(phimBo),
-            hoatHinh: getItems(hoatHinh),
-            tvShows: getItems(tvShows),
+            phimMoi,
+            phimLe,
+            phimBo,
+            hoatHinh,
+            tvShows,
         };
     } catch (error) {
         console.error("Error fetching home data:", error);
@@ -312,7 +351,7 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
             fetch(`${API_URL}/v1/api/danh-sach/${type}${query}`, { next: { revalidate: 3600 } }).then(r => r.json()),
             fetch(`${OPHIM_API}/v1/api/danh-sach/${type}${query}`, { next: { revalidate: 3600 } }).then(r => r.json()),
-            fetch(`${NGUONC_API}/api/films/danh-sach/${type}?page=${page}`, { next: { revalidate: 3600 } }).then(r => r.json())
+            fetch(`${NGUONC_API}/api/films/${type === 'phim-moi-cap-nhat' ? '' : 'danh-sach/'}${type}?page=${page}`, { next: { revalidate: 3600 } }).then(r => r.json())
         ]);
 
         let items: Movie[] = [];

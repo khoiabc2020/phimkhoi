@@ -18,13 +18,16 @@ function normalizeUrl(url: string, pathImage: string = '') {
     return `${pathImage}${url}`;
 }
 
-/** Search KKPHIM then OPhim for a movie by original title */
+const NGUONC_API = 'https://phim.nguonc.com';
+
+/** Search KKPHIM, OPhim, and NguonC for a movie by original title */
 async function findInVietnamese(query: string, year?: number) {
     const safeQuery = encodeURIComponent(query.replace(/[:\/\\]/g, ' ').trim());
 
-    const [kkRes, ophimRes] = await Promise.allSettled([
+    const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
         fetch(`${KKPHIM_API}/v1/api/tim-kiem?keyword=${safeQuery}&limit=5`).then(r => r.json()).catch(() => null),
         fetch(`${OPHIM_API}/v1/api/tim-kiem?keyword=${safeQuery}&limit=5`).then(r => r.json()).catch(() => null),
+        fetch(`${NGUONC_API}/api/films/search?keyword=${safeQuery}`).then(r => r.json()).catch(() => null),
     ]);
 
     const allItems: any[] = [];
@@ -47,6 +50,20 @@ async function findInVietnamese(query: string, year?: number) {
             ...m,
             thumb_url: normalizeUrl(m.thumb_url, pathImage),
             poster_url: normalizeUrl(m.poster_url, pathImage),
+        }));
+        allItems.push(...items);
+    }
+
+    if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
+        const items = (nguoncRes.value.items || []).map((m: any) => ({
+            _id: m.id || m.slug,
+            name: m.name,
+            slug: m.slug,
+            origin_name: m.original_name || m.name,
+            thumb_url: m.thumb_url,
+            poster_url: m.poster_url,
+            year: parseInt(m.year) || new Date().getFullYear(),
+            quality: m.quality || 'FHD',
         }));
         allItems.push(...items);
     }

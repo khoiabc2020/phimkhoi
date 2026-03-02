@@ -54,6 +54,7 @@ export default function HomeScreen() {
   // Extended Data State
   const [data, setData] = useState<{
     heroMovies: Movie[];
+    phimMoi: Movie[];
     phimLe: Movie[];
     phimBo: Movie[];
     hoatHinh: Movie[];
@@ -65,7 +66,7 @@ export default function HomeScreen() {
     tinhCam: Movie[];
     sapChieu: Movie[];
   }>({
-    heroMovies: [], phimLe: [], phimBo: [], hoatHinh: [], tvShows: [],
+    heroMovies: [], phimMoi: [], phimLe: [], phimBo: [], hoatHinh: [], tvShows: [],
     phimChieuRap: [], hanQuoc: [], trungQuoc: [], hanhDong: [], tinhCam: [], sapChieu: []
   });
 
@@ -103,6 +104,7 @@ export default function HomeScreen() {
       const baseSnapshot = {
         heroMovies: finalHero,
         // Giới hạn số lượng để nhẹ hơn và tránh cache quá nặng
+        phimMoi: (homeBasic.phimMoi || []).slice(0, 30),
         phimLe: (homeBasic.phimLe || []).slice(0, 30),
         phimBo: (homeBasic.phimBo || []).slice(0, 30),
         hoatHinh: (homeBasic.hoatHinh || []).slice(0, 30),
@@ -350,6 +352,10 @@ export default function HomeScreen() {
               {/* Hot Sections */}
               {data.phimChieuRap.length > 0 && (
                 <MovieRow title="Phim Chiếu Rạp Mới" movies={data.phimChieuRap} slug="phim-chieu-rap" />
+              )}
+
+              {data.phimMoi.length > 0 && (
+                <MovieRow title="Phim Mới Cập Nhật" movies={data.phimMoi.slice(0, 12)} slug="phim-moi-cap-nhat" />
               )}
 
               <MovieRow title="Phim Bộ Mới Nhất" movies={data.phimBo.slice(0, 12)} slug="phim-bo" />
