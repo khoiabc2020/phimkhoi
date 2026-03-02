@@ -38,6 +38,9 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                     top: rect.top + window.scrollY,
                     left: rect.left + window.scrollX,
                     width: rect.width,
+                    rectTop: rect.top,
+                    innerHeight: window.innerHeight,
+                    rectHeight: rect.height
                 });
                 setIsHovered(true);
             }
@@ -155,7 +158,7 @@ function OnflixHoverCard({
     onMouseLeave,
 }: {
     movie: Movie;
-    position: { top: number; left: number; width: number };
+    position: { top: number; left: number; width: number; rectTop?: number; innerHeight?: number; rectHeight?: number };
     displayBackdrop: string | null;
     orientation: 'portrait' | 'landscape';
     onMouseEnter: () => void;
@@ -164,16 +167,27 @@ function OnflixHoverCard({
     const CARD_WIDTH = 320;
     const offsetLeft = (CARD_WIDTH - position.width) / 2;
 
-    // Smart positioning: don't go off-screen
+    // Smart positioning: don't go off-screen horizontally
     let left = position.left - offsetLeft;
     if (left < 10) left = 10;
     if (left + CARD_WIDTH > window.innerWidth - 10) left = window.innerWidth - CARD_WIDTH - 10;
 
+    // Smart positioning: don't go off-screen vertically
+    const ESTIMATED_CARD_HEIGHT = 340;
+    let top = position.top - 10;
+
+    // Nếu sát mép dưới màn hình thì bật ngược lên trên
+    if (position.rectTop && position.innerHeight && position.rectHeight) {
+        if (position.rectTop + ESTIMATED_CARD_HEIGHT > position.innerHeight) {
+            top = position.top - ESTIMATED_CARD_HEIGHT + position.rectHeight + 10;
+        }
+    }
+
     return (
         <div
-            className="fixed z-[9999] pointer-events-auto"
+            className="absolute z-[9999] pointer-events-auto"
             style={{
-                top: position.top - 10,
+                top,
                 left,
                 width: CARD_WIDTH,
             }}
