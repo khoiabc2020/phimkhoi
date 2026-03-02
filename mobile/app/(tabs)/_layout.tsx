@@ -71,7 +71,7 @@ export default function TabLayout() {
           bottom: pillBottom,
           height: 60,
           borderRadius: 30,
-          backgroundColor: Platform.OS === 'android' ? 'rgba(28,28,32,0.85)' : 'transparent',
+          backgroundColor: 'transparent',
           borderWidth: 1,
           borderColor: 'rgba(255,255,255,0.15)',
           overflow: 'hidden',
@@ -87,11 +87,10 @@ export default function TabLayout() {
         tabBarLabelStyle: { fontSize: 10, fontWeight: '500' },
         tabBarLabel: () => null,
         tabBarBackground: () => (
-          Platform.OS === 'ios' ? (
-            <BlurView intensity={BLUR.tabBar} tint="dark" style={StyleSheet.absoluteFill} />
-          ) : (
-            <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(28,28,32,0.88)' }]} />
-          )
+          <View style={[StyleSheet.absoluteFill, { borderRadius: 30, overflow: 'hidden' }]}>
+            <BlurView intensity={90} tint="dark" style={StyleSheet.absoluteFill} />
+            <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(255,255,255,0.03)' }]} />
+          </View>
         ),
       }}
     >

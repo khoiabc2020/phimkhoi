@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
-import { View, Text, Pressable, StyleSheet, Dimensions, FlatList } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { Link } from 'expo-router';
 import { Image } from 'expo-image';
 import { getImageUrl } from '@/services/api';
@@ -44,8 +45,8 @@ const ContinueWatchingRow = memo(({ title, items }: ContinueWatchingRowProps) =>
                 </View>
             </View>
 
-            {/* Movie List - FlatList thay FlashList để tránh crash */}
-            <FlatList
+            {/* Movie List - FlashList for better performance */}
+            <FlashList
                 data={items.filter(i => !!i?.slug)}
                 renderItem={({ item }) => {
                     const posterUrl = item.movie?.thumb_url || item.movie?.poster_url || item.moviePoster;
@@ -93,6 +94,7 @@ const ContinueWatchingRow = memo(({ title, items }: ContinueWatchingRowProps) =>
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.listContent}
                 ItemSeparatorComponent={() => <View style={{ width: 12 }} />}
+                estimatedItemSize={CARD_WIDTH}
             />
         </View>
     );

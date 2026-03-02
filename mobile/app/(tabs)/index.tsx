@@ -214,13 +214,11 @@ export default function HomeScreen() {
       {/* Header — liquid glass */}
       <View style={styles.headerWrapper}>
         <LinearGradient
-          colors={['rgba(11,13,18,0.92)', 'rgba(11,13,18,0.6)', 'transparent']}
+          colors={['rgba(11,13,18,0.85)', 'rgba(11,13,18,0.4)', 'transparent']}
           locations={[0.2, 0.7, 1]}
           style={StyleSheet.absoluteFill}
         />
-        {!Platform.isTV && (
-          <BlurView intensity={BLUR.header} tint="dark" style={StyleSheet.absoluteFill} />
-        )}
+        <BlurView intensity={Platform.OS === 'ios' ? BLUR.header : 80} tint="dark" style={StyleSheet.absoluteFill} />
         <SafeAreaView edges={['top']} style={styles.headerContent}>
           <View style={styles.headerRow}>
             <View style={[styles.logoRow, { paddingLeft: 8 }]}>

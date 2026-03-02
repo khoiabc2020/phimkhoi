@@ -286,11 +286,7 @@ export default function MovieDetailScreen() {
 
             {/* HEADER — liquid glass */}
             <View style={styles.headerContainer}>
-                {Platform.OS === 'ios' ? (
-                    <BlurView intensity={BLUR.header} tint="dark" style={StyleSheet.absoluteFill} />
-                ) : (
-                    <LinearGradient colors={['rgba(11,13,18,0.85)', 'transparent']} style={StyleSheet.absoluteFill} />
-                )}
+                <BlurView intensity={Platform.OS === 'ios' ? BLUR.header : 80} tint="dark" style={StyleSheet.absoluteFill} />
                 <SafeAreaView edges={['top']} style={{ flex: 1 }}>
                     <View style={styles.headerRow}>
                         <Pressable onPress={() => router.back()} style={styles.iconBtn}>
@@ -396,8 +392,21 @@ export default function MovieDetailScreen() {
                                 <View style={{ flexDirection: 'row', gap: 8, paddingHorizontal: 0 }}>
                                     {activeLangGroups.map(lang => {
                                         const isActive = activeLangTab === lang;
-                                        // Small dot keeps language color; active highlight = system yellow
                                         const dotColor = LANG_COLORS[lang] || '#9ca3af';
+
+                                        // If only 1 server in this group, we might want to show source name in the tab
+                                        const serversInGroup = groupedEpisodes[lang];
+                                        let label = lang;
+                                        if (serversInGroup.length === 1) {
+                                            const s = serversInGroup[0];
+                                            const sName = s.server_name.split('##')[0]
+                                                .replace('Lồng Tiếng', '').replace('lồng tiếng', '')
+                                                .replace('Thuyết Minh', '').replace('thuyết minh', '')
+                                                .replace('Vietsub', '').replace('vietsub', '')
+                                                .replace(/\(\)/g, '').replace(/\[\]/g, '').trim() || s.server_name.split('##')[0].trim();
+                                            label = `${lang} • ${sName}`;
+                                        }
+
                                         return (
                                             <Pressable
                                                 key={lang}
@@ -424,7 +433,7 @@ export default function MovieDetailScreen() {
                                             >
                                                 <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: isActive ? dotColor : 'rgba(255,255,255,0.25)' }} />
                                                 <Text style={{ color: isActive ? '#F4C84A' : 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: isActive ? '700' : '500' }}>
-                                                    {lang}
+                                                    {label}
                                                 </Text>
                                             </Pressable>
                                         );
@@ -433,17 +442,17 @@ export default function MovieDetailScreen() {
                             </ScrollView>
 
                             {/* Server pills for current lang tab */}
-                            {activeLangTab && groupedEpisodes[activeLangTab]?.length > 1 && (
+                            {activeLangTab && groupedEpisodes[activeLangTab]?.length > 0 && (
                                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                                     <View style={{ flexDirection: 'row', gap: 8 }}>
                                         {groupedEpisodes[activeLangTab].map((server: any) => {
                                             const globalIdx = episodes.findIndex(e => e.server_name === server.server_name);
                                             const isActive = selectedServer === globalIdx;
-                                            const displayName = server.server_name
+                                            const displayName = server.server_name.split('##')[0]
                                                 .replace('Lồng Tiếng', '').replace('lồng tiếng', '')
                                                 .replace('Thuyết Minh', '').replace('thuyết minh', '')
                                                 .replace('Vietsub', '').replace('vietsub', '')
-                                                .replace(/\(\)/g, '').replace(/\[\]/g, '').trim() || server.server_name;
+                                                .replace(/\(\)/g, '').replace(/\[\]/g, '').trim() || server.server_name.split('##')[0].trim();
                                             return (
                                                 <Pressable
                                                     key={globalIdx}
@@ -467,11 +476,7 @@ export default function MovieDetailScreen() {
 
                     {/* TABS — liquid glass */}
                     <View style={styles.tabContainerWrap}>
-                        {Platform.OS === 'ios' ? (
-                            <BlurView intensity={BLUR.glassCard} tint="dark" style={StyleSheet.absoluteFill} />
-                        ) : (
-                            <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(255,255,255,0.08)' }]} />
-                        )}
+                        <BlurView intensity={Platform.OS === 'ios' ? BLUR.glassCard : 60} tint="dark" style={StyleSheet.absoluteFill} />
                         <View style={styles.tabContainer} pointerEvents="box-none">
                             {TABS.map(tab => (
                                 <Pressable
@@ -557,7 +562,6 @@ export default function MovieDetailScreen() {
                                                             >
                                                                 <Link href={playerHref as any} asChild>
                                                                     <Pressable style={styles.epCardInner}>
-                                                                        <Ionicons name="play-circle" size={14} color="rgba(255,255,255,0.4)" />
                                                                         <Text style={styles.epText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
                                                                             Tập {ep.name.replace('Tập ', '').padStart(2, '0')}
                                                                         </Text>

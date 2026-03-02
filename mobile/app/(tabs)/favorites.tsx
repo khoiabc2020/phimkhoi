@@ -1,8 +1,9 @@
-import { View, Text, FlatList, Pressable, RefreshControl, StyleSheet, Animated } from 'react-native';
+import { View, Text, Pressable, RefreshControl, StyleSheet, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useFocusEffect, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useState, useCallback, useRef } from 'react';
+import { FlashList } from '@shopify/flash-list';
 import { getFavorites, removeFavorite, FavoriteMovie } from '@/lib/favorites';
 import { Image } from 'expo-image';
 import { StatusBar } from 'expo-status-bar';
@@ -110,51 +111,60 @@ export default function FavoritesScreen() {
           </View>
         ) : (
           /* ── Grid ────────────────────────────────── */
-          <FlatList
-            data={favorites}
-            numColumns={COLS}
-            keyExtractor={(item, idx) => item.movieId || item._id || String(idx)}
-            columnWrapperStyle={{ gap: GAP, marginBottom: GAP }}
-            contentContainerStyle={styles.grid}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F4C84A" />
-            }
-            showsVerticalScrollIndicator={false}
-            renderItem={({ item }) => {
-              const slug = item.movieSlug || item.slug || '';
-              const img = item.moviePoster || item.thumb_url || item.poster_url || '';
-              return (
-                <Pressable
-                  style={({ pressed }) => [styles.card, pressed && { opacity: 0.85 }]}
-                  onPress={() => router.push(`/movie/${slug}` as any)}
-                >
-                  <Image
-                    source={{ uri: img }}
-                    style={styles.cardImg}
-                    contentFit="cover"
-                    transition={200}
-                  />
-                  {/* Remove button */}
-                  <Pressable
-                    onPress={() => handleRemove(item.movieId || item._id || '', slug)}
-                    style={styles.removeBtn}
-                    hitSlop={6}
-                  >
-                    <Ionicons name="heart" size={14} color="#ef4444" />
-                  </Pressable>
-                  {/* Title */}
-                  <View style={styles.cardOverlay}>
-                    <Text style={styles.cardTitle} numberOfLines={2}>
-                      {item.movieName || item.name || ''}
-                    </Text>
-                    {item.movieYear ? (
-                      <Text style={styles.cardYear}>{item.movieYear}</Text>
-                    ) : null}
+          <View style={{ flex: 1, paddingHorizontal: 16 }}>
+            <FlashList
+              data={favorites}
+              numColumns={COLS}
+              keyExtractor={(item, idx) => item.movieId || item._id || String(idx)}
+              contentContainerStyle={{ paddingBottom: 120 }}
+              estimatedItemSize={CARD_W * 1.45 + 16}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F4C84A" />
+              }
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item, index }) => {
+                const slug = item.movieSlug || item.slug || '';
+                const img = item.moviePoster || item.thumb_url || item.poster_url || '';
+                return (
+                  <View style={{
+                    flex: 1,
+                    paddingLeft: index % COLS === 0 ? 0 : GAP / 2,
+                    paddingRight: index % COLS === COLS - 1 ? 0 : GAP / 2,
+                    marginBottom: GAP
+                  }}>
+                    <Pressable
+                      style={({ pressed }) => [styles.card, pressed && { opacity: 0.85 }]}
+                      onPress={() => router.push(`/movie/${slug}` as any)}
+                    >
+                      <Image
+                        source={{ uri: img }}
+                        style={styles.cardImg}
+                        contentFit="cover"
+                        transition={200}
+                      />
+                      {/* Remove button */}
+                      <Pressable
+                        onPress={() => handleRemove(item.movieId || item._id || '', slug)}
+                        style={styles.removeBtn}
+                        hitSlop={6}
+                      >
+                        <Ionicons name="heart" size={14} color="#ef4444" />
+                      </Pressable>
+                      {/* Title */}
+                      <View style={styles.cardOverlay}>
+                        <Text style={styles.cardTitle} numberOfLines={2}>
+                          {item.movieName || item.name || ''}
+                        </Text>
+                        {item.movieYear ? (
+                          <Text style={styles.cardYear}>{item.movieYear}</Text>
+                        ) : null}
+                      </View>
+                    </Pressable>
                   </View>
-                </Pressable>
-              );
-            }}
-          />
+                );
+              }}
+            />
+          </View>
         )}
       </SafeAreaView>
     </View>
