@@ -136,58 +136,60 @@ export default function WatchContainer({
                     )}
                 </div>
 
-                {/* Info Bar below player - glassmorphism responsive card */}
-                <div className="mt-3 px-1">
-                    {/* Row 1: Title + Episode name */}
-                    <div className="flex items-center gap-2 mb-2">
+                {/* Info Bar below player - Inline Layout */}
+                <div className="mt-3 px-1 flex flex-row items-center justify-between gap-2 overflow-hidden">
+                    {/* Left: Title + Episode name */}
+                    <div className="flex items-center gap-2 min-w-0 pr-2">
                         <Link
                             href={`/phim/${movie.slug}`}
-                            className="text-gray-400 hover:text-white transition-colors flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10"
+                            className="text-gray-400 hover:text-white transition-colors flex-shrink-0 w-8 h-8 hidden sm:flex items-center justify-center rounded-full hover:bg-white/10"
                         >
                             <ChevronLeft className="w-5 h-5" />
                         </Link>
                         <div className="min-w-0 flex-1">
-                            <p className="text-white font-bold text-sm sm:text-base truncate leading-tight">
+                            <h1 className="text-white font-bold text-base sm:text-lg truncate leading-tight">
                                 {movie.name}
-                            </p>
-                            <p className="text-yellow-400/80 text-xs mt-0.5">
+                            </h1>
+                            <p className="text-yellow-400/80 text-xs sm:text-sm mt-0.5 truncate">
                                 {activeEpisode ? displayEpisodeName(activeEpisode.name) : ""}
                             </p>
                         </div>
                     </div>
 
-                    {/* Row 2: Episode navigation */}
-                    <div className="flex items-center gap-2 flex-wrap">
+                    {/* Right: Episode navigation */}
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
                         {/* Prev episode */}
                         {prevEpisodeUrl ? (
                             <Link
                                 href={prevEpisodeUrl}
-                                className="flex items-center gap-1.5 text-xs font-semibold text-gray-300 hover:text-white transition-all px-3 py-2 rounded-xl bg-white/5 hover:bg-white/12 border border-white/10 hover:border-white/20 touch-manipulation active:scale-95"
+                                title="Tập trước"
+                                className="flex items-center justify-center text-xs font-semibold text-gray-300 hover:text-white transition-all w-9 h-9 sm:w-auto sm:px-3 sm:py-2 rounded-xl bg-white/5 hover:bg-white/12 border border-white/10 hover:border-white/20 touch-manipulation active:scale-95"
                             >
                                 <ChevronLeft className="w-4 h-4" />
-                                <span>Tập trước</span>
+                                <span className="hidden sm:inline ml-1">Tập trước</span>
                             </Link>
                         ) : (
-                            <div className="flex items-center gap-1.5 text-xs font-semibold text-white/20 px-3 py-2 rounded-xl bg-white/[0.03] border border-white/5 cursor-not-allowed">
+                            <div className="flex items-center justify-center text-xs font-semibold text-white/20 w-9 h-9 sm:w-auto sm:px-3 sm:py-2 rounded-xl bg-white/[0.03] border border-white/5 cursor-not-allowed">
                                 <ChevronLeft className="w-4 h-4" />
-                                <span>Tập trước</span>
+                                <span className="hidden sm:inline ml-1">Tập trước</span>
                             </div>
                         )}
 
                         {/* Auto-next toggle */}
                         <button
                             onClick={() => setAutoNext(!autoNext)}
+                            title="Tự động chuyển tập"
                             className={cn(
-                                "flex items-center gap-1.5 text-xs font-bold transition-all px-3 py-2 rounded-xl border touch-manipulation active:scale-95",
+                                "flex items-center justify-center transition-all w-9 h-9 sm:w-auto sm:px-3 sm:py-2 rounded-xl border touch-manipulation active:scale-95",
                                 autoNext
                                     ? "bg-yellow-400/15 text-yellow-400 border-yellow-400/30 hover:bg-yellow-400/25"
                                     : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10"
                             )}
                         >
                             <SkipForward className={cn("w-3.5 h-3.5", autoNext ? "text-yellow-400" : "text-gray-500")} />
-                            <span>Tự chuyển</span>
+                            <span className="hidden sm:inline ml-1.5 text-xs font-bold">Tự chuyển</span>
                             <span className={cn(
-                                "px-1 py-0.5 rounded text-[10px] font-bold",
+                                "hidden sm:inline ml-1.5 px-1 py-0.5 rounded text-[10px] font-bold",
                                 autoNext ? "bg-yellow-400/20" : "bg-white/10"
                             )}>
                                 {autoNext ? "BẬT" : "TẮT"}
@@ -198,14 +200,15 @@ export default function WatchContainer({
                         {nextEpisodeUrl ? (
                             <Link
                                 href={nextEpisodeUrl}
-                                className="flex items-center gap-1.5 text-xs font-bold text-white bg-[#F4C84A] hover:bg-yellow-300 transition-all px-3 py-2 rounded-xl touch-manipulation active:scale-95 shadow-md shadow-yellow-400/20"
+                                title="Tập sau"
+                                className="flex items-center justify-center text-xs font-bold text-white bg-[#F4C84A] hover:bg-yellow-300 transition-all w-9 h-9 sm:w-auto sm:px-3 sm:py-2 rounded-xl touch-manipulation active:scale-95 shadow-md shadow-yellow-400/20"
                             >
-                                <span>Tập sau</span>
+                                <span className="hidden sm:inline mr-1">Tập sau</span>
                                 <ChevronRight className="w-4 h-4" />
                             </Link>
                         ) : (
-                            <div className="flex items-center gap-1.5 text-xs font-semibold text-white/20 px-3 py-2 rounded-xl bg-white/[0.03] border border-white/5 cursor-not-allowed">
-                                <span>Tập sau</span>
+                            <div className="flex items-center justify-center text-xs font-semibold text-white/20 w-9 h-9 sm:w-auto sm:px-3 sm:py-2 rounded-xl bg-white/[0.03] border border-white/5 cursor-not-allowed">
+                                <span className="hidden sm:inline mr-1">Tập sau</span>
                                 <ChevronRight className="w-4 h-4" />
                             </div>
                         )}
