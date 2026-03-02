@@ -149,12 +149,12 @@ export default function VideoPlayer({
                         {
                             position: "left",
                             name: "skip-back",
-                            index: 1,
+                            index: 11,
                             html: `<div style="display:flex; align-items:center; justify-content:center; width:36px; height:36px; margin: 0; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
-                                <svg viewBox="0 0 24 24" width="22" height="22" style="fill: none !important; stroke: white !important;" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M11 2.227A10 10 0 1 0 21.773 13" style="fill: none !important;"></path>
-                                    <polyline points="11 2 11 7 6 7" style="fill: none !important;"></polyline>
-                                    <text x="12" y="16" font-size="8" font-family="Arial, sans-serif" font-weight="bold" text-anchor="middle" style="fill: white !important; stroke: none !important;">10</text>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rotate-ccw">
+                                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                                    <path d="M3 3v5h5"/>
+                                    <text x="12" y="16.5" font-size="8.5" font-family="Arial, sans-serif" font-weight="bold" stroke="none" fill="white" text-anchor="middle">10</text>
                                 </svg>
                             </div>`,
                             tooltip: "Tua lùi 10s",
@@ -164,12 +164,12 @@ export default function VideoPlayer({
                         {
                             position: "left",
                             name: "skip-forward",
-                            index: 2,
+                            index: 12,
                             html: `<div style="display:flex; align-items:center; justify-content:center; width:36px; height:36px; margin: 0; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
-                                <svg viewBox="0 0 24 24" width="22" height="22" style="fill: none !important; stroke: white !important;" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M13 2.227A10 10 0 1 1 2.227 13" style="fill: none !important;"></path>
-                                    <polyline points="13 2 13 7 18 7" style="fill: none !important;"></polyline>
-                                    <text x="12" y="16" font-size="8" font-family="Arial, sans-serif" font-weight="bold" text-anchor="middle" style="fill: white !important; stroke: none !important;">10</text>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rotate-cw">
+                                    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+                                    <path d="M21 3v5h-5"/>
+                                    <text x="12" y="16.5" font-size="8.5" font-family="Arial, sans-serif" font-weight="bold" stroke="none" fill="white" text-anchor="middle">10</text>
                                 </svg>
                             </div>`,
                             tooltip: "Tua tiếp 10s",
