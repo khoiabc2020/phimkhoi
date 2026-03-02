@@ -372,25 +372,17 @@ export default function ExploreScreen() {
         {/* Content: Either Search Results FlatList or Default Views */}
         {search.trim() && (filteredResults.length > 0 || actorResults.length > 0) ? (
           <FlashList
-            data={filteredResults.map((item, index) => {
-              if (item.empty) return item;
-              return item;
-            })}
-            keyExtractor={item => item._id || item.slug || Math.random().toString()}
+            data={filteredResults}
+            keyExtractor={(item, index) => item._id ? item._id.toString() : (item.slug ? item.slug : `fallback-key-${index}`)}
             numColumns={COLUMN_COUNT}
             estimatedItemSize={ITEM_WIDTH * 1.5 + 40}
             contentContainerStyle={{ paddingBottom: 20 }}
             showsVerticalScrollIndicator={false}
-            renderItem={({ item, index }) => {
-              if (item.empty) {
-                return <View style={{ width: ITEM_WIDTH, height: ITEM_WIDTH * 1.5, marginLeft: index % 3 !== 0 ? ITEM_SPACING : 0, backgroundColor: 'transparent' }} />;
-              }
-              return (
-                <View style={{ marginLeft: index % 3 !== 0 ? ITEM_SPACING : 0, marginBottom: ITEM_SPACING + 4 }}>
-                  <HotMovieItem item={item} index={index} />
-                </View>
-              );
-            }}
+            renderItem={({ item, index }) => (
+              <View style={{ marginLeft: index % 3 !== 0 ? ITEM_SPACING : 0, marginBottom: ITEM_SPACING + 4 }}>
+                <HotMovieItem item={item} index={index} />
+              </View>
+            )}
           />
         ) : (
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>

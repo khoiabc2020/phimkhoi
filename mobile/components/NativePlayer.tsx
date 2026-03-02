@@ -127,8 +127,9 @@ export default function NativePlayer({
     const tapSideRef = useRef<'left' | 'right' | null>(null);
     const seekAccum = useRef(0);       // đang tích lũy bao nhiêu giây seek
     const tapCount = useRef(0);
-    const [seekFlash, setSeekFlash] = useState<{ side: 'left' | 'right'; amount: number } | null>(null);
+    const [seekFlash, setSeekFlash] = useState<{ side: 'left' | 'right', amount: number } | null>(null);
     const seekFlashTimer = useRef<any>(null);
+    const seekFlashAnim = useRef(new Animated.Value(0)).current;
 
     const fireSingleTap = useCallback(() => {
         setShowControls(prev => !prev);
@@ -176,6 +177,14 @@ export default function NativePlayer({
             // Show/update flash feedback ngay
             if (seekFlashTimer.current) clearTimeout(seekFlashTimer.current);
             setSeekFlash({ side, amount: seekAccum.current });
+            seekFlashAnim.setValue(0);
+            Animated.timing(seekFlashAnim, {
+                toValue: 1,
+                duration: 600,
+                useNativeDriver: true,
+                easing: Easing.out(Easing.ease),
+            }).start();
+
             seekFlashTimer.current = setTimeout(() => {
                 setSeekFlash(null);
             }, 700);
@@ -664,11 +673,31 @@ export default function NativePlayer({
                                     <Ionicons
                                         name={seekFlash.side === 'left' ? 'play-back' : 'play-forward'}
                                         size={36}
-                                        color="white"
+                                        color="rgba(255,255,255,0.7)"
                                     />
-                                    <Text style={{ color: 'white', fontSize: 13, fontWeight: '700', marginTop: 4 }}>
+                                    <Animated.Text style={{
+                                        color: 'white',
+                                        fontSize: 16,
+                                        fontWeight: 'bold',
+                                        position: 'absolute',
+                                        opacity: seekFlashAnim.interpolate({
+                                            inputRange: [0, 0.1, 0.8, 1],
+                                            outputRange: [0, 1, 1, 0]
+                                        }),
+                                        transform: [{
+                                            translateY: seekFlashAnim.interpolate({
+                                                inputRange: [0, 1],
+                                                outputRange: [0, -40]
+                                            })
+                                        }, {
+                                            scale: seekFlashAnim.interpolate({
+                                                inputRange: [0, 0.2, 0.8, 1],
+                                                outputRange: [0.5, 1.2, 1, 0.8]
+                                            })
+                                        }]
+                                    }}>
                                         {seekFlash.side === 'left' ? '-' : '+'}{seekFlash.amount}s
-                                    </Text>
+                                    </Animated.Text>
                                 </View>
                             </View>
                         )}
@@ -958,8 +987,8 @@ export default function NativePlayer({
                             </View>
 
                             {/* Language tabs */}
-                            {activeLangGroups.length > 1 && (
-                                <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+                            {activeLangGroups.length > 0 && (
+                                <View style={{ flexDirection: 'row', gap: 10, marginBottom: 20 }}>
                                     {activeLangGroups.map(lang => {
                                         const isActive = serverLangTab === lang || (!serverLangTab && activeLangGroups[0] === lang);
                                         const dotColor = LANG_COLORS[lang] || '#9ca3af'; // dot keeps language color

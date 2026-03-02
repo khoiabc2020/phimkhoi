@@ -95,9 +95,12 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                             src={displayPoster || "/placeholder.jpg"}
                             alt={movie.name}
                             fill
-                            className="object-cover transition-transform duration-500 ease-out group-hover/static-card:scale-105"
+                            className="object-cover transition-transform duration-500 ease-out group-hover/static-card:scale-105 will-change-transform"
                             sizes={orientation === 'landscape' ? "(max-width: 768px) 60vw, 30vw" : "(max-width: 768px) 40vw, 15vw"}
                             unoptimized
+                            loading="lazy"
+                            placeholder="blur"
+                            blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
                         />
                         <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
                     </Link>

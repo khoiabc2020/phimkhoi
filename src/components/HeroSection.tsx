@@ -114,8 +114,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                         return (
                             <div
                                 key={movie._id}
-                                className="relative flex-[0_0_100%] min-w-0 flex flex-col"
-                                style={{ opacity: isActive ? 1 : 0.3 }}
+                                className="relative flex-[0_0_100%] min-w-0 flex flex-col transition-opacity duration-300"
                             >
                                 {/* Backdrop — fixed height 200px, phủ toàn chiều rộng */}
                                 <div className="relative w-full h-[200px] sm:h-[260px] shrink-0 overflow-hidden">
@@ -145,14 +144,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                 </div>
 
                                 {/* Info block — compact */}
-                                <div
-                                    className="px-4 pt-2 pb-4 flex flex-col gap-2 transition-all duration-300"
-                                    style={{
-                                        opacity: isActive ? 1 : 0,
-                                        transform: isActive ? 'translateY(0)' : 'translateY(8px)',
-                                        pointerEvents: isActive ? 'auto' : 'none',
-                                    }}
-                                >
+                                <div className="px-4 pt-2 pb-4 flex flex-col gap-2">
                                     {/* Title + year */}
                                     <div className="pl-[84px]"> {/* align kế bên poster */}
                                         <h1 className="text-[17px] font-black text-white leading-snug line-clamp-2">
@@ -224,17 +216,20 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
                                     {/* 1. Cinematic Background */}
                                     <div className="absolute inset-0 z-0 select-none">
-                                        <div className="absolute inset-0 bg-black/50 z-10" /> {/* Tối giản màu nền Darken */}
+                                        <div className="absolute inset-0 bg-black/50 z-10 pointer-events-none" /> {/* Tối giản màu nền Darken */}
                                         <Image
                                             src={backdropImg}
                                             alt="bg"
                                             fill
-                                            className="object-cover opacity-60"
+                                            className="object-cover opacity-60 will-change-transform"
                                             priority={index === 0}
+                                            unoptimized
+                                            placeholder={index === 0 ? "empty" : "blur"}
+                                            blurDataURL={index === 0 ? undefined : "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="}
                                         />
                                         {/* Vignettes for focus */}
-                                        <div className="absolute inset-0 bg-gradient-to-r from-[#0B0D12] via-[#0B0D12]/80 to-transparent z-20 w-2/3" />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D12] via-transparent to-transparent z-20 h-1/2 bottom-0 top-auto" />
+                                        <div className="absolute inset-0 bg-gradient-to-r from-[#0B0D12] via-[#0B0D12]/80 to-transparent z-20 w-2/3 pointer-events-none" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D12] via-transparent to-transparent z-20 h-1/2 bottom-0 top-auto pointer-events-none" />
                                     </div>
 
                                     {/* 2. Content Container */}
