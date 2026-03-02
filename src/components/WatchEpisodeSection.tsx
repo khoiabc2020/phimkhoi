@@ -96,11 +96,13 @@ export default function WatchEpisodeSection({
     return (
         <div className="bg-[#08090C] rounded-[24px] border border-white/[0.05] overflow-hidden mb-6 sm:mb-8 mt-4 mx-3 sm:mx-4 md:mx-0 shadow-2xl">
             {/* Header: DANH SÁCH TẬP */}
-            <div className="flex items-center gap-3 px-6 py-5 border-b border-white/[0.05] bg-white/[0.01]">
-                <List className="w-[18px] h-[18px] text-[#F4C84A]" />
-                <h3 className="text-[14px] font-bold text-white uppercase tracking-wider">
-                    Danh Sách Tập
-                </h3>
+            <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-4 sm:py-5 border-b border-white/[0.05] bg-white/[0.01]">
+                <div className="flex items-center gap-2">
+                    <List className="w-[18px] h-[18px] text-[#F4C84A]" />
+                    <h3 className="text-[14px] font-bold text-white uppercase tracking-wider">
+                        Danh Sách Tập
+                    </h3>
+                </div>
             </div>
 
             <div className="px-6 pt-6 pb-8">
@@ -273,7 +275,7 @@ export default function WatchEpisodeSection({
 
                 {/* Episode grid */}
                 {!isCollapsed && (
-                    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3 sm:gap-4 max-h-[500px] overflow-y-auto custom-scrollbar pr-1 sm:pr-3 [contain:layout_paint]">
+                    <div className="grid grid-cols-3 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-3 max-h-[420px] sm:max-h-[500px] overflow-y-auto custom-scrollbar pr-1 sm:pr-3 [contain:layout_paint]">
                         {episodes.slice(currentChunk * EPISODES_PER_CHUNK, (currentChunk + 1) * EPISODES_PER_CHUNK).map((ep) => {
                             const isActive = ep.slug === currentEpisodeSlug;
 

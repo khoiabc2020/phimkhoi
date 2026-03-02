@@ -22,7 +22,7 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
                 ? scrollLeft - clientWidth / 2
                 : scrollLeft + clientWidth / 2;
 
-            rowRef.current.scrollTo({ left: scrollTo, behavior: "auto" });
+            rowRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
         }
     };
 
@@ -104,12 +104,12 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
             </div>
 
             <div className="relative group/row">
-                {/* Left Arrow - Glassmorphism */}
+                {/* Left Arrow - Glassmorphism pill */}
                 <button
                     onClick={() => scroll("left")}
-                    className="absolute left-0 top-0 bottom-0 z-40 bg-gradient-to-r from-black/80 to-transparent w-16 flex items-center justify-start pl-4 opacity-0 group-hover/row:opacity-100 transition-all duration-300 pointer-events-none group-hover/row:pointer-events-auto"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 z-40 w-9 h-9 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-sm border border-white/10 text-white hover:bg-[#F4C84A] hover:border-[#F4C84A] hover:text-black opacity-0 group-hover/row:opacity-100 transition-all duration-200 hover:scale-110 pointer-events-none group-hover/row:pointer-events-auto shadow-lg"
                 >
-                    <ChevronLeft className="w-10 h-10 text-white hover:text-[#fbbf24] transition-colors" />
+                    <ChevronLeft className="w-5 h-5" />
                 </button>
 
                 {/* Scroll Container - High Density */}
@@ -125,12 +125,12 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
                     ))}
                 </div>
 
-                {/* Right Arrow - Glassmorphism */}
+                {/* Right Arrow - Glassmorphism pill */}
                 <button
                     onClick={() => scroll("right")}
-                    className="absolute right-0 top-0 bottom-0 z-40 bg-gradient-to-l from-black/80 to-transparent w-16 flex items-center justify-end pr-4 opacity-0 group-hover/row:opacity-100 transition-all duration-300 pointer-events-none group-hover/row:pointer-events-auto"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 z-40 w-9 h-9 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-sm border border-white/10 text-white hover:bg-[#F4C84A] hover:border-[#F4C84A] hover:text-black opacity-0 group-hover/row:opacity-100 transition-all duration-200 hover:scale-110 pointer-events-none group-hover/row:pointer-events-auto shadow-lg"
                 >
-                    <ChevronRight className="w-10 h-10 text-white hover:text-[#fbbf24] transition-colors" />
+                    <ChevronRight className="w-5 h-5" />
                 </button>
             </div>
         </div>
