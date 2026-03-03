@@ -9,8 +9,8 @@ import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { CONFIG } from '@/constants/config';
 
-const APP_VERSION = '1.0.3';
-const APP_BUILD = 0;
+const APP_VERSION = '1.0.5';
+const APP_BUILD = 6;
 
 interface UpdateInfo {
   version: string;
@@ -233,6 +233,9 @@ function VersionCard({ updateInfo, checking, onCheck }: { updateInfo: UpdateInfo
             </Text>
             <Text style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13, marginTop: 2 }}>
               v{APP_VERSION} (Build {APP_BUILD})
+            </Text>
+            <Text style={{ color: 'rgba(255,255,255,0.25)', fontSize: 11, marginTop: 4 }}>
+              © 2026 MovieBox by Khôi
             </Text>
           </View>
         </View>

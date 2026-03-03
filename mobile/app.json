@@ -2,7 +2,7 @@
   "expo": {
     "name": "MovieBox",
     "slug": "phimkhoi-mobile",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "phimkhoi",
@@ -12,7 +12,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.phimkhoi.mobile",
       "requireFullScreen": false,
-      "buildNumber": "1"
+      "buildNumber": "6"
     },
     "android": {
       "permissions": [
@@ -23,7 +23,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png"
       },
       "package": "com.phimkhoi.mobile",
-      "versionCode": 5,
+      "versionCode": 6,
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "softwareKeyboardLayoutMode": "pan",
