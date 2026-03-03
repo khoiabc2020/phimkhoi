@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
             { $limit: 50 }
         ]);
 
-        const formattedHistory = history.map((h: any) => ({
+        const formattedHistory = history.map((h: { _id?: string; movieId?: string; movieID?: string; movieSlug: string; movieName: string; movieOriginName?: string; moviePoster?: string; movieYear?: number; movieQuality?: string; currentEpisode: string; currentServer?: string; currentEpisodeName?: string; currentTime?: number; duration?: number; updatedAt: Date; }) => ({
             _id: h._id,
             slug: h.movieSlug,
             episode: h.episodeSlug,
@@ -119,8 +119,8 @@ export async function POST(req: Request) {
         let episodeName = episode;
         let episodeData = null;
         if (movie.episodes) {
-            movie.episodes.forEach((server: any) => {
-                const found = server.server_data.find((e: any) => e.slug == episode);
+            movie.episodes.forEach((server: { server_name: string; server_data: { slug: string; name: string }[] }) => {
+                const found = server.server_data.find((e: { slug: string }) => e.slug == episode);
                 if (found) {
                     episodeData = found;
                     episodeName = found.name;

@@ -13,9 +13,9 @@ import FavoriteButton from "./FavoriteButton";
 import PlaylistManagerModal from "./PlaylistManagerModal";
 
 interface ProfileTabsProps {
-    user: any;
-    favorites: any[];
-    history: any[];
+    user: Record<string, unknown>;
+    favorites: Record<string, unknown>[];
+    history: Record<string, unknown>[];
 }
 
 export default function ProfileTabs({ user, favorites, history }: ProfileTabsProps) {
@@ -56,7 +56,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
         setIsModalOpen(true);
     };
 
-    const handleOpenEditModal = (playlist: any) => {
+    const handleOpenEditModal = (playlist: { _id?: string; name?: string; isPublic?: boolean }) => {
         setModalMode("edit");
         setSelectedPlaylist(playlist);
         setIsModalOpen(true);

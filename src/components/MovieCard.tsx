@@ -7,9 +7,12 @@ import Image from "next/image";
 import { Play, Info, Star, ChevronDown } from "lucide-react";
 import { getImageUrl, decodeHtml } from "@/lib/utils";
 import { Movie } from "@/services/api";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { getTMDBImage } from "@/services/tmdb";
+
+// Tiny LQIP blur placeholder shared across all movie cards
+const BLUR_PLACEHOLDER = "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA==";
 
 function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientation?: 'portrait' | 'landscape' }) {
     const [isHovered, setIsHovered] = useState(false);
@@ -121,13 +124,13 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                 </div>
 
                 <div className="mt-2 space-y-0.5 px-0.5">
-                    <h3 className="text-white font-bold text-[13px] truncate group-hover/static-card:text-primary transition-colors leading-tight">
-                        {movie.name}
+                    <h3 className="text-white font-bold text-[13px] truncate group-hover/static-card:text-primary transition-colors leading-tight" title={decodeHtml(movie.name)}>
+                        {decodeHtml(movie.name)}
                     </h3>
                     <div className="flex items-center justify-between">
                         {movie.origin_name && (
-                            <p className="text-white/40 text-[11px] truncate font-medium max-w-[80%]">
-                                {movie.origin_name}
+                            <p className="text-white/40 text-[11px] truncate font-medium max-w-[80%]" title={decodeHtml(movie.origin_name)}>
+                                {decodeHtml(movie.origin_name)}
                             </p>
                         )}
                         <span className="text-white/30 text-[10px] font-medium">{movie.year || 2024}</span>
@@ -167,6 +170,8 @@ function OnflixHoverCard({
     onMouseEnter: () => void;
     onMouseLeave: () => void;
 }) {
+    const [imgLoaded, setImgLoaded] = useState(false);
+    const [hasError, setHasError] = useState(false);
     const CARD_WIDTH = 320;
     const offsetLeft = (CARD_WIDTH - position.width) / 2;
 
@@ -199,16 +204,23 @@ function OnflixHoverCard({
         >
             <div className="relative animate-in fade-in zoom-in-95 duration-200 ease-out origin-top">
                 {/* Card */}
-                <div className="relative bg-[#141414] rounded-xl overflow-hidden shadow-[0_16px_48px_rgba(0,0,0,0.9),0_0_0_1px_rgba(255,255,255,0.08)]">
+                <div className="relative glass-panel overflow-hidden">
 
-                    {/* Backdrop Image - 16:9 */}
+                    {/* Backdrop Image - 16:9 — skeleton + fade-in khi load xong */}
                     <div className="relative aspect-video w-full overflow-hidden bg-[#1a1a1a]">
+                        {/* Skeleton hiển thị khi ảnh chưa load xong */}
+                        {!imgLoaded && !hasError && (
+                            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/[0.02] animate-pulse" />
+                        )}
                         <Image
                             src={displayBackdrop || "/placeholder.jpg"}
                             alt={movie.name}
                             fill
-                            className="object-cover"
+                            className={`object-cover transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
                             unoptimized
+                            priority
+                            onLoad={() => setImgLoaded(true)}
+                            onError={() => { setImgLoaded(true); setHasError(true); }}
                         />
 
                         {/* Gradient fading into card body */}

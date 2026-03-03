@@ -22,7 +22,7 @@ export async function GET() {
             .limit(200)
             .lean();
 
-        const movies = favorites.map((f: any) => ({
+        const movies = favorites.map((f: { _id?: string; movieID?: string; movieId?: string; movieSlug: string; movieName: string; movieOriginName?: string; moviePoster?: string; movieYear?: number; movieQuality?: string; }) => ({
             slug: f.movieSlug,
             name: f.movieName,
             poster: f.moviePoster,

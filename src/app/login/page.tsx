@@ -48,7 +48,7 @@ function LoginForm() {
     };
 
     return (
-        <div className="relative z-10 w-full max-w-[450px] p-8 md:p-12 bg-black/70 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl flex flex-col items-center transform -translate-y-8">
+        <div className="relative z-10 w-full max-w-[450px] mx-4 p-8 md:p-12 bg-black/70 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl flex flex-col items-center">
             <h1 className="text-3xl font-bold text-white mb-2 text-center w-full">Chào mừng trở lại</h1>
             <p className="text-[#a3a3a3] text-[15px] mb-8 text-center w-full">Cùng thưởng thức những bộ phim tuyệt vời nhất.</p>
 
@@ -155,7 +155,7 @@ function LoginForm() {
 
 export default function LoginPage() {
     return (
-        <main className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0a] relative overflow-hidden font-sans">
+        <main className="min-h-screen flex flex-col items-center justify-center pt-24 pb-8 bg-[#0a0a0a] relative overflow-hidden font-sans">
             <div className="absolute top-6 left-6 md:top-8 md:left-12 z-20">
                 <Link href="/" className="flex items-center gap-3 group shrink-0">
                     <div className="relative w-10 h-10 md:w-12 md:h-12 flex items-center justify-center">

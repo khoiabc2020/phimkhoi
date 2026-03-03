@@ -8,7 +8,7 @@ import { getImageUrl } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
 interface WatchEngagementBarProps {
-    movie: any;
+    movie: Record<string, unknown>;
     isTheaterMode?: boolean;
     toggleTheater?: () => void;
     isLightOff?: boolean;
@@ -31,7 +31,7 @@ export default function WatchEngagementBar({
         movieYear: Number(movie.year) || new Date().getFullYear(),
         movieQuality: movie.quality || "HD",
         movieVoteAverage: movie.vote_average || 0,
-        movieCategories: movie.category?.map((c: any) => c.name) || [],
+        movieCategories: (movie.category as { name: string }[])?.map(c => c.name) || [],
     };
 
     const handleShare = () => {
@@ -148,7 +148,7 @@ export default function WatchEngagementBar({
                     </div>
                     {/* Genres + IMDB badge cùng hàng */}
                     <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
-                        {movie.category?.slice(0, 3).map((c: any) => (
+                        {(movie.category as { id: string; name: string }[])?.slice(0, 3).map(c => (
                             <span key={c.id}
                                 className="text-[11px] px-2 py-0.5 rounded-full text-gray-300 border border-white/[0.08]"
                                 style={{ background: 'rgba(255,255,255,0.05)' }}>

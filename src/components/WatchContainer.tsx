@@ -11,11 +11,11 @@ import { List as ListIcon, Monitor, ChevronLeft, ChevronRight, SkipForward } fro
 
 interface WatchContainerProps {
     movie: Movie;
-    currentEpisode: any;
-    episodes: any[];
-    servers: any[];
+    currentEpisode: Record<string, unknown>;
+    episodes: Record<string, unknown>[];
+    servers: Record<string, unknown>[];
     initialProgress: number;
-    movieData: any;
+    movieData: Record<string, unknown>;
     initialServerName: string;
 }
 
@@ -40,10 +40,10 @@ export default function WatchContainer({
 
     const currentEpisodeSlug = initialCurrentEpisode?.slug;
     const activeEpisode =
-        currentServerEpisodes.find((ep: any) => ep.slug === currentEpisodeSlug) || initialCurrentEpisode;
+        currentServerEpisodes.find((ep: { slug?: string }) => ep.slug === currentEpisodeSlug) || initialCurrentEpisode;
 
     // Compute prev/next episode index
-    const currentIdx = currentServerEpisodes.findIndex((ep: any) => ep.slug === currentEpisodeSlug);
+    const currentIdx = currentServerEpisodes.findIndex((ep: { slug?: string }) => ep.slug === currentEpisodeSlug);
     const prevEpisode = currentIdx > 0 ? currentServerEpisodes[currentIdx - 1] : null;
     const nextEpisode = currentIdx >= 0 && currentIdx < currentServerEpisodes.length - 1
         ? currentServerEpisodes[currentIdx + 1]

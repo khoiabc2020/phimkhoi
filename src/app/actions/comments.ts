@@ -335,7 +335,7 @@ export async function getAllComments(filter: {
 
         await dbConnect();
 
-        const query: any = {};
+        const query: Record<string, unknown> = {};
         if (filter.isReported !== undefined) query.isReported = filter.isReported;
         if (filter.isApproved !== undefined) query.isApproved = filter.isApproved;
 

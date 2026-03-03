@@ -19,8 +19,8 @@ import { isInWatchlist } from "@/app/actions/watchlist";
 import WatchlistButton from "@/components/WatchlistButton";
 import ShareButton from "@/components/ShareButton";
 
-// Revalidate every 60 seconds for real-time TMDB rating updates
-export const revalidate = 60;
+// Revalidate every 5 minutes (was 60s). ISR means first visitor triggers refresh, others get cache.
+export const revalidate = 300;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params;
@@ -46,26 +46,29 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     const { movie, episodes } = data;
     const serverData = episodes?.[0]?.server_data || [];
 
-    // Fetch related movies
-    let relatedMovies: any[] = [];
-    if (movie?.category?.[0]?.slug) {
-        try {
-            const res = await getMoviesList('phim-moi-cap-nhat', { category: movie.category[0].slug, limit: 12 });
-            relatedMovies = res?.items?.filter((m: any) => m.slug !== movie.slug).slice(0, 8) || [];
-        } catch (e) {
-            console.error("Error fetching related movies:", e);
-        }
-    }
-
-    // Fetch TMDB Data
+    // Xác định loại phim cho TMDB
     let type: 'movie' | 'tv' = 'movie';
-    if (movie.type === 'phim-bo' || movie.type === 'tv-shows' || movie.type === 'hoat-hinh') {
+    if (movie?.type === 'phim-bo' || movie?.type === 'tv-shows' || movie?.type === 'hoat-hinh') {
         type = 'tv';
     }
 
-    const tmdbSearch = await searchTMDBMovie(movie.origin_name || movie.name, movie.year, type);
-    const tmdbDetails = tmdbSearch ? await getTMDBDetails(tmdbSearch.id, type) : null;
-    const { isFavorite: isFav } = await isFavorite(movie._id);
+    // ==> TỐI ƯU: Fetch song song tất cả dữ liệu phụ (TMDB + Related + isFavorite + isInWatchlist)
+    const [tmdbSearch, relatedMoviesRaw, isFavResult, isWatchlistResult] = await Promise.allSettled([
+        searchTMDBMovie(movie?.origin_name || movie?.name, movie?.year, type),
+        movie?.category?.[0]?.slug
+            ? getMoviesList('phim-moi-cap-nhat', { category: movie.category[0].slug, limit: 12 })
+            : Promise.resolve(null),
+        isFavorite(movie?._id),
+        isInWatchlist(movie?.slug),
+    ]);
+
+    const tmdbSearchResult = tmdbSearch.status === 'fulfilled' ? tmdbSearch.value : null;
+    const tmdbDetails = tmdbSearchResult ? await getTMDBDetails(tmdbSearchResult.id, type) : null;
+    const relatedMovies = relatedMoviesRaw.status === 'fulfilled' && relatedMoviesRaw.value?.items
+        ? relatedMoviesRaw.value.items.filter((m: { slug?: string }) => m.slug !== movie?.slug).slice(0, 8)
+        : [];
+    const { isFavorite: isFav } = isFavResult.status === 'fulfilled' ? isFavResult.value : { isFavorite: false };
+    const inWatchlist = isWatchlistResult.status === 'fulfilled' ? isWatchlistResult.value.isInWatchlist : false;
 
     // Fallback images and rating
     const posterUrl = tmdbDetails?.poster_path ? getTMDBImage(tmdbDetails.poster_path, "original") : getImageUrl(movie?.poster_url || movie?.thumb_url);
@@ -76,10 +79,19 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
         <main className="min-h-screen pb-20 bg-[#0a0a0a]">
             {/* Hero Section (Backdrop + Info Overlay) */}
             <div className="relative w-full pt-20 sm:pt-28 md:pt-32 pb-8 px-4 md:px-8 xl:px-16 flex items-end min-h-[420px] sm:min-h-[500px]">
-                <div
-                    className="absolute inset-0 bg-cover bg-center bg-top"
-                    style={{ backgroundImage: `url(${backdropUrl})` }}
-                />
+                {/* Backdrop ảnh — dùng Next/Image với priority=true để load sớm nhất + blur placeholder */}
+                {backdropUrl && (
+                    <Image
+                        src={backdropUrl}
+                        alt={movie?.name || ""}
+                        fill
+                        priority
+                        unoptimized
+                        className="absolute inset-0 object-cover object-top"
+                        placeholder="blur"
+                        blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
+                    />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-[#0a0a0a]/20" />
                 <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/70 to-transparent" />
 
@@ -119,14 +131,14 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                     })()}
 
                     <div className="text-xs sm:text-sm text-gray-300 flex flex-wrap items-center gap-2 sm:gap-4 py-1 sm:py-2 drop-shadow-md">
-                        {tmdbDetails?.credits?.crew?.find((c: any) => c.job === "Director")?.name || (movie?.director && movie.director.length > 0 && !movie.director.includes("Đang cập nhật")) ? (
-                            <span><span className="text-gray-500">Đạo diễn:</span> {tmdbDetails?.credits?.crew?.find((c: any) => c.job === "Director")?.name || movie?.director?.join(", ")}</span>
+                        {tmdbDetails?.credits?.crew?.find((c: { job?: string; name?: string }) => c.job === "Director")?.name || (movie?.director && movie.director.length > 0 && !movie.director.includes("Đang cập nhật")) ? (
+                            <span><span className="text-gray-500">Đạo diễn:</span> {tmdbDetails?.credits?.crew?.find((c: { job?: string; name?: string }) => c.job === "Director")?.name || movie?.director?.join(", ")}</span>
                         ) : null}
                         <span className="w-1 h-1 bg-gray-600 rounded-full hidden sm:block" />
                         <span><span className="text-gray-500">Thời lượng:</span> {movie?.time || "N/A"}</span>
                     </div>
                     <div className="text-xs sm:text-sm text-gray-300 mb-3 sm:mb-6 line-clamp-2 max-w-3xl drop-shadow-md">
-                        <span className="text-gray-500">Diễn viên:</span> {tmdbDetails?.credits?.cast?.slice(0, 5).map((c: any) => c.name).join(", ") || movie?.actor?.join(", ") || "Đang cập nhật"}
+                        <span className="text-gray-500">Diễn viên:</span> {tmdbDetails?.credits?.cast?.slice(0, 5).map((c: { name?: string }) => c.name).join(", ") || movie?.actor?.join(", ") || "Đang cập nhật"}
                     </div>
 
                     {/* Action Buttons -- bigger touch targets on mobile */}
@@ -152,14 +164,14 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                         moviePoster: posterUrl || "/fallback.png",
                                         movieYear: Number(movie.year) || new Date().getFullYear(),
                                         movieQuality: movie.quality || "HD",
-                                        movieCategories: movie.category?.map((c: any) => c.name) || [],
+                                        movieCategories: movie.category?.map((c: { name?: string }) => c.name) || [],
                                     }}
                                     className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/5 rounded-full"
                                     showLabel={true}
                                 />
                                 <WatchlistButton
                                     slug={movie.slug}
-                                    initialInWatchlist={(await isInWatchlist(movie.slug)).isInWatchlist}
+                                    initialInWatchlist={inWatchlist}
                                     className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/5 rounded-full"
                                     showLabel={true}
                                 />
@@ -218,7 +230,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         <div>
                             <div className="text-[11px] font-medium text-gray-500 uppercase tracking-widest mb-3">Thể loại</div>
                             <div className="flex flex-wrap gap-2">
-                                {movie?.category?.map((c: any) => (
+                                {movie?.category?.map((c: { slug?: string; name?: string; id?: string }) => (
                                     <Link key={c.id} href={`/the-loai/${c.slug}`} className="text-[11px] font-medium text-gray-400 bg-white/5 border border-white/5 py-1.5 px-3 rounded-full hover:text-white hover:border-[#F4C84A]/50 transition-colors uppercase tracking-wider">{c.name}</Link>
                                 ))}
                             </div>

@@ -9,13 +9,13 @@ import { cn } from "@/lib/utils";
 
 interface Server {
     server_name: string;
-    server_data: any[];
+    server_data: Record<string, unknown>[];
 }
 
 interface MovieTabsProps {
-    movie: any;
-    relatedMovies: any[];
-    episodes: { server_name: string; server_data: any[] }[];
+    movie: Record<string, unknown>;
+    relatedMovies: Record<string, unknown>[];
+    episodes: { server_name: string; server_data: Record<string, unknown>[] }[];
     slug: string;
 }
 
@@ -239,7 +239,7 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
 
                                 {/* Episode Grid */}
                                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-3 max-h-[360px] sm:max-h-[440px] overflow-y-auto custom-scrollbar pr-1 sm:pr-2 pb-1 [contain:layout_paint]">
-                                    {paginatedEpisodes.map((ep: any) => {
+                                    {paginatedEpisodes.map((ep: { slug?: string; name?: string }) => {
                                         let displayName = ep.name;
                                         const match = ep.name.match(/Tập\s+(\d+)/i);
                                         if (match) {

@@ -69,7 +69,7 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
 
                 if (data.results?.length > 0) {
                     // Filter best match
-                    const bestMatch = data.results.find((item: any) => {
+                    const bestMatch = data.results.find((item: { release_date?: string; first_air_date?: string; original_title?: string; original_name?: string }) => {
                         const itemYear = endpoint === 'movie'
                             ? (item.release_date ? parseInt(item.release_date.substring(0, 4)) : null)
                             : (item.first_air_date ? parseInt(item.first_air_date.substring(0, 4)) : null);

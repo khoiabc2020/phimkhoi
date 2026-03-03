@@ -107,13 +107,58 @@ export default function VideoPlayer({
     const handleVideoEnd = useCallback(() => {
         onEnded?.();
         if (autoNextRef.current && nextEpisodeUrlRef.current) {
-            router.push(nextEpisodeUrlRef.current);
+            // Thay vì nhảy ngay lập tức, ta cho countdown 5s để tăng UX
+            let countdown = 5;
+            const container = artRef.current;
+            let countdownEl: HTMLDivElement | null = null;
+
+            if (container) {
+                countdownEl = document.createElement('div');
+                countdownEl.style.position = 'absolute';
+                countdownEl.style.top = '10%';
+                countdownEl.style.right = '4%';
+                countdownEl.style.background = 'rgba(0,0,0,0.7)';
+                countdownEl.style.color = 'white';
+                countdownEl.style.padding = '8px 16px';
+                countdownEl.style.borderRadius = '8px';
+                countdownEl.style.zIndex = '999';
+                countdownEl.style.fontFamily = 'monospace';
+                countdownEl.style.fontSize = '14px';
+                countdownEl.innerHTML = `Tập tiếp theo sau <b>${countdown}s</b> <span style="margin-left:8px; cursor:pointer; color:#F4C84A;" id="cancel-next">✖</span>`;
+                container.appendChild(countdownEl);
+            }
+
+            const interval = setInterval(() => {
+                countdown--;
+                if (countdownEl) {
+                    countdownEl.innerHTML = `Tập tiếp theo sau <b>${countdown}s</b> <span style="margin-left:8px; cursor:pointer; color:#F4C84A;" id="cancel-next">✖</span>`;
+                    const cancelBtn = countdownEl.querySelector('#cancel-next');
+                    if (cancelBtn) {
+                        cancelBtn.addEventListener('click', () => {
+                            clearInterval(interval);
+                            if (countdownEl && countdownEl.parentNode) {
+                                countdownEl.parentNode.removeChild(countdownEl);
+                            }
+                        });
+                    }
+                }
+
+                if (countdown === 0) {
+                    clearInterval(interval);
+                    if (countdownEl && countdownEl.parentNode) {
+                        countdownEl.parentNode.removeChild(countdownEl);
+                    }
+                    if (nextEpisodeUrlRef.current) {
+                        router.push(nextEpisodeUrlRef.current);
+                    }
+                }
+            }, 1000);
         }
     }, [onEnded, router]);
 
     useEffect(() => {
         if (!shouldUseArtPlayer || !artRef.current) return;
-        let art: any = null;
+        let art: ReturnType<typeof initArt> | null = null;
 
         const initArtPlayer = async () => {
             try {
@@ -192,10 +237,12 @@ export default function VideoPlayer({
                                         bg.style.background = "rgba(255,255,255,0.3)";
                                         dot.style.left = "2px";
                                         localStorage.setItem("autoNextEpisode", "false");
+                                        autoNextRef.current = false;
                                     } else {
                                         bg.style.background = "#F4C84A";
                                         dot.style.left = "16px";
                                         localStorage.setItem("autoNextEpisode", "true");
+                                        autoNextRef.current = true;
                                     }
                                 }
                             },
@@ -227,22 +274,8 @@ export default function VideoPlayer({
                             </div>`,
                             tooltip: "Tập tiếp theo",
                             click: () => {
-                                const currentActiveStr = window.location.pathname;
-                                const episodeLinks = document.querySelectorAll('a[href^="/xem-phim/"]');
-                                let foundCurrent = false;
-                                let nextUrl = null;
-                                for (let i = 0; i < episodeLinks.length; i++) {
-                                    const link = episodeLinks[i] as HTMLAnchorElement;
-                                    const href = link.getAttribute('href');
-                                    if (href === currentActiveStr || href === decodeURIComponent(currentActiveStr)) {
-                                        foundCurrent = true;
-                                    } else if (foundCurrent && href && href.split('/').length >= 4) {
-                                        nextUrl = href;
-                                        break;
-                                    }
-                                }
-                                if (nextUrl) {
-                                    window.location.href = nextUrl;
+                                if (nextEpisodeUrlRef.current) {
+                                    router.push(nextEpisodeUrlRef.current);
                                 }
                             },
                         },
@@ -253,8 +286,12 @@ export default function VideoPlayer({
                             const Hls = HlsModule.default;
                             if (Hls.isSupported()) {
                                 const hls = new Hls({
-                                    maxBufferLength: 30,
-                                    maxMaxBufferLength: 60,
+                                    enableWorker: true,
+                                    lowLatencyMode: true,
+                                    backBufferLength: 30,
+                                    maxBufferLength: 20,
+                                    maxMaxBufferLength: 40,
+                                    maxBufferHole: 0.5,
                                     startLevel: -1,
                                     xhrSetup: (xhr: XMLHttpRequest) => {
                                         xhr.withCredentials = false;
@@ -275,15 +312,31 @@ export default function VideoPlayer({
 
                 // Seek to saved progress on ready
                 art.on("ready", () => {
+                    const savedVolume = localStorage.getItem("volume");
+                    if (savedVolume) art.volume = parseFloat(savedVolume);
+
+                    const savedRate = localStorage.getItem("playbackRate");
+                    if (savedRate) art.playbackRate = parseFloat(savedRate);
+
                     if (initialProgress > 0 && art.duration > 0) {
-                        const seekTo = Math.floor((initialProgress / 100) * art.duration);
+                        const percent = Math.min(Math.max(initialProgress, 0), 100);
+                        const seekTo = Math.floor((percent / 100) * art.duration);
                         if (seekTo > 10) art.seek = seekTo;
                     }
                 });
 
                 // Realtime history save
                 art.on("timeupdate", () => {
+                    if (!art.playing) return;
                     saveHistory(art.currentTime, art.duration);
+                });
+
+                // Save volume/rate config
+                art.on("video:volumechange", () => {
+                    localStorage.setItem("volume", String(art.volume));
+                });
+                art.on("video:ratechange", () => {
+                    localStorage.setItem("playbackRate", String(art.playbackRate));
                 });
 
                 // Auto-next on video end
@@ -302,13 +355,16 @@ export default function VideoPlayer({
                 };
                 art.on("pause", forceHistorySave);
                 art.on("destroy", forceHistorySave);
+                window.addEventListener("beforeunload", forceHistorySave);
 
                 // Keyboard shortcuts
-                document.addEventListener("keydown", (e) => {
+                const handleKeydown = (e: KeyboardEvent) => {
                     if (!art || document.activeElement?.tagName === "INPUT") return;
                     if (e.key === "ArrowLeft") { art.currentTime = Math.max(0, art.currentTime - 10); e.preventDefault(); }
                     if (e.key === "ArrowRight") { art.currentTime = Math.min(art.duration, art.currentTime + 10); e.preventDefault(); }
-                });
+                };
+                document.addEventListener("keydown", handleKeydown);
+                (artInstance.current as any).handleKeydown = handleKeydown;
 
             } catch (err) {
                 console.error("ArtPlayer init error:", err);
@@ -318,6 +374,9 @@ export default function VideoPlayer({
         initArtPlayer();
 
         return () => {
+            if (artInstance.current && (artInstance.current as any).handleKeydown) {
+                document.removeEventListener("keydown", (artInstance.current as any).handleKeydown);
+            }
             if (art) {
                 art.destroy(false);
                 artInstance.current = null;
@@ -436,7 +495,7 @@ export default function VideoPlayer({
     );
 }
 
-function IframePlayer({ url, slug, episode, movieData, initialProgress, session, onEnded }: any) {
+function IframePlayer({ url, slug, episode, movieData, initialProgress, session, onEnded }: Record<string, unknown>) {
     useEffect(() => {
         if (!movieData || !session?.user) return;
         const startTime = Date.now();
@@ -462,7 +521,7 @@ function IframePlayer({ url, slug, episode, movieData, initialProgress, session,
             clearTimeout(firstSave);
             clearInterval(interval);
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, [movieData, session, initialProgress]);
 
     return (

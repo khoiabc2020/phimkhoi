@@ -8,7 +8,7 @@ interface FavoritesContextType {
     favorites: Set<string>;
     isLoading: boolean;
     isFavorite: (movieSlug: string) => boolean;
-    toggleFavorite: (movieData: any) => Promise<void>;
+    toggleFavorite: (movieData: Record<string, unknown>) => Promise<void>;
 }
 
 const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined);
@@ -30,7 +30,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
             try {
                 const res = await getFavorites();
                 if (res.success && res.data) {
-                    const slugs = new Set(res.data.map((item: any) => item.movieSlug));
+                    const slugs = new Set(res.data.map((item: { movieSlug: string }) => item.movieSlug));
                     setFavorites(slugs);
                 }
             } catch (error) {
@@ -45,7 +45,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
 
     const isFavorite = (movieSlug: string) => favorites.has(movieSlug);
 
-    const toggleFavorite = async (movieData: any) => {
+    const toggleFavorite = async (movieData: { movieSlug: string;[key: string]: unknown }) => {
         if (!session?.user) return; // Should handle auth redirect in component
 
         const movieSlug = movieData.movieSlug;

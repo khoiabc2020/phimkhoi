@@ -45,7 +45,7 @@ export async function GET(req: Request) {
         const pageEnd = parseInt(searchParams.get("end") || "1"); // Default sync 1 page
 
         let totalSynced = 0;
-        const errors: any[] = [];
+        const errors: unknown[] = [];
 
         for (let page = pageStart; page <= pageEnd; page++) {
             try {
@@ -79,7 +79,7 @@ export async function GET(req: Request) {
 
                         // Upsert: Update if exists, Insert if new
                         await Movie.findOneAndUpdate(
-                            { slug: normalized.slug },
+                            { slug: normalized.slug } as any,
                             { $set: normalized },
                             { upsert: true, new: true, setDefaultsOnInsert: true }
                         );

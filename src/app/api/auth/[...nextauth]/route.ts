@@ -5,8 +5,9 @@ import FacebookProvider from "next-auth/providers/facebook";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
+import { NextAuthOptions, User as NextAuthUser } from "next-auth";
 
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
     providers: [
         // Google OAuth
         ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_ID !== 'your_google_client_id' ? [
@@ -54,10 +55,10 @@ export const authOptions = {
                     });
                     return {
                         id: newAdmin._id.toString(),
-                        name: newAdmin.name,
-                        email: newAdmin.email,
+                        name: newAdmin.name || "Admin",
+                        email: newAdmin.email || "admin@khoiphim.com",
                         role: newAdmin.role,
-                    };
+                    } as NextAuthUser;
                 }
 
                 if (!user) return null;
@@ -67,16 +68,16 @@ export const authOptions = {
 
                 return {
                     id: user._id.toString(),
-                    name: user.name,
-                    email: user.email,
+                    name: user.name || "User",
+                    email: user.email || "user@site.com",
                     role: user.role,
                     image: user.image,
-                };
+                } as NextAuthUser;
             },
         }),
     ],
     callbacks: {
-        async signIn({ user, account }: any) {
+        async signIn({ user, account }) {
             // Tự động tạo tài khoản khi đăng nhập bằng Google/Facebook
             if (account?.provider === 'google' || account?.provider === 'facebook') {
                 try {
@@ -97,7 +98,7 @@ export const authOptions = {
             }
             return true;
         },
-        async jwt({ token, user, account }: any) {
+        async jwt({ token, user, account }) {
             if (user) {
                 token.role = user.role || 'user';
                 token.id = user.id;
@@ -110,10 +111,12 @@ export const authOptions = {
             }
             return token;
         },
-        async session({ session, token }: any) {
+        async session({ session, token }) {
             if (session?.user) {
+                // @ts-ignore
                 session.user.role = token.role;
-                session.user.id = token.id || token.sub || token.email;
+                session.user.id = (token.id || token.sub || token.email) as string;
+                // @ts-ignore
                 session.user.provider = token.provider;
             }
             return session;

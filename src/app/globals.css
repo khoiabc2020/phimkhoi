@@ -178,19 +178,19 @@ h2 {
   letter-spacing: -0.02em;
 } */
 
-/* iOS 26 Glassmorphism Utilities — reduced blur for better scroll perf */
+/* iOS 26 Glassmorphism Utilities — Vibrant and ultra-smooth */
 @layer utilities {
   .glass {
-    /* blur(12px) instead of blur(20px) — 40% cheaper for GPU compositing */
-    @apply backdrop-blur-[12px] bg-white/[0.06] border-b border-white/[0.08];
+    /* iOS 26 style absolute glass: higher blur, saturate colors behind it, extreme transparency */
+    @apply backdrop-blur-[24px] saturate-[180%] bg-white/[0.02] border-b border-white/[0.08] shadow-[0_8px_32px_0_rgba(0, 0, 0, 0.3)];
   }
 
   .glass-panel {
-    @apply backdrop-blur-[16px] bg-[#1c1c1e]/60 border border-white/[0.08] shadow-2xl rounded-[24px];
+    @apply backdrop-blur-[32px] saturate-[150%] bg-[#1c1c1e]/40 border border-white/[0.08] shadow-[0_16px_40px_rgba(0, 0, 0, 0.5)] rounded-[32px];
   }
 
   .glass-pill {
-    @apply backdrop-blur-[10px] bg-white/[0.08] border border-white/[0.1] rounded-full;
+    @apply backdrop-blur-[16px] saturate-[120%] bg-white/[0.06] border border-white/[0.1] shadow-sm rounded-full;
   }
 
   /* Premium Text Glow */

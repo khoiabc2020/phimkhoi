@@ -34,24 +34,17 @@ export interface Movie {
     tmdbData?: { vote_average?: number; poster_path?: string; backdrop_path?: string } | null;
 }
 
-interface ListResponse {
-    status: boolean;
-    items: Movie[];
-    pathImage: string;
-    pagination: {
-        totalItems: number;
-        totalItemsPerPage: number;
-        currentPage: number;
-        totalPages: number;
-    };
-    data?: {
-        items: Movie[];
-        params: any;
-    }
+interface PaginatedData {
+    items?: Movie[];
+    data?: { items?: Movie[]; params?: unknown; pathImage?: string; APP_DOMAIN_CDN_IMAGE?: string };
+    status?: boolean | string;
+    pathImage?: string;
+    movie?: Record<string, unknown>;
+    episodes?: Record<string, unknown>[];
 }
 
 // Helper to normalize response because API structure varies slightly between endpoints
-const getItems = (data: any): Movie[] => {
+const getItems = (data: PaginatedData): Movie[] => {
     if (data.items) return data.items;
     if (data.data && data.data.items) return data.data.items;
     return [];
@@ -91,12 +84,16 @@ export const getOphimImages = async (slug: string) => {
     }
 };
 
-let homeCache: any = null;
+let homeCache: {
+    phimMoi: Movie[]; phimLe: Movie[]; phimBo: Movie[]; hoatHinh: Movie[];
+    tvShows: Movie[]; phimChieuRap: Movie[]; phimSapChieu: Movie[];
+    hanQuoc: Movie[]; trungQuoc: Movie[]; hanhDong: Movie[]; tinhCam: Movie[];
+} | null = null;
 let homeCacheTime = 0;
 
 export const getHomeData = async () => {
-    // 5 phút Memory Cache siêu tốc giúp bảo vệ Next.js VPS
-    if (homeCache && Date.now() - homeCacheTime < 5 * 60 * 1000) {
+    // 15 phút Memory Cache giúp bảo vệ Next.js VPS khỏi bị spam requests
+    if (homeCache && Date.now() - homeCacheTime < 15 * 60 * 1000) {
         return homeCache;
     }
 
@@ -120,19 +117,19 @@ export const getHomeData = async () => {
                 }))];
             }
             if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
-                const nguoncItems = (nguoncRes.value.items || []).map((item: any) => ({
-                    _id: item.id || item.slug,
-                    name: item.name,
-                    slug: item.slug,
-                    origin_name: item.original_name || item.name,
-                    thumb_url: item.thumb_url,
-                    poster_url: item.poster_url,
-                    year: parseInt(item.year) || new Date().getFullYear(),
-                    quality: item.quality || 'FHD',
+                const nguoncItems = (nguoncRes.value.items || []).map((item: Record<string, unknown>) => ({
+                    _id: (item.id || item.slug) as string,
+                    name: item.name as string,
+                    slug: item.slug as string,
+                    origin_name: (item.original_name || item.name) as string,
+                    thumb_url: item.thumb_url as string,
+                    poster_url: item.poster_url as string,
+                    year: parseInt(item.year as string) || new Date().getFullYear(),
+                    quality: (item.quality as string) || 'FHD',
                 }));
                 items = [...items, ...nguoncItems];
             }
-            const seen = new Set();
+            const seen = new Set<string>();
             return items.filter(item => {
                 const duplicate = seen.has(item.slug);
                 seen.add(item.slug);
@@ -176,19 +173,19 @@ export const getHomeData = async () => {
 export const getMovieDetail = async (slug: string) => {
     try {
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
-            fetch(`${API_URL}/phim/${slug}`, { next: { revalidate: 60 } }).then(r => r.json()),
-            fetch(`https://ophim1.com/phim/${slug}`, { next: { revalidate: 60 } }).then(r => r.json()),
-            fetch(`${NGUONC_API}/api/film/${slug}`, { next: { revalidate: 60 } }).then(r => r.json())
+            fetch(`${API_URL}/phim/${slug}`, { next: { revalidate: 180 } }).then(r => r.json()),
+            fetch(`https://ophim1.com/phim/${slug}`, { next: { revalidate: 180 } }).then(r => r.json()),
+            fetch(`${NGUONC_API}/api/film/${slug}`, { next: { revalidate: 180 } }).then(r => r.json())
         ]);
 
-        let combinedData: any = null;
+        let combinedData: Record<string, unknown> | null = null;
 
         // Base movie data prefers KKPhim, fallback to OPhim
         if (kkRes.status === 'fulfilled' && kkRes.value?.status) {
             combinedData = { ...kkRes.value };
             // Tag servers from KKPhim
-            if (combinedData.episodes) {
-                combinedData.episodes = combinedData.episodes.map((epGroup: any) => ({
+            if (combinedData.episodes && Array.isArray(combinedData.episodes)) {
+                combinedData.episodes = combinedData.episodes.map((epGroup: { server_name?: string }) => ({
                     ...epGroup,
                     server_name: `KKPhim #${epGroup.server_name || "1"}`
                 }));
@@ -196,13 +193,14 @@ export const getMovieDetail = async (slug: string) => {
         } else if (ophimRes.status === 'fulfilled' && ophimRes.value?.status) {
             combinedData = { ...ophimRes.value };
             // Ophim structures movie data slightly differently, might need normalization here if used as base
-            if (!combinedData.movie?.thumb_url?.startsWith('http') && combinedData.pathImage) {
-                combinedData.movie.thumb_url = combineUrl(combinedData.pathImage, combinedData.movie.thumb_url);
-                combinedData.movie.poster_url = combineUrl(combinedData.pathImage, combinedData.movie.poster_url);
+            const ophimMovie = combinedData.movie as Record<string, string> | undefined;
+            if (ophimMovie && !ophimMovie.thumb_url?.startsWith('http') && combinedData.pathImage) {
+                ophimMovie.thumb_url = combineUrl(combinedData.pathImage as string, ophimMovie.thumb_url);
+                ophimMovie.poster_url = combineUrl(combinedData.pathImage as string, ophimMovie.poster_url);
             }
             // Tag servers from OPhim
-            if (combinedData.episodes) {
-                combinedData.episodes = combinedData.episodes.map((epGroup: any) => ({
+            if (combinedData.episodes && Array.isArray(combinedData.episodes)) {
+                combinedData.episodes = combinedData.episodes.map((epGroup: { server_name?: string }) => ({
                     ...epGroup,
                     server_name: `OPhim #${epGroup.server_name || "1"}`
                 }));
@@ -213,22 +211,22 @@ export const getMovieDetail = async (slug: string) => {
         if (combinedData) {
             if (kkRes.status === 'fulfilled' && kkRes.value?.status && ophimRes.status === 'fulfilled' && ophimRes.value?.status) {
                 const ophimEpisodes = ophimRes.value.episodes || [];
-                const taggedOphimEpisodes = ophimEpisodes.map((epGroup: any) => ({
+                const taggedOphimEpisodes = ophimEpisodes.map((epGroup: { server_name?: string }) => ({
                     ...epGroup,
                     server_name: `OPhim #${epGroup.server_name || "1"}`
                 }));
                 // Prevent duplicate if names happen to match exactly (rare with our tags, but safe)
-                combinedData.episodes = [...(combinedData.episodes || []), ...taggedOphimEpisodes];
+                combinedData.episodes = [...((combinedData.episodes as unknown[]) || []), ...taggedOphimEpisodes];
             }
 
             // Also merge NguonC episodes if available
             if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
                 const nguoncEpisodes = nguoncRes.value.movie?.episodes || [];
-                const taggedNguoncEpisodes = nguoncEpisodes.map((epGroup: any) => ({
+                const taggedNguoncEpisodes = nguoncEpisodes.map((epGroup: { server_name?: string }) => ({
                     ...epGroup,
                     server_name: `NguonC #${epGroup.server_name || "1"}`
                 }));
-                combinedData.episodes = [...(combinedData.episodes || []), ...taggedNguoncEpisodes];
+                combinedData.episodes = [...((combinedData.episodes as unknown[]) || []), ...taggedNguoncEpisodes];
             }
             return combinedData;
         }
@@ -260,7 +258,7 @@ export const getMovieDetail = async (slug: string) => {
                     country: data.category?.['4']?.list || [],
                     trailer_url: data.trailer_url || "",
                 },
-                episodes: (data.episodes || []).map((epGroup: any) => ({
+                episodes: (data.episodes || []).map((epGroup: { server_name?: string }) => ({
                     ...epGroup,
                     server_name: `NguonC #${epGroup.server_name || "1"}`
                 }))
@@ -291,12 +289,12 @@ export const searchMovies = async (keyword: string) => {
             const data = kkRes.value;
             const pathImage = data.pathImage || data.data?.pathImage || "";
             // Ensure we construct full URL if strictly needed, though search endpoint sometimes gives full url
-            const items = (data.data?.items || []).map((item: any) => ({
+            const items = (data.data?.items || []).map((item: Record<string, unknown>) => ({
                 ...item,
-                thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : combineUrl(pathImage, item.thumb_url),
-                poster_url: item.poster_url?.startsWith('http') ? item.poster_url : combineUrl(pathImage, item.poster_url)
+                thumb_url: (typeof item.thumb_url === 'string' && item.thumb_url.startsWith('http')) ? item.thumb_url : combineUrl(pathImage, item.thumb_url as string),
+                poster_url: (typeof item.poster_url === 'string' && item.poster_url.startsWith('http')) ? item.poster_url : combineUrl(pathImage, item.poster_url as string)
             }));
-            results = [...results, ...items];
+            results = [...results, ...items as Movie[]];
         }
 
         if (ophimRes.status === 'fulfilled') {
@@ -305,26 +303,26 @@ export const searchMovies = async (keyword: string) => {
             if (pathImage === "https://img.ophim.live" || pathImage === "https://img.ophim.live/") {
                 pathImage = "https://img.ophim.live/uploads/movies/";
             }
-            const items = (data.data?.items || []).map((item: any) => normalizeOphimItem(item, pathImage));
+            const items = (data.data?.items || []).map((item: Record<string, unknown>) => normalizeOphimItem(item, pathImage));
             results = [...results, ...items];
         }
 
         if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
-            const items = (nguoncRes.value.items || []).map((item: any) => ({
-                _id: item.id || item.slug,
-                name: item.name,
-                slug: item.slug,
-                origin_name: item.original_name || item.name,
-                thumb_url: item.thumb_url,
-                poster_url: item.poster_url,
-                year: parseInt(item.year) || new Date().getFullYear(),
-                quality: item.quality || 'FHD',
-            }));
+            const items = (nguoncRes.value.items || []).map((item: Record<string, unknown>) => ({
+                _id: (item.id || item.slug) as string,
+                name: item.name as string,
+                slug: item.slug as string,
+                origin_name: (item.original_name || item.name) as string,
+                thumb_url: item.thumb_url as string,
+                poster_url: item.poster_url as string,
+                year: parseInt(item.year as string) || new Date().getFullYear(),
+                quality: (item.quality as string) || 'FHD',
+            })) as Movie[];
             results = [...results, ...items];
         }
 
         // Deduplicate
-        const seen = new Set();
+        const seen = new Set<string>();
         return results.filter(item => {
             const duplicate = seen.has(item.slug);
             seen.add(item.slug);
@@ -339,26 +337,26 @@ export const searchMovies = async (keyword: string) => {
 
 
 // Helper to normalize OPhim data to match our Movie interface
-const normalizeOphimItem = (item: any, pathImage: string): Movie => {
+const normalizeOphimItem = (item: Record<string, unknown>, pathImage: string): Movie => {
     return {
         ...item,
-        _id: item._id,
-        name: item.name,
-        slug: item.slug,
-        origin_name: item.origin_name,
-        thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : combineUrl(pathImage, item.thumb_url),
-        poster_url: item.poster_url?.startsWith('http') ? item.poster_url : combineUrl(pathImage, item.poster_url),
-        type: item.type || 'unknown',
-        sub_docquyen: item.sub_docquyen || false,
-        chieurap: item.chieurap || false,
-        time: item.time || '',
-        episode_current: item.episode_current || '',
-        quality: item.quality || '',
-        lang: item.lang || '',
-        year: item.year || new Date().getFullYear(),
-        category: item.category || [],
-        country: item.country || [],
-    };
+        _id: item._id as string,
+        name: item.name as string,
+        slug: item.slug as string,
+        origin_name: item.origin_name as string,
+        thumb_url: (typeof item.thumb_url === 'string' && item.thumb_url.startsWith('http')) ? item.thumb_url : combineUrl(pathImage, item.thumb_url as string),
+        poster_url: (typeof item.poster_url === 'string' && item.poster_url.startsWith('http')) ? item.poster_url : combineUrl(pathImage, item.poster_url as string),
+        type: (item.type as string) || 'unknown',
+        sub_docquyen: !!item.sub_docquyen,
+        chieurap: !!item.chieurap,
+        time: (item.time as string) || '',
+        episode_current: (item.episode_current as string) || '',
+        quality: (item.quality as string) || '',
+        lang: (item.lang as string) || '',
+        year: (item.year as number) || new Date().getFullYear(),
+        category: (item.category as { id: string, name: string, slug: string }[]) || [],
+        country: (item.country as { id: string, name: string, slug: string }[]) || [],
+    } as Movie;
 };
 
 export const getMoviesList = async (type: string, params: { page?: number; year?: number; category?: string; country?: string; limit?: number } = {}) => {
@@ -404,21 +402,21 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
         }
 
         if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
-            const nguoncItems = (nguoncRes.value.items || []).map((item: any) => ({
-                _id: item.id || item.slug,
-                name: item.name,
-                slug: item.slug,
-                origin_name: item.original_name || item.name,
-                thumb_url: item.thumb_url,
-                poster_url: item.poster_url,
-                year: parseInt(item.year) || new Date().getFullYear(),
-                quality: item.quality || 'FHD',
-            }));
+            const nguoncItems = (nguoncRes.value.items || []).map((item: Record<string, unknown>) => ({
+                _id: (item.id || item.slug) as string,
+                name: item.name as string,
+                slug: item.slug as string,
+                origin_name: (item.original_name || item.name) as string,
+                thumb_url: item.thumb_url as string,
+                poster_url: item.poster_url as string,
+                year: parseInt(item.year as string) || new Date().getFullYear(),
+                quality: (item.quality as string) || 'FHD',
+            })) as Movie[];
             items = [...items, ...nguoncItems];
         }
 
         // Deduplicate by Slug
-        const seen = new Set();
+        const seen = new Set<string>();
         const uniqueItems = items.filter(item => {
             const duplicate = seen.has(item.slug);
             seen.add(item.slug);
@@ -471,21 +469,21 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
         }
 
         if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
-            const nguoncItems = (nguoncRes.value.items || []).map((item: any) => ({
-                _id: item.id || item.slug,
-                name: item.name,
-                slug: item.slug,
-                origin_name: item.original_name || item.name,
-                thumb_url: item.thumb_url,
-                poster_url: item.poster_url,
-                year: parseInt(item.year) || new Date().getFullYear(),
-                quality: item.quality || 'FHD',
-            }));
+            const nguoncItems = (nguoncRes.value.items || []).map((item: Record<string, unknown>) => ({
+                _id: (item.id || item.slug) as string,
+                name: item.name as string,
+                slug: item.slug as string,
+                origin_name: (item.original_name || item.name) as string,
+                thumb_url: item.thumb_url as string,
+                poster_url: item.poster_url as string,
+                year: parseInt(item.year as string) || new Date().getFullYear(),
+                quality: (item.quality as string) || 'FHD',
+            })) as Movie[];
             items = [...items, ...nguoncItems];
         }
 
         // Deduplicate
-        const seen = new Set();
+        const seen = new Set<string>();
         const uniqueItems = items.filter(item => {
             const duplicate = seen.has(item.slug);
             seen.add(item.slug);
@@ -537,20 +535,20 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
         }
 
         if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
-            const nguoncItems = (nguoncRes.value.items || []).map((item: any) => ({
-                _id: item.id || item.slug,
-                name: item.name,
-                slug: item.slug,
-                origin_name: item.original_name || item.name,
-                thumb_url: item.thumb_url,
-                poster_url: item.poster_url,
-                year: parseInt(item.year) || new Date().getFullYear(),
-                quality: item.quality || 'FHD',
-            }));
+            const nguoncItems = (nguoncRes.value.items || []).map((item: Record<string, unknown>) => ({
+                _id: (item.id || item.slug) as string,
+                name: item.name as string,
+                slug: item.slug as string,
+                origin_name: (item.original_name || item.name) as string,
+                thumb_url: item.thumb_url as string,
+                poster_url: item.poster_url as string,
+                year: parseInt(item.year as string) || new Date().getFullYear(),
+                quality: (item.quality as string) || 'FHD',
+            })) as Movie[];
             items = [...items, ...nguoncItems];
         }
 
-        const seen = new Set();
+        const seen = new Set<string>();
         const uniqueItems = items.filter(item => {
             const duplicate = seen.has(item.slug);
             seen.add(item.slug);
@@ -572,7 +570,7 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
 import { getTMDBTrending } from "./tmdb";
 
 // Kiểm tra năm TMDB vs phim nguồn có khớp (cùng phim) để dùng ảnh TMDB chất lượng cao
-function isSameMovieByYear(tmdbItem: any, movie: any): boolean {
+function isSameMovieByYear(tmdbItem: Record<string, unknown>, movie: Movie): boolean {
     const tmdbYear = tmdbItem.release_date
         ? parseInt(String(tmdbItem.release_date).substring(0, 4), 10)
         : tmdbItem.first_air_date
@@ -587,7 +585,7 @@ export const getTrendMovies = async (type: 'movie' | 'tv' | 'all' = 'all') => {
     try {
         const trendList = await getTMDBTrending(type);
 
-        const movies = await Promise.all(trendList.slice(0, 15).map(async (tmdbItem: any) => {
+        const movies = await Promise.all(trendList.slice(0, 15).map(async (tmdbItem: Record<string, unknown>) => {
             const query = tmdbItem.original_name || tmdbItem.original_title || tmdbItem.name || tmdbItem.title;
             const searchResults = await searchMovies(query);
 
@@ -611,7 +609,7 @@ export const getTrendMovies = async (type: 'movie' | 'tv' | 'all' = 'all') => {
             return null;
         }));
 
-        return movies.filter((m: any) => m !== null);
+        return movies.filter((m: unknown) => m !== null);
     } catch (error) {
         console.error("Error fetching trend movies:", error);
         return [];
@@ -633,8 +631,8 @@ export const getMenuData = async () => {
         const ophimCountries = ophimCountriesData?.data?.items || [];
 
         // Deduplicate functions
-        const uniqueBySlug = (arr: any[]) => {
-            const seen = new Set();
+        const uniqueBySlug = (arr: { slug?: string, name?: string }[]) => {
+            const seen = new Set<string>();
             return arr.filter(item => {
                 if (!item || !item.slug) return false;
                 const duplicate = seen.has(item.slug);
@@ -661,8 +659,8 @@ export const getMenuData = async () => {
 export const getMoviesByActor = async (actorName: string, page: number = 1, limit: number = 24) => {
     try {
         const TMDB_KEY = process.env.TMDB_API_KEY;
-        let searchNames: string[] = [actorName];
-        let tmdbCreditTitles: string[] = [];
+        const searchNames: string[] = [actorName];
+        const tmdbCreditTitles: string[] = [];
 
         // Phase 1: Try to get TMDB person to get English/original name + credit list
         if (TMDB_KEY) {
@@ -689,10 +687,10 @@ export const getMoviesByActor = async (actorName: string, page: number = 1, limi
 
                     // Collect known Vietnamese + original titles of their biggest movies
                     const castCredits = (creditsData.cast || [])
-                        .sort((a: any, b: any) => (b.popularity || 0) - (a.popularity || 0))
+                        .sort((a: { popularity?: number }, b: { popularity?: number }) => (b.popularity || 0) - (a.popularity || 0))
                         .slice(0, 30);
 
-                    castCredits.forEach((credit: any) => {
+                    castCredits.forEach((credit: { title?: string, name?: string, original_title?: string, original_name?: string }) => {
                         const title = credit.title || credit.name;
                         const origTitle = credit.original_title || credit.original_name;
                         if (title) tmdbCreditTitles.push(title);
@@ -724,7 +722,7 @@ export const getMoviesByActor = async (actorName: string, page: number = 1, limi
 
         const allResults = await Promise.allSettled([...nameSearchPromises, ...creditSearchPromises]);
 
-        let items: Movie[] = [];
+        const items: Movie[] = [];
         const seen = new Set<string>();
 
         for (const result of allResults) {

@@ -23,7 +23,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
     const [searchHistory, setSearchHistory] = useState<string[]>([]);
     const [showHistory, setShowHistory] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
-    const [searchResults, setSearchResults] = useState<{ movies: any[], actors: any[] } | null>(null);
+    const [searchResults, setSearchResults] = useState<{ movies: Record<string, unknown>[], actors: Record<string, unknown>[] } | null>(null);
     const [openDropdown, setOpenDropdown] = useState<"categories" | "countries" | null>(null);
     const router = useRouter();
     const pathname = usePathname();
@@ -179,11 +179,11 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                 className={cn(
                     "fixed top-0 left-0 right-0 z-40 transition-colors duration-200 will-change-transform transform-gpu",
                     isScrolled
-                        ? "bg-[#0B0D12]/98 border-b border-white/5"
-                        : "bg-gradient-to-b from-black/80 via-black/40 to-transparent"
+                        ? "glass"
+                        : "bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none"
                 )}
             >
-                <div className="max-w-[1600px] mx-auto px-4 lg:px-8 h-[52px] flex items-center justify-between gap-4 flex-nowrap">
+                <div className="max-w-[1600px] mx-auto px-4 lg:px-8 h-[52px] flex items-center justify-between gap-4 flex-nowrap pointer-events-auto">
 
                     {/* Left Section: Logo & Mobile Menu */}
                     <div className="flex items-center gap-4 shrink-0">
@@ -243,10 +243,10 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             </button>
                             <div
                                 className={
-                                    "absolute top-full left-1/2 -translate-x-1/2 w-[400px] max-h-[60vh] overflow-y-auto custom-scrollbar bg-[#0B0D12] border border-white/10 rounded-2xl p-4 transition-all duration-200 transform shadow-[0_20px_40px_rgba(0,0,0,0.8)] grid grid-cols-2 gap-2 z-50 mt-2 " +
+                                    "absolute top-full left-1/2 -translate-x-1/2 w-[400px] max-h-[60vh] overflow-y-auto custom-scrollbar glass-panel p-4 transition-all duration-300 transform grid grid-cols-2 gap-2 z-50 mt-2 " +
                                     (openDropdown === "categories"
-                                        ? "opacity-100 visible translate-y-0"
-                                        : "opacity-0 invisible translate-y-2 pointer-events-none")
+                                        ? "opacity-100 visible translate-y-0 scale-100"
+                                        : "opacity-0 invisible -translate-y-2 scale-95 pointer-events-none")
                                 }
                             >
                                 {displayCategories.map((cat) => (
@@ -280,10 +280,10 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             </button>
                             <div
                                 className={
-                                    "absolute top-full left-1/2 -translate-x-1/2 w-72 max-h-[60vh] overflow-y-auto custom-scrollbar bg-[#0B0D12] border border-white/10 rounded-2xl p-3 transition-all duration-200 transform shadow-[0_20px_40px_rgba(0,0,0,0.8)] grid grid-cols-2 gap-1 z-50 mt-2 " +
+                                    "absolute top-full left-1/2 -translate-x-1/2 w-72 max-h-[60vh] overflow-y-auto custom-scrollbar glass-panel p-3 transition-all duration-300 transform grid grid-cols-2 gap-1 z-50 mt-2 " +
                                     (openDropdown === "countries"
-                                        ? "opacity-100 visible translate-y-0"
-                                        : "opacity-0 invisible translate-y-2 pointer-events-none")
+                                        ? "opacity-100 visible translate-y-0 scale-100"
+                                        : "opacity-0 invisible -translate-y-2 scale-95 pointer-events-none")
                                 }
                             >
                                 {displayCountries.map((country) => (
@@ -369,7 +369,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
 
                                     {/* Realtime Search & History Dropdown */}
                                     {isSearchOpen && (showHistory || searchQuery.length > 0) && (
-                                        <div className="absolute top-full left-0 right-0 mt-2 bg-[#0B0D12] border border-white/10 rounded-2xl shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 overflow-hidden">
+                                        <div className="absolute top-full left-0 right-0 mt-2 glass-panel z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
                                             {searchQuery.length > 0 ? (
                                                 <div className="flex flex-col max-h-[400px] overflow-y-auto custom-scrollbar p-2">
                                                     <div className="px-3 pb-2 pt-1 border-b border-white/10 flex justify-between items-center mb-2">
@@ -381,7 +381,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                     {searchResults?.actors && searchResults.actors.length > 0 && (
                                                         <div className="mb-3">
                                                             <div className="px-3 py-1 text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Diễn viên</div>
-                                                            {searchResults.actors.map((actor: any) => (
+                                                            {searchResults.actors.map((actor: Record<string, unknown>) => (
                                                                 <Link
                                                                     href={`/dien-vien/${encodeURIComponent(actor.name)}`}
                                                                     key={actor.id}
@@ -407,7 +407,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                     {searchResults?.movies && searchResults.movies.length > 0 && (
                                                         <div className="mb-1">
                                                             <div className="px-3 py-1 text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Phim</div>
-                                                            {searchResults.movies.map((movie: any) => (
+                                                            {searchResults.movies.map((movie: Record<string, unknown>) => (
                                                                 <Link
                                                                     href={`/xem-phim/${movie.slug}`}
                                                                     key={movie._id || movie.slug}

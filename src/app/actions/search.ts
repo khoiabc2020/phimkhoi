@@ -14,7 +14,7 @@ export async function getRealtimeSearch(query: string) {
             searchTMDBPerson(query),
         ]);
 
-        const formattedActors = (actors || []).map((actor: any) => ({
+        const formattedActors = (actors || []).map((actor: { id?: number; name?: string; profile_path?: string; }) => ({
             id: actor.id,
             name: actor.name,
             profile_url: actor.profile_path ? getTMDBImage(actor.profile_path, "w500") : null,

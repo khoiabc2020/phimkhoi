@@ -13,12 +13,12 @@ export const revalidate = 3600;
 
 // Wrapper cho Sidebar Trending
 async function AsyncTopTrending({ title, slug, type }: { title: string, slug: string, type: 'tv' | 'movie' }) {
-  let data: any[] = await getTrendMovies(type).catch(() => []);
+  const data: Record<string, unknown>[] = await getTrendMovies(type).catch(() => []);
 
   // Backfill if empty
   if (data.length < 10) {
     const backup = await getMoviesList(type === 'tv' ? 'phim-bo' : 'phim-le', { limit: 10 });
-    const sourceIds = new Set(data.map((m: any) => m._id));
+    const sourceIds = new Set(data.map((m: { _id?: string }) => m._id));
     for (const item of (backup?.items || [])) {
       if (data.length >= 10) break;
       if (!sourceIds.has(item._id)) {
@@ -39,11 +39,11 @@ export default async function Home() {
     getHomeData(),
   ]);
 
-  let finalHeroData: any[] = heroTrending.slice(0, 5); // Limit hero to 5 items early on
+  let finalHeroData: Record<string, unknown>[] = heroTrending.slice(0, 5); // Limit hero to 5 items early on
 
   if (finalHeroData.length < 4) {
     // Nếu Hero fail, gọi fallback từ homeData
-    const heroMixed: any[] = [];
+    const heroMixed: Record<string, unknown>[] = [];
     const phimBoItems = homeData.phimBo || [];
     const phimLeItems = homeData.phimLe || [];
     const maxLen = Math.max(phimBoItems.length, phimLeItems.length);

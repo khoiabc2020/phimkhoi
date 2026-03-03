@@ -8,7 +8,7 @@ interface PlaylistManagerModalProps {
     onClose: () => void;
     onSuccess: () => void;
     mode: "create" | "edit";
-    playlist?: any;
+    playlist?: Record<string, unknown>;
 }
 
 export default function PlaylistManagerModal({ isOpen, onClose, onSuccess, mode, playlist }: PlaylistManagerModalProps) {
@@ -50,7 +50,7 @@ export default function PlaylistManagerModal({ isOpen, onClose, onSuccess, mode,
             }
             onSuccess();
             onClose();
-        } catch (err: any) {
+        } catch (err: unknown) {
             setError(err.message);
         } finally {
             setIsLoading(false);
@@ -71,7 +71,7 @@ export default function PlaylistManagerModal({ isOpen, onClose, onSuccess, mode,
             if (!res.ok) throw new Error(data.error || "Có lỗi xảy ra");
             onSuccess();
             onClose();
-        } catch (err: any) {
+        } catch (err: unknown) {
             setError(err.message);
             setIsDeleting(false);
         }

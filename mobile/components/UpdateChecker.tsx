@@ -3,13 +3,14 @@ import {
     View, Text, Modal, Pressable, StyleSheet, Linking, Platform,
     ActivityIndicator, Alert
 } from 'react-native';
+import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { CONFIG } from '@/constants/config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Version hiện tại của ứng dụng — cập nhật mỗi lần build
-const CURRENT_VERSION = '1.0.2';
-const CURRENT_BUILD = 3;
+const CURRENT_VERSION = '1.0.6';
+const CURRENT_BUILD = 7;
 
 const SKIP_KEY = 'skipped_update_build';
 
@@ -79,7 +80,7 @@ export default function UpdateChecker({ silent = true }: Props) {
 
     return (
         <Modal visible={visible} transparent animationType="fade" onRequestClose={() => !updateInfo?.force_update && setVisible(false)}>
-            <View style={styles.overlay}>
+            <BlurView intensity={40} tint="dark" style={styles.overlay}>
                 <View style={styles.card}>
                     {/* Header */}
                     <View style={styles.iconWrap}>
@@ -109,16 +110,17 @@ export default function UpdateChecker({ silent = true }: Props) {
                         </Pressable>
                     )}
                 </View>
-            </View>
+            </BlurView>
         </Modal>
     );
 }
 
 const styles = StyleSheet.create({
-    overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.75)', justifyContent: 'center', alignItems: 'center', padding: 24 },
+    overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center', padding: 24, zIndex: 999 },
     card: {
-        backgroundColor: '#13161f', borderRadius: 24, padding: 28, width: '100%', maxWidth: 360,
-        borderWidth: 1, borderColor: 'rgba(244,200,74,0.25)', alignItems: 'center',
+        backgroundColor: '#1c1c1e', borderRadius: 32, padding: 28, width: '100%', maxWidth: 360,
+        borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', alignItems: 'center',
+        shadowColor: '#000', shadowOffset: { width: 0, height: 16 }, shadowOpacity: 0.5, shadowRadius: 32, elevation: 12
     },
     iconWrap: {
         width: 72, height: 72, borderRadius: 36,

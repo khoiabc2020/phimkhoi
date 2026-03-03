@@ -4,8 +4,8 @@ import Pagination from "@/components/Pagination";
 import { getMoviesList } from "@/services/api";
 import { Metadata } from "next";
 
-// Revalidate every 60 seconds for real-time updates
-export const revalidate = 60;
+// Revalidate mỗi 5 phút - cân bằng giữa freshness và server load
+export const revalidate = 300;
 
 interface PageProps {
     params: Promise<{ type: string }>;
@@ -105,7 +105,7 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
                 {/* Grid: content-visibility giúp giảm CPU khi cuộn */}
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2 sm:gap-3 md:gap-4 mt-6 [contain:layout_paint]">
                     {items?.length > 0 ? (
-                        items.map((movie: any) => (
+                        items.map((movie: Record<string, unknown>) => (
                             <MovieCard key={movie._id} movie={movie} />
                         ))
                     ) : (

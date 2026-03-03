@@ -30,7 +30,7 @@ export async function getMovieCast(query: string, year?: number, type: 'movie' |
         if (movie) {
             const details = await getTMDBDetails(movie.id, type);
             if (details && details.credits && details.credits.cast) {
-                return details.credits.cast.slice(0, 10).map((actor: any) => ({
+                return details.credits.cast.slice(0, 10).map((actor: { id: number; name: string; profile_path: string; character: string, original_name?: string }) => ({
                     id: actor.id,
                     name: actor.name,
                     original_name: actor.original_name,

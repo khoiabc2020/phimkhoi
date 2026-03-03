@@ -29,7 +29,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
     const serverIndex = server ? Number(server) || 0 : 0;
     const usedIndex = servers[serverIndex] ? serverIndex : 0;
     const episodes = servers[usedIndex]?.server_data || [];
-    const currentEpisode = episodes.find((ep: any) => ep.slug === episode);
+    const currentEpisode = episodes.find((ep: { slug: string }) => ep.slug === episode);
     if (!movie) return { title: "Không tìm thấy phim" };
     return {
         title: `Xem phim ${movie.name} - Tập ${currentEpisode?.name || episode} | MovieBox`,
@@ -49,10 +49,10 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
     const serverIndex = server ? Number(server) || 0 : 0;
     const usedIndex = servers[serverIndex] ? serverIndex : 0;
     const episodes = servers[usedIndex]?.server_data || [];
-    const currentEpisode = episodes.find((ep: any) => ep.slug === episode);
+    const currentEpisode = episodes.find((ep: { slug: string }) => ep.slug === episode);
 
     let session = null;
-    let cast: any[] = [];
+    let cast: Record<string, unknown>[] = [];
 
     try {
         const [sessionRes, castRes, tmdbRes] = await Promise.all([
@@ -158,7 +158,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
                                                 <div>
                                                     <h4 className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2">Diễn viên</h4>
                                                     <div className="flex flex-wrap gap-1.5">
-                                                        {cast.slice(0, 10).map((actor: any) => (
+                                                        {cast.slice(0, 10).map((actor: { id: React.Key | null | undefined; name: string; profile_url: string; character: string }) => (
                                                             <span key={actor.id}
                                                                 className="text-xs px-2.5 py-1 rounded-full text-gray-300 border border-white/[0.08]"
                                                                 style={{ background: "rgba(255,255,255,0.05)" }}>
@@ -195,7 +195,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
                                         <h3 className="text-white font-bold text-[15px] tracking-wide">Thể loại</h3>
                                     </div>
                                     <div className="p-5 flex flex-wrap gap-2">
-                                        {movie.category.map((c: any) => (
+                                        {movie.category.map((c: { id: React.Key | null | undefined; slug: string; name: string }) => (
                                             <Link key={c.id} href={`/the-loai/${c.slug}`}
                                                 className="text-xs px-3 py-1.5 rounded-full text-gray-300 border border-white/[0.08] hover:border-yellow-400/40 hover:text-yellow-300 transition-colors"
                                                 style={{ background: "rgba(255,255,255,0.05)" }}>

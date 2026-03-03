@@ -14,14 +14,14 @@ export default async function RelatedMovies({ categorySlug, currentMovieId, mode
     if (!categorySlug) return null;
 
     const data = await getMoviesByCategory(categorySlug, 1, 12);
-    const movies = data.items?.filter((m: any) => m._id !== currentMovieId) || [];
+    const movies = data.items?.filter((m: { _id?: string }) => m._id !== currentMovieId) || [];
 
     if (movies.length === 0) return null;
 
     if (mode === 'vertical') {
         return (
             <div className="space-y-3 [contain:layout_paint]">
-                {movies.slice(0, 5).map((movie: any) => (
+                {movies.slice(0, 5).map((movie: Record<string, unknown>) => (
                     <Link key={movie._id} href={`/phim/${movie.slug}`}
                         className="flex gap-3 group rounded-xl p-2 transition-all duration-200 hover:bg-white/[0.04]">
                         {/* Poster */}

@@ -31,7 +31,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
         // Logic 2: Thêm phim
         if (action === "add_movie" && movieData) {
-            const isExist = playlist.movies.some((m: any) => m.movieSlug === movieData.movieSlug);
+            const isExist = playlist.movies.some((m: { movieSlug: string; }) => m.movieSlug === movieData.movieSlug);
             if (!isExist) {
                 playlist.movies.push(movieData);
                 await playlist.save();
@@ -41,7 +41,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
         // Logic 3: Xoá phim
         if (action === "remove_movie" && movieData?.movieSlug) {
-            playlist.movies = playlist.movies.filter((m: any) => m.movieSlug !== movieData.movieSlug);
+            playlist.movies = playlist.movies.filter((m: { movieSlug: string; }) => m.movieSlug !== movieData.movieSlug);
             await playlist.save();
             return NextResponse.json({ success: true, data: playlist });
         }

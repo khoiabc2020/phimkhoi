@@ -52,15 +52,15 @@ export default function AddToPlaylistButton({ movieData, className, variant = "i
         }
     };
 
-    const togglePlaylist = async (playlist: any) => {
-        const isExist = playlist.movies.some((m: any) => m.movieSlug === movieData.movieSlug);
+    const togglePlaylist = async (playlist: { _id?: string; name?: string; movies: { movieSlug: string }[] }) => {
+        const isExist = playlist.movies.some((m: { movieSlug: string }) => m.movieSlug === movieData.movieSlug);
         const action = isExist ? "remove_movie" : "add_movie";
 
         // Optimistic UI updates
         setPlaylists(prev => prev.map(p => {
             if (p._id === playlist._id) {
                 if (isExist) {
-                    return { ...p, movies: p.movies.filter((m: any) => m.movieSlug !== movieData.movieSlug) };
+                    return { ...p, movies: p.movies.filter((m: { movieSlug: string }) => m.movieSlug !== movieData.movieSlug) };
                 } else {
                     return { ...p, movies: [...p.movies, movieData] };
                 }
@@ -158,7 +158,7 @@ export default function AddToPlaylistButton({ movieData, className, variant = "i
                             ) : (
                                 <div className="space-y-1 p-2">
                                     {playlists.map(playlist => {
-                                        const isChecked = playlist.movies.some((m: any) => m.movieSlug === movieData.movieSlug);
+                                        const isChecked = playlist.movies.some((m: { movieSlug: string }) => m.movieSlug === movieData.movieSlug);
                                         return (
                                             <label
                                                 key={playlist._id}

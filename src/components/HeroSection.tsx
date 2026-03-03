@@ -85,7 +85,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
     });
 
     // Hero dùng poster/thumbnail từ API (TMDB Server Side khi đã match năm, hoặc nguồn PhimAPI). Fallback placeholder để không bao giờ slide đen.
-    const getHeroImage = (movie: any, type: 'poster' | 'backdrop' = 'poster') => {
+    const getHeroImage = (movie: Record<string, unknown>, type: 'poster' | 'backdrop' = 'poster') => {
         const tmdbData = movie.tmdbData;
         if (tmdbData) {
             if (type === 'poster' && tmdbData.poster_path) {
@@ -105,7 +105,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
             {/* ================= MOBILE LAYOUT compact — chiều cao tiết kiệm ================= */}
             <div className="md:hidden relative w-full bg-[#0B0D12]" ref={mobileRef}>
                 <div className="flex flex-row touch-pan-y">
-                    {heroMovies.map((movie: any, index) => {
+                    {heroMovies.map((movie: Record<string, unknown>, index) => {
                         const posterImg = getHeroImage(movie, 'poster');
                         const backdropImg = getHeroImage(movie, 'backdrop');
                         const rating = movie.tmdbData?.vote_average ? movie.tmdbData.vote_average.toFixed(1) : null;
@@ -125,12 +125,19 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                         className="object-cover object-top"
                                         priority={index === 0}
                                         sizes="100vw"
+                                        placeholder="blur"
+                                        blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
+                                        unoptimized
                                     />
                                     {/* Gradient bottom */}
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D12] via-[#0B0D12]/40 to-transparent" />
                                     {/* Poster nhỏ góc trái dưới */}
                                     <Link href={`/phim/${movie.slug}`} className="absolute bottom-3 left-3 w-[72px] h-[100px] rounded-xl overflow-hidden shadow-xl ring-1 ring-white/15 shrink-0">
-                                        <Image src={posterImg} alt="" fill className="object-cover" sizes="80px" />
+                                        <Image src={posterImg} alt="" fill className="object-cover" sizes="80px"
+                                            placeholder="blur"
+                                            blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
+                                            unoptimized
+                                        />
                                     </Link>
                                     {/* Badges góc phải dưới (để tránh overlap notch và header phía trên) */}
                                     <div className="absolute bottom-3 right-3 flex flex-col items-end gap-1.5 z-40">
@@ -152,7 +159,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                         </h1>
                                         <div className="flex items-center gap-2 mt-1 flex-wrap">
                                             {movie.year && <span className="text-[11px] text-gray-400">{movie.year}</span>}
-                                            {movie.category?.slice(0, 2).map((c: any) => (
+                                            {movie.category?.slice(0, 2).map((c: { id?: string; name?: string }) => (
                                                 <span key={c.id} className="text-[11px] text-gray-500">· {c.name}</span>
                                             ))}
                                         </div>
@@ -234,22 +241,26 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
                                     {/* 2. Content Container */}
                                     <div className="relative z-30 h-full container max-w-[1600px] mx-auto px-6 md:px-12 lg:px-24 xl:px-32 flex items-center">
-                                        <div className="grid grid-cols-12 gap-6 md:gap-6 md:gap-12 w-full items-center mt-12 md:mt-16">
+                                        <div className="grid grid-cols-12 gap-6 md:gap-8 lg:gap-12 w-full items-center mt-12 md:mt-16">
 
                                             {/* Left: Info — rút ngắn animation để giảm lag desktop */}
-                                            <div className="col-span-12 md:col-span-7 xl:col-span-5 lg:col-span-6 space-y-6 lg:space-y-8 animate-in fade-in slide-in-from-left-4 duration-300">
+                                            <div className="col-span-12 md:col-span-8 lg:col-span-7 xl:col-span-6 space-y-6 lg:space-y-8 animate-in fade-in slide-in-from-left-4 duration-300">
 
                                                 {/* Meta Badges */}
                                                 <div className="flex flex-wrap items-center gap-3">
                                                     <span className="px-3 py-1 rounded bg-[#F4C84A] text-black text-xs font-bold tracking-wider uppercase">
                                                         Phim Hot
                                                     </span>
-                                                    <span className="px-3 py-1 rounded border border-white/20 bg-white/5 text-white text-xs font-semibold">
-                                                        {movie.year}
-                                                    </span>
-                                                    <span className="px-3 py-1 rounded border border-[#F4C84A]/50 bg-[#F4C84A]/10 text-[#F4C84A] text-xs font-bold border-glow-accent">
-                                                        {movie.quality}
-                                                    </span>
+                                                    {movie.year && (
+                                                        <span className="px-3 py-1 rounded border border-white/20 bg-white/5 text-white text-xs font-semibold">
+                                                            {movie.year}
+                                                        </span>
+                                                    )}
+                                                    {movie.quality && (
+                                                        <span className="px-3 py-1 rounded border border-[#F4C84A]/50 bg-[#F4C84A]/10 text-[#F4C84A] text-xs font-bold border-glow-accent">
+                                                            {movie.quality}
+                                                        </span>
+                                                    )}
                                                     <span className="flex items-center gap-1 text-white/80 text-xs font-medium">
                                                         <span className="text-[#F4C84A]">★</span> {movie.tmdbData?.vote_average?.toFixed(1) || "N/A"}
                                                     </span>
@@ -257,18 +268,21 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
                                                 {/* Title */}
                                                 <h1
-                                                    className="text-lg md:text-xl font-bold text-white leading-tight tracking-tight drop-shadow-2xl line-clamp-2 mb-3 px-1"
+                                                    className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight drop-shadow-2xl line-clamp-2 lg:line-clamp-3 mb-3 px-1"
+                                                    title={decodeHtml(movie.name)}
                                                 >
                                                     {decodeHtml(movie.name)}
                                                 </h1>
 
                                                 {/* Origin Name & Categories */}
-                                                <div className="flex items-center gap-4 mb-5">
-                                                    <h2 className="text-[16px] text-[#F4C84A] font-medium tracking-wide opacity-90">
-                                                        {decodeHtml(movie.origin_name || "")}
-                                                    </h2>
+                                                <div className="flex items-center gap-4 mb-5 flex-wrap">
+                                                    {movie.origin_name && (
+                                                        <h2 className="text-[16px] text-[#F4C84A] font-medium tracking-wide opacity-90 truncate max-w-[200px] sm:max-w-xs" title={decodeHtml(movie.origin_name)}>
+                                                            {decodeHtml(movie.origin_name)}
+                                                        </h2>
+                                                    )}
                                                     <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
-                                                    <div className="flex gap-3">
+                                                    <div className="flex gap-3 flex-wrap">
                                                         {movie.category?.slice(0, 3).map(c => (
                                                             <span key={c.id} className="text-white/80 hover:text-[#F4C84A] transition-colors cursor-pointer text-xs font-semibold uppercase tracking-wider">
                                                                 {c.name}
@@ -278,29 +292,29 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                                 </div>
 
                                                 {/* Description */}
-                                                <p className="text-white/60 text-base leading-relaxed line-clamp-3 font-normal max-w-2xl text-shadow-sm">
+                                                <p className="text-white/60 text-sm md:text-base leading-relaxed line-clamp-3 font-normal max-w-2xl text-shadow-sm">
                                                     {decodeHtml(stripHtml(movie.content || ""))}
                                                 </p>
 
                                                 {/* CTA Buttons - Liquid Glass Container (Desktop) */}
-                                                <div className="flex items-center gap-3 p-[6px] rounded-full bg-[#1A1C23] border border-white/10 w-max mt-4">
+                                                <div className="flex flex-wrap items-center gap-3 p-[6px] glass-pill w-fit mt-4">
                                                     <Link
                                                         href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                                        className="group relative flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-extrabold text-[15px] transition-all duration-200 hover:scale-105 active:scale-95"
+                                                        className="group relative flex items-center justify-center gap-2 h-12 px-6 sm:px-8 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-extrabold text-[15px] transition-all duration-200 hover:scale-105 active:scale-95"
                                                     >
-                                                        <Play className="w-5 h-5 fill-black" />
-                                                        <span>Xem Ngay</span>
+                                                        <Play className="w-5 h-5 fill-black shrink-0" />
+                                                        <span className="whitespace-nowrap">Xem Ngay</span>
                                                     </Link>
 
                                                     <Link
                                                         href={`/phim/${movie.slug}`}
-                                                        className="flex items-center justify-center gap-2 h-12 px-6 rounded-full glass hover:bg-white/15 border border-white/10 text-white font-bold text-[15px] transition-all hover:scale-105 active:scale-95 group/info"
+                                                        className="flex items-center justify-center gap-2 h-12 px-5 sm:px-6 rounded-full glass hover:bg-white/15 border border-white/10 text-white font-bold text-[15px] transition-all hover:scale-105 active:scale-95 group/info"
                                                     >
-                                                        <Info className="w-5 h-5 text-white/80 group-hover/info:text-[#F4C84A] transition-colors" />
-                                                        <span>Chi tiết</span>
+                                                        <Info className="w-5 h-5 text-white/80 group-hover/info:text-[#F4C84A] transition-colors shrink-0" />
+                                                        <span className="hidden sm:inline whitespace-nowrap">Chi tiết</span>
                                                     </Link>
 
-                                                    <div className="h-12 w-12 flex items-center justify-center rounded-full glass hover:bg-white/15 border border-white/10 transition-all hover:scale-110 cursor-pointer">
+                                                    <div className="h-12 w-12 flex items-center justify-center rounded-full glass hover:bg-white/15 border border-white/10 transition-all hover:scale-110 cursor-pointer shrink-0">
                                                         <FavoriteButton movieData={getFavoriteData(movie)} size="md" />
                                                     </div>
                                                 </div>
@@ -308,14 +322,17 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
                                             {/* Right: 3D Tilt Poster Card */}
                                             {/* Scaled for both tablets and large screens */}
-                                            <div className="col-span-12 md:col-span-5 xl:col-span-7 lg:col-span-6 hidden md:flex justify-end pr-0 lg:pr-0 lg:pr-8 xl:pr-16">
-                                                <div className="relative w-[280px] lg:w-[280px] lg:w-[340px] xl:w-[400px] aspect-[2/3] rounded-[24px] lg:rounded-[32px] overflow-hidden ring-1 ring-white/10 group/poster transition-transform duration-300 ease-out hover:scale-[1.02] z-30 will-change-transform transform-gpu shadow-2xl">
+                                            <div className="col-span-12 md:col-span-4 lg:col-span-5 xl:col-span-6 hidden md:flex justify-end lg:justify-center xl:justify-end pr-0 lg:pr-8 xl:pr-16">
+                                                <div className="relative w-[240px] lg:w-[300px] xl:w-[360px] aspect-[2/3] rounded-[24px] lg:rounded-[32px] overflow-hidden ring-1 ring-white/10 group/poster transition-transform duration-300 ease-out hover:scale-[1.02] z-30 will-change-transform transform-gpu shadow-2xl shrink-0">
                                                     <Image
                                                         src={posterImg}
                                                         alt={decodeHtml(movie.name)}
                                                         fill
                                                         className="object-cover transition-transform duration-300 group-hover/poster:scale-105 will-change-transform"
                                                         priority={index === 0}
+                                                        unoptimized
+                                                        placeholder="blur"
+                                                        blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
                                                     />
                                                 </div>
                                             </div>

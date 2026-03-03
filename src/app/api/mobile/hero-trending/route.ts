@@ -4,7 +4,7 @@ const TMDB_API_KEY = process.env.TMDB_API_KEY;
 const KKPHIM_API = 'https://phimapi.com';
 const OPHIM_API = 'https://ophim1.com';
 
-function getItems(data: any) {
+function getItems(data: { items?: unknown[]; data?: { items?: unknown[] } }) {
     if (!data) return [];
     if (Array.isArray(data.items)) return data.items;
     if (data.data?.items) return data.data.items;
@@ -30,12 +30,12 @@ async function findInVietnamese(query: string, year?: number) {
         fetch(`${NGUONC_API}/api/films/search?keyword=${safeQuery}`).then(r => r.json()).catch(() => null),
     ]);
 
-    const allItems: any[] = [];
+    const allItems: Record<string, unknown>[] = [];
 
     if (kkRes.status === 'fulfilled' && kkRes.value) {
         const d = kkRes.value;
         const pathImage = d.pathImage || d.data?.pathImage || '';
-        const items = getItems(d).map((m: any) => ({
+        const items = getItems(d).map((m: Record<string, unknown>) => ({
             ...m,
             thumb_url: normalizeUrl(m.thumb_url, pathImage),
             poster_url: normalizeUrl(m.poster_url, pathImage),
@@ -46,7 +46,7 @@ async function findInVietnamese(query: string, year?: number) {
     if (ophimRes.status === 'fulfilled' && ophimRes.value) {
         const d = ophimRes.value;
         const pathImage = d.pathImage || 'https://img.ophim.live/uploads/movies/';
-        const items = getItems(d).map((m: any) => ({
+        const items = getItems(d).map((m: Record<string, unknown>) => ({
             ...m,
             thumb_url: normalizeUrl(m.thumb_url, pathImage),
             poster_url: normalizeUrl(m.poster_url, pathImage),
@@ -55,7 +55,7 @@ async function findInVietnamese(query: string, year?: number) {
     }
 
     if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
-        const items = (nguoncRes.value.items || []).map((m: any) => ({
+        const items = (nguoncRes.value.items || []).map((m: Record<string, unknown>) => ({
             _id: m.id || m.slug,
             name: m.name,
             slug: m.slug,
@@ -96,7 +96,7 @@ export async function GET() {
         ]);
 
         // Combine and deduplicate TMDB results
-        const tmdbItems: any[] = [];
+        const tmdbItems: Record<string, unknown>[] = [];
         const seenIds = new Set<number>();
 
         for (const item of [...(trendAllRes.results || []), ...(trendTvRes.results || [])]) {
@@ -107,7 +107,7 @@ export async function GET() {
         }
 
         // 2. For each TMDB item, find matching Vietnamese streaming movie
-        const heroMovies: any[] = [];
+        const heroMovies: Record<string, unknown>[] = [];
 
         for (const tmdb of tmdbItems.slice(0, 20)) {
             // Use original title for better matching accuracy
