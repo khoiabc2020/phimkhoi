@@ -5,11 +5,7 @@ import { useRouter } from "next/navigation";
 import { Lock, User, Mail } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import TurnstileWidget from "@/components/TurnstileWidget";
 import { signIn } from "next-auth/react";
-
-const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
-const hasRealTurnstile = TURNSTILE_SITE_KEY && TURNSTILE_SITE_KEY !== "your_turnstile_site_key";
 
 function RegisterForm() {
     const [name, setName] = useState("");
@@ -18,7 +14,6 @@ function RegisterForm() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
-    const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
     const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -27,11 +22,6 @@ function RegisterForm() {
 
         if (password !== confirmPassword) {
             setError("Mật khẩu xác nhận không khớp.");
-            return;
-        }
-
-        if (hasRealTurnstile && !turnstileToken) {
-            setError("Vui lòng hoàn thành xác minh bảo mật.");
             return;
         }
 
@@ -150,16 +140,6 @@ function RegisterForm() {
                         required
                     />
                 </div>
-
-                {/* Cloudflare Turnstile */}
-                {TURNSTILE_SITE_KEY && (
-                    <TurnstileWidget
-                        siteKey={TURNSTILE_SITE_KEY}
-                        onSuccess={setTurnstileToken}
-                        onError={() => setTurnstileToken(null)}
-                        onExpire={() => setTurnstileToken(null)}
-                    />
-                )}
 
                 <button
                     type="submit"

@@ -7,10 +7,7 @@ import Link from "next/link";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import Image from "next/image";
 import Script from "next/script";
-import TurnstileWidget from "@/components/TurnstileWidget";
 
-const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
-const hasRealTurnstile = TURNSTILE_SITE_KEY && TURNSTILE_SITE_KEY !== "your_turnstile_site_key";
 const hasGoogle = true; // controlled by env in NextAuth
 const hasFacebook = true;
 
@@ -20,7 +17,6 @@ function LoginForm() {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
     const router = useRouter();
     const searchParams = useSearchParams();
     const callbackUrl = searchParams.get("callbackUrl") || "/";
@@ -29,12 +25,6 @@ function LoginForm() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
-
-        // Validate Turnstile if configured
-        if (hasRealTurnstile && !turnstileToken) {
-            setError("Vui lòng hoàn thành xác minh bảo mật.");
-            return;
-        }
 
         setIsLoading(true);
         try {
@@ -139,16 +129,6 @@ function LoginForm() {
                         {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                 </div>
-
-                {/* Cloudflare Turnstile */}
-                {TURNSTILE_SITE_KEY && (
-                    <TurnstileWidget
-                        siteKey={TURNSTILE_SITE_KEY}
-                        onSuccess={setTurnstileToken}
-                        onError={() => setTurnstileToken(null)}
-                        onExpire={() => setTurnstileToken(null)}
-                    />
-                )}
 
                 <div className="flex justify-end w-full cursor-pointer mb-2">
                     <Link href="/forgot-password" className="text-[#b3b3b3] text-[13px] hover:underline hover:text-white transition-colors">Quên mật khẩu?</Link>
