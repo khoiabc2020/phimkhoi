@@ -132,10 +132,10 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                     <Link href={`/phim/${movie.slug}`} className="absolute bottom-3 left-3 w-[72px] h-[100px] rounded-xl overflow-hidden shadow-xl ring-1 ring-white/15 shrink-0">
                                         <Image src={posterImg} alt="" fill className="object-cover" sizes="80px" />
                                     </Link>
-                                    {/* Badges góc phải trên */}
-                                    <div className="absolute top-3 right-3 flex gap-1.5">
+                                    {/* Badges góc phải dưới (để tránh overlap notch và header phía trên) */}
+                                    <div className="absolute bottom-3 right-3 flex flex-col items-end gap-1.5 z-40">
                                         {movie.quality && (
-                                            <span className="bg-[#F4C84A] text-black text-[10px] font-black px-2 py-0.5 rounded">{movie.quality}</span>
+                                            <span className="bg-[#F4C84A] text-black text-[10px] font-black px-2 py-0.5 rounded shadow-sm">{movie.quality}</span>
                                         )}
                                         {rating && (
                                             <span className="bg-black/70 text-[#F4C84A] text-[10px] font-bold px-2 py-0.5 rounded backdrop-blur-sm">★ {rating}</span>
