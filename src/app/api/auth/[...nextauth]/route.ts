@@ -1,11 +1,30 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
+import FacebookProvider from "next-auth/providers/facebook";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 
 export const authOptions = {
     providers: [
+        // Google OAuth
+        ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_ID !== 'your_google_client_id' ? [
+            GoogleProvider({
+                clientId: process.env.GOOGLE_CLIENT_ID!,
+                clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+            })
+        ] : []),
+
+        // Facebook OAuth
+        ...(process.env.FACEBOOK_CLIENT_ID && process.env.FACEBOOK_CLIENT_ID !== 'your_facebook_app_id' ? [
+            FacebookProvider({
+                clientId: process.env.FACEBOOK_CLIENT_ID!,
+                clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
+            })
+        ] : []),
+
+        // Email/Password
         CredentialsProvider({
             name: "Credentials",
             credentials: {
@@ -17,7 +36,6 @@ export const authOptions = {
 
                 await dbConnect();
 
-                // 1. Check if user exists
                 const user = await User.findOne({
                     $or: [
                         { email: credentials.username },
@@ -25,7 +43,7 @@ export const authOptions = {
                     ]
                 });
 
-                // 2. Setup real Admin if DB is empty/first run
+                // Tạo admin mặc định nếu DB trống
                 if (!user && credentials.username === "admin" && credentials.password === "admin123") {
                     const hashed = await bcrypt.hash("admin123", 10);
                     const newAdmin = await User.create({
@@ -44,9 +62,7 @@ export const authOptions = {
 
                 if (!user) return null;
 
-                // 3. Verify password
                 const isValid = await bcrypt.compare(credentials.password, user.password || "");
-
                 if (!isValid) return null;
 
                 return {
@@ -60,12 +76,35 @@ export const authOptions = {
         }),
     ],
     callbacks: {
-        async jwt({ token, user }: any) {
-            if (user) {
-                token.role = user.role;
-                token.id = user.id; // persist user ID
+        async signIn({ user, account }: any) {
+            // Tự động tạo tài khoản khi đăng nhập bằng Google/Facebook
+            if (account?.provider === 'google' || account?.provider === 'facebook') {
+                try {
+                    await dbConnect();
+                    const existingUser = await User.findOne({ email: user.email });
+                    if (!existingUser) {
+                        await User.create({
+                            name: user.name,
+                            email: user.email,
+                            image: user.image,
+                            role: 'user',
+                            provider: account.provider,
+                        });
+                    }
+                } catch (error) {
+                    console.error('OAuth signIn error:', error);
+                }
             }
-            // Fallback: đảm bảo token.id luôn có giá trị
+            return true;
+        },
+        async jwt({ token, user, account }: any) {
+            if (user) {
+                token.role = user.role || 'user';
+                token.id = user.id;
+            }
+            if (account?.provider) {
+                token.provider = account.provider;
+            }
             if (!token.id) {
                 token.id = token.sub || token.email || 'anonymous';
             }
@@ -74,8 +113,8 @@ export const authOptions = {
         async session({ session, token }: any) {
             if (session?.user) {
                 session.user.role = token.role;
-                // Fallback chain: token.id → token.sub → token.email
                 session.user.id = token.id || token.sub || token.email;
+                session.user.provider = token.provider;
             }
             return session;
         },

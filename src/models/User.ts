@@ -15,6 +15,7 @@ export interface IUser extends Document {
         timestamp: number;
         progress: number; // Seconds watched
     }[];
+    provider?: string;
     resetPasswordToken?: string;
     resetPasswordExpires?: number;
     createdAt: Date;
@@ -39,6 +40,7 @@ const UserSchema: Schema<IUser> = new Schema(
                 progress: { type: Number, default: 0 },
             },
         ],
+        provider: { type: String },
         resetPasswordToken: { type: String },
         resetPasswordExpires: { type: Date },
     },
