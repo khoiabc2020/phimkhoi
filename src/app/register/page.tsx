@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Lock, User, Mail } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import TurnstileWidget from "@/components/TurnstileWidget";
 import { signIn } from "next-auth/react";
 
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
@@ -152,16 +153,12 @@ function RegisterForm() {
 
                 {/* Cloudflare Turnstile */}
                 {TURNSTILE_SITE_KEY && (
-                    <div className="mt-2 mb-2 w-full flex justify-center min-h-[65px] h-[65px] overflow-hidden items-center relative z-50">
-                        <div
-                            className="cf-turnstile"
-                            data-sitekey={TURNSTILE_SITE_KEY}
-                            data-theme="dark"
-                            data-callback="onTurnstileSuccess"
-                            data-error-callback="onTurnstileError"
-                            data-expired-callback="onTurnstileExpire"
-                        ></div>
-                    </div>
+                    <TurnstileWidget
+                        siteKey={TURNSTILE_SITE_KEY}
+                        onSuccess={setTurnstileToken}
+                        onError={() => setTurnstileToken(null)}
+                        onExpire={() => setTurnstileToken(null)}
+                    />
                 )}
 
                 <button

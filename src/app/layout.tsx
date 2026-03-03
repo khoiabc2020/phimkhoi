@@ -32,7 +32,6 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="beforeInteractive" />
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased pb-20 lg:pb-0`}
       >
