@@ -6,7 +6,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import Image from "next/image";
-import Script from "next/script";
+import dynamic from "next/dynamic";
+
+const Turnstile = dynamic(() => import("@marsidev/react-turnstile").then((mod) => mod.Turnstile), {
+    ssr: false,
+});
 
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
 const hasRealTurnstile = TURNSTILE_SITE_KEY && TURNSTILE_SITE_KEY !== "your_turnstile_site_key";
@@ -153,28 +157,18 @@ function LoginForm() {
                 </div>
 
                 {/* Cloudflare Turnstile */}
-                {hasRealTurnstile ? (
-                    <div className="mt-1 flex justify-center">
-                        <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></Script>
-                        <div className="cf-turnstile" data-sitekey={TURNSTILE_SITE_KEY} data-theme="dark" data-callback="onTurnstileSuccess" data-error-callback="onTurnstileError" data-expired-callback="onTurnstileExpire"></div>
-                    </div>
-                ) : (
-                    <div className="mt-2 mb-2 w-full h-[65px] bg-white/5 border border-white/10 rounded-[3px] flex items-center justify-between px-4">
-                        <div className="flex items-center gap-3">
-                            <div className="w-6 h-6 rounded-full bg-[#eab308] flex items-center justify-center">
-                                <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-                            </div>
-                            <span className="text-[#e2e2e2] text-sm font-medium">Thành công!</span>
-                        </div>
-                        <div className="flex flex-col items-end">
-                            <div className="flex items-center gap-1 opacity-80">
-                                <svg className="w-6 h-4 text-[#f38020]" viewBox="0 0 32 32" fill="currentColor">
-                                    <path d="M22.5,10.6c-0.6-3.8-3.9-6.6-7.8-6.6c-3.1,0-5.8,1.7-7.1,4.3c-0.2,0-0.3,0-0.5,0c-3.2,0-5.9,2.6-5.9,5.9c0,3.2,2.6,5.9,5.9,5.9h15.4c3.3,0,6-2.7,6-6C28.4,11.2,25.8,8.8,22.5,10.6z"></path>
-                                </svg>
-                                <span className="font-bold text-[#f38020] text-[10px] tracking-tight">CLOUDFLARE</span>
-                            </div>
-                            <div className="text-[9px] text-[#8c8c8c] mt-0.5">Quyền riêng tư - Các ĐK</div>
-                        </div>
+                {TURNSTILE_SITE_KEY && (
+                    <div className="mt-2 mb-2 w-full flex justify-center min-h-[65px] h-[65px] overflow-hidden items-center relative z-50">
+                        <Turnstile
+                            siteKey={TURNSTILE_SITE_KEY}
+                            onSuccess={(token) => setTurnstileToken(token)}
+                            onError={() => setTurnstileToken(null)}
+                            onExpire={() => setTurnstileToken(null)}
+                            options={{
+                                size: "normal",
+                                theme: "dark",
+                            }}
+                        />
                     </div>
                 )}
 
