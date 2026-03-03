@@ -80,12 +80,12 @@ export default function ExploreScreen() {
       if (data) setSearchHistory(JSON.parse(data));
     });
     getHomeData().then((data) => {
-      if (data.phimLe) setHotMovies(data.phimLe.slice(0, 9));
-    });
+      if (data?.phimLe) setHotMovies(data.phimLe.slice(0, 9));
+    }).catch(e => console.error("Explore getHomeData Err:", e));
     getMenuData().then((data) => {
-      setCategories(data.categories);
-      setCountries(data.countries);
-    });
+      setCategories(data?.categories || []);
+      setCountries(data?.countries || []);
+    }).catch(e => console.error("Explore getMenuData Err:", e));
   }, []);
 
   useEffect(() => {

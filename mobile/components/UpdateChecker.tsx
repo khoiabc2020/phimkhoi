@@ -32,7 +32,7 @@ export default function UpdateChecker({ silent = true }: Props) {
 
     useEffect(() => {
         checkForUpdate();
-    }, []);
+    }, [silent]);
 
     const checkForUpdate = async () => {
         try {
@@ -44,12 +44,12 @@ export default function UpdateChecker({ silent = true }: Props) {
             if (!res.ok) return;
             const data: UpdateInfo = await res.json();
 
-            // Kiểm tra xem người dùng đã bỏ qua build này chưa
+            // Kiểm tra xem người dùng đã bỏ qua build này chưa (chỉ xét khi chạy ngầm)
             const skipped = await AsyncStorage.getItem(SKIP_KEY);
-            if (!data.force_update && skipped === String(data.build)) return;
+            if (silent && !data.force_update && skipped === String(data.build)) return;
 
-            // So sánh build number
-            if (data.build > CURRENT_BUILD) {
+            // So sánh build number - Bấm tay (silent=false) thì luôn báo k kể skip
+            if (data.build > CURRENT_BUILD || !silent) {
                 setUpdateInfo(data);
                 setVisible(true);
             }

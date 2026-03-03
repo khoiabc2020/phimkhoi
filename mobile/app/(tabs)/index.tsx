@@ -24,7 +24,7 @@ import { useAuth } from '@/context/auth'; // Added imports
 import { COLORS, SPACING, RADIUS, BLUR } from '@/constants/theme';
 
 const { width } = Dimensions.get('window');
-const HOME_CACHE_KEY = 'home_screen_cache_v1';
+const HOME_CACHE_KEY = 'home_screen_cache_v2';
 
 // Main Nav Pills (Top)
 const NAV_PILLS = [

@@ -50,7 +50,8 @@ export default function TabLayout() {
   const insets = useSafeAreaInsets();
 
   // Floating pill tab bar (iOS 26 style) — exactly 4 items, lower + no text overflow
-  const pillBottom = Math.max(insets.bottom, 6);
+  // Tăng bottom thêm 12px để tránh bị home indicator đè hoặc màn cong cắt mất chữ
+  const pillBottom = Math.max(insets.bottom, 6) + 12;
   return (
     <Tabs
       screenOptions={{
