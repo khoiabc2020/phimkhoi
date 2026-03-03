@@ -466,33 +466,34 @@ export default function MovieDetailScreen() {
                             {activeLangTab && groupedEpisodes[activeLangTab]?.length > 0 && (
                                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                                     <View style={{ flexDirection: 'row', gap: 8 }}>
+                                        {groupedEpisodes[activeLangTab].map((server: any) => {
                                             const globalIdx = episodes.findIndex(e => e.server_name === server.server_name);
-                                        const isActive = selectedServer === globalIdx;
-                                        const rawName = server.server_name || '';
-                                        // Phân rã Tên server thực tế và Tên Nguồn (NguonC, PhimAPI...)
-                                        const nameParts = rawName.split('##');
-                                        let displayName = nameParts[0]
-                                        .replace('Lồng Tiếng', '').replace('lồng tiếng', '')
-                                        .replace('Thuyết Minh', '').replace('thuyết minh', '')
-                                        .replace('Vietsub', '').replace('vietsub', '')
-                                        .replace(/\(\)/g, '').replace(/\[\]/g, '').trim() || nameParts[0].trim();
+                                            const isActive = selectedServer === globalIdx;
+                                            const rawName = server.server_name || '';
+                                            // Phân rã Tên server thực tế và Tên Nguồn (NguonC, PhimAPI...)
+                                            const nameParts = rawName.split('##');
+                                            let displayName = nameParts[0]
+                                                .replace('Lồng Tiếng', '').replace('lồng tiếng', '')
+                                                .replace('Thuyết Minh', '').replace('thuyết minh', '')
+                                                .replace('Vietsub', '').replace('vietsub', '')
+                                                .replace(/\(\)/g, '').replace(/\[\]/g, '').trim() || nameParts[0].trim();
                                             // Lấy tên Nguồn được gán sẵn qua dấu ## từ API aggregate (Dự phòng Nguồn: Khác)
                                             const sourceName = nameParts.length > 1 ? nameParts[1].trim() : 'Server';
 
-                                        return (
-                                        <Pressable
-                                            key={globalIdx}
-                                            onPress={() => { setSelectedServer(globalIdx); setSelectedEpRange(0); }}
-                                            style={[
-                                                styles.selectorPill,
-                                                isActive && { backgroundColor: 'rgba(244,200,74,0.15)', borderColor: '#F4C84A' }
-                                            ]}
-                                        >
-                                            <Text style={[styles.selectorText, isActive && { color: '#F4C84A', fontWeight: '600' }]}>
-                                                {displayName} • {sourceName}
-                                            </Text>
-                                        </Pressable>
-                                        );
+                                            return (
+                                                <Pressable
+                                                    key={globalIdx}
+                                                    onPress={() => { setSelectedServer(globalIdx); setSelectedEpRange(0); }}
+                                                    style={[
+                                                        styles.selectorPill,
+                                                        isActive && { backgroundColor: 'rgba(244,200,74,0.15)', borderColor: '#F4C84A' }
+                                                    ]}
+                                                >
+                                                    <Text style={[styles.selectorText, isActive && { color: '#F4C84A', fontWeight: '600' }]}>
+                                                        {displayName} • {sourceName}
+                                                    </Text>
+                                                </Pressable>
+                                            );
                                         })}
                                     </View>
                                 </ScrollView>
