@@ -9,8 +9,8 @@ import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { CONFIG } from '@/constants/config';
 
-const APP_VERSION = '1.0.5';
-const APP_BUILD = 6;
+const APP_VERSION = '1.0.6'; // Đồng bộ với /api/mobile/version
+const APP_BUILD = 7;
 
 interface UpdateInfo {
   version: string;
@@ -83,11 +83,18 @@ export default function ProfileScreen() {
   const checkVersion = async (isManual = false) => {
     try {
       setChecking(true);
-      const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/version`, {
-        headers: { 'Cache-Control': 'no-cache' },
-        signal: AbortSignal.timeout(6000),
-      });
-      if (res.ok) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 12000); // 12s timeout
+      let res;
+      try {
+        res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/version`, {
+          headers: { 'Cache-Control': 'no-cache' },
+          signal: controller.signal,
+        });
+      } finally {
+        clearTimeout(timer);
+      }
+      if (res && res.ok) {
         const data: UpdateInfo = await res.json();
         if (data.build > APP_BUILD) {
           setUpdateInfo(data);
@@ -98,11 +105,14 @@ export default function ProfileScreen() {
             ]);
           }
         } else if (isManual) {
-          Alert.alert('Cập nhật', 'Bạn đang dùng phiên bản mới nhất!');
+          Alert.alert('Phiên bản mới nhất', 'Bạn đang dùng phiên bản mới nhất rồi! 🎉');
         }
+      } else if (isManual) {
+        Alert.alert('Lỗi', 'Không thể kiểm tra cập nhật. Vui lòng thử lại.');
       }
     } catch {
-      if (isManual) Alert.alert('Lỗi', 'Không thể kiểm tra cập nhật.');
+      // Chỉ show lỗi khi user chủ động nhấn nút, không hiện khi auto-check lúc mở app
+      if (isManual) Alert.alert('Lỗi', 'Không thể kết nối máy chủ. Kiểm tra lại kết nối mạng.');
     } finally { setChecking(false); }
   };
 
