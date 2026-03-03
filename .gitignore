@@ -70,3 +70,8 @@ eslint-files*.txt
 parse.js
 phimkhoi.conf
 *.conf
+build-apk.log
+
+# APK files (quá lớn cho GitHub)
+*.apk
+public/*.apk
