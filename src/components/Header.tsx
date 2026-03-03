@@ -515,9 +515,11 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                         <Link href="/thong-tin-tai-khoan" className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-colors">
                                             <User className="w-4 h-4" /> Tài khoản
                                         </Link>
-                                        <Link href="/admin" className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-colors">
-                                            <Settings className="w-4 h-4" /> Quản trị
-                                        </Link>
+                                        {(session.user as any)?.role === "admin" && (
+                                            <Link href="/admin" className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-colors">
+                                                <Settings className="w-4 h-4" /> Quản trị
+                                            </Link>
+                                        )}
                                         <button
                                             onClick={() => signOut()}
                                             className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-colors mt-1"
