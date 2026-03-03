@@ -1,7 +1,7 @@
-
-import { View, Text, Pressable, Image, Alert, ScrollView } from 'react-native';
+import { View, Text, Pressable, Image, Alert, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as Linking from 'expo-linking';
 import { StatusBar } from 'expo-status-bar';
 import { useAuth } from '@/context/auth';
@@ -16,59 +16,60 @@ interface UpdateInfo {
   version: string;
   build: number;
   download_url: string;
-  force_update?: boolean;
 }
 
-const ProfileMenuItem = ({
-  icon, label, sublabel, onPress, isDestructive = false, badge
-}: {
-  icon: string; label: string; sublabel?: string;
-  onPress: () => void; isDestructive?: boolean; badge?: string;
-}) => (
-  <Pressable
-    onPress={onPress}
-    style={({ pressed }) => ({
-      flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-      paddingVertical: 14, paddingHorizontal: 16, borderRadius: 14,
-      backgroundColor: pressed ? 'rgba(255,255,255,0.06)' : 'transparent',
-      marginBottom: 2,
-    })}
-  >
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, flex: 1 }}>
+function GlassCard({ children, style }: { children: React.ReactNode; style?: any }) {
+  return (
+    <View style={[{
+      backgroundColor: 'rgba(255,255,255,0.04)',
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.08)',
+      overflow: 'hidden',
+    }, style]}>
+      {children}
+    </View>
+  );
+}
+
+function MenuRow({ icon, label, sublabel, badge, onPress, danger = false }: {
+  icon: string; label: string; sublabel?: string; badge?: string;
+  onPress: () => void; danger?: boolean;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => ({
+        flexDirection: 'row', alignItems: 'center',
+        paddingVertical: 13, paddingHorizontal: 16,
+        backgroundColor: pressed ? 'rgba(255,255,255,0.05)' : 'transparent',
+      })}
+    >
       <View style={{
-        width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center',
-        backgroundColor: isDestructive ? 'rgba(239,68,68,0.15)' : 'rgba(255,255,255,0.08)',
+        width: 34, height: 34, borderRadius: 10, alignItems: 'center', justifyContent: 'center',
+        backgroundColor: danger ? 'rgba(239,68,68,0.12)' : 'rgba(255,255,255,0.07)',
+        marginRight: 13,
       }}>
-        <Ionicons
-          name={icon as any}
-          size={20}
-          color={isDestructive ? '#ef4444' : 'rgba(255,255,255,0.85)'}
-        />
+        <Ionicons name={icon as any} size={18} color={danger ? '#ef4444' : 'rgba(255,255,255,0.75)'} />
       </View>
       <View style={{ flex: 1 }}>
-        <Text style={{ color: isDestructive ? '#ef4444' : 'white', fontSize: 15, fontWeight: '600' }}>
-          {label}
-        </Text>
-        {sublabel && (
-          <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12, marginTop: 2 }}>{sublabel}</Text>
-        )}
+        <Text style={{ color: danger ? '#ef4444' : 'white', fontSize: 15, fontWeight: '600' }}>{label}</Text>
+        {sublabel && <Text style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12, marginTop: 1 }}>{sublabel}</Text>}
       </View>
-    </View>
-    {badge ? (
-      <View style={{ backgroundColor: '#F4C84A', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 }}>
-        <Text style={{ color: '#0a0d14', fontSize: 11, fontWeight: '800' }}>{badge}</Text>
-      </View>
-    ) : (
-      <Ionicons name="chevron-forward" size={16} color="rgba(255,255,255,0.2)" />
-    )}
-  </Pressable>
-);
+      {badge ? (
+        <View style={{ backgroundColor: '#eab308', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 2 }}>
+          <Text style={{ color: '#000', fontSize: 11, fontWeight: '800' }}>{badge}</Text>
+        </View>
+      ) : (
+        <Ionicons name="chevron-forward" size={15} color="rgba(255,255,255,0.15)" />
+      )}
+    </Pressable>
+  );
+}
 
-const SectionHeader = ({ title }: { title: string }) => (
-  <Text style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 6, marginTop: 16, paddingHorizontal: 16 }}>
-    {title}
-  </Text>
-);
+function Divider() {
+  return <View style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.05)', marginLeft: 63 }} />;
+}
 
 export default function ProfileScreen() {
   const webUrl = 'https://khoiphim.io.vn';
@@ -77,184 +78,262 @@ export default function ProfileScreen() {
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
   const [checking, setChecking] = useState(false);
 
-  useEffect(() => {
-    checkVersion(false);
-  }, []);
+  useEffect(() => { checkVersion(false); }, []);
 
   const checkVersion = async (isManual = false) => {
     try {
       setChecking(true);
       const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/version`, {
         headers: { 'Cache-Control': 'no-cache' },
-        signal: AbortSignal.timeout(6000)
+        signal: AbortSignal.timeout(6000),
       });
       if (res.ok) {
         const data: UpdateInfo = await res.json();
         if (data.build > APP_BUILD) {
           setUpdateInfo(data);
           if (isManual) {
-            Alert.alert('Đã tìm thấy bản cập nhật!', `Phiên bản mới v${data.version} đã sẵn sàng. Bạn có muốn cập nhật ngay không?`, [
+            Alert.alert('Cập nhật mới!', `v${data.version} đã sẵn sàng`, [
               { text: 'Để sau', style: 'cancel' },
-              { text: 'Cập nhật', style: 'default', onPress: () => Linking.openURL(data.download_url) }
+              { text: 'Cập nhật', onPress: () => Linking.openURL(data.download_url) }
             ]);
           }
         } else if (isManual) {
-          Alert.alert('Cập nhật', 'Bạn đang sử dụng phiên bản mới nhất!');
+          Alert.alert('Cập nhật', 'Bạn đang dùng phiên bản mới nhất!');
         }
-      } else if (isManual) {
-        Alert.alert('Lỗi', 'Không thể kiểm tra bản cập nhật lúc này.');
       }
     } catch {
-      if (isManual) {
-        Alert.alert('Lỗi', 'Kiểm tra cập nhật thất bại. Vui lòng kiểm tra lại kết nối mạng.');
-      }
+      if (isManual) Alert.alert('Lỗi', 'Không thể kiểm tra cập nhật.');
     } finally { setChecking(false); }
   };
 
   const handleLogout = () => {
-    Alert.alert('Đăng xuất', 'Bạn có chắc chắn muốn đăng xuất?', [
+    Alert.alert('Đăng xuất', 'Bạn có chắc chắn?', [
       { text: 'Hủy', style: 'cancel' },
       { text: 'Đăng xuất', style: 'destructive', onPress: logout }
     ]);
   };
 
+  // ── Not logged in ──────────────────────────────────────────────────────────
   if (!user) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#0B0D12' }}>
+      <View style={{ flex: 1, backgroundColor: '#05060a' }}>
         <StatusBar style="light" />
+        {/* Background gradient */}
+        <View style={{ position: 'absolute', inset: 0 }} pointerEvents="none">
+          <LinearGradient colors={['#0d0a1f', '#05060a']} style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '55%' }} />
+          <View style={{ position: 'absolute', top: -60, right: -80, width: 240, height: 240, borderRadius: 120, backgroundColor: 'rgba(234,179,8,0.05)' }} />
+        </View>
         <SafeAreaView style={{ flex: 1 }}>
-          <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 120 }}>
-            <Text style={{ color: 'white', fontSize: 26, fontWeight: '800', marginBottom: 24 }}>Tài khoản</Text>
+          <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
+            <Text style={{ color: 'white', fontSize: 28, fontWeight: '800', marginBottom: 8, letterSpacing: -0.5 }}>Tài khoản</Text>
+            <Text style={{ color: 'rgba(255,255,255,0.35)', fontSize: 14, marginBottom: 28 }}>Đăng nhập để đồng bộ mọi thứ</Text>
 
-            <View style={{ backgroundColor: 'rgba(244,200,74,0.08)', borderRadius: 20, borderWidth: 1, borderColor: 'rgba(244,200,74,0.2)', padding: 20, marginBottom: 28, alignItems: 'center' }}>
-              <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: 'rgba(244,200,74,0.12)', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
-                <Ionicons name="person-outline" size={30} color="#F4C84A" />
+            {/* Hero sign-in card */}
+            <GlassCard style={{ padding: 24, marginBottom: 24, alignItems: 'center' }}>
+              <LinearGradient
+                colors={['rgba(234,179,8,0.08)', 'transparent']}
+                style={{ position: 'absolute', inset: 0, borderRadius: 20 }}
+              />
+              <View style={{
+                width: 72, height: 72, borderRadius: 20, backgroundColor: 'rgba(234,179,8,0.1)',
+                alignItems: 'center', justifyContent: 'center', marginBottom: 16,
+                borderWidth: 1, borderColor: 'rgba(234,179,8,0.2)'
+              }}>
+                <Ionicons name="person-outline" size={32} color="#eab308" />
               </View>
-              <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 14, textAlign: 'center', marginBottom: 16, lineHeight: 20 }}>
-                Đăng nhập để lưu lịch sử xem, yêu thích và đồng bộ trên nhiều thiết bị
+              <Text style={{ color: 'white', fontSize: 18, fontWeight: '700', marginBottom: 8 }}>Chưa đăng nhập</Text>
+              <Text style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13, textAlign: 'center', lineHeight: 20, marginBottom: 24 }}>
+                Lưu lịch sử xem, yêu thích và đồng bộ trên mọi thiết bị của bạn.
               </Text>
-              <View style={{ gap: 10, width: '100%' }}>
-                <Pressable
-                  style={{ backgroundColor: '#F4C84A', borderRadius: 14, paddingVertical: 13, alignItems: 'center' }}
-                  onPress={() => router.push('/(auth)/login' as any)}
+              <TouchableOpacity
+                onPress={() => router.push('/(auth)/login' as any)}
+                style={{ width: '100%', borderRadius: 14, overflow: 'hidden', marginBottom: 10 }}
+              >
+                <LinearGradient
+                  colors={['#f59e0b', '#eab308']}
+                  start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                  style={{ paddingVertical: 14, alignItems: 'center' }}
                 >
-                  <Text style={{ color: '#0a0d14', fontWeight: '800', fontSize: 15 }}>Đăng nhập</Text>
-                </Pressable>
-                <Pressable
-                  style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 14, paddingVertical: 13, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)' }}
-                  onPress={() => router.push('/(auth)/register' as any)}
+                  <Text style={{ color: '#000', fontWeight: '800', fontSize: 15 }}>Đăng nhập</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => router.push('/(auth)/login' as any)}
+                style={{ width: '100%', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 14, paddingVertical: 13, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' }}
+              >
+                <Text style={{ color: 'white', fontWeight: '700', fontSize: 15 }}>Tạo tài khoản</Text>
+              </TouchableOpacity>
+            </GlassCard>
+
+            {/* Stats preview */}
+            <View style={{ flexDirection: 'row', gap: 10, marginBottom: 24 }}>
+              {[{ icon: 'time-outline', label: 'Lịch sử', path: '/history' },
+              { icon: 'heart-outline', label: 'Yêu thích', path: '/(tabs)/favorites' },
+              { icon: 'bookmarks-outline', label: 'Xem sau', path: '/watchlist' }].map(item => (
+                <TouchableOpacity
+                  key={item.label}
+                  onPress={() => router.push(item.path as any)}
+                  style={{ flex: 1 }}
                 >
-                  <Text style={{ color: 'white', fontWeight: '700', fontSize: 15 }}>Đăng ký</Text>
-                </Pressable>
+                  <GlassCard style={{ padding: 14, alignItems: 'center' }}>
+                    <Ionicons name={item.icon as any} size={22} color="rgba(255,255,255,0.5)" style={{ marginBottom: 6 }} />
+                    <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, fontWeight: '500' }}>{item.label}</Text>
+                  </GlassCard>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* App version */}
+            <GlassCard>
+              <View style={{ flexDirection: 'row', alignItems: 'center', padding: 16, gap: 12 }}>
+                <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.07)', alignItems: 'center', justifyContent: 'center' }}>
+                  <Ionicons name="information-circle-outline" size={22} color="rgba(255,255,255,0.6)" />
+                </View>
+                <View>
+                  <Text style={{ color: 'white', fontSize: 14, fontWeight: '600' }}>MovieBox</Text>
+                  <Text style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>v{APP_VERSION} · © 2026</Text>
+                </View>
               </View>
-            </View>
-
-            <SectionHeader title="Khám phá" />
-            <View style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' }}>
-              <ProfileMenuItem icon="time-outline" label="Lịch sử xem" onPress={() => router.push('/history' as any)} />
-              <ProfileMenuItem icon="heart-outline" label="Yêu thích" onPress={() => router.push('/(tabs)/favorites' as any)} />
-              <ProfileMenuItem icon="bookmarks-outline" label="Xem sau" onPress={() => router.push('/watchlist' as any)} />
-            </View>
-
-            <VersionCard updateInfo={updateInfo} checking={checking} onCheck={() => checkVersion(true)} />
+            </GlassCard>
           </ScrollView>
         </SafeAreaView>
       </View>
     );
   }
 
-  return (
-    <View style={{ flex: 1, backgroundColor: '#0B0D12' }}>
-      <StatusBar style="light" />
-      <SafeAreaView style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 120, paddingTop: 12 }}>
+  // ── Logged in ──────────────────────────────────────────────────────────────
+  const initials = user.name?.slice(0, 2).toUpperCase() || 'U';
 
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 4, marginBottom: 20 }}>
-            <View style={{ width: 62, height: 62, borderRadius: 31, overflow: 'hidden', borderWidth: 2, borderColor: 'rgba(244,200,74,0.4)' }}>
-              {user.image ? (
-                <Image source={{ uri: user.image }} style={{ width: '100%', height: '100%' }} />
-              ) : (
-                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(244,200,74,0.12)' }}>
-                  <Text style={{ color: '#F4C84A', fontSize: 24, fontWeight: '800' }}>{user.name?.charAt(0).toUpperCase()}</Text>
-                </View>
-              )}
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={{ color: 'white', fontSize: 19, fontWeight: '800', marginBottom: 4 }}>{user.name}</Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <View style={{ backgroundColor: 'rgba(244,200,74,0.15)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                  <Ionicons name="star" size={11} color="#F4C84A" />
-                  <Text style={{ color: '#F4C84A', fontSize: 11, fontWeight: '700' }}>Thành viên</Text>
+  return (
+    <View style={{ flex: 1, backgroundColor: '#05060a' }}>
+      <StatusBar style="light" />
+      {/* Background */}
+      <View style={{ position: 'absolute', inset: 0 }} pointerEvents="none">
+        <LinearGradient colors={['#0d0a1f', '#05060a']} style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '40%' }} />
+        <View style={{ position: 'absolute', top: -40, right: -60, width: 200, height: 200, borderRadius: 100, backgroundColor: 'rgba(234,179,8,0.05)' }} />
+      </View>
+
+      <SafeAreaView style={{ flex: 1 }}>
+        <ScrollView
+          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 120, paddingTop: 8 }}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header */}
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <Text style={{ color: 'white', fontSize: 28, fontWeight: '800', letterSpacing: -0.5 }}>Tài khoản</Text>
+          </View>
+
+          {/* Profile Card — iOS 26 Hero */}
+          <GlassCard style={{ padding: 20, marginBottom: 16 }}>
+            <LinearGradient
+              colors={['rgba(234,179,8,0.07)', 'transparent']}
+              style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 80, borderRadius: 20 }}
+            />
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+              {/* Avatar */}
+              <View style={{
+                width: 68, height: 68, borderRadius: 34,
+                borderWidth: 2.5, borderColor: 'rgba(234,179,8,0.5)',
+                overflow: 'hidden',
+              }}>
+                {user.image ? (
+                  <Image source={{ uri: user.image }} style={{ width: '100%', height: '100%' }} />
+                ) : (
+                  <LinearGradient
+                    colors={['rgba(234,179,8,0.25)', 'rgba(234,179,8,0.08)']}
+                    style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <Text style={{ color: '#eab308', fontSize: 24, fontWeight: '800' }}>{initials}</Text>
+                  </LinearGradient>
+                )}
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: 'white', fontSize: 20, fontWeight: '800', marginBottom: 4, letterSpacing: -0.3 }}>{user.name}</Text>
+                <Text style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13 }} numberOfLines={1}>{user.email}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8 }}>
+                  <View style={{ backgroundColor: 'rgba(234,179,8,0.12)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(234,179,8,0.2)', flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                    <Ionicons name={user.role === 'admin' ? 'shield' : 'star'} size={11} color="#eab308" />
+                    <Text style={{ color: '#eab308', fontSize: 11, fontWeight: '700' }}>
+                      {user.role === 'admin' ? 'Quản trị' : 'Thành viên'}
+                    </Text>
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
 
-          <SectionHeader title="Thư viện" />
-          <View style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' }}>
-            <ProfileMenuItem icon="time-outline" label="Lịch sử xem" sublabel="Tiếp tục xem dang dở" onPress={() => router.push('/history' as any)} />
-            <ProfileMenuItem icon="heart-outline" label="Yêu thích" sublabel="Phim đã thêm vào yêu thích" onPress={() => router.push('/(tabs)/favorites' as any)} />
-            <ProfileMenuItem icon="bookmarks-outline" label="Xem sau" sublabel="Danh sách phim của tôi" onPress={() => router.push('/watchlist' as any)} />
-          </View>
+            {/* Quick stats */}
+            <View style={{ flexDirection: 'row', marginTop: 20, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' }}>
+              {[
+                { label: 'Yêu thích', value: user.favorites?.length ?? 0 },
+                { label: 'Xem sau', value: user.watchlist?.length ?? 0 },
+                { label: 'Lịch sử', value: user.history?.length ?? 0 },
+              ].map((s, i) => (
+                <View key={s.label} style={{ flex: 1, alignItems: 'center' }}>
+                  <Text style={{ color: 'white', fontSize: 20, fontWeight: '800' }}>{s.value}</Text>
+                  <Text style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12, marginTop: 2 }}>{s.label}</Text>
+                  {i < 2 && <View style={{ position: 'absolute', right: 0, top: 4, bottom: 4, width: 1, backgroundColor: 'rgba(255,255,255,0.07)' }} />}
+                </View>
+              ))}
+            </View>
+          </GlassCard>
 
-          <SectionHeader title="Hỗ trợ" />
-          <View style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' }}>
-            <ProfileMenuItem icon="chatbox-ellipses-outline" label="Góp ý" sublabel="Gửi phản hồi cho chúng tôi" onPress={() => Linking.openURL(`${webUrl}#gop-y`)} />
-            <ProfileMenuItem icon="globe-outline" label="Trang web" sublabel={webUrl} onPress={() => Linking.openURL(webUrl)} />
-          </View>
+          {/* Thư viện */}
+          <Text style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 8, paddingHorizontal: 4 }}>Thư viện</Text>
+          <GlassCard style={{ marginBottom: 16 }}>
+            <MenuRow icon="time-outline" label="Lịch sử xem" sublabel="Tiếp tục xem dở" onPress={() => router.push('/history' as any)} />
+            <Divider />
+            <MenuRow icon="heart-outline" label="Yêu thích" sublabel="Phim đã thêm" onPress={() => router.push('/(tabs)/favorites' as any)} />
+            <Divider />
+            <MenuRow icon="bookmarks-outline" label="Xem sau" sublabel="Danh sách của tôi" onPress={() => router.push('/watchlist' as any)} />
+          </GlassCard>
 
-          <SectionHeader title="Ứng dụng" />
-          <VersionCard updateInfo={updateInfo} checking={checking} onCheck={() => checkVersion(true)} />
+          {/* Hỗ trợ */}
+          <Text style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 8, paddingHorizontal: 4 }}>Hỗ trợ</Text>
+          <GlassCard style={{ marginBottom: 16 }}>
+            <MenuRow icon="globe-outline" label="Trang web" sublabel="khoiphim.io.vn" onPress={() => Linking.openURL(webUrl)} />
+            <Divider />
+            <MenuRow icon="chatbox-ellipses-outline" label="Góp ý" sublabel="Gửi phản hồi" onPress={() => Linking.openURL(`${webUrl}#gop-y`)} />
+          </GlassCard>
 
-          <SectionHeader title="Tài khoản" />
-          <View style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' }}>
-            <ProfileMenuItem icon="log-out-outline" label="Đăng xuất" isDestructive onPress={handleLogout} />
-          </View>
+          {/* Ứng dụng */}
+          <Text style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 8, paddingHorizontal: 4 }}>Ứng dụng</Text>
+          <GlassCard style={{ marginBottom: 16 }}>
+            <Pressable
+              onPress={() => checkVersion(true)}
+              style={({ pressed }) => ({
+                flexDirection: 'row', alignItems: 'center', padding: 16,
+                backgroundColor: pressed ? 'rgba(255,255,255,0.04)' : 'transparent',
+              })}
+            >
+              <View style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: updateInfo ? 'rgba(234,179,8,0.15)' : 'rgba(255,255,255,0.07)', alignItems: 'center', justifyContent: 'center', marginRight: 13 }}>
+                <Ionicons name={updateInfo ? 'cloud-download-outline' : 'checkmark-circle-outline'} size={18} color={updateInfo ? '#eab308' : 'rgba(255,255,255,0.6)'} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: 'white', fontSize: 15, fontWeight: '600' }}>
+                  {updateInfo ? `Bản mới v${updateInfo.version}` : 'Phiên bản mới nhất'}
+                </Text>
+                <Text style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>v{APP_VERSION} · Build {APP_BUILD}</Text>
+              </View>
+              {updateInfo ? (
+                <TouchableOpacity onPress={() => Linking.openURL(updateInfo.download_url)} style={{ backgroundColor: '#eab308', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}>
+                  <Text style={{ color: '#000', fontSize: 12, fontWeight: '800' }}>Cập nhật</Text>
+                </TouchableOpacity>
+              ) : (
+                <Ionicons name="refresh-outline" size={18} color={checking ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.4)'} />
+              )}
+            </Pressable>
+          </GlassCard>
 
+          {/* Đăng xuất */}
+          <GlassCard>
+            <MenuRow icon="log-out-outline" label="Đăng xuất" danger onPress={handleLogout} />
+          </GlassCard>
+
+          <Text style={{ color: 'rgba(255,255,255,0.15)', fontSize: 11, textAlign: 'center', marginTop: 24 }}>
+            © 2026 MovieBox · Khôi Le
+          </Text>
         </ScrollView>
       </SafeAreaView>
-    </View>
-  );
-}
-
-function VersionCard({ updateInfo, checking, onCheck }: { updateInfo: UpdateInfo | null; checking: boolean; onCheck: () => void }) {
-  return (
-    <View style={{
-      backgroundColor: updateInfo ? 'rgba(244,200,74,0.08)' : 'rgba(255,255,255,0.03)',
-      borderRadius: 16, borderWidth: 1,
-      borderColor: updateInfo ? 'rgba(244,200,74,0.25)' : 'rgba(255,255,255,0.06)',
-      padding: 16,
-    }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: updateInfo ? 'rgba(244,200,74,0.15)' : 'rgba(255,255,255,0.08)', alignItems: 'center', justifyContent: 'center' }}>
-            <Ionicons name={updateInfo ? 'cloud-download-outline' : 'checkmark-circle-outline'} size={22} color={updateInfo ? '#F4C84A' : 'rgba(255,255,255,0.7)'} />
-          </View>
-          <View>
-            <Text style={{ color: 'white', fontSize: 15, fontWeight: '700' }}>
-              {updateInfo ? `Có phiên bản mới v${updateInfo.version}` : 'Phiên bản hiện tại'}
-            </Text>
-            <Text style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13, marginTop: 2 }}>
-              v{APP_VERSION} (Build {APP_BUILD})
-            </Text>
-            <Text style={{ color: 'rgba(255,255,255,0.25)', fontSize: 11, marginTop: 4 }}>
-              © 2026 MovieBox by Khôi
-            </Text>
-          </View>
-        </View>
-        {updateInfo ? (
-          <Pressable
-            onPress={() => Linking.openURL(updateInfo.download_url)}
-            style={{ backgroundColor: '#F4C84A', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8 }}
-          >
-            <Text style={{ color: '#0a0d14', fontSize: 13, fontWeight: '800' }}>Cập nhật</Text>
-          </Pressable>
-        ) : (
-          <Pressable onPress={onCheck} disabled={checking} style={{ padding: 6 }}>
-            <Ionicons name="refresh-outline" size={20} color={checking ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.5)'} />
-          </Pressable>
-        )}
-      </View>
     </View>
   );
 }

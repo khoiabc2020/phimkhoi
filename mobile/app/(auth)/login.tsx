@@ -1,161 +1,339 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, Image } from 'react-native';
+import {
+    View, Text, TextInput, TouchableOpacity, ActivityIndicator,
+    Alert, KeyboardAvoidingView, Platform, ScrollView, Image, Pressable
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
-import { useRouter, Link, Stack } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '@/context/auth';
 import { CONFIG } from '@/constants/config';
+import * as WebBrowser from 'expo-web-browser';
+import * as AuthSession from 'expo-auth-session';
+import * as Google from 'expo-auth-session/providers/google';
 
-export default function LoginScreen() {
+WebBrowser.maybeCompleteAuthSession();
+
+const GOOGLE_WEB_CLIENT_ID = '855740529726-jtgo46gn63ce2mcgdm9fmsu7bndbjekj.apps.googleusercontent.com';
+
+export default function AuthScreen() {
     const router = useRouter();
     const { login } = useAuth();
 
-    const [username, setUsername] = useState('');
+    const [tab, setTab] = useState<'login' | 'register'>('login');
+    const [email, setEmail] = useState('');
+    const [name, setName] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [googleLoading, setGoogleLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
+    const [request, response, promptAsync] = Google.useAuthRequest({
+        webClientId: GOOGLE_WEB_CLIENT_ID,
+    });
+
+    const handleGoogleLogin = async () => {
+        try {
+            setGoogleLoading(true);
+            const result = await promptAsync();
+            if (result.type !== 'success') {
+                return;
+            }
+            const { access_token } = result.params;
+            const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/auth/google`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ accessToken: access_token }),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Đăng nhập Google thất bại');
+            await login(data.token, data.user);
+            router.replace('/(tabs)/profile');
+        } catch (err: any) {
+            Alert.alert('Lỗi', err.message || 'Không thể đăng nhập bằng Google');
+        } finally {
+            setGoogleLoading(false);
+        }
+    };
+
     const handleLogin = async () => {
-        if (!username || !password) {
-            Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin');
+        if (!email || !password) {
+            Alert.alert('Thiếu thông tin', 'Vui lòng nhập email và mật khẩu');
             return;
         }
-
         setLoading(true);
         try {
             const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password }),
+                body: JSON.stringify({ username: email, password }),
             });
-
-            // Check content type before parsing JSON
             const contentType = res.headers.get('content-type') || '';
-            if (!contentType.includes('application/json')) {
-                throw new Error('Server không phản hồi đúng định dạng. Vui lòng thử lại sau.');
-            }
-
+            if (!contentType.includes('application/json')) throw new Error('Server lỗi, thử lại sau.');
             const data = await res.json();
-
-            if (!res.ok) {
-                throw new Error(data.message || 'Đăng nhập thất bại');
-            }
-
+            if (!res.ok) throw new Error(data.message || 'Đăng nhập thất bại');
             await login(data.token, data.user);
-            Alert.alert('Thành công', 'Đăng nhập thành công', [
-                { text: 'OK', onPress: () => router.replace('/(tabs)/profile') }
-            ]);
-
+            router.replace('/(tabs)/profile');
         } catch (error: any) {
-            if (error.message === 'Network request failed') {
-                Alert.alert('Lỗi kết nối', 'Không thể kết nối đến server. Vui lòng kiểm tra mạng.');
-            } else {
-                Alert.alert('Lỗi', error.message);
-            }
+            Alert.alert('Lỗi', error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleRegister = async () => {
+        if (!name || !email || !password) {
+            Alert.alert('Thiếu thông tin', 'Vui lòng điền đầy đủ');
+            return;
+        }
+        if (password !== confirmPassword) {
+            Alert.alert('Lỗi', 'Mật khẩu xác nhận không khớp');
+            return;
+        }
+        if (password.length < 6) {
+            Alert.alert('Lỗi', 'Mật khẩu tối thiểu 6 ký tự');
+            return;
+        }
+        setLoading(true);
+        try {
+            const res = await fetch(`${CONFIG.BACKEND_URL}/api/auth/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, password }),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Đăng ký thất bại');
+            Alert.alert('Đăng ký thành công!', 'Vui lòng đăng nhập.', [
+                { text: 'OK', onPress: () => setTab('login') }
+            ]);
+        } catch (error: any) {
+            Alert.alert('Lỗi', error.message);
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <View className="flex-1 bg-black">
+        <View style={{ flex: 1, backgroundColor: '#05060a' }}>
             <Stack.Screen options={{ headerShown: false }} />
             <StatusBar style="light" />
 
+            {/* Background gradient blobs */}
+            <View style={{ position: 'absolute', inset: 0 }} pointerEvents="none">
+                <LinearGradient
+                    colors={['#1a0e3a', '#05060a', '#05060a']}
+                    style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '60%' }}
+                />
+                <View style={{
+                    position: 'absolute', top: -80, right: -60,
+                    width: 260, height: 260, borderRadius: 130,
+                    backgroundColor: 'rgba(234,179,8,0.06)',
+                }} />
+                <View style={{
+                    position: 'absolute', bottom: 100, left: -80,
+                    width: 220, height: 220, borderRadius: 110,
+                    backgroundColor: 'rgba(99,102,241,0.07)',
+                }} />
+            </View>
+
             <KeyboardAvoidingView
-                className="flex-1"
+                style={{ flex: 1 }}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 24}
             >
-                <SafeAreaView className="flex-1">
+                <SafeAreaView style={{ flex: 1 }}>
                     <ScrollView
-                        className="flex-1"
-                        contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 32, flexGrow: 1, justifyContent: 'center' }}
+                        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, flexGrow: 1, justifyContent: 'center' }}
                         keyboardShouldPersistTaps="handled"
+                        showsVerticalScrollIndicator={false}
                     >
-                        <View className="bg-[#020617] rounded-3xl border border-white/10 px-6 py-8 shadow-2xl shadow-black/60">
+                        {/* Back button */}
+                        <TouchableOpacity onPress={() => router.back()} style={{ marginBottom: 24, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' }}>
+                            <Ionicons name="arrow-back" size={20} color="white" />
+                        </TouchableOpacity>
+
+                        {/* Logo */}
+                        <View style={{ alignItems: 'center', marginBottom: 32 }}>
+                            <View style={{ width: 80, height: 80, borderRadius: 22, overflow: 'hidden', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.15)', marginBottom: 16, shadowColor: '#eab308', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.3, shadowRadius: 20 }}>
+                                <Image source={require('../../assets/images/logo.webp')} style={{ width: 80, height: 80 }} resizeMode="cover" />
+                            </View>
+                            <Text style={{ color: 'white', fontSize: 28, fontWeight: '800', letterSpacing: -0.5 }}>
+                                Movie<Text style={{ color: '#eab308' }}>Box</Text>
+                            </Text>
+                            <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, marginTop: 6 }}>
+                                {tab === 'login' ? 'Chào mừng trở lại!' : 'Tạo tài khoản mới'}
+                            </Text>
+                        </View>
+
+                        {/* Tab Switcher — iOS 26 pill style */}
+                        <View style={{
+                            flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.06)',
+                            borderRadius: 16, padding: 4, marginBottom: 24,
+                            borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)'
+                        }}>
+                            {(['login', 'register'] as const).map(t => (
+                                <TouchableOpacity
+                                    key={t}
+                                    onPress={() => setTab(t)}
+                                    style={{
+                                        flex: 1, paddingVertical: 11, alignItems: 'center', borderRadius: 12,
+                                        backgroundColor: tab === t ? 'rgba(255,255,255,0.12)' : 'transparent',
+                                    }}
+                                >
+                                    <Text style={{
+                                        color: tab === t ? 'white' : 'rgba(255,255,255,0.4)',
+                                        fontWeight: tab === t ? '700' : '500', fontSize: 14
+                                    }}>
+                                        {t === 'login' ? 'Đăng nhập' : 'Đăng ký'}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+
+                        {/* Glass Card */}
+                        <View style={{
+                            backgroundColor: 'rgba(255,255,255,0.04)',
+                            borderRadius: 24, padding: 20,
+                            borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+                        }}>
+                            {/* Google button */}
                             <TouchableOpacity
-                                onPress={() => router.back()}
-                                className="mb-6 w-9 h-9 items-center justify-center rounded-full bg-white/5"
+                                onPress={handleGoogleLogin}
+                                disabled={googleLoading || !request}
+                                style={{
+                                    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+                                    gap: 10, backgroundColor: 'rgba(255,255,255,0.07)',
+                                    borderRadius: 14, paddingVertical: 14,
+                                    borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)',
+                                    marginBottom: 18, opacity: (googleLoading || !request) ? 0.6 : 1,
+                                }}
                             >
-                                <Ionicons name="arrow-back" size={20} color="white" />
+                                {googleLoading ? (
+                                    <ActivityIndicator color="white" size="small" />
+                                ) : (
+                                    <>
+                                        <View style={{ width: 22, height: 22 }}>
+                                            {/* Google G logo */}
+                                            <Text style={{ fontSize: 16, fontWeight: '800', color: '#4285F4' }}>G</Text>
+                                        </View>
+                                        <Text style={{ color: 'white', fontWeight: '600', fontSize: 15 }}>
+                                            Tiếp tục với Google
+                                        </Text>
+                                    </>
+                                )}
                             </TouchableOpacity>
 
-                            <View className="items-center mb-8">
-                                <View style={{ width: 72, height: 72, borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.18)' }}>
-                                    <Image source={require('../../assets/images/logo.webp')} style={{ width: 72, height: 72 }} resizeMode="cover" />
-                                </View>
-                                <Text className="text-3xl font-bold text-white mt-4 tracking-tight">
-                                    Chào mừng trở lại
-                                </Text>
-                                <Text className="text-gray-400 mt-2 text-center text-sm">
-                                    Đăng nhập để đồng bộ tiến độ xem và phim yêu thích trên mọi thiết bị.
-                                </Text>
+                            {/* Divider */}
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 18 }}>
+                                <View style={{ flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.08)' }} />
+                                <Text style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12, marginHorizontal: 12 }}>hoặc</Text>
+                                <View style={{ flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.08)' }} />
                             </View>
 
-                            <View className="space-y-4">
-                                <View>
-                                    <Text className="text-gray-400 mb-2 ml-1 text-sm">Tài khoản / Email</Text>
-                                    <View className="flex-row items-center bg-gray-900 rounded-2xl px-3">
-                                        <Ionicons name="person-outline" size={18} color="#9ca3af" />
+                            {/* Name field (register only) */}
+                            {tab === 'register' && (
+                                <View style={{ marginBottom: 12 }}>
+                                    <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, marginBottom: 6, marginLeft: 2 }}>Tên hiển thị</Text>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 14, paddingHorizontal: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' }}>
+                                        <Ionicons name="person-outline" size={17} color="rgba(255,255,255,0.35)" />
                                         <TextInput
-                                            className="flex-1 text-white px-2 py-3 text-base"
-                                            placeholder="Nhập tài khoản hoặc email"
-                                            placeholderTextColor="#6b7280"
-                                            value={username}
-                                            onChangeText={setUsername}
-                                            autoCapitalize="none"
-                                            returnKeyType="next"
+                                            style={{ flex: 1, color: 'white', paddingVertical: 13, paddingHorizontal: 10, fontSize: 15 }}
+                                            placeholder="Tên của bạn"
+                                            placeholderTextColor="rgba(255,255,255,0.25)"
+                                            value={name}
+                                            onChangeText={setName}
+                                            autoCapitalize="words"
                                         />
                                     </View>
                                 </View>
+                            )}
 
-                                <View>
-                                    <Text className="text-gray-400 mb-2 ml-1 text-sm">Mật khẩu</Text>
-                                    <View className="flex-row items-center bg-gray-900 rounded-2xl px-3">
-                                        <Ionicons name="lock-closed-outline" size={18} color="#9ca3af" />
+                            {/* Email */}
+                            <View style={{ marginBottom: 12 }}>
+                                <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, marginBottom: 6, marginLeft: 2 }}>Email</Text>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 14, paddingHorizontal: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' }}>
+                                    <Ionicons name="mail-outline" size={17} color="rgba(255,255,255,0.35)" />
+                                    <TextInput
+                                        style={{ flex: 1, color: 'white', paddingVertical: 13, paddingHorizontal: 10, fontSize: 15 }}
+                                        placeholder="email@example.com"
+                                        placeholderTextColor="rgba(255,255,255,0.25)"
+                                        value={email}
+                                        onChangeText={setEmail}
+                                        autoCapitalize="none"
+                                        keyboardType="email-address"
+                                    />
+                                </View>
+                            </View>
+
+                            {/* Password */}
+                            <View style={{ marginBottom: tab === 'register' ? 12 : 20 }}>
+                                <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, marginBottom: 6, marginLeft: 2 }}>Mật khẩu</Text>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 14, paddingHorizontal: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' }}>
+                                    <Ionicons name="lock-closed-outline" size={17} color="rgba(255,255,255,0.35)" />
+                                    <TextInput
+                                        style={{ flex: 1, color: 'white', paddingVertical: 13, paddingHorizontal: 10, fontSize: 15 }}
+                                        placeholder="Tối thiểu 6 ký tự"
+                                        placeholderTextColor="rgba(255,255,255,0.25)"
+                                        value={password}
+                                        onChangeText={setPassword}
+                                        secureTextEntry={!showPassword}
+                                        returnKeyType="done"
+                                    />
+                                    <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                                        <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={17} color="rgba(255,255,255,0.35)" />
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+
+                            {/* Confirm Password (register) */}
+                            {tab === 'register' && (
+                                <View style={{ marginBottom: 20 }}>
+                                    <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, marginBottom: 6, marginLeft: 2 }}>Xác nhận mật khẩu</Text>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 14, paddingHorizontal: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' }}>
+                                        <Ionicons name="shield-checkmark-outline" size={17} color="rgba(255,255,255,0.35)" />
                                         <TextInput
-                                            className="flex-1 text-white px-2 py-3 text-base"
-                                            placeholder="Nhập mật khẩu"
-                                            placeholderTextColor="#6b7280"
-                                            value={password}
-                                            onChangeText={setPassword}
+                                            style={{ flex: 1, color: 'white', paddingVertical: 13, paddingHorizontal: 10, fontSize: 15 }}
+                                            placeholder="Nhập lại mật khẩu"
+                                            placeholderTextColor="rgba(255,255,255,0.25)"
+                                            value={confirmPassword}
+                                            onChangeText={setConfirmPassword}
                                             secureTextEntry={!showPassword}
-                                            returnKeyType="done"
                                         />
-                                        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                                            <Ionicons
-                                                name={showPassword ? "eye-off-outline" : "eye-outline"}
-                                                size={18}
-                                                color="#9ca3af"
-                                            />
-                                        </TouchableOpacity>
                                     </View>
                                 </View>
+                            )}
 
-                                <TouchableOpacity
-                                    onPress={handleLogin}
-                                    disabled={loading}
-                                    className={`mt-5 rounded-2xl h-12 items-center justify-center bg-yellow-500 ${loading ? 'opacity-70' : ''}`}
-                                >
-                                    {loading ? (
-                                        <ActivityIndicator color="black" />
-                                    ) : (
-                                        <Text className="text-black font-bold text-base tracking-wide">Đăng nhập</Text>
-                                    )}
-                                </TouchableOpacity>
-
-                                <View className="flex-row justify-center mt-6">
-                                    <Text className="text-gray-400 text-sm">Chưa có tài khoản? </Text>
-                                    <Link href="/(auth)/register" asChild>
-                                        <TouchableOpacity>
-                                            <Text className="text-yellow-500 font-semibold text-sm">Đăng ký ngay</Text>
-                                        </TouchableOpacity>
-                                    </Link>
-                                </View>
-                            </View>
+                            {/* Submit button */}
+                            <TouchableOpacity
+                                onPress={tab === 'login' ? handleLogin : handleRegister}
+                                disabled={loading}
+                                style={{
+                                    borderRadius: 14, height: 52,
+                                    alignItems: 'center', justifyContent: 'center',
+                                    overflow: 'hidden',
+                                }}
+                            >
+                                <LinearGradient
+                                    colors={['#f59e0b', '#eab308']}
+                                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                                    style={{ position: 'absolute', inset: 0 }}
+                                />
+                                {loading ? (
+                                    <ActivityIndicator color="black" />
+                                ) : (
+                                    <Text style={{ color: '#000', fontWeight: '800', fontSize: 16 }}>
+                                        {tab === 'login' ? 'Đăng nhập' : 'Tạo tài khoản'}
+                                    </Text>
+                                )}
+                            </TouchableOpacity>
                         </View>
+
+                        <Text style={{ color: 'rgba(255,255,255,0.25)', fontSize: 11, textAlign: 'center', marginTop: 24, lineHeight: 16 }}>
+                            Bằng cách tiếp tục, bạn đồng ý với{'\n'}Điều khoản sử dụng & Chính sách quyền riêng tư.
+                        </Text>
                     </ScrollView>
                 </SafeAreaView>
             </KeyboardAvoidingView>

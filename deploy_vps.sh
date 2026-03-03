@@ -36,8 +36,10 @@ cp -rf public .next/standalone/public
 cp -rf .next/static .next/standalone/.next/static
 # Copy env file if it exists (Crucial for Standalone)
 if [ -f .env.local ]; then
-    cp .env.local .next/standalone/.env.production
+    cp .env.local .next/standalone/.env.local
     cp .env.local .next/standalone/.env
+    cp .env.local .next/standalone/.env.production
+    echo "Copied .env.local to standalone directory"
 fi
 
 # Restart PM2 process
