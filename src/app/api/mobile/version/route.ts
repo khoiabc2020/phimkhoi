@@ -4,10 +4,10 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
     return NextResponse.json({
-        version: "1.0.4",
-        build: 5,
+        version: "1.0.5",
+        build: 6,
         force_update: false,
         download_url: "https://khoiphim.io.vn/downloads/PhimKhoi-Release.apk",
-        change_log: "- Fix double-tap tua phim: không còn giật (seek ngay lập tức)\n- Brightness slider mượt 60fps\n- Badge trạng thái phim: Hoàn Tất (xanh) vs Đang chiếu (vàng)\n- Tab Tài khoản gọn hơn, thêm kiểm tra phiên bản\n- HeroSection mobile compact hơn"
+        change_log: "- Tích hợp thẻ Cập nhật tự động vào tab Thông báo\n- Sửa lỗi UI Hero Section bị đen chữ\n- Fix chiều cao TabBar (iOS)\n- Tối ưu hiệu năng 120Hz mượt mà"
     });
 }
