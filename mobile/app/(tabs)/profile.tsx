@@ -84,10 +84,17 @@ export default function ProfileScreen() {
   const checkVersion = async () => {
     try {
       setChecking(true);
-      const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/version`, { signal: AbortSignal.timeout(6000) });
+      const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/version`, {
+        headers: { 'Cache-Control': 'no-cache' },
+        signal: AbortSignal.timeout(6000)
+      });
       if (res.ok) {
         const data: UpdateInfo = await res.json();
-        if (data.build > APP_BUILD) setUpdateInfo(data);
+        if (data.build > APP_BUILD) {
+          setUpdateInfo(data);
+        } else {
+          Alert.alert('Cập nhật', 'Bạn đang sử dụng phiên bản mới nhất!');
+        }
       }
     } catch { } finally { setChecking(false); }
   };
