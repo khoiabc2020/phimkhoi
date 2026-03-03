@@ -657,14 +657,45 @@ export const getTMDBCast = async (query: string, year?: number, type: 'movie' | 
 
 // --- Ophim Native Extensions ---
 
-export const getOphimCast = async (slug: string) => {
+export const getOphimCast = async (slug: string, origin_name?: string, year?: number) => {
     try {
         if (!slug) return [];
-        const res = await fetch(`${OPHIM_API}/phim/${slug}/peoples`);
-        const data = await res.json();
-        return data.cast || [];
+        let ophimCast: any[] = [];
+        let tmdbCast: any[] = [];
+
+        // Chạy song song cả hai nguồn để đảm bảo tốc độ
+        await Promise.allSettled([
+            fetch(`${OPHIM_API}/phim/${slug}/peoples`).then(async (res) => {
+                if (res.ok) {
+                    const data = await res.json();
+                    ophimCast = data.cast || [];
+                }
+            }),
+            (async () => {
+                if (origin_name && year) {
+                    tmdbCast = await getTMDBCast(origin_name, year) || [];
+                }
+            })()
+        ]);
+
+        // Nếu Ophim rỗng hoặc có chữ "đang cập nhật" -> Ưu tiên dùng dữ liệu TMDB (nếu có)
+        const isOphimEmpty = ophimCast.length === 0;
+        const isOphimUpdating = ophimCast.some((c: any) => c.name?.toLowerCase().includes('đang cập nhật'));
+
+        if ((isOphimEmpty || isOphimUpdating) && tmdbCast.length > 0) {
+            return tmdbCast.map((c: any) => ({
+                id: c.id,
+                name: c.name,
+                character: c.character,
+                profile_path: c.profile_path
+            }));
+        }
+
+        // Bỏ qua diễn viên "Đang cập nhật" của Ophim
+        return ophimCast.filter((c: any) => !c.name?.toLowerCase().includes('đang cập nhật') && !c.name?.toLowerCase().includes('updating'));
+
     } catch (error) {
-        console.error(`OPhim Cast Error [${slug}]:`, error);
+        console.error(`OPhim Cast/TMDB Error [${slug}]:`, error);
         return [];
     }
 };

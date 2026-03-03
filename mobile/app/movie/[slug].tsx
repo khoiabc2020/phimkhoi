@@ -591,7 +591,7 @@ export default function MovieDetailScreen() {
                                                                 <Link href={playerHref as any} asChild>
                                                                     <Pressable style={styles.epCardInner}>
                                                                         <Text style={styles.epText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
-                                                                            Tập {ep.name.replace('Tập ', '').padStart(2, '0')}
+                                                                            {ep.name.toLowerCase().includes('tập') || ep.name.toLowerCase().includes('phần') ? ep.name : `Tập ${ep.name.padStart(2, '0')}`}
                                                                         </Text>
                                                                         {localUri && <Ionicons name="cloud-done" size={12} color={COLORS.accent} style={{ position: 'absolute', top: 4, right: 4 }} />}
                                                                     </Pressable>
@@ -622,7 +622,7 @@ export default function MovieDetailScreen() {
 
                         {selectedTab === 'actors' && (
                             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-                                {cast.map((actor: any) => (
+                                {cast.length > 0 ? cast.map((actor: any) => (
                                     <View key={actor.id || actor.name} style={{ width: '31%', marginBottom: 12 }}>
                                         <Image
                                             source={{ uri: actor.profile_url || (actor.profile_path ? `https://image.tmdb.org/t/p/w185${actor.profile_path}` : 'https://ui-avatars.com/api/?name=' + actor.name) }}
@@ -632,8 +632,11 @@ export default function MovieDetailScreen() {
                                         <Text numberOfLines={1} style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>{actor.name}</Text>
                                         <Text numberOfLines={1} style={{ color: 'gray', fontSize: 11 }}>{actor.character}</Text>
                                     </View>
-                                ))}
-                                {cast.length === 0 && <Text style={{ color: 'gray', textAlign: 'center', width: '100%', marginTop: 20 }}>Đang cập nhật diễn viên...</Text>}
+                                )) : (
+                                    <Text style={{ color: 'rgba(255,255,255,0.4)', textAlign: 'center', width: '100%', marginTop: 20, fontSize: 14 }}>
+                                        Chưa có thông tin diễn viên.
+                                    </Text>
+                                )}
                             </View>
                         )}
 

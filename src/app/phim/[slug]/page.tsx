@@ -92,8 +92,8 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         const epCurrent = movie?.episode_current || "";
                         const isCompleted = epCurrent.toLowerCase().includes("hoàn tất") || epCurrent.toLowerCase().includes("full");
                         const total = movie?.episode_total || "?";
-                        // Extract episode number from "Tập X" or raw number
-                        const epNum = epCurrent.replace(/hoàn tất/gi, "").replace(/\(.*?\)/g, "").trim() || "1";
+                        // Extract episode number, removing "Tập " strings to avoid duplication
+                        const epNum = epCurrent.replace(/hoàn tất/gi, "").replace(/\(.*?\)/g, "").replace(/tập\s*/gi, "").trim() || "1";
                         return (
                             <div className="flex items-center gap-2 font-bold text-sm mt-2 drop-shadow-md">
                                 {isCompleted ? (
@@ -118,12 +118,14 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                     })()}
 
                     <div className="text-xs sm:text-sm text-gray-300 flex flex-wrap items-center gap-2 sm:gap-4 py-1 sm:py-2 drop-shadow-md">
-                        <span><span className="text-gray-500">Đạo diễn:</span> {movie?.director?.join(", ") || "Đang cập nhật"}</span>
+                        {tmdbDetails?.credits?.crew?.find((c: any) => c.job === "Director")?.name || (movie?.director && movie.director.length > 0 && !movie.director.includes("Đang cập nhật")) ? (
+                            <span><span className="text-gray-500">Đạo diễn:</span> {tmdbDetails?.credits?.crew?.find((c: any) => c.job === "Director")?.name || movie?.director?.join(", ")}</span>
+                        ) : null}
                         <span className="w-1 h-1 bg-gray-600 rounded-full hidden sm:block" />
                         <span><span className="text-gray-500">Thời lượng:</span> {movie?.time || "N/A"}</span>
                     </div>
                     <div className="text-xs sm:text-sm text-gray-300 mb-3 sm:mb-6 line-clamp-2 max-w-3xl drop-shadow-md">
-                        <span className="text-gray-500">Diễn viên:</span> {movie?.actor?.join(", ") || "Đang cập nhật"}
+                        <span className="text-gray-500">Diễn viên:</span> {tmdbDetails?.credits?.cast?.slice(0, 5).map((c: any) => c.name).join(", ") || movie?.actor?.join(", ") || "Đang cập nhật"}
                     </div>
 
                     {/* Action Buttons -- bigger touch targets on mobile */}

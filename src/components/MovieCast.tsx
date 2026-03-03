@@ -3,8 +3,12 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default async function MovieCast({ slug, isCompact = false }: { slug: string; isCompact?: boolean }) {
-    const cast = await getOphimCast(slug);
+    let cast = await getOphimCast(slug);
     if (!cast || cast.length === 0) return null;
+
+    // Filter out dummy actors
+    cast = cast.filter((actor: any) => !actor.name?.toLowerCase().includes('đang cập nhật') && !actor.name?.toLowerCase().includes('updating'));
+    if (cast.length === 0) return null;
 
     const topCast = cast.slice(0, 15);
 
