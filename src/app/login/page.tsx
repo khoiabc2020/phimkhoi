@@ -6,7 +6,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import Image from "next/image";
-import { Turnstile } from "@marsidev/react-turnstile";
+import dynamic from "next/dynamic";
+
+const Turnstile = dynamic(() => import("@marsidev/react-turnstile").then((mod) => mod.Turnstile), {
+    ssr: false,
+});
 
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
 const hasRealTurnstile = TURNSTILE_SITE_KEY && TURNSTILE_SITE_KEY !== "your_turnstile_site_key";

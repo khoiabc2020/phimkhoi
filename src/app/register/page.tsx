@@ -5,8 +5,12 @@ import { useRouter } from "next/navigation";
 import { Lock, User, Mail } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { signIn } from "next-auth/react";
-import { Turnstile } from "@marsidev/react-turnstile";
+
+const Turnstile = dynamic(() => import("@marsidev/react-turnstile").then((mod) => mod.Turnstile), {
+    ssr: false,
+});
 
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
 const hasRealTurnstile = TURNSTILE_SITE_KEY && TURNSTILE_SITE_KEY !== "your_turnstile_site_key";
