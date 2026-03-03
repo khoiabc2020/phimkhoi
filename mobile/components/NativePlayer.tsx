@@ -114,6 +114,9 @@ export default function NativePlayer({
     const [showControls, setShowControls] = useState(true);
     const [resizeMode, setResizeMode] = useState(ResizeMode.CONTAIN);
     const [locked, setLocked] = useState(false);
+    const [isBuffering, setIsBuffering] = useState(false);
+    const [retryCount, setRetryCount] = useState(0);
+    const autoRetryTimer = useRef<any>(null);
     const lockedRef = useRef(false);
     const showEpisodesRef = useRef(false);
     const showServersRef = useRef(false);
@@ -350,6 +353,9 @@ export default function NativePlayer({
     const onPlaybackStatusUpdate = (status: AVPlaybackStatus) => {
         setStatus(status);
         if (status.isLoaded) {
+            // Cập nhật buffering state
+            setIsBuffering(status.isBuffering ?? false);
+
             if (!initialSeekDone.current && initialTime > 0) {
                 video.current?.setPositionAsync(initialTime);
                 initialSeekDone.current = true;
@@ -375,6 +381,7 @@ export default function NativePlayer({
             }
         } else {
             finishedOnce.current = false;
+            setIsBuffering(false);
         }
     };
 
@@ -445,8 +452,18 @@ export default function NativePlayer({
         const message = typeof err === 'string'
             ? err
             : err?.error || err?.nativeEvent?.error || 'Lỗi phát video';
-        console.log("Video Error:", err);
-        setError(message);
+        console.log('Video Error:', err);
+
+        // Auto-retry 1 lần sau 3s trước khi hiện error UI
+        if (retryCount < 1) {
+            setRetryCount(prev => prev + 1);
+            if (autoRetryTimer.current) clearTimeout(autoRetryTimer.current);
+            autoRetryTimer.current = setTimeout(() => {
+                setVideoSource({ uri: url + (url.includes('?') ? '&' : '?') + '_r=' + Date.now() });
+            }, 3000);
+        } else {
+            setError(message);
+        }
     };
 
     // --- BRIGHTNESS GESTURE (PanResponder) ---
@@ -588,16 +605,22 @@ export default function NativePlayer({
                     shouldPlay={true}
                 />
 
-                {/* Loading indicator – chỉ khi video chưa load lần đầu, không chớp khi tua 10s */}
-                {(!('isLoaded' in status) || !status.isLoaded) && !error && (
+                {/* Loading/Buffering indicator */}
+                {((!('isLoaded' in status) || !status.isLoaded) || isBuffering) && !error && (
                     <View style={styles.loadingOverlay} pointerEvents="none">
                         <ActivityIndicator size="large" color="#fbbf24" />
+                        {!('isLoaded' in status) && (
+                            <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, marginTop: 8, fontWeight: '500' }}>
+                                Đang tải...
+                            </Text>
+                        )}
                     </View>
                 )}
 
                 {/* Error overlay */}
                 {error && (
                     <View style={styles.errorOverlay}>
+                        <Ionicons name="warning-outline" size={48} color="#fbbf24" style={{ marginBottom: 12 }} />
                         <Text style={styles.errorTitle}>Không phát được video</Text>
                         <Text style={styles.errorMessage} numberOfLines={3}>
                             {error}
@@ -613,6 +636,7 @@ export default function NativePlayer({
                                 style={styles.errorButtonPrimary}
                                 onPress={() => {
                                     setError(null);
+                                    setRetryCount(0);
                                     setVideoSource({ uri: url });
                                     video.current?.replayAsync().catch(() => { });
                                 }}
@@ -620,6 +644,14 @@ export default function NativePlayer({
                                 <Text style={styles.errorButtonPrimaryText}>Thử lại</Text>
                             </TouchableOpacity>
                         </View>
+                        {serverList.length > 1 && (
+                            <TouchableOpacity
+                                style={{ marginTop: 10, paddingVertical: 8, paddingHorizontal: 20, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' }}
+                                onPress={() => { setError(null); setRetryCount(0); setShowServers(true); }}
+                            >
+                                <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13 }}>Đổi server khác</Text>
+                            </TouchableOpacity>
+                        )}
                     </View>
                 )}
 
@@ -785,7 +817,12 @@ export default function NativePlayer({
                         {!locked && (
                             <View style={styles.centerControls} pointerEvents="box-none">
                                 {/* Netflix Style Skip Buttons */}
-                                <TouchableOpacity onPress={() => handleSkip(-10000)} style={styles.skipBtn}>
+                                <TouchableOpacity
+                                    onPress={() => handleSkip(-10000)}
+                                    onLongPress={() => handleSkip(-30000)}
+                                    delayLongPress={400}
+                                    style={styles.skipBtn}
+                                >
                                     <MaterialIcons name="replay-10" size={48} color="white" />
                                 </TouchableOpacity>
 
@@ -799,7 +836,12 @@ export default function NativePlayer({
                                     />
                                 </TouchableOpacity>
 
-                                <TouchableOpacity onPress={() => handleSkip(10000)} style={styles.skipBtn}>
+                                <TouchableOpacity
+                                    onPress={() => handleSkip(10000)}
+                                    onLongPress={() => handleSkip(30000)}
+                                    delayLongPress={400}
+                                    style={styles.skipBtn}
+                                >
                                     <MaterialIcons name="forward-10" size={48} color="white" />
                                 </TouchableOpacity>
                             </View>
