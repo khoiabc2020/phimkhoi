@@ -1,4 +1,3 @@
-```typescript
 "use client";
 
 import { useState, useEffect } from "react";
@@ -16,7 +15,7 @@ export default function TurnstileWidget({ siteKey, onSuccess, onError, onExpire 
     const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
-        // Fallback Timeout: Nếu sau 5 giây thư viện không báo Loaded (hoặc token không có), 
+        // Fallback Timeout: Nếu sau 5 giây thư viện không báo Loaded (hoặc token không có),
         // khả năng cao nó đã bị block mạng/adblock ngầm. Ta kích hoạt Fallback bypass.
         const timer = setTimeout(() => {
             if (!isLoaded) {
@@ -80,8 +79,8 @@ export default function TurnstileWidget({ siteKey, onSuccess, onError, onExpire 
                 strategy="lazyOnload"
                 onLoad={() => setIsLoaded(true)}
             />
-            <div 
-                className="cf-turnstile" 
+            <div
+                className="cf-turnstile"
                 data-sitekey={siteKey}
                 data-callback="onTurnstileSuccess"
                 data-error-callback="onTurnstileError"
@@ -92,4 +91,3 @@ export default function TurnstileWidget({ siteKey, onSuccess, onError, onExpire 
         </div>
     );
 }
-```
