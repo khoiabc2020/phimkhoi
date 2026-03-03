@@ -358,9 +358,9 @@ export default function MovieDetailScreen() {
                                     }}>
                                         <View style={{
                                             width: 6, height: 6, borderRadius: 3,
-                                            backgroundColor: isCompleted ? '#22c55e' : '#eab308',
+                                            backgroundColor: isCompleted ? '#22c55e' : '#E6BF5C',
                                         }} />
-                                        <Text style={{ color: isCompleted ? '#22c55e' : '#eab308', fontSize: 12, fontWeight: '700' }}>
+                                        <Text style={{ color: isCompleted ? '#22c55e' : '#E6BF5C', fontSize: 12, fontWeight: '700' }}>
                                             {isCompleted ? 'Hoàn Tất' : 'Đang chiếu'}
                                         </Text>
                                     </View>
@@ -450,11 +450,11 @@ export default function MovieDetailScreen() {
                                                     borderRadius: 20,
                                                     backgroundColor: isActive ? 'rgba(244,200,74,0.15)' : 'rgba(255,255,255,0.05)',
                                                     borderWidth: 1,
-                                                    borderColor: isActive ? '#F4C84A' : 'rgba(255,255,255,0.08)',
+                                                    borderColor: isActive ? '#E6BF5C' : 'rgba(255,255,255,0.08)',
                                                 }}
                                             >
                                                 <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: isActive ? dotColor : 'rgba(255,255,255,0.25)' }} />
-                                                <Text style={{ color: isActive ? '#F4C84A' : 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: isActive ? '700' : '500' }}>
+                                                <Text style={{ color: isActive ? '#E6BF5C' : 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: isActive ? '700' : '500' }}>
                                                     {label}
                                                 </Text>
                                             </Pressable>
@@ -487,10 +487,10 @@ export default function MovieDetailScreen() {
                                                     onPress={() => { setSelectedServer(globalIdx); setSelectedEpRange(0); }}
                                                     style={[
                                                         styles.selectorPill,
-                                                        isActive && { backgroundColor: 'rgba(244,200,74,0.15)', borderColor: '#F4C84A' }
+                                                        isActive && { backgroundColor: 'rgba(244,200,74,0.15)', borderColor: '#E6BF5C' }
                                                     ]}
                                                 >
-                                                    <Text style={[styles.selectorText, isActive && { color: '#F4C84A', fontWeight: '600' }]}>
+                                                    <Text style={[styles.selectorText, isActive && { color: '#E6BF5C', fontWeight: '600' }]}>
                                                         {displayName} • {sourceName}
                                                     </Text>
                                                 </Pressable>
@@ -767,7 +767,7 @@ const styles = StyleSheet.create({
         height: 44,
         paddingHorizontal: 16,
         borderRadius: 22,
-        backgroundColor: '#F4C84A',
+        backgroundColor: '#E6BF5C',
         minWidth: 88,
         borderWidth: 1,
         borderColor: 'rgba(0,0,0,0.12)',
@@ -818,7 +818,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(244,200,74,0.4)',
         marginBottom: 16,
     },
-    downloadAllBtnText: { color: '#F4C84A', fontSize: 15, fontWeight: '600' },
+    downloadAllBtnText: { color: '#E6BF5C', fontSize: 15, fontWeight: '600' },
     downloadSheetSub: { color: 'rgba(255,255,255,0.6)', fontSize: 13, marginBottom: 10 },
     downloadEpList: { gap: 6 },
     downloadEpRow: {
@@ -838,7 +838,7 @@ const styles = StyleSheet.create({
         marginTop: 16,
         height: 48,
         borderRadius: 24,
-        backgroundColor: '#F4C84A',
+        backgroundColor: '#E6BF5C',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -848,7 +848,7 @@ const styles = StyleSheet.create({
     selectorPill: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.05)', marginRight: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
     selectorPillActive: { backgroundColor: 'rgba(244,200,74,0.12)', borderColor: 'rgba(244,200,74,0.4)' },
     selectorText: { color: 'rgba(255,255,255,0.55)', fontSize: 14, fontWeight: '500' },
-    selectorTextActive: { color: '#F4C84A', fontWeight: '600' },
+    selectorTextActive: { color: '#E6BF5C', fontWeight: '600' },
 
     // Segmented Tab — liquid glass
     tabContainerWrap: { position: 'relative', borderRadius: 20, marginBottom: 20, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
@@ -908,7 +908,7 @@ const styles = StyleSheet.create({
     },
     rangeBtnActive: { backgroundColor: 'rgba(244,200,74,0.12)', borderColor: 'rgba(244,200,74,0.4)' },
     rangeBtnText: { color: 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: '500' },
-    rangeBtnTextActive: { color: '#F4C84A', fontWeight: '600' },
+    rangeBtnTextActive: { color: '#E6BF5C', fontWeight: '600' },
 
     synopsisBox: { marginTop: 24, padding: 16, backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
 });

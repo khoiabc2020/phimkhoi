@@ -35,7 +35,7 @@ const NAV_PILLS = [
 ];
 
 const HIGHLIGHT_CATS = [
-  { label: 'Chiếu Rạp', color: '#eab308', slug: 'phim-chieu-rap' },
+  { label: 'Chiếu Rạp', color: '#E6BF5C', slug: 'phim-chieu-rap' },
   { label: 'Hàn Quốc', color: '#db2777', isCountry: true, slug: 'han-quoc' },
   { label: 'Trung Quốc', color: '#ef4444', isCountry: true, slug: 'trung-quoc' },
   { label: 'Hành Động', color: '#059669', slug: 'hanh-dong' },

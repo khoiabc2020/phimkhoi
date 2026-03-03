@@ -57,7 +57,7 @@ function MenuRow({ icon, label, sublabel, badge, onPress, danger = false }: {
         {sublabel && <Text style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12, marginTop: 1 }}>{sublabel}</Text>}
       </View>
       {badge ? (
-        <View style={{ backgroundColor: '#eab308', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 2 }}>
+        <View style={{ backgroundColor: '#E6BF5C', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 2 }}>
           <Text style={{ color: '#000', fontSize: 11, fontWeight: '800' }}>{badge}</Text>
         </View>
       ) : (
@@ -139,7 +139,7 @@ export default function ProfileScreen() {
                 alignItems: 'center', justifyContent: 'center', marginBottom: 16,
                 borderWidth: 1, borderColor: 'rgba(234,179,8,0.2)'
               }}>
-                <Ionicons name="person-outline" size={32} color="#eab308" />
+                <Ionicons name="person-outline" size={32} color="#E6BF5C" />
               </View>
               <Text style={{ color: 'white', fontSize: 18, fontWeight: '700', marginBottom: 8 }}>Chưa đăng nhập</Text>
               <Text style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13, textAlign: 'center', lineHeight: 20, marginBottom: 24 }}>
@@ -150,7 +150,7 @@ export default function ProfileScreen() {
                 style={{ width: '100%', borderRadius: 14, overflow: 'hidden', marginBottom: 10 }}
               >
                 <LinearGradient
-                  colors={['#f59e0b', '#eab308']}
+                  colors={['#f59e0b', '#E6BF5C']}
                   start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
                   style={{ paddingVertical: 14, alignItems: 'center' }}
                 >
@@ -243,7 +243,7 @@ export default function ProfileScreen() {
                     colors={['rgba(234,179,8,0.25)', 'rgba(234,179,8,0.08)']}
                     style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
                   >
-                    <Text style={{ color: '#eab308', fontSize: 24, fontWeight: '800' }}>{initials}</Text>
+                    <Text style={{ color: '#E6BF5C', fontSize: 24, fontWeight: '800' }}>{initials}</Text>
                   </LinearGradient>
                 )}
               </View>
@@ -252,8 +252,8 @@ export default function ProfileScreen() {
                 <Text style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13 }} numberOfLines={1}>{user.email}</Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8 }}>
                   <View style={{ backgroundColor: 'rgba(234,179,8,0.12)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(234,179,8,0.2)', flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                    <Ionicons name={user.role === 'admin' ? 'shield' : 'star'} size={11} color="#eab308" />
-                    <Text style={{ color: '#eab308', fontSize: 11, fontWeight: '700' }}>
+                    <Ionicons name={user.role === 'admin' ? 'shield' : 'star'} size={11} color="#E6BF5C" />
+                    <Text style={{ color: '#E6BF5C', fontSize: 11, fontWeight: '700' }}>
                       {user.role === 'admin' ? 'Quản trị' : 'Thành viên'}
                     </Text>
                   </View>
@@ -306,7 +306,7 @@ export default function ProfileScreen() {
               })}
             >
               <View style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: updateInfo ? 'rgba(234,179,8,0.15)' : 'rgba(255,255,255,0.07)', alignItems: 'center', justifyContent: 'center', marginRight: 13 }}>
-                <Ionicons name={updateInfo ? 'cloud-download-outline' : 'checkmark-circle-outline'} size={18} color={updateInfo ? '#eab308' : 'rgba(255,255,255,0.6)'} />
+                <Ionicons name={updateInfo ? 'cloud-download-outline' : 'checkmark-circle-outline'} size={18} color={updateInfo ? '#E6BF5C' : 'rgba(255,255,255,0.6)'} />
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={{ color: 'white', fontSize: 15, fontWeight: '600' }}>
@@ -315,7 +315,7 @@ export default function ProfileScreen() {
                 <Text style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>v{APP_VERSION} · Build {APP_BUILD}</Text>
               </View>
               {updateInfo ? (
-                <TouchableOpacity onPress={() => Linking.openURL(updateInfo.download_url)} style={{ backgroundColor: '#eab308', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}>
+                <TouchableOpacity onPress={() => Linking.openURL(updateInfo.download_url)} style={{ backgroundColor: '#E6BF5C', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}>
                   <Text style={{ color: '#000', fontSize: 12, fontWeight: '800' }}>Cập nhật</Text>
                 </TouchableOpacity>
               ) : (

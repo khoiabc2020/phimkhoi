@@ -83,7 +83,7 @@ export default function UpdateChecker({ silent = true }: Props) {
                 <View style={styles.card}>
                     {/* Header */}
                     <View style={styles.iconWrap}>
-                        <Ionicons name="rocket-outline" size={40} color="#F4C84A" />
+                        <Ionicons name="rocket-outline" size={40} color="#E6BF5C" />
                     </View>
 
                     <Text style={styles.title}>Phiên bản mới!</Text>
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     title: { color: 'white', fontSize: 22, fontWeight: '700', marginBottom: 4 },
-    versionText: { color: '#F4C84A', fontSize: 15, fontWeight: '600', marginBottom: 16 },
+    versionText: { color: '#E6BF5C', fontSize: 15, fontWeight: '600', marginBottom: 16 },
     changelogBox: {
         width: '100%', backgroundColor: 'rgba(255,255,255,0.05)',
         borderRadius: 12, padding: 14, marginBottom: 20,
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     changelogText: { color: 'rgba(255,255,255,0.8)', fontSize: 13, lineHeight: 20 },
     updateBtn: {
         width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-        backgroundColor: '#F4C84A', borderRadius: 14, paddingVertical: 14, marginBottom: 10,
+        backgroundColor: '#E6BF5C', borderRadius: 14, paddingVertical: 14, marginBottom: 10,
     },
     updateBtnText: { color: '#0B0D12', fontSize: 16, fontWeight: '700' },
     skipBtn: { paddingVertical: 10 },

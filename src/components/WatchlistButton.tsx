@@ -25,12 +25,21 @@ export default function WatchlistButton({ slug, initialInWatchlist, className, s
                 if (result.success) {
                     setInWatchlist(false);
                     router.refresh();
+                } else {
+                    alert(result.error || "Có lỗi xảy ra, vui lòng thử lại!");
                 }
             } else {
                 const result = await addToWatchlist(slug);
                 if (result.success) {
                     setInWatchlist(true);
                     router.refresh();
+                } else {
+                    if (result.error === "Unauthorized") {
+                        alert("Vui lòng đăng nhập để thêm phim vào danh sách Xem Sau!");
+                        router.push("/login");
+                    } else {
+                        alert(result.error || "Có lỗi xảy ra, vui lòng thử lại!");
+                    }
                 }
             }
         });

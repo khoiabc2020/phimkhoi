@@ -229,6 +229,28 @@ h2 {
     width: 0px;
     background: transparent;
   }
+
+  /* Override Tailwind Default Yellow-500 across app */
+  .text-yellow-500 {
+    color: #eab308;
+    /* Soft golden yellow */
+    opacity: 0.85 !important;
+  }
+
+  .bg-yellow-500 {
+    background-color: #eab308;
+    /* Soft golden yellow */
+    opacity: 0.8 !important;
+    /* Dịu mắt hơn, bớt gắt */
+  }
+
+  .border-yellow-500 {
+    border-color: rgba(234, 179, 8, 0.6) !important;
+  }
+
+  .hover\:bg-yellow-500:hover {
+    background-color: rgba(234, 179, 8, 0.9) !important;
+  }
 }
 
 /* Scrollbar Hide Utility */

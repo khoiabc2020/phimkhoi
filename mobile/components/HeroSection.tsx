@@ -194,7 +194,7 @@ const HeroSlide = React.memo(function HeroSlide({ movie, index, isFav, onToggleF
                     )}
                     {rating && (
                         <View style={styles.badgeRating}>
-                            <Ionicons name="star" size={12} color="#F4C84A" />
+                            <Ionicons name="star" size={12} color="#E6BF5C" />
                             <Text style={styles.badgeRatingText}>{rating}</Text>
                         </View>
                     )}
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
         zIndex: 2,
     },
     badgeQuality: {
-        backgroundColor: '#F4C84A',
+        backgroundColor: '#E6BF5C',
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 6,
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.1)',
     },
     badgeRatingText: {
-        color: '#F4C84A',
+        color: '#E6BF5C',
         fontSize: 11,
         fontWeight: '700',
     },
@@ -364,12 +364,12 @@ const styles = StyleSheet.create({
         flex: 1,
         height: 48,
         borderRadius: 24,
-        backgroundColor: '#F4C84A',
+        backgroundColor: '#E6BF5C',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 8,
-        shadowColor: '#F4C84A',
+        shadowColor: '#E6BF5C',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
         gap: 6,
     },
     dot: { height: 6, borderRadius: 3 },
-    dotActive: { width: 22, backgroundColor: '#F4C84A' },
+    dotActive: { width: 22, backgroundColor: '#E6BF5C' },
     dotInactive: { width: 6, backgroundColor: 'rgba(255,255,255,0.25)' },
 
     // Tablet Overrides

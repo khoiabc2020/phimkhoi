@@ -17,6 +17,7 @@ import { searchTMDBMovie, getTMDBDetails, getTMDBImage } from "@/services/tmdb";
 import { isFavorite } from "@/app/actions/favorites";
 import { isInWatchlist } from "@/app/actions/watchlist";
 import WatchlistButton from "@/components/WatchlistButton";
+import ShareButton from "@/components/ShareButton";
 
 // Revalidate every 60 seconds for real-time TMDB rating updates
 export const revalidate = 60;
@@ -162,10 +163,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                     className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/5 rounded-full"
                                     showLabel={true}
                                 />
-                                <button className="hidden sm:flex items-center gap-2 px-4 py-2 min-h-[40px] rounded-full bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white font-medium text-sm transition-all border border-white/5 group">
-                                    <Share2 className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors shrink-0" />
-                                    <span>Chia sẻ</span>
-                                </button>
+                                <ShareButton title={`Xem phim ${movie.name} trên MovieBox`} />
                             </>
                         )}
                     </div>

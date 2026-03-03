@@ -4,8 +4,8 @@ export const COLORS = {
   bg1: '#0F121A', // Card background
 
   // Accents
-  accent: '#F4C84A', // Soft Gold
-  accentPressed: '#DUB239',
+  accent: '#E6BF5C', // Soft Sand Gold
+  accentPressed: '#CCA43B',
 
   // Text
   textPrimary: 'rgba(255,255,255,0.92)',

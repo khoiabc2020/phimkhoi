@@ -96,7 +96,7 @@ export default function WatchListScreen() {
             <View style={styles.centered}>
                 <Stack.Screen options={{ headerShown: false }} />
                 <StatusBar style="light" />
-                <ActivityIndicator size="large" color="#F4C84A" />
+                <ActivityIndicator size="large" color="#E6BF5C" />
             </View>
         );
     }
@@ -133,7 +133,7 @@ export default function WatchListScreen() {
                             <RefreshControl
                                 refreshing={refreshing}
                                 onRefresh={onRefresh}
-                                tintColor="#F4C84A"
+                                tintColor="#E6BF5C"
                             />
                         }
                         renderItem={({ item }) => {
@@ -177,7 +177,7 @@ export default function WatchListScreen() {
                                         {/* Row actions */}
                                         <View style={styles.actionRow}>
                                             <View style={styles.playBtn}>
-                                                <Ionicons name="play-circle" size={18} color="#F4C84A" />
+                                                <Ionicons name="play-circle" size={18} color="#E6BF5C" />
                                                 <Text style={styles.playBtnText}>Xem phim</Text>
                                             </View>
 
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
         paddingVertical: 4,
         borderRadius: 12,
     },
-    countText: { color: '#F4C84A', fontSize: 12, fontWeight: '600' },
+    countText: { color: '#E6BF5C', fontSize: 12, fontWeight: '600' },
     listContent: { paddingHorizontal: 16, paddingBottom: 40 },
     card: {
         flexDirection: 'row',
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
         gap: 5,
     },
     playBtnText: {
-        color: '#F4C84A',
+        color: '#E6BF5C',
         fontSize: 12,
         fontWeight: '600',
     },

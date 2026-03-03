@@ -11,7 +11,7 @@ import * as Linking from 'expo-linking';
 import { COLORS } from '@/constants/theme';
 import { CONFIG } from '@/constants/config';
 
-const ACCENT = COLORS.accent ?? '#F4C84A';
+const ACCENT = COLORS.accent ?? '#E6BF5C';
 const APP_BUILD = 6; // Constants matching profile.tsx
 
 interface UpdateInfo {
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     updateVersion: {
-        color: '#F4C84A',
+        color: '#E6BF5C',
         fontSize: 14,
         fontWeight: '600',
     },
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         gap: 8,
-        backgroundColor: '#F4C84A',
+        backgroundColor: '#E6BF5C',
         borderRadius: 14,
         paddingVertical: 14,
         width: '100%',

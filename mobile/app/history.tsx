@@ -63,7 +63,7 @@ export default function HistoryScreen() {
             <View style={styles.centered}>
                 <Stack.Screen options={{ headerShown: false }} />
                 <StatusBar style="light" />
-                <Ionicons name="time-outline" size={48} color="#F4C84A" />
+                <Ionicons name="time-outline" size={48} color="#E6BF5C" />
             </View>
         );
     }
@@ -111,7 +111,7 @@ export default function HistoryScreen() {
                             <RefreshControl
                                 refreshing={refreshing}
                                 onRefresh={onRefresh}
-                                tintColor="#F4C84A"
+                                tintColor="#E6BF5C"
                             />
                         }
                         renderItem={({ item }) => {
@@ -165,7 +165,7 @@ export default function HistoryScreen() {
                                             {formatTime(item.timestamp || Date.now())}
                                         </Text>
                                         <View style={styles.continueBtn}>
-                                            <Ionicons name="play-circle" size={16} color="#F4C84A" />
+                                            <Ionicons name="play-circle" size={16} color="#E6BF5C" />
                                             <Text style={styles.continueBtnText}>Tiếp tục xem</Text>
                                         </View>
                                     </View>
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
         paddingVertical: 4,
         borderRadius: 12,
     },
-    countText: { color: '#F4C84A', fontSize: 12, fontWeight: '600' },
+    countText: { color: '#E6BF5C', fontSize: 12, fontWeight: '600' },
     listContent: { paddingHorizontal: 16, paddingBottom: 40 },
     card: {
         flexDirection: 'row',
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
         paddingVertical: 2,
         borderRadius: 6,
     },
-    episodeBadgeText: { color: '#F4C84A', fontSize: 10, fontWeight: '700' },
+    episodeBadgeText: { color: '#E6BF5C', fontSize: 10, fontWeight: '700' },
     info: {
         flex: 1,
         padding: 12,
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
         marginTop: 8,
     },
     continueBtnText: {
-        color: '#F4C84A',
+        color: '#E6BF5C',
         fontSize: 12,
         fontWeight: '600',
     },

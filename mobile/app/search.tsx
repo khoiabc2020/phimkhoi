@@ -310,7 +310,7 @@ export default function SearchScreen() {
                     ItemSeparatorComponent={() => <View style={styles.separator} />}
                     ListHeaderComponent={actorResults.length > 0 ? (
                         <View style={{ paddingHorizontal: 16, paddingTop: 12, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)', marginBottom: 4 }}>
-                            <Text style={{ color: '#F4C84A', fontSize: 11, fontWeight: '700', letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 12 }}>
+                            <Text style={{ color: '#E6BF5C', fontSize: 11, fontWeight: '700', letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 12 }}>
                                 Diễn viên / Đạo diễn
                             </Text>
                             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 16 }}>

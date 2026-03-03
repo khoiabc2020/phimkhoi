@@ -1002,11 +1002,11 @@ export default function NativePlayer({
                                                     borderRadius: 20,
                                                     backgroundColor: isActive ? 'rgba(244,200,74,0.15)' : 'rgba(255,255,255,0.06)',
                                                     borderWidth: 1,
-                                                    borderColor: isActive ? '#F4C84A' : 'rgba(255,255,255,0.1)',
+                                                    borderColor: isActive ? '#E6BF5C' : 'rgba(255,255,255,0.1)',
                                                 }}
                                             >
                                                 <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: isActive ? dotColor : 'rgba(255,255,255,0.25)' }} />
-                                                <Text style={{ color: isActive ? '#F4C84A' : 'rgba(255,255,255,0.55)', fontSize: 13, fontWeight: isActive ? '700' : '500' }}>
+                                                <Text style={{ color: isActive ? '#E6BF5C' : 'rgba(255,255,255,0.55)', fontSize: 13, fontWeight: isActive ? '700' : '500' }}>
                                                     {lang}
                                                 </Text>
                                             </TouchableOpacity>

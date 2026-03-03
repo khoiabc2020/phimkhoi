@@ -6,11 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import Image from "next/image";
-import dynamic from "next/dynamic";
-
-const Turnstile = dynamic(() => import("@marsidev/react-turnstile").then((mod) => mod.Turnstile), {
-    ssr: false,
-});
+import Script from "next/script";
 
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
 const hasRealTurnstile = TURNSTILE_SITE_KEY && TURNSTILE_SITE_KEY !== "your_turnstile_site_key";
@@ -28,6 +24,19 @@ function LoginForm() {
     const searchParams = useSearchParams();
     const callbackUrl = searchParams.get("callbackUrl") || "/";
     const registered = searchParams.get("registered");
+
+    // Lấy token từ Cloudflare Callback
+    if (typeof window !== "undefined") {
+        (window as any).onTurnstileSuccess = (token: string) => {
+            setTurnstileToken(token);
+        };
+        (window as any).onTurnstileError = () => {
+            setTurnstileToken(null);
+        };
+        (window as any).onTurnstileExpire = () => {
+            setTurnstileToken(null);
+        };
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -145,13 +154,9 @@ function LoginForm() {
 
                 {/* Cloudflare Turnstile */}
                 {hasRealTurnstile ? (
-                    <div className="mt-1">
-                        <Turnstile
-                            siteKey={TURNSTILE_SITE_KEY}
-                            onSuccess={(token) => setTurnstileToken(token)}
-                            onError={() => setTurnstileToken(null)}
-                            onExpire={() => setTurnstileToken(null)}
-                        />
+                    <div className="mt-1 flex justify-center">
+                        <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></Script>
+                        <div className="cf-turnstile" data-sitekey={TURNSTILE_SITE_KEY} data-theme="dark" data-callback="onTurnstileSuccess" data-error-callback="onTurnstileError" data-expired-callback="onTurnstileExpire"></div>
                     </div>
                 ) : (
                     <div className="mt-2 mb-2 w-full h-[65px] bg-white/5 border border-white/10 rounded-[3px] flex items-center justify-between px-4">

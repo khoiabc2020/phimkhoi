@@ -146,7 +146,7 @@ export default function ScheduleScreen() {
                         <Text style={styles.headerSub}>Cập nhật phim mới nhất tại rạp</Text>
                     </View>
                     <View style={styles.headerBadge}>
-                        <Ionicons name="film-outline" size={18} color="#F4C84A" />
+                        <Ionicons name="film-outline" size={18} color="#E6BF5C" />
                     </View>
                 </View>
 
@@ -180,7 +180,7 @@ export default function ScheduleScreen() {
                             keyExtractor={(item) => item._id || item.slug}
                             renderItem={({ item }) => <MovieRow item={item} />}
                             refreshControl={
-                                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F4C84A" />
+                                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#E6BF5C" />
                             }
                             contentContainerStyle={{ paddingBottom: 120 }}
                             showsVerticalScrollIndicator={false}
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
         borderRadius: 11,
     },
     tabBtnActive: {
-        backgroundColor: '#F4C84A',
+        backgroundColor: '#E6BF5C',
     },
     tabText: { color: 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: '600' },
     tabTextActive: { color: '#000' },
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
 
     watchBtn: {
         flexDirection: 'row', alignItems: 'center', gap: 5,
-        backgroundColor: '#F4C84A',
+        backgroundColor: '#E6BF5C',
         borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8,
         alignSelf: 'flex-start', marginTop: 6,
     },
