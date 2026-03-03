@@ -8,6 +8,7 @@ import { useAuth } from '@/context/auth';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { CONFIG } from '@/constants/config';
+import ModernAlert, { AlertButton } from '@/components/ModernAlert';
 
 const APP_VERSION = '1.0.6'; // Đồng bộ với /api/mobile/version
 const APP_BUILD = 7;
@@ -78,6 +79,18 @@ export default function ProfileScreen() {
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
   const [checking, setChecking] = useState(false);
 
+  const [alertConfig, setAlertConfig] = useState<{
+    visible: boolean;
+    title: string;
+    message: string;
+    type?: 'info' | 'success' | 'warning' | 'error';
+    buttons?: AlertButton[];
+  }>({ visible: false, title: '', message: '' });
+
+  const showAlert = (title: string, message: string, buttons?: AlertButton[], type: 'info' | 'success' | 'warning' | 'error' = 'info') => {
+    setAlertConfig({ visible: true, title, message, buttons, type });
+  };
+
   useEffect(() => { checkVersion(false); }, []);
 
   const checkVersion = async (isManual = false) => {
@@ -99,28 +112,28 @@ export default function ProfileScreen() {
         if (data.build > APP_BUILD) {
           setUpdateInfo(data);
           if (isManual) {
-            Alert.alert('Cập nhật mới!', `v${data.version} đã sẵn sàng`, [
+            showAlert('Cập nhật mới!', `v${data.version} đã sẵn sàng`, [
               { text: 'Để sau', style: 'cancel' },
               { text: 'Cập nhật', onPress: () => Linking.openURL(data.download_url) }
-            ]);
+            ], 'success');
           }
         } else if (isManual) {
-          Alert.alert('Phiên bản mới nhất', 'Bạn đang dùng phiên bản mới nhất rồi! 🎉');
+          showAlert('Phiên bản mới nhất', 'Bạn đang dùng phiên bản mới nhất rồi! 🎉', undefined, 'success');
         }
       } else if (isManual) {
-        Alert.alert('Lỗi', 'Không thể kiểm tra cập nhật. Vui lòng thử lại.');
+        showAlert('Lỗi', 'Không thể kiểm tra cập nhật. Vui lòng thử lại.', undefined, 'error');
       }
     } catch {
       // Chỉ show lỗi khi user chủ động nhấn nút, không hiện khi auto-check lúc mở app
-      if (isManual) Alert.alert('Lỗi', 'Không thể kết nối máy chủ. Kiểm tra lại kết nối mạng.');
+      if (isManual) showAlert('Lỗi', 'Không thể kết nối máy chủ. Kiểm tra lại kết nối mạng.', undefined, 'warning');
     } finally { setChecking(false); }
   };
 
   const handleLogout = () => {
-    Alert.alert('Đăng xuất', 'Bạn có chắc chắn?', [
+    showAlert('Đăng xuất', 'Bạn có chắc chắn muốn đăng xuất khỏi ứng dụng?', [
       { text: 'Hủy', style: 'cancel' },
       { text: 'Đăng xuất', style: 'destructive', onPress: logout }
-    ]);
+    ], 'warning');
   };
 
   // ── Not logged in ──────────────────────────────────────────────────────────
@@ -344,6 +357,14 @@ export default function ProfileScreen() {
           </Text>
         </ScrollView>
       </SafeAreaView>
+      <ModernAlert
+        visible={alertConfig.visible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        buttons={alertConfig.buttons}
+        type={alertConfig.type}
+        onClose={() => setAlertConfig(prev => ({ ...prev, visible: false }))}
+      />
     </View>
   );
 }

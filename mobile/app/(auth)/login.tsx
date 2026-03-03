@@ -14,6 +14,7 @@ import { CONFIG } from '@/constants/config';
 import * as WebBrowser from 'expo-web-browser';
 import * as AuthSession from 'expo-auth-session';
 import * as Google from 'expo-auth-session/providers/google';
+import ModernAlert, { AlertButton } from '@/components/ModernAlert';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -31,6 +32,18 @@ export default function AuthScreen() {
     const [loading, setLoading] = useState(false);
     const [googleLoading, setGoogleLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+
+    const [alertConfig, setAlertConfig] = useState<{
+        visible: boolean;
+        title: string;
+        message: string;
+        type?: 'info' | 'success' | 'warning' | 'error';
+        buttons?: AlertButton[];
+    }>({ visible: false, title: '', message: '' });
+
+    const showAlert = (title: string, message: string, buttons?: AlertButton[], type: 'info' | 'success' | 'warning' | 'error' = 'info') => {
+        setAlertConfig({ visible: true, title, message, buttons, type });
+    };
 
     const [request, response, promptAsync] = Google.useAuthRequest({
         webClientId: GOOGLE_WEB_CLIENT_ID,
@@ -54,7 +67,7 @@ export default function AuthScreen() {
             await login(data.token, data.user);
             router.replace('/(tabs)/profile');
         } catch (err: any) {
-            Alert.alert('Lỗi', err.message || 'Không thể đăng nhập bằng Google');
+            showAlert('Lỗi', err.message || 'Không thể đăng nhập bằng Google', undefined, 'error');
         } finally {
             setGoogleLoading(false);
         }
@@ -62,7 +75,7 @@ export default function AuthScreen() {
 
     const handleLogin = async () => {
         if (!email || !password) {
-            Alert.alert('Thiếu thông tin', 'Vui lòng nhập email và mật khẩu');
+            showAlert('Thiếu thông tin', 'Vui lòng nhập email và mật khẩu', undefined, 'warning');
             return;
         }
         setLoading(true);
@@ -79,7 +92,7 @@ export default function AuthScreen() {
             await login(data.token, data.user);
             router.replace('/(tabs)/profile');
         } catch (error: any) {
-            Alert.alert('Lỗi', error.message);
+            showAlert('Lỗi', error.message, undefined, 'error');
         } finally {
             setLoading(false);
         }
@@ -87,15 +100,15 @@ export default function AuthScreen() {
 
     const handleRegister = async () => {
         if (!name || !email || !password) {
-            Alert.alert('Thiếu thông tin', 'Vui lòng điền đầy đủ');
+            showAlert('Thiếu thông tin', 'Vui lòng điền đầy đủ', undefined, 'warning');
             return;
         }
         if (password !== confirmPassword) {
-            Alert.alert('Lỗi', 'Mật khẩu xác nhận không khớp');
+            showAlert('Lỗi', 'Mật khẩu xác nhận không khớp', undefined, 'warning');
             return;
         }
         if (password.length < 6) {
-            Alert.alert('Lỗi', 'Mật khẩu tối thiểu 6 ký tự');
+            showAlert('Lỗi', 'Mật khẩu tối thiểu 6 ký tự', undefined, 'warning');
             return;
         }
         setLoading(true);
@@ -107,11 +120,11 @@ export default function AuthScreen() {
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Đăng ký thất bại');
-            Alert.alert('Đăng ký thành công!', 'Vui lòng đăng nhập.', [
+            showAlert('Đăng ký thành công!', 'Vui lòng đăng nhập.', [
                 { text: 'OK', onPress: () => setTab('login') }
-            ]);
+            ], 'success');
         } catch (error: any) {
-            Alert.alert('Lỗi', error.message);
+            showAlert('Lỗi', error.message, undefined, 'error');
         } finally {
             setLoading(false);
         }
@@ -337,6 +350,15 @@ export default function AuthScreen() {
                     </ScrollView>
                 </SafeAreaView>
             </KeyboardAvoidingView>
+
+            <ModernAlert
+                visible={alertConfig.visible}
+                title={alertConfig.title}
+                message={alertConfig.message}
+                buttons={alertConfig.buttons}
+                type={alertConfig.type}
+                onClose={() => setAlertConfig(prev => ({ ...prev, visible: false }))}
+            />
         </View>
     );
 }
