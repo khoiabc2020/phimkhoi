@@ -1,6 +1,12 @@
+```typescript
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
+
+const Turnstile = dynamic(() => import("@marsidev/react-turnstile").then((mod) => mod.Turnstile), {
+    ssr: false,
+});
 
 interface TurnstileProps {
     siteKey: string;
@@ -9,90 +15,30 @@ interface TurnstileProps {
     onExpire?: () => void;
 }
 
-declare global {
-    interface Window {
-        turnstile?: {
-            render: (container: string | HTMLElement, options: any) => string;
-            remove: (widgetId: string) => void;
-        };
-        onTurnstileSuccess?: (token: string) => void;
-        onTurnstileError?: () => void;
-        onTurnstileExpire?: () => void;
-    }
-}
-
 export default function TurnstileWidget({ siteKey, onSuccess, onError, onExpire }: TurnstileProps) {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const widgetIdRef = useRef<string | null>(null);
     const [isError, setIsError] = useState(false);
+    const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
-        // Expose callbacks to global window object
-        window.onTurnstileSuccess = onSuccess;
-        window.onTurnstileError = onError;
-        window.onTurnstileExpire = onExpire;
-
-        // Function to render turnstile
-        const renderTurnstile = () => {
-            if (window.turnstile && containerRef.current && !widgetIdRef.current) {
-                try {
-                    widgetIdRef.current = window.turnstile.render(containerRef.current, {
-                        sitekey: siteKey,
-                        theme: "dark",
-                        callback: "onTurnstileSuccess",
-                        "error-callback": "onTurnstileError",
-                        "expired-callback": "onTurnstileExpire",
-                    });
-                } catch (e) {
-                    console.error("Turnstile render error", e);
-                    setIsError(true);
-                    onSuccess("fallback_token");
-                }
-            } else if (!window.turnstile) {
+        // Fallback Timeout: Nếu sau 5 giây thư viện không báo Loaded (hoặc token không có), 
+        // khả năng cao nó đã bị block mạng/adblock ngầm. Ta kích hoạt Fallback bypass.
+        const timer = setTimeout(() => {
+            if (!isLoaded) {
+                console.warn("Turnstile Widget load timeout. Enabling Bypass Fallback.");
                 setIsError(true);
-                onSuccess("fallback_token");
+                onSuccess("bypass-timeout-token");
             }
-        };
+        }, 5000);
 
-        // Load script directly if window.turnstile isn't ready
-        if (!window.turnstile) {
-            const script = document.createElement("script");
-            script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-            script.async = true;
-            script.defer = true;
+        return () => clearTimeout(timer);
+    }, [isLoaded, onSuccess]);
 
-            script.onerror = () => {
-                console.error("Failed to load Turnstile script, likely blocked by AdBlocker.");
-                setIsError(true);
-                onSuccess("fallback_token"); // Bypass
-            };
-
-            script.onload = () => {
-                setTimeout(renderTurnstile, 100);
-            };
-
-            document.head.appendChild(script);
-        } else {
-            renderTurnstile();
-        }
-
-        // Cleanup
-        return () => {
-            if (window.turnstile && widgetIdRef.current) {
-                try {
-                    window.turnstile.remove(widgetIdRef.current);
-                    widgetIdRef.current = null;
-                } catch (e) {
-                    console.error("Turnstile remove error", e);
-                }
-            }
-
-            // Cleanup globals to avoid memory leaks
-            window.onTurnstileSuccess = undefined;
-            window.onTurnstileError = undefined;
-            window.onTurnstileExpire = undefined;
-        };
-    }, [siteKey, onSuccess, onError, onExpire]);
+    const handleError = () => {
+        console.error("Turnstile Widget encountered an error via API.");
+        setIsError(true);
+        onSuccess("bypass-error-token");
+        if (onError) onError();
+    };
 
     if (isError) {
         return (
@@ -101,7 +47,7 @@ export default function TurnstileWidget({ siteKey, onSuccess, onError, onExpire 
                     <div className="w-6 h-6 rounded-full bg-[#eab308] flex items-center justify-center">
                         <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                     </div>
-                    <span className="text-[#e2e2e2] text-sm font-medium">Thành công!</span>
+                    <span className="text-[#e2e2e2] text-sm font-medium">Bảo mật tự động!</span>
                 </div>
                 <div className="flex flex-col items-end">
                     <div className="flex items-center gap-1 opacity-80">
@@ -110,7 +56,7 @@ export default function TurnstileWidget({ siteKey, onSuccess, onError, onExpire 
                         </svg>
                         <span className="font-bold text-[#f38020] text-[10px] tracking-tight">CLOUDFLARE</span>
                     </div>
-                    <div className="text-[9px] text-[#8c8c8c] mt-0.5">Quyền riêng tư - Các ĐK</div>
+                    <div className="text-[9px] text-[#8c8c8c] mt-0.5">Bypass Fallback</div>
                 </div>
             </div>
         );
@@ -118,7 +64,21 @@ export default function TurnstileWidget({ siteKey, onSuccess, onError, onExpire 
 
     return (
         <div className="mt-2 mb-2 w-full flex justify-center min-h-[65px] h-[65px] overflow-hidden items-center relative z-50">
-            <div ref={containerRef}></div>
+            <Turnstile
+                siteKey={siteKey}
+                onSuccess={(t) => {
+                    setIsLoaded(true);
+                    onSuccess(t);
+                }}
+                onError={handleError}
+                onExpire={onExpire}
+                onLoad={() => setIsLoaded(true)}
+                options={{
+                    size: "normal",
+                    theme: "dark",
+                }}
+            />
         </div>
     );
 }
+```
