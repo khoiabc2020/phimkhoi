@@ -119,7 +119,7 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
                     style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
                     {movies.map((movie) => (
-                        <div key={movie._id} className="min-w-[130px] sm:min-w-[150px] md:min-w-[180px] lg:min-w-[200px] snap-center">
+                        <div key={movie._id} className="min-w-[130px] md:min-w-[150px] snap-center">
                             <MovieCard movie={movie} />
                         </div>
                     ))}

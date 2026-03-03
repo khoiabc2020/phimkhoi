@@ -55,7 +55,7 @@ export default function QuickNav() {
                         <Link
                             key={index}
                             href={item.href}
-                            className="quick-nav-card flex-[0_0_36%] sm:flex-[0_0_28%] md:flex-[0_0_22%] lg:flex-[0_0_16%] aspect-[1.5/1] md:aspect-[16/9] relative rounded-2xl overflow-hidden snap-start shadow-lg"
+                            className="quick-nav-card flex-[0_0_36%] sm:flex-[0_0_28%] md:flex-[0_0_22%] lg:flex-[0_0_16%] aspect-[1.5/1] md:aspect-[16/9] lg:aspect-[1.5/1] relative rounded-2xl overflow-hidden snap-start shadow-lg"
                             style={{ background: item.bg }}
                         >
                             {/* Noise texture */}
@@ -69,11 +69,11 @@ export default function QuickNav() {
                             <div className="quick-nav-shine absolute inset-0 pointer-events-none" />
 
                             {/* Content */}
-                            <div className="absolute inset-0 flex flex-col justify-end p-3.5 md:p-4">
-                                <p className="text-white font-black text-[15px] sm:text-[16px] md:text-[18px] leading-tight drop-shadow-sm truncate">
+                            <div className="absolute inset-0 flex flex-col justify-end p-3 lg:p-3 md:p-3.5">
+                                <p className="text-white font-black text-[15px] sm:text-[16px] lg:text-[17px] leading-tight drop-shadow-sm line-clamp-1">
                                     {item.label}
                                 </p>
-                                <p className="text-white/60 text-[12px] font-semibold mt-0.5 flex items-center gap-1">
+                                <p className="text-white/60 text-[11px] sm:text-[12px] font-semibold mt-0.5 flex items-center gap-0.5 sm:gap-1">
                                     {item.sub}
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                         <polyline points="9 18 15 12 9 6" />
