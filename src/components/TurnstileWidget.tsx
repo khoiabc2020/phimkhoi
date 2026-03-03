@@ -2,11 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import dynamic from "next/dynamic";
-
-const Turnstile = dynamic(() => import("@marsidev/react-turnstile").then((mod) => mod.Turnstile), {
-    ssr: false,
-});
+import Script from "next/script";
 
 interface TurnstileProps {
     siteKey: string;
@@ -32,6 +28,21 @@ export default function TurnstileWidget({ siteKey, onSuccess, onError, onExpire 
 
         return () => clearTimeout(timer);
     }, [isLoaded, onSuccess]);
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            (window as any).onTurnstileSuccess = (token: string) => {
+                setIsLoaded(true);
+                onSuccess(token);
+            };
+            (window as any).onTurnstileError = () => {
+                handleError();
+            };
+            (window as any).onTurnstileExpire = () => {
+                if (onExpire) onExpire();
+            };
+        }
+    }, [onSuccess, onError, onExpire]);
 
     const handleError = () => {
         console.error("Turnstile Widget encountered an error via API.");
@@ -63,21 +74,21 @@ export default function TurnstileWidget({ siteKey, onSuccess, onError, onExpire 
     }
 
     return (
-        <div className="mt-2 mb-2 w-full flex justify-center min-h-[65px] h-[65px] overflow-hidden items-center relative z-50">
-            <Turnstile
-                siteKey={siteKey}
-                onSuccess={(t) => {
-                    setIsLoaded(true);
-                    onSuccess(t);
-                }}
-                onError={handleError}
-                onExpire={onExpire}
+        <div className="mt-2 mb-2 w-full flex justify-center min-h-[65px] min-w-[300px] overflow-hidden items-center relative z-50">
+            <Script
+                src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+                strategy="lazyOnload"
                 onLoad={() => setIsLoaded(true)}
-                options={{
-                    size: "normal",
-                    theme: "dark",
-                }}
             />
+            <div 
+                className="cf-turnstile" 
+                data-sitekey={siteKey}
+                data-callback="onTurnstileSuccess"
+                data-error-callback="onTurnstileError"
+                data-expired-callback="onTurnstileExpire"
+                data-theme="dark"
+                data-size="normal"
+            ></div>
         </div>
     );
 }

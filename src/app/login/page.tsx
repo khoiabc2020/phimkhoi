@@ -26,19 +26,6 @@ function LoginForm() {
     const callbackUrl = searchParams.get("callbackUrl") || "/";
     const registered = searchParams.get("registered");
 
-    // Lấy token từ Cloudflare Callback
-    if (typeof window !== "undefined") {
-        (window as any).onTurnstileSuccess = (token: string) => {
-            setTurnstileToken(token);
-        };
-        (window as any).onTurnstileError = () => {
-            setTurnstileToken(null);
-        };
-        (window as any).onTurnstileExpire = () => {
-            setTurnstileToken(null);
-        };
-    }
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
