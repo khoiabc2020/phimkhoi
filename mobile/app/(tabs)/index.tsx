@@ -26,7 +26,6 @@ import { COLORS, SPACING, RADIUS, BLUR } from '@/constants/theme';
 const { width } = Dimensions.get('window');
 const HOME_CACHE_KEY = 'home_screen_cache_v2';
 
-// Main Nav Pills (Top)
 const NAV_PILLS = [
   { label: 'Đề xuất', href: '/(tabs)/explore', active: true },
   { label: 'Phim bộ', href: '/list/phim-bo', active: false },
@@ -35,7 +34,6 @@ const NAV_PILLS = [
   { label: 'TV Shows', href: '/list/tv-shows', active: false },
 ];
 
-// Highlight Categories (Horizontal Scroll)
 const HIGHLIGHT_CATS = [
   { label: 'Chiếu Rạp', color: '#eab308', slug: 'phim-chieu-rap' },
   { label: 'Hàn Quốc', color: '#db2777', isCountry: true, slug: 'han-quoc' },
@@ -51,7 +49,6 @@ export default function HomeScreen() {
   const router = useRouter();
   const { user, syncHistory } = useAuth();
 
-  // Extended Data State
   const [data, setData] = useState<{
     heroMovies: Movie[];
     phimMoi: Movie[];
@@ -72,7 +69,6 @@ export default function HomeScreen() {
 
   const fetchData = useCallback(async () => {
     try {
-      // Giai đoạn 1: Tải nhanh homepage + hero trước
       const [homeBasic, heroTrendingRes] = await Promise.all([
         getHomeData(),
         fetch(`${CONFIG.BACKEND_URL}/api/mobile/hero-trending`)
@@ -93,17 +89,14 @@ export default function HomeScreen() {
         finalHero = heroMixed.slice(0, 8);
       }
 
-      // Nếu backend trả về rỗng thì thoát sớm, tránh crash
       if (!homeBasic) {
         setLoading(false);
         setRefreshing(false);
         return;
       }
 
-      // Snapshot cơ bản cho hero + section chính
       const baseSnapshot = {
         heroMovies: finalHero,
-        // Giới hạn số lượng để nhẹ hơn và tránh cache quá nặng
         phimMoi: (homeBasic.phimMoi || []).slice(0, 30),
         phimLe: (homeBasic.phimLe || []).slice(0, 30),
         phimBo: (homeBasic.phimBo || []).slice(0, 30),
@@ -117,7 +110,6 @@ export default function HomeScreen() {
         sapChieu: [] as Movie[],
       };
 
-      // Hiện nội dung chính ngay — không chờ section phụ
       setData(prev => ({
         ...prev,
         ...baseSnapshot,
@@ -125,7 +117,6 @@ export default function HomeScreen() {
       setLoading(false);
       setRefreshing(false);
 
-      // Giai đoạn 2: Load section phụ ngầm sau
       const [chieuRapRes, hanQuocRes, trungQuocRes, hanhDongRes, tinhCamRes, sapChieuRes] = await Promise.all([
         getMoviesByCategory('phim-chieu-rap', 1, 12),
         getMoviesByCountry('han-quoc', 1, 10),
@@ -150,7 +141,6 @@ export default function HomeScreen() {
         ...fullSnapshot,
       }));
 
-      // Lưu cache cho lần mở app sau
       try {
         await AsyncStorage.setItem(HOME_CACHE_KEY, JSON.stringify(fullSnapshot));
       } catch (e) {
@@ -179,7 +169,6 @@ export default function HomeScreen() {
       } catch (e) {
         console.warn('Load home cache failed', e);
       } finally {
-        // Luôn refresh ngầm từ server
         fetchData();
       }
     })();
@@ -206,14 +195,12 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <StatusBar style="light" />
 
-      {/* Background Gradient - Dark Cinematic */}
       <LinearGradient
         colors={[COLORS.bg0, '#121826', COLORS.bg0]}
         locations={[0, 0.4, 0.9]}
         style={StyleSheet.absoluteFill}
       />
 
-      {/* Header — liquid glass */}
       <View style={styles.headerWrapper}>
         <LinearGradient
           colors={['rgba(11,13,18,0.85)', 'rgba(11,13,18,0.4)', 'transparent']}
@@ -267,7 +254,6 @@ export default function HomeScreen() {
             </View>
           </View>
 
-          {/* Category Pills */}
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.pillsRow}>
             {NAV_PILLS.map((pill, index) => (
               <Link key={index} href={pill.href as any} asChild>
@@ -282,7 +268,6 @@ export default function HomeScreen() {
         </SafeAreaView>
       </View>
 
-      {/* Main Scroll Content */}
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -290,7 +275,6 @@ export default function HomeScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.accent} colors={[COLORS.accent]} progressViewOffset={140} />
         }
       >
-        {/* Hero Section - Mixed Content */}
         {
           loading ? (
             <View style={{ height: 400, justifyContent: 'center' }}>
@@ -301,7 +285,6 @@ export default function HomeScreen() {
           )
         }
 
-        {/* Categories Compact */}
         <View style={styles.catSection}>
           <Text style={styles.sectionTitle}>Thể loại nổi bật</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.catScroll}>
@@ -320,14 +303,12 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
-        {/* Tiếp tục xem (Continue Watching) */}
         {
           !loading && user?.history && user.history.length > 0 ? (
             <View style={{ marginBottom: 10 }}>
               <ContinueWatchingRow
                 title="Tiếp tục xem"
                 items={(() => {
-                  // Deduplicate: chỉ giữ tập mới nhất của mỗi phim (slug)
                   const seen = new Set<string>();
                   return (user.history || []).filter((item: any) => {
                     const key = item.slug || item.movie?.slug;
@@ -341,7 +322,6 @@ export default function HomeScreen() {
           ) : null
         }
 
-        {/* Movie Rows - Synced with Web */}
         {
           loading ? (
             <View style={{ padding: 20 }}>
@@ -349,7 +329,6 @@ export default function HomeScreen() {
             </View>
           ) : (
             <View style={styles.movieRows}>
-              {/* Hot Sections */}
               {data.phimChieuRap.length > 0 && (
                 <MovieRow title="Phim Chiếu Rạp Mới" movies={data.phimChieuRap} slug="phim-chieu-rap" />
               )}
@@ -361,7 +340,6 @@ export default function HomeScreen() {
               <MovieRow title="Phim Bộ Mới Nhất" movies={data.phimBo.slice(0, 12)} slug="phim-bo" />
               <MovieRow title="Phim Lẻ Đặc Sắc" movies={data.phimLe.slice(0, 12)} slug="phim-le" />
 
-              {/* Countries */}
               {data.hanQuoc.length > 0 && (
                 <MovieRow title="Phim Hàn Quốc Hot" movies={data.hanQuoc} slug="han-quoc" type="country" />
               )}
@@ -369,7 +347,6 @@ export default function HomeScreen() {
                 <MovieRow title="Phim Trung Quốc Hot" movies={data.trungQuoc} slug="trung-quoc" type="country" />
               )}
 
-              {/* Genres */}
               {data.hanhDong.length > 0 && (
                 <MovieRow title="Phim Hành Động Kịch Tính" movies={data.hanhDong} slug="hanh-dong" type="category" />
               )}

@@ -77,7 +77,7 @@ export default function CommentSection({ movieSlug }: { movieSlug: string }) {
             {user ? (
                 <View style={styles.inputContainer}>
                     <Image
-                        source={{ uri: user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName || user.username || 'U')}` }}
+                        source={{ uri: user.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'U')}` }}
                         style={styles.avatar}
                     />
                     <View style={styles.inputWrapper}>

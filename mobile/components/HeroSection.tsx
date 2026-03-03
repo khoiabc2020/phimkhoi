@@ -97,7 +97,6 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                     style={StyleSheet.absoluteFill}
                     contentFit="cover"
                     blurRadius={Platform.OS === 'ios' ? 15 : 3}
-                    transition={Platform.OS === 'ios' ? 300 : 0}
                 />
                 <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(11,13,24,0.7)' }]} />
                 <LinearGradient
@@ -149,6 +148,9 @@ export default function HeroSection({ movies }: HeroSectionProps) {
 
 const HeroSlide = React.memo(function HeroSlide({ movie, index, isFav, onToggleFav }: { movie: Movie; index: number; isFav: boolean; onToggleFav: () => void }) {
     const router = useRouter();
+    const { width: windowWidth } = Dimensions.get('window');
+    const isTablet = windowWidth >= 768;
+
     const posterUri = getImageUrl(movie.poster_url || movie.thumb_url);
     const rating = (movie as any).tmdbData?.vote_average
         ? Number((movie as any).tmdbData.vote_average).toFixed(1)
@@ -167,10 +169,21 @@ const HeroSlide = React.memo(function HeroSlide({ movie, index, isFav, onToggleF
                     priority={index === 0 ? 'high' : 'normal'}
                     cachePolicy="memory-disk"
                 />
-                <LinearGradient
-                    colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.95)']}
-                    style={StyleSheet.absoluteFill}
-                />
+
+                {/* Gradient Nền */}
+                {isTablet ? (
+                    <LinearGradient
+                        colors={['rgba(11,13,24,0.9)', 'rgba(11,13,24,0.4)', 'transparent']}
+                        start={{ x: 0, y: 0.5 }}
+                        end={{ x: 1, y: 0.5 }}
+                        style={StyleSheet.absoluteFill}
+                    />
+                ) : (
+                    <LinearGradient
+                        colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.95)']}
+                        style={StyleSheet.absoluteFill}
+                    />
+                )}
 
                 {/* Tags on top-right */}
                 <View style={styles.badgesRow}>
@@ -187,22 +200,22 @@ const HeroSlide = React.memo(function HeroSlide({ movie, index, isFav, onToggleF
                     )}
                 </View>
 
-                {/* Info block overlaid at the bottom of the poster */}
-                <View style={styles.infoBlock}>
-                    <Text style={styles.title} numberOfLines={2} adjustsFontSizeToFit>{movie.name}</Text>
-                    <View style={styles.metaRow}>
+                {/* Info block overlaid */}
+                <View style={[styles.infoBlock, isTablet && styles.infoBlockTablet]}>
+                    <Text style={[styles.title, isTablet && styles.titleTablet]} numberOfLines={2} adjustsFontSizeToFit>{movie.name}</Text>
+                    <View style={[styles.metaRow, isTablet && styles.metaRowTablet]}>
                         {movie.year && <Text style={styles.metaText}>{movie.year}</Text>}
                         {movie.category?.slice(0, 2).map((c: any) => (
                             <Text key={c.id || c.name} style={styles.metaDot}>· {c.name}</Text>
                         ))}
                     </View>
 
-                    <View style={styles.actionRow}>
+                    <View style={[styles.actionRow, isTablet && styles.actionRowTablet]}>
                         {/* Nút Xem Phim */}
                         <Pressable
-                            style={styles.playBtn}
+                            style={[styles.playBtn, isTablet && { flex: 0, width: 140 }]}
                             onPress={(e) => {
-                                e.stopPropagation(); // Avoid triggering card press
+                                e.stopPropagation();
                                 router.push(`/movie/${movie.slug}?autoPlay=true` as any);
                             }}
                         >
@@ -212,7 +225,7 @@ const HeroSlide = React.memo(function HeroSlide({ movie, index, isFav, onToggleF
 
                         {/* Nút Chi Tiết */}
                         <Pressable
-                            style={styles.detailBtn}
+                            style={[styles.detailBtn, isTablet && { flex: 0, width: 140 }]}
                             onPress={(e) => {
                                 e.stopPropagation();
                                 router.push(`/movie/${movie.slug}` as any);
@@ -410,4 +423,22 @@ const styles = StyleSheet.create({
     dot: { height: 6, borderRadius: 3 },
     dotActive: { width: 22, backgroundColor: '#F4C84A' },
     dotInactive: { width: 6, backgroundColor: 'rgba(255,255,255,0.25)' },
+
+    // Tablet Overrides
+    infoBlockTablet: {
+        width: '50%',
+        left: 40,
+        bottom: 40,
+        alignItems: 'flex-start',
+    },
+    titleTablet: {
+        textAlign: 'left',
+        fontSize: 32,
+    },
+    metaRowTablet: {
+        justifyContent: 'flex-start',
+    },
+    actionRowTablet: {
+        justifyContent: 'flex-start',
+    },
 });

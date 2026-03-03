@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, useWindowDimensions } from 'react-native';
 import { Image } from 'expo-image';
 import { Link } from 'expo-router';
 import { Movie, getImageUrl } from '@/services/api';
@@ -11,7 +11,16 @@ interface MovieCardProps {
     height?: number;
 }
 
-const MovieCard = memo(({ movie, width = 115, height = 172 }: MovieCardProps) => {
+const MovieCard = memo(({ movie, width: propsWidth, height: propsHeight }: MovieCardProps) => {
+    const { width: windowWidth } = useWindowDimensions();
+    const isTablet = windowWidth >= 768;
+
+    // Tính toán Width động tối ưu
+    const targetCols = isTablet ? Math.floor(windowWidth / 140) : 3;
+    const padding = isTablet ? 110 : 32; // Tablet trừ hao Sidebar 90px + margin
+    const dynamicWidth = propsWidth || Math.floor((windowWidth - padding - (targetCols - 1) * 10) / targetCols);
+    const dynamicHeight = propsHeight || (dynamicWidth * 1.5);
+
     if (!movie || !movie.slug) return null;
     const imageUrl = getImageUrl(movie.poster_url || movie.thumb_url);
 
@@ -19,20 +28,18 @@ const MovieCard = memo(({ movie, width = 115, height = 172 }: MovieCardProps) =>
         <Link href={`/movie/${movie.slug}`} asChild>
             <FocusableButton
                 className="mr-3 transition-opacity"
-                style={{ width, borderRadius: 14, padding: 2 }}
+                style={{ width: dynamicWidth, borderRadius: 14, padding: 2 }}
                 focusStyle={{ borderWidth: 2, borderColor: '#fbbf24', transform: [{ scale: 1.05 }] }}
             >
-                {/* Image + Overlay Badges */}
-                <View style={{ width, height, borderRadius: 14, overflow: 'hidden', position: 'relative' }}>
+                <View style={{ width: dynamicWidth, height: dynamicHeight, borderRadius: 14, overflow: 'hidden', position: 'relative' }}>
                     <Image
                         source={{ uri: imageUrl }}
-                        style={{ width, height }}
+                        style={{ width: dynamicWidth, height: dynamicHeight }}
                         contentFit="cover"
                         transition={200}
                         cachePolicy="memory-disk"
                     />
 
-                    {/* Badge: PD/TM + Ep - Ẩn khi không có số tập, phim lẻ hiển thị "Full" */}
                     {(movie.episode_current != null && String(movie.episode_current).trim() !== '') && (
                         <View style={{ position: 'absolute', bottom: 6, left: 6, flexDirection: 'row', gap: 4 }}>
                             {movie.lang?.includes('Thuyết') ? (
@@ -51,7 +58,6 @@ const MovieCard = memo(({ movie, width = 115, height = 172 }: MovieCardProps) =>
                         </View>
                     )}
 
-                    {/* Quality Badge - Inside image, top-right */}
                     {movie.quality && (
                         <View style={{ position: 'absolute', top: 8, right: 8, backgroundColor: '#fbbf24', paddingHorizontal: 6, paddingVertical: 3, borderRadius: 6, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84, elevation: 5 }}>
                             <Text style={{ fontSize: 9, fontWeight: 'bold', color: 'black' }}>{movie.quality}</Text>
@@ -59,7 +65,6 @@ const MovieCard = memo(({ movie, width = 115, height = 172 }: MovieCardProps) =>
                     )}
                 </View>
 
-                {/* Title Section */}
                 <View style={{ marginTop: 6 }}>
                     <Text
                         style={{ color: 'white', fontSize: 12, fontWeight: '700', lineHeight: 16 }}

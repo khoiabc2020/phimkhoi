@@ -12,7 +12,7 @@ import { COLORS } from '@/constants/theme';
 import { CONFIG } from '@/constants/config';
 
 const ACCENT = COLORS.accent ?? '#F4C84A';
-const APP_BUILD = 0; // Constants matching profile.tsx
+const APP_BUILD = 6; // Constants matching profile.tsx
 
 interface UpdateInfo {
     version: string;
@@ -25,7 +25,6 @@ export default function NotificationsScreen() {
     const router = useRouter();
     const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
 
-    // ── Entry Animations ────────────────────────────────────────────────────
     const iconScale = useRef(new Animated.Value(0.7)).current;
     const iconOpacity = useRef(new Animated.Value(0)).current;
     const textOpacity = useRef(new Animated.Value(0)).current;
@@ -80,7 +79,6 @@ export default function NotificationsScreen() {
             <Stack.Screen options={{ headerShown: false }} />
             <StatusBar style="light" />
             <SafeAreaView style={styles.safe} edges={['top']}>
-                {/*── Header ──────────────────────────────────────────────────*/}
                 <View style={styles.header}>
                     <Pressable onPress={() => router.back()} hitSlop={12} style={styles.iconBtn}>
                         <Feather name="arrow-left" size={22} color="rgba(255,255,255,0.8)" strokeWidth={1.5} />
@@ -91,7 +89,6 @@ export default function NotificationsScreen() {
                     </Pressable>
                 </View>
 
-                {/*── Content ─────────────────────────────────────────────────*/}
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                     {updateInfo ? (
                         <View style={{ paddingHorizontal: 20, paddingTop: 10 }}>

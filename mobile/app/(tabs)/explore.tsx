@@ -64,7 +64,6 @@ export default function ExploreScreen() {
   const [hotMovies, setHotMovies] = useState<Movie[]>([]);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
 
-  // Filters State
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
   const [countries, setCountries] = useState<any[]>([]);
@@ -97,7 +96,6 @@ export default function ExploreScreen() {
     const timer = setTimeout(async () => {
       setSearching(true);
       const query = search.trim();
-      // Fetch movies and actors concurrently for best performance
       const [results, actors] = await Promise.all([
         searchMovies(query, 40),
         searchActors(query)
@@ -125,7 +123,6 @@ export default function ExploreScreen() {
     AsyncStorage.removeItem('search_history');
   };
 
-  // Client-side filtering logic
   const filteredResults = useMemo(() => {
     return searchResults.filter((movie) => {
       if (selectedCategory !== 'all') {
@@ -147,7 +144,6 @@ export default function ExploreScreen() {
 
   const renderHeader = () => (
     <View className="px-4 mb-4">
-      {/* Actor results horizontal row */}
       {actorResults.length > 0 && (
         <View className="mb-5">
           <Text className="text-white text-sm font-bold mb-3" style={{ color: '#F4C84A' }}>
@@ -223,7 +219,6 @@ export default function ExploreScreen() {
       </View>
     );
 
-    // Only actors found but no movies - show actor section with empty movie note
     if (search.trim() && filteredResults.length === 0 && actorResults.length > 0) return (
       <View className="px-4 mt-4">
         <Text style={{ color: '#F4C84A', fontSize: 13, fontWeight: '700', marginBottom: 12 }}>Diễn viên / Đạo diễn</Text>
@@ -332,7 +327,6 @@ export default function ExploreScreen() {
       <StatusBar style="light" />
       <SafeAreaView edges={['top']} className="flex-1">
 
-        {/* Search Header */}
         <View className="px-4 pb-4 pt-2">
           <View className="flex-row items-center gap-3">
             <View className="flex-1 flex-row items-center bg-[#1e293b] rounded-full px-4 py-3 border border-gray-800">
@@ -353,7 +347,6 @@ export default function ExploreScreen() {
               )}
             </View>
 
-            {/* Filter Toggle */}
             <Pressable
               onPress={() => setIsFilterVisible(true)}
               className="bg-[#1e293b] w-12 h-12 rounded-full items-center justify-center border border-gray-800 relative shadow-sm"
@@ -369,7 +362,6 @@ export default function ExploreScreen() {
           </View>
         </View>
 
-        {/* Content: Either Search Results FlatList or Default Views */}
         {search.trim() && (filteredResults.length > 0 || actorResults.length > 0) ? (
           <FlashList
             data={filteredResults}
@@ -391,7 +383,6 @@ export default function ExploreScreen() {
         )}
       </SafeAreaView>
 
-      {/* Filter Modal */}
       <Modal visible={isFilterVisible} animationType="slide" transparent={true} onRequestClose={() => setIsFilterVisible(false)}>
         <View className="flex-1 justify-end">
           <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.6)' }]} />
@@ -404,7 +395,6 @@ export default function ExploreScreen() {
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} className="mb-4">
-              {/* Thể loại */}
               <Text className="text-white font-semibold mb-3 ml-2 text-lg">Thể Loại</Text>
               <View className="flex-row flex-wrap gap-2 px-2 pb-6">
                 <TouchableOpacity onPress={() => setSelectedCategory('all')} className={`px-4 py-2.5 border rounded-full ${selectedCategory === 'all' ? 'bg-[#F4C84A] border-[#F4C84A]' : 'bg-transparent border-white/20'}`}>
@@ -417,7 +407,6 @@ export default function ExploreScreen() {
                 ))}
               </View>
 
-              {/* Quốc Gia */}
               <Text className="text-white font-semibold mb-3 ml-2 text-lg">Quốc Gia</Text>
               <View className="flex-row flex-wrap gap-2 px-2 pb-6">
                 <TouchableOpacity onPress={() => setSelectedCountry('all')} className={`px-4 py-2.5 border rounded-full ${selectedCountry === 'all' ? 'bg-[#F4C84A] border-[#F4C84A]' : 'bg-transparent border-white/20'}`}>
@@ -430,7 +419,6 @@ export default function ExploreScreen() {
                 ))}
               </View>
 
-              {/* Năm Phát Hành */}
               <Text className="text-white font-semibold mb-3 ml-2 text-lg">Năm Phát Hành</Text>
               <View className="flex-row flex-wrap gap-2 px-2 pb-6">
                 <TouchableOpacity onPress={() => setSelectedYear('all')} className={`px-4 py-2.5 border rounded-full ${selectedYear === 'all' ? 'bg-[#F4C84A] border-[#F4C84A]' : 'bg-transparent border-white/20'}`}>

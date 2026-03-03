@@ -78,10 +78,10 @@ export default function ProfileScreen() {
   const [checking, setChecking] = useState(false);
 
   useEffect(() => {
-    checkVersion();
+    checkVersion(false);
   }, []);
 
-  const checkVersion = async () => {
+  const checkVersion = async (isManual = false) => {
     try {
       setChecking(true);
       const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/version`, {
@@ -92,11 +92,23 @@ export default function ProfileScreen() {
         const data: UpdateInfo = await res.json();
         if (data.build > APP_BUILD) {
           setUpdateInfo(data);
-        } else {
+          if (isManual) {
+            Alert.alert('Đã tìm thấy bản cập nhật!', `Phiên bản mới v${data.version} đã sẵn sàng. Bạn có muốn cập nhật ngay không?`, [
+              { text: 'Để sau', style: 'cancel' },
+              { text: 'Cập nhật', style: 'default', onPress: () => Linking.openURL(data.download_url) }
+            ]);
+          }
+        } else if (isManual) {
           Alert.alert('Cập nhật', 'Bạn đang sử dụng phiên bản mới nhất!');
         }
+      } else if (isManual) {
+        Alert.alert('Lỗi', 'Không thể kiểm tra bản cập nhật lúc này.');
       }
-    } catch { } finally { setChecking(false); }
+    } catch {
+      if (isManual) {
+        Alert.alert('Lỗi', 'Kiểm tra cập nhật thất bại. Vui lòng kiểm tra lại kết nối mạng.');
+      }
+    } finally { setChecking(false); }
   };
 
   const handleLogout = () => {
@@ -106,7 +118,6 @@ export default function ProfileScreen() {
     ]);
   };
 
-  // ─── Chưa đăng nhập ──────────────────────────────────────────────────────
   if (!user) {
     return (
       <View style={{ flex: 1, backgroundColor: '#0B0D12' }}>
@@ -115,7 +126,6 @@ export default function ProfileScreen() {
           <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 120 }}>
             <Text style={{ color: 'white', fontSize: 26, fontWeight: '800', marginBottom: 24 }}>Tài khoản</Text>
 
-            {/* Login Banner */}
             <View style={{ backgroundColor: 'rgba(244,200,74,0.08)', borderRadius: 20, borderWidth: 1, borderColor: 'rgba(244,200,74,0.2)', padding: 20, marginBottom: 28, alignItems: 'center' }}>
               <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: 'rgba(244,200,74,0.12)', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
                 <Ionicons name="person-outline" size={30} color="#F4C84A" />
@@ -146,22 +156,19 @@ export default function ProfileScreen() {
               <ProfileMenuItem icon="bookmarks-outline" label="Xem sau" onPress={() => router.push('/watchlist' as any)} />
             </View>
 
-            {/* Version */}
-            <VersionCard updateInfo={updateInfo} checking={checking} onCheck={checkVersion} />
+            <VersionCard updateInfo={updateInfo} checking={checking} onCheck={() => checkVersion(true)} />
           </ScrollView>
         </SafeAreaView>
       </View>
     );
   }
 
-  // ─── Đã đăng nhập ─────────────────────────────────────────────────────────
   return (
     <View style={{ flex: 1, backgroundColor: '#0B0D12' }}>
       <StatusBar style="light" />
       <SafeAreaView style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 120, paddingTop: 12 }}>
 
-          {/* Header Profile */}
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 4, marginBottom: 20 }}>
             <View style={{ width: 62, height: 62, borderRadius: 31, overflow: 'hidden', borderWidth: 2, borderColor: 'rgba(244,200,74,0.4)' }}>
               {user.image ? (
@@ -183,7 +190,6 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          {/* Thư viện */}
           <SectionHeader title="Thư viện" />
           <View style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' }}>
             <ProfileMenuItem icon="time-outline" label="Lịch sử xem" sublabel="Tiếp tục xem dang dở" onPress={() => router.push('/history' as any)} />
@@ -191,18 +197,15 @@ export default function ProfileScreen() {
             <ProfileMenuItem icon="bookmarks-outline" label="Xem sau" sublabel="Danh sách phim của tôi" onPress={() => router.push('/watchlist' as any)} />
           </View>
 
-          {/* Hỗ trợ */}
           <SectionHeader title="Hỗ trợ" />
           <View style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' }}>
             <ProfileMenuItem icon="chatbox-ellipses-outline" label="Góp ý" sublabel="Gửi phản hồi cho chúng tôi" onPress={() => Linking.openURL(`${webUrl}#gop-y`)} />
             <ProfileMenuItem icon="globe-outline" label="Trang web" sublabel={webUrl} onPress={() => Linking.openURL(webUrl)} />
           </View>
 
-          {/* Phiên bản */}
           <SectionHeader title="Ứng dụng" />
-          <VersionCard updateInfo={updateInfo} checking={checking} onCheck={checkVersion} />
+          <VersionCard updateInfo={updateInfo} checking={checking} onCheck={() => checkVersion(true)} />
 
-          {/* Đăng xuất */}
           <SectionHeader title="Tài khoản" />
           <View style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' }}>
             <ProfileMenuItem icon="log-out-outline" label="Đăng xuất" isDestructive onPress={handleLogout} />

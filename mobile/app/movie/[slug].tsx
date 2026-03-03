@@ -56,7 +56,8 @@ export default function MovieDetailScreen() {
     const { width: winWidth } = useWindowDimensions();
     const screenW = Math.max(Number(winWidth) || dimWidth, 320);
     const contentWidth = screenW - BODY_PADDING * 2;
-    const epCols = contentWidth < 340 ? 4 : 5;
+    const isTablet = screenW >= 768;
+    const epCols = isTablet ? Math.floor(contentWidth / 80) : (contentWidth < 340 ? 4 : 5);
     const epCardWidth = Math.floor((contentWidth - EP_GAP * (epCols - 1)) / epCols);
 
     // Data State
@@ -305,7 +306,7 @@ export default function MovieDetailScreen() {
                 contentContainerStyle={{ paddingBottom: 100 }}
             >
                 {/* HERO IMAGE */}
-                <View style={{ height: height * 0.45, width: '100%' }}>
+                <View style={{ height: isTablet ? Math.min(screenW * (9 / 16), 600) : height * 0.45, width: '100%' }}>
                     <Image
                         source={{ uri: posterUrl }}
                         style={StyleSheet.absoluteFill}

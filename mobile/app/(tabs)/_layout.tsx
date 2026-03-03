@@ -1,8 +1,8 @@
-import { Tabs } from 'expo-router';
+import { Tabs, useRouter } from 'expo-router';
 import React, { useRef, useEffect } from 'react';
-import { Platform, View, StyleSheet, Text, Animated, Easing } from 'react-native';
+import { Platform, View, StyleSheet, Text, Animated, Easing, useWindowDimensions, Pressable } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { Feather } from '@expo/vector-icons';
+import { Feather, Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS, BLUR } from '@/constants/theme';
 
@@ -48,9 +48,75 @@ function TabIcon({ focused, label, icon }: {
 export default function TabLayout() {
   const isAndroid = Platform.OS === 'android';
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  const isTablet = width >= 768; // Breakpoint for Tablet/PC
+  const router = useRouter();
 
   // Floating pill tab bar (iOS 26 style) — exactly 4 items, lower + no text overflow
   const pillBottom = Math.max(insets.bottom, 8);
+
+  // Nếu là Tablet/Web (>= 768px): Hiển thị SideBar bên Trái thay vì Bottom Tab Bar
+  if (isTablet) {
+    return (
+      <View style={{ flex: 1, flexDirection: 'row', backgroundColor: '#000' }}>
+        {/* L E F T   S I D E B A R */}
+        <View style={[styles.sideBar, { paddingTop: insets.top + 20, paddingBottom: insets.bottom + 20 }]}>
+          <View style={styles.sideBarLogoWrap}>
+            <Ionicons name="film-outline" size={28} color={COLORS.accent} />
+          </View>
+
+          <View style={styles.sideBarMenu}>
+            {TABS.map((tab) => (
+              <Tabs.Screen
+                key={tab.name}
+                name={tab.name}
+                options={{
+                  title: tab.label,
+                  tabBarButton: (props) => {
+                    const focused = props.accessibilityState?.selected || false;
+                    return (
+                      <Pressable
+                        onPress={props.onPress}
+                        style={[styles.sideBarItem, focused && styles.sideBarItemActive]}
+                      >
+                        <Feather name={tab.icon as any} size={24} color={focused ? COLORS.accent : 'rgba(255,255,255,0.6)'} />
+                        <Text style={[styles.sideBarLabel, focused && styles.sideBarLabelActive]} numberOfLines={1}>
+                          {tab.label}
+                        </Text>
+                      </Pressable>
+                    );
+                  }
+                }}
+              />
+            ))}
+          </View>
+          <View style={{ flex: 1 }} />
+          <Pressable style={styles.sideBarItem} onPress={() => router.push('/settings' as any)}>
+            <Feather name="settings" size={24} color="rgba(255,255,255,0.6)" />
+            <Text style={styles.sideBarLabel}>Cài đặt</Text>
+          </Pressable>
+        </View>
+
+        {/* R I G H T   C O N T E N T */}
+        <View style={{ flex: 1, overflow: 'hidden', borderRadius: 24, marginVertical: 8, marginRight: 8, backgroundColor: COLORS.bg0 }}>
+          <Tabs
+            screenOptions={{
+              headerShown: false,
+              tabBarStyle: { display: 'none' }, // Ẩn hoàn toàn Bottom Tab
+            }}
+          >
+            {TABS.map((tab) => (
+              <Tabs.Screen key={tab.name} name={tab.name} />
+            ))}
+            <Tabs.Screen name="favorites" options={{ href: null }} />
+            <Tabs.Screen name="schedule" options={{ href: null }} />
+          </Tabs>
+        </View>
+      </View>
+    );
+  }
+
+  // Nếu là Mobile (< 768px): Hiển thị Bottom Tab Bar chuẩn
   return (
     <Tabs
       screenOptions={{
@@ -117,6 +183,7 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
+  // Mobile Tab Bar Styles
   tabItem: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -145,5 +212,50 @@ const styles = StyleSheet.create({
   tabLabelActive: {
     color: COLORS.accent,
     fontWeight: '600',
+  },
+
+  // Tablet SideBar Styles
+  sideBar: {
+    width: 90,
+    backgroundColor: '#000',
+    alignItems: 'center',
+    borderRightWidth: 1,
+    borderRightColor: '#1A1D24',
+  },
+  sideBarLogoWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    backgroundColor: 'rgba(244,200,74,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 40,
+    borderWidth: 1,
+    borderColor: 'rgba(244,200,74,0.2)',
+  },
+  sideBarMenu: {
+    gap: 16,
+    width: '100%',
+    alignItems: 'center',
+  },
+  sideBarItem: {
+    width: 64,
+    height: 64,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  sideBarItemActive: {
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
+  sideBarLabel: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.5)',
+    fontWeight: '600',
+  },
+  sideBarLabelActive: {
+    color: COLORS.accent,
+    fontWeight: '800',
   },
 });
