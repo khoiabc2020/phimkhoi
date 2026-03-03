@@ -1,1 +1,0 @@
-feat: mobile iPad responsive - hero mobile padding, column order, touch targets, episode grid

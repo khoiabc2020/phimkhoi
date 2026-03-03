@@ -60,3 +60,13 @@ mobile/*.js
 *.log
 tmp/
 C:\Users\LE HUY KHOI\.gemini/
+
+# Temp/debug files (không commit)
+tsc-errors.txt
+filtered-eslint.txt
+eslint-*.json
+eslint-*.txt
+eslint-files*.txt
+parse.js
+phimkhoi.conf
+*.conf
