@@ -5,12 +5,7 @@ import { useRouter } from "next/navigation";
 import { Lock, User, Mail } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import dynamic from "next/dynamic";
 import { signIn } from "next-auth/react";
-
-const Turnstile = dynamic(() => import("@marsidev/react-turnstile").then((mod) => mod.Turnstile), {
-    ssr: false,
-});
 
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
 const hasRealTurnstile = TURNSTILE_SITE_KEY && TURNSTILE_SITE_KEY !== "your_turnstile_site_key";
@@ -158,16 +153,14 @@ function RegisterForm() {
                 {/* Cloudflare Turnstile */}
                 {TURNSTILE_SITE_KEY && (
                     <div className="mt-2 mb-2 w-full flex justify-center min-h-[65px] h-[65px] overflow-hidden items-center relative z-50">
-                        <Turnstile
-                            siteKey={TURNSTILE_SITE_KEY}
-                            onSuccess={(token) => setTurnstileToken(token)}
-                            onError={() => setTurnstileToken(null)}
-                            onExpire={() => setTurnstileToken(null)}
-                            options={{
-                                size: "normal",
-                                theme: "dark",
-                            }}
-                        />
+                        <div
+                            className="cf-turnstile"
+                            data-sitekey={TURNSTILE_SITE_KEY}
+                            data-theme="dark"
+                            data-callback="onTurnstileSuccess"
+                            data-error-callback="onTurnstileError"
+                            data-expired-callback="onTurnstileExpire"
+                        ></div>
                     </div>
                 )}
 
