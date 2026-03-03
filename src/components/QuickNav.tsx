@@ -55,7 +55,7 @@ export default function QuickNav() {
                         <Link
                             key={index}
                             href={item.href}
-                            className="quick-nav-card flex-[0_0_36%] md:flex-[0_0_16%] aspect-[1.5/1] relative rounded-2xl overflow-hidden snap-start shadow-lg"
+                            className="quick-nav-card flex-[0_0_36%] sm:flex-[0_0_28%] md:flex-[0_0_22%] lg:flex-[0_0_16%] aspect-[1.5/1] md:aspect-[16/9] relative rounded-2xl overflow-hidden snap-start shadow-lg"
                             style={{ background: item.bg }}
                         >
                             {/* Noise texture */}
@@ -69,8 +69,8 @@ export default function QuickNav() {
                             <div className="quick-nav-shine absolute inset-0 pointer-events-none" />
 
                             {/* Content */}
-                            <div className="absolute inset-0 flex flex-col justify-end p-3.5">
-                                <p className="text-white font-black text-[16px] md:text-[17px] leading-tight drop-shadow-sm">
+                            <div className="absolute inset-0 flex flex-col justify-end p-3.5 md:p-4">
+                                <p className="text-white font-black text-[15px] sm:text-[16px] md:text-[18px] leading-tight drop-shadow-sm truncate">
                                     {item.label}
                                 </p>
                                 <p className="text-white/60 text-[12px] font-semibold mt-0.5 flex items-center gap-1">

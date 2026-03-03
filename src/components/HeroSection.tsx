@@ -117,7 +117,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                 className="relative flex-[0_0_100%] min-w-0 flex flex-col transition-opacity duration-300"
                             >
                                 {/* Backdrop — fixed height 200px, phủ toàn chiều rộng */}
-                                <div className="relative w-full h-[200px] sm:h-[260px] shrink-0 overflow-hidden">
+                                <div className="relative w-full h-[230px] sm:h-[300px] md:h-[400px] shrink-0 overflow-hidden">
                                     <Image
                                         src={backdropImg}
                                         alt={decodeHtml(movie.name)}
@@ -129,8 +129,8 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                     {/* Gradient bottom */}
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D12] via-[#0B0D12]/40 to-transparent" />
                                     {/* Poster nhỏ góc trái dưới */}
-                                    <Link href={`/phim/${movie.slug}`} className="absolute bottom-3 left-3 w-[72px] h-[100px] rounded-xl overflow-hidden shadow-xl ring-1 ring-white/15 shrink-0">
-                                        <Image src={posterImg} alt="" fill className="object-cover" sizes="80px" />
+                                    <Link href={`/phim/${movie.slug}`} className="absolute bottom-3 left-3 md:bottom-5 md:left-5 w-[80px] h-[115px] sm:w-[100px] sm:h-[145px] md:w-[130px] md:h-[190px] rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/20 shrink-0 z-10">
+                                        <Image src={posterImg} alt="" fill className="object-cover" sizes="(max-width: 768px) 80px, 130px" />
                                     </Link>
                                     {/* Badges góc phải trên */}
                                     <div className="absolute top-3 right-3 flex gap-1.5">
@@ -144,39 +144,42 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                 </div>
 
                                 {/* Info block — compact */}
-                                <div className="px-4 pt-2 pb-4 flex flex-col gap-2">
+                                <div className="px-4 md:px-6 pt-3 pb-5 md:pt-4 md:pb-6 flex flex-col gap-2 md:gap-4">
                                     {/* Title + year */}
-                                    <div className="pl-[84px]"> {/* align kế bên poster */}
-                                        <h1 className="text-[17px] font-black text-white leading-snug line-clamp-2">
+                                    <div className="pl-[92px] sm:pl-[116px] md:pl-[150px]"> {/* align kế bên poster */}
+                                        <h1 className="text-[18px] sm:text-[20px] md:text-3xl font-black text-white leading-tight md:leading-snug line-clamp-2 drop-shadow-md md:mb-1">
                                             {decodeHtml(movie.name)}
                                         </h1>
                                         <div className="flex items-center gap-2 mt-1 flex-wrap">
-                                            {movie.year && <span className="text-[11px] text-gray-400">{movie.year}</span>}
+                                            {movie.year && <span className="text-[12px] md:text-[14px] text-gray-400 font-medium">{movie.year}</span>}
                                             {movie.category?.slice(0, 2).map((c: any) => (
-                                                <span key={c.id} className="text-[11px] text-gray-500">· {c.name}</span>
+                                                <span key={c.id} className="text-[12px] md:text-[14px] text-gray-400 font-medium">· {c.name}</span>
                                             ))}
                                         </div>
                                     </div>
 
                                     {/* Buttons */}
-                                    <div className="flex items-center gap-2 mt-1">
+                                    <div className="flex items-center gap-2.5 md:gap-4 mt-2 md:mt-1 md:pl-[150px]">
                                         <Link
                                             href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                            className="flex flex-1 items-center justify-center gap-2 h-10 rounded-full bg-[#F4C84A] text-black font-extrabold active:scale-95 transition-transform"
+                                            className="flex md:flex-none md:w-auto md:px-8 flex-1 items-center justify-center gap-2 h-10 md:h-12 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-extrabold active:scale-95 transition-all"
                                         >
-                                            <Play className="w-4 h-4 fill-black" />
-                                            <span className="text-[13px]">Xem ngay</span>
+                                            <Play className="w-4 h-4 md:w-5 md:h-5 fill-black" />
+                                            <span className="text-[14px] md:text-[15px]">Xem ngay</span>
                                         </Link>
 
                                         <Link
                                             href={`/phim/${movie.slug}`}
-                                            className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 border border-white/15 active:scale-95 transition-transform shrink-0"
+                                            className="w-10 h-10 md:w-12 md:h-12 md:px-6 md:rounded-full md:flex-none flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 border border-white/15 active:scale-95 transition-all shrink-0"
                                         >
-                                            <Info className="w-4 h-4 text-white" />
+                                            <Info className="w-4 h-4 md:w-5 md:h-5 text-white md:mr-2 hidden md:block" />
+                                            <Info className="w-4 h-4 text-white md:hidden" />
+                                            <span className="hidden md:block text-[15px] text-white font-bold">Chi tiết</span>
                                         </Link>
 
-                                        <div className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 border border-white/15 active:scale-95 transition-transform shrink-0">
-                                            <FavoriteButton movieData={getFavoriteData(movie)} size="sm" />
+                                        <div className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 border border-white/15 active:scale-95 transition-transform shrink-0">
+                                            <FavoriteButton movieData={getFavoriteData(movie)} size="sm" className="md:hidden" />
+                                            <FavoriteButton movieData={getFavoriteData(movie)} size="md" className="hidden md:block" />
                                         </div>
                                     </div>
                                 </div>
