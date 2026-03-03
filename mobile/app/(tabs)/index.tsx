@@ -276,13 +276,13 @@ export default function HomeScreen() {
         }
       >
         {
-          loading ? (
-            <View style={{ height: 400, justifyContent: 'center' }}>
+          data.heroMovies.length > 0 ? (
+            <HeroSection movies={data.heroMovies} />
+          ) : loading ? (
+            <View style={{ height: 380, justifyContent: 'center', alignItems: 'center' }}>
               <LoadingState count={1} type="card" />
             </View>
-          ) : (
-            <HeroSection movies={data.heroMovies} />
-          )
+          ) : null
         }
 
         <View style={styles.catSection}>

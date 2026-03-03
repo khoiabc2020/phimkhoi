@@ -6,9 +6,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { searchMovies, searchActors, Movie, getHomeData, getImageUrl, getMenuData } from '@/services/api';
+import { searchMovies, searchActors, Movie, getMoviesList, getImageUrl, getMenuData } from '@/services/api';
 import { Image } from 'expo-image';
 import { StatusBar } from 'expo-status-bar';
+import { CONFIG } from '@/constants/config';
 
 const { width } = Dimensions.get('window');
 const COLUMN_COUNT = 3;
@@ -78,13 +79,42 @@ export default function ExploreScreen() {
     AsyncStorage.getItem('search_history').then(data => {
       if (data) setSearchHistory(JSON.parse(data));
     });
-    getHomeData().then((data) => {
-      if (data?.phimLe) setHotMovies(data.phimLe.slice(0, 9));
-    }).catch(e => console.error("Explore getHomeData Err:", e));
+
+    // Dùng /api/mobile/home (cache sẵn) thay vì getHomeData() chậm
+    const loadHotMovies = async () => {
+      try {
+        // Thử API mobile trước (có cache 1 giờ, rất nhanh)
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 8000);
+        try {
+          const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/home`, {
+            signal: controller.signal,
+          });
+          clearTimeout(timer);
+          if (res.ok) {
+            const json = await res.json();
+            const movies = json?.data?.phimLe || json?.data?.phimMoi || json?.phimLe || [];
+            if (movies.length > 0) {
+              setHotMovies(movies.slice(0, 9));
+              return;
+            }
+          }
+        } catch {
+          clearTimeout(timer);
+        }
+        // Fallback: gọi getMoviesList trực tiếp
+        const res2 = await getMoviesList('phim-moi', 1, 9);
+        if (res2?.items?.length > 0) setHotMovies(res2.items.slice(0, 9));
+      } catch (e) {
+        console.error('Explore loadHotMovies:', e);
+      }
+    };
+
+    loadHotMovies();
     getMenuData().then((data) => {
       setCategories(data?.categories || []);
       setCountries(data?.countries || []);
-    }).catch(e => console.error("Explore getMenuData Err:", e));
+    }).catch(e => console.error('Explore getMenuData Err:', e));
   }, []);
 
   useEffect(() => {
