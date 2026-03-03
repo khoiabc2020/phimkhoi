@@ -1,4 +1,4 @@
-import { Tabs, useRouter } from 'expo-router';
+import { Tabs, useRouter, usePathname } from 'expo-router';
 import React, { useRef, useEffect } from 'react';
 import { Platform, View, StyleSheet, Text, Animated, Easing, useWindowDimensions, Pressable } from 'react-native';
 import { BlurView } from 'expo-blur';
@@ -51,6 +51,7 @@ export default function TabLayout() {
   const { width } = useWindowDimensions();
   const isTablet = width >= 768; // Breakpoint for Tablet/PC
   const router = useRouter();
+  const pathname = usePathname();
 
   // Floating pill tab bar (iOS 26 style) — exactly 4 items, lower + no text overflow
   const pillBottom = Math.max(insets.bottom, 8);
@@ -66,29 +67,21 @@ export default function TabLayout() {
           </View>
 
           <View style={styles.sideBarMenu}>
-            {TABS.map((tab) => (
-              <Tabs.Screen
-                key={tab.name}
-                name={tab.name}
-                options={{
-                  title: tab.label,
-                  tabBarButton: (props) => {
-                    const focused = props.accessibilityState?.selected || false;
-                    return (
-                      <Pressable
-                        onPress={props.onPress}
-                        style={[styles.sideBarItem, focused && styles.sideBarItemActive]}
-                      >
-                        <Feather name={tab.icon as any} size={24} color={focused ? COLORS.accent : 'rgba(255,255,255,0.6)'} />
-                        <Text style={[styles.sideBarLabel, focused && styles.sideBarLabelActive]} numberOfLines={1}>
-                          {tab.label}
-                        </Text>
-                      </Pressable>
-                    );
-                  }
-                }}
-              />
-            ))}
+            {TABS.map((tab) => {
+              const isActive = pathname === `/${tab.name}` || pathname === `/(tabs)/${tab.name}` || (pathname === '/' && tab.name === 'index');
+              return (
+                <Pressable
+                  key={tab.name}
+                  onPress={() => router.replace(`/(tabs)/${tab.name}` as any)}
+                  style={[styles.sideBarItem, isActive && styles.sideBarItemActive]}
+                >
+                  <Feather name={tab.icon as any} size={24} color={isActive ? COLORS.accent : 'rgba(255,255,255,0.6)'} />
+                  <Text style={[styles.sideBarLabel, isActive && styles.sideBarLabelActive]} numberOfLines={1}>
+                    {tab.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
           </View>
           <View style={{ flex: 1 }} />
           <Pressable style={styles.sideBarItem} onPress={() => router.push('/settings' as any)}>
