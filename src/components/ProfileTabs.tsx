@@ -217,7 +217,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                             </h2>
                             <button
                                 onClick={handleOpenCreateModal}
-                                className="flex items-center gap-1.5 px-4 py-2 bg-[#fbbf24] hover:brightness-110 text-black text-sm font-bold rounded-full transition-all shadow-[0_0_15px_rgba(251,191,36,0.3)] active:scale-95"
+                                className="flex items-center gap-1.5 px-4 py-2 bg-[#fbbf24] hover:brightness-110 text-black text-sm font-bold rounded-full transition-all shadow-[0_0_15px_#fbc0244d] active:scale-95"
                             >
                                 <Plus className="w-4 h-4" /> Tạo danh sách
                             </button>

@@ -107,7 +107,7 @@ export default async function WatchHistoryPage() {
 
                                                 {/* Play button on hover */}
                                                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 bg-black/20">
-                                                    <div className="w-12 h-12 rounded-full bg-[#fbbf24] flex items-center justify-center shadow-[0_0_20px_rgba(251,191,36,0.5)] scale-0 group-hover:scale-100 transition-transform duration-300">
+                                                    <div className="w-12 h-12 rounded-full bg-[#fbbf24] flex items-center justify-center shadow-[0_0_20px_#fbc02480] scale-0 group-hover:scale-100 transition-transform duration-300">
                                                         <Play className="w-6 h-6 text-black fill-black ml-1" />
                                                     </div>
                                                 </div>

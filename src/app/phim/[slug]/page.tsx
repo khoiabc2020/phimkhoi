@@ -146,7 +146,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         {serverData.length > 0 && (
                             <Link
                                 href={`/xem-phim/${movie?.slug}/${serverData[0].slug}`}
-                                className="flex items-center gap-2 bg-[#F4C84A] text-black px-5 sm:px-6 py-2.5 rounded-full font-bold text-sm hover:brightness-110 hover:scale-105 transition-all shadow-[0_4px_14px_0_rgba(244,200,74,0.39)]"
+                                className="flex items-center gap-2 bg-[#F4C84A] text-black px-5 sm:px-6 py-2.5 rounded-full font-bold text-sm hover:brightness-110 hover:scale-105 transition-all shadow-[0_4px_14px_0_#F4C84A63]"
                             >
                                 <Play className="w-4 h-4 fill-current" />
                                 CHIẾU PHÁT

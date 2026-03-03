@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://khoiphim.io.vn"),
   title: "MovieBox - Xem phim là mê",
   description: "Website xem phim online chất lượng cao, cập nhật liên tục.",
 };
