@@ -2,9 +2,8 @@ module.exports = {
   apps: [
     {
       name: "phimkhoi",
-      cwd: ".next/standalone",
-      script: "server.js",
-      args: "--port 3000",
+      script: "npm",
+      args: "start",
       exec_mode: "cluster",
       instances: "max",
       env: {
