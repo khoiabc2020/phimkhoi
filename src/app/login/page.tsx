@@ -153,9 +153,8 @@ function LoginForm() {
                 </div>
 
                 {/* Cloudflare Turnstile */}
-                {/* Cloudflare Turnstile */}
                 {TURNSTILE_SITE_KEY && (
-                    <div className="mt-2 mb-2 w-full flex justify-center py-2 relative z-50">
+                    <div className="mt-2 mb-2 w-full flex justify-center min-h-[65px] h-[65px] overflow-hidden items-center relative z-50">
                         <div
                             className="cf-turnstile"
                             data-sitekey={TURNSTILE_SITE_KEY}
