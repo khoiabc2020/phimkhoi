@@ -132,11 +132,10 @@ export const authOptions: NextAuthOptions = {
         },
         async session({ session, token }) {
             if (session?.user) {
-                // @ts-expect-error - NextAuth types don't include custom role field
-                session.user.role = token.role;
-                session.user.id = (token.id || token.sub || token.email) as string;
-                // @ts-expect-error - NextAuth types don't include custom provider field
-                session.user.provider = token.provider;
+                const updatedUser: any = session.user;
+                updatedUser.role = token.role;
+                updatedUser.id = (token.id || token.sub || token.email) as string;
+                updatedUser.provider = token.provider;
             }
             return session;
         },
