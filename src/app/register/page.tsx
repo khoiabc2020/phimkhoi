@@ -144,7 +144,7 @@ function RegisterForm() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-[#eab308] hover:bg-[#d9a307] text-black font-bold h-12 rounded transition-colors flex items-center justify-center shadow-[0_2px_10px_rgba(234,179,8,0.2)] disabled:opacity-70 disabled:cursor-not-allowed mt-1"
+                    className="w-full bg-[#eab308] hover:bg-[#d9a307] text-black font-bold h-12 rounded transition-colors flex items-center justify-center shadow-[0_2px_10px_#EAB30833] disabled:opacity-70 disabled:cursor-not-allowed mt-1"
                 >
                     {loading ? "Đang xử lý..." : "Đăng ký"}
                 </button>

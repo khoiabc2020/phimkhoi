@@ -97,7 +97,7 @@ export default function MobileMenu({
                             alt="MovieBox Logo"
                             width={34}
                             height={34}
-                            className="w-[34px] h-[34px] rounded-[10px] object-cover shadow-[0_0_12px_rgba(244,200,74,0.25)] ring-1 ring-white/10"
+                            className="w-[34px] h-[34px] rounded-[10px] object-cover shadow-[0_0_12px_#F4C84A40] ring-1 ring-white/10"
                         />
                         <span className="text-[17px] font-black text-white tracking-tighter">MOVIE<span className="text-[#F4C84A]">BOX</span></span>
                     </Link>
@@ -127,7 +127,7 @@ export default function MobileMenu({
 
                     {/* User Card */}
                     {session ? (
-                        <div className="rounded-[18px] p-4 border border-white/[0.07]" style={{ background: "rgba(255,255,255,0.04)" }}>
+                        <div className="rounded-[18px] p-4 border border-white/[0.07]" style={{ background: "#FFFFFF0A" }}>
                             <div className="flex items-center gap-3 mb-3">
                                 <div className="w-11 h-11 rounded-full overflow-hidden border border-[#F4C84A]/30 shrink-0 ring-2 ring-[#F4C84A]/10">
                                     <img
@@ -147,20 +147,20 @@ export default function MobileMenu({
                             <div className="grid grid-cols-2 gap-2">
                                 <Link href="/lich-su-xem" onClick={onClose}
                                     className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-[13px] text-white/60 hover:text-white transition-colors"
-                                    style={{ background: "rgba(255,255,255,0.05)" }}
+                                    style={{ background: "#FFFFFF0D" }}
                                 >
                                     <History className="w-3.5 h-3.5" strokeWidth={1.5} /> Lịch sử
                                 </Link>
                                 <Link href="/phim-yeu-thich" onClick={onClose}
                                     className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-[13px] text-white/60 hover:text-white transition-colors"
-                                    style={{ background: "rgba(255,255,255,0.05)" }}
+                                    style={{ background: "#FFFFFF0D" }}
                                 >
                                     <Heart className="w-3.5 h-3.5" strokeWidth={1.5} /> Yêu thích
                                 </Link>
                             </div>
                         </div>
                     ) : (
-                        <div className="rounded-[18px] p-4 border border-[#F4C84A]/15 text-center" style={{ background: "rgba(244,200,74,0.06)" }}>
+                        <div className="rounded-[18px] p-4 border border-[#F4C84A]/15 text-center" style={{ background: "#F4C84A0F" }}>
                             <p className="text-white/45 mb-3 text-[13px] leading-relaxed">Đăng nhập để lưu phim yêu thích và lịch sử xem</p>
                             <Link href="/login" onClick={onClose}
                                 className="block w-full bg-[#F4C84A] text-black font-bold py-2.5 rounded-[12px] text-[14px] hover:brightness-105 transition-all"
@@ -268,7 +268,7 @@ export default function MobileMenu({
                     <div className="h-px bg-white/[0.05]" />
 
                     {/* Download App Banner */}
-                    <div className="rounded-[18px] overflow-hidden border border-[#F4C84A]/20" style={{ background: "linear-gradient(135deg, rgba(244,200,74,0.12) 0%, rgba(244,200,74,0.04) 100%)" }}>
+                    <div className="rounded-[18px] overflow-hidden border border-[#F4C84A]/20" style={{ background: "linear-gradient(135deg, #F4C84A1F 0%, #F4C84A0A 100%)" }}>
                         <div className="p-4">
                             <div className="flex items-center gap-3 mb-3">
                                 <div className="w-10 h-10 rounded-[12px] bg-[#F4C84A]/15 flex items-center justify-center border border-[#F4C84A]/20">
@@ -282,7 +282,7 @@ export default function MobileMenu({
                             <a
                                 href={APK_DOWNLOAD_URL}
                                 download="PhimKhoi-Release.apk"
-                                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-[12px] text-[13px] font-bold text-[#0a0d14] bg-[#F4C84A] hover:brightness-105 transition-all shadow-[0_4px_16px_rgba(244,200,74,0.2)]"
+                                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-[12px] text-[13px] font-bold text-[#0a0d14] bg-[#F4C84A] hover:brightness-105 transition-all shadow-[0_4px_16px_#F4C84A33]"
                             >
                                 <Download className="w-4 h-4" strokeWidth={2.5} />
                                 Tải APK Android

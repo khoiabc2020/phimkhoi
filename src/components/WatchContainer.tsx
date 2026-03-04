@@ -77,7 +77,7 @@ export default function WatchContainer({
             <div
                 className="absolute -inset-8 pointer-events-none z-0"
                 style={{
-                    background: "radial-gradient(ellipse at center, rgba(251,191,36,0.06) 0%, transparent 65%)",
+                    background: "radial-gradient(ellipse at center, #FBBF240F 0%, transparent 65%)",
                     filter: "blur(20px)",
                 }}
             />
@@ -112,10 +112,10 @@ export default function WatchContainer({
                 {/* Player Card */}
                 <div
                     className={cn(
-                        "rounded-xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.6)] ring-1 ring-white/[0.08] relative z-10 mx-auto transition-all duration-500",
+                        "rounded-xl overflow-hidden shadow-[0_20px_60px_#00000099] ring-1 ring-white/[0.08] relative z-10 mx-auto transition-all duration-500",
                         isTheaterMode ? "w-full max-w-[1500px] aspect-video md:aspect-[21/9] h-auto" : "w-full aspect-video"
                     )}
-                    style={{ background: "rgba(15,18,26,0.95)" }}
+                    style={{ background: "#0F121AF2" }}
                 >
                     {activeEpisode ? (
                         <VideoPlayer

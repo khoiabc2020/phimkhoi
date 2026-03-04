@@ -33,46 +33,65 @@ export const authOptions: NextAuthOptions = {
                 password: { label: "Password", type: "password" },
             },
             async authorize(credentials) {
-                if (!credentials?.username || !credentials?.password) return null;
-
-                await dbConnect();
-
-                const user = await User.findOne({
-                    $or: [
-                        { email: credentials.username },
-                        { name: credentials.username }
-                    ]
-                });
-
-                // Tạo admin mặc định nếu DB trống
-                if (!user && credentials.username === "admin" && credentials.password === "admin123") {
-                    const hashed = await bcrypt.hash("admin123", 10);
-                    const newAdmin = await User.create({
-                        name: "Admin User",
-                        email: "admin@khoiphim.com",
-                        password: hashed,
-                        role: "admin",
-                    });
-                    return {
-                        id: newAdmin._id.toString(),
-                        name: newAdmin.name || "Admin",
-                        email: newAdmin.email || "admin@khoiphim.com",
-                        role: newAdmin.role,
-                    } as NextAuthUser;
+                if (!credentials?.username || !credentials?.password) {
+                    console.log("NextAuth: Missing credentials");
+                    return null;
                 }
 
-                if (!user) return null;
+                try {
+                    console.log("NextAuth: Connecting to DB...");
+                    await dbConnect();
+                    console.log("NextAuth: DB Connected. Searching user:", credentials.username);
 
-                const isValid = await bcrypt.compare(credentials.password, user.password || "");
-                if (!isValid) return null;
+                    const user = await User.findOne({
+                        $or: [
+                            { email: credentials.username },
+                            { name: credentials.username }
+                        ]
+                    });
 
-                return {
-                    id: user._id.toString(),
-                    name: user.name || "User",
-                    email: user.email || "user@site.com",
-                    role: user.role,
-                    image: user.image,
-                } as NextAuthUser;
+                    // Tạo admin mặc định nếu DB trống
+                    if (!user && credentials.username === "admin" && credentials.password === "admin123") {
+                        console.log("NextAuth: Creating default admin");
+                        const hashed = await bcrypt.hash("admin123", 10);
+                        const newAdmin = await User.create({
+                            name: "Admin User",
+                            email: "admin@khoiphim.com",
+                            password: hashed,
+                            role: "admin",
+                        });
+                        return {
+                            id: newAdmin._id.toString(),
+                            name: newAdmin.name || "Admin",
+                            email: newAdmin.email || "admin@khoiphim.com",
+                            role: newAdmin.role,
+                        } as NextAuthUser;
+                    }
+
+                    if (!user) {
+                        console.log("NextAuth: User not found for username:", credentials.username);
+                        return null;
+                    }
+
+                    console.log("NextAuth: User found. Comparing passwords...");
+                    const isValid = await bcrypt.compare(credentials.password, user.password || "");
+                    if (!isValid) {
+                        console.log("NextAuth: Invalid password for user:", credentials.username);
+                        return null;
+                    }
+
+                    console.log("NextAuth: Login successful for:", credentials.username);
+                    return {
+                        id: user._id.toString(),
+                        name: user.name || "User",
+                        email: user.email || "user@site.com",
+                        role: user.role,
+                        image: user.image,
+                    } as NextAuthUser;
+                } catch (error) {
+                    console.error("NextAuth Authorize Error:", error);
+                    return null;
+                }
             },
         }),
     ],
@@ -127,6 +146,8 @@ export const authOptions: NextAuthOptions = {
         error: "/login"
     },
     secret: process.env.NEXTAUTH_SECRET,
+    trustHost: true,
+    debug: true,
 };
 
 const handler = NextAuth(authOptions);

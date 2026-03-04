@@ -181,7 +181,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                                             {/* Progress Bar */}
                                             <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20 z-20">
                                                 <div
-                                                    className="h-full bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.7)]"
+                                                    className="h-full bg-red-600 shadow-[0_0_10px_#DC2626B3]"
                                                     style={{ width: `${item.progress}%` }}
                                                 />
                                             </div>
@@ -284,7 +284,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                             <div className="absolute top-0 right-0 p-32 bg-[#fbbf24] rounded-full blur-[100px] opacity-5 -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
 
                             <div className="flex items-start gap-8 relative z-10">
-                                <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-[#fbbf24] bg-black shadow-[0_0_20px_rgba(251,191,36,0.2)]">
+                                <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-[#fbbf24] bg-black shadow-[0_0_20px_#FBBF2433]">
                                     {user?.image ? (
                                         <Image src={user.image} alt="Avatar" width={96} height={96} className="w-full h-full object-cover" />
                                     ) : (
@@ -331,25 +331,31 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                     <nav className="flex-1 space-y-1">
                         <button
                             onClick={() => setActiveTab("account")}
-                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm ${activeTab === "account" ? "text-black bg-[#fbbf24] shadow-[0_0_15px_rgba(251,191,36,0.4)]" : "text-white/60 hover:text-white hover:bg-white/10"}`}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm ${activeTab === "account" ? "text-black bg-[#fbbf24] shadow-[0_0_15px_#FBBF2466]" : "text-white/60 hover:text-white hover:bg-white/10"}`}
                         >
-                            <User className="w-4 h-4" /> Tài khoản
+                            <User className="w-5 h-5" />
+                            Quản lý tài khoản
                         </button>
+
                         <button
                             onClick={() => setActiveTab("favorites")}
-                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm ${activeTab === "favorites" ? "text-black bg-[#fbbf24] shadow-[0_0_15px_rgba(251,191,36,0.4)]" : "text-white/60 hover:text-white hover:bg-white/10"}`}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm ${activeTab === "favorites" ? "text-black bg-[#fbbf24] shadow-[0_0_15px_#FBBF2466]" : "text-white/60 hover:text-white hover:bg-white/10"}`}
                         >
-                            <Heart className={activeTab === "favorites" ? "fill-current w-4 h-4" : "w-4 h-4"} /> Yêu thích
+                            <Heart className="w-5 h-5" />
+                            Danh sách yêu thích
                         </button>
+
                         <button
                             onClick={() => setActiveTab("history")}
-                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm ${activeTab === "history" ? "text-black bg-[#fbbf24] shadow-[0_0_15px_rgba(251,191,36,0.4)]" : "text-white/60 hover:text-white hover:bg-white/10"}`}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm ${activeTab === "history" ? "text-black bg-[#fbbf24] shadow-[0_0_15px_#FBBF2466]" : "text-white/60 hover:text-white hover:bg-white/10"}`}
                         >
-                            <History className="w-4 h-4" /> Lịch sử xem
+                            <History className="w-5 h-5" />
+                            Lịch sử xem phim
                         </button>
+
                         <button
                             onClick={() => setActiveTab("lists")}
-                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm ${activeTab === "lists" ? "text-black bg-[#fbbf24] shadow-[0_0_15px_rgba(251,191,36,0.4)]" : "text-white/60 hover:text-white hover:bg-white/10"}`}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm ${activeTab === "lists" ? "text-black bg-[#fbbf24] shadow-[0_0_15px_#FBBF2466]" : "text-white/60 hover:text-white hover:bg-white/10"}`}
                         >
                             <Plus className="w-4 h-4" /> Danh sách
                         </button>

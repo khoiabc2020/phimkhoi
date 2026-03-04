@@ -147,7 +147,7 @@ export default function WatchEpisodeSection({
                                     <Icon className={cn("w-[14px] h-[14px] sm:w-[16px] sm:h-[16px]", isActive ? "text-[#F4C84A]" : "text-gray-500")} />
                                     {lang}
                                     {isActive && (
-                                        <span className="absolute bottom-[-1px] left-0 right-0 h-[3px] rounded-t-full bg-[#F4C84A] shadow-[0_0_12px_rgba(244,200,74,0.6)]" />
+                                        <span className="absolute bottom-[-1px] left-0 right-0 h-[3px] rounded-t-full bg-[#F4C84A] shadow-[0_0_12px_#F4C84A99]" />
                                     )}
                                 </button>
                             );
@@ -186,7 +186,7 @@ export default function WatchEpisodeSection({
                                         className={cn(
                                             "h-[32px] sm:h-[38px] px-3 sm:px-5 rounded-full text-[12px] sm:text-[13px] font-bold transition-all duration-300 border flex items-center justify-center gap-2 shadow-sm",
                                             isServerActive
-                                                ? "bg-[#F4C84A] border-[#F4C84A] text-[#08090C] shadow-[0_4px_14px_rgba(244,200,74,0.25)] scale-105 transform"
+                                                ? "bg-[#F4C84A] border-[#F4C84A] text-[#08090C] shadow-[0_4px_14px_#F4C84A40] scale-105 transform"
                                                 : "bg-white/[0.03] border-white/[0.08] text-[#A1A1AA] hover:text-white hover:border-white/[0.15] hover:bg-white/[0.06] active:scale-95"
                                         )}
                                     >
@@ -277,7 +277,7 @@ export default function WatchEpisodeSection({
                                     className={cn(
                                         "h-[40px] sm:h-[44px] rounded-[12px] flex items-center justify-center gap-1.5 text-[13px] sm:text-[14px] font-semibold transition-all duration-200 border backdrop-blur-md touch-manipulation",
                                         isActive
-                                            ? "bg-[#F4C84A]/[0.15] border-[#F4C84A]/60 text-[#F4C84A] shadow-[0_0_16px_rgba(244,200,74,0.12)]"
+                                            ? "bg-[#F4C84A]/[0.15] border-[#F4C84A]/60 text-[#F4C84A] shadow-[0_0_16px_#F4C84A1F]"
                                             : "bg-white/[0.03] border-white/[0.06] text-[#A1A1AA] hover:text-[#E4E4E5] hover:bg-white/[0.08] hover:border-white/[0.12] hover:-translate-y-[1px] active:scale-95"
                                     )}
                                 >
