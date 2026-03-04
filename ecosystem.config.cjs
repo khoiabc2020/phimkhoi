@@ -5,8 +5,7 @@ module.exports = {
   apps: [
     {
       name: "phimkhoi",
-      script: "npm",
-      args: "start",
+      script: ".next/standalone/server.js",
       exec_mode: "cluster",
       instances: "max",
       env: {
@@ -26,4 +25,3 @@ module.exports = {
     },
   ],
 };
-
