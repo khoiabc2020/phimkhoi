@@ -469,7 +469,17 @@ export default function VideoPlayer({
                     }
                     /* Hide less important controls on tiny screens */
                     .art-ios-theme.art-video-player .art-screenshot { display: none !important; }
+                    /* Force fullscreen button always visible on mobile */
+                    .art-ios-theme.art-video-player .art-fullscreen,
+                    .art-ios-theme.art-video-player .art-fullscreen-web {
+                        display: flex !important;
+                        visibility: visible !important;
+                        opacity: 1 !important;
+                    }
+                    /* Hide pip and setting on very small screens to save space */
+                    .art-ios-theme.art-video-player .art-pip { display: none !important; }
                 }
+
                 /* Hide "Chuyển tập" text on small mobile, only keep toggle */
                 @media (max-width: 540px) {
                     #auto-next-toggle > span:first-child {
