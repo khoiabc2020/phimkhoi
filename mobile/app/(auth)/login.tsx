@@ -45,8 +45,14 @@ export default function AuthScreen() {
         setAlertConfig({ visible: true, title, message, buttons, type });
     };
 
+    // Android OAuth Client ID (cần tạo riêng trong Google Console cho Android app)
+    // Package name: com.phimkhoi.mobile, SHA-1 cần được thêm vào Google Console
+    const GOOGLE_ANDROID_CLIENT_ID = '855740529726-jtgo46gn63ce2mcgdm9fmsu7bndbjekj.apps.googleusercontent.com';
+
     const [request, response, promptAsync] = Google.useAuthRequest({
         webClientId: GOOGLE_WEB_CLIENT_ID,
+        androidClientId: GOOGLE_ANDROID_CLIENT_ID,
+        scopes: ['openid', 'profile', 'email'],
     });
 
     const handleGoogleLogin = async () => {

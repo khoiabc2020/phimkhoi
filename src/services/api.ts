@@ -222,9 +222,16 @@ export const getMovieDetail = async (slug: string) => {
             // Also merge NguonC episodes if available
             if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
                 const nguoncEpisodes = nguoncRes.value.movie?.episodes || [];
-                const taggedNguoncEpisodes = nguoncEpisodes.map((epGroup: { server_name?: string }) => ({
-                    ...epGroup,
-                    server_name: `NguonC #${epGroup.server_name || "1"}`
+                const taggedNguoncEpisodes = nguoncEpisodes.map((epGroup: { server_name?: string; items?: { name: string; slug: string; embed: string; m3u8: string }[] }) => ({
+                    server_name: `NguonC #${epGroup.server_name || "1"}`,
+                    // Convert NguonC format (items) to standard format (server_data)
+                    server_data: (epGroup.items || []).map((ep) => ({
+                        name: ep.name,
+                        slug: ep.slug,
+                        filename: ep.name,
+                        link_embed: ep.embed || '',
+                        link_m3u8: ep.m3u8 || '',
+                    })),
                 }));
                 combinedData.episodes = [...((combinedData.episodes as unknown[]) || []), ...taggedNguoncEpisodes];
             }
@@ -251,25 +258,32 @@ export const getMovieDetail = async (slug: string) => {
                     episode_total: data.total_episodes,
                     quality: data.quality || "FHD",
                     lang: data.language || "Vietsub",
-                    year: parseInt(data.category?.[3]?.list?.[0]?.name || new Date().getFullYear()),
+                    year: parseInt(data.category?.['3']?.list?.[0]?.name || new Date().getFullYear()),
                     actor: data.casts?.split(',') || [],
                     director: data.director?.split(',') || [],
-                    category: data.category?.['1']?.list || [],
+                    category: data.category?.['2']?.list || [],
                     country: data.category?.['4']?.list || [],
                     trailer_url: data.trailer_url || "",
                 },
-                episodes: (data.episodes || []).map((epGroup: { server_name?: string }) => ({
-                    ...epGroup,
-                    server_name: `NguonC #${epGroup.server_name || "1"}`
+                episodes: (data.episodes || []).map((epGroup: { server_name?: string; items?: { name: string; slug: string; embed: string; m3u8: string }[] }) => ({
+                    server_name: `NguonC #${epGroup.server_name || "1"}`,
+                    server_data: (epGroup.items || []).map((ep) => ({
+                        name: ep.name,
+                        slug: ep.slug,
+                        filename: ep.name,
+                        link_embed: ep.embed || '',
+                        link_m3u8: ep.m3u8 || '',
+                    })),
                 }))
             };
-        }
+        };
+    }
 
         return null;
-    } catch (error) {
-        console.error(`Error fetching movie detail [${slug}]:`, error);
-        return null;
-    }
+} catch (error) {
+    console.error(`Error fetching movie detail [${slug}]:`, error);
+    return null;
+}
 };
 
 export const OPHIM_API = "https://ophim1.com";

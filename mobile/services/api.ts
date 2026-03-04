@@ -138,8 +138,14 @@ export const getMovieDetail = async (slug: string) => {
             if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
                 const nguoncEpisodes = nguoncRes.value.movie?.episodes || [];
                 const taggedNguoncEpisodes = nguoncEpisodes.map((epGroup: any) => ({
-                    ...epGroup,
-                    server_name: `NguonC #${epGroup.server_name || "1"}`
+                    server_name: `NguonC #${epGroup.server_name || "1"}`,
+                    server_data: (epGroup.items || []).map((ep: any) => ({
+                        name: ep.name,
+                        slug: ep.slug,
+                        filename: ep.name,
+                        link_embed: ep.embed || '',
+                        link_m3u8: ep.m3u8 || '',
+                    })),
                 }));
                 combinedData.episodes = [...(combinedData.episodes || []), ...taggedNguoncEpisodes];
             }
@@ -166,16 +172,22 @@ export const getMovieDetail = async (slug: string) => {
                     episode_total: data.total_episodes,
                     quality: data.quality || "FHD",
                     lang: data.language || "Vietsub",
-                    year: parseInt(data.category?.[3]?.list?.[0]?.name || new Date().getFullYear()),
+                    year: parseInt(data.category?.['3']?.list?.[0]?.name || new Date().getFullYear()),
                     actor: data.casts?.split(',') || [],
                     director: data.director?.split(',') || [],
-                    category: data.category?.['1']?.list || [],
+                    category: data.category?.['2']?.list || [],
                     country: data.category?.['4']?.list || [],
                     trailer_url: data.trailer_url || "",
                 },
                 episodes: (data.episodes || []).map((epGroup: any) => ({
-                    ...epGroup,
-                    server_name: `NguonC #${epGroup.server_name || "1"}`
+                    server_name: `NguonC #${epGroup.server_name || "1"}`,
+                    server_data: (epGroup.items || []).map((ep: any) => ({
+                        name: ep.name,
+                        slug: ep.slug,
+                        filename: ep.name,
+                        link_embed: ep.embed || '',
+                        link_m3u8: ep.m3u8 || '',
+                    })),
                 }))
             };
         }
