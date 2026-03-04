@@ -27,12 +27,29 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const data = await getMovieDetail(slug);
     const movie: any = data?.movie;
     if (!movie) return { title: "Không tìm thấy phim - Khôi Phim" };
+
+    // Giới hạn description để SEO tốt hơn
+    const desc = movie.content ? movie.content.replace(/<[^>]+>/g, '').substring(0, 160) + '...' : "";
+
     return {
         title: `${movie.name || "Phim"} - Xem phim tại Khôi Phim`,
-        description: movie.content || "",
+        description: desc,
         openGraph: {
-            images: [movie.poster_url || ""],
+            title: `${movie.name} | ${movie.origin_name}`,
+            description: desc,
+            images: [
+                {
+                    url: movie.poster_url || movie.thumb_url || "",
+                    width: 800,
+                    height: 1200,
+                    alt: movie.name,
+                }
+            ],
+            type: "video.movie",
         },
+        alternates: {
+            canonical: `https://khoiphim.com/phim/${slug}`
+        }
     };
 }
 
@@ -71,13 +88,37 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     const { isFavorite: isFav } = isFavResult.status === 'fulfilled' ? isFavResult.value : { isFavorite: false };
     const inWatchlist = isWatchlistResult.status === 'fulfilled' ? isWatchlistResult.value.isInWatchlist : false;
 
-    // Fallback images and rating
     const posterUrl = tmdbDetails?.poster_path ? getTMDBImage(tmdbDetails.poster_path, "original") : getImageUrl(movie?.poster_url || movie?.thumb_url);
     const backdropUrl = tmdbDetails?.backdrop_path ? getTMDBImage(tmdbDetails.backdrop_path, "original") : getImageUrl(movie?.poster_url || movie?.thumb_url);
     const rating = tmdbDetails?.vote_average ? tmdbDetails.vote_average.toFixed(1) : "9.7";
 
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": type === 'tv' ? "TVSeries" : "Movie",
+        "name": movie?.name,
+        "alternativeHeadline": movie?.origin_name,
+        "image": posterUrl,
+        "description": movie?.content?.replace(/<[^>]+>/g, ''),
+        "dateCreated": movie?.year?.toString(),
+        "director": {
+            "@type": "Person",
+            "name": movie?.director?.[0] || tmdbDetails?.credits?.crew?.find((c: any) => c.job === "Director")?.name || "Đang cập nhật"
+        },
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": rating,
+            "bestRating": "10",
+            "ratingCount": "100"
+        }
+    };
+
     return (
         <main className="min-h-screen pb-20 bg-[#0a0a0a]">
+            {/* JSON-LD for SEO */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
             {/* Hero Section (Backdrop + Info Overlay) */}
             <div className="relative w-full pt-20 sm:pt-28 md:pt-32 pb-8 px-4 md:px-8 xl:px-16 flex items-end min-h-[420px] sm:min-h-[500px]">
                 {/* Backdrop ảnh — dùng Next/Image với priority=true để load sớm nhất + blur placeholder */}

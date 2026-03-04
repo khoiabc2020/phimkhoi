@@ -32,6 +32,31 @@ async function AsyncTopTrending({ title, slug, type }: { title: string, slug: st
   return <TopTrending title={title} movies={data.slice(0, 10)} slug={slug} className={type === 'movie' ? "mt-8" : ""} />;
 }
 
+// Server Component for fetching TMDB data asynchronously for the Hero Section
+async function AsyncHeroSection({ initialMovies }: { initialMovies: any[] }) {
+  const enhancedHeroData = await Promise.all(
+    initialMovies.map(async (movie) => {
+      const year = movie.year ? parseInt(movie.year.toString().split("-")[0]) : undefined;
+      let type: 'movie' | 'tv' = 'movie';
+      if (movie.type === 'phim-bo' || movie.type === 'tv-shows' || movie.type === 'hoat-hinh') type = 'tv';
+
+      const tmdbData = await getTMDBDataForCard(
+        movie.origin_name || movie.name,
+        isNaN(year!) ? undefined : year,
+        type,
+        { originalName: movie.origin_name, countrySlug: movie.country?.[0]?.slug }
+      ).catch((): any => null);
+
+      return {
+        ...movie,
+        tmdbData: tmdbData || null
+      };
+    })
+  );
+
+  return <HeroSection movies={enhancedHeroData} />;
+}
+
 export default async function Home() {
   // Fetch Hero + Home Data concurrently for faster FCP
   const [heroTrending, homeData] = await Promise.all([
@@ -54,33 +79,12 @@ export default async function Home() {
     finalHeroData = heroMixed.slice(0, 5);
   }
 
-  // ============== TỐI ƯU HÓA VPS SERVER SIDE RENDERING ============== 
-  // Thực hiện fetch TMDB Data (Poster HQ, Backdrop HQ, Vote) BẰNG SERVER NODEJS thay vì Client
-  // Việc này loại bỏ trọn vẹn tình trạng "giật lag" HeroSection do Client phải tự gọi Fetch + Render DOM
-  const enhancedHeroData = await Promise.all(
-    finalHeroData.map(async (movie) => {
-      const year = movie.year ? parseInt(movie.year.toString().split("-")[0]) : undefined;
-      let type: 'movie' | 'tv' = 'movie';
-      if (movie.type === 'phim-bo' || movie.type === 'tv-shows' || movie.type === 'hoat-hinh') type = 'tv';
-
-      const tmdbData = await getTMDBDataForCard(
-        movie.origin_name || movie.name,
-        isNaN(year!) ? undefined : year,
-        type,
-        { originalName: movie.origin_name, countrySlug: movie.country?.[0]?.slug }
-      ).catch((): any => null);
-
-      return {
-        ...movie,
-        tmdbData: tmdbData || null
-      };
-    })
-  );
-
   return (
     <main className="min-h-screen pb-20 bg-[#0a0a0a]">
       {/* Hero Section */}
-      <HeroSection movies={enhancedHeroData} />
+      <Suspense fallback={<div className="w-full h-[60vh] md:h-[80vh] bg-neutral-900 animate-pulse" />}>
+        <AsyncHeroSection initialMovies={finalHeroData} />
+      </Suspense>
 
       {/* Interested Topics Section */}
       <div className="relative z-20 -mt-10 md:-mt-20 lg:-mt-24 mb-8">

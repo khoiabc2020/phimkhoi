@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { ChevronDown, List, ChevronLeft, Database, Mic, Subtitles, Volume2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { parseServerLabel } from "@/services/api";
 
 interface Episode {
     slug: string;
@@ -164,38 +165,34 @@ export default function WatchEpisodeSection({
 
                     <div className="flex flex-wrap items-center gap-2">
                         {activeLangTab && groupedServers[activeLangTab]?.length > 0 ? (
-                            groupedServers[activeLangTab].map((s, i) => {
-                                const isServerActive = s.server_name === activeServerName;
+                            (() => {
+                                const serverCountMap = new Map<string, number>();
+                                return groupedServers[activeLangTab].map((s, i) => {
+                                    const isServerActive = s.server_name === activeServerName;
+                                    const displayName = parseServerLabel(s.server_name, serverCountMap);
 
-                                // Clean up server name for display
-                                const displayName = s.server_name.split("##")[0]
-                                    .replace("Lồng Tiếng", "").replace("lồng tiếng", "").replace("longtieng", "")
-                                    .replace("Thuyết Minh", "").replace("thuyết minh", "").replace("thuyetminh", "")
-                                    .replace("Vietsub", "").replace("vietsub", "")
-                                    .replace(/\(\)/g, "").replace(/\[\]/g, "").replace(/--/g, "-").trim()
-                                    || s.server_name.split("##")[0].trim();
-
-                                return (
-                                    <button
-                                        key={i}
-                                        type="button"
-                                        onClick={() => {
-                                            onServerChange(s.server_name);
-                                            setCurrentChunk(0);
-                                        }}
-                                        className={cn(
-                                            "h-[32px] sm:h-[38px] px-3 sm:px-5 rounded-full text-[12px] sm:text-[13px] font-bold transition-all duration-300 border flex items-center justify-center gap-2 shadow-sm",
-                                            isServerActive
-                                                ? "bg-[#F4C84A] border-[#F4C84A] text-[#08090C] shadow-[0_4px_14px_#F4C84A40] scale-105 transform"
-                                                : "bg-white/[0.03] border-white/[0.08] text-[#A1A1AA] hover:text-white hover:border-white/[0.15] hover:bg-white/[0.06] active:scale-95"
-                                        )}
-                                    >
-                                        <span className="truncate max-w-[120px] sm:max-w-[150px]">{displayName}</span>
-                                        <span className={cn("w-[2px] h-3 rounded-full", isServerActive ? "bg-black/20" : "bg-white/10")} />
-                                        <span className={cn("font-bold", isServerActive ? "" : "text-gray-500")}>{s.server_data.length}</span>
-                                    </button>
-                                );
-                            })
+                                    return (
+                                        <button
+                                            key={i}
+                                            type="button"
+                                            onClick={() => {
+                                                onServerChange(s.server_name);
+                                                setCurrentChunk(0);
+                                            }}
+                                            className={cn(
+                                                "h-[32px] sm:h-[38px] px-3 sm:px-5 rounded-full text-[12px] sm:text-[13px] font-bold transition-all duration-300 border flex items-center justify-center gap-2 shadow-sm",
+                                                isServerActive
+                                                    ? "bg-[#F4C84A] border-[#F4C84A] text-[#08090C] shadow-[0_4px_14px_#F4C84A40] scale-105 transform"
+                                                    : "bg-white/[0.03] border-white/[0.08] text-[#A1A1AA] hover:text-white hover:border-white/[0.15] hover:bg-white/[0.06] active:scale-95"
+                                            )}
+                                        >
+                                            <span className="truncate max-w-[120px] sm:max-w-[150px]">{displayName}</span>
+                                            <span className={cn("w-[2px] h-3 rounded-full", isServerActive ? "bg-black/20" : "bg-white/10")} />
+                                            <span className={cn("font-bold", isServerActive ? "" : "text-gray-500")}>{s.server_data.length}</span>
+                                        </button>
+                                    );
+                                });
+                            })()
                         ) : (
                             <button className="h-[32px] sm:h-[38px] px-3 sm:px-5 rounded-full text-[12px] sm:text-[13px] font-bold bg-white/[0.03] border border-white/[0.08] text-[#A1A1AA] shadow-sm flex items-center justify-center gap-2">
                                 {serverName}

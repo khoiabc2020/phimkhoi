@@ -59,6 +59,57 @@ const combineUrl = (base: string, path: string) => {
     return `${cleanBase}${cleanPath}`;
 };
 
+// --- Utilities ---
+export const parseServerLabel = (
+    serverName: string,
+    serverGroups: Map<string, number> = new Map() // Pass a map if you need numbering (e.g. NguonC 1, NguonC 2)
+): string => {
+    if (!serverName) return "VIP";
+
+    // Common prefixes to strip out when determining the base domain
+    let baseName = serverName;
+    const prefixesToRemove = ["vip", "vietsub", "thuyết minh", "thuyetminh", "lồng tiếng", "longtieng", "[]", "()", "#"];
+
+    // 1) Clean common noise words
+    const lowerName = baseName.toLowerCase();
+    for (const prefix of prefixesToRemove) {
+        if (lowerName.includes(prefix)) {
+            // Regex case-insensitive replace
+            const regex = new RegExp(`\\b${prefix}\\b|\\[${prefix}\\]|\\(${prefix}\\)|#`, 'gi');
+            baseName = baseName.replace(regex, "");
+        }
+    }
+
+    baseName = baseName.trim().replace(/^[-_\s]+|[-_\s]+$/g, "");
+
+    // 2) Map domains to friendly names
+    const lowerBase = baseName.toLowerCase();
+    let finalLabel = baseName || "VIP";
+
+    if (lowerBase.includes("kkphim")) {
+        finalLabel = "KKPhim";
+    } else if (lowerBase.includes("ophim")) {
+        finalLabel = "OPhim";
+    } else if (lowerBase.includes("nguonc")) {
+        finalLabel = "NguonC";
+    } else if (lowerBase.includes("tkb")) {
+        finalLabel = "TKB";
+    } else if (finalLabel.length > 15) {
+        // If it's still just a long garbage string, return a fallback
+        finalLabel = "Server";
+    }
+
+    // Default to the mapping logic
+    const currentCount = serverGroups.get(finalLabel) || 0;
+    serverGroups.set(finalLabel, currentCount + 1);
+
+    if (currentCount > 0) {
+        return `${finalLabel} ${currentCount + 1}`;
+    }
+
+    return finalLabel;
+};
+
 // --- Ophim Native Extensions ---
 
 export const getOphimCast = async (slug: string) => {
