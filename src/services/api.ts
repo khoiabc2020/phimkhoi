@@ -276,14 +276,13 @@ export const getMovieDetail = async (slug: string) => {
                     })),
                 }))
             };
-        };
-    }
+        }
 
         return null;
-} catch (error) {
-    console.error(`Error fetching movie detail [${slug}]:`, error);
-    return null;
-}
+    } catch (error) {
+        console.error(`Error fetching movie detail [${slug}]:`, error);
+        return null;
+    }
 };
 
 export const OPHIM_API = "https://ophim1.com";
