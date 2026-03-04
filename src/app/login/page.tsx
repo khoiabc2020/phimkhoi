@@ -21,6 +21,36 @@ function LoginForm() {
     const searchParams = useSearchParams();
     const callbackUrl = searchParams.get("callbackUrl") || "/";
     const registered = searchParams.get("registered");
+    const authError = searchParams.get("error"); // NextAuth default error query
+
+    // Map NextAuth errors to human-readable Vietnamese text
+    const getAuthErrorMessage = (errorParam: string | null) => {
+        if (!errorParam) return "";
+        switch (errorParam) {
+            case "OAuthAccountNotLinked":
+                return "Email này đã đăng ký qua Google/Facebook/Email khác. Vui lòng đăng nhập đúng kênh.";
+            case "OAuthSignin":
+            case "OAuthCallback":
+            case "OAuthCreateAccount":
+            case "EmailCreateAccount":
+            case "Callback":
+                return "Có lỗi xảy ra trong quá trình xác thực. Vui lòng thử lại.";
+            case "CredentialsSignin":
+                return "Sai tên đăng nhập hoặc mật khẩu";
+            case "SessionRequired":
+                return "Vui lòng đăng nhập để tiếp tục";
+            case "Default":
+            default:
+                return "Lỗi xác thực không xác định. Vui lòng thử lại.";
+        }
+    };
+
+    // Initialize error state with NextAuth error if present
+    useState(() => {
+        if (authError) {
+            setError(getAuthErrorMessage(authError));
+        }
+    }, [authError]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
