@@ -117,6 +117,23 @@ export default function NativePlayer({
     const [isBuffering, setIsBuffering] = useState(false);
     const [retryCount, setRetryCount] = useState(0);
     const autoRetryTimer = useRef<any>(null);
+
+    // Auto Next Countdown
+    const [autoNextCountdown, setAutoNextCountdown] = useState<number | null>(null);
+    const autoNextTimer = useRef<any>(null);
+
+    useEffect(() => {
+        if (autoNextCountdown === null) return;
+        if (autoNextCountdown <= 0) {
+            setAutoNextCountdown(null);
+            if (onNext) onNext();
+            return;
+        }
+        autoNextTimer.current = setTimeout(() => {
+            setAutoNextCountdown(prev => prev !== null ? prev - 1 : null);
+        }, 1000);
+        return () => clearTimeout(autoNextTimer.current);
+    }, [autoNextCountdown, onNext]);
     const lockedRef = useRef(false);
     const showEpisodesRef = useRef(false);
     const showServersRef = useRef(false);
@@ -377,7 +394,7 @@ export default function NativePlayer({
             // Auto next episode when finished
             if (status.didJustFinish && onNext && !finishedOnce.current) {
                 finishedOnce.current = true;
-                onNext();
+                setAutoNextCountdown(5); // Bắt đầu đếm ngược 5 giây
             }
         } else {
             finishedOnce.current = false;
@@ -605,15 +622,36 @@ export default function NativePlayer({
                     shouldPlay={true}
                 />
 
-                {/* Loading/Buffering indicator */}
-                {((!('isLoaded' in status) || !status.isLoaded) || isBuffering) && !error && (
+                {/* Loading/Buffering indicator - Only show when first loading metadata, NOT when buffering mid-stream */}
+                {(!('isLoaded' in status) || !status.isLoaded) && !error && (
                     <View style={styles.loadingOverlay} pointerEvents="none">
                         <ActivityIndicator size="large" color="#fbbf24" />
-                        {!('isLoaded' in status) && (
-                            <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, marginTop: 8, fontWeight: '500' }}>
-                                Đang tải...
-                            </Text>
-                        )}
+                        <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, marginTop: 8, fontWeight: '500' }}>
+                            Đang tải...
+                        </Text>
+                    </View>
+                )}
+
+                {/* Auto Next Countdown Overlay */}
+                {autoNextCountdown !== null && (
+                    <View style={[styles.loadingOverlay, { backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 50 }]}>
+                        <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold', marginBottom: 24 }}>
+                            Tập tiếp theo sẽ phát sau {autoNextCountdown} giây...
+                        </Text>
+                        <View style={{ flexDirection: 'row', gap: 16 }}>
+                            <TouchableOpacity
+                                style={{ paddingHorizontal: 24, paddingVertical: 10, backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 8 }}
+                                onPress={() => setAutoNextCountdown(null)}
+                            >
+                                <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>Hủy</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={{ paddingHorizontal: 24, paddingVertical: 10, backgroundColor: '#E6BF5C', borderRadius: 8 }}
+                                onPress={() => { setAutoNextCountdown(0); }}
+                            >
+                                <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 16 }}>Chuyển ngay</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 )}
 
@@ -778,7 +816,21 @@ export default function NativePlayer({
                                         )}
                                         <View style={{ width: 3, height: 3, borderRadius: 1.5, backgroundColor: 'rgba(255,255,255,0.5)' }} />
                                         <Text style={styles.subTitle}>
-                                            Server {serverList[currentServerIndex] || currentServerIndex + 1}
+                                            {(() => {
+                                                const rawName = serverList[currentServerIndex] || `Server ${currentServerIndex + 1}`;
+                                                const nameParts = rawName.split('##');
+                                                let shortName = 'NguonC';
+                                                if (nameParts.length > 1) {
+                                                    const sourceStr = nameParts[1].toLowerCase();
+                                                    if (sourceStr.includes('ophim')) shortName = 'OPhim';
+                                                    else if (sourceStr.includes('kkphim')) shortName = 'KKPhim';
+                                                    else shortName = nameParts[1].trim();
+                                                } else {
+                                                    if (rawName.toLowerCase().includes('ophim')) shortName = 'OPhim';
+                                                    else if (rawName.toLowerCase().includes('kkphim')) shortName = 'KKPhim';
+                                                }
+                                                return shortName;
+                                            })()}
                                         </Text>
                                     </View>
                                 </View>

@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
         width: 3,
         height: 18,
         borderRadius: 2,
-        backgroundColor: '#ef4444', // Netflix Red!
+        backgroundColor: '#E6BF5C', // Phục hồi màu vàng gốc
     },
     title: {
         color: '#ffffff',
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     },
     progressFill: {
         height: '100%',
-        backgroundColor: '#e50914',
+        backgroundColor: '#E6BF5C', // Phục hồi màu vàng gốc
         borderTopRightRadius: 2,
         borderBottomRightRadius: 2,
     },

@@ -11,7 +11,7 @@ import { StatusBar } from 'expo-status-bar';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { getMovieDetail, getImageUrl, getRelatedMovies, Movie, getTMDBRating, getOphimCast, toggleFavorite as apiToggleFavorite } from '@/services/api';
+import { getMovieDetail, getImageUrl, getRelatedMovies, Movie, getTMDBRating, getOphimCast, toggleFavorite as apiToggleFavorite, getHistory } from '@/services/api';
 import { addFavorite, removeFavorite, isFavorite } from '@/lib/favorites';
 import { addToWatchList, removeFromWatchList, isInWatchList } from '@/lib/watchList';
 import { useAuth } from '@/context/auth';
@@ -88,6 +88,9 @@ export default function MovieDetailScreen() {
 
     const { user, token, syncFavorites, syncWatchList } = useAuth();
 
+    // Watch History for Resume
+    const [historyRecord, setHistoryRecord] = useState<any>(null);
+
     useEffect(() => {
         if (!movie?.slug) return;
         getDownloads().then((list) => {
@@ -140,6 +143,14 @@ export default function MovieDetailScreen() {
         }
     }, [slug, autoPlay, router]);
 
+    useEffect(() => {
+        if (token && slug) {
+            getHistory(token).then((hist: any[]) => {
+                const match = hist.find(h => h.slug === slug);
+                if (match) setHistoryRecord(match);
+            }).catch(() => { });
+        }
+    }, [token, slug]);
 
     useEffect(() => {
         fetchData();
@@ -347,6 +358,7 @@ export default function MovieDetailScreen() {
                             const isCompleted = ep.toLowerCase().includes('hoàn tất') || ep.toLowerCase().includes('full');
                             const total = movie.episode_total || '?';
                             const epNum = ep.replace(/hoàn tất/gi, '').replace(/\(.*?\)/g, '').trim() || '1';
+                            const formattedEp = epNum.toLowerCase().includes('tập') ? epNum : `Tập ${epNum}`;
                             return (
                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 }}>
                                     <View style={{
@@ -365,7 +377,7 @@ export default function MovieDetailScreen() {
                                         </Text>
                                     </View>
                                     <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>
-                                        {isCompleted ? `${total} tập` : `Tập ${epNum} / ${total}`}
+                                        {isCompleted ? `${total} tập` : `${formattedEp} / ${total}`}
                                     </Text>
                                 </View>
                             );
@@ -378,15 +390,43 @@ export default function MovieDetailScreen() {
                 <View style={styles.bodyContent}>
                     <View style={styles.actionRowFull}>
                         <Pressable
-                            style={[styles.playBtnCompact, !firstEpisode && styles.playBtnCompactDisabled]}
+                            style={[
+                                styles.playBtnCompact,
+                                !firstEpisode && styles.playBtnCompactDisabled,
+                                { overflow: 'hidden' } // for the progress bar overlay
+                            ]}
                             disabled={!firstEpisode}
                             onPress={() => {
                                 if (!firstEpisode) return;
-                                router.push(`/player/${movie.slug}?ep=${firstEpisode.slug}&server=${selectedServer}` as any);
+                                if (historyRecord?.episode) {
+                                    router.push(`/player/${movie.slug}?ep=${historyRecord.episode}&server=${selectedServer}` as any);
+                                } else {
+                                    router.push(`/player/${movie.slug}?ep=${firstEpisode.slug}&server=${selectedServer}` as any);
+                                }
                             }}
                         >
                             <Ionicons name="play" size={18} color="#0B0D12" />
-                            <Text style={styles.playBtnCompactText} numberOfLines={1}>{firstEpisode ? 'Xem' : '—'}</Text>
+                            <View style={{ flexDirection: 'column', alignItems: 'center', marginLeft: 4 }}>
+                                <Text style={styles.playBtnCompactText} numberOfLines={1}>
+                                    {historyRecord ? 'Tiếp tục xem' : (firstEpisode ? 'Xem' : '—')}
+                                </Text>
+                                {historyRecord && (
+                                    <Text style={{ fontSize: 9, color: 'rgba(0,0,0,0.6)', fontWeight: '700', marginTop: -2 }} numberOfLines={1}>
+                                        {historyRecord.episode_name || historyRecord.episode}
+                                    </Text>
+                                )}
+                            </View>
+
+                            {/* Resume Progress Bar */}
+                            {historyRecord && historyRecord.duration > 0 && (
+                                <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, backgroundColor: 'rgba(0,0,0,0.1)' }}>
+                                    <View style={{
+                                        height: '100%',
+                                        backgroundColor: '#E6BF5C',
+                                        width: `${Math.min(100, (historyRecord.progress / historyRecord.duration) * 100)}%`
+                                    }} />
+                                </View>
+                            )}
                         </Pressable>
 
                         <Pressable
@@ -471,15 +511,17 @@ export default function MovieDetailScreen() {
                                             const globalIdx = episodes.findIndex(e => e.server_name === server.server_name);
                                             const isActive = selectedServer === globalIdx;
                                             const rawName = server.server_name || '';
-                                            // Phân rã Tên server thực tế và Tên Nguồn (NguonC, PhimAPI...)
                                             const nameParts = rawName.split('##');
-                                            const displayName = nameParts[0]
-                                                .replace('Lồng Tiếng', '').replace('lồng tiếng', '')
-                                                .replace('Thuyết Minh', '').replace('thuyết minh', '')
-                                                .replace('Vietsub', '').replace('vietsub', '')
-                                                .replace(/\(\)/g, '').replace(/\[\]/g, '').trim() || nameParts[0].trim();
-                                            // Lấy tên Nguồn được gán sẵn qua dấu ## từ API aggregate (Dự phòng Nguồn: Khác)
-                                            const sourceName = nameParts.length > 1 ? nameParts[1].trim() : 'Server';
+                                            let shortName = 'NguonC';
+                                            if (nameParts.length > 1) {
+                                                const sourceStr = nameParts[1].toLowerCase();
+                                                if (sourceStr.includes('ophim')) shortName = 'OPhim';
+                                                else if (sourceStr.includes('kkphim')) shortName = 'KKPhim';
+                                                else shortName = nameParts[1].trim();
+                                            } else {
+                                                if (rawName.toLowerCase().includes('ophim')) shortName = 'OPhim';
+                                                else if (rawName.toLowerCase().includes('kkphim')) shortName = 'KKPhim';
+                                            }
 
                                             return (
                                                 <Pressable
@@ -491,7 +533,7 @@ export default function MovieDetailScreen() {
                                                     ]}
                                                 >
                                                     <Text style={[styles.selectorText, isActive && { color: '#E6BF5C', fontWeight: '600' }]}>
-                                                        {displayName} • {sourceName}
+                                                        {shortName}
                                                     </Text>
                                                 </Pressable>
                                             );
