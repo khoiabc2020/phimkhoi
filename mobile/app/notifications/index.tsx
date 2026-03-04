@@ -33,6 +33,21 @@ export default function NotificationsScreen() {
     const btnY = useRef(new Animated.Value(16)).current;
     const btnScale = useRef(new Animated.Value(1)).current;
 
+    const checkVersion = async () => {
+        try {
+            const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/version`, {
+                headers: { 'Cache-Control': 'no-cache' },
+                signal: AbortSignal.timeout(6000)
+            });
+            if (res.ok) {
+                const data: UpdateInfo = await res.json();
+                if (data.build > APP_BUILD) {
+                    setUpdateInfo(data);
+                }
+            }
+        } catch { }
+    };
+
     useEffect(() => {
         checkVersion();
         Animated.sequence([
@@ -50,21 +65,6 @@ export default function NotificationsScreen() {
             ]),
         ]).start();
     }, []);
-
-    const checkVersion = async () => {
-        try {
-            const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/version`, {
-                headers: { 'Cache-Control': 'no-cache' },
-                signal: AbortSignal.timeout(6000)
-            });
-            if (res.ok) {
-                const data: UpdateInfo = await res.json();
-                if (data.build > APP_BUILD) {
-                    setUpdateInfo(data);
-                }
-            }
-        } catch { }
-    };
 
     const onPressIn = () => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

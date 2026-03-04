@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
             { $limit: 50 }
         ]);
 
-        const formattedHistory = history.map((h: { _id?: string; movieId?: string; movieID?: string; movieSlug: string; movieName: string; movieOriginName?: string; moviePoster?: string; movieYear?: number; movieQuality?: string; currentEpisode: string; currentServer?: string; currentEpisodeName?: string; currentTime?: number; duration?: number; updatedAt: Date; }) => ({
+        const formattedHistory = history.map((h: any) => ({
             _id: h._id,
             slug: h.movieSlug,
             episode: h.episodeSlug,

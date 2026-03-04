@@ -90,7 +90,7 @@ export async function getComments(movieSlug: string, limit: number = 20, offset:
         return { success: true, data: commentsWithReplies, total };
     } catch (error) {
         console.error("Get comments error:", error);
-        return { success: false, error: "Failed to fetch comments", data: [], total: 0 };
+        return { success: false, error: "Failed to fetch comments", data: [] as any[], total: 0 };
     }
 }
 
@@ -109,7 +109,7 @@ export async function getReplies(parentId: string) {
         return { success: true, data: replies };
     } catch (error) {
         console.error("Get replies error:", error);
-        return { success: false, error: "Failed to fetch replies", data: [] };
+        return { success: false, error: "Failed to fetch replies", data: [] as any[] };
     }
 }
 
@@ -303,7 +303,7 @@ export async function getMyComments(limit: number = 50) {
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user?.id) {
-            return { success: false, error: "Unauthorized", data: [] };
+            return { success: false, error: "Unauthorized", data: [] as any[] };
         }
 
         await dbConnect();
@@ -316,7 +316,7 @@ export async function getMyComments(limit: number = 50) {
         return { success: true, data: comments };
     } catch (error) {
         console.error("Get my comments error:", error);
-        return { success: false, error: "Failed to fetch comments", data: [] };
+        return { success: false, error: "Failed to fetch comments", data: [] as any[] };
     }
 }
 
@@ -330,7 +330,7 @@ export async function getAllComments(filter: {
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user?.email || session.user.email !== "admin@example.com") {
-            return { success: false, error: "Unauthorized", data: [], total: 0 };
+            return { success: false, error: "Unauthorized", data: [] as any[], total: 0 };
         }
 
         await dbConnect();
@@ -350,7 +350,7 @@ export async function getAllComments(filter: {
         return { success: true, data: comments, total };
     } catch (error) {
         console.error("Get all comments error:", error);
-        return { success: false, error: "Failed to fetch comments", data: [], total: 0 };
+        return { success: false, error: "Failed to fetch comments", data: [] as any[], total: 0 };
     }
 }
 

@@ -158,7 +158,7 @@ export default function VideoPlayer({
 
     useEffect(() => {
         if (!shouldUseArtPlayer || !artRef.current) return;
-        let art: ReturnType<typeof initArt> | null = null;
+        let art: any = null;
 
         const initArtPlayer = async () => {
             try {
@@ -495,7 +495,17 @@ export default function VideoPlayer({
     );
 }
 
-function IframePlayer({ url, slug, episode, movieData, initialProgress, session, onEnded }: Record<string, unknown>) {
+interface IframePlayerProps {
+    url: string;
+    slug?: string;
+    episode?: string;
+    movieData?: VideoPlayerProps["movieData"];
+    initialProgress: number;
+    session: any;
+    onEnded: () => void;
+}
+
+function IframePlayer({ url, slug, episode, movieData, initialProgress, session, onEnded }: IframePlayerProps) {
     useEffect(() => {
         if (!movieData || !session?.user) return;
         const startTime = Date.now();

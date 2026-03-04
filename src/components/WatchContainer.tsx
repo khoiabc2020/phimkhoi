@@ -9,13 +9,25 @@ import WatchEpisodeSection from "@/components/WatchEpisodeSection";
 import { Movie } from "@/services/api";
 import { List as ListIcon, Monitor, ChevronLeft, ChevronRight, SkipForward } from "lucide-react";
 
+interface Episode {
+    slug: string;
+    name: string;
+    link_embed: string;
+    link_m3u8?: string;
+}
+
+interface Server {
+    server_name: string;
+    server_data: Episode[];
+}
+
 interface WatchContainerProps {
     movie: Movie;
-    currentEpisode: Record<string, unknown>;
-    episodes: Record<string, unknown>[];
-    servers: Record<string, unknown>[];
+    currentEpisode: Episode;
+    episodes: Episode[];
+    servers: Server[];
     initialProgress: number;
-    movieData: Record<string, unknown>;
+    movieData: any;
     initialServerName: string;
 }
 

@@ -24,7 +24,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
     const { slug, episode } = await params;
     const { server } = (await (searchParams || Promise.resolve({}))) as { server?: string };
     const data = await getMovieDetail(slug);
-    const movie = data?.movie;
+    const movie = data?.movie as any;
     const servers = data?.episodes || [];
     const serverIndex = server ? Number(server) || 0 : 0;
     const usedIndex = servers[serverIndex] ? serverIndex : 0;
@@ -56,9 +56,9 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
 
     try {
         const [sessionRes, castRes, tmdbRes] = await Promise.all([
-            getServerSession(authOptions).catch(() => null),
-            getMovieCast(movie.origin_name || movie.name, movie.year, movie.type === "series" ? "tv" : "movie").catch(() => []),
-            getTMDBDataForCard(movie.origin_name || movie.name, movie.year, movie.type === "series" ? "tv" : "movie").catch(() => null),
+            getServerSession(authOptions).catch((): any => null),
+            getMovieCast(movie.origin_name || movie.name, movie.year, movie.type === "series" ? "tv" : "movie").catch((): any[] => []),
+            getTMDBDataForCard(movie.origin_name || movie.name, movie.year, movie.type === "series" ? "tv" : "movie").catch((): any => null),
         ]);
         session = sessionRes;
         cast = castRes || [];
@@ -158,7 +158,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
                                                 <div>
                                                     <h4 className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2">Diễn viên</h4>
                                                     <div className="flex flex-wrap gap-1.5">
-                                                        {cast.slice(0, 10).map((actor: { id: React.Key | null | undefined; name: string; profile_url: string; character: string }) => (
+                                                        {cast.slice(0, 10).map((actor: any) => (
                                                             <span key={actor.id}
                                                                 className="text-xs px-2.5 py-1 rounded-full text-gray-300 border border-white/[0.08]"
                                                                 style={{ background: "rgba(255,255,255,0.05)" }}>

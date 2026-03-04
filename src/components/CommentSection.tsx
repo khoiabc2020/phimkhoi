@@ -60,10 +60,6 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
     const [replyingTo, setReplyingTo] = useState<string | null>(null);
     const [total, setTotal] = useState(0);
 
-    useEffect(() => {
-        fetchComments();
-    }, [movieSlug]);
-
     const fetchComments = async () => {
         setLoading(true);
         const result = await getComments(movieSlug, 20, 0);
@@ -73,6 +69,10 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
         }
         setLoading(false);
     };
+
+    useEffect(() => {
+        fetchComments();
+    }, [movieSlug]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

@@ -26,9 +26,12 @@ export function WatchlistProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         if (!session?.user) {
-            setWatchlistSlugs(new Set());
-            setIsLoaded(true);
-            return;
+            // Use setTimeout to avoid synchronous setState in effect body
+            const t = setTimeout(() => {
+                setWatchlistSlugs(new Set());
+                setIsLoaded(true);
+            }, 0);
+            return () => clearTimeout(t);
         }
 
         fetch("/api/user/watchlist")

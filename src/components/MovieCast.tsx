@@ -15,7 +15,7 @@ export default async function MovieCast({ slug, isCompact = false }: { slug: str
     if (isCompact) {
         return (
             <div className="flex flex-wrap gap-4 pt-1">
-                {topCast.slice(0, 8).map((actor: { id: string | number; profile_url?: string; name: string; character?: string }) => (
+                {topCast.slice(0, 8).map((actor: any) => (
                     <Link href={`/dien-vien/${encodeURIComponent(String(actor.name))}`} key={actor.id || actor.name} className="flex flex-col items-center gap-2 w-[4.5rem] group" title={actor.name}>
                         <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border border-white/10 group-hover:border-[#F4C84A] transition-colors relative bg-white/5">
                             {actor.profile_url || actor.profile_path ? (
@@ -37,7 +37,7 @@ export default async function MovieCast({ slug, isCompact = false }: { slug: str
                 Diễn Viên
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                {topCast.map((actor: { id: string | number; profile_url?: string; name: string; character?: string }) => (
+                {topCast.map((actor: any) => (
                     <Link href={`/dien-vien/${encodeURIComponent(String(actor.name))}`} key={actor.id || actor.name} className="bg-white/5 rounded-lg p-2 text-center group hover:bg-white/10 transition-colors block">
                         <div className="relative w-24 h-24 mx-auto mb-2 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-yellow-500 transition-colors">
                             {actor.profile_url || actor.profile_path ? (

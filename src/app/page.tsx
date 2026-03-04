@@ -13,7 +13,7 @@ export const revalidate = 3600;
 
 // Wrapper cho Sidebar Trending
 async function AsyncTopTrending({ title, slug, type }: { title: string, slug: string, type: 'tv' | 'movie' }) {
-  const data: Record<string, unknown>[] = await getTrendMovies(type).catch(() => []);
+  const data: any[] = await getTrendMovies(type).catch((): any[] => []);
 
   // Backfill if empty
   if (data.length < 10) {
@@ -35,15 +35,15 @@ async function AsyncTopTrending({ title, slug, type }: { title: string, slug: st
 export default async function Home() {
   // Fetch Hero + Home Data concurrently for faster FCP
   const [heroTrending, homeData] = await Promise.all([
-    getTrendMovies('all').catch(() => []),
+    getTrendMovies('all').catch((): any[] => []),
     getHomeData(),
   ]);
 
-  let finalHeroData: Record<string, unknown>[] = heroTrending.slice(0, 5); // Limit hero to 5 items early on
+  let finalHeroData: any[] = heroTrending.slice(0, 5); // Limit hero to 5 items early on
 
   if (finalHeroData.length < 4) {
     // Nếu Hero fail, gọi fallback từ homeData
-    const heroMixed: Record<string, unknown>[] = [];
+    const heroMixed: any[] = [];
     const phimBoItems = homeData.phimBo || [];
     const phimLeItems = homeData.phimLe || [];
     const maxLen = Math.max(phimBoItems.length, phimLeItems.length);
@@ -68,7 +68,7 @@ export default async function Home() {
         isNaN(year!) ? undefined : year,
         type,
         { originalName: movie.origin_name, countrySlug: movie.country?.[0]?.slug }
-      ).catch(() => null);
+      ).catch((): any => null);
 
       return {
         ...movie,

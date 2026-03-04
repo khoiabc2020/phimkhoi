@@ -8,7 +8,7 @@ import { getImageUrl } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
 interface WatchEngagementBarProps {
-    movie: Record<string, unknown>;
+    movie: any;
     isTheaterMode?: boolean;
     toggleTheater?: () => void;
     isLightOff?: boolean;

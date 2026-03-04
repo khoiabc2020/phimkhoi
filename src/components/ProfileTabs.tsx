@@ -13,9 +13,9 @@ import FavoriteButton from "./FavoriteButton";
 import PlaylistManagerModal from "./PlaylistManagerModal";
 
 interface ProfileTabsProps {
-    user: Record<string, unknown>;
-    favorites: Record<string, unknown>[];
-    history: Record<string, unknown>[];
+    user: any;
+    favorites: any[];
+    history: any[];
 }
 
 export default function ProfileTabs({ user, favorites, history }: ProfileTabsProps) {

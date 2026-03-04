@@ -13,9 +13,9 @@ interface Server {
 }
 
 interface MovieTabsProps {
-    movie: Record<string, unknown>;
-    relatedMovies: Record<string, unknown>[];
-    episodes: { server_name: string; server_data: Record<string, unknown>[] }[];
+    movie: any;
+    relatedMovies: any[];
+    episodes: { server_name: string; server_data: any[] }[];
     slug: string;
 }
 

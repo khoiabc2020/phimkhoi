@@ -16,7 +16,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     ]);
 
     // Client-side filtering because search API doesn't support complex filters
-    const filteredMovies = movies.filter((movie: { category?: { slug: string }[]; country?: { slug: string }[] }) => {
+    const filteredMovies = movies.filter((movie: any) => {
         if (category && category !== "all") {
             const hasCategory = movie.category?.some((c: { slug: string }) => c.slug === category);
             if (!hasCategory) return false;
@@ -61,7 +61,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                             <h2 className="text-base font-bold text-white">Diễn viên / Đạo diễn</h2>
                         </div>
                         <div className="flex gap-4 overflow-x-auto pb-3 scrollbar-none">
-                            {actors.map((actor: { id: string | number; name: string; profile_url: string }) => {
+                            {actors.map((actor: any) => {
                                 const profileImg = actor.profile_path
                                     ? `https://image.tmdb.org/t/p/w185${actor.profile_path}`
                                     : null;
@@ -113,7 +113,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                             </div>
                         )}
                         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2 sm:gap-3 md:gap-4 [contain:layout_paint]">
-                            {filteredMovies.map((movie: Record<string, unknown>) => (
+                            {filteredMovies.map((movie: any) => (
                                 <MovieCard key={movie._id} movie={movie} />
                             ))}
                         </div>

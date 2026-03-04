@@ -483,7 +483,7 @@ export default function NativePlayer({
     const updateBrightness = useCallback((totalDy: number) => {
         // Sensitivity: /200 thay vì /300 → nhạy hơn, cần ít quẹt hơn
         const delta = -totalDy / 200;
-        let newVal = Math.max(0.05, Math.min(1, brightnessStart.current + delta));
+        const newVal = Math.max(0.05, Math.min(1, brightnessStart.current + delta));
         brightnessValue.current = newVal;
 
         // 1) UI overlay + Animated.Value: cập nhật NGAY LẬP TỨC không cần chờ

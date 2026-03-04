@@ -427,7 +427,7 @@ export default function MovieDetailScreen() {
                                         const dotColor = LANG_COLORS[lang] || '#9ca3af';
 
                                         const serversInGroup = groupedEpisodes[lang];
-                                        let label = lang;
+                                        const label = lang;
 
                                         return (
                                             <Pressable
@@ -473,7 +473,7 @@ export default function MovieDetailScreen() {
                                             const rawName = server.server_name || '';
                                             // Phân rã Tên server thực tế và Tên Nguồn (NguonC, PhimAPI...)
                                             const nameParts = rawName.split('##');
-                                            let displayName = nameParts[0]
+                                            const displayName = nameParts[0]
                                                 .replace('Lồng Tiếng', '').replace('lồng tiếng', '')
                                                 .replace('Thuyết Minh', '').replace('thuyết minh', '')
                                                 .replace('Vietsub', '').replace('vietsub', '')

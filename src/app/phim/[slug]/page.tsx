@@ -25,12 +25,13 @@ export const revalidate = 300;
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params;
     const data = await getMovieDetail(slug);
-    if (!data || !data.movie) return { title: "Không tìm thấy phim - Khôi Phim" };
+    const movie: any = data?.movie;
+    if (!movie) return { title: "Không tìm thấy phim - Khôi Phim" };
     return {
-        title: `${data.movie?.name || "Phim"} - Xem phim tại Khôi Phim`,
-        description: data.movie?.content || "",
+        title: `${movie.name || "Phim"} - Xem phim tại Khôi Phim`,
+        description: movie.content || "",
         openGraph: {
-            images: [data.movie?.poster_url || ""],
+            images: [movie.poster_url || ""],
         },
     };
 }
@@ -43,7 +44,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
         return <div className="text-center py-20 text-white">Không tìm thấy phim</div>;
     }
 
-    const { movie, episodes } = data;
+    const { movie, episodes } = data as any;
     const serverData = episodes?.[0]?.server_data || [];
 
     // Xác định loại phim cho TMDB

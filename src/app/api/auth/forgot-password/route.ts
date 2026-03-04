@@ -25,7 +25,7 @@ export async function POST(req: Request) {
         const resetTokenExpires = Date.now() + 3600000; // 1 hour
 
         user.resetPasswordToken = resetToken;
-        user.resetPasswordExpires = resetTokenExpires;
+        user.resetPasswordExpires = new Date(resetTokenExpires);
         await user.save();
 
         // Create Transporter

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, Suspense } from "react";
+import { useState, useRef, Suspense, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -46,9 +46,9 @@ function LoginForm() {
     };
 
     // Initialize error state with NextAuth error if present
-    useState(() => {
+    useEffect(() => {
         if (authError) {
-            setError(getAuthErrorMessage(authError));
+            setError(getAuthErrorMessage(authError as string));
         }
     }, [authError]);
 

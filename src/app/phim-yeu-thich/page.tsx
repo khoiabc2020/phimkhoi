@@ -74,7 +74,7 @@ export default async function FavoritesPage() {
                     />
                 ) : (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 [contain:layout_paint]">
-                        {favorites.map((item: Record<string, unknown>) => (
+                        {favorites.map((item: any) => (
                             <div key={item._id} className="group relative">
                                 <Link href={`/phim/${item.movieSlug}`}>
                                     <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-white/5">

@@ -85,7 +85,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
     });
 
     // Hero dùng poster/thumbnail từ API (TMDB Server Side khi đã match năm, hoặc nguồn PhimAPI). Fallback placeholder để không bao giờ slide đen.
-    const getHeroImage = (movie: Record<string, unknown>, type: 'poster' | 'backdrop' = 'poster') => {
+    const getHeroImage = (movie: any, type: 'poster' | 'backdrop' = 'poster') => {
         const tmdbData = movie.tmdbData;
         if (tmdbData) {
             if (type === 'poster' && tmdbData.poster_path) {
@@ -105,7 +105,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
             {/* ================= MOBILE LAYOUT compact — chiều cao tiết kiệm ================= */}
             <div className="md:hidden relative w-full bg-[#0B0D12]" ref={mobileRef}>
                 <div className="flex flex-row touch-pan-y">
-                    {heroMovies.map((movie: Record<string, unknown>, index) => {
+                    {heroMovies.map((movie: any, index) => {
                         const posterImg = getHeroImage(movie, 'poster');
                         const backdropImg = getHeroImage(movie, 'backdrop');
                         const rating = movie.tmdbData?.vote_average ? movie.tmdbData.vote_average.toFixed(1) : null;

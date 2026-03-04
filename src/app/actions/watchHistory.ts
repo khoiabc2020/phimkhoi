@@ -160,7 +160,7 @@ export async function getWatchHistoryForEpisode(movieId: string, episodeSlug: st
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user?.id) {
-            return { success: false, error: "Unauthorized", data: null };
+            return { success: false, error: "Unauthorized", data: null as any };
         }
 
         await dbConnect();

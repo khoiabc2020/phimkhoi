@@ -132,10 +132,10 @@ export const authOptions: NextAuthOptions = {
         },
         async session({ session, token }) {
             if (session?.user) {
-                // @ts-ignore
+                // @ts-expect-error - NextAuth types don't include custom role field
                 session.user.role = token.role;
                 session.user.id = (token.id || token.sub || token.email) as string;
-                // @ts-ignore
+                // @ts-expect-error - NextAuth types don't include custom provider field
                 session.user.provider = token.provider;
             }
             return session;
@@ -146,7 +146,6 @@ export const authOptions: NextAuthOptions = {
         error: "/login"
     },
     secret: process.env.NEXTAUTH_SECRET,
-    trustHost: true,
     debug: true,
 };
 

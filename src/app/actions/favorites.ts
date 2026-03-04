@@ -32,7 +32,7 @@ export async function addFavorite(movieData: {
         revalidatePath("/phim-yeu-thich");
         revalidatePath(`/phim/${movieData.movieSlug}`);
         return { success: true, data: favorite };
-    } catch (error: unknown) {
+    } catch (error: any) {
         // Handle duplicate key error
         if (error.code === 11000) {
             return { success: true, error: "Already in favorites", data: movieData };

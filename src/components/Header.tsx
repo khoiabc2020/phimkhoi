@@ -23,7 +23,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
     const [searchHistory, setSearchHistory] = useState<string[]>([]);
     const [showHistory, setShowHistory] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
-    const [searchResults, setSearchResults] = useState<{ movies: Record<string, unknown>[], actors: Record<string, unknown>[] } | null>(null);
+    const [searchResults, setSearchResults] = useState<any>(null);
     const [openDropdown, setOpenDropdown] = useState<"categories" | "countries" | null>(null);
     const router = useRouter();
     const pathname = usePathname();
@@ -381,7 +381,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                     {searchResults?.actors && searchResults.actors.length > 0 && (
                                                         <div className="mb-3">
                                                             <div className="px-3 py-1 text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Diễn viên</div>
-                                                            {searchResults.actors.map((actor: Record<string, unknown>) => (
+                                                            {searchResults.actors.map((actor: any) => (
                                                                 <Link
                                                                     href={`/dien-vien/${encodeURIComponent(actor.name)}`}
                                                                     key={actor.id}
@@ -407,7 +407,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                     {searchResults?.movies && searchResults.movies.length > 0 && (
                                                         <div className="mb-1">
                                                             <div className="px-3 py-1 text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Phim</div>
-                                                            {searchResults.movies.map((movie: Record<string, unknown>) => (
+                                                            {searchResults.movies.map((movie: any) => (
                                                                 <Link
                                                                     href={`/xem-phim/${movie.slug}`}
                                                                     key={movie._id || movie.slug}

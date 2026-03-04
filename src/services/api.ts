@@ -350,7 +350,7 @@ export const searchMovies = async (keyword: string) => {
 
 
 // Helper to normalize OPhim data to match our Movie interface
-const normalizeOphimItem = (item: Record<string, unknown>, pathImage: string): Movie => {
+const normalizeOphimItem = (item: any, pathImage: string): Movie => {
     return {
         ...item,
         _id: item._id as string,
@@ -583,7 +583,7 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
 import { getTMDBTrending } from "./tmdb";
 
 // Kiểm tra năm TMDB vs phim nguồn có khớp (cùng phim) để dùng ảnh TMDB chất lượng cao
-function isSameMovieByYear(tmdbItem: Record<string, unknown>, movie: Movie): boolean {
+function isSameMovieByYear(tmdbItem: any, movie: Movie): boolean {
     const tmdbYear = tmdbItem.release_date
         ? parseInt(String(tmdbItem.release_date).substring(0, 4), 10)
         : tmdbItem.first_air_date
@@ -598,7 +598,7 @@ export const getTrendMovies = async (type: 'movie' | 'tv' | 'all' = 'all') => {
     try {
         const trendList = await getTMDBTrending(type);
 
-        const movies = await Promise.all(trendList.slice(0, 15).map(async (tmdbItem: Record<string, unknown>) => {
+        const movies = await Promise.all(trendList.slice(0, 15).map(async (tmdbItem: any) => {
             const query = tmdbItem.original_name || tmdbItem.original_title || tmdbItem.name || tmdbItem.title;
             const searchResults = await searchMovies(query);
 
@@ -622,7 +622,7 @@ export const getTrendMovies = async (type: 'movie' | 'tv' | 'all' = 'all') => {
             return null;
         }));
 
-        return movies.filter((m: unknown) => m !== null);
+        return movies.filter((m: any) => m !== null);
     } catch (error) {
         console.error("Error fetching trend movies:", error);
         return [];
@@ -638,13 +638,13 @@ export const getMenuData = async () => {
             fetch(`${OPHIM_API}/v1/api/quoc-gia`, { next: { revalidate: 86400 } })
         ]);
 
-        const kkCategories = await kkCatRes.json().catch(() => []);
-        const kkCountries = await kkCountRes.json().catch(() => []);
-        const ophimCountriesData = await ophimCountRes.json().catch(() => null);
+        const kkCategories = await kkCatRes.json().catch((): any[] => []);
+        const kkCountries = await kkCountRes.json().catch((): any[] => []);
+        const ophimCountriesData = await ophimCountRes.json().catch((): any => null);
         const ophimCountries = ophimCountriesData?.data?.items || [];
 
         // Deduplicate functions
-        const uniqueBySlug = (arr: { slug?: string, name?: string }[]) => {
+        const uniqueBySlug = (arr: { slug?: string, name?: string }[]): any[] => {
             const seen = new Set<string>();
             return arr.filter(item => {
                 if (!item || !item.slug) return false;
@@ -720,9 +720,9 @@ export const getMoviesByActor = async (actorName: string, page: number = 1, limi
             const keyword = encodeURIComponent(name);
             return [
                 fetch(`${API_URL}/v1/api/tim-kiem?keyword=${keyword}&limit=100`, { next: { revalidate: 3600 } })
-                    .then(r => r.json()).catch(() => null),
+                    .then(r => r.json()).catch((): any => null),
                 fetch(`${OPHIM_API}/v1/api/tim-kiem?keyword=${keyword}&limit=100`, { next: { revalidate: 3600 } })
-                    .then(r => r.json()).catch(() => null),
+                    .then(r => r.json()).catch((): any => null),
             ];
         });
 
@@ -730,7 +730,7 @@ export const getMoviesByActor = async (actorName: string, page: number = 1, limi
         const creditSearchPromises = tmdbCreditTitles.slice(0, 10).map(title => {
             const keyword = encodeURIComponent(title);
             return fetch(`${API_URL}/v1/api/tim-kiem?keyword=${keyword}&limit=10`, { next: { revalidate: 3600 } })
-                .then(r => r.json()).catch(() => null);
+                .then(r => r.json()).catch((): any => null);
         });
 
         const allResults = await Promise.allSettled([...nameSearchPromises, ...creditSearchPromises]);
