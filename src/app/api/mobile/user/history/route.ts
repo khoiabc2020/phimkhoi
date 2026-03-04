@@ -99,7 +99,15 @@ export async function POST(req: Request) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
-        const { slug, episode, progress, duration } = await req.json(); // progress/duration in seconds
+        const {
+            slug, episode, progress, duration,
+            // Client can provide these so history saves even for movies not yet in our DB
+            movieName: clientMovieName,
+            moviePoster: clientMoviePoster,
+            movieOriginName: clientMovieOriginName,
+            episodeName: clientEpisodeName,
+        } = await req.json();
+
         if (!slug) {
             return NextResponse.json(
                 { message: "Slug is required" },
@@ -109,49 +117,45 @@ export async function POST(req: Request) {
 
         await dbConnect();
 
-        // 1. Get Movie Details (needed for WatchHistory)
-        const movie = await Movie.findOne({ slug }) as any;
-        if (!movie) {
-            return NextResponse.json({ message: "Movie not found" }, { status: 404 });
-        }
+        // Try to get metadata from DB first; fall back to client-supplied data
+        const movie = await Movie.findOne({ slug }).lean() as any;
 
-        // 2. Find Episode Name
-        let episodeName = episode;
-        let episodeData = null;
-        if (movie.episodes) {
+        const resolvedMovieName = movie?.name || clientMovieName || slug;
+        const resolvedMovieOriginName = movie?.origin_name || clientMovieOriginName || slug;
+        const resolvedMoviePoster = movie?.thumb_url || movie?.poster_url || clientMoviePoster || '';
+        const resolvedMovieId = movie?._id?.toString() || slug; // Use slug as ID fallback
+
+        // Find episode name from DB if available, else use client-supplied
+        let episodeName = clientEpisodeName || episode;
+        if (movie?.episodes) {
             movie.episodes.forEach((server: { server_name: string; server_data: { slug: string; name: string }[] }) => {
                 const found = server.server_data.find((e: { slug: string }) => e.slug == episode);
-                if (found) {
-                    episodeData = found;
-                    episodeName = found.name;
-                }
+                if (found) episodeName = found.name;
             });
         }
 
-        // 3. Calculate Percentage Progress
-        // If duration is provided (from mobile), use it. Else try to find from movie? (Movie time is string usually).
-        // If duration is 0 or null, progress is 0.
+        // Calculate Percentage Progress
         const safeDuration = duration || 0;
         const safeCurrentTime = progress || 0;
         const percentage = safeDuration > 0
             ? Math.min(100, Math.round((safeCurrentTime / safeDuration) * 100))
             : 0;
 
-        // 4. Update/Upsert WatchHistory
+        // Update/Upsert WatchHistory
         const watchHistory = await WatchHistory.findOneAndUpdate(
             {
                 userId: userPayload.id,
-                movieId: movie._id.toString(), // Store as string ID usually
+                movieSlug: slug,
                 episodeSlug: episode,
             },
             {
                 $set: {
                     userId: userPayload.id,
-                    movieId: movie._id.toString(),
-                    movieSlug: movie.slug,
-                    movieName: movie.name,
-                    movieOriginName: movie.origin_name,
-                    moviePoster: movie.thumb_url || movie.poster_url,
+                    movieId: resolvedMovieId,
+                    movieSlug: slug,
+                    movieName: resolvedMovieName,
+                    movieOriginName: resolvedMovieOriginName,
+                    moviePoster: resolvedMoviePoster,
                     episodeSlug: episode,
                     episodeName: episodeName,
                     progress: percentage,
@@ -166,10 +170,6 @@ export async function POST(req: Request) {
                 setDefaultsOnInsert: true
             }
         );
-
-        // Optional: Also Sync to legacy user.history for backward compatibility if needed?
-        // skipping for now to rely on single source of truth. 
-        // We updated GET to read from WatchHistory, so we are good.
 
         return NextResponse.json({ success: true, historyId: watchHistory._id });
     } catch (error) {

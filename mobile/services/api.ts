@@ -82,6 +82,33 @@ function cacheGet(key: string): any | null {
 function cacheSet(key: string, data: any) { _cache.set(key, { data, ts: Date.now() }); }
 // ────────────────────────────────────────────────────────────────────────────
 
+/**
+ * Converts a tagged server_name like 'KKPhim #1', 'OPhim #HD #2', 'NguonC #1'
+ * to a short display label. Appends a number only when there are multiple servers
+ * from the same source in the list.
+ *
+ * @param serverName  The raw tagged server_name string
+ * @param allNames    All server_name strings in the episode list (for dedup counting)
+ */
+export function parseServerLabel(serverName: string, allNames: string[]): string {
+    const getBase = (name: string): string => {
+        const lower = name.toLowerCase();
+        if (lower.includes('kkphim')) return 'KKPhim';
+        if (lower.includes('ophim')) return 'OPhim';
+        if (lower.includes('nguonc')) return 'NguonC';
+        // Fallback: take the first segment before ' #' or the full name
+        return name.split(' #')[0].trim();
+    };
+
+    const base = getBase(serverName);
+    // Count how many servers share the same base
+    const sameGroup = allNames.filter(n => getBase(n) === base);
+    if (sameGroup.length <= 1) return base;
+    // Assign a 1-based index within the group
+    const idx = sameGroup.indexOf(serverName);
+    return `${base} ${idx + 1}`;
+}
+
 export const getMovieDetail = async (slug: string) => {
     const cacheKey = `movie:${slug}`;
     const cached = cacheGet(cacheKey);
@@ -494,18 +521,29 @@ export const checkAppVersion = async () => {
     }
 };
 
-export const saveHistory = async (slug: string, episode: string, time: number, duration: number, token?: string) => {
+export const saveHistory = async (
+    slug: string,
+    episode: string,
+    time: number,
+    duration: number,
+    token?: string,
+    movieMeta?: { name?: string; poster?: string; originName?: string; episodeName?: string }
+) => {
     if (!token) return;
-
     try {
-        // Thống nhất dữ liệu POST (gửi cả slug cũ lẫn movieSlug mới cho an toàn)
         await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/history`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`
-            },
-            body: JSON.stringify({ slug, episode, movieSlug: slug, episodeSlug: episode, progress: time, duration })
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({
+                slug,
+                episode,
+                progress: time,
+                duration,
+                movieName: movieMeta?.name,
+                moviePoster: movieMeta?.poster,
+                movieOriginName: movieMeta?.originName,
+                episodeName: movieMeta?.episodeName,
+            })
         });
     } catch (error) {
         console.error("Error saving history:", error);

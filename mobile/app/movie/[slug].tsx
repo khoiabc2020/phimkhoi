@@ -11,7 +11,7 @@ import { StatusBar } from 'expo-status-bar';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { getMovieDetail, getImageUrl, getRelatedMovies, Movie, getTMDBRating, getOphimCast, toggleFavorite as apiToggleFavorite, getHistory } from '@/services/api';
+import { getMovieDetail, getImageUrl, getRelatedMovies, Movie, getTMDBRating, getOphimCast, toggleFavorite as apiToggleFavorite, getHistory, parseServerLabel } from '@/services/api';
 import { addFavorite, removeFavorite, isFavorite } from '@/lib/favorites';
 import { addToWatchList, removeFromWatchList, isInWatchList } from '@/lib/watchList';
 import { useAuth } from '@/context/auth';
@@ -503,25 +503,14 @@ export default function MovieDetailScreen() {
                                 </View>
                             </ScrollView>
 
-                            {/* Server pills for current lang tab */}
                             {activeLangTab && groupedEpisodes[activeLangTab]?.length > 0 && (
                                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                                     <View style={{ flexDirection: 'row', gap: 8 }}>
                                         {groupedEpisodes[activeLangTab].map((server: any) => {
                                             const globalIdx = episodes.findIndex(e => e.server_name === server.server_name);
                                             const isActive = selectedServer === globalIdx;
-                                            const rawName = server.server_name || '';
-                                            const nameParts = rawName.split('##');
-                                            let shortName = 'NguonC';
-                                            if (nameParts.length > 1) {
-                                                const sourceStr = nameParts[1].toLowerCase();
-                                                if (sourceStr.includes('ophim')) shortName = 'OPhim';
-                                                else if (sourceStr.includes('kkphim')) shortName = 'KKPhim';
-                                                else shortName = nameParts[1].trim();
-                                            } else {
-                                                if (rawName.toLowerCase().includes('ophim')) shortName = 'OPhim';
-                                                else if (rawName.toLowerCase().includes('kkphim')) shortName = 'KKPhim';
-                                            }
+                                            const allServerNames = episodes.map((e: any) => e.server_name);
+                                            const shortName = parseServerLabel(server.server_name || '', allServerNames);
 
                                             return (
                                                 <Pressable

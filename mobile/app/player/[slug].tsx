@@ -31,6 +31,7 @@ export default function PlayerScreen() {
     const [selectedServer, setSelectedServer] = useState(server ? Number(server) : 0);
     const [pipSize, setPipSize] = useState<PipSizeKey>('medium');
     const [initialTime, setInitialTime] = useState(0);
+    const movieMetaRef = useRef<{ name?: string; poster?: string; originName?: string }>({});
 
     // Derived: only non-empty servers for the player UI
     const nonEmptyEpisodes = episodes.filter(s => s.server_data && s.server_data.length > 0);
@@ -120,7 +121,14 @@ export default function PlayerScreen() {
 
             const data = await getMovieDetail(slug as string);
             if (data && data.episodes) {
-                setMovieTitle(data.movie?.name || "");
+                const m = data.movie;
+                setMovieTitle(m?.name || "");
+                // Store movie metadata for history saving
+                movieMetaRef.current = {
+                    name: m?.name || '',
+                    poster: m?.thumb_url || m?.poster_url || '',
+                    originName: m?.origin_name || '',
+                };
                 applyEpisode(data, selectedServer, ep);
             }
 
@@ -137,11 +145,14 @@ export default function PlayerScreen() {
 
     const handleProgress = async (currentTime: number, duration: number) => {
         if (!user || !token || !slug || !ep) return;
-
         try {
             const progressSeconds = Math.floor(currentTime / 1000);
             const durationSeconds = Math.floor(duration / 1000);
-            await saveHistory(slug as string, ep as string, progressSeconds, durationSeconds, token);
+            // Include episode name (displayed title) and movie metadata for fallback
+            await saveHistory(slug as string, ep as string, progressSeconds, durationSeconds, token, {
+                ...movieMetaRef.current,
+                episodeName: episodeTitle,
+            });
         } catch (e) {
             console.error("Failed to sync history", e);
         }

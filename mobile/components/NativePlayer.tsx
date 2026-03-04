@@ -23,6 +23,7 @@ import * as Brightness from 'expo-brightness';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useKeepAwake } from 'expo-keep-awake';
 import ExpoPip from 'expo-pip';
+import { parseServerLabel } from '@/services/api';
 
 const { width, height } = Dimensions.get('window');
 
@@ -816,21 +817,10 @@ export default function NativePlayer({
                                         )}
                                         <View style={{ width: 3, height: 3, borderRadius: 1.5, backgroundColor: 'rgba(255,255,255,0.5)' }} />
                                         <Text style={styles.subTitle}>
-                                            {(() => {
-                                                const rawName = serverList[currentServerIndex] || `Server ${currentServerIndex + 1}`;
-                                                const nameParts = rawName.split('##');
-                                                let shortName = 'NguonC';
-                                                if (nameParts.length > 1) {
-                                                    const sourceStr = nameParts[1].toLowerCase();
-                                                    if (sourceStr.includes('ophim')) shortName = 'OPhim';
-                                                    else if (sourceStr.includes('kkphim')) shortName = 'KKPhim';
-                                                    else shortName = nameParts[1].trim();
-                                                } else {
-                                                    if (rawName.toLowerCase().includes('ophim')) shortName = 'OPhim';
-                                                    else if (rawName.toLowerCase().includes('kkphim')) shortName = 'KKPhim';
-                                                }
-                                                return shortName;
-                                            })()}
+                                            {parseServerLabel(
+                                                serverList[currentServerIndex] || `Server ${currentServerIndex + 1}`,
+                                                serverList
+                                            )}
                                         </Text>
                                     </View>
                                 </View>
