@@ -12,22 +12,42 @@ import { COLORS } from '@/constants/theme';
 import { addFavorite, removeFavorite, isFavorite } from '@/lib/favorites';
 import { useAuth } from '@/context/auth';
 import Carousel from 'react-native-reanimated-carousel';
-import Animated, { useAnimatedStyle, withTiming, FadeIn } from 'react-native-reanimated';
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming,
+    Easing,
+    interpolate,
+} from 'react-native-reanimated';
 
-const { width } = Dimensions.get('window');
-
-// Chiều cao Carousel gọn lại để đẩy lên cao, tiết kiệm diện tích
+const { width, height: screenHeight } = Dimensions.get('window');
 const CAROUSEL_HEIGHT = width * 1.15;
+const isTablet = width >= 768;
 
 interface HeroSectionProps {
     movies: Movie[];
 }
+
+// Precomputed stable config outside component to avoid recreation each render
+const PARALLAX_CONFIG = {
+    parallaxScrollingScale: 0.88,
+    parallaxScrollingOffset: 48,
+};
+const PAN_HANDLER_PROPS = { activeOffsetX: [-10, 10] };
 
 export default function HeroSection({ movies }: HeroSectionProps) {
     const [activeIndex, setActiveIndex] = useState(0);
     const [favSlugs, setFavSlugs] = useState<Set<string>>(new Set());
     const router = useRouter();
     const { user, token, syncFavorites } = useAuth();
+
+    // Shared value for background cross-fade
+    const bgOpacity = useSharedValue(1);
+    // Keep previous and next backdrop URIs to cross-fade
+    const [backdropUris, setBackdropUris] = useState<[string, string]>(() => {
+        const uri = movies?.length ? getImageUrl(movies[0].thumb_url || movies[0].poster_url) : '';
+        return [uri, uri];
+    });
 
     // Load favorites
     useEffect(() => {
@@ -43,6 +63,24 @@ export default function HeroSection({ movies }: HeroSectionProps) {
             setFavSlugs(next);
         })();
     }, [movies, user]);
+
+    // Smooth cross-fade when active slide changes
+    const handleSnapToItem = useCallback((index: number) => {
+        setActiveIndex(index);
+        const newUri = getImageUrl(movies[index].thumb_url || movies[index].poster_url);
+        // Fade out, swap URI, fade in
+        bgOpacity.value = withTiming(0, { duration: 200, easing: Easing.out(Easing.quad) }, () => {
+            'worklet';
+        });
+        setTimeout(() => {
+            setBackdropUris(([, prev]) => [prev, newUri]);
+            bgOpacity.value = withTiming(1, { duration: 350, easing: Easing.in(Easing.quad) });
+        }, 200);
+    }, [movies, bgOpacity]);
+
+    const bgAnimStyle = useAnimatedStyle(() => ({
+        opacity: bgOpacity.value,
+    }));
 
     const toggleFav = useCallback(async (movie: Movie) => {
         const slug = movie.slug;
@@ -84,24 +122,24 @@ export default function HeroSection({ movies }: HeroSectionProps) {
 
     if (!movies?.length) return null;
 
-    const activeMovie = movies[activeIndex] || movies[0];
-    const activeBackdropUri = getImageUrl(activeMovie.thumb_url || activeMovie.poster_url);
+    const [, activeBackdropUri] = backdropUris;
 
     return (
         <View style={styles.wrapper}>
-            {/* Background Image Blurred */}
+            {/* Background — single Image that fades smoothly, no re-mount */}
             <View style={StyleSheet.absoluteFill}>
                 <Image
-                    key={activeBackdropUri}
                     source={{ uri: activeBackdropUri }}
                     style={StyleSheet.absoluteFill}
                     contentFit="cover"
-                    blurRadius={Platform.OS === 'ios' ? 15 : 3}
+                    blurRadius={Platform.OS === 'ios' ? 12 : 2}
+                    cachePolicy="memory-disk"
                 />
-                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(11,13,24,0.7)' }]} />
+                <Animated.View style={[StyleSheet.absoluteFill, bgAnimStyle, { backgroundColor: 'rgba(11,13,24,0.72)' }]} />
                 <LinearGradient
                     colors={['transparent', '#0B0D18']}
                     style={[StyleSheet.absoluteFill, { top: '30%' }]}
+                    pointerEvents="none"
                 />
             </View>
 
@@ -112,17 +150,12 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                     data={movies}
                     loop={true}
                     autoPlay={true}
-                    autoPlayInterval={4000}
-                    scrollAnimationDuration={1000}
-                    onSnapToItem={(index) => setActiveIndex(index)}
+                    autoPlayInterval={4500}
+                    scrollAnimationDuration={750}
+                    onSnapToItem={handleSnapToItem}
                     mode="parallax"
-                    modeConfig={{
-                        parallaxScrollingScale: 0.85,
-                        parallaxScrollingOffset: 55,
-                    }}
-                    panGestureHandlerProps={{
-                        activeOffsetX: [-10, 10], // Allow vertical scrolling to pass through
-                    }}
+                    modeConfig={PARALLAX_CONFIG}
+                    panGestureHandlerProps={PAN_HANDLER_PROPS}
                     renderItem={({ item, index }) => (
                         <HeroSlide
                             movie={item}
@@ -146,11 +179,11 @@ export default function HeroSection({ movies }: HeroSectionProps) {
     );
 }
 
-const HeroSlide = React.memo(function HeroSlide({ movie, index, isFav, onToggleFav }: { movie: Movie; index: number; isFav: boolean; onToggleFav: () => void }) {
+// HeroSlide is pure — memoized so it never re-renders unless its own props change
+const HeroSlide = React.memo(function HeroSlide({
+    movie, index, isFav, onToggleFav,
+}: { movie: Movie; index: number; isFav: boolean; onToggleFav: () => void }) {
     const router = useRouter();
-    const { width: windowWidth } = Dimensions.get('window');
-    const isTablet = windowWidth >= 768;
-
     const posterUri = getImageUrl(movie.poster_url || movie.thumb_url);
     const rating = (movie as any).tmdbData?.vote_average
         ? Number((movie as any).tmdbData.vote_average).toFixed(1)
@@ -180,7 +213,7 @@ const HeroSlide = React.memo(function HeroSlide({ movie, index, isFav, onToggleF
                     />
                 ) : (
                     <LinearGradient
-                        colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.95)']}
+                        colors={['transparent', 'rgba(0,0,0,0.25)', 'rgba(0,0,0,0.92)']}
                         style={StyleSheet.absoluteFill}
                     />
                 )}
@@ -211,7 +244,6 @@ const HeroSlide = React.memo(function HeroSlide({ movie, index, isFav, onToggleF
                     </View>
 
                     <View style={[styles.actionRow, isTablet && styles.actionRowTablet]}>
-                        {/* Nút Xem Phim */}
                         <Pressable
                             style={[styles.playBtn, isTablet && { flex: 0, width: 140 }]}
                             onPress={(e) => {
@@ -223,7 +255,6 @@ const HeroSlide = React.memo(function HeroSlide({ movie, index, isFav, onToggleF
                             <Text style={styles.playBtnText}>XEM</Text>
                         </Pressable>
 
-                        {/* Nút Chi Tiết */}
                         <Pressable
                             style={[styles.detailBtn, isTablet && { flex: 0, width: 140 }]}
                             onPress={(e) => {
@@ -235,7 +266,6 @@ const HeroSlide = React.memo(function HeroSlide({ movie, index, isFav, onToggleF
                             <Text style={styles.detailBtnText}>CHI TIẾT</Text>
                         </Pressable>
 
-                        {/* Nút Yêu Thích */}
                         <TouchableOpacity
                             style={[styles.circleBtn, isFav && styles.circleBtnFav]}
                             onPress={(e) => {
@@ -258,7 +288,7 @@ const styles = StyleSheet.create({
         width: '100%',
         backgroundColor: '#0B0D18',
         paddingBottom: 16,
-        overflow: 'hidden'
+        overflow: 'hidden',
     },
     slideContainer: {
         flex: 1,
@@ -266,17 +296,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     posterWrapper: {
-        width: '90%',  // takes 90% of the item width generated by Carousel
+        width: '90%',
         height: '98%',
         borderRadius: 24,
         overflow: 'hidden',
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.15)',
+        borderColor: 'rgba(255,255,255,0.12)',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.8,
-        shadowRadius: 20,
-        elevation: 15,
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.7,
+        shadowRadius: 16,
+        elevation: 12,
     },
     badgesRow: {
         position: 'absolute',

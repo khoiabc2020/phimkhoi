@@ -644,38 +644,75 @@ export const getTMDBRating = async (query: string, year?: number, type: 'movie' 
     }
 };
 
-export const getTMDBCast = async (query: string, year?: number, type: 'movie' | 'tv' = 'movie') => {
+// Search TMDB accurately: tries query with year filter, picks the result whose
+// release year matches closest. If nothing found, retries without year filter.
+export const getTMDBCast = async (
+    query: string,
+    year?: number,
+    type: 'movie' | 'tv' = 'movie',
+    language: string = 'en-US'
+): Promise<any[]> => {
     try {
         if (!query) return [];
-        // 1. Search for ID
-        const searchUrl = `https://api.themoviedb.org/3/search/${type}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&year=${year}`;
-        const searchRes = await fetch(searchUrl);
-        const searchData = await searchRes.json();
 
-        if (searchData.results?.length > 0) {
-            const id = searchData.results[0].id;
-            // 2. Get Credits
-            const creditUrl = `https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${TMDB_API_KEY}`;
-            const creditRes = await fetch(creditUrl);
-            const creditData = await creditRes.json();
-            return creditData.cast || [];
+        const search = async (q: string, withYear: boolean): Promise<any[]> => {
+            const params = new URLSearchParams({
+                api_key: TMDB_API_KEY,
+                query: q,
+                language,
+                ...(withYear && year ? { [type === 'movie' ? 'primary_release_year' : 'first_air_date_year']: String(year) } : {}),
+            });
+            const res = await fetch(`https://api.themoviedb.org/3/search/${type}?${params}`);
+            if (!res.ok) return [];
+            const data = await res.json();
+            return data.results || [];
+        };
+
+        // Try with exact year first, then without if empty
+        let results = await search(query, true);
+        if (!results.length) results = await search(query, false);
+        if (!results.length) return [];
+
+        // Pick the result whose year matches closest (avoid false positives)
+        let best = results[0];
+        if (year && results.length > 1) {
+            const getYear = (r: any) => {
+                const d = r.release_date || r.first_air_date || '';
+                return d ? parseInt(d.slice(0, 4)) : 0;
+            };
+            best = results.reduce((a: any, b: any) => {
+                return Math.abs(getYear(a) - year) <= Math.abs(getYear(b) - year) ? a : b;
+            });
+            // If best result year is more than 2 years off, it's probably wrong movie
+            if (Math.abs(getYear(best) - year) > 2) return [];
         }
-        return [];
+
+        const creditRes = await fetch(
+            `https://api.themoviedb.org/3/${type}/${best.id}/credits?api_key=${TMDB_API_KEY}`
+        );
+        if (!creditRes.ok) return [];
+        const creditData = await creditRes.json();
+        return creditData.cast || [];
     } catch (error) {
-        console.error("TMDB Cast Error:", error);
+        console.error('TMDB Cast Error:', error);
         return [];
     }
 };
 
 // --- Ophim Native Extensions ---
 
-export const getOphimCast = async (slug: string, origin_name?: string, year?: number) => {
+export const getOphimCast = async (
+    slug: string,
+    origin_name?: string,
+    year?: number,
+    movie?: Movie   // Pass full movie to grab actor[] as last resort
+) => {
     try {
         if (!slug) return [];
         let ophimCast: any[] = [];
         let tmdbCast: any[] = [];
 
-        // Chạy song song cả hai nguồn để đảm bảo tốc độ
+        // Chạy song song: OPhim cast + TMDB cast (thử origin_name, rồi Vietnamese vietsub title)
         await Promise.allSettled([
             fetch(`${OPHIM_API}/phim/${slug}/peoples`).then(async (res) => {
                 if (res.ok) {
@@ -684,13 +721,31 @@ export const getOphimCast = async (slug: string, origin_name?: string, year?: nu
                 }
             }),
             (async () => {
-                if (origin_name && year) {
-                    tmdbCast = await getTMDBCast(origin_name, year) || [];
+                if (!origin_name || !year) return;
+
+                // Determine most likely TMDB media type based on episode_total
+                const mediaType: 'tv' | 'movie' = (movie?.episode_total && parseInt(movie.episode_total) > 1)
+                    ? 'tv'
+                    : 'movie';
+
+                // Try 1: search by original title (most accurate for Asian films)
+                tmdbCast = await getTMDBCast(origin_name, year, mediaType, 'en-US');
+
+                // Try 2: if origin_name is the same as Vietnamese name (no foreign title), 
+                //         search TMDB with language=vi-VN to get localized matches
+                if (!tmdbCast.length && movie?.name && movie.name !== origin_name) {
+                    tmdbCast = await getTMDBCast(movie.name, year, mediaType, 'vi-VN');
+                }
+
+                // Try 3: Retry as the opposite media type (tv/movie swap)
+                if (!tmdbCast.length) {
+                    const altType = mediaType === 'tv' ? 'movie' : 'tv';
+                    tmdbCast = await getTMDBCast(origin_name, year, altType, 'en-US');
                 }
             })()
         ]);
 
-        // Nếu Ophim rỗng hoặc có chữ "đang cập nhật" -> Ưu tiên dùng dữ liệu TMDB (nếu có)
+        // Nếu Ophim rỗng hoặc có chữ "đang cập nhật" → Ưu tiên dùng dữ liệu TMDB nếu có
         const isOphimEmpty = ophimCast.length === 0;
         const isOphimUpdating = ophimCast.some((c: any) => c.name?.toLowerCase().includes('đang cập nhật'));
 
@@ -699,12 +754,27 @@ export const getOphimCast = async (slug: string, origin_name?: string, year?: nu
                 id: c.id,
                 name: c.name,
                 character: c.character,
-                profile_path: c.profile_path
+                profile_path: c.profile_path,
             }));
         }
 
         // Bỏ qua diễn viên "Đang cập nhật" của Ophim
-        return ophimCast.filter((c: any) => !c.name?.toLowerCase().includes('đang cập nhật') && !c.name?.toLowerCase().includes('updating'));
+        const cleanOphim = ophimCast.filter(
+            (c: any) => !c.name?.toLowerCase().includes('đang cập nhật') && !c.name?.toLowerCase().includes('updating')
+        );
+        if (cleanOphim.length > 0) return cleanOphim;
+
+        // Last resort: convert movie.actor[] string list to actor cards (no photo)
+        if (movie?.actor?.length) {
+            return movie.actor.slice(0, 15).map((name: string, i: number) => ({
+                id: `actor-${i}`,
+                name,
+                character: '',
+                profile_path: null,
+            }));
+        }
+
+        return [];
 
     } catch (error) {
         console.error(`OPhim Cast/TMDB Error [${slug}]:`, error);

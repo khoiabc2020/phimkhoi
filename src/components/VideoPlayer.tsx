@@ -450,7 +450,7 @@ export default function VideoPlayer({
                 /* Bigger bottom controls on mobile for touch */
                 @media (max-width: 768px) {
                     .art-ios-theme.art-video-player .art-bottom {
-                        padding: 6px 10px 14px 10px !important;
+                        padding: 6px 10px calc(14px + env(safe-area-inset-bottom, 0px)) 10px !important;
                     }
                     .art-ios-theme.art-video-player .art-progress {
                         height: 6px !important;

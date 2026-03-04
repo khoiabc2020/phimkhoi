@@ -126,7 +126,7 @@ export default function MovieDetailScreen() {
                 const [relatedResult, ratingResult, castResult] = await Promise.allSettled([
                     getRelatedMovies(data.movie.category?.[0]?.slug || ''),
                     getTMDBRating(data.movie.name, data.movie.year),
-                    getOphimCast(data.movie.slug, data.movie.origin_name || data.movie.name, data.movie.year),
+                    getOphimCast(data.movie.slug, data.movie.origin_name || data.movie.name, data.movie.year, data.movie),
                 ]);
 
                 if (relatedResult.status === 'fulfilled') setRelatedMovies(relatedResult.value);
