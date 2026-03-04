@@ -121,32 +121,42 @@ export default function WatchContainer({
                     </div>
                 )}
 
-                {/* Player Card */}
+                {/* Player Card — overflow-hidden hides ArtPlayer controls on mobile,
+                    so on small screens we let the player container clip only the video */}
                 <div
                     className={cn(
-                        "rounded-xl overflow-hidden shadow-[0_20px_60px_#00000099] ring-1 ring-white/[0.08] relative z-10 mx-auto transition-all duration-500",
-                        isTheaterMode ? "w-full max-w-[1500px] aspect-video md:aspect-[21/9] h-auto" : "w-full aspect-video"
+                        "rounded-xl shadow-[0_20px_60px_#00000099] ring-1 ring-white/[0.08] relative z-10 mx-auto transition-all duration-500",
+                        isTheaterMode
+                            ? "w-full max-w-[1500px] aspect-video md:aspect-[21/9] h-auto overflow-hidden"
+                            : "w-full overflow-hidden"
                     )}
                     style={{ background: "#0F121AF2" }}
                 >
-                    {activeEpisode ? (
-                        <VideoPlayer
-                            url={activeEpisode.link_embed}
-                            m3u8={activeEpisode.link_m3u8}
-                            slug={movie.slug}
-                            episode={displayEpisodeName(activeEpisode.name)}
-                            movieData={movieData}
-                            initialProgress={initialProgress}
-                            autoNext={autoNext}
-                            nextEpisodeUrl={nextEpisodeUrl}
-                        />
-                    ) : (
-                        <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-white gap-3">
-                            <span className="text-4xl">🎬</span>
-                            <p className="text-gray-400 text-sm">Tập phim không khả dụng.</p>
-                        </div>
-                    )}
-                </div>
+                    {/* Inner wrapper maintains aspect ratio but allows controls to breathe */}
+                    <div className={cn(
+                        "relative w-full",
+                        !isTheaterMode && "aspect-video"
+                    )}>
+
+                        {activeEpisode ? (
+                            <VideoPlayer
+                                url={activeEpisode.link_embed}
+                                m3u8={activeEpisode.link_m3u8}
+                                slug={movie.slug}
+                                episode={displayEpisodeName(activeEpisode.name)}
+                                movieData={movieData}
+                                initialProgress={initialProgress}
+                                autoNext={autoNext}
+                                nextEpisodeUrl={nextEpisodeUrl}
+                            />
+                        ) : (
+                            <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-white gap-3">
+                                <span className="text-4xl">🎬</span>
+                                <p className="text-gray-400 text-sm">Tập phim không khả dụng.</p>
+                            </div>
+                        )}
+                    </div>{/* end inner aspect-video wrapper */}
+                </div>{/* end outer player card */}
 
                 {/* Info Bar below player - Inline Layout */}
                 <div className="mt-3 px-1 flex flex-row items-center justify-between gap-2 overflow-hidden">
