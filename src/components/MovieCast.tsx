@@ -1,14 +1,20 @@
-import { getOphimCast } from "@/services/api";
+import { getMovieCast } from "@/app/actions/tmdb";
 import Image from "next/image";
 import Link from "next/link";
 
-export default async function MovieCast({ slug, isCompact = false }: { slug: string; isCompact?: boolean }) {
-    let cast = await getOphimCast(slug);
-    if (!cast || cast.length === 0) return null;
+export default async function MovieCast({ movie, slug, isCompact = false }: { movie?: any; slug: string; isCompact?: boolean }) {
+    if (!movie) return null;
+
+    let type: 'movie' | 'tv' = 'movie';
+    if (movie.type === 'phim-bo' || movie.type === 'tv-shows' || movie.type === 'hoat-hinh') {
+        type = 'tv';
+    }
+
+    let cast = await getMovieCast(movie.origin_name || movie.name, movie.year, type, movie.actor);
 
     // Filter out dummy actors
-    cast = cast.filter((actor: { name: string }) => !actor.name?.toLowerCase().includes('đang cập nhật') && !actor.name?.toLowerCase().includes('updating'));
-    if (cast.length === 0) return null;
+    cast = cast.filter((actor: any) => !actor.name?.toLowerCase().includes('đang cập nhật') && !actor.name?.toLowerCase().includes('updating'));
+    if (!cast || cast.length === 0) return null;
 
     const topCast = cast.slice(0, 15);
 
@@ -19,7 +25,7 @@ export default async function MovieCast({ slug, isCompact = false }: { slug: str
                     <Link href={`/dien-vien/${encodeURIComponent(String(actor.name))}`} key={actor.id || actor.name} className="flex flex-col items-center gap-2 w-[4.5rem] group" title={actor.name}>
                         <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border border-white/10 group-hover:border-[#F4C84A] transition-colors relative bg-white/5">
                             {actor.profile_url || actor.profile_path ? (
-                                <Image src={actor.profile_url || `https://image.tmdb.org/t/p/w185${actor.profile_path}`} alt={actor.name || "Actor"} fill className="object-cover" />
+                                <Image src={actor.profile_url || actor.profile_path} alt={actor.name || "Actor"} fill className="object-cover" />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center text-[10px] text-gray-500 text-center leading-tight">N/A</div>
                             )}
@@ -42,7 +48,7 @@ export default async function MovieCast({ slug, isCompact = false }: { slug: str
                         <div className="relative w-24 h-24 mx-auto mb-2 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-yellow-500 transition-colors">
                             {actor.profile_url || actor.profile_path ? (
                                 <Image
-                                    src={actor.profile_url || `https://image.tmdb.org/t/p/w500${actor.profile_path}`}
+                                    src={actor.profile_url || actor.profile_path.replace('/w185', '/w500')}
                                     alt={actor.name || "Actor"}
                                     fill
                                     className="object-cover"

@@ -745,23 +745,27 @@ export const getOphimCast = async (
             })()
         ]);
 
-        // Nếu Ophim rỗng hoặc có chữ "đang cập nhật" → Ưu tiên dùng dữ liệu TMDB nếu có
-        const isOphimEmpty = ophimCast.length === 0;
-        const isOphimUpdating = ophimCast.some((c: any) => c.name?.toLowerCase().includes('đang cập nhật'));
-
-        if ((isOphimEmpty || isOphimUpdating) && tmdbCast.length > 0) {
-            return tmdbCast.map((c: any) => ({
-                id: c.id,
-                name: c.name,
-                character: c.character,
-                profile_path: c.profile_path,
-            }));
-        }
-
-        // Bỏ qua diễn viên "Đang cập nhật" của Ophim
+        // Lấy list tên diễn viên đã việt hóa (Hán Việt) từ Ophim
         const cleanOphim = ophimCast.filter(
             (c: any) => !c.name?.toLowerCase().includes('đang cập nhật') && !c.name?.toLowerCase().includes('updating')
         );
+        const localizedActors = cleanOphim.length > 0 ? cleanOphim.map((c: any) => c.name) : (movie?.actor || []);
+
+        if (tmdbCast.length > 0) {
+            return tmdbCast.map((c: any, index: number) => {
+                let displayName = c.name;
+                if (localizedActors[index] && localizedActors[index].trim().length > 1) {
+                    displayName = localizedActors[index];
+                }
+                return {
+                    id: c.id,
+                    name: displayName,
+                    character: c.character,
+                    profile_path: c.profile_path,
+                };
+            });
+        }
+
         if (cleanOphim.length > 0) return cleanOphim;
 
         // Last resort: convert movie.actor[] string list to actor cards (no photo)

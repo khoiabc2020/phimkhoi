@@ -24,19 +24,32 @@ export async function getTMDBDataForCard(
     }
 }
 
-export async function getMovieCast(query: string, year?: number, type: 'movie' | 'tv' = 'movie') {
+export async function getMovieCast(
+    query: string,
+    year?: number,
+    type: 'movie' | 'tv' = 'movie',
+    localizedActors?: string[]
+) {
     try {
         const movie = await searchTMDBMovie(query, year, type);
         if (movie) {
             const details = await getTMDBDetails(movie.id, type);
             if (details && details.credits && details.credits.cast) {
-                return details.credits.cast.slice(0, 10).map((actor: { id: number; name: string; profile_path: string; character: string, original_name?: string }) => ({
-                    id: actor.id,
-                    name: actor.name,
-                    original_name: actor.original_name,
-                    character: actor.character,
-                    profile_path: actor.profile_path ? `https://image.tmdb.org/t/p/w185${actor.profile_path}` : null
-                }));
+                return details.credits.cast.slice(0, 10).map((actor: any, index: number) => {
+                    let displayName = actor.name;
+                    // If we have localized (Hán Việt) names from Ophim API, use them!
+                    // This fixes Chinese actors showing up as Pinyin (e.g. Wang Churan instead of Vương Sở Nhiên)
+                    if (localizedActors && localizedActors[index] && localizedActors[index].trim().length > 1) {
+                        displayName = localizedActors[index];
+                    }
+                    return {
+                        id: actor.id,
+                        name: displayName,
+                        original_name: actor.original_name,
+                        character: actor.character,
+                        profile_path: actor.profile_path ? `https://image.tmdb.org/t/p/w185${actor.profile_path}` : null
+                    };
+                });
             }
         }
         return [];

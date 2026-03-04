@@ -139,7 +139,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         <span><span className="text-gray-500">Thời lượng:</span> {movie?.time || "N/A"}</span>
                     </div>
                     <div className="text-xs sm:text-sm text-gray-300 mb-3 sm:mb-6 line-clamp-2 max-w-3xl drop-shadow-md">
-                        <span className="text-gray-500">Diễn viên:</span> {tmdbDetails?.credits?.cast?.slice(0, 5).map((c: { name?: string }) => c.name).join(", ") || movie?.actor?.join(", ") || "Đang cập nhật"}
+                        <span className="text-gray-500">Diễn viên:</span> {movie?.actor?.join(", ") || tmdbDetails?.credits?.cast?.slice(0, 5).map((c: { name?: string }) => c.name).join(", ") || "Đang cập nhật"}
                     </div>
 
                     {/* Action Buttons -- bigger touch targets on mobile */}
@@ -224,7 +224,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         {/* Diễn viên */}
                         <div>
                             <div className="text-[11px] font-medium text-gray-500 uppercase tracking-widest mb-3">Diễn viên</div>
-                            <MovieCast slug={movie.slug} isCompact={true} />
+                            <MovieCast movie={movie} slug={movie.slug} isCompact={true} />
                         </div>
 
                         {/* Thể loại */}
