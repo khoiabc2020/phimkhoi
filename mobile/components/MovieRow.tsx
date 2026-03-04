@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { FlashList } from '@shopify/flash-list';
+import { FlashList, ListRenderItem } from '@shopify/flash-list';
 import { Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Movie } from '@/services/api';
@@ -16,6 +16,11 @@ interface MovieRowProps {
 
 const MovieRow = memo(({ title, movies, slug, subtitle, type = 'list' }: MovieRowProps) => {
     if (!movies || movies.length === 0) return null;
+
+    const renderItem: ListRenderItem<Movie> = React.useCallback(
+        ({ item }) => <MovieCard movie={item} />,
+        []
+    );
 
     return (
         <View style={styles.container}>
@@ -44,7 +49,7 @@ const MovieRow = memo(({ title, movies, slug, subtitle, type = 'list' }: MovieRo
             {/* Movie List - Optimized FlashList */}
             <FlashList
                 data={movies.filter(m => m && m.slug)}
-                renderItem={({ item }) => <MovieCard movie={item} />}
+                renderItem={renderItem}
                 keyExtractor={(item, index) => item._id || item.slug || `row-${index}`}
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -109,4 +114,12 @@ const styles = StyleSheet.create({
     },
 });
 
-export default MovieRow;
+export default React.memo(MovieRow, (prev, next) => {
+    if (prev.title !== next.title) return false;
+    if (prev.movies.length !== next.movies.length) return false;
+    // Deep compare slugs to ensure data hasn't changed
+    for (let i = 0; i < prev.movies.length; i++) {
+        if (prev.movies[i].slug !== next.movies[i].slug) return false;
+    }
+    return true;
+});

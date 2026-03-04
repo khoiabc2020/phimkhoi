@@ -52,7 +52,6 @@ const ContinueWatchingRow = memo(({ title, items }: ContinueWatchingRowProps) =>
                     const posterUrl = item.movie?.thumb_url || item.movie?.poster_url || item.moviePoster;
                     const name = item.movie?.name || item.movieName || item.slug;
                     const progress = item.progress || 0;
-                    // Làm sạch tên tập: "tap-06" -> "Tập 6", "fullHD" -> "Tập Full"
                     const formatEp = (ep: string | undefined) => {
                         if (!ep) return 'Tiếp tục';
                         if (ep.toLowerCase() === 'full' || ep.toLowerCase() === 'fullhd') return 'Tập Full';
@@ -119,7 +118,7 @@ const styles = StyleSheet.create({
         width: 3,
         height: 18,
         borderRadius: 2,
-        backgroundColor: '#E6BF5C', // Phục hồi màu vàng gốc
+        backgroundColor: '#fbbf24', // Standard App Gold
     },
     title: {
         color: '#ffffff',
@@ -137,7 +136,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         backgroundColor: '#1f2937',
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.05)',
+        borderColor: 'rgba(255,255,255,0.08)',
         position: 'relative',
     },
     playIconContainer: {

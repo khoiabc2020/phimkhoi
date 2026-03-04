@@ -368,11 +368,25 @@ export default function NativePlayer({
 
     const finishedOnce = useRef(false);
 
-    const onPlaybackStatusUpdate = (status: AVPlaybackStatus) => {
-        setStatus(status);
-        if (status.isLoaded) {
-            // Cập nhật buffering state
-            setIsBuffering(status.isBuffering ?? false);
+    const onPlaybackStatusUpdate = (newStatus: AVPlaybackStatus) => {
+        // Only trigger a full re-render (setStatus) if a critical state changes,
+        // rather than every 500ms just for time updates.
+        if (newStatus.isLoaded) {
+            const currentBuffering = newStatus.isBuffering ?? false;
+            const currentPlaying = newStatus.isPlaying;
+
+            // Only update main state if buffering or play state changed
+            setStatus(prev => {
+                if (!('isLoaded' in prev)) return newStatus;
+                if (prev.isBuffering !== currentBuffering || prev.isPlaying !== currentPlaying) {
+                    return newStatus;
+                }
+                return prev;
+            });
+
+            if (currentBuffering !== isBuffering) {
+                setIsBuffering(currentBuffering);
+            }
 
             if (!initialSeekDone.current && initialTime > 0) {
                 video.current?.setPositionAsync(initialTime);
@@ -380,12 +394,15 @@ export default function NativePlayer({
             }
 
             if (!isSeeking.current) {
-                setSliderValue(status.positionMillis);
+                // Update slider state (this might still cause smaller re-renders, 
+                // but avoids full player re-renders)
+                setSliderValue(newStatus.positionMillis);
             }
 
-            if (status.isPlaying) {
-                const currentTime = status.positionMillis;
-                const duration = status.durationMillis || 0;
+            if (currentPlaying) {
+                const currentTime = newStatus.positionMillis;
+                const duration = newStatus.durationMillis || 0;
+                // Throttle network history save to every 5-10 seconds
                 if (currentTime - lastProgressUpdate.current > 5000) {
                     lastProgressUpdate.current = currentTime;
                     if (onProgress) onProgress(currentTime, duration);
@@ -393,11 +410,12 @@ export default function NativePlayer({
             }
 
             // Auto next episode when finished
-            if (status.didJustFinish && onNext && !finishedOnce.current) {
+            if (newStatus.didJustFinish && onNext && !finishedOnce.current) {
                 finishedOnce.current = true;
                 setAutoNextCountdown(5); // Bắt đầu đếm ngược 5 giây
             }
         } else {
+            setStatus(newStatus);
             finishedOnce.current = false;
             setIsBuffering(false);
         }

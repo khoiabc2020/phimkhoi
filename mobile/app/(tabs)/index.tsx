@@ -3,7 +3,7 @@ import {
   RefreshControl, Platform, StyleSheet, Dimensions
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useRouter, useFocusEffect } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -334,11 +334,11 @@ export default function HomeScreen() {
               )}
 
               {data.phimMoi.length > 0 && (
-                <MovieRow title="Phim Mới Cập Nhật" movies={data.phimMoi.slice(0, 12)} slug="phim-moi-cap-nhat" />
+                <MovieRow title="Phim Mới Cập Nhật" movies={useMemo(() => data.phimMoi.slice(0, 12), [data.phimMoi])} slug="phim-moi-cap-nhat" />
               )}
 
-              <MovieRow title="Phim Bộ Mới Nhất" movies={data.phimBo.slice(0, 12)} slug="phim-bo" />
-              <MovieRow title="Phim Lẻ Đặc Sắc" movies={data.phimLe.slice(0, 12)} slug="phim-le" />
+              <MovieRow title="Phim Bộ Mới Nhất" movies={useMemo(() => data.phimBo.slice(0, 12), [data.phimBo])} slug="phim-bo" />
+              <MovieRow title="Phim Lẻ Đặc Sắc" movies={useMemo(() => data.phimLe.slice(0, 12), [data.phimLe])} slug="phim-le" />
 
               {data.hanQuoc.length > 0 && (
                 <MovieRow title="Phim Hàn Quốc Hot" movies={data.hanQuoc} slug="han-quoc" type="country" />
@@ -354,8 +354,8 @@ export default function HomeScreen() {
                 <MovieRow title="Phim Tình Cảm Lãng Mạn" movies={data.tinhCam} slug="tinh-cam" type="category" />
               )}
 
-              <MovieRow title="Hoạt Hình" movies={data.hoatHinh.slice(0, 12)} slug="hoat-hinh" />
-              <MovieRow title="TV Shows" movies={data.tvShows.slice(0, 12)} slug="tv-shows" />
+              <MovieRow title="Hoạt Hình" movies={useMemo(() => data.hoatHinh.slice(0, 12), [data.hoatHinh])} slug="hoat-hinh" />
+              <MovieRow title="TV Shows" movies={useMemo(() => data.tvShows.slice(0, 12), [data.tvShows])} slug="tv-shows" />
 
               {data.sapChieu.length > 0 && (
                 <MovieRow title="Phim Sắp Chiếu" movies={data.sapChieu} slug="phim-sap-chieu" />
