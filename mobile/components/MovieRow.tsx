@@ -1,10 +1,18 @@
 import React, { memo } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
 import { FlashList, ListRenderItem } from '@shopify/flash-list';
 import { Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Movie } from '@/services/api';
 import MovieCard from './MovieCard';
+
+// Compute once at module level – avoids recalculation per card and per render
+const { width: WIN_W } = Dimensions.get('window');
+const isTablet = WIN_W >= 768;
+const TARGET_COLS = isTablet ? Math.floor(WIN_W / 140) : 3;
+const PADDING = isTablet ? 110 : 32;
+const CARD_WIDTH = Math.floor((WIN_W - PADDING - (TARGET_COLS - 1) * 10) / TARGET_COLS);
+const CARD_HEIGHT = Math.floor(CARD_WIDTH * 1.5);
 
 interface MovieRowProps {
     title: string;
@@ -18,7 +26,7 @@ const MovieRow = memo(({ title, movies, slug, subtitle, type = 'list' }: MovieRo
     if (!movies || movies.length === 0) return null;
 
     const renderItem: ListRenderItem<Movie> = React.useCallback(
-        ({ item }) => <MovieCard movie={item} />,
+        ({ item }) => <MovieCard movie={item} width={CARD_WIDTH} height={CARD_HEIGHT} />,
         []
     );
 

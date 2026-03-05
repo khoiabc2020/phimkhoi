@@ -1,9 +1,13 @@
 import React, { memo } from 'react';
-import { View, Text, useWindowDimensions } from 'react-native';
+import { View, Text } from 'react-native';
 import { Image } from 'expo-image';
 import { Link } from 'expo-router';
 import { Movie, getImageUrl } from '@/services/api';
 import FocusableButton from './FocusableButton';
+
+// Default card size – MovieRow overrides these with computed values
+const DEFAULT_CARD_WIDTH = 110;
+const DEFAULT_CARD_HEIGHT = 165;
 
 interface MovieCardProps {
     movie: Movie;
@@ -12,14 +16,9 @@ interface MovieCardProps {
 }
 
 const MovieCard = memo(({ movie, width: propsWidth, height: propsHeight }: MovieCardProps) => {
-    const { width: windowWidth } = useWindowDimensions();
-    const isTablet = windowWidth >= 768;
-
-    // Tính toán Width động tối ưu
-    const targetCols = isTablet ? Math.floor(windowWidth / 140) : 3;
-    const padding = isTablet ? 110 : 32; // Tablet trừ hao Sidebar 90px + margin
-    const dynamicWidth = propsWidth || Math.floor((windowWidth - padding - (targetCols - 1) * 10) / targetCols);
-    const dynamicHeight = propsHeight || (dynamicWidth * 1.5);
+    // Dimensions are computed ONCE per MovieRow (not per card) to avoid mass re-renders
+    const dynamicWidth = propsWidth ?? DEFAULT_CARD_WIDTH;
+    const dynamicHeight = propsHeight ?? DEFAULT_CARD_HEIGHT;
 
     if (!movie || !movie.slug) return null;
     const imageUrl = getImageUrl(movie.poster_url || movie.thumb_url);

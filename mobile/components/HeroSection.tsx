@@ -49,18 +49,28 @@ export default function HeroSection({ movies }: HeroSectionProps) {
         return [uri, uri];
     });
 
-    // Load favorites
+    // Load favorites — prefer user.favorites from API (already in memory) to avoid slow AsyncStorage loop
     useEffect(() => {
         if (!movies?.length) return;
         (async () => {
             const next = new Set<string>();
-            for (const m of movies) {
-                try {
-                    if (user?.favorites?.some((f: any) => (typeof f === 'string' ? f : f.slug) === m.slug)) next.add(m.slug);
-                    else if (await isFavorite(m.slug)) next.add(m.slug);
-                } catch (_) { }
+            if (user?.favorites?.length) {
+                // Fast path: use favorites array already available from the auth context
+                movies.forEach(m => {
+                    if (user.favorites.some((f: any) => (typeof f === 'string' ? f : f.slug) === m.slug)) {
+                        next.add(m.slug);
+                    }
+                });
+                setFavSlugs(next);
+            } else {
+                // Slow path: query local storage only when API data is not available
+                for (const m of movies) {
+                    try {
+                        if (await isFavorite(m.slug)) next.add(m.slug);
+                    } catch (_) { }
+                }
+                setFavSlugs(next);
             }
-            setFavSlugs(next);
         })();
     }, [movies, user]);
 

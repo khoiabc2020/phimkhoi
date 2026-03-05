@@ -47,6 +47,16 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        // API routes: CDN caches for 60s, stale-while-revalidate for 5 minutes
+        source: "/api/((?!auth).*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, s-maxage=60, stale-while-revalidate=300",
+          },
+        ],
+      },
     ];
   },
 };
