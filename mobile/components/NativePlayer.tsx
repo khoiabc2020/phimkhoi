@@ -377,7 +377,8 @@ export default function NativePlayer({
 
             // Only update main state if buffering or play state changed
             setStatus(prev => {
-                if (!('isLoaded' in prev)) return newStatus;
+                // If the previous state isn't loaded, just return the new status
+                if (!prev.isLoaded) return newStatus;
                 if (prev.isBuffering !== currentBuffering || prev.isPlaying !== currentPlaying) {
                     return newStatus;
                 }

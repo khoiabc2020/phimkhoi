@@ -33,7 +33,7 @@ const PARALLAX_CONFIG = {
     parallaxScrollingScale: 0.88,
     parallaxScrollingOffset: 48,
 };
-const PAN_HANDLER_PROPS = { activeOffsetX: [-10, 10] };
+const PAN_HANDLER_PROPS = { activeOffsetX: [-10, 10] as [number, number] };
 
 export default function HeroSection({ movies }: HeroSectionProps) {
     const [activeIndex, setActiveIndex] = useState(0);
@@ -54,10 +54,10 @@ export default function HeroSection({ movies }: HeroSectionProps) {
         if (!movies?.length) return;
         (async () => {
             const next = new Set<string>();
-            if (user?.favorites?.length) {
+            if (user?.favorites && user.favorites.length > 0) {
                 // Fast path: use favorites array already available from the auth context
                 movies.forEach(m => {
-                    if (user.favorites.some((f: any) => (typeof f === 'string' ? f : f.slug) === m.slug)) {
+                    if (user.favorites!.some((f: any) => (typeof f === 'string' ? f : f.slug) === m.slug)) {
                         next.add(m.slug);
                     }
                 });

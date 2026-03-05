@@ -60,7 +60,7 @@ export default function ModernAlert({
     }, [visible]);
 
     // Handle immediate unmount rendering issues
-    if (!visible && opacityValue._value === 0) return null;
+    if (!visible && (opacityValue as any)._value === 0) return null;
 
     const handlePress = (onPress?: () => void) => {
         if (onPress) onPress();
