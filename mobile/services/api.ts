@@ -115,10 +115,12 @@ export const getMovieDetail = async (slug: string) => {
     if (cached) return cached;   // ← instant return on repeat visits
 
     try {
+        // 8s timeout per source — prevents a slow CDN from blocking the entire player load
+        const TIMEOUT = AbortSignal.timeout(8000);
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
-            fetch(`${API_URL}/phim/${slug}`).then(r => r.json()),
-            fetch(`${OPHIM_API}/phim/${slug}`).then(r => r.json()),
-            fetch(`${NGUONC_API}/api/film/${slug}`).then(r => r.json())
+            fetch(`${API_URL}/phim/${slug}`, { signal: TIMEOUT }).then(r => r.json()),
+            fetch(`${OPHIM_API}/phim/${slug}`, { signal: AbortSignal.timeout(8000) }).then(r => r.json()),
+            fetch(`${NGUONC_API}/api/film/${slug}`, { signal: AbortSignal.timeout(8000) }).then(r => r.json())
         ]);
 
 
@@ -176,6 +178,8 @@ export const getMovieDetail = async (slug: string) => {
                 }));
                 combinedData.episodes = [...(combinedData.episodes || []), ...taggedNguoncEpisodes];
             }
+            // Cache the merged result before returning
+            cacheSet(cacheKey, combinedData);
             return combinedData;
         }
 
