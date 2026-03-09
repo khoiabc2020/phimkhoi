@@ -69,6 +69,24 @@ const combineUrl = (base: string, path: string) => {
     return `${cleanBase}${cleanPath}`;
 };
 
+// ── Custom Timeout Wrapper for React Native ─────────────────────────────────
+const fetchWithTimeout = async (url: string, options: RequestInit = {}, timeoutMs: number = 8000) => {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+        const response = await fetch(url, {
+            ...options,
+            signal: controller.signal
+        });
+        clearTimeout(id);
+        return response;
+    } catch (error) {
+        clearTimeout(id);
+        throw error;
+    }
+};
+
 // ── In-memory cache (session-scoped, 5-minute TTL) ──────────────────────────
 const _cache = new Map<string, { data: any; ts: number }>();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -116,11 +134,10 @@ export const getMovieDetail = async (slug: string) => {
 
     try {
         // 8s timeout per source — prevents a slow CDN from blocking the entire player load
-        const TIMEOUT = AbortSignal.timeout(8000);
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
-            fetch(`${API_URL}/phim/${slug}`, { signal: TIMEOUT }).then(r => r.json()),
-            fetch(`${OPHIM_API}/phim/${slug}`, { signal: AbortSignal.timeout(8000) }).then(r => r.json()),
-            fetch(`${NGUONC_API}/api/film/${slug}`, { signal: AbortSignal.timeout(8000) }).then(r => r.json())
+            fetchWithTimeout(`${API_URL}/phim/${slug}`).then(r => r.json()),
+            fetchWithTimeout(`${OPHIM_API}/phim/${slug}`).then(r => r.json()),
+            fetchWithTimeout(`${NGUONC_API}/api/film/${slug}`).then(r => r.json())
         ]);
 
 

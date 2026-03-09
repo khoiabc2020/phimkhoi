@@ -284,7 +284,23 @@ export default function MovieDetailScreen() {
         );
     }
 
-    if (!movie) return null;
+    if (!movie) {
+        return (
+            <View style={styles.centerLoading}>
+                <Stack.Screen options={{ headerShown: false }} />
+                <Ionicons name="film-outline" size={64} color="rgba(255,255,255,0.2)" />
+                <Text style={{ color: 'rgba(255,255,255,0.5)', marginTop: 16, fontSize: 16 }}>
+                    Không tìm thấy thông tin phim
+                </Text>
+                <Pressable
+                    style={{ marginTop: 24, paddingHorizontal: 20, paddingVertical: 10, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 20 }}
+                    onPress={() => router.back()}
+                >
+                    <Text style={{ color: 'white', fontWeight: 'bold' }}>Quay lại</Text>
+                </Pressable>
+            </View>
+        );
+    }
 
     const posterUrl = getImageUrl(movie.poster_url || movie.thumb_url);
     const currentServerData = episodes[selectedServer]?.server_data || [];

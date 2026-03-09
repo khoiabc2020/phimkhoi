@@ -1,0 +1,133 @@
+---
+description: Universal clean code standards — human-quality, minimal, high-performance. Apply to every project.
+alwaysApply: true
+---
+
+# Clean Code Standards
+
+Write code as a senior engineer would for a team they respect: clear intent, no waste, easy to change.
+
+## Naming
+
+- Full words over abbreviations. `calculate_total` not `calc_tot`. `user_count` not `uc`.
+- Exception: universally known abbreviations are fine — `id`, `url`, `api`, `db`, `config`, `img`, `btn`, `msg`, `err`, `ctx`.
+- Booleans read as yes/no questions: `is_valid`, `has_permission`, `should_retry`, `can_edit`.
+- Functions start with verbs: `get_user`, `build_query`, `parse_response`, `validate_input`.
+- Classes are nouns: `UserService`, `ImageProcessor`, `TrainingConfig`.
+- Constants: `UPPER_SNAKE_CASE`, defined once at module/file top.
+- No Hungarian notation (`strName`, `iCount`). No type suffixes (`name_string`, `count_int`).
+- Plurals for collections: `users` not `user_list`. `items` not `item_array`.
+
+## Functions
+
+- One function, one job. If you need "and" to describe it, split it.
+- Max 4 positional params. Beyond that, use keyword-only (`*`) or a config object.
+- Return early on failure. Avoid deep nesting and else chains.
+- Pure functions when possible — same input, same output, no side effects.
+- Don't return `None` to signal failure when you can raise or return an explicit result type.
+- If a function is longer than 30 lines, consider extracting helpers.
+
+## Comments
+
+- No comments that restate the code. `x += 1  # increment x` is noise.
+- No decorative banners, ASCII art, or section dividers.
+- No AI-style confirmations: `print("ok")`, `print("done")`, `print("step completed")`.
+- No marketing language: "blazing fast", "state-of-the-art", "production-ready", "best-in-class".
+- Comment only: **why** (not what), trade-offs, non-obvious constraints, links to specs/issues.
+- TODOs must include context: `# TODO(auth): rate limit per IP after v2 launch` not just `# TODO: fix this`.
+
+## Structure
+
+- One responsibility per file/module/cell. Name tells you what's inside.
+- Group by concern: imports → constants → types/config → helpers → main logic.
+- Define before use. No forward references readers have to hunt for.
+- Flat over nested. Max 3 levels of indentation. If deeper, extract a function.
+- Consistent ordering: public before private, high-level before low-level.
+- Blank lines separate logical blocks. Never more than one consecutive blank line.
+- Imports: stdlib → third-party → local, alphabetical within each group.
+
+## Error Handling
+
+- Fail fast. Validate inputs at boundaries, not deep inside logic.
+- `assert` for programmer errors (invariants). Include fix instructions in the message.
+- Exceptions for runtime errors. Specific types, never bare `except:`.
+- `try/except` should wrap the smallest possible scope.
+- Never silently swallow errors that affect correctness. Log or re-raise.
+- Error messages answer: what failed, why, and how to fix it.
+
+## Config & Magic Numbers
+
+- All tunable values in one place: a config file, dataclass, or env vars. Never scattered in code.
+- Immutable config after initialization (`frozen=True`, `const`, `readonly`).
+- No magic numbers in logic. `if retries > MAX_RETRIES` not `if retries > 3`.
+- Defaults should be safe. Opt-in to dangerous behavior, not opt-out.
+
+## Data & IO
+
+- Never hardcode file paths, URLs, or credentials.
+- Discover resources at runtime. Match by pattern, not by exact name.
+- Validate data shape/schema at load time. Fail fast with a clear message.
+- Remap and adapt — don't reject inputs for fixable format differences.
+- Intermediate state in files (JSON, CSV) so steps can re-run independently.
+
+## Performance (general)
+
+- Measure before optimizing. Profile, don't guess.
+- Batch over loop. Vectorize over iterate. Parallelize over serialize.
+- Pre-allocate when size is known. Avoid growing collections in hot loops.
+- Cache expensive computations. Invalidate explicitly.
+- Lazy loading for heavy resources. Don't pay for what you don't use.
+- Use the right data structure: set for membership, dict for lookup, list for order.
+
+## Performance (Python specific)
+
+- Generator expressions over list comprehensions when you only iterate once.
+- `__slots__` for classes with many instances.
+- `functools.lru_cache` for pure functions called repeatedly.
+- Avoid global state in hot paths. Local variable lookup is faster.
+- Use `collections.defaultdict`, `Counter`, `deque` instead of manual equivalents.
+
+## Performance (ML / PyTorch specific)
+
+- `torch.backends.cudnn.benchmark = True` for fixed input sizes.
+- `memory_format=torch.channels_last` for conv models.
+- `pin_memory=True`, `non_blocking=True`, `persistent_workers=True` in DataLoader.
+- `GradScaler(enabled=flag)` — always create, let the flag control. No if/else branching for AMP.
+- `optimizer.zero_grad(set_to_none=True)` — faster than zeroing.
+- `torch.compile` with capability check and silent fallback.
+- `@torch.no_grad()` for all eval/inference paths.
+- Batch size should use >30% of available GPU memory. Don't waste hardware.
+- Val/test batch = train batch × 2-4 (no gradient memory).
+- `drop_last=True` for training only.
+- Mixed precision (fp16/bf16) by default on supported hardware.
+
+## Testing
+
+- Test behavior, not implementation. Tests survive refactors.
+- One assertion per test. Test name describes the expectation.
+- No test interdependence. Each test sets up its own state.
+- Mock external services, not your own code.
+- Edge cases: empty input, single element, max size, None, unicode, negative numbers.
+
+## Git
+
+- Commit messages: imperative mood, ≤72 chars, explain **why** not what.
+- One logical change per commit. Don't mix refactors with features.
+- Branch names: `type/short-description` — `fix/login-timeout`, `feat/export-csv`.
+
+## API / Interface Design
+
+- Consistent naming across endpoints/functions. If one uses `get_`, all use `get_`.
+- Accept the most general type, return the most specific.
+- Optional params have safe defaults. Required params have no defaults.
+- Backward compatible changes. Don't break callers.
+- Pagination for lists. Limits for queries. Timeouts for external calls.
+
+## Style
+
+- No emoji in code, comments, or commit messages unless the project convention uses them.
+- Consistent alignment of `=` in related assignments when it aids scanning.
+- Consistent string quotes within a file (pick `"` or `'` and stick with it).
+- Line length ≤100 chars. Break at logical points, not arbitrary ones.
+- Trailing commas in multi-line collections (easier diffs).
+- No dead code. Delete it; git remembers.

@@ -161,7 +161,8 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                     loop={true}
                     autoPlay={true}
                     autoPlayInterval={4500}
-                    scrollAnimationDuration={750}
+                    scrollAnimationDuration={450}
+                    windowSize={5}
                     onSnapToItem={handleSnapToItem}
                     mode="parallax"
                     modeConfig={PARALLAX_CONFIG}

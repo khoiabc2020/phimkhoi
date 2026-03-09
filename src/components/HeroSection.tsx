@@ -84,6 +84,18 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
         movieCategories: movie.category?.map(c => c.name) || [],
     });
 
+    const formatQualityLabel = (quality?: string) => {
+        if (!quality) return null;
+        const q = String(quality).trim();
+        const upper = q.toUpperCase();
+        if (upper.includes("FULL") && upper.includes("HD")) return "FHD";
+        if (upper === "FULLHD") return "FHD";
+        if (upper.includes("BLURAY")) return "BR";
+        if (upper.includes("WEB-DL") || upper.includes("WEBDL")) return "WEB";
+        if (upper === "FHD" || upper === "HD" || upper === "4K" || upper === "CAM") return upper;
+        return q.length > 6 ? q.slice(0, 6) : q;
+    };
+
     // Hero dùng poster/thumbnail từ API (TMDB Server Side khi đã match năm, hoặc nguồn PhimAPI). Fallback placeholder để không bao giờ slide đen.
     const getHeroImage = (movie: any, type: 'poster' | 'backdrop' = 'poster') => {
         const tmdbData = movie.tmdbData;
@@ -142,10 +154,12 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                     {/* Badges góc phải dưới (để tránh overlap notch và header phía trên) */}
                                     <div className="absolute bottom-3 right-3 flex flex-col items-end gap-1.5 z-40">
                                         {movie.quality && (
-                                            <span className="bg-[#F4C84A] text-black text-[10px] font-black px-2 py-0.5 rounded shadow-sm">{movie.quality}</span>
+                                            <span className="bg-[#F4C84A] text-black text-[10px] font-black px-2 py-0.5 rounded shadow-sm tracking-wide max-w-[64px] truncate">
+                                                {formatQualityLabel(movie.quality) || movie.quality}
+                                            </span>
                                         )}
                                         {rating && (
-                                            <span className="bg-black/70 text-[#F4C84A] text-[10px] font-bold px-2 py-0.5 rounded backdrop-blur-sm">★ {rating}</span>
+                                            <span className="bg-black/70 text-[#F4C84A] text-[10px] font-bold px-2 py-0.5 rounded">★ {rating}</span>
                                         )}
                                     </div>
                                 </div>
@@ -258,7 +272,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                                     )}
                                                     {movie.quality && (
                                                         <span className="px-3 py-1 rounded border border-[#F4C84A]/50 bg-[#F4C84A]/10 text-[#F4C84A] text-xs font-bold border-glow-accent">
-                                                            {movie.quality}
+                                                            {formatQualityLabel(movie.quality) || movie.quality}
                                                         </span>
                                                     )}
                                                     <span className="flex items-center gap-1 text-white/80 text-xs font-medium">

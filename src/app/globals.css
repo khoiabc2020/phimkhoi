@@ -154,10 +154,11 @@ body::before {
   position: fixed;
   inset: 0;
   z-index: -1;
+  /* More neutral, less "AI neon" */
   background:
-    radial-gradient(circle at 30% 10%, #FFC8000A, transparent 50%),
-    radial-gradient(circle at 70% 60%, rgba(56, 189, 248, 0.04), transparent 50%),
-    linear-gradient(to bottom, #0B0D12, #121826);
+    radial-gradient(circle at 28% 12%, rgba(244, 200, 74, 0.045), transparent 55%),
+    radial-gradient(circle at 74% 68%, rgba(255, 255, 255, 0.02), transparent 60%),
+    linear-gradient(to bottom, #0B0D12, #0F1420);
   /* Composite on GPU — no repaint on scroll */
   will-change: transform;
   transform: translateZ(0);
@@ -181,16 +182,16 @@ h2 {
 /* iOS 26 Glassmorphism Utilities — Vibrant and ultra-smooth */
 @layer utilities {
   .glass {
-    /* iOS 26 style absolute glass: higher blur, saturate colors behind it, extreme transparency */
-    @apply backdrop-blur-[24px] saturate-[180%] bg-white/[0.02] border-b border-white/[0.08] shadow-[0_8px_32px_0_#0000004d];
+    /* Performance-first: no heavy blur, chỉ hơi trong nhẹ */
+    @apply bg-black/70 border-b border-white/[0.08] shadow-[0_10px_28px_0_#00000055];
   }
 
   .glass-panel {
-    @apply backdrop-blur-[32px] saturate-[150%] bg-[#1c1c1e]/40 border border-white/[0.08] shadow-[0_16px_40px_#00000080] rounded-[32px];
+    @apply bg-[#0c0f16]/95 border border-white/[0.08] shadow-[0_18px_40px_#00000090] rounded-[24px];
   }
 
   .glass-pill {
-    @apply backdrop-blur-[16px] saturate-[120%] bg-white/[0.06] border border-white/[0.1] shadow-sm rounded-full;
+    @apply bg-white/[0.06] border border-white/[0.1] shadow-sm rounded-full;
   }
 
   /* Premium Text Glow */

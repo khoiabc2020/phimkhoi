@@ -4,12 +4,17 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 const topics = [
-    { id: 'marvel', name: 'Marvel', color: '#ef4444', href: '/the-loai/hanh-dong' },
-    { id: '4k', name: '4K Ultra HD', color: '#a855f7', href: '/danh-sach/phim-le?quality=4K' },
-    { id: 'sitcom', name: 'Sitcom', color: '#F4C84A', href: '/the-loai/hai-huoc' },
-    { id: 'long-tieng', name: 'Lồng Tiếng', color: '#6366f1', href: '/danh-sach/long-tieng' },
-    { id: 'xuyen-khong', name: 'Xuyên Không', color: '#f97316', href: '/the-loai/vien-tuong' },
-    { id: 'co-trang', name: 'Cổ Trang', color: '#dc2626', href: '/the-loai/co-trang' },
+    // Marvel: dùng search theo từ khóa để đúng nội dung
+    { id: "marvel", name: "Marvel", color: "#ef4444", href: "/tim-kiem?q=Marvel" },
+    // 4K: lọc chất lượng 4K trên toàn bộ danh sách mới cập nhật
+    { id: "4k", name: "4K Ultra HD", color: "#a855f7", href: "/danh-sach/tat-ca-the-loai?quality=4K" },
+    // Sitcom: map về thể loại Hài Hước
+    { id: "sitcom", name: "Sitcom", color: "#F4C84A", href: "/the-loai/hai-huoc" },
+    // Lồng tiếng: dùng đúng slug danh sách phim lồng tiếng
+    { id: "long-tieng", name: "Lồng Tiếng", color: "#6366f1", href: "/danh-sach/phim-long-tieng" },
+    // Xuyên không: map về thể loại xuyen-khong (nếu có trong KKPhim)
+    { id: "xuyen-khong", name: "Xuyên Không", color: "#f97316", href: "/the-loai/xuyen-khong" },
+    { id: "co-trang", name: "Cổ Trang", color: "#dc2626", href: "/the-loai/co-trang" },
 ];
 
 export default function TopicSection() {

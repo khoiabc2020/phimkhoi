@@ -65,6 +65,7 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
     const year = Number(resolvedSearchParams.year) || undefined;
     const category = (resolvedSearchParams.category as string) || undefined;
     const country = (resolvedSearchParams.country as string) || undefined;
+    const quality = (resolvedSearchParams.quality as string) || undefined;
     const typeName = TYPE_NAMES[type] || type;
 
     // Handle special case for 'phim-moi-cap-nhat' vs 'danh-sach'
@@ -72,9 +73,9 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
     try {
         if (type === 'phim-moi' || type === 'tat-ca-the-loai') {
             const endpoint = type === 'tat-ca-the-loai' ? 'phim-moi-cap-nhat' : type;
-            data = await getMoviesList(endpoint, { page, year, category, country });
+            data = await getMoviesList(endpoint, { page, year, category, country, quality });
         } else {
-            data = await getMoviesList(type, { page, year, category, country });
+            data = await getMoviesList(type, { page, year, category, country, quality });
         }
     } catch (error) {
         console.error("Catalog Error", error);

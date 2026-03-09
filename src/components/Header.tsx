@@ -20,7 +20,9 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
     const [isScrolled, setIsScrolled] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-    const [searchHistory, setSearchHistory] = useState<string[]>([]);
+    const [movieSearchHistory, setMovieSearchHistory] = useState<string[]>([]);
+    const [actorSearchHistory, setActorSearchHistory] = useState<string[]>([]);
+    const [historyTab, setHistoryTab] = useState<"movies" | "actors">("movies");
     const [showHistory, setShowHistory] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
     const [searchResults, setSearchResults] = useState<any>(null);
@@ -31,6 +33,17 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
     const searchInputRef = useRef<HTMLInputElement>(null);
     const navRef = useRef<HTMLDivElement | null>(null);
 
+    const saveHistoryItem = (kind: "movies" | "actors", value: string) => {
+        const trimmed = value.trim();
+        if (!trimmed) return;
+        const key = kind === "movies" ? "searchHistory_movies" : "searchHistory_actors";
+        const setState = kind === "movies" ? setMovieSearchHistory : setActorSearchHistory;
+        const current = kind === "movies" ? movieSearchHistory : actorSearchHistory;
+        const next = [trimmed, ...current.filter(h => h !== trimmed)].slice(0, 10);
+        setState(next);
+        localStorage.setItem(key, JSON.stringify(next));
+    };
+
     const handleSearch = (e?: React.FormEvent | string) => {
         if (e && typeof e === 'object' && 'preventDefault' in e) {
             e.preventDefault();
@@ -38,10 +51,8 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
         const searchTerm = typeof e === 'string' ? e : searchQuery;
 
         if (searchTerm.trim()) {
-            // Save to history
-            const newHistory = [searchTerm, ...searchHistory.filter(h => h !== searchTerm)].slice(0, 10);
-            setSearchHistory(newHistory);
-            localStorage.setItem('searchHistory', JSON.stringify(newHistory));
+            // Save ONLY movie-search history for /tim-kiem
+            saveHistoryItem("movies", searchTerm);
 
             router.push(`/tim-kiem?q=${encodeURIComponent(searchTerm)}`);
             setIsSearchOpen(false);
@@ -51,8 +62,13 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
     };
 
     const clearHistory = () => {
-        setSearchHistory([]);
-        localStorage.removeItem('searchHistory');
+        if (historyTab === "movies") {
+            setMovieSearchHistory([]);
+            localStorage.removeItem("searchHistory_movies");
+        } else {
+            setActorSearchHistory([]);
+            localStorage.removeItem("searchHistory_actors");
+        }
         setShowHistory(false);
     };
 
@@ -104,13 +120,13 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
 
     // Load search history from localStorage
     useEffect(() => {
-        const saved = localStorage.getItem('searchHistory');
-        if (saved) {
-            try {
-                setSearchHistory(JSON.parse(saved));
-            } catch (e) {
-                console.error('Failed to load search history:', e);
-            }
+        const savedMovies = localStorage.getItem("searchHistory_movies");
+        const savedActors = localStorage.getItem("searchHistory_actors");
+        if (savedMovies) {
+            try { setMovieSearchHistory(JSON.parse(savedMovies)); } catch { }
+        }
+        if (savedActors) {
+            try { setActorSearchHistory(JSON.parse(savedActors)); } catch { }
         }
     }, []);
 
@@ -385,7 +401,11 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                                 <Link
                                                                     href={`/dien-vien/${encodeURIComponent(actor.name)}`}
                                                                     key={actor.id}
-                                                                    onClick={() => { setIsSearchOpen(false); setSearchQuery(""); }}
+                                                                    onClick={() => {
+                                                                        saveHistoryItem("actors", actor.name);
+                                                                        setIsSearchOpen(false);
+                                                                        setSearchQuery("");
+                                                                    }}
                                                                     className="flex items-center gap-3 px-3 py-2 hover:bg-white/10 rounded-xl transition-colors group"
                                                                 >
                                                                     <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-800 shrink-0 border border-white/10 group-hover:border-primary/50 transition-colors">
@@ -411,7 +431,11 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                                 <Link
                                                                     href={`/xem-phim/${movie.slug}`}
                                                                     key={movie._id || movie.slug}
-                                                                    onClick={() => { setIsSearchOpen(false); setSearchQuery(""); }}
+                                                                    onClick={() => {
+                                                                        saveHistoryItem("movies", movie.name);
+                                                                        setIsSearchOpen(false);
+                                                                        setSearchQuery("");
+                                                                    }}
                                                                     className="flex items-center gap-3 px-3 py-2 hover:bg-white/10 rounded-xl transition-colors group"
                                                                 >
                                                                     <div className="w-10 h-14 rounded-md overflow-hidden bg-gray-800 shrink-0 border border-white/10 group-hover:border-primary/50 transition-colors">
@@ -443,20 +467,51 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                     </button>
                                                 </div>
                                             ) : (
-                                                searchHistory.length > 0 && (
+                                                (historyTab === "movies" ? movieSearchHistory.length > 0 : actorSearchHistory.length > 0) && (
                                                     <div className="p-2">
                                                         <div className="flex items-center justify-between px-3 pb-2 pt-1 border-b border-white/10 mb-2">
-                                                            <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Lịch sử tìm kiếm</span>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Lịch sử</span>
+                                                                <div className="flex items-center gap-1 rounded-full bg-white/[0.06] border border-white/10 p-0.5">
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => setHistoryTab("movies")}
+                                                                        className={cn(
+                                                                            "px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors",
+                                                                            historyTab === "movies" ? "bg-[#F4C84A] text-black" : "text-white/60 hover:text-white"
+                                                                        )}
+                                                                    >
+                                                                        Phim
+                                                                    </button>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => setHistoryTab("actors")}
+                                                                        className={cn(
+                                                                            "px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors",
+                                                                            historyTab === "actors" ? "bg-[#F4C84A] text-black" : "text-white/60 hover:text-white"
+                                                                        )}
+                                                                    >
+                                                                        Diễn viên
+                                                                    </button>
+                                                                </div>
+                                                            </div>
                                                             <button type="button" onClick={clearHistory} className="text-xs text-red-400 hover:text-red-300 transition-colors">Xóa</button>
                                                         </div>
                                                         <div className="flex flex-col gap-1 max-h-[300px] overflow-y-auto custom-scrollbar">
-                                                            {searchHistory.map((item, idx) => (
+                                                            {(historyTab === "movies" ? movieSearchHistory : actorSearchHistory).map((item, idx) => (
                                                                 <button
                                                                     key={idx}
                                                                     type="button"
                                                                     onClick={() => {
                                                                         setSearchQuery(item);
-                                                                        handleSearch(item);
+                                                                        if (historyTab === "movies") {
+                                                                            handleSearch(item);
+                                                                        } else {
+                                                                            router.push(`/dien-vien/${encodeURIComponent(item)}`);
+                                                                            setIsSearchOpen(false);
+                                                                            setShowHistory(false);
+                                                                            setSearchQuery("");
+                                                                        }
                                                                     }}
                                                                     className="flex items-center gap-3 px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-colors text-left"
                                                                 >

@@ -38,10 +38,15 @@ export default function UpdateChecker({ silent = true }: Props) {
     const checkForUpdate = async () => {
         try {
             setChecking(true);
+            const controller = new AbortController();
+            const timerId = setTimeout(() => controller.abort(), 8000);
+
             const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/version`, {
                 headers: { 'Cache-Control': 'no-cache' },
-                signal: AbortSignal.timeout(8000),
+                signal: controller.signal,
             });
+            clearTimeout(timerId);
+
             if (!res.ok) return;
             const data: UpdateInfo = await res.json();
 

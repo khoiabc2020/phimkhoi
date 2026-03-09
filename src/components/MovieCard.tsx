@@ -14,6 +14,20 @@ import { getTMDBImage } from "@/services/tmdb";
 // Tiny LQIP blur placeholder shared across all movie cards
 const BLUR_PLACEHOLDER = "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA==";
 
+function formatQualityLabel(quality?: string) {
+    if (!quality) return null;
+    const q = quality.trim();
+    const upper = q.toUpperCase();
+    if (upper.includes("FULL") && upper.includes("HD")) return "FHD";
+    if (upper === "FULLHD") return "FHD";
+    if (upper.includes("BLURAY")) return "BR";
+    if (upper.includes("WEB-DL") || upper.includes("WEBDL")) return "WEB";
+    // Keep common short forms
+    if (upper === "FHD" || upper === "HD" || upper === "4K" || upper === "CAM") return upper;
+    // Avoid long ugly strings on badge
+    return q.length > 6 ? q.slice(0, 6) : q;
+}
+
 function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientation?: 'portrait' | 'landscape' }) {
     const [isHovered, setIsHovered] = useState(false);
     const [position, setPosition] = useState<{ top: number; left: number; width: number; rectTop?: number; innerHeight?: number; rectHeight?: number }>({ top: 0, left: 0, width: 0 });
@@ -110,9 +124,9 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
 
                     {/* Badges */}
                     <div className="absolute top-2 left-2 flex flex-col gap-1 z-10 pointer-events-none">
-                        {movie.quality && (
-                            <span className="bg-black/80 shadow-md border border-white/10 text-white/90 text-[9px] font-bold px-1.5 py-0.5 rounded tracking-wide">
-                                {movie.quality}
+                        {formatQualityLabel(movie.quality) && (
+                            <span className="bg-black/75 shadow-md border border-white/10 text-white/90 text-[9px] font-extrabold px-1.5 py-0.5 rounded tracking-[0.08em] max-w-[56px] truncate">
+                                {formatQualityLabel(movie.quality)}
                             </span>
                         )}
                         {movie.episode_current && (

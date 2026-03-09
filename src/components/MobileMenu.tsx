@@ -77,7 +77,7 @@ export default function MobileMenu({
         <>
             {/* Backdrop */}
             {isOpen && (
-                <div className="fixed inset-0 z-[9999] lg:hidden bg-black/80 backdrop-blur-sm" onClick={onClose} />
+                <div className="fixed inset-0 z-[9999] lg:hidden bg-black/85" onClick={onClose} />
             )}
 
             {/* Drawer */}

@@ -423,9 +423,9 @@ const normalizeOphimItem = (item: any, pathImage: string): Movie => {
     } as Movie;
 };
 
-export const getMoviesList = async (type: string, params: { page?: number; year?: number; category?: string; country?: string; limit?: number } = {}) => {
+export const getMoviesList = async (type: string, params: { page?: number; year?: number; category?: string; country?: string; limit?: number; quality?: string } = {}) => {
     try {
-        const { page = 1, year, category, country, limit = 24 } = params;
+        const { page = 1, year, category, country, limit = 24, quality } = params;
         let query = `?page=${page}&limit=${limit}`;
         if (year) query += `&year=${year}`;
         if (category) query += `&category=${category}`;
@@ -481,11 +481,19 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
 
         // Deduplicate by Slug
         const seen = new Set<string>();
-        const uniqueItems = items.filter(item => {
+        let uniqueItems = items.filter(item => {
             const duplicate = seen.has(item.slug);
             seen.add(item.slug);
             return !duplicate;
         });
+
+        // Optional client-side quality filter (e.g. 4K only)
+        if (quality) {
+            const q = String(quality).toUpperCase();
+            uniqueItems = uniqueItems.filter(item =>
+                item.quality && String(item.quality).toUpperCase().includes(q)
+            );
+        }
 
         return {
             items: uniqueItems,

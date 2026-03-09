@@ -54,6 +54,12 @@ export default function WatchContainer({
     const activeEpisode =
         currentServerEpisodes.find((ep: { slug?: string }) => ep.slug === currentEpisodeSlug) || initialCurrentEpisode;
 
+    // Nguồn C (NguonC) hay bị CORS / Referer block → dùng HLS proxy cho m3u8
+    const effectiveM3u8 =
+        activeEpisode?.link_m3u8 && /nguonc/i.test(activeServerName)
+            ? `/api/hls-proxy?url=${encodeURIComponent(activeEpisode.link_m3u8)}`
+            : activeEpisode?.link_m3u8;
+
     // Compute prev/next episode index
     const currentIdx = currentServerEpisodes.findIndex((ep: { slug?: string }) => ep.slug === currentEpisodeSlug);
     const prevEpisode = currentIdx > 0 ? currentServerEpisodes[currentIdx - 1] : null;
@@ -141,7 +147,7 @@ export default function WatchContainer({
                         {activeEpisode ? (
                             <VideoPlayer
                                 url={activeEpisode.link_embed}
-                                m3u8={activeEpisode.link_m3u8}
+                                m3u8={effectiveM3u8}
                                 slug={movie.slug}
                                 episode={displayEpisodeName(activeEpisode.name)}
                                 movieData={movieData}

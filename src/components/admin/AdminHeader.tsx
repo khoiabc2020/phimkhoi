@@ -8,7 +8,7 @@ export default function AdminHeader() {
     const { data: session } = useSession();
 
     return (
-        <header className="h-16 bg-black/80 backdrop-blur-md border-b border-white/10 flex items-center justify-between px-6 fixed top-0 right-0 left-64 z-40">
+        <header className="h-16 bg-black/85 border-b border-white/10 flex items-center justify-between px-6 fixed top-0 right-0 left-64 z-40">
             {/* Search */}
             <div className="relative w-96">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
