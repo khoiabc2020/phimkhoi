@@ -112,10 +112,10 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
     };
 
     return (
-        <div className="relative w-full h-auto bg-[#0B0D12] overflow-hidden flex flex-col font-sans">
+        <div className="relative w-full h-auto bg-transparent overflow-hidden flex flex-col font-sans">
 
             {/* ================= MOBILE LAYOUT compact — chiều cao tiết kiệm ================= */}
-            <div className="md:hidden relative w-full bg-[#0B0D12]" ref={mobileRef}>
+            <div className="md:hidden relative w-full bg-transparent" ref={mobileRef}>
                 <div className="flex flex-row touch-pan-y">
                     {heroMovies.map((movie: any, index) => {
                         const posterImg = getHeroImage(movie, 'poster');
@@ -141,8 +141,8 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                         blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
                                         unoptimized
                                     />
-                                    {/* Gradient bottom */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D12] via-[#0B0D12]/40 to-transparent" />
+                                    {/* Gradient bottom (nhẹ hơn để hợp nền sáng) */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/95 via-[#020617]/40 to-transparent" />
                                     {/* Poster nhỏ góc trái dưới */}
                                     <Link href={`/phim/${movie.slug}`} className="absolute bottom-3 left-3 w-[72px] h-[100px] rounded-xl overflow-hidden shadow-xl ring-1 ring-white/15 shrink-0">
                                         <Image src={posterImg} alt="" fill className="object-cover" sizes="80px"
