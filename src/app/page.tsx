@@ -80,19 +80,19 @@ export default async function Home() {
   }
 
   return (
-    <main className="min-h-screen pb-20">
+    <main className="min-h-screen pb-16">
       {/* Hero Section */}
       <Suspense fallback={<div className="w-full h-[60vh] md:h-[80vh] bg-neutral-900 animate-pulse" />}>
         <AsyncHeroSection initialMovies={finalHeroData} />
       </Suspense>
 
       {/* Interested Topics Section */}
-      <div className="relative z-20 -mt-10 md:-mt-20 lg:-mt-24 mb-8">
+      <div className="relative z-20 -mt-16 md:-mt-28 lg:-mt-32 mb-4">
         <TopicSection />
       </div>
 
-      <div className="container mx-auto px-4 md:px-12 relative z-20 pb-20">
-        <div className="mb-8">
+      <div className="container mx-auto px-4 md:px-12 relative z-20 pb-16">
+        <div className="mb-4">
           <QuickNav />
         </div>
 

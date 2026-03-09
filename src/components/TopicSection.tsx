@@ -19,8 +19,8 @@ const topics = [
 
 export default function TopicSection() {
     return (
-        <section className="container mx-auto px-4 md:px-12 py-6">
-            <div className="flex items-center gap-2 mb-4 px-2">
+        <section className="container mx-auto px-4 md:px-12 py-3">
+            <div className="flex items-center gap-2 mb-3 px-2">
                 <span className="w-1 h-5 bg-gradient-to-t from-[#F4C84A] to-yellow-200 rounded-sm inline-block" />
                 <h2 className="text-[17px] font-bold text-white">
                     Khám phá nhanh
@@ -28,7 +28,7 @@ export default function TopicSection() {
             </div>
 
             {/* Horizontal Scroll - Pill Style (iOS 26) */}
-            <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2 mask-gradient-responsive">
+            <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1 mask-gradient-responsive">
                 {topics.map((topic) => (
                     <Link
                         key={topic.id}
