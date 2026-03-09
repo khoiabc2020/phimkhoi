@@ -13,10 +13,30 @@ export function getImageUrl(url: string, proxy = true): string {
         finalUrl = `https://phimimg.com/${url}`;
     }
 
-    // Route qua VPS Image Proxy để được Cache & phục vụ nhanh hơn
-    // Proxy server sẽ tải ảnh về, cache 4 giờ và serve từ VPS (loại bỏ màn đen)
-    if (proxy && finalUrl.startsWith("http")) {
-        return `/api/img-proxy?url=${encodeURIComponent(finalUrl)}`;
+    // Nếu ảnh đã nằm trên CDN/host tin cậy thì trả URL trực tiếp
+    if (finalUrl.startsWith("http")) {
+        try {
+            const host = new URL(finalUrl).hostname;
+            const trustedHosts = [
+                "phimimg.com",
+                "img.ophim.live",
+                "img.ophim1.com",
+                "image.tmdb.org",
+                "ui-avatars.com",
+                "assets.nflxext.com",
+            ];
+
+            if (trustedHosts.some((h) => host === h || host.endsWith(`.${h}`))) {
+                return finalUrl;
+            }
+        } catch {
+            // ignore URL parse error and fall through to proxy logic
+        }
+
+        // Các host khác vẫn có thể route qua proxy nếu bật cờ
+        if (proxy) {
+            return `/api/img-proxy?url=${encodeURIComponent(finalUrl)}`;
+        }
     }
 
     return finalUrl;
