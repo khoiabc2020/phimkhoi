@@ -102,7 +102,8 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
         <>
             <div
                 ref={cardRef}
-                className={`relative block h-full w-full cursor-pointer z-10 group/static-card hover:z-20 will-change-transform transform-gpu`}
+                className="relative block h-full w-full cursor-pointer z-10 group/static-card hover:z-20"
+                style={{ contain: "layout style paint" }}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
@@ -112,7 +113,7 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                             src={displayPoster || "/placeholder.jpg"}
                             alt={decodeHtml(movie.name) || movie.slug || "Phim"}
                             fill
-                            className="object-cover transition-transform duration-500 ease-out group-hover/static-card:scale-105 will-change-transform"
+                            className="object-cover transition-transform duration-300 ease-out group-hover/static-card:scale-105"
                             sizes={orientation === 'landscape' ? "(max-width: 768px) 60vw, 30vw" : "(max-width: 768px) 40vw, 15vw"}
                             unoptimized
                             loading="lazy"

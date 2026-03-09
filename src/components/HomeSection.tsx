@@ -25,7 +25,7 @@ export default function HomeSection({
         <section
             aria-labelledby={headingId}
             className={compact ? "space-y-2" : "space-y-4"}
-            style={{ contain: "layout", scrollMarginTop: "6rem" }}
+            style={{ contain: "layout style paint", scrollMarginTop: "6rem" }}
         >
             <div className="flex items-center justify-between gap-4 px-1">
                 <h2 id={headingId} className="text-base md:text-[17px] font-bold text-white flex items-center gap-2 uppercase tracking-wide">

@@ -134,7 +134,7 @@ function ContinueWatchingRowInner() {
                 <div
                     ref={rowRef}
                     className="flex gap-3 md:gap-4 overflow-x-auto pb-4 pt-2 no-scrollbar snap-x px-1"
-                    style={{ scrollbarWidth: "none", msOverflowStyle: "none", scrollBehavior: "smooth" }}
+                    style={{ scrollbarWidth: "none", msOverflowStyle: "none", scrollBehavior: "smooth", contain: "layout paint" }}
                 >
                     {movies.map((item) => (
                         <div key={item._id} className="relative group/card flex-[0_0_160px] sm:flex-[0_0_200px] md:flex-[0_0_240px] snap-start">
@@ -148,7 +148,7 @@ function ContinueWatchingRowInner() {
                                         src={getImageUrl(item.moviePoster)}
                                         alt={item.movieName}
                                         fill
-                                        className="object-cover group-hover/card:scale-105 transition-transform duration-500"
+                                        className="object-cover group-hover/card:scale-105 transition-transform duration-300"
                                     />
 
                                     {/* Play button on hover; on mobile always show subtle */}

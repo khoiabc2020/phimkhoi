@@ -259,6 +259,13 @@ h2 {
   scrollbar-width: none;
 }
 
+/* Scroll performance: auto tránh lag (smooth gây repaint nặng trên trang dài) */
+html {
+  overflow-x: hidden;
+  scroll-behavior: auto;
+}
+
+
 /* Animate-in utilities (lightweight alternative to tailwind-animate) */
 .animate-slide-up {
   animation: slide-up 0.4s ease-out both;

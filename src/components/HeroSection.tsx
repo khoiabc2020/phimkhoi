@@ -113,11 +113,11 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
     };
 
     return (
-        <div className="relative w-full h-auto bg-transparent overflow-hidden flex flex-col font-sans will-change-auto">
+        <div className="relative w-full h-auto bg-transparent overflow-hidden flex flex-col font-sans" style={{ contain: "layout style paint" }}>
 
-            {/* ================= MOBILE LAYOUT compact — chiều cao tiết kiệm, chuyển slide mượt ================= */}
-            <div className="md:hidden relative w-full bg-transparent" ref={mobileRef}>
-                <div className="flex flex-row touch-pan-y">
+            {/* ================= MOBILE LAYOUT — contain để tránh reflow toàn trang khi cuộn ================= */}
+            <div className="md:hidden relative w-full bg-transparent" ref={mobileRef} style={{ contain: "layout paint" }}>
+                <div className="flex flex-row touch-pan-y" style={{ contain: "layout" }}>
                     {heroMovies.map((movie: any, index) => {
                         const posterImg = getHeroImage(movie, 'poster');
                         const backdropImg = getHeroImage(movie, 'backdrop');
@@ -137,10 +137,12 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                         fill
                                         className="object-cover object-top"
                                         priority={index === 0}
+                                        loading={index === 0 ? "eager" : "lazy"}
                                         sizes="100vw"
                                         placeholder="blur"
                                         blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
                                         unoptimized
+                                        decoding="async"
                                     />
                                     {/* Gradient bottom sáng hơn để không làm tối nền */}
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/70 via-[#020617]/20 to-transparent" />
@@ -150,6 +152,8 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                             placeholder="blur"
                                             blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
                                             unoptimized
+                                            loading={index === 0 ? "eager" : "lazy"}
+                                            decoding="async"
                                         />
                                     </Link>
                                     {/* Badges góc phải dưới (để tránh overlap notch và header phía trên) */}
@@ -223,11 +227,10 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
             </div>
 
 
-            {/* ================= DESKTOP LAYOUT (Tablet / Large Screens) ================= */}
-            <div className="hidden md:block relative w-full h-[55vh] lg:h-[70vh] xl:h-screen overflow-hidden">
-
-                <div className="absolute inset-0 h-full" ref={desktopRef}>
-                    <div className="flex h-full touch-pan-y">
+            {/* ================= DESKTOP — contain tránh scroll lag toàn trang ================= */}
+            <div className="hidden md:block relative w-full h-[55vh] lg:h-[70vh] xl:h-screen overflow-hidden" style={{ contain: "layout style paint" }}>
+                <div className="absolute inset-0 h-full" ref={desktopRef} style={{ contain: "layout" }}>
+                    <div className="flex h-full touch-pan-y" style={{ contain: "layout" }}>
                         {heroMovies.map((movie, index) => {
                             const posterImg = getHeroImage(movie, 'poster');
                             const backdropImg = getHeroImage(movie, 'backdrop');
@@ -243,11 +246,13 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                             src={backdropImg}
                                             alt="bg"
                                             fill
-                                            className="object-cover opacity-80 transition-opacity duration-500 ease-out"
+                                            className="object-cover opacity-80 transition-opacity duration-300 ease-out"
                                             priority={index === 0}
+                                            loading={index === 0 ? "eager" : "lazy"}
                                             unoptimized
                                             placeholder={index === 0 ? "empty" : "blur"}
                                             blurDataURL={index === 0 ? undefined : "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="}
+                                            decoding="async"
                                         />
                                         {/* Vignettes for focus (nhẹ hơn, không che quá nhiều) */}
                                         <div className="absolute inset-0 bg-gradient-to-r from-[#020617]/60 via-[#020617]/20 to-transparent z-20 w-2/3 pointer-events-none" />
@@ -258,8 +263,8 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                     <div className="relative z-30 h-full container max-w-[1600px] mx-auto px-6 md:px-12 lg:px-24 xl:px-32 flex items-center">
                                         <div className="grid grid-cols-12 gap-6 md:gap-8 lg:gap-12 w-full items-center mt-12 md:mt-16">
 
-                                            {/* Left: Info — rút ngắn animation để giảm lag desktop */}
-                                            <div className="col-span-12 md:col-span-8 lg:col-span-7 xl:col-span-6 space-y-6 lg:space-y-8 animate-in fade-in slide-in-from-left-4 duration-300">
+                                            {/* Left: Info — bỏ animation nặng để scroll/carousel mượt */}
+                                            <div className="col-span-12 md:col-span-8 lg:col-span-7 xl:col-span-6 space-y-6 lg:space-y-8">
 
                                                 {/* Meta Badges */}
                                                 <div className="flex flex-wrap items-center gap-3">
@@ -338,16 +343,18 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                             {/* Right: 3D Tilt Poster Card */}
                                             {/* Scaled for both tablets and large screens */}
                                             <div className="col-span-12 md:col-span-4 lg:col-span-5 xl:col-span-6 hidden md:flex justify-end lg:justify-center xl:justify-end pr-0 lg:pr-8 xl:pr-16">
-                                                <div className="relative w-[240px] lg:w-[300px] xl:w-[360px] aspect-[2/3] rounded-[24px] lg:rounded-[32px] overflow-hidden ring-1 ring-white/10 group/poster transition-transform duration-300 ease-out hover:scale-[1.02] z-30 shrink-0 shadow-2xl">
+                                                <div className="relative w-[240px] lg:w-[300px] xl:w-[360px] aspect-[2/3] rounded-[24px] lg:rounded-[32px] overflow-hidden ring-1 ring-white/10 group/poster transition-transform duration-200 ease-out hover:scale-[1.02] z-30 shrink-0 shadow-2xl">
                                                     <Image
                                                         src={posterImg}
                                                         alt={decodeHtml(movie.name)}
                                                         fill
-                                                        className="object-cover transition-transform duration-300 ease-out group-hover/poster:scale-105"
+                                                        className="object-cover transition-transform duration-200 ease-out group-hover/poster:scale-105"
                                                         priority={index === 0}
+                                                        loading={index === 0 ? "eager" : "lazy"}
                                                         unoptimized
                                                         placeholder="blur"
                                                         blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
+                                                        decoding="async"
                                                     />
                                                 </div>
                                             </div>
