@@ -1,11 +1,12 @@
 "use client";
 
-import { Heart, Share2, Users, MessageSquare, Monitor, Moon, Zap, Flag } from "lucide-react";
+import { Heart, Share2, Monitor, Moon, Flag } from "lucide-react";
 import FavoriteButton from "./FavoriteButton";
 import WatchlistInlineButton from "./WatchlistInlineButton";
 import Image from "next/image";
 import { getImageUrl } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/context/ToastContext";
 
 interface WatchEngagementBarProps {
     movie: any;
@@ -13,6 +14,9 @@ interface WatchEngagementBarProps {
     toggleTheater?: () => void;
     isLightOff?: boolean;
     toggleLight?: () => void;
+    autoNext?: boolean;
+    onAutoNextToggle?: () => void;
+    currentEpisodeName?: string;
 }
 
 export default function WatchEngagementBar({
@@ -20,8 +24,12 @@ export default function WatchEngagementBar({
     isTheaterMode = false,
     toggleTheater,
     isLightOff = false,
-    toggleLight
+    toggleLight,
+    autoNext = true,
+    onAutoNextToggle,
+    currentEpisodeName,
 }: WatchEngagementBarProps) {
+    const { showToast } = useToast();
     const movieData = {
         movieId: movie._id || "",
         movieSlug: movie.slug,
@@ -34,9 +42,36 @@ export default function WatchEngagementBar({
         movieCategories: (movie.category as { name: string }[])?.map(c => c.name) || [],
     };
 
-    const handleShare = () => {
-        if (navigator.share) {
-            navigator.share({ title: movie.name, url: window.location.href });
+    const handleShare = async () => {
+        const url = window.location.href;
+        const title = `${movie.name}${currentEpisodeName ? ` - ${currentEpisodeName}` : ""}`;
+        try {
+            if (navigator.share) {
+                await navigator.share({ title, url });
+                showToast({ type: "success", title: "Đã chia sẻ" });
+            } else {
+                await navigator.clipboard.writeText(url);
+                showToast({ type: "success", title: "Đã sao chép link", description: url });
+            }
+        } catch (e) {
+            if ((e as Error).name !== "AbortError") {
+                try {
+                    await navigator.clipboard.writeText(url);
+                    showToast({ type: "success", title: "Đã sao chép link" });
+                } catch {
+                    showToast({ type: "error", title: "Không thể chia sẻ" });
+                }
+            }
+        }
+    };
+
+    const handleReportError = async () => {
+        const report = `Báo lỗi phim:\n- Phim: ${movie.name}\n- Tập: ${currentEpisodeName || "N/A"}\n- URL: ${window.location.href}`;
+        try {
+            await navigator.clipboard.writeText(report);
+            showToast({ type: "success", title: "Đã sao chép thông tin báo lỗi", description: "Dán vào form hoặc gửi email hỗ trợ" });
+        } catch {
+            showToast({ type: "error", title: "Không thể sao chép" });
         }
     };
 
@@ -65,18 +100,31 @@ export default function WatchEngagementBar({
                         className="!bg-transparent !border-0 !rounded-none !w-auto text-gray-400 hover:text-primary gap-1.5 px-0 text-xs font-semibold uppercase tracking-wide"
                     />
                     <div className="h-4 w-[1px] bg-white/10" />
-                    <div className="flex items-center gap-2 text-xs font-semibold text-gray-500">
-                        Chuyển tập
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold"
-                            style={{ background: 'rgba(251,191,36,0.15)', color: '#fbbf24', border: '1px solid rgba(251,191,36,0.3)' }}>
-                            ON
-                        </span>
-                    </div>
+                    {onAutoNextToggle && (
+                        <>
+                            <button
+                                onClick={onAutoNextToggle}
+                                className={cn(
+                                    "flex items-center gap-2 text-xs font-semibold transition-all",
+                                    autoNext ? "text-yellow-400" : "text-gray-500 hover:text-white"
+                                )}
+                            >
+                                Chuyển tập
+                                <span className={cn(
+                                    "px-1.5 py-0.5 rounded text-[10px] font-bold border",
+                                    autoNext ? "bg-yellow-400/15 text-yellow-400 border-yellow-400/30" : "bg-white/5 text-gray-500 border-white/10"
+                                )}>
+                                    {autoNext ? "ON" : "OFF"}
+                                </span>
+                            </button>
+                            <div className="h-4 w-[1px] bg-white/10" />
+                        </>
+                    )}
                 </div>
 
                 {/* Center Toggles */}
                 <div className="flex items-center shrink-0 gap-5">
-                    <button onClick={toggleTheater}
+                    {toggleTheater && <button onClick={toggleTheater}
                         className={cn("flex items-center gap-2 text-xs font-semibold transition-all", isTheaterMode ? "text-yellow-400" : "text-gray-400 hover:text-white")}>
                         <Monitor className="w-4 h-4" /> Rạp phim
                         <span className={cn("px-1.5 py-0.5 rounded text-[10px] font-bold border", isTheaterMode
@@ -84,8 +132,8 @@ export default function WatchEngagementBar({
                             : "bg-white/5 text-gray-500 border-white/10")}>
                             {isTheaterMode ? "ON" : "OFF"}
                         </span>
-                    </button>
-                    <button onClick={toggleLight}
+                    </button>}
+                    {toggleLight && <button onClick={toggleLight}
                         className={cn("flex items-center gap-2 text-xs font-semibold transition-all", isLightOff ? "text-yellow-400" : "text-gray-400 hover:text-white")}>
                         <Moon className="w-4 h-4" /> Đèn
                         <span className={cn("px-1.5 py-0.5 rounded text-[10px] font-bold border", isLightOff
@@ -93,11 +141,7 @@ export default function WatchEngagementBar({
                             : "bg-white/5 text-gray-500 border-white/10")}>
                             {isLightOff ? "OFF" : "ON"}
                         </span>
-                    </button>
-                    <button className="flex items-center gap-2 text-xs font-semibold text-gray-400 hover:text-white transition-all">
-                        <Zap className="w-4 h-4" /> Anti Lag
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-yellow-400/15 text-yellow-400 border border-yellow-400/30">ON</span>
-                    </button>
+                    </button>}
                 </div>
 
                 {/* Right */}
@@ -106,13 +150,9 @@ export default function WatchEngagementBar({
                         <Share2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
                         <span className="hidden sm:inline">Chia sẻ</span>
                     </button>
-                    <button type="button" className="hidden sm:flex items-center gap-2 hover:text-white transition-all text-xs font-semibold">
-                        <Users className="w-4 h-4" />
-                        <span className="hidden lg:inline">Xem chung</span>
-                    </button>
-                    <button type="button" className="hover:text-red-400 transition-all flex items-center gap-2">
+                    <button type="button" onClick={handleReportError} className="flex items-center gap-2 hover:text-red-400 transition-all text-xs font-semibold">
                         <Flag className="w-4 h-4" />
-                        <span className="hidden lg:inline text-xs font-semibold">Báo lỗi</span>
+                        <span className="hidden sm:inline">Báo lỗi</span>
                     </button>
                 </div>
             </div>

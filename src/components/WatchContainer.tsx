@@ -252,6 +252,9 @@ export default function WatchContainer({
                     toggleTheater={() => setIsTheaterMode(!isTheaterMode)}
                     isLightOff={isLightOff}
                     toggleLight={() => setIsLightOff(!isLightOff)}
+                    autoNext={autoNext}
+                    onAutoNextToggle={() => setAutoNext(!autoNext)}
+                    currentEpisodeName={activeEpisode ? displayEpisodeName(activeEpisode.name) : undefined}
                 />
             </div>
 
