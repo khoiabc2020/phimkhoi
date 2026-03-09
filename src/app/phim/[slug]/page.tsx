@@ -134,8 +134,9 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
                     />
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-[#0a0a0a]/20" />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/70 to-transparent" />
+                {/* Overlay đồng tông #020617 để hòa với nền toàn site, không chia cắt màu */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/85 to-[#020617]/30" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#020617] via-[#020617]/60 to-transparent" />
 
                 {/* Hero Info Content aligned left/bottom */}
                 <div className="relative z-10 w-full max-w-[1600px] mx-auto space-y-2 sm:space-y-4">
