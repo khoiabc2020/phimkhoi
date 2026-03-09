@@ -19,9 +19,12 @@ phimkhoi/
 │   └── services/           # API gọi backend
 ├── public/                 # Static web + APK
 ├── scripts/                # Cron (daily-sync), deploy hỗ trợ
+│   ├── windows/            # Script tiện cho Windows (deploy VPS, build APK)
+│   └── vps/                # Cấu hình Nginx + hướng dẫn domain
 ├── deploy_vps.sh           # Deploy lên VPS (git pull, build, PM2)
-├── ecosystem.config.cjs   # PM2 chạy Next.js standalone
-└── VPS                     # Ghi chú SSH / deploy
+├── ecosystem.config.cjs    # PM2 chạy Next.js standalone
+├── .eslintrc.cjs           # ESLint cấu hình (Next.js core-web-vitals)
+└── .rules/clean-code.mdc   # Quy tắc clean code dùng chung
 ```
 
 ## Chạy local
@@ -45,13 +48,49 @@ npx expo start
 
 Build APK: xem `mobile/README.md` (EAS hoặc local Gradle).
 
-## Deploy VPS
+## Deploy VPS (web)
 
-1. SSH vào server, clone repo vào thư mục (ví dụ `/home/ubuntu/phimkhoi`).
-2. Cấu hình `.env.local` (giống local).
-3. Chạy: `bash deploy_vps.sh` (sẽ `git pull`, `npm run build`, copy standalone + static, PM2 reload).
+1. SSH vào server, clone repo vào thư mục (mặc định script dùng `/home/bitnami/phimkhoi`).
+2. Cấu hình `.env.local` (giống local, có `MONGODB_URI`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `TMDB_API_KEY`, ...).
+3. Lần đầu trên VPS có thể chạy trực tiếp:
 
-PM2 chạy từ `.next/standalone` với `ecosystem.config.cjs`.
+```bash
+bash deploy_vps.sh
+```
+
+Hoặc trên Windows dùng script đã cấu hình sẵn SSH key + host:
+
+```bat
+scripts\windows\sync_vps.bat "deploy: any message"
+```
+
+Script này sẽ:
+
+- Tự `git add / commit / push` (nếu có thay đổi).
+- SSH vào VPS (`bitnami@13.212.99.28`, thư mục `/home/bitnami/phimkhoi` – chỉnh trong file nếu đổi server).
+- Chạy `bash deploy_vps.sh` (npm install + build + PM2 reload).
+
+PM2 đọc cấu hình từ `ecosystem.config.cjs` và chạy app từ `.next/standalone`.
+
+## Domain & HTTPS
+
+- File `scripts/vps/nginx-phimkhoi.conf`: virtual host cho `khoiphim.io.vn` (và alias).
+- File `scripts/vps/README-domain.md`: chi tiết:
+  - Cách tạo bản ghi A (`@` và `www` → `18.141.25.244`) trên ZoneDNS.
+  - Cách áp dụng cấu hình Nginx từ Windows:
+
+    ```bat
+    scripts\windows\setup_domain_vps.bat
+    ```
+
+  - Cách cài SSL với certbot:
+
+    ```bash
+    sudo apt install -y certbot python3-certbot-nginx
+    sudo certbot --nginx -d khoiphim.io.vn -d www.khoiphim.io.vn
+    ```
+
+Xem thêm chi tiết hoặc lỗi DNS/HTTPS trong `scripts/vps/README-domain.md`.
 
 ## Học tập
 
