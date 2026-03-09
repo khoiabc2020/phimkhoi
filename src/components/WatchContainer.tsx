@@ -54,11 +54,13 @@ export default function WatchContainer({
     const activeEpisode =
         currentServerEpisodes.find((ep: { slug?: string }) => ep.slug === currentEpisodeSlug) || initialCurrentEpisode;
 
-    // Nguồn C (NguonC) hay bị CORS / Referer block → dùng HLS proxy cho m3u8
+    // NguonC: mặc định phát bằng iframe (link_embed) để hạn chế lỗi CORS/Referer.
+    // Các server khác vẫn ưu tiên HLS qua hls-proxy nếu có link_m3u8.
+    const isNguoncServer = /nguonc/i.test(activeServerName);
     const effectiveM3u8 =
-        activeEpisode?.link_m3u8 && /nguonc/i.test(activeServerName)
+        !isNguoncServer && activeEpisode?.link_m3u8
             ? `/api/hls-proxy?url=${encodeURIComponent(activeEpisode.link_m3u8)}`
-            : activeEpisode?.link_m3u8;
+            : undefined;
 
     // Compute prev/next episode index
     const currentIdx = currentServerEpisodes.findIndex((ep: { slug?: string }) => ep.slug === currentEpisodeSlug);
