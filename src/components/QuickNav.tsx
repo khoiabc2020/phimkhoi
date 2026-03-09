@@ -7,43 +7,43 @@ const NAV_ITEMS = [
         label: "Hàn Quốc",
         sub: "Xem chủ đề",
         href: "/quoc-gia/han-quoc",
-        bg: "linear-gradient(135deg, #020617 0%, #1d4ed8 40%, #60a5fa 100%)",
+        bg: "#2563eb",
     },
     {
         label: "Trung Quốc",
         sub: "Xem chủ đề",
         href: "/quoc-gia/trung-quoc",
-        bg: "linear-gradient(135deg, #111827 0%, #b91c1c 38%, #fb7185 100%)",
+        bg: "#dc2626",
     },
     {
         label: "Phim Ngắn",
         sub: "Xem chủ đề",
         href: "/danh-sach/phim-le?year=2024",
-        bg: "linear-gradient(135deg, #020617 0%, #4f46e5 42%, #a855f7 100%)",
+        bg: "#a855f7",
     },
     {
         label: "Thuyết Minh",
         sub: "Xem chủ đề",
         href: "/danh-sach/thuyet-minh",
-        bg: "linear-gradient(135deg, #020617 0%, #7c3aed 40%, #f9a8d4 100%)",
+        bg: "#7c3aed",
     },
     {
         label: "Phim Mỹ",
         sub: "Xem chủ đề",
         href: "/quoc-gia/my",
-        bg: "linear-gradient(135deg, #020617 0%, #0ea5e9 40%, #4ade80 100%)",
+        bg: "#0ea5e9",
     },
     {
         label: "Thái Lan",
         sub: "Xem chủ đề",
         href: "/quoc-gia/thai-lan",
-        bg: "linear-gradient(135deg, #020617 0%, #f97316 40%, #facc15 100%)",
+        bg: "#f97316",
     },
     {
         label: "+1 chủ đề",
         sub: "Xem tất cả",
         href: "/thu-vien",
-        bg: "linear-gradient(135deg, #020617 0%, #4b5563 40%, #9ca3af 100%)",
+        bg: "#4b5563",
     },
 ];
 
@@ -61,14 +61,11 @@ export default function QuickNav() {
                         <Link
                             key={index}
                             href={item.href}
-                            className="quick-nav-card flex-[0_0_40%] sm:flex-[0_0_28%] md:flex-[0_0_22%] lg:flex-[0_0_16%] aspect-[1.5/1] md:aspect-[16/9] lg:aspect-[1.5/1] relative rounded-2xl overflow-hidden snap-start shadow-[0_12px_32px_rgba(0,0,0,0.6)] border border-white/5"
-                            style={{ background: item.bg, backgroundSize: "200% 200%" }}
+                            className="quick-nav-card flex-[0_0_40%] sm:flex-[0_0_28%] md:flex-[0_0_22%] lg:flex-[0_0_16%] aspect-[1.5/1] md:aspect-[16/9] lg:aspect-[1.5/1] relative rounded-2xl overflow-hidden snap-start border border-white/10"
+                            style={{ backgroundColor: item.bg }}
                         >
-                            {/* Soft overlay để chữ nổi rõ, cảm giác "blend" hơn với nền */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-black/22 via-black/8 to-transparent" />
-
                             {/* Content */}
-                            <div className="relative z-10 absolute inset-0 flex flex-col justify-end p-3 lg:p-3 md:p-3.5">
+                            <div className="absolute inset-0 flex flex-col justify-end p-3 lg:p-3 md:p-3.5">
                                 <p className="text-white font-semibold text-[14px] sm:text-[15px] lg:text-[16px] leading-tight line-clamp-1">
                                     {item.label}
                                 </p>
