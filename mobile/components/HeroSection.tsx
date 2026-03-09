@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
     View, Text, Dimensions, StyleSheet, Pressable,
     TouchableOpacity, Platform
@@ -17,7 +17,6 @@ import Animated, {
     useSharedValue,
     withTiming,
     Easing,
-    interpolate,
 } from 'react-native-reanimated';
 
 const { width, height: screenHeight } = Dimensions.get('window');
@@ -41,13 +40,43 @@ export default function HeroSection({ movies }: HeroSectionProps) {
     const router = useRouter();
     const { user, token, syncFavorites } = useAuth();
 
+    const tmdbImage = useCallback((path?: string, size: string = 'w780') => {
+        if (!path) return '';
+        const p = path.startsWith('/') ? path : `/${path}`;
+        return `https://image.tmdb.org/t/p/${size}${p}`;
+    }, []);
+
+    const getBackdropUri = useCallback((m: Movie) => {
+        const tmdb = (m as any).tmdbData;
+        if (tmdb?.backdrop_path) return tmdbImage(tmdb.backdrop_path, 'w780');
+        return getImageUrl(m.thumb_url || m.poster_url);
+    }, [tmdbImage]);
+
+    const getPosterUri = useCallback((m: Movie) => {
+        const tmdb = (m as any).tmdbData;
+        if (tmdb?.poster_path) return tmdbImage(tmdb.poster_path, 'w342');
+        return getImageUrl(m.poster_url || m.thumb_url);
+    }, [tmdbImage]);
+
     // Shared value for background cross-fade
     const bgOpacity = useSharedValue(1);
     // Keep previous and next backdrop URIs to cross-fade
     const [backdropUris, setBackdropUris] = useState<[string, string]>(() => {
-        const uri = movies?.length ? getImageUrl(movies[0].thumb_url || movies[0].poster_url) : '';
+        const uri = movies?.length ? getBackdropUri(movies[0]) : '';
         return [uri, uri];
     });
+
+    // Prefetch top images to avoid "black flash" + reduce perceived jank
+    useEffect(() => {
+        if (!movies?.length) return;
+        const top = movies.slice(0, 3);
+        const uris = top
+            .flatMap((m) => [getBackdropUri(m), getPosterUri(m)])
+            .filter(Boolean);
+        // expo-image supports prefetching for smoother first interactions
+        // @ts-expect-error - static method exists on expo-image Image
+        Image.prefetch?.(uris).catch?.(() => { });
+    }, [movies, getBackdropUri, getPosterUri]);
 
     // Load favorites — prefer user.favorites from API (already in memory) to avoid slow AsyncStorage loop
     useEffect(() => {
@@ -77,7 +106,7 @@ export default function HeroSection({ movies }: HeroSectionProps) {
     // Smooth cross-fade when active slide changes
     const handleSnapToItem = useCallback((index: number) => {
         setActiveIndex(index);
-        const newUri = getImageUrl(movies[index].thumb_url || movies[index].poster_url);
+        const newUri = getBackdropUri(movies[index]);
         // Fade out, swap URI, fade in
         bgOpacity.value = withTiming(0, { duration: 200, easing: Easing.out(Easing.quad) }, () => {
             'worklet';
@@ -142,8 +171,10 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                     source={{ uri: activeBackdropUri }}
                     style={StyleSheet.absoluteFill}
                     contentFit="cover"
-                    blurRadius={Platform.OS === 'ios' ? 12 : 2}
+                    // Blur is expensive on Android; keep it subtle like Netflix
+                    blurRadius={Platform.OS === 'ios' ? 8 : 0}
                     cachePolicy="memory-disk"
+                    transition={180}
                 />
                 <Animated.View style={[StyleSheet.absoluteFill, bgAnimStyle, { backgroundColor: 'rgba(11,13,24,0.72)' }]} />
                 <LinearGradient
@@ -159,9 +190,9 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                     height={CAROUSEL_HEIGHT}
                     data={movies}
                     loop={true}
-                    autoPlay={true}
+                    autoPlay={movies.length > 1}
                     autoPlayInterval={4500}
-                    scrollAnimationDuration={450}
+                    scrollAnimationDuration={380}
                     windowSize={5}
                     onSnapToItem={handleSnapToItem}
                     mode="parallax"
@@ -195,7 +226,14 @@ const HeroSlide = React.memo(function HeroSlide({
     movie, index, isFav, onToggleFav,
 }: { movie: Movie; index: number; isFav: boolean; onToggleFav: () => void }) {
     const router = useRouter();
-    const posterUri = getImageUrl(movie.poster_url || movie.thumb_url);
+    const posterUri = (() => {
+        const tmdb = (movie as any).tmdbData;
+        if (tmdb?.poster_path) {
+            const p = String(tmdb.poster_path);
+            return `https://image.tmdb.org/t/p/w342${p.startsWith('/') ? p : `/${p}`}`;
+        }
+        return getImageUrl(movie.poster_url || movie.thumb_url);
+    })();
     const rating = (movie as any).tmdbData?.vote_average
         ? Number((movie as any).tmdbData.vote_average).toFixed(1)
         : null;
@@ -212,6 +250,7 @@ const HeroSlide = React.memo(function HeroSlide({
                     contentFit="cover"
                     priority={index === 0 ? 'high' : 'normal'}
                     cachePolicy="memory-disk"
+                    transition={180}
                 />
 
                 {/* Gradient Nền */}
