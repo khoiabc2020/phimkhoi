@@ -207,8 +207,8 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                     })}
                 </div>
 
-                {/* Dot indicators — cách rõ với block dưới, transition mượt */}
-                <div className="flex justify-center gap-1.5 pb-5 pt-2">
+                {/* Dot indicators — nằm gọn trong hero, không tràn xuống Khám phá nhanh */}
+                <div className="flex justify-center gap-1.5 pb-4 pt-2 shrink-0">
                     {heroMovies.map((_, i) => (
                         <button
                             key={i}

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getHomeData } from '@/services/api';
 
+/** Trả toàn bộ dữ liệu trang chủ (đồng bộ web getHomeData). Dùng chung cache in-memory 20 phút → load nhanh cho app. */
 export async function GET() {
     try {
         const data = await getHomeData();

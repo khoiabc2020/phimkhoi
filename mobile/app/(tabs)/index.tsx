@@ -3,7 +3,7 @@ import {
   RefreshControl, Platform, StyleSheet, Dimensions
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useRouter, useFocusEffect } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,17 +15,14 @@ import HeroSection from '@/components/HeroSection';
 import MovieRow from '@/components/MovieRow';
 import ContinueWatchingRow from '@/components/ContinueWatchingRow';
 import LoadingState from '@/components/LoadingState';
-import {
-  getHomeData, getMoviesByCategory, getMoviesByCountry,
-  Movie, getMoviesList
-} from '@/services/api';
+import { Movie } from '@/services/api';
 import { CONFIG } from '@/constants/config';
 import { useAuth } from '@/context/auth';
 import { COLORS, SPACING, RADIUS, BLUR } from '@/constants/theme';
 import { HOT_KEYWORDS, getSectionHref } from '@/constants/sections';
 
 const { width } = Dimensions.get('window');
-const HOME_CACHE_KEY = 'home_screen_cache_v2';
+const HOME_CACHE_KEY = 'home_screen_cache_v3';
 
 const NAV_PILLS = [
   { label: 'Đề xuất', href: '/(tabs)/explore', active: true },
@@ -53,94 +50,61 @@ export default function HomeScreen() {
     trungQuoc: Movie[];
     hanhDong: Movie[];
     tinhCam: Movie[];
-    sapChieu: Movie[];
+    phimSapChieu: Movie[];
   }>({
     heroMovies: [], phimMoi: [], phimLe: [], phimBo: [], hoatHinh: [], tvShows: [],
-    phimChieuRap: [], hanQuoc: [], trungQuoc: [], hanhDong: [], tinhCam: [], sapChieu: []
+    phimChieuRap: [], hanQuoc: [], trungQuoc: [], hanhDong: [], tinhCam: [], phimSapChieu: []
   });
 
+  /** Một request: api/mobile/home trả đủ tất cả section (đồng bộ web). Bỏ 6 request thừa → load nhanh. */
   const fetchData = useCallback(async () => {
     try {
-      const [homeBasic, heroTrendingRes] = await Promise.all([
-        getHomeData(),
-        fetch(`${CONFIG.BACKEND_URL}/api/mobile/hero-trending`)
-          .then(r => r.ok ? r.json() : null)
-          .catch(() => null),
+      const [homeRes, heroRes] = await Promise.all([
+        fetch(`${CONFIG.BACKEND_URL}/api/mobile/home`),
+        fetch(`${CONFIG.BACKEND_URL}/api/mobile/hero-trending`).then(r => r.ok ? r.json() : null).catch(() => null),
       ]);
 
+      const homeJson = homeRes.ok ? await homeRes.json() : null;
+      const home = homeJson?.data || null;
+
       let finalHero: Movie[] = [];
-      if (heroTrendingRes?.movies?.length > 0) {
-        finalHero = heroTrendingRes.movies.slice(0, 12);
-      } else {
+      if (heroRes?.movies?.length > 0) {
+        finalHero = heroRes.movies.slice(0, 8);
+      } else if (home) {
         const heroMixed: Movie[] = [];
-        const len = Math.max(homeBasic.phimBo.length, homeBasic.phimLe.length);
+        const len = Math.max((home.phimBo || []).length, (home.phimLe || []).length);
         for (let i = 0; i < len; i++) {
-          if (homeBasic.phimBo[i]) heroMixed.push(homeBasic.phimBo[i]);
-          if (homeBasic.phimLe[i]) heroMixed.push(homeBasic.phimLe[i]);
+          if (home.phimBo?.[i]) heroMixed.push(home.phimBo[i]);
+          if (home.phimLe?.[i]) heroMixed.push(home.phimLe[i]);
         }
         finalHero = heroMixed.slice(0, 8);
       }
 
-      if (!homeBasic) {
-        setLoading(false);
-        setRefreshing(false);
-        return;
-      }
-
-      const baseSnapshot = {
-        heroMovies: finalHero,
-        phimMoi: (homeBasic.phimMoi || []).slice(0, 30),
-        phimLe: (homeBasic.phimLe || []).slice(0, 30),
-        phimBo: (homeBasic.phimBo || []).slice(0, 30),
-        hoatHinh: (homeBasic.hoatHinh || []).slice(0, 30),
-        tvShows: (homeBasic.tvShows || []).slice(0, 30),
-        phimChieuRap: [] as Movie[],
-        hanQuoc: [] as Movie[],
-        trungQuoc: [] as Movie[],
-        hanhDong: [] as Movie[],
-        tinhCam: [] as Movie[],
-        sapChieu: [] as Movie[],
-      };
-
-      setData(prev => ({
-        ...prev,
-        ...baseSnapshot,
-      }));
-      setLoading(false);
-      setRefreshing(false);
-
-      const [chieuRapRes, hanQuocRes, trungQuocRes, hanhDongRes, tinhCamRes, sapChieuRes] = await Promise.all([
-        getMoviesByCategory('phim-chieu-rap', 1, 12),
-        getMoviesByCountry('han-quoc', 1, 10),
-        getMoviesByCountry('trung-quoc', 1, 10),
-        getMoviesByCategory('hanh-dong', 1, 10),
-        getMoviesByCategory('tinh-cam', 1, 10),
-        getMoviesList('phim-sap-chieu', 1, 10)
-      ]);
+      const slice12 = (arr: Movie[] | undefined) => (arr || []).slice(0, 12);
 
       const fullSnapshot = {
-        ...baseSnapshot,
-        phimChieuRap: (chieuRapRes?.items || []).slice(0, 24),
-        hanQuoc: (hanQuocRes?.items || []).slice(0, 24),
-        trungQuoc: (trungQuocRes?.items || []).slice(0, 24),
-        hanhDong: (hanhDongRes?.items || []).slice(0, 24),
-        tinhCam: (tinhCamRes?.items || []).slice(0, 24),
-        sapChieu: (sapChieuRes?.items || []).slice(0, 24),
+        heroMovies: finalHero,
+        phimMoi: slice12(home?.phimMoi),
+        phimLe: slice12(home?.phimLe),
+        phimBo: slice12(home?.phimBo),
+        hoatHinh: slice12(home?.hoatHinh),
+        tvShows: slice12(home?.tvShows),
+        phimChieuRap: slice12(home?.phimChieuRap),
+        phimSapChieu: slice12(home?.phimSapChieu),
+        hanQuoc: slice12(home?.hanQuoc),
+        trungQuoc: slice12(home?.trungQuoc),
+        hanhDong: slice12(home?.hanhDong),
+        tinhCam: slice12(home?.tinhCam),
       };
 
-      setData(prev => ({
-        ...prev,
-        ...fullSnapshot,
-      }));
-
+      setData(prev => ({ ...prev, ...fullSnapshot }));
       try {
         await AsyncStorage.setItem(HOME_CACHE_KEY, JSON.stringify(fullSnapshot));
       } catch (e) {
-        console.warn('Cache home screen failed', e);
+        console.warn('Cache home failed', e);
       }
-
     } catch (error) {
-      console.error(error);
+      console.error('Home fetch error', error);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -155,6 +119,7 @@ export default function HomeScreen() {
         const cached = await AsyncStorage.getItem(HOME_CACHE_KEY);
         if (cached && isMounted) {
           const parsed = JSON.parse(cached);
+          if (parsed.sapChieu && !parsed.phimSapChieu) parsed.phimSapChieu = parsed.sapChieu;
           setData(prev => ({ ...prev, ...parsed }));
           setLoading(false);
         }
@@ -182,13 +147,6 @@ export default function HomeScreen() {
     setRefreshing(true);
     fetchData();
   }, [fetchData]);
-
-  // Unconditional memoization of sliced arrays to prevent Rules of Hooks violations
-  const slicedPhimMoi = useMemo(() => data.phimMoi.slice(0, 12), [data.phimMoi]);
-  const slicedPhimBo = useMemo(() => data.phimBo.slice(0, 12), [data.phimBo]);
-  const slicedPhimLe = useMemo(() => data.phimLe.slice(0, 12), [data.phimLe]);
-  const slicedHoatHinh = useMemo(() => data.hoatHinh.slice(0, 12), [data.hoatHinh]);
-  const slicedTvShows = useMemo(() => data.tvShows.slice(0, 12), [data.tvShows]);
 
   return (
     <View style={styles.container}>
@@ -328,37 +286,66 @@ export default function HomeScreen() {
             </View>
           ) : (
             <View style={styles.movieRows}>
-              {data.phimChieuRap.length > 0 && (
-                <MovieRow title="Phim Chiếu Rạp Mới" movies={data.phimChieuRap} slug="phim-chieu-rap" type="category" />
+              {/* Đề xuất cho bạn — đồng bộ web */}
+              {(data.phimChieuRap.length > 0 || data.phimMoi.length > 0) && (
+                <View style={styles.sectionBlock}>
+                  <View style={styles.sectionTitleRow}>
+                    <View style={styles.accentBar} />
+                    <Text style={styles.sectionTitleText}>Đề xuất cho bạn</Text>
+                  </View>
+                  {data.phimChieuRap.length > 0 && (
+                    <MovieRow title="Phim Chiếu Rạp Mới" movies={data.phimChieuRap} slug="phim-chieu-rap" type="category" />
+                  )}
+                  {data.phimMoi.length > 0 && (
+                    <MovieRow title="Phim Mới Cập Nhật" movies={data.phimMoi} slug="phim-moi-cap-nhat" type="list" />
+                  )}
+                </View>
               )}
 
-              {data.phimMoi.length > 0 && (
-                <MovieRow title="Phim Mới Cập Nhật" movies={slicedPhimMoi} slug="phim-moi-cap-nhat" type="list" />
+              {/* Phim theo quốc gia */}
+              {(data.hanQuoc.length > 0 || data.trungQuoc.length > 0) && (
+                <View style={styles.sectionBlock}>
+                  <View style={styles.sectionTitleRow}>
+                    <View style={styles.accentBar} />
+                    <Text style={styles.sectionTitleText}>Phim theo quốc gia</Text>
+                  </View>
+                  {data.hanQuoc.length > 0 && (
+                    <MovieRow title="Hàn Quốc" movies={data.hanQuoc} slug="han-quoc" type="country" />
+                  )}
+                  {data.trungQuoc.length > 0 && (
+                    <MovieRow title="Trung Quốc" movies={data.trungQuoc} slug="trung-quoc" type="country" />
+                  )}
+                </View>
               )}
 
-              <MovieRow title="Phim Bộ Mới Nhất" movies={slicedPhimBo} slug="phim-bo" type="list" />
-              <MovieRow title="Phim Lẻ Đặc Sắc" movies={slicedPhimLe} slug="phim-le" type="list" />
+              {/* Mới cập nhật */}
+              <View style={styles.sectionBlock}>
+                <View style={styles.sectionTitleRow}>
+                  <View style={styles.accentBar} />
+                  <Text style={styles.sectionTitleText}>Mới cập nhật</Text>
+                </View>
+                {data.phimSapChieu.length > 0 && (
+                  <MovieRow title="Phim Sắp Chiếu" movies={data.phimSapChieu} slug="phim-sap-chieu" type="list" />
+                )}
+                <MovieRow title="Phim Lẻ Mới" movies={data.phimLe} slug="phim-le" type="list" />
+                <MovieRow title="Phim Bộ Mới" movies={data.phimBo} slug="phim-bo" type="list" />
+              </View>
 
-              {data.hanQuoc.length > 0 && (
-                <MovieRow title="Phim Hàn Quốc Hot" movies={data.hanQuoc} slug="han-quoc" type="country" />
-              )}
-              {data.trungQuoc.length > 0 && (
-                <MovieRow title="Phim Trung Quốc Hot" movies={data.trungQuoc} slug="trung-quoc" type="country" />
-              )}
-
-              {data.hanhDong.length > 0 && (
-                <MovieRow title="Phim Hành Động Kịch Tính" movies={data.hanhDong} slug="hanh-dong" type="category" />
-              )}
-              {data.tinhCam.length > 0 && (
-                <MovieRow title="Phim Tình Cảm Lãng Mạn" movies={data.tinhCam} slug="tinh-cam" type="category" />
-              )}
-
-              <MovieRow title="Hoạt Hình" movies={slicedHoatHinh} slug="hoat-hinh" type="list" />
-              <MovieRow title="TV Shows" movies={slicedTvShows} slug="tv-shows" type="list" />
-
-              {data.sapChieu.length > 0 && (
-                <MovieRow title="Phim Sắp Chiếu" movies={data.sapChieu} slug="phim-sap-chieu" type="list" />
-              )}
+              {/* Thể loại */}
+              <View style={styles.sectionBlock}>
+                <View style={styles.sectionTitleRow}>
+                  <View style={styles.accentBar} />
+                  <Text style={styles.sectionTitleText}>Thể loại</Text>
+                </View>
+                {data.hanhDong.length > 0 && (
+                  <MovieRow title="Hành Động" movies={data.hanhDong} slug="hanh-dong" type="category" />
+                )}
+                {data.tinhCam.length > 0 && (
+                  <MovieRow title="Tình Cảm" movies={data.tinhCam} slug="tinh-cam" type="category" />
+                )}
+                <MovieRow title="Hoạt Hình" movies={data.hoatHinh} slug="hoat-hinh" type="list" />
+                <MovieRow title="TV Shows" movies={data.tvShows} slug="tv-shows" type="list" />
+              </View>
             </View>
           )
         }
@@ -434,4 +421,8 @@ const styles = StyleSheet.create({
   catText: { color: 'rgba(255,255,255,0.8)', fontSize: 13, fontWeight: '500' },
 
   movieRows: { gap: 10 },
+  sectionBlock: { marginBottom: 24 },
+  sectionTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8, paddingHorizontal: 16 },
+  accentBar: { width: 3, height: 18, borderRadius: 2, backgroundColor: '#fbbf24' },
+  sectionTitleText: { color: COLORS.textPrimary, fontSize: 16, fontWeight: '700' },
 });
