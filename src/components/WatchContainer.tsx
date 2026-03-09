@@ -91,22 +91,13 @@ export default function WatchContainer({
                 />
             )}
 
-            {/* Glow Aura */}
-            <div
-                className="absolute -inset-8 pointer-events-none z-0"
-                style={{
-                    background: "radial-gradient(ellipse at center, #FBBF240F 0%, transparent 65%)",
-                    filter: "blur(20px)",
-                }}
-            />
-
             {/* Placeholder when theater mode on */}
             {isTheaterMode && <div className="w-full aspect-video hidden md:block" />}
 
             {/* Theater Mode Container */}
             <div
                 className={cn(
-                    "transition-all duration-500",
+                    "transition-all duration-300",
                     isTheaterMode
                         ? "fixed top-[70px] md:top-[80px] left-0 right-0 bottom-0 z-[100] bg-[#080b12] overflow-y-auto w-full px-4 md:px-10 lg:px-20 py-6 pb-32"
                         : "relative z-10 w-full"

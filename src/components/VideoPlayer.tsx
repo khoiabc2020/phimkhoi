@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { addWatchHistory } from "@/app/actions/watchHistory";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -94,7 +94,8 @@ export default function VideoPlayer({
     useEffect(() => { nextEpisodeUrlRef.current = nextEpisodeUrl; }, [nextEpisodeUrl]);
 
     const streamUrl = m3u8 || url;
-    const shouldUseArtPlayer = isDirectStream(streamUrl);
+    const [fallbackIframe, setFallbackIframe] = useState(false);
+    const shouldUseArtPlayer = !fallbackIframe && isDirectStream(streamUrl);
 
     // Realtime watch history save — throttled every 15s
     const saveHistory = useCallback(async (currentTime: number, duration: number) => {
@@ -345,6 +346,25 @@ export default function VideoPlayer({
                 art.on("video:ended", () => {
                     handleVideoEnd();
                 });
+
+                // Nếu player báo lỗi (nguồn chặn, HLS lỗi, CORS...), fallback sang iframe embed gốc
+                art.on("error", () => {
+                    setFallbackIframe(true);
+                });
+                art.on("video:error", () => {
+                    setFallbackIframe(true);
+                });
+
+                // Thêm một timeout an toàn: nếu sau 10s vẫn không play được thì cũng fallback
+                setTimeout(() => {
+                    try {
+                        if (!art || !art.duration || Number.isNaN(art.duration)) {
+                            setFallbackIframe(true);
+                        }
+                    } catch {
+                        setFallbackIframe(true);
+                    }
+                }, 10000);
 
                 // Save on pause/destroy
                 const forceHistorySave = () => {
