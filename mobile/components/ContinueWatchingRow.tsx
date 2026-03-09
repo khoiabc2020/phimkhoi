@@ -1,8 +1,9 @@
 import React, { memo } from 'react';
 import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { Image } from 'expo-image';
+import { Ionicons } from '@expo/vector-icons';
 import { getImageUrl } from '@/services/api';
 
 const { width } = Dimensions.get('window');
@@ -33,6 +34,7 @@ interface ContinueWatchingRowProps {
 }
 
 const ContinueWatchingRow = memo(({ title, items }: ContinueWatchingRowProps) => {
+    const router = useRouter();
     if (!items || items.length === 0) return null;
 
     return (
@@ -43,6 +45,10 @@ const ContinueWatchingRow = memo(({ title, items }: ContinueWatchingRowProps) =>
                     <View style={styles.accentBar} />
                     <Text style={styles.title}>{title}</Text>
                 </View>
+                <Pressable onPress={() => router.push('/history' as any)} style={styles.seeAllBtn}>
+                    <Text style={styles.seeAllText}>Xem tất cả</Text>
+                    <Ionicons name="chevron-forward" size={16} color="#E6BF5C" />
+                </Pressable>
             </View>
 
             {/* Movie List - FlashList for better performance */}
@@ -82,7 +88,10 @@ const ContinueWatchingRow = memo(({ title, items }: ContinueWatchingRowProps) =>
                                 {/* Text xuống dưới card — không che mặt nhân vật */}
                                 <View style={styles.cardInfo}>
                                     <Text style={styles.movieName} numberOfLines={1}>{name}</Text>
-                                    <Text style={styles.episodeText}>{linkLabel}</Text>
+                                    <View style={styles.episodeRow}>
+                                        <Text style={styles.episodeText}>{linkLabel}</Text>
+                                        <Text style={styles.progressText}>{progress}%</Text>
+                                    </View>
                                 </View>
                             </Pressable>
                         </Link>
@@ -106,8 +115,21 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
         paddingHorizontal: 16,
         marginBottom: 12,
+    },
+    seeAllBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+        paddingVertical: 6,
+        paddingHorizontal: 10,
+    },
+    seeAllText: {
+        color: '#E6BF5C',
+        fontSize: 13,
+        fontWeight: '600',
     },
     titleGroup: {
         flexDirection: 'row',
@@ -202,6 +224,17 @@ const styles = StyleSheet.create({
         color: 'rgba(255,255,255,0.5)',
         fontSize: 12,
         marginTop: 2,
+    },
+    episodeRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginTop: 4,
+    },
+    progressText: {
+        color: 'rgba(230,191,92,0.9)',
+        fontSize: 11,
+        fontWeight: '600',
     },
 });
 

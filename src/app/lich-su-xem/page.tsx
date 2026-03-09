@@ -46,12 +46,11 @@ export default async function WatchHistoryPage() {
     const history = historyResult.success && historyResult.data ? historyResult.data : [];
 
     return (
-        <div className="min-h-screen bg-black pt-28 pb-12 relative overflow-hidden">
-            {/* Background Gradients */}
-            <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-900/10 blur-[120px] rounded-full mix-blend-screen" />
-                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-900/10 blur-[120px] rounded-full mix-blend-screen" />
-            </div>
+        <div className="min-h-screen pt-28 pb-12 relative overflow-hidden">
+            {/* Background nhẹ đồng bộ với toàn site */}
+            <div className="fixed inset-0 pointer-events-none z-0 bg-gradient-to-b from-[#020617]/90 via-[#020617]/50 to-[#020617]" />
+            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-purple-900/10 blur-[100px] rounded-full mix-blend-screen pointer-events-none z-0" />
+            <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-900/10 blur-[100px] rounded-full mix-blend-screen pointer-events-none z-0" />
 
             <div className="container mx-auto px-4 md:px-12 relative z-10">
                 {/* Header */}

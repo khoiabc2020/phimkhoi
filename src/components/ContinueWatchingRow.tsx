@@ -93,36 +93,43 @@ function ContinueWatchingRowInner() {
 
     return (
         <div className="space-y-4 group relative py-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-3">
                 <h2 className="text-lg md:text-xl font-[800] text-white flex items-center gap-2">
                     Xem tiếp của bạn
-                    <ChevronRight className="w-4 h-4 text-gray-500" />
+                    <ChevronRight className="w-4 h-4 text-gray-500 shrink-0" />
                 </h2>
+                <Link
+                    href="/lich-su-xem"
+                    className="text-sm font-semibold text-[#fbbf24] hover:text-[#fcd34d] whitespace-nowrap flex items-center gap-1"
+                >
+                    Lịch sử
+                    <ChevronRight className="w-3.5 h-3.5" />
+                </Link>
             </div>
 
             <div className="relative group/row">
-                {/* Left Arrow */}
+                {/* Left Arrow - visible on touch (mobile) for easier scroll */}
                 <button
                     onClick={() => scroll("left")}
-                    className="absolute left-0 top-0 bottom-0 z-40 bg-gradient-to-r from-[#020617]/80 to-transparent w-12 flex items-center justify-start pl-2 opacity-0 group-hover/row:opacity-100 transition-all duration-300 pointer-events-none group-hover/row:pointer-events-auto"
+                    className="absolute left-0 top-0 bottom-0 z-40 bg-gradient-to-r from-[#020617]/80 to-transparent w-10 md:w-12 flex items-center justify-start pl-1 md:pl-2 opacity-60 md:opacity-0 md:group-hover/row:opacity-100 transition-all duration-300 pointer-events-auto md:pointer-events-none md:group-hover/row:pointer-events-auto"
                 >
-                    <ChevronLeft className="w-8 h-8 text-white hover:text-[#fbbf24] transition-colors drop-shadow-lg" />
+                    <ChevronLeft className="w-7 h-7 md:w-8 md:h-8 text-white hover:text-[#fbbf24] transition-colors drop-shadow-lg" />
                 </button>
 
                 {/* Scroll Container */}
                 <div
                     ref={rowRef}
-                    className="flex gap-4 overflow-x-auto pb-4 pt-2 no-scrollbar snap-x"
+                    className="flex gap-3 md:gap-4 overflow-x-auto pb-4 pt-2 no-scrollbar snap-x px-1"
                     style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
                     {movies.map((item) => (
-                        <div key={item._id} className="relative group/card flex-[0_0_200px] md:flex-[0_0_240px] snap-start">
+                        <div key={item._id} className="relative group/card flex-[0_0_160px] sm:flex-[0_0_200px] md:flex-[0_0_240px] snap-start">
                             <Link
                                 href={`/xem-phim/${item.movieSlug}/${item.episodeSlug}`}
                                 className="block w-full"
                             >
                                 {/* Card Image - ảnh đầy đủ không bị che */}
-                                <div className="relative aspect-video rounded-lg overflow-hidden bg-white/5 border border-white/10 group-hover/card:border-[#fbbf24]/50 transition-all duration-300">
+                                <div className="relative aspect-video rounded-xl overflow-hidden bg-white/5 border border-white/10 group-hover/card:border-[#fbbf24]/50 transition-all duration-300">
                                     <Image
                                         src={getImageUrl(item.moviePoster)}
                                         alt={item.movieName}
@@ -130,20 +137,20 @@ function ContinueWatchingRowInner() {
                                         className="object-cover group-hover/card:scale-105 transition-transform duration-500"
                                     />
 
-                                    {/* Play button on hover only */}
-                                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
-                                        <div className="w-10 h-10 rounded-full bg-[#fbbf24] flex items-center justify-center shadow-[0_0_15px_#fbbf24] transform scale-0 group-hover/card:scale-100 transition-transform duration-300 delay-75">
+                                    {/* Play button on hover; on mobile always show subtle */}
+                                    <div className="absolute inset-0 bg-black/20 md:bg-black/30 md:opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
+                                        <div className="w-10 h-10 rounded-full bg-[#fbbf24] flex items-center justify-center shadow-[0_0_15px_#fbbf24] scale-90 md:scale-0 group-hover/card:scale-100 transition-transform duration-300 delay-75">
                                             <Play className="w-5 h-5 text-black fill-black ml-0.5" />
                                         </div>
                                     </div>
 
-                                    {/* Nút X xóa */}
+                                    {/* Nút X xóa — luôn hiện trên mobile để chạm được, desktop hover */}
                                     <button
                                         onClick={(e) => handleRemove(e, item._id)}
-                                        className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 hover:bg-red-600 backdrop-blur-md flex items-center justify-center text-white/70 hover:text-white transition-colors opacity-0 group-hover/card:opacity-100 z-30"
+                                        className="absolute top-1.5 right-1.5 md:top-2 md:right-2 w-8 h-8 md:w-6 md:h-6 rounded-full bg-black/70 hover:bg-red-600 backdrop-blur-md flex items-center justify-center text-white/90 hover:text-white transition-colors opacity-100 md:opacity-0 md:group-hover/card:opacity-100 z-30 touch-manipulation"
                                         title="Xóa khỏi lịch sử"
                                     >
-                                        <X className="w-3 h-3" />
+                                        <X className="w-4 h-4 md:w-3 md:h-3" />
                                     </button>
 
                                     {/* Progress Bar - chỉ 1 dải mỏng đáy ảnh */}
@@ -161,8 +168,8 @@ function ContinueWatchingRowInner() {
                                         {item.movieName}
                                     </h3>
                                     <div className="flex items-center justify-between mt-0.5">
-                                        <span className="text-white/50 text-xs">{item.episodeName || "Tiếp tục xem"}</span>
-                                        <span className="text-[#fbbf24]/70 text-[10px]">{item.progress}%</span>
+                                        <span className="text-white/50 text-xs truncate mr-1">{item.episodeName || "Tiếp tục xem"}</span>
+                                        <span className="text-[#fbbf24]/80 text-[10px] font-medium shrink-0">{item.progress}%</span>
                                     </div>
                                 </div>
                             </Link>
@@ -170,12 +177,12 @@ function ContinueWatchingRowInner() {
                     ))}
                 </div>
 
-                {/* Right Arrow */}
+                {/* Right Arrow - visible on touch (mobile) */}
                 <button
                     onClick={() => scroll("right")}
-                    className="absolute right-0 top-0 bottom-0 z-40 bg-gradient-to-l from-[#020617]/80 to-transparent w-12 flex items-center justify-end pr-2 opacity-0 group-hover/row:opacity-100 transition-all duration-300 pointer-events-none group-hover/row:pointer-events-auto"
+                    className="absolute right-0 top-0 bottom-0 z-40 bg-gradient-to-l from-[#020617]/80 to-transparent w-10 md:w-12 flex items-center justify-end pr-1 md:pr-2 opacity-60 md:opacity-0 md:group-hover/row:opacity-100 transition-all duration-300 pointer-events-auto md:pointer-events-none md:group-hover/row:pointer-events-auto"
                 >
-                    <ChevronRight className="w-8 h-8 text-white hover:text-[#fbbf24] transition-colors" />
+                    <ChevronRight className="w-7 h-7 md:w-8 md:h-8 text-white hover:text-[#fbbf24] transition-colors" />
                 </button>
             </div>
         </div>

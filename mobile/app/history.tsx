@@ -135,7 +135,7 @@ export default function HistoryScreen() {
                             return (
                                 <Pressable
                                     style={styles.card}
-                                    onPress={() => router.push(`/movie/${item.slug}` as any)}
+                                    onPress={() => router.push(`/player/${item.slug}?ep=${item.episode || item.episodeName || ''}` as any)}
                                 >
                                     {/* Ảnh bên trái */}
                                     <View style={styles.posterContainer}>
@@ -180,9 +180,9 @@ export default function HistoryScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#0B0D12' },
+    container: { flex: 1, backgroundColor: '#111827' },
     safeArea: { flex: 1 },
-    centered: { flex: 1, backgroundColor: '#0B0D12', justifyContent: 'center', alignItems: 'center', gap: 12 },
+    centered: { flex: 1, backgroundColor: '#111827', justifyContent: 'center', alignItems: 'center', gap: 12 },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -279,6 +279,6 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 10 },
-    emptyText: { color: 'rgba(255,255,255,0.6)', fontSize: 15, fontWeight: '500' },
-    emptySubText: { color: 'rgba(255,255,255,0.35)', fontSize: 13 },
+    emptyText: { color: 'rgba(255,255,255,0.7)', fontSize: 15, fontWeight: '500' },
+    emptySubText: { color: 'rgba(255,255,255,0.45)', fontSize: 13 },
 });
