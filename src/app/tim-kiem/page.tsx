@@ -35,7 +35,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     const hasMovies = filteredMovies.length > 0;
 
     return (
-        <main className="min-h-screen pb-20 bg-[#0a0a0a]">
+        <main className="min-h-screen pb-20">
             <div className="container mx-auto px-4 pt-24">
                 <div className="mb-6">
                     <h1 className="text-lg md:text-xl font-bold text-white flex items-center gap-2">

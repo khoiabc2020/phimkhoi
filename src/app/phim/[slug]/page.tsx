@@ -113,7 +113,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     };
 
     return (
-        <main className="min-h-screen pb-20 bg-[#0a0a0a]">
+        <main className="min-h-screen pb-20 bg-transparent">
             {/* JSON-LD for SEO */}
             <script
                 type="application/ld+json"

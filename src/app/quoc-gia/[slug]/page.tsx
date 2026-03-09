@@ -26,7 +26,7 @@ export default async function CountryPage({ params, searchParams }: { params: Pr
     const { items, pagination } = data;
 
     return (
-        <main className="min-h-screen pb-20 bg-[#0a0a0a]">
+        <main className="min-h-screen pb-20">
             <div className="pt-24 container mx-auto px-4 md:px-12">
                 <div className="mb-8">
                     <h1 className="text-xl md:text-2xl font-bold text-white capitalize flex items-center gap-2">
