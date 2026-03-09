@@ -54,7 +54,7 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
                         {/* Left Arrow */}
                         <button
                             onClick={() => scroll("left")}
-                            className="absolute left-0 top-0 bottom-0 z-40 w-12 bg-gradient-to-r from-black via-black/50 to-transparent flex items-center justify-center opacity-0 group-hover/row:opacity-100 transition-all duration-300 -translate-x-full group-hover/row:translate-x-0"
+                            className="absolute left-0 top-0 bottom-0 z-40 w-12 bg-gradient-to-r from-[#020617]/80 via-transparent to-transparent flex items-center justify-center opacity-0 group-hover/row:opacity-100 transition-all duration-300 -translate-x-full group-hover/row:translate-x-0"
                         >
                             <ChevronLeft className="w-8 h-8 text-white hover:text-[#fbbf24] transition-colors" />
                         </button>
@@ -74,7 +74,7 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
                         {/* Right Arrow */}
                         <button
                             onClick={() => scroll("right")}
-                            className="absolute right-0 top-0 bottom-0 z-40 w-12 bg-gradient-to-l from-black via-black/50 to-transparent flex items-center justify-center opacity-0 group-hover/row:opacity-100 transition-all duration-300 translate-x-full group-hover/row:translate-x-0"
+                            className="absolute right-0 top-0 bottom-0 z-40 w-12 bg-gradient-to-l from-[#020617]/80 via-transparent to-transparent flex items-center justify-center opacity-0 group-hover/row:opacity-100 transition-all duration-300 translate-x-full group-hover/row:translate-x-0"
                         >
                             <ChevronRight className="w-8 h-8 text-white hover:text-[#fbbf24] transition-colors" />
                         </button>
@@ -88,7 +88,7 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
     return (
         <section className="py-4">
             <div className="container mx-auto px-4 md:px-12">
-                <div className="space-y-4 rounded-3xl bg-[#020617]/95 border border-white/5 shadow-[0_18px_45px_rgba(0,0,0,0.75)] overflow-hidden">
+                <div className="space-y-4 rounded-3xl bg-[#020617]/80 border border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.55)] overflow-hidden">
                     <div className="flex items-center justify-between px-4 md:px-6 pt-4">
                 <h2 className="text-[15px] font-bold text-white flex items-center gap-2 uppercase tracking-wide">
                     <span className="w-1 h-5 md:h-6 bg-gradient-to-t from-[#fbbf24] to-yellow-200 rounded-sm"></span>
@@ -109,7 +109,7 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
                         {/* Left Arrow */}
                         <button
                             onClick={() => scroll("left")}
-                            className="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-9 h-9 flex items-center justify-center rounded-full bg-black/70 border border-white/15 text-white hover:bg-[#F4C84A] hover:border-[#F4C84A] hover:text-black opacity-0 group-hover/row:opacity-100 transition-all duration-200 hover:scale-110 pointer-events-none group-hover/row:pointer-events-auto shadow-lg"
+                            className="absolute left-4 top-1/2 -translate-y-1/2 z-40 w-9 h-9 flex items-center justify-center rounded-full bg-[#020617]/90 border border-white/20 text-white hover:bg-[#F4C84A] hover:border-[#F4C84A] hover:text-black opacity-0 group-hover/row:opacity-100 transition-all duration-200 hover:scale-110 pointer-events-none group-hover/row:pointer-events-auto shadow-lg"
                         >
                             <ChevronLeft className="w-5 h-5" />
                         </button>
@@ -130,7 +130,7 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
                         {/* Right Arrow */}
                         <button
                             onClick={() => scroll("right")}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-9 h-9 flex items-center justify-center rounded-full bg-black/70 border border-white/15 text-white hover:bg-[#F4C84A] hover:border-[#F4C84A] hover:text-black opacity-0 group-hover/row:opacity-100 transition-all duration-200 hover:scale-110 pointer-events-none group-hover/row:pointer-events-auto shadow-lg"
+                            className="absolute right-4 top-1/2 -translate-y-1/2 z-40 w-9 h-9 flex items-center justify-center rounded-full bg-[#020617]/90 border border-white/20 text-white hover:bg-[#F4C84A] hover:border-[#F4C84A] hover:text-black opacity-0 group-hover/row:opacity-100 transition-all duration-200 hover:scale-110 pointer-events-none group-hover/row:pointer-events-auto shadow-lg"
                         >
                             <ChevronRight className="w-5 h-5" />
                         </button>

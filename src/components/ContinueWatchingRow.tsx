@@ -104,7 +104,7 @@ function ContinueWatchingRowInner() {
                 {/* Left Arrow */}
                 <button
                     onClick={() => scroll("left")}
-                    className="absolute left-0 top-0 bottom-0 z-40 bg-gradient-to-r from-black/80 to-transparent w-12 flex items-center justify-start pl-2 opacity-0 group-hover/row:opacity-100 transition-all duration-300 pointer-events-none group-hover/row:pointer-events-auto"
+                    className="absolute left-0 top-0 bottom-0 z-40 bg-gradient-to-r from-[#020617]/80 to-transparent w-12 flex items-center justify-start pl-2 opacity-0 group-hover/row:opacity-100 transition-all duration-300 pointer-events-none group-hover/row:pointer-events-auto"
                 >
                     <ChevronLeft className="w-8 h-8 text-white hover:text-[#fbbf24] transition-colors drop-shadow-lg" />
                 </button>
@@ -173,7 +173,7 @@ function ContinueWatchingRowInner() {
                 {/* Right Arrow */}
                 <button
                     onClick={() => scroll("right")}
-                    className="absolute right-0 top-0 bottom-0 z-40 bg-gradient-to-l from-black/80 to-transparent w-12 flex items-center justify-end pr-2 opacity-0 group-hover/row:opacity-100 transition-all duration-300 pointer-events-none group-hover/row:pointer-events-auto"
+                    className="absolute right-0 top-0 bottom-0 z-40 bg-gradient-to-l from-[#020617]/80 to-transparent w-12 flex items-center justify-end pr-2 opacity-0 group-hover/row:opacity-100 transition-all duration-300 pointer-events-none group-hover/row:pointer-events-auto"
                 >
                     <ChevronRight className="w-8 h-8 text-white hover:text-[#fbbf24] transition-colors" />
                 </button>

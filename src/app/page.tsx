@@ -82,7 +82,7 @@ export default async function Home() {
   return (
     <main className="min-h-screen pb-16">
       {/* Hero Section */}
-      <Suspense fallback={<div className="w-full h-[60vh] md:h-[80vh] bg-neutral-900 animate-pulse" />}>
+      <Suspense fallback={<div className="w-full h-[60vh] md:h-[80vh] bg-[#020617] animate-pulse" />}>
         <AsyncHeroSection initialMovies={finalHeroData} />
       </Suspense>
 

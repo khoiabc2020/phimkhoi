@@ -56,8 +56,8 @@ export default async function WatchlistPage() {
     // Guard against non-ObjectId session IDs (e.g. admin mock)
     if (!mongoose.isValidObjectId(session.user.id)) {
         return (
-            <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-                <p className="text-white/40 text-sm">Không thể tải danh sách. Vui lòng đăng nhập lại.</p>
+            <div className="min-h-screen flex items-center justify-center">
+                <p className="text-white/60 text-sm">Không thể tải danh sách. Vui lòng đăng nhập lại.</p>
             </div>
         );
     }
@@ -71,9 +71,9 @@ export default async function WatchlistPage() {
     const validMovies = movies.filter(Boolean);
 
     return (
-        <div className="min-h-screen bg-[#0a0a0a]">
+        <div className="min-h-screen">
             {/* Hero Banner */}
-            <div className="relative pt-20 pb-8 px-4 md:px-12 bg-gradient-to-b from-black/60 to-[#0a0a0a]">
+            <div className="relative pt-20 pb-8 px-4 md:px-12 bg-gradient-to-b from-[#020617]/70 via-[#020617]/30 to-transparent">
                 <div className="max-w-7xl mx-auto">
                     <Link
                         href="/"
