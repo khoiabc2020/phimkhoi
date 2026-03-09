@@ -31,6 +31,9 @@ export default function PlayerScreen() {
     const [selectedServer, setSelectedServer] = useState(server ? Number(server) : 0);
     const [pipSize, setPipSize] = useState<PipSizeKey>('medium');
     const [initialTime, setInitialTime] = useState(0);
+    const [currentEpisodeSlug, setCurrentEpisodeSlug] = useState<string | null>(
+        typeof ep === 'string' ? ep : null
+    );
     const movieMetaRef = useRef<{ name?: string; poster?: string; originName?: string }>({});
 
     // Derived: only non-empty servers for the player UI
@@ -82,6 +85,7 @@ export default function PlayerScreen() {
 
         if (!epObj) return;
 
+        setCurrentEpisodeSlug(epObj.slug);
         setEpisodeTitle(epObj.name);
 
         if (epObj.link_m3u8 && !epObj.link_m3u8.includes('youtube')) {
@@ -144,12 +148,14 @@ export default function PlayerScreen() {
     }, [slug, ep, selectedServer, localUriParam, applyEpisode, token]);
 
     const handleProgress = async (currentTime: number, duration: number) => {
-        if (!user || !token || !slug || !ep) return;
+        if (!user || !token || !slug) return;
+        const epSlug = currentEpisodeSlug || (typeof ep === 'string' ? ep : null);
+        if (!epSlug) return;
         try {
             const progressSeconds = Math.floor(currentTime / 1000);
             const durationSeconds = Math.floor(duration / 1000);
             // Include episode name (displayed title) and movie metadata for fallback
-            await saveHistory(slug as string, ep as string, progressSeconds, durationSeconds, token, {
+            await saveHistory(slug as string, epSlug, progressSeconds, durationSeconds, token, {
                 ...movieMetaRef.current,
                 episodeName: episodeTitle,
             });
@@ -165,6 +171,9 @@ export default function PlayerScreen() {
     const handleNextEpisode = () => {
         if (!nextEpisodeSlug || !episodes.length) return;
         applyEpisode({ episodes }, selectedServer, nextEpisodeSlug);
+        setCurrentEpisodeSlug(nextEpisodeSlug);
+        // Optional: cập nhật URL để khi reload vẫn vào đúng tập
+        router.setParams({ ep: nextEpisodeSlug });
     };
 
     if (loading) {
@@ -222,14 +231,14 @@ export default function PlayerScreen() {
                     onPipSizeCycle={cyclePipSize}
                     onProgress={handleProgress}
                     initialTime={initialTime}
-                    // New Props
-
                     episodeList={episodes[selectedServer]?.server_data || []}
                     serverList={nonEmptyEpisodes.map((s: any) => s.server_name)}
                     currentServerIndex={nonEmptyEpisodes.findIndex((s: any) => s.server_name === (episodes[selectedServer]?.server_name || ''))}
-                    currentEpisodeSlug={ep as string}
+                    currentEpisodeSlug={currentEpisodeSlug || (ep as string)}
                     onEpisodeChange={(newSlug) => {
                         applyEpisode({ episodes }, selectedServer, newSlug);
+                        setCurrentEpisodeSlug(newSlug);
+                        router.setParams({ ep: newSlug });
                     }}
                     onServerChange={(newServerIndexInFiltered) => {
                         // Map back from filtered index to original episodes array index
