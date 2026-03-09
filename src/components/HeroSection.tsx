@@ -15,13 +15,17 @@ function useMediaQuery(query: string) {
             if (typeof window === "undefined") return () => { };
             const mql = window.matchMedia(query);
             const onChange = () => cb();
-            mql.addEventListener?.("change", onChange);
-            // @ts-expect-error - older Safari
-            mql.addListener?.(onChange);
+            if (mql.addEventListener) {
+                mql.addEventListener("change", onChange);
+            } else if (mql.addListener) {
+                mql.addListener(onChange);
+            }
             return () => {
-                mql.removeEventListener?.("change", onChange);
-                // @ts-expect-error - older Safari
-                mql.removeListener?.(onChange);
+                if (mql.removeEventListener) {
+                    mql.removeEventListener("change", onChange);
+                } else if (mql.removeListener) {
+                    mql.removeListener(onChange);
+                }
             };
         },
         () => (typeof window !== "undefined" ? window.matchMedia(query).matches : false),
@@ -69,10 +73,10 @@ function getHeroImage(movie: any, type: "poster" | "backdrop", variant: "mobile"
     const tmdbData = movie?.tmdbData;
     if (tmdbData) {
         if (type === "poster" && tmdbData.poster_path) {
-            return getImageUrl(tmdbImage(tmdbData.poster_path, variant === "desktop" ? "w500" : "w342"));
+            return tmdbImage(tmdbData.poster_path, variant === "desktop" ? "w500" : "w342");
         }
         if (type === "backdrop" && tmdbData.backdrop_path) {
-            return getImageUrl(tmdbImage(tmdbData.backdrop_path, variant === "desktop" ? "w1280" : "w780"));
+            return tmdbImage(tmdbData.backdrop_path, variant === "desktop" ? "w1280" : "w780");
         }
     }
     const apiPath = type === "backdrop" ? movie.thumb_url || movie.poster_url : movie.poster_url || movie.thumb_url;
@@ -97,10 +101,12 @@ function MobileHero({
     });
 
     useEffect(() => {
-        if (!mobileApi) return;
+        if (!mobileApi) return undefined;
         const onSelect = () => setSelectedIndex(mobileApi.selectedScrollSnap());
         mobileApi.on("select", onSelect);
-        return () => mobileApi.off("select", onSelect);
+        return () => {
+            mobileApi.off("select", onSelect);
+        };
     }, [mobileApi, setSelectedIndex]);
 
     const scrollTo = useCallback((index: number) => mobileApi?.scrollTo(index), [mobileApi]);
@@ -232,10 +238,12 @@ function DesktopHero({
     const [desktopRef, desktopApi] = useEmblaCarousel({ loop: true, duration: 45 });
 
     useEffect(() => {
-        if (!desktopApi) return;
+        if (!desktopApi) return undefined;
         const onSelect = () => setSelectedIndex(desktopApi.selectedScrollSnap());
         desktopApi.on("select", onSelect);
-        return () => desktopApi.off("select", onSelect);
+        return () => {
+            desktopApi.off("select", onSelect);
+        };
     }, [desktopApi, setSelectedIndex]);
 
     const scrollTo = useCallback((index: number) => desktopApi?.scrollTo(index), [desktopApi]);
