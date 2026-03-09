@@ -79,5 +79,7 @@ const WatchHistorySchema = new Schema<IWatchHistory>(
 // Compound index for efficient queries
 WatchHistorySchema.index({ userId: 1, movieId: 1, episodeSlug: 1 }, { unique: true });
 WatchHistorySchema.index({ userId: 1, lastWatched: -1 });
+// Mobile API tìm theo movieSlug + episodeSlug — index để query nhanh
+WatchHistorySchema.index({ userId: 1, movieSlug: 1, episodeSlug: 1 });
 
 export default mongoose.models.WatchHistory || mongoose.model<IWatchHistory>("WatchHistory", WatchHistorySchema);

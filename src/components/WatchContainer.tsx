@@ -138,10 +138,10 @@ export default function WatchContainer({
                     )}
                     style={{ background: "#0F121AF2" }}
                 >
-                    {/* Inner wrapper maintains aspect ratio but allows controls to breathe */}
+                    {/* Inner wrapper: luôn có aspect-ratio để container có chiều cao xác định, tránh màn đen khi chế độ rạp phim */}
                     <div className={cn(
-                        "relative w-full",
-                        !isTheaterMode && "aspect-video"
+                        "relative w-full min-h-0",
+                        isTheaterMode ? "aspect-video md:aspect-[21/9]" : "aspect-video"
                     )}>
 
                         {activeEpisode ? (
@@ -154,6 +154,7 @@ export default function WatchContainer({
                                 initialProgress={initialProgress}
                                 autoNext={autoNext}
                                 nextEpisodeUrl={nextEpisodeUrl}
+                                isTheaterMode={isTheaterMode}
                             />
                         ) : (
                             <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-white gap-3">

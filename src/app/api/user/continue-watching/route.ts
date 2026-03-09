@@ -34,7 +34,12 @@ export async function GET() {
 
     return NextResponse.json(
       { success: true, data: continueWatching },
-      { headers: { "Cache-Control": "no-store" } }
+      {
+        headers: {
+          // 20s cache giảm tải VPS; đồng bộ vẫn nhanh khi user xem tiếp
+          "Cache-Control": "private, max-age=20, stale-while-revalidate=30",
+        },
+      }
     );
   } catch (error) {
     console.error("Continue watching API error:", error);

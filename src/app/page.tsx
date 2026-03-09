@@ -6,7 +6,8 @@ import QuickNav from "@/components/QuickNav";
 import ContinueWatchingRow from "@/components/ContinueWatchingRow";
 import TopicSection from "@/components/TopicSection";
 import TopicCloud from "@/components/TopicCloud";
-import { getMoviesList, getTrendMovies, getHomeData } from "@/services/api";
+import HomeSection from "@/components/HomeSection";
+import { getMoviesList, getTrendMovies, getHomeData, HOME_SECTION_SLUGS } from "@/services/api";
 import { getTMDBDataForCard } from "@/app/actions/tmdb";
 
 export const revalidate = 3600;
@@ -86,62 +87,69 @@ export default async function Home() {
         <AsyncHeroSection initialMovies={finalHeroData} />
       </Suspense>
 
-      {/* Interested Topics Section */}
-      <div className="relative z-20 -mt-16 md:-mt-28 lg:-mt-32 mb-4">
+      {/* Interested Topics Section — giảm kéo lên trên mobile để không đè nút Xem ngay */}
+      <div className="relative z-20 -mt-6 md:-mt-28 lg:-mt-32 mb-4">
         <TopicSection />
       </div>
 
       <div className="container mx-auto px-4 md:px-12 relative z-20 pb-16">
-        <div className="mb-4">
+        <div className="mb-6">
           <QuickNav />
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
 
-          {/* MAIN CONTENT */}
-          <div className="xl:col-span-9 space-y-16">
-            <ContinueWatchingRow />
+          {/* MAIN CONTENT — tổ chức theo đề mục kiểu rophim, mượt và rõ ràng */}
+          <div className="xl:col-span-9 space-y-12 md:space-y-14">
+            {/* Đề xuất cho bạn */}
+            <HomeSection title="Đề xuất cho bạn">
+              <ContinueWatchingRow />
+              {homeData.phimChieuRap?.length ? (
+                <MovieRow title="Phim Chiếu Rạp Mới" movies={homeData.phimChieuRap} slug={HOME_SECTION_SLUGS.phimChieuRap} />
+              ) : null}
+              {homeData.phimMoi?.length ? (
+                <MovieRow title="Phim Mới Cập Nhật" movies={homeData.phimMoi.slice(0, 12)} slug={HOME_SECTION_SLUGS.phimMoi} />
+              ) : null}
+            </HomeSection>
 
-            {/* Render rows directly from pre-fetched homeData (mượt mà, không giật lag, chuẩn SEO) */}
-            {homeData.phimChieuRap?.length ? (
-              <MovieRow title="Phim Chiếu Rạp Mới" movies={homeData.phimChieuRap} slug="/the-loai/phim-chieu-rap" />
-            ) : null}
+            {/* Phim theo quốc gia */}
+            <HomeSection title="Phim theo quốc gia" viewAllHref={HOME_SECTION_SLUGS.hanQuoc} viewAllLabel="Xem thêm">
+              {homeData.hanQuoc?.length ? (
+                <MovieRow title="Hàn Quốc" movies={homeData.hanQuoc.slice(0, 12)} slug={HOME_SECTION_SLUGS.hanQuoc} />
+              ) : null}
+              {homeData.trungQuoc?.length ? (
+                <MovieRow title="Trung Quốc" movies={homeData.trungQuoc.slice(0, 12)} slug={HOME_SECTION_SLUGS.trungQuoc} />
+              ) : null}
+            </HomeSection>
 
-            {homeData.phimMoi?.length ? (
-              <MovieRow title="Phim Mới Cập Nhật" movies={homeData.phimMoi.slice(0, 12)} slug="/danh-sach/phim-moi-cap-nhat" />
-            ) : null}
+            {/* Mới cập nhật */}
+            <HomeSection title="Mới cập nhật" viewAllHref={HOME_SECTION_SLUGS.phimMoi}>
+              {homeData.phimSapChieu?.length ? (
+                <MovieRow title="Phim Sắp Chiếu" movies={homeData.phimSapChieu.slice(0, 12)} slug={HOME_SECTION_SLUGS.phimSapChieu} />
+              ) : null}
+              {homeData.phimLe?.length ? (
+                <MovieRow title="Phim Lẻ Mới" movies={homeData.phimLe.slice(0, 12)} slug={HOME_SECTION_SLUGS.phimLe} />
+              ) : null}
+              {homeData.phimBo?.length ? (
+                <MovieRow title="Phim Bộ Mới" movies={homeData.phimBo.slice(0, 12)} slug={HOME_SECTION_SLUGS.phimBo} />
+              ) : null}
+            </HomeSection>
 
-            {homeData.hanQuoc?.length ? (
-              <MovieRow title="Phim Hàn Quốc" movies={homeData.hanQuoc.slice(0, 12)} slug="/quoc-gia/han-quoc" />
-            ) : null}
-
-            {homeData.trungQuoc?.length ? (
-              <MovieRow title="Phim Trung Quốc" movies={homeData.trungQuoc.slice(0, 12)} slug="/quoc-gia/trung-quoc" />
-            ) : null}
-
-            {homeData.phimSapChieu?.length ? (
-              <MovieRow title="Phim Sắp Chiếu" movies={homeData.phimSapChieu.slice(0, 12)} slug="/danh-sach/phim-sap-chieu" />
-            ) : null}
-
-            {homeData.phimLe?.length ? (
-              <MovieRow title="Phim Lẻ Mới" movies={homeData.phimLe.slice(0, 12)} slug="/danh-sach/phim-le" />
-            ) : null}
-
-            {homeData.phimBo?.length ? (
-              <MovieRow title="Phim Bộ Mới" movies={homeData.phimBo.slice(0, 12)} slug="/danh-sach/phim-bo" />
-            ) : null}
-
-            {homeData.hanhDong?.length ? (
-              <MovieRow title="Phim Hành Động" movies={homeData.hanhDong.slice(0, 12)} slug="/the-loai/hanh-dong" />
-            ) : null}
-
-            {homeData.hoatHinh?.length ? (
-              <MovieRow title="Hoạt Hình" movies={homeData.hoatHinh.slice(0, 12)} slug="/danh-sach/hoat-hinh" />
-            ) : null}
-
-            {homeData.tvShows?.length ? (
-              <MovieRow title="TV Shows" movies={homeData.tvShows.slice(0, 12)} slug="/danh-sach/tv-shows" />
-            ) : null}
+            {/* Thể loại */}
+            <HomeSection title="Thể loại" viewAllHref={HOME_SECTION_SLUGS.hanhDong} viewAllLabel="Xem thêm">
+              {homeData.hanhDong?.length ? (
+                <MovieRow title="Hành Động" movies={homeData.hanhDong.slice(0, 12)} slug={HOME_SECTION_SLUGS.hanhDong} />
+              ) : null}
+              {homeData.tinhCam?.length ? (
+                <MovieRow title="Tình Cảm" movies={homeData.tinhCam.slice(0, 12)} slug={HOME_SECTION_SLUGS.tinhCam} />
+              ) : null}
+              {homeData.hoatHinh?.length ? (
+                <MovieRow title="Hoạt Hình" movies={homeData.hoatHinh.slice(0, 12)} slug={HOME_SECTION_SLUGS.hoatHinh} />
+              ) : null}
+              {homeData.tvShows?.length ? (
+                <MovieRow title="TV Shows" movies={homeData.tvShows.slice(0, 12)} slug={HOME_SECTION_SLUGS.tvShows} />
+              ) : null}
+            </HomeSection>
           </div>
 
           {/* SIDEBAR */}

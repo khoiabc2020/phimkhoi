@@ -164,8 +164,8 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                     </div>
                                 </div>
 
-                                {/* Info block — compact */}
-                                <div className="px-4 pt-2 pb-4 flex flex-col gap-2">
+                                {/* Info block — compact, thêm padding dưới để không dính Khám phá nhanh */}
+                                <div className="px-4 pt-2 pb-5 flex flex-col gap-2">
                                     {/* Title + year */}
                                     <div className="pl-[84px]"> {/* align kế bên poster */}
                                         <h1 className="text-[17px] font-black text-white leading-snug line-clamp-2">
@@ -206,8 +206,8 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                     })}
                 </div>
 
-                {/* Dot indicators */}
-                <div className="flex justify-center gap-1.5 pb-3">
+                {/* Dot indicators — cách rõ với block dưới */}
+                <div className="flex justify-center gap-1.5 pb-4 pt-1">
                     {heroMovies.map((_, i) => (
                         <button
                             key={i}

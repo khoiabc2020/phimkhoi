@@ -40,13 +40,20 @@ export async function GET(req: NextRequest) {
                 episodeSlug: episodeSlug,
             }).lean();
 
-            return NextResponse.json({
-                history: history ? {
-                    progress: history.progress,
-                    currentTime: history.currentTime || 0,
-                    duration: history.duration || 0,
-                } : null
-            });
+            return NextResponse.json(
+                {
+                    history: history ? {
+                        progress: history.progress,
+                        currentTime: history.currentTime || 0,
+                        duration: history.duration || 0,
+                    } : null
+                },
+                {
+                    headers: {
+                        "Cache-Control": "private, max-age=10",
+                    },
+                }
+            );
         }
 
         // Dùng aggregation để dedupe: chỉ lấy tập mới nhất mỗi phim (giống web getContinueWatching)
@@ -85,7 +92,14 @@ export async function GET(req: NextRequest) {
             }
         }));
 
-        return NextResponse.json({ history: formattedHistory });
+        return NextResponse.json(
+            { history: formattedHistory },
+            {
+                headers: {
+                    "Cache-Control": "private, max-age=15, stale-while-revalidate=20",
+                },
+            }
+        );
     } catch (error) {
         console.error("Get History Error:", error);
         return NextResponse.json({ message: "Server Error" }, { status: 500 });

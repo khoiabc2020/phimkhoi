@@ -10,9 +10,9 @@ const tags = [
 
 export default function TopicCloud() {
     return (
-        <div className="bg-[#111] p-5 rounded-xl border border-white/5">
+        <div className="rounded-2xl bg-[#020617]/80 border border-white/10 p-5 overflow-hidden">
             <h3 className="text-white font-bold text-base mb-4 uppercase flex items-center gap-2">
-                <span className="w-1 h-4 bg-[#fbbf24] rounded-full"></span>
+                <span className="w-1 h-4 bg-[#F4C84A] rounded-sm shrink-0" />
                 Từ khóa hot
             </h3>
             <div className="flex flex-wrap gap-2 text-xs text-gray-400">
@@ -20,7 +20,7 @@ export default function TopicCloud() {
                     <Link
                         key={tag}
                         href={`/tim-kiem?keyword=${tag}`}
-                        className="bg-white/5 hover:bg-[#fbbf24] hover:text-black px-3 py-1.5 rounded-full transition-colors duration-200 cursor-pointer border border-white/5 active:scale-95"
+                        className="bg-white/5 hover:bg-[#F4C84A] hover:text-black px-3 py-1.5 rounded-full transition-colors duration-200 cursor-pointer border border-white/10 active:scale-95"
                     >
                         {tag}
                     </Link>

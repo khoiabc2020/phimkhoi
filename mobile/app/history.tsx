@@ -60,10 +60,26 @@ export default function HistoryScreen() {
 
     if (loading) {
         return (
-            <View style={styles.centered}>
+            <View style={styles.container}>
                 <Stack.Screen options={{ headerShown: false }} />
                 <StatusBar style="light" />
-                <Ionicons name="time-outline" size={48} color="#E6BF5C" />
+                <View style={[styles.header, { marginBottom: 16 }]}>
+                    <View style={[styles.backBtn, { opacity: 0.5 }]} />
+                    <View style={{ flex: 1, height: 22, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 8 }} />
+                    <View style={{ width: 60, height: 28, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 12 }} />
+                </View>
+                <View style={styles.listContent}>
+                    {[1, 2, 3, 4].map((i) => (
+                        <View key={i} style={styles.card}>
+                            <View style={[styles.posterContainer, { backgroundColor: 'rgba(255,255,255,0.08)' }]} />
+                            <View style={{ flex: 1, padding: 12, gap: 8 }}>
+                                <View style={{ height: 16, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 4, width: '80%' }} />
+                                <View style={{ height: 12, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 4, width: '50%' }} />
+                                <View style={{ height: 10, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 4, width: '40%' }} />
+                            </View>
+                        </View>
+                    ))}
+                </View>
             </View>
         );
     }
@@ -105,7 +121,11 @@ export default function HistoryScreen() {
                 ) : (
                     <FlatList
                         data={history}
-                        keyExtractor={(item) => item._id || item.slug}
+                        keyExtractor={(item, index) => item._id || item.slug || `item-${index}`}
+                        initialNumToRender={10}
+                        maxToRenderPerBatch={10}
+                        windowSize={5}
+                        removeClippedSubviews={true}
                         contentContainerStyle={styles.listContent}
                         refreshControl={
                             <RefreshControl

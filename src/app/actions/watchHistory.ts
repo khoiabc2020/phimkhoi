@@ -44,12 +44,12 @@ export async function addWatchHistory(movieData: {
             },
             {
                 upsert: true,
-                new: true,
+                new: false, // Không cần trả doc — giảm tải DB khi traffic lớn
             }
         );
 
         revalidatePath("/lich-su-xem");
-        return { success: true, data: watchHistory };
+        return { success: true, data: watchHistory ?? undefined };
     } catch (error) {
         console.error("Add watch history error:", error);
         return { success: false, error: "Failed to save watch history" };

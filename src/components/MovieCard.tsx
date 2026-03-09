@@ -110,7 +110,7 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                     <Link href={`/phim/${movie.slug}`} className="block h-full w-full absolute inset-0 z-0" prefetch={false}>
                         <Image
                             src={displayPoster || "/placeholder.jpg"}
-                            alt={movie.name}
+                            alt={decodeHtml(movie.name) || movie.slug || "Phim"}
                             fill
                             className="object-cover transition-transform duration-500 ease-out group-hover/static-card:scale-105 will-change-transform"
                             sizes={orientation === 'landscape' ? "(max-width: 768px) 60vw, 30vw" : "(max-width: 768px) 40vw, 15vw"}
@@ -138,8 +138,8 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                 </div>
 
                 <div className="mt-2 space-y-0.5 px-0.5">
-                    <h3 className="text-white font-bold text-[13px] truncate group-hover/static-card:text-primary transition-colors leading-tight" title={decodeHtml(movie.name)}>
-                        {decodeHtml(movie.name)}
+                    <h3 className="text-white font-bold text-[13px] truncate group-hover/static-card:text-primary transition-colors leading-tight" title={decodeHtml(movie.name) || movie.slug || ""}>
+                        {decodeHtml(movie.name) || movie.slug || "—"}
                     </h3>
                     <div className="flex items-center justify-between">
                         {movie.origin_name && (
@@ -228,7 +228,7 @@ function OnflixHoverCard({
                         )}
                         <Image
                             src={displayBackdrop || "/placeholder.jpg"}
-                            alt={movie.name}
+                            alt={decodeHtml(movie.name) || movie.slug || "Phim"}
                             fill
                             className={`object-cover transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
                             unoptimized
@@ -246,7 +246,7 @@ function OnflixHoverCard({
                         {/* Title and Subtitle */}
                         <div>
                             <h3 className="text-white font-bold text-lg leading-tight truncate">
-                                {decodeHtml(movie.name)}
+                                {decodeHtml(movie.name) || movie.slug || "—"}
                             </h3>
                             {movie.origin_name && (
                                 <p className="text-white/50 text-[13px] leading-tight truncate mt-0.5">

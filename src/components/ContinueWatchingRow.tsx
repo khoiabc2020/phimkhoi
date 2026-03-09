@@ -84,11 +84,25 @@ function ContinueWatchingRowInner() {
                 ? scrollLeft - clientWidth / 2
                 : scrollLeft + clientWidth / 2;
 
-            rowRef.current.scrollTo({ left: scrollTo, behavior: "auto" });
+            rowRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
         }
     };
 
-    if (loading) return null;
+    if (loading) {
+        return (
+            <div className="space-y-4 py-4">
+                <div className="flex items-center justify-between gap-3">
+                    <div className="h-6 w-48 bg-white/10 rounded animate-pulse" />
+                    <div className="h-4 w-16 bg-white/10 rounded animate-pulse" />
+                </div>
+                <div className="flex gap-3 overflow-x-hidden pb-4">
+                    {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className="flex-[0_0_160px] sm:flex-[0_0_200px] md:flex-[0_0_240px] aspect-video rounded-xl bg-white/10 animate-pulse" />
+                    ))}
+                </div>
+            </div>
+        );
+    }
     if (!session || !movies || movies.length === 0) return null;
 
     return (
@@ -120,7 +134,7 @@ function ContinueWatchingRowInner() {
                 <div
                     ref={rowRef}
                     className="flex gap-3 md:gap-4 overflow-x-auto pb-4 pt-2 no-scrollbar snap-x px-1"
-                    style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+                    style={{ scrollbarWidth: "none", msOverflowStyle: "none", scrollBehavior: "smooth" }}
                 >
                     {movies.map((item) => (
                         <div key={item._id} className="relative group/card flex-[0_0_160px] sm:flex-[0_0_200px] md:flex-[0_0_240px] snap-start">

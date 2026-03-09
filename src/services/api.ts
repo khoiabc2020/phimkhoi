@@ -50,6 +50,42 @@ const getItems = (data: PaginatedData): Movie[] => {
     return [];
 };
 
+/** Chuẩn hóa item từ NguonC về đúng kiểu Movie để card và link hoạt động đầy đủ */
+function normalizeNguoncItem(item: Record<string, unknown>): Movie {
+    const name = (item.name as string) || "";
+    const slug = (item.slug as string) || "";
+    const id = (item.id || item.slug || slug) as string;
+    return {
+        _id: id,
+        name,
+        slug,
+        origin_name: (item.original_name as string) || name,
+        content: "",
+        type: (item.type as string) || "single",
+        status: "",
+        thumb_url: (item.thumb_url as string) || "",
+        poster_url: (item.poster_url as string) || (item.thumb_url as string) || "",
+        is_copyright: false,
+        sub_docquyen: false,
+        chieurap: false,
+        trailer_url: "",
+        time: "",
+        episode_current: (item.current_episode as string) || "",
+        episode_total: "",
+        quality: (item.quality as string) || "FHD",
+        lang: "",
+        notify: "",
+        showtimes: "",
+        year: parseInt(item.year as string) || new Date().getFullYear(),
+        view: 0,
+        actor: [],
+        director: [],
+        category: Array.isArray(item.category) ? item.category as { id: string; name: string; slug: string }[] : [],
+        country: Array.isArray(item.country) ? item.country as { id: string; name: string; slug: string }[] : [],
+        episodes: [],
+    };
+}
+
 // Safe URI concatenation
 const combineUrl = (base: string, path: string) => {
     if (!base) return path;
@@ -142,9 +178,41 @@ let homeCache: {
 } | null = null;
 let homeCacheTime = 0;
 
+/** Cấu hình đề mục trang chủ — slug + endpoint chuẩn (PhimAPI/KKPhim + NguonC) */
+type HomeCacheKey = 'phimMoi' | 'phimLe' | 'phimBo' | 'hoatHinh' | 'tvShows' | 'phimChieuRap' | 'phimSapChieu' | 'hanQuoc' | 'trungQuoc' | 'hanhDong' | 'tinhCam';
+const HOME_CATEGORIES: { key: HomeCacheKey; slug: string; endpoint: 'danh-sach' | 'the-loai' | 'quoc-gia' }[] = [
+    { key: 'phimMoi', slug: 'phim-moi-cap-nhat', endpoint: 'danh-sach' },
+    { key: 'phimLe', slug: 'phim-le', endpoint: 'danh-sach' },
+    { key: 'phimBo', slug: 'phim-bo', endpoint: 'danh-sach' },
+    { key: 'hoatHinh', slug: 'hoat-hinh', endpoint: 'danh-sach' },
+    { key: 'tvShows', slug: 'tv-shows', endpoint: 'danh-sach' },
+    { key: 'phimChieuRap', slug: 'phim-chieu-rap', endpoint: 'the-loai' },
+    { key: 'phimSapChieu', slug: 'phim-sap-chieu', endpoint: 'danh-sach' },
+    { key: 'hanQuoc', slug: 'han-quoc', endpoint: 'quoc-gia' },
+    { key: 'trungQuoc', slug: 'trung-quoc', endpoint: 'quoc-gia' },
+    { key: 'hanhDong', slug: 'hanh-dong', endpoint: 'the-loai' },
+    { key: 'tinhCam', slug: 'tinh-cam', endpoint: 'the-loai' },
+];
+
+/** Slug "Xem tất cả" cho từng đề mục — dùng chung cho trang chủ và link chính xác */
+export const HOME_SECTION_SLUGS: Record<HomeCacheKey, string> = {
+    phimMoi: "/danh-sach/phim-moi-cap-nhat",
+    phimLe: "/danh-sach/phim-le",
+    phimBo: "/danh-sach/phim-bo",
+    hoatHinh: "/danh-sach/hoat-hinh",
+    tvShows: "/danh-sach/tv-shows",
+    phimChieuRap: "/the-loai/phim-chieu-rap",
+    phimSapChieu: "/danh-sach/phim-sap-chieu",
+    hanQuoc: "/quoc-gia/han-quoc",
+    trungQuoc: "/quoc-gia/trung-quoc",
+    hanhDong: "/the-loai/hanh-dong",
+    tinhCam: "/the-loai/tinh-cam",
+};
+
 export const getHomeData = async () => {
-    // 15 phút Memory Cache giúp bảo vệ Next.js VPS khỏi bị spam requests
-    if (homeCache && Date.now() - homeCacheTime < 15 * 60 * 1000) {
+    // Cache 20 phút trên VPS để giảm tải khi lượng xem lớn
+    const CACHE_TTL_MS = 20 * 60 * 1000;
+    if (homeCache && Date.now() - homeCacheTime < CACHE_TTL_MS) {
         return homeCache;
     }
 
@@ -153,10 +221,20 @@ export const getHomeData = async () => {
             let nguoncUrl = `${NGUONC_API}/api/films/${endpoint}/${slug}?page=1`;
             if (slug === 'phim-moi-cap-nhat') nguoncUrl = `${NGUONC_API}/api/films/phim-moi-cap-nhat?page=1`;
 
+            const FETCH_TIMEOUT_MS = 12000; // 12s timeout để VPS không treo khi API ngoài chậm
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+            const doFetch = (url: string) =>
+                fetch(url, { signal: controller.signal, next: { revalidate: 3600 } })
+                    .then((res) => res.json())
+                    .finally(() => clearTimeout(timeoutId));
+
             const [kkRes, nguoncRes] = await Promise.allSettled([
-                fetch(`${API_URL}/v1/api/${endpoint}/${slug}?limit=12`, { next: { revalidate: 3600 } }).then((res) => res.json()),
-                fetch(nguoncUrl, { next: { revalidate: 3600 } }).then((res) => res.json())
+                doFetch(`${API_URL}/v1/api/${endpoint}/${slug}?limit=12`),
+                doFetch(nguoncUrl),
             ]);
+
             let items: Movie[] = [];
             if (kkRes.status === 'fulfilled' && kkRes.value?.data?.items) {
                 const data = kkRes.value;
@@ -168,16 +246,7 @@ export const getHomeData = async () => {
                 }))];
             }
             if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
-                const nguoncItems = (nguoncRes.value.items || []).map((item: Record<string, unknown>) => ({
-                    _id: (item.id || item.slug) as string,
-                    name: item.name as string,
-                    slug: item.slug as string,
-                    origin_name: (item.original_name || item.name) as string,
-                    thumb_url: item.thumb_url as string,
-                    poster_url: item.poster_url as string,
-                    year: parseInt(item.year as string) || new Date().getFullYear(),
-                    quality: (item.quality as string) || 'FHD',
-                }));
+                const nguoncItems = ((nguoncRes.value.items || []) as Record<string, unknown>[]).map(normalizeNguoncItem);
                 items = [...items, ...nguoncItems];
             }
             const seen = new Set<string>();
@@ -192,21 +261,11 @@ export const getHomeData = async () => {
             phimMoi, phimLe, phimBo, hoatHinh, tvShows,
             phimChieuRap, phimSapChieu, hanQuoc, trungQuoc,
             hanhDong, tinhCam
-        ] = await Promise.all([
-            fetchCategory('phim-moi-cap-nhat'),
-            fetchCategory('phim-le'),
-            fetchCategory('phim-bo'),
-            fetchCategory('hoat-hinh'),
-            fetchCategory('tv-shows'),
-            fetchCategory('phim-chieu-rap', 'the-loai'),
-            fetchCategory('phim-sap-chieu'),
-            fetchCategory('han-quoc', 'quoc-gia'),
-            fetchCategory('trung-quoc', 'quoc-gia'),
-            fetchCategory('hanh-dong', 'the-loai'),
-            fetchCategory('tinh-cam', 'the-loai')
-        ]);
+        ] = await Promise.all(
+            HOME_CATEGORIES.map(c => fetchCategory(c.slug, c.endpoint))
+        );
 
-        const data = {
+        const data: Record<HomeCacheKey, Movie[]> = {
             phimMoi, phimLe, phimBo, hoatHinh, tvShows,
             phimChieuRap, phimSapChieu, hanQuoc, trungQuoc,
             hanhDong, tinhCam

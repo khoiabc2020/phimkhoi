@@ -21,10 +21,11 @@ interface VideoPlayerProps {
         duration?: number;
     };
     initialProgress?: number;
-    // Auto-next episode support
     autoNext?: boolean;
-    nextEpisodeUrl?: string; // Route path for next episode, e.g. /xem-phim/slug/ep-02
+    nextEpisodeUrl?: string;
     onEnded?: () => void;
+    /** Khi bật chế độ rạp phim, container đổi kích thước — cần resize player */
+    isTheaterMode?: boolean;
 }
 
 // Vietnamese i18n for ArtPlayer
@@ -78,6 +79,7 @@ export default function VideoPlayer({
     autoNext = false,
     nextEpisodeUrl,
     onEnded,
+    isTheaterMode = false,
 }: VideoPlayerProps) {
     const artRef = useRef<HTMLDivElement>(null);
     const artInstance = useRef<any>(null);
@@ -384,6 +386,28 @@ export default function VideoPlayer({
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [streamUrl]);
+
+    // Khi bật/tắt chế độ rạp phim, container đổi kích thước — gọi resize để player vẽ lại đúng, tránh màn đen
+    useEffect(() => {
+        if (!shouldUseArtPlayer || !artInstance.current) return;
+        const art = artInstance.current as any;
+        const t = setTimeout(() => {
+            if (typeof art.resize === "function") art.resize();
+        }, 350);
+        return () => clearTimeout(t);
+    }, [isTheaterMode, shouldUseArtPlayer]);
+
+    // ResizeObserver: khi kích thước container thay đổi (resize window, chế độ rạp phim), player tự resize
+    useEffect(() => {
+        if (!shouldUseArtPlayer || !artRef.current) return;
+        const el = artRef.current;
+        const ro = new ResizeObserver(() => {
+            const art = artInstance.current as any;
+            if (art && typeof art.resize === "function") art.resize();
+        });
+        ro.observe(el);
+        return () => ro.disconnect();
+    }, [shouldUseArtPlayer]);
 
     // Iframe fallback
     if (!shouldUseArtPlayer) {

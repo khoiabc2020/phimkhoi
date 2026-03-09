@@ -61,8 +61,8 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
 
                         <div
                             ref={rowRef}
-                            className="flex gap-4 overflow-x-auto pb-4 pt-2 no-scrollbar snap-x"
-                            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+                            className="flex gap-4 overflow-x-auto overflow-y-hidden pb-4 pt-2 no-scrollbar snap-x scroll-smooth"
+                            style={{ scrollbarWidth: "none", msOverflowStyle: "none", scrollBehavior: "smooth" }}
                         >
                             {movies.map((movie) => (
                                 <div key={movie._id} className="min-w-[200px] md:min-w-[280px] snap-start">
@@ -117,8 +117,8 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
                         {/* Scroll Container */}
                         <div
                             ref={rowRef}
-                            className="flex gap-2.5 overflow-x-auto px-4 md:px-6 pb-4 pt-2 no-scrollbar snap-x"
-                            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+                            className="flex gap-2.5 overflow-x-auto overflow-y-hidden px-4 md:px-6 pb-4 pt-2 no-scrollbar snap-x scroll-smooth"
+                            style={{ scrollbarWidth: "none", msOverflowStyle: "none", scrollBehavior: "smooth" }}
                         >
                             {movies.map((movie) => (
                                 <div key={movie._id} className="min-w-[130px] md:min-w-[150px] snap-center">
