@@ -19,7 +19,8 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
         loop: true,
         align: "center",
         containScroll: "trimSnaps",
-        dragFree: false // Tắt dragFree để vuốt từng slide có điểm dừng rõ ràng
+        dragFree: false,
+        duration: 28,
     });
 
     const [selectedIndex, setSelectedIndex] = useState(0);
@@ -112,9 +113,9 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
     };
 
     return (
-        <div className="relative w-full h-auto bg-transparent overflow-hidden flex flex-col font-sans">
+        <div className="relative w-full h-auto bg-transparent overflow-hidden flex flex-col font-sans will-change-auto">
 
-            {/* ================= MOBILE LAYOUT compact — chiều cao tiết kiệm ================= */}
+            {/* ================= MOBILE LAYOUT compact — chiều cao tiết kiệm, chuyển slide mượt ================= */}
             <div className="md:hidden relative w-full bg-transparent" ref={mobileRef}>
                 <div className="flex flex-row touch-pan-y">
                     {heroMovies.map((movie: any, index) => {
@@ -164,8 +165,8 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                     </div>
                                 </div>
 
-                                {/* Info block — compact, thêm padding dưới để không dính Khám phá nhanh */}
-                                <div className="px-4 pt-2 pb-5 flex flex-col gap-2">
+                                {/* Info block — compact, padding dưới thoáng để không dính Khám phá nhanh */}
+                                <div className="px-4 pt-2 pb-6 flex flex-col gap-2">
                                     {/* Title + year */}
                                     <div className="pl-[84px]"> {/* align kế bên poster */}
                                         <h1 className="text-[17px] font-black text-white leading-snug line-clamp-2">
@@ -179,24 +180,24 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                         </div>
                                     </div>
 
-                                    {/* Buttons */}
+                                    {/* Buttons — touch target rõ, transition mượt */}
                                     <div className="flex items-center gap-2 mt-1">
                                         <Link
                                             href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                            className="flex flex-1 items-center justify-center gap-2 h-10 rounded-full bg-[#F4C84A] text-black font-extrabold active:scale-95 transition-transform"
+                                            className="flex flex-1 items-center justify-center gap-2 h-11 rounded-full bg-[#F4C84A] text-black font-extrabold active:scale-[0.98] transition-transform duration-150"
                                         >
-                                            <Play className="w-4 h-4 fill-black" />
+                                            <Play className="w-4 h-4 fill-black shrink-0" />
                                             <span className="text-[13px]">Xem ngay</span>
                                         </Link>
 
                                         <Link
                                             href={`/phim/${movie.slug}`}
-                                            className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 border border-white/15 active:scale-95 transition-transform shrink-0"
+                                            className="w-11 h-11 flex items-center justify-center rounded-full bg-white/10 border border-white/15 active:scale-[0.98] transition-transform duration-150 shrink-0"
                                         >
-                                            <Info className="w-4 h-4 text-white" />
+                                            <Info className="w-4 h-4 text-white shrink-0" />
                                         </Link>
 
-                                        <div className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 border border-white/15 active:scale-95 transition-transform shrink-0">
+                                        <div className="w-11 h-11 flex items-center justify-center rounded-full bg-white/10 border border-white/15 active:scale-[0.98] transition-transform duration-150 shrink-0">
                                             <FavoriteButton movieData={getFavoriteData(movie)} size="sm" />
                                         </div>
                                     </div>
@@ -206,13 +207,13 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                     })}
                 </div>
 
-                {/* Dot indicators — cách rõ với block dưới */}
-                <div className="flex justify-center gap-1.5 pb-4 pt-1">
+                {/* Dot indicators — cách rõ với block dưới, transition mượt */}
+                <div className="flex justify-center gap-1.5 pb-5 pt-2">
                     {heroMovies.map((_, i) => (
                         <button
                             key={i}
                             onClick={() => scrollTo(i)}
-                            className={`h-1.5 rounded-full transition-all duration-300 ${i === selectedIndex
+                            className={`h-1.5 rounded-full transition-all duration-300 ease-out ${i === selectedIndex
                                 ? 'w-5 bg-[#F4C84A]'
                                 : 'w-1.5 bg-white/20'
                                 }`}
@@ -223,8 +224,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
 
 
             {/* ================= DESKTOP LAYOUT (Tablet / Large Screens) ================= */}
-            {/* Shows on md screens (>= 768px) for cinematic iPad view */}
-            <div className="hidden md:block relative w-full h-[55vh] lg:h-[70vh] xl:h-screen">
+            <div className="hidden md:block relative w-full h-[55vh] lg:h-[70vh] xl:h-screen overflow-hidden">
 
                 <div className="absolute inset-0 h-full" ref={desktopRef}>
                     <div className="flex h-full touch-pan-y">
@@ -243,7 +243,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                             src={backdropImg}
                                             alt="bg"
                                             fill
-                                            className="object-cover opacity-80 will-change-transform"
+                                            className="object-cover opacity-80 transition-opacity duration-500 ease-out"
                                             priority={index === 0}
                                             unoptimized
                                             placeholder={index === 0 ? "empty" : "blur"}
@@ -338,12 +338,12 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                             {/* Right: 3D Tilt Poster Card */}
                                             {/* Scaled for both tablets and large screens */}
                                             <div className="col-span-12 md:col-span-4 lg:col-span-5 xl:col-span-6 hidden md:flex justify-end lg:justify-center xl:justify-end pr-0 lg:pr-8 xl:pr-16">
-                                                <div className="relative w-[240px] lg:w-[300px] xl:w-[360px] aspect-[2/3] rounded-[24px] lg:rounded-[32px] overflow-hidden ring-1 ring-white/10 group/poster transition-transform duration-300 ease-out hover:scale-[1.02] z-30 will-change-transform transform-gpu shadow-2xl shrink-0">
+                                                <div className="relative w-[240px] lg:w-[300px] xl:w-[360px] aspect-[2/3] rounded-[24px] lg:rounded-[32px] overflow-hidden ring-1 ring-white/10 group/poster transition-transform duration-300 ease-out hover:scale-[1.02] z-30 shrink-0 shadow-2xl">
                                                     <Image
                                                         src={posterImg}
                                                         alt={decodeHtml(movie.name)}
                                                         fill
-                                                        className="object-cover transition-transform duration-300 group-hover/poster:scale-105 will-change-transform"
+                                                        className="object-cover transition-transform duration-300 ease-out group-hover/poster:scale-105"
                                                         priority={index === 0}
                                                         unoptimized
                                                         placeholder="blur"

@@ -11,6 +11,8 @@ const TYPE_LABELS: Record<string, string> = {
   'phim-bo': 'Phim Bộ',
   'hoat-hinh': 'Hoạt Hình',
   'tv-shows': 'TV Shows',
+  'phim-moi-cap-nhat': 'Phim Mới Cập Nhật',
+  'phim-sap-chieu': 'Phim Sắp Chiếu',
 };
 
 export default function ListScreen() {

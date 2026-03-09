@@ -20,8 +20,9 @@ import {
   Movie, getMoviesList
 } from '@/services/api';
 import { CONFIG } from '@/constants/config';
-import { useAuth } from '@/context/auth'; // Added imports
+import { useAuth } from '@/context/auth';
 import { COLORS, SPACING, RADIUS, BLUR } from '@/constants/theme';
+import { HOT_KEYWORDS, getSectionHref } from '@/constants/sections';
 
 const { width } = Dimensions.get('window');
 const HOME_CACHE_KEY = 'home_screen_cache_v2';
@@ -32,15 +33,6 @@ const NAV_PILLS = [
   { label: 'Phim lẻ', href: '/list/phim-le', active: false },
   { label: 'Hoạt hình', href: '/list/hoat-hinh', active: false },
   { label: 'TV Shows', href: '/list/tv-shows', active: false },
-];
-
-const HIGHLIGHT_CATS = [
-  { label: 'Chiếu Rạp', color: '#E6BF5C', slug: 'phim-chieu-rap' },
-  { label: 'Hàn Quốc', color: '#db2777', isCountry: true, slug: 'han-quoc' },
-  { label: 'Trung Quốc', color: '#ef4444', isCountry: true, slug: 'trung-quoc' },
-  { label: 'Hành Động', color: '#059669', slug: 'hanh-dong' },
-  { label: 'Tình Cảm', color: '#ec4899', slug: 'tinh-cam' },
-  { label: 'Kinh Dị', color: '#7c3aed', slug: 'kinh-di' },
 ];
 
 export default function HomeScreen() {
@@ -293,12 +285,12 @@ export default function HomeScreen() {
         }
 
         <View style={styles.catSection}>
-          <Text style={styles.sectionTitle}>Thể loại nổi bật</Text>
+          <Text style={styles.sectionTitle}>Từ khóa hot</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.catScroll}>
-            {HIGHLIGHT_CATS.map((cat, idx) => (
+            {HOT_KEYWORDS.map((cat, idx) => (
               <Link
                 key={idx}
-                href={cat.isCountry ? `/country/${cat.slug}` as any : `/category/${cat.slug}` as any}
+                href={getSectionHref(cat.slug, cat.type) as any}
                 asChild
               >
                 <Pressable style={styles.catPill}>
@@ -337,15 +329,15 @@ export default function HomeScreen() {
           ) : (
             <View style={styles.movieRows}>
               {data.phimChieuRap.length > 0 && (
-                <MovieRow title="Phim Chiếu Rạp Mới" movies={data.phimChieuRap} slug="phim-chieu-rap" />
+                <MovieRow title="Phim Chiếu Rạp Mới" movies={data.phimChieuRap} slug="phim-chieu-rap" type="category" />
               )}
 
               {data.phimMoi.length > 0 && (
-                <MovieRow title="Phim Mới Cập Nhật" movies={slicedPhimMoi} slug="phim-moi-cap-nhat" />
+                <MovieRow title="Phim Mới Cập Nhật" movies={slicedPhimMoi} slug="phim-moi-cap-nhat" type="list" />
               )}
 
-              <MovieRow title="Phim Bộ Mới Nhất" movies={slicedPhimBo} slug="phim-bo" />
-              <MovieRow title="Phim Lẻ Đặc Sắc" movies={slicedPhimLe} slug="phim-le" />
+              <MovieRow title="Phim Bộ Mới Nhất" movies={slicedPhimBo} slug="phim-bo" type="list" />
+              <MovieRow title="Phim Lẻ Đặc Sắc" movies={slicedPhimLe} slug="phim-le" type="list" />
 
               {data.hanQuoc.length > 0 && (
                 <MovieRow title="Phim Hàn Quốc Hot" movies={data.hanQuoc} slug="han-quoc" type="country" />
@@ -361,11 +353,11 @@ export default function HomeScreen() {
                 <MovieRow title="Phim Tình Cảm Lãng Mạn" movies={data.tinhCam} slug="tinh-cam" type="category" />
               )}
 
-              <MovieRow title="Hoạt Hình" movies={slicedHoatHinh} slug="hoat-hinh" />
-              <MovieRow title="TV Shows" movies={slicedTvShows} slug="tv-shows" />
+              <MovieRow title="Hoạt Hình" movies={slicedHoatHinh} slug="hoat-hinh" type="list" />
+              <MovieRow title="TV Shows" movies={slicedTvShows} slug="tv-shows" type="list" />
 
               {data.sapChieu.length > 0 && (
-                <MovieRow title="Phim Sắp Chiếu" movies={data.sapChieu} slug="phim-sap-chieu" />
+                <MovieRow title="Phim Sắp Chiếu" movies={data.sapChieu} slug="phim-sap-chieu" type="list" />
               )}
             </View>
           )

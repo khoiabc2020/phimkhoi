@@ -27,21 +27,21 @@ export default function TopicSection() {
                 </h2>
             </div>
 
-            {/* Horizontal Scroll - Pill Style (iOS 26) */}
-            <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1 mask-gradient-responsive">
+            {/* Horizontal Scroll - Pill Style (iOS 26): dot luôn bên trái, không đè lên chữ */}
+            <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1 mask-gradient-responsive scroll-smooth">
                 {topics.map((topic) => (
                     <Link
                         key={topic.id}
                         href={topic.href}
-                        className="group flex-shrink-0 flex items-center gap-3 px-4 py-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors duration-200 active:scale-95"
+                        className="group flex-shrink-0 flex items-center gap-2.5 min-w-0 pl-3 pr-4 py-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors duration-200 active:scale-[0.98]"
                     >
-                        {/* Dot Indicator */}
-                        <div
-                            className="w-2 h-2 rounded-full"
+                        {/* Dot: cố định bên trái, không co */}
+                        <span
+                            className="w-2 h-2 rounded-full flex-shrink-0"
                             style={{ backgroundColor: topic.color }}
+                            aria-hidden
                         />
-
-                        <span className="text-sm font-medium text-white/90 group-hover:text-white whitespace-nowrap">
+                        <span className="text-sm font-medium text-white/90 group-hover:text-white whitespace-nowrap truncate min-w-0">
                             {topic.name}
                         </span>
                     </Link>
