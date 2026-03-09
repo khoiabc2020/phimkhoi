@@ -141,8 +141,8 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                         blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
                                         unoptimized
                                     />
-                                    {/* Gradient bottom (nhẹ hơn để hợp nền sáng) */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/95 via-[#020617]/40 to-transparent" />
+                                    {/* Gradient bottom sáng hơn để không làm tối nền */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/70 via-[#020617]/20 to-transparent" />
                                     {/* Poster nhỏ góc trái dưới */}
                                     <Link href={`/phim/${movie.slug}`} className="absolute bottom-3 left-3 w-[72px] h-[100px] rounded-xl overflow-hidden shadow-xl ring-1 ring-white/15 shrink-0">
                                         <Image src={posterImg} alt="" fill className="object-cover" sizes="80px"
@@ -233,24 +233,25 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                             const backdropImg = getHeroImage(movie, 'backdrop');
 
                             return (
-                                <div key={movie._id} className="relative flex-[0_0_100%] min-w-0 h-full bg-[#0B0D12] overflow-hidden">
+                                <div key={movie._id} className="relative flex-[0_0_100%] min-w-0 h-full bg-transparent overflow-hidden">
 
                                     {/* 1. Cinematic Background */}
                                     <div className="absolute inset-0 z-0 select-none">
-                                        <div className="absolute inset-0 bg-black/50 z-10 pointer-events-none" /> {/* Tối giản màu nền Darken */}
+                                        {/* Làm overlay sáng hơn để hero không bị đen */}
+                                        <div className="absolute inset-0 bg-black/25 z-10 pointer-events-none" />
                                         <Image
                                             src={backdropImg}
                                             alt="bg"
                                             fill
-                                            className="object-cover opacity-60 will-change-transform"
+                                            className="object-cover opacity-80 will-change-transform"
                                             priority={index === 0}
                                             unoptimized
                                             placeholder={index === 0 ? "empty" : "blur"}
                                             blurDataURL={index === 0 ? undefined : "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="}
                                         />
-                                        {/* Vignettes for focus */}
-                                        <div className="absolute inset-0 bg-gradient-to-r from-[#0B0D12] via-[#0B0D12]/80 to-transparent z-20 w-2/3 pointer-events-none" />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D12] via-transparent to-transparent z-20 h-1/2 bottom-0 top-auto pointer-events-none" />
+                                        {/* Vignettes for focus (nhẹ hơn, không che quá nhiều) */}
+                                        <div className="absolute inset-0 bg-gradient-to-r from-[#020617]/60 via-[#020617]/20 to-transparent z-20 w-2/3 pointer-events-none" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/45 via-transparent to-transparent z-20 h-1/2 bottom-0 top-auto pointer-events-none" />
                                     </div>
 
                                     {/* 2. Content Container */}
@@ -306,7 +307,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
                                                 </div>
 
                                                 {/* Description */}
-                                                <p className="text-white/60 text-sm md:text-base leading-relaxed line-clamp-3 font-normal max-w-2xl text-shadow-sm">
+                                                <p className="text-white/70 text-sm md:text-base leading-relaxed line-clamp-3 font-normal max-w-2xl text-shadow-sm">
                                                     {decodeHtml(stripHtml(movie.content || ""))}
                                                 </p>
 
