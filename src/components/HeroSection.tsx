@@ -72,14 +72,15 @@ function getHeroImage(movie: any, type: "poster" | "backdrop", variant: "mobile"
     const tmdbData = movie?.tmdbData;
     if (tmdbData) {
         if (type === "poster" && tmdbData.poster_path) {
-            return tmdbImage(tmdbData.poster_path, variant === "desktop" ? "w500" : "w342");
+            // Hero: luôn đi qua proxy để VPS + Cloudflare cache
+            return getImageUrl(tmdbImage(tmdbData.poster_path, variant === "desktop" ? "w500" : "w342"), true);
         }
         if (type === "backdrop" && tmdbData.backdrop_path) {
-            return tmdbImage(tmdbData.backdrop_path, variant === "desktop" ? "w1280" : "w780");
+            return getImageUrl(tmdbImage(tmdbData.backdrop_path, variant === "desktop" ? "w1280" : "w780"), true);
         }
     }
     const apiPath = type === "backdrop" ? movie.thumb_url || movie.poster_url : movie.poster_url || movie.thumb_url;
-    return apiPath ? getImageUrl(apiPath) : "/placeholder.jpg";
+    return apiPath ? getImageUrl(apiPath, true) : "/placeholder.jpg";
 }
 
 function MobileHero({

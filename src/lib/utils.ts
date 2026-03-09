@@ -13,7 +13,12 @@ export function getImageUrl(url: string, proxy = true): string {
         finalUrl = `https://phimimg.com/${url}`;
     }
 
-    // Nếu ảnh đã nằm trên CDN/host tin cậy thì trả URL trực tiếp
+    // Trường hợp ép proxy: luôn đi qua /api/img-proxy để VPS + Cloudflare cache
+    if (proxy && finalUrl.startsWith("http")) {
+        return `/api/img-proxy?url=${encodeURIComponent(finalUrl)}`;
+    }
+
+    // Ngược lại: nếu ảnh đã nằm trên CDN/host tin cậy thì trả URL trực tiếp
     if (finalUrl.startsWith("http")) {
         try {
             const host = new URL(finalUrl).hostname;
@@ -33,10 +38,7 @@ export function getImageUrl(url: string, proxy = true): string {
             // ignore URL parse error and fall through to proxy logic
         }
 
-        // Các host khác vẫn có thể route qua proxy nếu bật cờ
-        if (proxy) {
-            return `/api/img-proxy?url=${encodeURIComponent(finalUrl)}`;
-        }
+        // Các host khác: giữ nguyên URL gốc
     }
 
     return finalUrl;
