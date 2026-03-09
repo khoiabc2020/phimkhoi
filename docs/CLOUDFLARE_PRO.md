@@ -10,13 +10,17 @@ Sau khi mua gói **Cloudflare Pro**, bạn có thể bật các tính năng sau 
 
 ### Tạo Cache Rules phù hợp Next.js
 
-| Thứ tự | Tên rule | Khi nào áp dụng | Hành động |
-|--------|----------|------------------|------------|
-| 1 | Cache Static Forever | URI Path starts with `/_next/static` | Cache eligibility: Eligible for cache. Edge TTL: Override → 1 year. Browser TTL: 1 year. |
-| 2 | Cache Images | URI Path matches `\.(jpg|jpeg|png|gif|webp|avif)$` OR hostname equals `img.ophim.live` / `image.tmdb.org` (nếu bạn proxy ảnh qua CF) | Edge TTL: 1 month. Browser TTL: 1 week. |
-| 3 | Cache API Short | URI Path starts with `/api/` | Edge TTL: Override → 1 minute (hoặc 5 phút cho `/api/mobile/home`). Browser TTL: 1 minute. (API động thì cache ngắn.) |
-| 4 | Bypass API Auth | URI Path starts with `/api/user` hoặc `/api/auth` | Bypass cache (không cache). |
-| 5 | Cache HTML Short | URI Path is `/` hoặc không có extension và không match `/api/` | Edge TTL: 2–5 phút. Browser TTL: 0 (hoặc 1 phút). Để Next.js revalidate hoạt động đúng. |
+| # | Tên rule | **When (expression trong Cloudflare)** | **Then (bạn set trong rule)** |
+|---|----------|--------------------------------------|------------------------------|
+| 1 | Cache Next static (1 năm) | `starts_with(http.request.uri.path, "/_next/static/")` | **Cache eligibility**: Eligible for cache  \n**Edge TTL**: Override → **1 year**  \n**Browser TTL**: Override → **1 year** |
+| 2 | Cache assets/ảnh (30 ngày) | `(http.request.uri.path wildcard "*.css") or (http.request.uri.path wildcard "*.js") or (http.request.uri.path wildcard "*.mjs") or (http.request.uri.path wildcard "*.map") or (http.request.uri.path wildcard "*.woff2") or (http.request.uri.path wildcard "*.woff") or (http.request.uri.path wildcard "*.ttf") or (http.request.uri.path wildcard "*.eot") or (http.request.uri.path wildcard "*.png") or (http.request.uri.path wildcard "*.jpg") or (http.request.uri.path wildcard "*.jpeg") or (http.request.uri.path wildcard "*.gif") or (http.request.uri.path wildcard "*.webp") or (http.request.uri.path wildcard "*.avif") or (http.request.uri.path wildcard "*.svg") or (http.request.uri.path wildcard "*.ico")` | **Cache eligibility**: Eligible for cache  \n**Edge TTL**: Override → **30 days**  \n**Browser TTL**: Override → **7 days** |
+| 3 | Cache API public (1 giờ) | `http.request.uri.path in {"/api/mobile/home" "/api/mobile/hero-trending"}` | **Cache eligibility**: Eligible for cache  \n**Edge TTL**: Override → **1 hour**  \n**Browser TTL**: Override → **60 seconds** |
+| 4 | Bypass API đăng nhập/user | `starts_with(http.request.uri.path, "/api/auth") or starts_with(http.request.uri.path, "/api/user")` | **Cache eligibility**: **Bypass cache** |
+| 5 | HTML (khuyến nghị an toàn) | `(http.request.method eq "GET") and not starts_with(http.request.uri.path, "/api/") and not starts_with(http.request.uri.path, "/_next/") and not ((http.request.uri.path wildcard "*.css") or (http.request.uri.path wildcard "*.js") or (http.request.uri.path wildcard "*.mjs") or (http.request.uri.path wildcard "*.map") or (http.request.uri.path wildcard "*.woff2") or (http.request.uri.path wildcard "*.woff") or (http.request.uri.path wildcard "*.ttf") or (http.request.uri.path wildcard "*.eot") or (http.request.uri.path wildcard "*.png") or (http.request.uri.path wildcard "*.jpg") or (http.request.uri.path wildcard "*.jpeg") or (http.request.uri.path wildcard "*.gif") or (http.request.uri.path wildcard "*.webp") or (http.request.uri.path wildcard "*.avif") or (http.request.uri.path wildcard "*.svg") or (http.request.uri.path wildcard "*.ico"))` | **Khuyến nghị**: để mặc định (không ép “Cache Everything”), tránh cache nhầm HTML có cá nhân hoá. Nếu bạn muốn cache HTML ở edge thì chỉ nên dùng **Edge TTL ≥ 1 hour** và cần quy trình **Purge cache khi deploy**. |
+
+**Lưu ý quan trọng (Cloudflare Pro):** nếu bạn dùng **Edge TTL Override** trong rule, Cloudflare Pro có **Minimum Edge Cache TTL = 1 hour**. Vì vậy các rule “cache ngắn vài phút” ở edge là **không áp dụng được** trên Pro (trừ khi bạn không override và để origin tự control).
+
+**Lưu ý quan trọng (Cloudflare Pro):** biểu thức Rules Language dùng `starts_with()`/`ends_with()` dưới dạng **hàm**. Ví dụ đúng: `starts_with(http.request.uri.path, "/_next/static/")` (không viết kiểu `http.request.uri.path starts_with ...`).
 
 **Cách tạo (ví dụ rule 1):**
 
