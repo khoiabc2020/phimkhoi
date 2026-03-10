@@ -46,17 +46,20 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
     try {
         if (!TMDB_API_KEY) return null;
 
+        // Force originalName (English/Pinyin) as the primary search query, then fallback to Vietnamese name
         const queries = [verification?.originalName, query].filter(Boolean) as string[];
         // Deduplicate
         const uniqueQueries = [...new Set(queries)];
 
         for (const q of uniqueQueries) {
             const cleanQuery = cleanQueryString(q);
-            const endpoints = type === 'tv' ? ['tv', 'movie'] : ['movie', 'tv'];
+            // Search 'tv' primarily for Asian dramas (Thuyết Minh/Lồng Tiếng usually means series)
+            const isLikelyTv = type === 'tv' || query.toLowerCase().includes("tập") || query.toLowerCase().includes("thuyết minh");
+            const endpoints = isLikelyTv ? ['tv', 'movie'] : ['movie', 'tv'];
 
             for (const endpoint of endpoints) {
                 // Thêm &_v=1 để phá cache vì NextJS lưu cache fetch API quá lâu (1 tiếng)
-                let url = `${TMDB_API_URL}/search/${endpoint}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanQuery)}&language=vi-VN&_v=1`;
+                let url = `${TMDB_API_URL}/search/${endpoint}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanQuery)}&language=vi-VN&_v=2`;
 
                 if (year) {
                     if (endpoint === 'movie') url += `&primary_release_year=${year}`;
@@ -84,7 +87,7 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
                         // 1. Check original name from verification
                         if (verification?.originalName) {
                             const originalTitle = endpoint === 'movie' ? item.original_title : item.original_name;
-                            if (originalTitle && calculateSimilarity(verification.originalName, originalTitle) >= 0.5) {
+                            if (originalTitle && calculateSimilarity(verification.originalName, originalTitle) >= 0.35) {
                                 isMatch = true;
                             }
                         }
@@ -96,11 +99,11 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
                         if (localTitle && calculateSimilarity(cleanQuery, localTitle) >= 0.5) isMatch = true;
                         if (originalTitleSearch && calculateSimilarity(cleanQuery, originalTitleSearch) >= 0.5) isMatch = true;
 
-                        // 3. If year matches exactly, we can be a bit more lenient, but still require *some* similarity or TMDB ranking
-                        if (!isMatch && year && itemYear === year) {
-                            // Only accept if it's an exact year match AND we really have no other way to verify it.
-                            // TMDB usually sorts best match first. Let's trust TMDB's first result if year matches exactly.
-                            isMatch = true;
+                        // 3. Fallback: If Chinese/Korean names fail to match TMDB's English names, we rely strictly on the similarity check above.
+                        // We DO NOT force a match just because the year matches, as that leads to hilarious false positives (like Western movies for Chinese dramas).
+                        if (!isMatch && itemYear === year) {
+                            // Only force match if the query was EXACTLY the original name, meaning TMDB returned this as the #1 result for the original name
+                            if (q === verification?.originalName) isMatch = true;
                         }
 
                         return isMatch;
