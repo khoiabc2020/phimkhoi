@@ -72,7 +72,12 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
 
     // ==> TỐI ƯU: Fetch song song tất cả dữ liệu phụ (TMDB + Related + isFavorite + isInWatchlist)
     const [tmdbSearch, relatedMoviesRaw, isFavResult, isWatchlistResult] = await Promise.allSettled([
-        searchTMDBMovie(movie?.origin_name || movie?.name, movie?.year, type),
+        searchTMDBMovie(
+            movie?.origin_name || movie?.name,
+            movie?.year ? parseInt(movie.year.toString().split("-")[0]) : undefined,
+            type,
+            { originalName: movie?.origin_name, countrySlug: movie?.country?.[0]?.slug }
+        ),
         movie?.category?.[0]?.slug
             ? getMoviesList('phim-moi-cap-nhat', { category: movie.category[0].slug, limit: 12 })
             : Promise.resolve(null),

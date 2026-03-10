@@ -54,10 +54,11 @@ export async function getMovieCast(
     query: string,
     year?: number,
     type: 'movie' | 'tv' = 'movie',
-    localizedActors?: string[]
+    localizedActors?: string[],
+    verification?: { originalName?: string; countrySlug?: string }
 ) {
     try {
-        const movie = await searchTMDBMovie(query, year, type);
+        const movie = await searchTMDBMovie(query, year, type, verification);
         if (movie) {
             const details = await getTMDBDetails(movie.id, type);
             if (details && details.credits && details.credits.cast) {

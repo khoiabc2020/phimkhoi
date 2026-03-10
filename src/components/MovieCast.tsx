@@ -10,7 +10,13 @@ export default async function MovieCast({ movie, slug, isCompact = false }: { mo
         type = 'tv';
     }
 
-    let cast = await getMovieCast(movie.origin_name || movie.name, movie.year, type, movie.actor);
+    let cast = await getMovieCast(
+        movie.origin_name || movie.name,
+        movie.year ? parseInt(movie.year.toString().split("-")[0]) : undefined,
+        type,
+        movie.actor,
+        { originalName: movie.origin_name, countrySlug: movie.country?.[0]?.slug }
+    );
 
     // Filter out dummy actors
     cast = cast.filter((actor: any) => !actor.name?.toLowerCase().includes('đang cập nhật') && !actor.name?.toLowerCase().includes('updating'));
