@@ -283,6 +283,28 @@ html {
   animation: slide-up 0.4s ease-out both;
 }
 
+/* Hero content entry — fast, GPU-friendly fade+lift */
+.animate-hero-in {
+  animation: hero-content-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animation-delay-100 {
+  animation-delay: 80ms;
+}
+
+.animation-delay-150 {
+  animation-delay: 140ms;
+}
+
+.animation-delay-200 {
+  animation-delay: 200ms;
+}
+
+/* Custom backdrop transition duration for crossfade slides */
+.duration-800 {
+  transition-duration: 800ms;
+}
+
 .animate-fade-in {
   animation: fade-in 0.3s ease-out both;
 }

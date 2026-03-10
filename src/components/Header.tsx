@@ -231,6 +231,15 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         </Link>
                     </div>
 
+                    {/* Overlay to close dropdowns when clicking outside nav */}
+                    {openDropdown && (
+                        <div
+                            className="fixed inset-0 z-30"
+                            onClick={() => setOpenDropdown(null)}
+                            aria-hidden="true"
+                        />
+                    )}
+
                     {/* Middle Section: Desktop Nav */}
                     <nav
                         ref={navRef}
@@ -334,7 +343,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                 onSubmit={handleSearch}
                                 className={cn(
                                     "flex relative items-center transition-all duration-500 ease-out h-10",
-                                    isSearchOpen ? "w-[calc(100vw-6rem)] md:w-80 lg:w-60 absolute right-4 lg:relative lg:right-0 bg-[#0B0D12] lg:bg-transparent z-40 rounded-full" : "w-10 relative"
+                                    isSearchOpen ? "w-[calc(100vw-6rem)] md:w-80 lg:w-60 absolute right-4 lg:relative lg:right-0 z-40 rounded-full" : "w-10 relative"
                                 )}
                             >
                                 <button
@@ -364,7 +373,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         onFocus={() => setShowHistory(true)}
                                         placeholder="Tìm kiếm..."
-                                        className="w-full h-10 bg-white/[0.08] border border-white/[0.08] rounded-full pl-4 pr-10 text-sm text-white outline-none focus:border-primary/50 focus:bg-black/80 transition-all duration-300 shadow-xl"
+                                        className="w-full h-10 bg-[#0c0f18]/95 border border-white/[0.12] rounded-full pl-4 pr-10 text-sm text-white outline-none focus:border-primary/50 transition-all duration-300 shadow-xl backdrop-blur-md"
                                     />
 
                                     {isSearchOpen && (
@@ -528,11 +537,11 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                 </div>
                             </form>
 
-                            {/* Invisible overlay to close history when clicking out */}
-                            {showHistory && isSearchOpen && (
+                            {/* Invisible overlay to close history + search when clicking out */}
+                            {isSearchOpen && (
                                 <div
                                     className="fixed inset-0 z-30"
-                                    onClick={() => setShowHistory(false)}
+                                    onClick={() => { setShowHistory(false); setIsSearchOpen(false); setSearchQuery(""); }}
                                     aria-hidden="true"
                                 />
                             )}

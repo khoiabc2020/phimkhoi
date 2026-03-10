@@ -2,13 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Play, ChevronRight, Info } from "lucide-react";
+import { Play, Info, ChevronLeft, ChevronRight } from "lucide-react";
 import { Movie } from "@/services/api";
 import { getImageUrl, decodeHtml, cn } from "@/lib/utils";
 import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from "react";
-import useEmblaCarousel from "embla-carousel-react";
-import Autoplay from "embla-carousel-autoplay";
 import FavoriteButton from "./FavoriteButton";
+
+// ─── Utils ────────────────────────────────────────────────────────────────────
 
 function useMediaQuery(query: string) {
     return useSyncExternalStore(
@@ -30,14 +30,14 @@ const blurData =
 
 function formatQualityLabel(quality?: string) {
     if (!quality) return null;
-    const q = String(quality).trim();
-    const upper = q.toUpperCase();
-    if (upper.includes("FULL") && upper.includes("HD")) return "FHD";
-    if (upper === "FULLHD") return "FHD";
-    if (upper.includes("BLURAY")) return "BR";
-    if (upper.includes("WEB-DL") || upper.includes("WEBDL")) return "WEB";
-    if (upper === "FHD" || upper === "HD" || upper === "4K" || upper === "CAM") return upper;
-    return q.length > 6 ? q.slice(0, 6) : q;
+    const q = String(quality).trim().toUpperCase();
+    if (q.includes("FULL") && q.includes("HD")) return "FHD";
+    if (q === "FULLHD") return "FHD";
+    if (q.includes("BLURAY")) return "BR";
+    if (q.includes("WEB-DL") || q.includes("WEBDL")) return "WEB";
+    if (q === "FHD" || q === "HD" || q === "4K" || q === "CAM") return q;
+    const orig = String(quality).trim();
+    return orig.length > 6 ? orig.slice(0, 6) : orig;
 }
 
 function getFavoriteData(movie: Movie) {
@@ -60,421 +60,408 @@ function tmdbImage(path: string, size: string) {
 }
 
 function getHeroImage(movie: any, type: "poster" | "backdrop", variant: "mobile" | "desktop") {
-    const tmdbData = movie?.tmdbData;
-    if (tmdbData) {
-        if (type === "poster" && tmdbData.poster_path) {
-            return getImageUrl(tmdbImage(tmdbData.poster_path, variant === "desktop" ? "w500" : "w342"), true);
-        }
-        if (type === "backdrop" && tmdbData.backdrop_path) {
-            return getImageUrl(tmdbImage(tmdbData.backdrop_path, variant === "desktop" ? "w1280" : "w780"), true);
-        }
+    const tmdb = movie?.tmdbData;
+    if (tmdb) {
+        if (type === "poster" && tmdb.poster_path)
+            return getImageUrl(tmdbImage(tmdb.poster_path, variant === "desktop" ? "w500" : "w342"), true);
+        if (type === "backdrop" && tmdb.backdrop_path)
+            return getImageUrl(tmdbImage(tmdb.backdrop_path, variant === "desktop" ? "w1280" : "w780"), true);
     }
-    const apiPath = type === "backdrop" ? movie.thumb_url || movie.poster_url : movie.poster_url || movie.thumb_url;
-    return apiPath ? getImageUrl(apiPath, true) : "/placeholder.jpg";
+    const api = type === "backdrop" ? movie.thumb_url || movie.poster_url : movie.poster_url || movie.thumb_url;
+    return api ? getImageUrl(api, true) : "/placeholder.jpg";
 }
 
-// ─── Hook: track active slide index from Embla ───────────────────────────────
-function useSelectedIndex(embla: any) {
-    const [selectedIndex, setSelectedIndex] = useState(0);
+// ─── Autoplay hook ────────────────────────────────────────────────────────────
+
+function useAutoplay(count: number, delay: number, paused: boolean) {
+    const [index, setIndex] = useState(0);
+    const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+    const go = useCallback((i: number) => setIndex((i + count) % count), [count]);
+
     useEffect(() => {
-        if (!embla) return;
-        const onSelect = () => setSelectedIndex(embla.selectedScrollSnap());
-        embla.on("select", onSelect);
-        onSelect();
-        return () => { embla.off("select", onSelect); };
-    }, [embla]);
-    return selectedIndex;
+        if (paused || count <= 1) return;
+        timerRef.current = setInterval(() => setIndex((p) => (p + 1) % count), delay);
+        return () => { if (timerRef.current) clearInterval(timerRef.current); };
+    }, [count, delay, paused]);
+
+    const next = useCallback(() => {
+        if (timerRef.current) clearInterval(timerRef.current);
+        setIndex((p) => (p + 1) % count);
+    }, [count]);
+
+    const prev = useCallback(() => {
+        if (timerRef.current) clearInterval(timerRef.current);
+        setIndex((p) => (p - 1 + count) % count);
+    }, [count]);
+
+    return { index, go, next, prev };
 }
 
-// ─── Mobile HeroSection ───────────────────────────────────────────────────────
-function MobileHero({ movies }: { movies: Movie[] }) {
-    const autoplay = useRef(
-        Autoplay({ delay: 5000, stopOnInteraction: true, stopOnMouseEnter: false })
-    );
-    const [emblaRef, emblaApi] = useEmblaCarousel(
-        { loop: true, align: "start", duration: 30 },
-        [autoplay.current]
-    );
-    const selectedIndex = useSelectedIndex(emblaApi);
+// ─── Dot indicators ───────────────────────────────────────────────────────────
 
-    const scrollTo = useCallback(
-        (index: number) => {
-            if (!emblaApi) return;
-            autoplay.current.stop();
-            emblaApi.scrollTo(index);
-        },
-        [emblaApi]
+function Dots({ count, active, onGo }: { count: number; active: number; onGo: (i: number) => void }) {
+    if (count <= 1) return null;
+    return (
+        <div className="flex items-center gap-2">
+            {Array.from({ length: count }).map((_, i) => (
+                <button
+                    key={i}
+                    onClick={() => onGo(i)}
+                    aria-label={`Slide ${i + 1}`}
+                    className={cn(
+                        "rounded-full transition-all duration-400 ease-out",
+                        i === active ? "w-7 h-1.5 bg-[#F4C84A]" : "w-1.5 h-1.5 bg-white/30 hover:bg-white/60"
+                    )}
+                />
+            ))}
+        </div>
     );
+}
+
+// ─── MOBILE HERO ──────────────────────────────────────────────────────────────
+
+function MobileHero({ movies }: { movies: Movie[] }) {
+    const { index, go, next, prev } = useAutoplay(movies.length, 5500, false);
+    const movie = movies[index] as any;
+
+    const backdropImg = getHeroImage(movie, "backdrop", "mobile");
+    const posterImg = getHeroImage(movie, "poster", "mobile");
+    const rating = movie.tmdbData?.vote_average ? movie.tmdbData.vote_average.toFixed(1) : null;
+
+    // touch swipe
+    const touchX = useRef<number | null>(null);
+    const onTouchStart = (e: React.TouchEvent) => { touchX.current = e.touches[0].clientX; };
+    const onTouchEnd = (e: React.TouchEvent) => {
+        if (touchX.current === null) return;
+        const dx = e.changedTouches[0].clientX - touchX.current;
+        if (Math.abs(dx) > 48) dx < 0 ? next() : prev();
+        touchX.current = null;
+    };
 
     return (
-        <div className="relative w-full bg-transparent" style={{ contain: "layout paint" }}>
-            <div className="overflow-hidden" ref={emblaRef}>
-                <div className="flex touch-pan-y">
-                    {movies.map((m: any, i) => {
-                        const movie = m;
-                        const posterImg = getHeroImage(movie, "poster", "mobile");
-                        const backdropImg = getHeroImage(movie, "backdrop", "mobile");
-                        const rating = movie.tmdbData?.vote_average
-                            ? movie.tmdbData.vote_average.toFixed(1)
-                            : null;
-                        const isActive = i === selectedIndex;
-                        // Priority: first 2 slides. Preload next. Lazy rest.
-                        const imgPriority = i < 2;
-                        const imgLoading = i < 2 ? "eager" : "lazy";
+        <div
+            className="relative w-full select-none"
+            onTouchStart={onTouchStart}
+            onTouchEnd={onTouchEnd}
+        >
+            {/* ── Crossfade slide stack ── */}
+            <div className="relative w-full overflow-hidden">
+                {movies.map((m: any, i) => {
+                    const bg = getHeroImage(m, "backdrop", "mobile");
+                    const po = getHeroImage(m, "poster", "mobile");
+                    const isPriority = i < 2;
+                    const isActive = i === index;
 
-                        return (
-                            <div
-                                key={movie._id || i}
-                                className="relative flex-[0_0_100%] min-w-0 flex flex-col"
-                            >
-                                <div className="relative w-full h-[200px] sm:h-[260px] shrink-0 overflow-hidden">
-                                    <Image
-                                        src={backdropImg}
-                                        alt={decodeHtml(movie.name)}
-                                        fill
-                                        className="object-cover object-top"
-                                        priority={imgPriority}
-                                        loading={imgLoading}
-                                        sizes="100vw"
-                                        placeholder="blur"
-                                        blurDataURL={blurData}
-                                        unoptimized
-                                        decoding="async"
-                                        fetchPriority={i === 0 ? "high" : i < 3 ? "auto" : "low"}
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/75 via-[#020617]/20 to-transparent" />
-                                    <Link
-                                        href={`/phim/${movie.slug}`}
-                                        className="absolute bottom-3 left-3 w-[72px] h-[100px] rounded-xl overflow-hidden shadow-xl ring-1 ring-white/15 shrink-0"
-                                    >
-                                        <Image
-                                            src={posterImg}
-                                            alt=""
-                                            fill
-                                            className="object-cover"
-                                            sizes="80px"
-                                            placeholder="blur"
-                                            blurDataURL={blurData}
-                                            unoptimized
-                                            loading={imgLoading}
-                                            decoding="async"
-                                        />
-                                    </Link>
+                    return (
+                        <div
+                            key={m._id || i}
+                            className={cn(
+                                "absolute inset-0 transition-opacity duration-700 ease-in-out",
+                                i === 0 ? "relative" : "absolute inset-0",
+                                isActive ? "opacity-100 z-10" : "opacity-0 z-0"
+                            )}
+                            style={i > 0 ? { position: "absolute", inset: 0 } : undefined}
+                            aria-hidden={!isActive}
+                        >
+                            {/* Backdrop */}
+                            <div className="relative w-full h-[210px] sm:h-[260px] overflow-hidden bg-[#080d18]">
+                                <Image
+                                    src={bg}
+                                    alt=""
+                                    fill
+                                    className="object-cover object-top"
+                                    priority={isPriority}
+                                    loading={isPriority ? "eager" : "lazy"}
+                                    sizes="100vw"
+                                    placeholder="blur"
+                                    blurDataURL={blurData}
+                                    unoptimized
+                                    decoding="async"
+                                />
+                                {/* Gradient overlay */}
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/30 to-transparent" />
+                                <div className="absolute inset-0 bg-gradient-to-r from-[#020617]/50 via-transparent to-transparent" />
 
-                                    <div className="absolute bottom-3 right-3 flex flex-col items-end gap-1.5 z-40">
-                                        {movie.quality && (
-                                            <span className="bg-[#F4C84A] text-black text-[10px] font-black px-2 py-0.5 rounded shadow-sm tracking-wide max-w-[64px] truncate">
-                                                {formatQualityLabel(movie.quality) || movie.quality}
-                                            </span>
-                                        )}
-                                        {rating && (
-                                            <span className="bg-black/70 text-[#F4C84A] text-[10px] font-bold px-2 py-0.5 rounded">
-                                                ★ {rating}
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Content — animates in when slide is active */}
-                                <div
-                                    className={cn(
-                                        "px-4 pt-2 pb-6 flex flex-col gap-2 transition-all duration-500",
-                                        isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
+                                {/* Quality + rating badges */}
+                                <div className="absolute top-3 right-3 flex flex-col items-end gap-1.5 z-20">
+                                    {m.quality && (
+                                        <span className="bg-[#F4C84A] text-black text-[9px] font-black px-2 py-0.5 rounded tracking-wider shadow-md">
+                                            {formatQualityLabel(m.quality) || m.quality}
+                                        </span>
                                     )}
-                                >
-                                    <div className="pl-[84px]">
-                                        <h1 className="text-[17px] font-black text-white leading-snug line-clamp-2">
-                                            {decodeHtml(movie.name)}
-                                        </h1>
-                                        <div className="flex items-center gap-2 mt-1 flex-wrap">
-                                            {movie.year && <span className="text-[11px] text-gray-400">{movie.year}</span>}
-                                            {movie.category?.slice(0, 2).map((c: { id?: string; name?: string }) => (
-                                                <span key={c.id || c.name} className="text-[11px] text-gray-500">
-                                                    · {c.name}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-2 mt-1">
-                                        <Link
-                                            href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                            className="flex flex-1 items-center justify-center gap-2 h-11 rounded-full bg-[#F4C84A] text-black font-extrabold active:scale-[0.97] transition-transform duration-150"
-                                        >
-                                            <Play className="w-4 h-4 fill-black shrink-0" />
-                                            <span className="text-[13px]">Xem ngay</span>
-                                        </Link>
-
-                                        <Link
-                                            href={`/phim/${movie.slug}`}
-                                            className="w-11 h-11 flex items-center justify-center rounded-full bg-white/10 border border-white/15 active:scale-[0.97] transition-transform duration-150 shrink-0"
-                                        >
-                                            <Info className="w-4 h-4 text-white shrink-0" />
-                                        </Link>
-
-                                        <div className="w-11 h-11 flex items-center justify-center rounded-full bg-white/10 border border-white/15 active:scale-[0.97] transition-transform duration-150 shrink-0">
-                                            <FavoriteButton movieData={getFavoriteData(movie)} size="sm" />
-                                        </div>
-                                    </div>
+                                    {m.tmdbData?.vote_average && (
+                                        <span className="bg-black/70 backdrop-blur-sm text-[#F4C84A] text-[9px] font-bold px-2 py-0.5 rounded">
+                                            ★ {m.tmdbData.vote_average.toFixed(1)}
+                                        </span>
+                                    )}
                                 </div>
                             </div>
-                        );
-                    })}
-                </div>
+                        </div>
+                    );
+                })}
+
+                {/* Poster always on top (not crossfaded — just switches) */}
+                <Link
+                    href={`/phim/${movie.slug}`}
+                    className="absolute bottom-3 left-3 z-20 w-[68px] h-[96px] rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10"
+                >
+                    <Image
+                        src={posterImg}
+                        alt=""
+                        fill
+                        className="object-cover"
+                        sizes="72px"
+                        placeholder="blur"
+                        blurDataURL={blurData}
+                        unoptimized
+                        loading="eager"
+                        decoding="async"
+                    />
+                </Link>
             </div>
 
-            {/* Dots */}
-            <div className="flex justify-center gap-1.5 pb-4 pt-1 shrink-0">
-                {movies.map((_, i) => (
-                    <button
-                        key={i}
-                        onClick={() => scrollTo(i)}
-                        className={cn(
-                            "h-1.5 rounded-full transition-all duration-300 ease-out",
-                            i === selectedIndex ? "w-5 bg-[#F4C84A]" : "w-1.5 bg-white/25"
-                        )}
-                    />
-                ))}
+            {/* ── Content below ── */}
+            <div className="px-4 pt-2 pb-2">
+                <div className="pl-[80px] min-h-[64px]">
+                    <h1
+                        key={index}
+                        className="text-[16px] font-black text-white leading-snug line-clamp-2 animate-hero-in"
+                    >
+                        {decodeHtml(movie.name)}
+                    </h1>
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                        {movie.year && <span className="text-[11px] text-gray-400">{movie.year}</span>}
+                        {movie.category?.slice(0, 2).map((c: any) => (
+                            <span key={c.id || c.name} className="text-[11px] text-gray-500">· {c.name}</span>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Buttons */}
+                <div className="flex items-center gap-2 mt-3">
+                    <Link
+                        href={`/xem-phim/${movie.slug}?autoPlay=true`}
+                        className="flex flex-1 items-center justify-center gap-1.5 h-10 rounded-full bg-[#F4C84A] text-black font-extrabold text-[13px] active:scale-[0.97] transition-transform"
+                    >
+                        <Play className="w-3.5 h-3.5 fill-black shrink-0" />
+                        Xem ngay
+                    </Link>
+                    <Link
+                        href={`/phim/${movie.slug}`}
+                        className="w-10 h-10 flex items-center justify-center rounded-full bg-white/8 border border-white/12 active:scale-[0.97] transition-transform shrink-0"
+                    >
+                        <Info className="w-4 h-4 text-white shrink-0" />
+                    </Link>
+                    <div className="w-10 h-10 flex items-center justify-center rounded-full bg-white/8 border border-white/12 active:scale-[0.97] transition-transform shrink-0">
+                        <FavoriteButton movieData={getFavoriteData(movie)} size="sm" />
+                    </div>
+                </div>
+
+                {/* Dots */}
+                <div className="flex justify-center mt-3 mb-1">
+                    <Dots count={movies.length} active={index} onGo={go} />
+                </div>
             </div>
         </div>
     );
 }
 
-// ─── Desktop HeroSection ──────────────────────────────────────────────────────
+// ─── DESKTOP HERO ─────────────────────────────────────────────────────────────
+
 function DesktopHero({ movies }: { movies: Movie[] }) {
-    const autoplay = useRef(
-        Autoplay({ delay: 6000, stopOnInteraction: true, stopOnMouseEnter: true })
-    );
-    const [emblaRef, emblaApi] = useEmblaCarousel(
-        { loop: true, align: "start", duration: 35 },
-        [autoplay.current]
-    );
-    const selectedIndex = useSelectedIndex(emblaApi);
-
-    const scrollTo = useCallback(
-        (index: number) => {
-            if (!emblaApi) return;
-            autoplay.current.stop();
-            emblaApi.scrollTo(index);
-        },
-        [emblaApi]
-    );
-
-    const scrollNext = useCallback(() => {
-        if (!emblaApi) return;
-        autoplay.current.stop();
-        emblaApi.scrollNext();
-    }, [emblaApi]);
-
-    const scrollPrev = useCallback(() => {
-        if (!emblaApi) return;
-        autoplay.current.stop();
-        emblaApi.scrollPrev();
-    }, [emblaApi]);
+    const [paused, setPaused] = useState(false);
+    const { index, go, next, prev } = useAutoplay(movies.length, 6000, paused);
+    const movie = movies[index] as any;
 
     return (
         <div
-            className="relative w-full h-[55vh] lg:h-[70vh] xl:h-screen overflow-hidden"
-            style={{ contain: "layout style paint" }}
+            className="relative w-full h-[58vh] lg:h-[72vh] xl:h-[85vh] overflow-hidden bg-[#020617]"
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
         >
-            <div className="overflow-hidden h-full" ref={emblaRef}>
-                <div className="flex h-full">
-                    {movies.map((m: any, i) => {
-                        const movie = m;
-                        const posterImg = getHeroImage(movie, "poster", "desktop");
-                        const backdropImg = getHeroImage(movie, "backdrop", "desktop");
-                        const imgPriority = i < 2;
-                        const imgLoading = i < 2 ? "eager" : "lazy";
-                        const isActive = i === selectedIndex;
+            {/* ── Crossfade backdrop stack ── */}
+            {movies.map((m: any, i) => {
+                const bg = getHeroImage(m, "backdrop", "desktop");
+                const isActive = i === index;
+                return (
+                    <div
+                        key={`bg-${m._id || i}`}
+                        className={cn(
+                            "absolute inset-0 transition-opacity duration-800 ease-in-out will-change-[opacity]",
+                            isActive ? "opacity-100 z-[1]" : "opacity-0 z-0"
+                        )}
+                        aria-hidden={!isActive}
+                    >
+                        <Image
+                            src={bg}
+                            alt=""
+                            fill
+                            className="object-cover"
+                            priority={i < 2}
+                            loading={i < 2 ? "eager" : "lazy"}
+                            unoptimized
+                            sizes="100vw"
+                            placeholder="blur"
+                            blurDataURL={blurData}
+                            decoding="async"
+                        />
+                    </div>
+                );
+            })}
 
-                        return (
-                            <div
-                                key={movie._id || i}
-                                className="relative flex-[0_0_100%] min-w-0 h-full bg-transparent overflow-hidden"
-                            >
-                                {/* Background image layer */}
-                                <div className="absolute inset-0 z-0 select-none">
-                                    <div className="absolute inset-0 bg-black/20 z-10 pointer-events-none" />
-                                    <Image
-                                        src={backdropImg}
-                                        alt="bg"
-                                        fill
-                                        className="object-cover"
-                                        priority={imgPriority}
-                                        loading={imgLoading}
-                                        unoptimized
-                                        sizes="100vw"
-                                        placeholder="blur"
-                                        blurDataURL={blurData}
-                                        decoding="async"
-                                        fetchPriority={i === 0 ? "high" : i < 3 ? "auto" : "low"}
-                                    />
-                                    {/* Left gradient for text readability */}
-                                    <div className="absolute inset-0 bg-gradient-to-r from-[#020617]/80 via-[#020617]/40 to-transparent z-20 pointer-events-none" />
-                                    {/* Bottom gradient to blend into page */}
-                                    <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#020617] via-[#020617]/60 to-transparent z-20 pointer-events-none" />
-                                </div>
-
-                                {/* Content layer */}
-                                <div className="relative z-30 h-full container max-w-[1600px] mx-auto px-6 md:px-12 lg:px-24 xl:px-32 flex items-center">
-                                    <div className="grid grid-cols-12 gap-6 md:gap-8 lg:gap-12 w-full items-center mt-12 md:mt-16">
-                                        {/* Text + Buttons — animate in when active */}
-                                        <div
-                                            className={cn(
-                                                "col-span-12 md:col-span-8 lg:col-span-7 xl:col-span-6 space-y-5 lg:space-y-7 transition-all duration-500 ease-out",
-                                                isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
-                                            )}
-                                        >
-                                            {/* Tags row */}
-                                            <div className="flex flex-wrap items-center gap-2.5">
-                                                <span className="px-3 py-1 rounded bg-[#F4C84A] text-black text-xs font-bold tracking-wider uppercase">
-                                                    Phim Hot
-                                                </span>
-                                                {movie.year && (
-                                                    <span className="px-3 py-1 rounded border border-white/20 bg-white/5 text-white text-xs font-semibold">
-                                                        {movie.year}
-                                                    </span>
-                                                )}
-                                                {movie.quality && (
-                                                    <span className="px-3 py-1 rounded border border-[#F4C84A]/50 bg-[#F4C84A]/10 text-[#F4C84A] text-xs font-bold">
-                                                        {formatQualityLabel(movie.quality) || movie.quality}
-                                                    </span>
-                                                )}
-                                                <span className="flex items-center gap-1 text-white/80 text-xs font-medium">
-                                                    <span className="text-[#F4C84A]">★</span>{" "}
-                                                    {movie.tmdbData?.vote_average?.toFixed(1) || "N/A"}
-                                                </span>
-                                            </div>
-
-                                            <h1
-                                                className="text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight drop-shadow-2xl line-clamp-2 lg:line-clamp-3"
-                                                title={decodeHtml(movie.name)}
-                                            >
-                                                {decodeHtml(movie.name)}
-                                            </h1>
-
-                                            <div className="flex items-center gap-3 flex-wrap">
-                                                {movie.origin_name && (
-                                                    <h2
-                                                        className="text-[15px] text-[#F4C84A] font-medium tracking-wide opacity-90 truncate max-w-[200px] sm:max-w-xs"
-                                                        title={decodeHtml(movie.origin_name)}
-                                                    >
-                                                        {decodeHtml(movie.origin_name)}
-                                                    </h2>
-                                                )}
-                                                <span className="w-1 h-1 rounded-full bg-white/25" />
-                                                <div className="flex gap-2.5 flex-wrap">
-                                                    {movie.category?.slice(0, 3).map((c: any) => (
-                                                        <span
-                                                            key={c.id || c.name}
-                                                            className="text-white/70 text-xs font-semibold uppercase tracking-wider"
-                                                        >
-                                                            {c.name}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            </div>
-
-                                            <p className="text-white/65 text-sm md:text-base leading-relaxed line-clamp-3 font-normal max-w-xl">
-                                                {decodeHtml(stripHtml(movie.content || ""))}
-                                            </p>
-
-                                            {/* Action buttons */}
-                                            <div className="flex flex-wrap items-center gap-3 p-[6px] glass-pill w-fit">
-                                                <Link
-                                                    href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                                    className="flex items-center justify-center gap-2 h-12 px-6 sm:px-8 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-extrabold text-[15px] transition-all duration-200 hover:scale-105 active:scale-95"
-                                                >
-                                                    <Play className="w-5 h-5 fill-black shrink-0" />
-                                                    <span className="whitespace-nowrap">Xem Ngay</span>
-                                                </Link>
-
-                                                <Link
-                                                    href={`/phim/${movie.slug}`}
-                                                    className="flex items-center justify-center gap-2 h-12 px-5 sm:px-6 rounded-full glass hover:bg-white/15 border border-white/10 text-white font-bold text-[15px] transition-all hover:scale-105 active:scale-95"
-                                                >
-                                                    <Info className="w-5 h-5 text-white/80 shrink-0" />
-                                                    <span className="hidden sm:inline whitespace-nowrap">Chi tiết</span>
-                                                </Link>
-
-                                                <div className="h-12 w-12 flex items-center justify-center rounded-full glass hover:bg-white/15 border border-white/10 transition-all hover:scale-110 cursor-pointer shrink-0">
-                                                    <FavoriteButton movieData={getFavoriteData(movie)} size="md" />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Poster — animates in with slight scale */}
-                                        <div className="col-span-12 md:col-span-4 lg:col-span-5 xl:col-span-6 hidden md:flex justify-end lg:justify-center xl:justify-end pr-0 lg:pr-8 xl:pr-16">
-                                            <div
-                                                className={cn(
-                                                    "relative w-[220px] lg:w-[280px] xl:w-[340px] aspect-[2/3] rounded-[24px] lg:rounded-[32px] overflow-hidden ring-1 ring-white/10 group/poster z-30 shrink-0 shadow-2xl transition-all duration-500 ease-out hover:scale-[1.02]",
-                                                    isActive ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 translate-y-4"
-                                                )}
-                                            >
-                                                <Image
-                                                    src={posterImg}
-                                                    alt={decodeHtml(movie.name)}
-                                                    fill
-                                                    className="object-cover transition-transform duration-300 ease-out group-hover/poster:scale-105"
-                                                    priority={imgPriority}
-                                                    loading={imgLoading}
-                                                    unoptimized
-                                                    sizes="(min-width: 1280px) 340px, (min-width: 1024px) 280px, 220px"
-                                                    placeholder="blur"
-                                                    blurDataURL={blurData}
-                                                    decoding="async"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
+            {/* ── Gradient overlays (always on top) ── */}
+            <div className="absolute inset-0 z-[2] pointer-events-none">
+                {/* Left text readability */}
+                <div className="absolute inset-0 bg-gradient-to-r from-[#020617]/90 via-[#020617]/50 to-transparent" />
+                {/* Bottom blend into page */}
+                <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#020617] via-[#020617]/70 to-transparent" />
+                {/* Top subtle vignette */}
+                <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-[#020617]/40 to-transparent" />
             </div>
 
-            {/* Prev/Next buttons */}
-            {movies.length > 1 && (
-                <>
-                    <button
-                        onClick={scrollPrev}
-                        className="absolute left-4 lg:left-8 top-1/2 -translate-y-1/2 z-50 w-12 h-12 lg:w-14 lg:h-14 rounded-full glass flex items-center justify-center text-white/50 hover:text-black hover:bg-[#F4C84A] hover:border-[#F4C84A] transition-all duration-200"
-                        aria-label="Slide trước"
-                    >
-                        <ChevronRight className="w-6 h-6 rotate-180" />
-                    </button>
-                    <button
-                        onClick={scrollNext}
-                        className="absolute right-4 lg:right-8 top-1/2 -translate-y-1/2 z-50 w-12 h-12 lg:w-14 lg:h-14 rounded-full glass flex items-center justify-center text-white/50 hover:text-black hover:bg-[#F4C84A] hover:border-[#F4C84A] transition-all duration-200"
-                        aria-label="Slide tiếp theo"
-                    >
-                        <ChevronRight className="w-6 h-6" />
-                    </button>
-                </>
-            )}
+            {/* ── Content ── */}
+            <div className="relative z-[3] h-full container max-w-[1600px] mx-auto px-6 md:px-12 lg:px-20 xl:px-28 flex items-end pb-16 md:pb-20 lg:pb-24">
+                <div className="grid grid-cols-12 gap-8 lg:gap-12 w-full items-end">
 
-            {/* Dots */}
-            {movies.length > 1 && (
-                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-50 flex gap-3">
-                    {movies.map((_, idx) => (
-                        <button
-                            key={idx}
-                            onClick={() => scrollTo(idx)}
-                            aria-label={`Slide ${idx + 1}`}
-                            className={cn(
-                                "h-1.5 rounded-full transition-all duration-500 ease-out",
-                                idx === selectedIndex ? "w-10 bg-[#F4C84A]" : "w-1.5 bg-white/25 hover:bg-white/50"
+                    {/* Left: Text block */}
+                    <div className="col-span-12 md:col-span-8 lg:col-span-7 xl:col-span-6 space-y-4 lg:space-y-5">
+                        {/* Tags */}
+                        <div className="flex flex-wrap items-center gap-2">
+                            <span className="px-2.5 py-0.5 rounded bg-[#F4C84A] text-black text-[11px] font-black tracking-widest uppercase">
+                                Hot
+                            </span>
+                            {movie.year && (
+                                <span className="px-2.5 py-0.5 rounded border border-white/15 bg-white/[0.06] text-white/80 text-[11px] font-semibold">
+                                    {movie.year}
+                                </span>
                             )}
-                        />
-                    ))}
+                            {movie.quality && (
+                                <span className="px-2.5 py-0.5 rounded border border-[#F4C84A]/40 bg-[#F4C84A]/10 text-[#F4C84A] text-[11px] font-bold">
+                                    {formatQualityLabel(movie.quality) || movie.quality}
+                                </span>
+                            )}
+                            {movie.tmdbData?.vote_average && (
+                                <span className="flex items-center gap-1 text-white/70 text-[11px]">
+                                    <span className="text-[#F4C84A]">★</span>
+                                    {movie.tmdbData.vote_average.toFixed(1)}
+                                </span>
+                            )}
+                        </div>
+
+                        {/* Title — key triggers re-animation on slide change */}
+                        <h1
+                            key={`title-${index}`}
+                            className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black text-white leading-[1.05] tracking-tight drop-shadow-xl line-clamp-2 animate-hero-in"
+                            title={decodeHtml(movie.name)}
+                        >
+                            {decodeHtml(movie.name)}
+                        </h1>
+
+                        {/* Origin + Genres */}
+                        <div
+                            key={`meta-${index}`}
+                            className="flex items-center gap-2.5 flex-wrap animate-hero-in animation-delay-100"
+                        >
+                            {movie.origin_name && (
+                                <span className="text-[#F4C84A] text-sm font-medium opacity-90 truncate max-w-[200px]">
+                                    {decodeHtml(movie.origin_name)}
+                                </span>
+                            )}
+                            {movie.category?.slice(0, 3).map((c: any) => (
+                                <span key={c.id || c.name} className="text-white/50 text-xs font-medium">
+                                    · {c.name}
+                                </span>
+                            ))}
+                        </div>
+
+                        {/* Description */}
+                        {movie.content && (
+                            <p
+                                key={`desc-${index}`}
+                                className="text-white/60 text-sm leading-relaxed line-clamp-2 max-w-lg animate-hero-in animation-delay-150"
+                            >
+                                {decodeHtml(stripHtml(movie.content))}
+                            </p>
+                        )}
+
+                        {/* Buttons */}
+                        <div
+                            key={`btns-${index}`}
+                            className="flex flex-wrap items-center gap-3 animate-hero-in animation-delay-200"
+                        >
+                            <Link
+                                href={`/xem-phim/${movie.slug}?autoPlay=true`}
+                                className="flex items-center gap-2 h-12 px-7 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-black text-[15px] transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg shadow-[#F4C84A]/20"
+                            >
+                                <Play className="w-5 h-5 fill-black shrink-0" />
+                                Xem Ngay
+                            </Link>
+                            <Link
+                                href={`/phim/${movie.slug}`}
+                                className="flex items-center gap-2 h-12 px-6 rounded-full bg-white/10 hover:bg-white/18 border border-white/15 text-white font-bold text-[15px] transition-all hover:scale-105 active:scale-95 backdrop-blur-sm"
+                            >
+                                <Info className="w-4 h-4 text-white/80 shrink-0" />
+                                <span className="hidden sm:inline">Chi tiết</span>
+                            </Link>
+                            <div className="h-12 w-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/18 border border-white/15 transition-all hover:scale-110 cursor-pointer backdrop-blur-sm">
+                                <FavoriteButton movieData={getFavoriteData(movie)} size="md" />
+                            </div>
+                        </div>
+
+                        {/* Dots + nav */}
+                        <div className="flex items-center gap-4 pt-1">
+                            <Dots count={movies.length} active={index} onGo={go} />
+                            {movies.length > 1 && (
+                                <div className="flex items-center gap-2 ml-auto">
+                                    <button
+                                        onClick={prev}
+                                        className="w-9 h-9 rounded-full bg-white/10 hover:bg-[#F4C84A] hover:text-black border border-white/10 flex items-center justify-center text-white/60 transition-all duration-200"
+                                        aria-label="Trước"
+                                    >
+                                        <ChevronLeft className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                        onClick={next}
+                                        className="w-9 h-9 rounded-full bg-white/10 hover:bg-[#F4C84A] hover:text-black border border-white/10 flex items-center justify-center text-white/60 transition-all duration-200"
+                                        aria-label="Tiếp"
+                                    >
+                                        <ChevronRight className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Right: Poster */}
+                    <div className="col-span-12 md:col-span-4 lg:col-span-5 xl:col-span-6 hidden md:flex justify-end items-end pr-0 lg:pr-8 xl:pr-12">
+                        <div
+                            key={`poster-${index}`}
+                            className="relative w-[200px] lg:w-[260px] xl:w-[310px] aspect-[2/3] rounded-2xl lg:rounded-3xl overflow-hidden ring-1 ring-white/10 shadow-2xl shadow-black/60 group/poster hover:scale-[1.02] transition-transform duration-300 ease-out animate-hero-in animation-delay-100"
+                        >
+                            <Image
+                                src={getHeroImage(movie, "poster", "desktop")}
+                                alt={decodeHtml(movie.name)}
+                                fill
+                                className="object-cover group-hover/poster:scale-105 transition-transform duration-300 ease-out"
+                                priority={index < 2}
+                                loading={index < 2 ? "eager" : "lazy"}
+                                unoptimized
+                                sizes="(min-width: 1280px) 310px, (min-width: 1024px) 260px, 200px"
+                                placeholder="blur"
+                                blurDataURL={blurData}
+                                decoding="async"
+                            />
+                        </div>
+                    </div>
                 </div>
-            )}
+            </div>
         </div>
     );
 }
 
 // ─── Export ───────────────────────────────────────────────────────────────────
+
 export default function HeroSection({ movies }: { movies: Movie[] }) {
     const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -483,7 +470,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
     const heroMovies = movies.slice(0, 5);
 
     return (
-        <div className="relative w-full h-auto bg-transparent overflow-hidden flex flex-col font-sans" style={{ contain: "layout style paint" }}>
+        <div className="relative w-full bg-transparent font-sans" style={{ contain: "layout style paint" }}>
             {isDesktop ? (
                 <DesktopHero movies={heroMovies} />
             ) : (
