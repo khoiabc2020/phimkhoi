@@ -203,24 +203,38 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                     );
                 })}
 
-                {/* Poster always on top (not crossfaded — just switches) */}
-                <Link
-                    href={`/phim/${movie.slug}`}
-                    className="absolute bottom-3 left-3 z-20 w-[68px] h-[96px] rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10"
-                >
-                    <Image
-                        src={posterImg}
-                        alt=""
-                        fill
-                        className="object-cover"
-                        sizes="72px"
-                        placeholder="blur"
-                        blurDataURL={blurData}
-                        unoptimized
-                        loading="eager"
-                        decoding="async"
-                    />
-                </Link>
+                {/* Poster Stack always on top */}
+                <div className="absolute bottom-3 left-3 z-20 w-[68px] h-[96px] rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+                    {movies.map((m: any, i) => {
+                        const isActive = i === index;
+                        const po = getHeroImage(m, "poster", "mobile");
+                        return (
+                            <Link
+                                key={`m-poster-${m._id || i}`}
+                                href={`/phim/${m.slug}`}
+                                className={cn(
+                                    "absolute inset-0 transition-opacity duration-300",
+                                    isActive ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+                                )}
+                                aria-hidden={!isActive}
+                            >
+                                <Image
+                                    src={po}
+                                    alt=""
+                                    fill
+                                    className="object-cover"
+                                    sizes="72px"
+                                    placeholder="blur"
+                                    blurDataURL={blurData}
+                                    unoptimized
+                                    loading="eager"
+                                    decoding="async"
+                                    priority={true}
+                                />
+                            </Link>
+                        );
+                    })}
+                </div>
             </div>
 
             {/* ── Content below ── */}
@@ -435,25 +449,36 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         </div>
                     </div>
 
-                    {/* Right: Poster */}
+                    {/* Right: Poster Stack (Preloaded) */}
                     <div className="col-span-12 md:col-span-4 lg:col-span-5 xl:col-span-6 hidden md:flex justify-end items-end pr-0 lg:pr-8 xl:pr-12">
-                        <div
-                            key={`poster-${index}`}
-                            className="relative w-[200px] lg:w-[260px] xl:w-[310px] aspect-[2/3] rounded-2xl lg:rounded-3xl overflow-hidden ring-1 ring-white/10 shadow-2xl shadow-black/60 group/poster hover:scale-[1.02] transition-transform duration-300 ease-out animate-hero-in animation-delay-100"
-                        >
-                            <Image
-                                src={getHeroImage(movie, "poster", "desktop")}
-                                alt={decodeHtml(movie.name)}
-                                fill
-                                className="object-cover group-hover/poster:scale-105 transition-transform duration-300 ease-out"
-                                priority={true}
-                                loading="eager"
-                                unoptimized
-                                sizes="(min-width: 1280px) 310px, (min-width: 1024px) 260px, 200px"
-                                placeholder="blur"
-                                blurDataURL={blurData}
-                                decoding="async"
-                            />
+                        <div className="relative w-[200px] lg:w-[260px] xl:w-[310px] aspect-[2/3] rounded-2xl lg:rounded-3xl overflow-hidden ring-1 ring-white/10 shadow-2xl shadow-black/60 group/poster hover:scale-[1.02] transition-transform duration-300 ease-out animate-hero-in animation-delay-100">
+                            {movies.map((m: any, i) => {
+                                const isActive = i === index;
+                                return (
+                                    <div
+                                        key={`poster-${m._id || i}`}
+                                        className={cn(
+                                            "absolute inset-0 transition-opacity duration-700 ease-in-out",
+                                            isActive ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+                                        )}
+                                        aria-hidden={!isActive}
+                                    >
+                                        <Image
+                                            src={getHeroImage(m, "poster", "desktop")}
+                                            alt={decodeHtml(m.name)}
+                                            fill
+                                            className="object-cover group-hover/poster:scale-105 transition-transform duration-300 ease-out"
+                                            priority={true}
+                                            loading="eager"
+                                            unoptimized
+                                            sizes="(min-width: 1280px) 310px, (min-width: 1024px) 260px, 200px"
+                                            placeholder="blur"
+                                            blurDataURL={blurData}
+                                            decoding="async"
+                                        />
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
