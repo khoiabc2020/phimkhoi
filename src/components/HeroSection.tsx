@@ -55,6 +55,8 @@ function getFavoriteData(movie: Movie) {
 
 function tmdbImage(path: string, size: string) {
     if (!path) return "";
+    // If it's already a full URL, don't prepend tmdb domain
+    if (path.startsWith("http")) return path;
     const p = path.startsWith("/") ? path : `/${path}`;
     return `https://image.tmdb.org/t/p/${size}${p}`;
 }

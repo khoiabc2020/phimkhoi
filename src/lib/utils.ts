@@ -10,7 +10,9 @@ export function getImageUrl(url: string, proxy = true): string {
 
     let finalUrl = url;
     if (!url.startsWith("http")) {
-        finalUrl = `https://phimimg.com/${url}`;
+        // If it starts with a slash, we assume it's an internal relative path or a missing domain.
+        // For ophim, normally paths without http are relative to phimimg.com
+        finalUrl = url.startsWith("/") ? `https://phimimg.com${url}` : `https://phimimg.com/${url}`;
     }
 
     // Trường hợp ép proxy: luôn đi qua /api/img-proxy để VPS + Cloudflare cache
