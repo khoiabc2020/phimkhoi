@@ -18,8 +18,32 @@ export async function getTMDBDataForCard(
             };
         }
         return null;
+        return null;
+    }
+}
+
+export async function getMovieTrailer(
+    query: string,
+    year?: number,
+    type: 'movie' | 'tv' = 'movie',
+    verification?: { originalName?: string; countrySlug?: string }
+) {
+    try {
+        const movie = await searchTMDBMovie(query, year, type, verification);
+        if (movie) {
+            const details = await getTMDBDetails(movie.id, type);
+            if (details?.videos?.results?.length > 0) {
+                // Find a trailer on YouTube
+                const trailer = details.videos.results.find((v: any) => v.site === 'YouTube' && v.type === 'Trailer')
+                    || details.videos.results.find((v: any) => v.site === 'YouTube');
+                if (trailer) {
+                    return trailer.key;
+                }
+            }
+        }
+        return null;
     } catch (error) {
-        console.error("TMDB Action Error:", error);
+        console.error("Fetch Trailer Error:", error);
         return null;
     }
 }

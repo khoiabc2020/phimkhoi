@@ -20,6 +20,7 @@
     "dotenv": "^17.3.1",
     "embla-carousel-autoplay": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
+    "framer-motion": "^12.35.2",
     "hls.js": "^1.6.15",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.564.0",

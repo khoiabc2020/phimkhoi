@@ -10,6 +10,7 @@ import { Movie } from "@/services/api";
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { getTMDBImage } from "@/services/tmdb";
+import { getMovieTrailer } from "@/app/actions/tmdb";
 
 // Tiny LQIP blur placeholder shared across all movie cards
 const BLUR_PLACEHOLDER = "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA==";
@@ -108,7 +109,7 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                 onMouseLeave={handleMouseLeave}
             >
                 <div className={`relative ${orientation === 'landscape' ? 'aspect-video' : 'aspect-[2/3]'} rounded-xl overflow-hidden bg-[#1a1a1a] shadow-lg`}>
-                    <Link href={`/phim/${movie.slug}`} className="block h-full w-full absolute inset-0 z-0" prefetch={false}>
+                    <Link href={`/phim/${movie.slug}`} className="block h-full w-full absolute inset-0 z-0" prefetch={true}>
                         <Image
                             src={displayPoster || "/placeholder.jpg"}
                             alt={decodeHtml(movie.name) || movie.slug || "Phim"}
@@ -187,6 +188,33 @@ function OnflixHoverCard({
 }) {
     const [imgLoaded, setImgLoaded] = useState(false);
     const [hasError, setHasError] = useState(false);
+    const [trailerKey, setTrailerKey] = useState<string | null>(null);
+
+    useEffect(() => {
+        let active = true;
+        const fetchTrailer = async () => {
+            let type: 'movie' | 'tv' = 'movie';
+            if (movie.type === 'phim-bo' || movie.type === 'tv-shows' || movie.type === 'hoat-hinh') type = 'tv';
+
+            const year = movie.year ? parseInt(movie.year.toString().split("-")[0]) : undefined;
+            const key = await getMovieTrailer(
+                movie.origin_name || movie.name,
+                isNaN(year!) ? undefined : year,
+                type,
+                { originalName: movie.origin_name, countrySlug: movie.country?.[0]?.slug }
+            );
+            if (active && key) {
+                setTrailerKey(key);
+            }
+        };
+
+        const timer = setTimeout(fetchTrailer, 1000); // 1s hover delay
+        return () => {
+            active = false;
+            clearTimeout(timer);
+        };
+    }, [movie]);
+
     const CARD_WIDTH = 320;
     const offsetLeft = (CARD_WIDTH - position.width) / 2;
 
@@ -238,8 +266,19 @@ function OnflixHoverCard({
                             onError={() => { setImgLoaded(true); setHasError(true); }}
                         />
 
+                        {trailerKey && (
+                            <div className="absolute inset-0 z-10 w-[300%] h-[300%] -left-[100%] -top-[100%] pointer-events-none">
+                                <iframe
+                                    src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=1&controls=0&loop=1&playlist=${trailerKey}&modestbranding=1&playsinline=1`}
+                                    allow="autoplay"
+                                    className="w-full h-full animate-in fade-in duration-1000"
+                                    frameBorder="0"
+                                />
+                            </div>
+                        )}
+
                         {/* Gradient fading into card body */}
-                        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#141414] via-[#141414]/80 to-transparent" />
+                        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#141414] via-[#141414]/80 to-transparent z-20 pointer-events-none" />
                     </div>
 
                     {/* Card body */}
