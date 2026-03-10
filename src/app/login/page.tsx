@@ -191,7 +191,7 @@ export default function LoginPage() {
                     <div className="relative w-10 h-10 md:w-12 md:h-12 flex items-center justify-center">
                         <div className="absolute inset-0 bg-primary/10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                         <Image
-                            src="/logo.webp"
+                            src="/logo.png"
                             alt="MovieBox Logo"
                             width={48}
                             height={48}

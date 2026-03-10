@@ -93,7 +93,7 @@ export default function MobileMenu({
                 <div className="flex items-center justify-between px-5 h-[68px] shrink-0 border-b border-white/[0.06]">
                     <Link href="/" onClick={onClose} className="flex items-center gap-2.5">
                         <Image
-                            src="/logo.webp"
+                            src="/logo.png"
                             alt="MovieBox Logo"
                             width={34}
                             height={34}
