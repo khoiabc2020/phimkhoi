@@ -296,14 +296,14 @@ function OnflixHoverCard({
                         </div>
 
                         {/* Action Buttons row */}
-                        <div className="flex items-center gap-2.5">
+                        <div className="flex items-center gap-2">
                             {/* Play button (Yellow) */}
                             <Link
                                 href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                className="flex-1 flex items-center justify-center gap-2 bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-extrabold text-[14px] h-10 px-4 rounded-full transition-all hover:scale-105"
+                                className="flex-1 min-w-0 flex items-center justify-center gap-1.5 bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-extrabold text-[13px] h-9 px-3 rounded-full transition-all hover:scale-105"
                             >
-                                <Play className="w-4 h-4 fill-current" />
-                                Xem ngay
+                                <Play className="w-3.5 h-3.5 fill-current shrink-0" />
+                                <span className="truncate">Xem</span>
                             </Link>
 
                             <div className="flex items-center gap-2 shrink-0">
@@ -313,11 +313,11 @@ function OnflixHoverCard({
                                     movieName={movie.name}
                                     moviePoster={movie.poster_url || movie.thumb_url}
                                     size="md"
-                                    className="!w-10 !h-10 rounded-full text-white/80 hover:text-white bg-white/5 hover:bg-white/15 border border-white/20 hover:border-white transition-all hover:scale-105 flex items-center justify-center"
+                                    className="!w-9 !h-9 shrink-0 rounded-full text-white/80 hover:text-white bg-white/5 hover:bg-white/15 border border-white/20 hover:border-white transition-all hover:scale-105 flex items-center justify-center"
                                 />
 
                                 {/* Favorite button */}
-                                <div className="w-10 h-10 flex items-center justify-center rounded-full border border-white/20 hover:border-white text-white/80 hover:text-white bg-white/5 hover:bg-white/15 cursor-pointer transition-all hover:scale-105">
+                                <div className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full border border-white/20 hover:border-white text-white/80 hover:text-white bg-white/5 hover:bg-white/15 cursor-pointer transition-all hover:scale-105">
                                     <FavoriteButton
                                         movieData={{
                                             movieId: movie._id || "",
@@ -334,13 +334,12 @@ function OnflixHoverCard({
                                     />
                                 </div>
 
-                                {/* Detail link */}
                                 <Link
                                     href={`/phim/${movie.slug}`}
-                                    className="w-10 h-10 flex items-center justify-center rounded-full border border-white/20 hover:border-white text-white/80 hover:text-white bg-white/5 hover:bg-white/15 transition-all hover:scale-105"
+                                    className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full border border-white/20 hover:border-white text-white/80 hover:text-white bg-white/5 hover:bg-white/15 transition-all hover:scale-105"
                                     title="Chi tiết"
                                 >
-                                    <ChevronDown className="w-5 h-5" />
+                                    <ChevronDown className="w-4 h-4" />
                                 </Link>
                             </div>
                         </div>
