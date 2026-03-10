@@ -171,8 +171,8 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                                     alt=""
                                     fill
                                     className="object-cover object-top"
-                                    priority={isPriority}
-                                    loading={isPriority ? "eager" : "lazy"}
+                                    priority={true}
+                                    loading="eager"
                                     sizes="100vw"
                                     placeholder="blur"
                                     blurDataURL={blurData}
@@ -298,8 +298,8 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                             alt=""
                             fill
                             className="object-cover"
-                            priority={i < 2}
-                            loading={i < 2 ? "eager" : "lazy"}
+                            priority={true}
+                            loading="eager"
                             unoptimized
                             sizes="100vw"
                             placeholder="blur"
@@ -444,8 +444,8 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                                 alt={decodeHtml(movie.name)}
                                 fill
                                 className="object-cover group-hover/poster:scale-105 transition-transform duration-300 ease-out"
-                                priority={index < 2}
-                                loading={index < 2 ? "eager" : "lazy"}
+                                priority={true}
+                                loading="eager"
                                 unoptimized
                                 sizes="(min-width: 1280px) 310px, (min-width: 1024px) 260px, 200px"
                                 placeholder="blur"

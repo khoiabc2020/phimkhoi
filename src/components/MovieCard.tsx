@@ -116,7 +116,7 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                             className="object-cover transition-transform duration-300 ease-out group-hover/static-card:scale-105"
                             sizes={orientation === 'landscape' ? "(max-width: 768px) 60vw, 30vw" : "(max-width: 768px) 40vw, 15vw"}
                             unoptimized
-                            loading="lazy"
+                            loading="eager"
                             placeholder="blur"
                             blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
                         />
