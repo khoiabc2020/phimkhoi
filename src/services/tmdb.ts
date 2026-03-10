@@ -55,7 +55,8 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
             const endpoints = type === 'tv' ? ['tv', 'movie'] : ['movie', 'tv'];
 
             for (const endpoint of endpoints) {
-                let url = `${TMDB_API_URL}/search/${endpoint}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanQuery)}&language=vi-VN`;
+                // Thêm &_v=1 để phá cache vì NextJS lưu cache fetch API quá lâu (1 tiếng)
+                let url = `${TMDB_API_URL}/search/${endpoint}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanQuery)}&language=vi-VN&_v=1`;
 
                 if (year) {
                     if (endpoint === 'movie') url += `&primary_release_year=${year}`;
