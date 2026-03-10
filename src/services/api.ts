@@ -740,7 +740,17 @@ export const getTrendMovies = async (type: 'movie' | 'tv' | 'all' = 'all') => {
             return null;
         }));
 
-        return movies.filter((m: any) => m !== null);
+        // Filter out nulls and movies that only have a trailer (not yet released)
+        return movies.filter((m: any) => {
+            if (!m) return false;
+
+            // Lọc bỏ phim chưa ra mắt (chỉ có trailer)
+            const status = String(m.status || "").toLowerCase();
+            const epCurrent = String(m.episode_current || "").toLowerCase();
+            if (status.includes("trailer") || epCurrent.includes("trailer")) return false;
+
+            return true;
+        });
     } catch (error) {
         console.error("Error fetching trend movies:", error);
         return [];
