@@ -18,6 +18,8 @@ export async function getTMDBDataForCard(
             };
         }
         return null;
+    } catch (error) {
+        console.error("TMDB Action Error:", error);
         return null;
     }
 }
