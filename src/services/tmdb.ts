@@ -77,14 +77,32 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
                         // Year Check: Allow +/- 1 year tolerance for release date discrepancies
                         if (year && itemYear && Math.abs(itemYear - year) > 1) return false;
 
-                        // Title Check: If we searched by Original Name, we expect high similarity matches on original_title/original_name
+                        // Title Check:
+                        let isMatch = false;
+
+                        // 1. Check original name from verification
                         if (verification?.originalName) {
                             const originalTitle = endpoint === 'movie' ? item.original_title : item.original_name;
-                            const sim = calculateSimilarity(verification.originalName, originalTitle);
-                            if (sim > 0.6) return true;
+                            if (originalTitle && calculateSimilarity(verification.originalName, originalTitle) >= 0.5) {
+                                isMatch = true;
+                            }
                         }
 
-                        return true; // If no verification or year matches, take first (usually best)
+                        // 2. Check query against local title and original title
+                        const localTitle = endpoint === 'movie' ? item.title : item.name;
+                        const originalTitleSearch = endpoint === 'movie' ? item.original_title : item.original_name;
+
+                        if (localTitle && calculateSimilarity(cleanQuery, localTitle) >= 0.5) isMatch = true;
+                        if (originalTitleSearch && calculateSimilarity(cleanQuery, originalTitleSearch) >= 0.5) isMatch = true;
+
+                        // 3. If year matches exactly, we can be a bit more lenient, but still require *some* similarity or TMDB ranking
+                        if (!isMatch && year && itemYear === year) {
+                            // Only accept if it's an exact year match AND we really have no other way to verify it.
+                            // TMDB usually sorts best match first. Let's trust TMDB's first result if year matches exactly.
+                            isMatch = true;
+                        }
+
+                        return isMatch;
                     });
 
                     if (bestMatch) {
