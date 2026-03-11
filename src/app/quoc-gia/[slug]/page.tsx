@@ -27,7 +27,7 @@ export default async function CountryPage({ params, searchParams }: { params: Pr
 
     return (
         <main className="min-h-screen pb-20">
-            <div className="pt-24 container mx-auto px-4 md:px-12">
+            <div className="pt-24 w-full max-w-[1920px] mx-auto px-4 md:px-12">
                 <div className="mb-8">
                     <h1 className="text-xl md:text-2xl font-bold text-white capitalize flex items-center gap-2">
                         <span className="w-1 h-6 bg-[#fbbf24] rounded-full"></span>

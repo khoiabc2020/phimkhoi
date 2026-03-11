@@ -146,7 +146,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 <div className="absolute inset-0 bg-gradient-to-r from-[#020617] via-[#020617]/60 to-transparent" />
 
                 {/* Hero Info Content aligned left/bottom */}
-                <div className="relative z-10 w-full max-w-[1600px] mx-auto space-y-2 sm:space-y-4">
+                <div className="relative z-10 w-full max-w-[1920px] mx-auto space-y-2 sm:space-y-4">
                     <span className="inline-block bg-[#F4C84A] text-black px-2 py-0.5 text-[10px] font-bold rounded shadow-sm mb-1 uppercase">{movie?.quality || "FHD"} {movie?.year}</span>
                     <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight drop-shadow-2xl">{movie?.name}</h1>
                     <h2 className="hidden sm:block text-base md:text-2xl text-gray-300 font-medium tracking-wide drop-shadow-md">{movie?.origin_name}</h2>
@@ -232,7 +232,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
             </div>
 
             {/* Bottom Content: responsive — stacked on mobile, 2-col on desktop */}
-            <div className="max-w-[1600px] mx-auto px-4 md:px-8 xl:px-16 mt-6 sm:mt-10 lg:mt-12 relative z-10">
+            <div className="max-w-[1920px] mx-auto px-4 md:px-8 xl:px-16 mt-6 sm:mt-10 lg:mt-12 relative z-10">
                 {/* On mobile/tablet: RIGHT column (tabs) first, then sidebar info below */}
                 <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-8 items-start">
 

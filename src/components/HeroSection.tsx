@@ -337,7 +337,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
             </div>
 
             {/* ── Content ── */}
-            <div className="relative z-[3] h-full container max-w-[1600px] mx-auto px-6 md:px-12 lg:px-20 xl:px-28 flex items-end pb-16 md:pb-20 lg:pb-24">
+            <div className="relative z-[3] h-full container max-w-[1920px] mx-auto px-6 md:px-12 lg:px-20 xl:px-28 flex items-end pb-16 md:pb-20 lg:pb-24">
                 <div className="grid grid-cols-12 gap-8 lg:gap-12 w-full items-end">
 
                     {/* Left: Text block */}

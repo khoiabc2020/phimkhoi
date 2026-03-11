@@ -50,7 +50,7 @@ export default async function WatchHistoryPage() {
             {/* Background nhẹ đồng bộ với toàn site */}
             <div className="fixed inset-0 pointer-events-none z-0 bg-[#020617]" />
 
-            <div className="container mx-auto px-4 md:px-12 relative z-10">
+            <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12 relative z-10">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center gap-4">

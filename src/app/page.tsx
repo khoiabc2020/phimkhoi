@@ -15,7 +15,7 @@ export const revalidate = 3600;
 
 const heroSkeleton = <div className="w-full h-[60vh] md:h-[80vh] bg-[#020617] animate-pulse" />;
 const contentSkeleton = (
-  <div className="container mx-auto px-4 md:px-12 py-8 space-y-8">
+  <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12 py-8 space-y-8">
     <div className="h-6 w-48 bg-white/10 rounded animate-pulse" />
     <div className="flex gap-4 overflow-hidden">
       {[1, 2, 3, 4, 5].map((i) => (
@@ -94,7 +94,7 @@ async function HomeContentStream() {
   const homeData = await getHomeData();
 
   return (
-    <div className="container mx-auto px-4 md:px-12 relative z-20 pb-16">
+    <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12 relative z-20 pb-16">
       <div className="mb-6">
         <QuickNav />
       </div>

@@ -50,7 +50,7 @@ const NAV_ITEMS = [
 export default function QuickNav() {
     return (
         <div className="w-full py-2 pb-8">
-            <div className="container mx-auto px-4 md:px-12 mb-4">
+            <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12 mb-4">
                 <h2 className="text-[17px] font-bold text-white mb-5 flex items-center gap-2">
                     <span className="w-1 h-5 bg-[#F4C84A] rounded-sm inline-block" />
                     Bạn đang quan tâm gì?

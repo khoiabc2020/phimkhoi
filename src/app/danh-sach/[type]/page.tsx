@@ -86,7 +86,7 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
 
     return (
         <main className="min-h-screen pb-20">
-            <div className="pt-24 container mx-auto px-4 md:px-12">
+            <div className="pt-24 w-full max-w-[1920px] mx-auto px-4 md:px-12">
                 {/* Title & Badge */}
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
                     <div>

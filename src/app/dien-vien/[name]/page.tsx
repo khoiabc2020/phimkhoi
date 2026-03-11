@@ -62,7 +62,7 @@ export default async function ActorPage({ params, searchParams }: { params: Prom
 
     return (
         <main className="min-h-screen pt-20 md:pt-24 pb-12 bg-[#0b0b0b]">
-            <div className="container mx-auto px-4 md:px-8 xl:px-12 max-w-[1600px]">
+            <div className="w-full max-w-[1920px] mx-auto px-4 md:px-8 xl:px-12 max-w-[1920px]">
 
                 <div className="flex flex-col md:flex-row gap-6 lg:gap-10">
                     {/* Left Sidebar: Poster & Info */}

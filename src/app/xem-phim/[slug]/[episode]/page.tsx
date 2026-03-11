@@ -97,7 +97,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
 
 
                 {/* ── CONTENT GRID (9+3) ── */}
-                <div className="container mx-auto px-4 lg:px-8 max-w-[1600px]">
+                <div className="w-full max-w-[1920px] mx-auto px-4 lg:px-8 max-w-[1920px]">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8">
 
                         {/* Left (9 cols) */}

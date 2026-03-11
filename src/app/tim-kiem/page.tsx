@@ -36,7 +36,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 
     return (
         <main className="min-h-screen pb-20">
-            <div className="container mx-auto px-4 pt-24">
+            <div className="w-full max-w-[1920px] mx-auto px-4 pt-24">
                 <div className="mb-6">
                     <h1 className="text-lg md:text-xl font-bold text-white flex items-center gap-2">
                         <span className="w-1 h-5 bg-[#fbbf24] rounded-full"></span>

@@ -30,7 +30,7 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
 
     if (variant === 'sidebar') {
         return (
-            <div className="group relative py-10 container mx-auto px-4 md:px-12">
+            <div className="group relative py-10 w-full max-w-[1920px] mx-auto px-4 md:px-12">
                 <div className="flex flex-col md:flex-row md:items-start gap-8">
                     {/* Sidebar Title Section */}
                     <div className="w-full md:w-[220px] flex-shrink-0 flex flex-col justify-start space-y-4 pt-2">
@@ -87,7 +87,7 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
     // Default Layout
     return (
         <section className="py-4">
-            <div className="container mx-auto px-4 md:px-12">
+            <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12">
                 <div className="space-y-4 rounded-lg bg-[#020617]/80 border border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.55)] overflow-hidden">
                     <div className="flex items-center justify-between px-4 md:px-6 pt-4">
                         <h2 className="text-[15px] font-bold text-white flex items-center gap-2 uppercase tracking-wide">

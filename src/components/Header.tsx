@@ -199,7 +199,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         : "bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none"
                 )}
             >
-                <div className="max-w-[1600px] mx-auto px-4 lg:px-8 h-[52px] flex items-center justify-between gap-4 flex-nowrap pointer-events-auto">
+                <div className="max-w-[1920px] mx-auto px-4 lg:px-8 h-[52px] flex items-center justify-between gap-4 flex-nowrap pointer-events-auto">
 
                     {/* Left Section: Logo & Mobile Menu */}
                     <div className="flex items-center gap-4 shrink-0">
