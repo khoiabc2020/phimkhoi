@@ -59,21 +59,30 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
 
             for (const endpoint of endpoints) {
                 // Thêm &_v=1 để phá cache vì NextJS lưu cache fetch API quá lâu (1 tiếng)
-                let url = `${TMDB_API_URL}/search/${endpoint}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanQuery)}&language=vi-VN&_v=2`;
+                let url = `${TMDB_API_URL}/search/${endpoint}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanQuery)}&language=vi-VN&_v=4`;
 
                 if (year) {
                     if (endpoint === 'movie') url += `&primary_release_year=${year}`;
-                    // For TV, fuzzy year search (first_air_date_year) might be too strict if seasons span years, 
-                    // but let's keep it for now or relax it if no results.
-                    if (endpoint === 'tv') url += `&first_air_date_year=${year}`;
+                    // Do NOT add first_air_date_year for tv because it's too strict — some Chinese dramas air over 2 years
+                    // Instead, we filter by year in the result
                 }
 
-                const res = await fetch(url, { next: { revalidate: 3600 } });
+                const res = await fetch(url, { next: { revalidate: 300 } });
                 const data = await res.json();
 
-                if (data.results?.length > 0) {
+                // Quick pre-filter: if searching for a modern movie/show, reject ancient results 
+                const filteredResults = data.results?.filter((item: any) => {
+                    if (!year || year < 2010) return true; // Don't filter old searches
+                    const itemDate = endpoint === 'movie' ? item.release_date : item.first_air_date;
+                    const itemYear = itemDate ? parseInt(itemDate.substring(0, 4)) : null;
+                    // Reject if the result is more than 10 years older than what we're searching for
+                    if (itemYear && itemYear < year - 10) return false;
+                    return true;
+                }) || [];
+
+                if (filteredResults.length > 0) {
                     // Filter best match
-                    const bestMatch = data.results.find((item: { title?: string; name?: string; release_date?: string; first_air_date?: string; original_title?: string; original_name?: string }) => {
+                    const bestMatch = filteredResults.find((item: { title?: string; name?: string; release_date?: string; first_air_date?: string; original_title?: string; original_name?: string }) => {
                         const itemYear = endpoint === 'movie'
                             ? (item.release_date ? parseInt(item.release_date.substring(0, 4)) : null)
                             : (item.first_air_date ? parseInt(item.first_air_date.substring(0, 4)) : null);
