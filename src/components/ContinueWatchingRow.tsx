@@ -97,7 +97,7 @@ function ContinueWatchingRowInner() {
                 </div>
                 <div className="flex gap-3 overflow-x-hidden pb-4">
                     {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="flex-[0_0_160px] sm:flex-[0_0_200px] md:flex-[0_0_240px] aspect-video rounded-xl bg-white/10 animate-pulse" />
+                        <div key={i} className="flex-[0_0_160px] sm:flex-[0_0_200px] md:flex-[0_0_240px] aspect-video rounded-md bg-white/10 animate-pulse" />
                     ))}
                 </div>
             </div>
@@ -143,7 +143,7 @@ function ContinueWatchingRowInner() {
                                 className="block w-full"
                             >
                                 {/* Card Image - ảnh đầy đủ không bị che */}
-                                <div className="relative aspect-video rounded-xl overflow-hidden bg-white/5 border border-white/10 group-hover/card:border-[#fbbf24]/50 transition-all duration-300">
+                                <div className="relative aspect-video rounded-md overflow-hidden bg-white/5 border border-white/10 group-hover/card:border-[#fbbf24]/50 transition-all duration-300">
                                     <Image
                                         src={getImageUrl(item.moviePoster)}
                                         alt={item.movieName}

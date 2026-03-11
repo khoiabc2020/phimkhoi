@@ -108,7 +108,7 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
-                <div className={`relative ${orientation === 'landscape' ? 'aspect-video' : 'aspect-[2/3]'} rounded-xl overflow-hidden bg-[#1a1a1a] shadow-lg`}>
+                <div className={`relative ${orientation === 'landscape' ? 'aspect-video' : 'aspect-[2/3]'} rounded-md overflow-hidden bg-[#1a1a1a] shadow-lg`}>
                     <Link href={`/phim/${movie.slug}`} className="block h-full w-full absolute inset-0 z-0" prefetch={false}>
                         <Image
                             src={displayPoster || "/placeholder.svg"}

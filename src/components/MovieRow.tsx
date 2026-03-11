@@ -88,22 +88,22 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
     return (
         <section className="py-4">
             <div className="container mx-auto px-4 md:px-12">
-                <div className="space-y-4 rounded-3xl bg-[#020617]/80 border border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.55)] overflow-hidden">
+                <div className="space-y-4 rounded-2xl bg-[#020617]/80 border border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.55)] overflow-hidden">
                     <div className="flex items-center justify-between px-4 md:px-6 pt-4">
-                <h2 className="text-[15px] font-bold text-white flex items-center gap-2 uppercase tracking-wide">
-                    <span className="w-1 h-5 md:h-6 bg-gradient-to-t from-[#fbbf24] to-yellow-200 rounded-sm"></span>
-                    <span className="drop-shadow-lg">{title}</span>
-                </h2>
-                {slug && (
-                    <a
-                        href={slug.startsWith('/') ? slug : `/danh-sach/${slug}`}
-                        className="text-xs md:text-sm font-medium text-[#fbbf24] hover:text-white flex items-center gap-1 transition-colors group/link"
-                    >
-                        Xem tất cả
-                        <ChevronRight className="w-4 h-4 transition-transform group-hover/link:translate-x-1" />
-                    </a>
-                )}
-            </div>
+                        <h2 className="text-[15px] font-bold text-white flex items-center gap-2 uppercase tracking-wide">
+                            <span className="w-1 h-5 md:h-6 bg-gradient-to-t from-[#fbbf24] to-yellow-200 rounded-sm"></span>
+                            <span className="drop-shadow-lg">{title}</span>
+                        </h2>
+                        {slug && (
+                            <a
+                                href={slug.startsWith('/') ? slug : `/danh-sach/${slug}`}
+                                className="text-xs md:text-sm font-medium text-[#fbbf24] hover:text-white flex items-center gap-1 transition-colors group/link"
+                            >
+                                Xem tất cả
+                                <ChevronRight className="w-4 h-4 transition-transform group-hover/link:translate-x-1" />
+                            </a>
+                        )}
+                    </div>
 
                     <div className="relative group/row pb-3">
                         {/* Left Arrow */}
