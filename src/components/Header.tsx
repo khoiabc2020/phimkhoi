@@ -343,7 +343,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                 onSubmit={handleSearch}
                                 className={cn(
                                     "flex relative items-center transition-all duration-500 ease-out h-10",
-                                    isSearchOpen ? "w-[calc(100vw-6rem)] md:w-80 lg:w-60 absolute right-4 lg:relative lg:right-0 z-40 rounded-full" : "w-10 relative"
+                                    isSearchOpen ? "w-[calc(100vw-6rem)] md:w-[420px] lg:w-[520px] absolute right-4 lg:relative lg:right-0 z-40 rounded-full" : "w-10 relative"
                                 )}
                             >
                                 <button
@@ -481,25 +481,31 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                         <div className="flex items-center justify-between px-3 pb-2 pt-1 border-b border-white/10 mb-2">
                                                             <div className="flex items-center gap-2">
                                                                 <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Lịch sử</span>
-                                                                <div className="flex items-center gap-1 rounded-full bg-white/[0.06] border border-white/10 p-0.5">
+                                                                <div className="flex items-center gap-0.5 bg-white/[0.07] rounded-full p-0.5 border border-white/10">
                                                                     <button
                                                                         type="button"
                                                                         onClick={() => setHistoryTab("movies")}
                                                                         className={cn(
-                                                                            "px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors",
-                                                                            historyTab === "movies" ? "bg-[#F4C84A] text-black" : "text-white/60 hover:text-white"
+                                                                            "flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold transition-all duration-200",
+                                                                            historyTab === "movies"
+                                                                                ? "bg-[#F4C84A] text-black shadow-sm"
+                                                                                : "text-white/50 hover:text-white/80"
                                                                         )}
                                                                     >
+                                                                        <Film className="w-3 h-3" />
                                                                         Phim
                                                                     </button>
                                                                     <button
                                                                         type="button"
                                                                         onClick={() => setHistoryTab("actors")}
                                                                         className={cn(
-                                                                            "px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors",
-                                                                            historyTab === "actors" ? "bg-[#F4C84A] text-black" : "text-white/60 hover:text-white"
+                                                                            "flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold transition-all duration-200",
+                                                                            historyTab === "actors"
+                                                                                ? "bg-[#F4C84A] text-black shadow-sm"
+                                                                                : "text-white/50 hover:text-white/80"
                                                                         )}
                                                                     >
+                                                                        <User className="w-3 h-3" />
                                                                         Diễn viên
                                                                     </button>
                                                                 </div>
