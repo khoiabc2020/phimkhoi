@@ -1,42 +1,78 @@
-import { getMovieCast } from "@/app/actions/tmdb";
 import Image from "next/image";
 import Link from "next/link";
+import { searchTMDBPerson } from "@/services/tmdb";
+
+async function getActorPhoto(actorName: string): Promise<string | null> {
+    try {
+        const results = await searchTMDBPerson(actorName);
+        if (results && results.length > 0 && results[0].profile_path) {
+            return `https://image.tmdb.org/t/p/w185${results[0].profile_path}`;
+        }
+        return null;
+    } catch {
+        return null;
+    }
+}
+
+function ActorInitials({ name }: { name: string }) {
+    const parts = name.trim().split(" ");
+    const initials = parts.length >= 2
+        ? parts[0][0] + parts[parts.length - 1][0]
+        : name.slice(0, 2);
+    // Pick a consistent color based on name char
+    const colors = [
+        "from-blue-600 to-blue-800",
+        "from-rose-600 to-rose-800",
+        "from-violet-600 to-violet-800",
+        "from-emerald-600 to-emerald-800",
+        "from-orange-600 to-orange-800",
+        "from-teal-600 to-teal-800",
+    ];
+    const colorIdx = (name.charCodeAt(0) || 0) % colors.length;
+    return (
+        <div className={`w-full h-full bg-gradient-to-br ${colors[colorIdx]} flex items-center justify-center`}>
+            <span className="text-white font-bold text-[11px] uppercase tracking-wider">{initials}</span>
+        </div>
+    );
+}
 
 export default async function MovieCast({ movie, slug, isCompact = false }: { movie?: any; slug: string; isCompact?: boolean }) {
     if (!movie) return null;
 
-    let type: 'movie' | 'tv' = 'movie';
-    if (movie.type === 'phim-bo' || movie.type === 'tv-shows' || movie.type === 'hoat-hinh') {
-        type = 'tv';
-    }
+    // Use source actor list (always correct — from Ophim/KKPhim)
+    const actorNames: string[] = (movie.actor || [])
+        .filter((a: string) => a && !a.toLowerCase().includes("đang cập nhật") && !a.toLowerCase().includes("updating"))
+        .slice(0, isCompact ? 8 : 15);
 
-    let cast = await getMovieCast(
-        movie.origin_name || movie.name,
-        movie.year ? parseInt(movie.year.toString().split("-")[0]) : undefined,
-        type,
-        movie.actor,
-        { originalName: movie.origin_name, countrySlug: movie.country?.[0]?.slug }
+    if (actorNames.length === 0) return null;
+
+    // Fetch photos by actor name individually — decoupled from (potentially wrong) movie TMDB match
+    const actorPhotos = await Promise.all(
+        actorNames.map((name: string) => getActorPhoto(name))
     );
 
-    // Filter out dummy actors
-    cast = cast.filter((actor: any) => !actor.name?.toLowerCase().includes('đang cập nhật') && !actor.name?.toLowerCase().includes('updating'));
-    if (!cast || cast.length === 0) return null;
-
-    const topCast = cast.slice(0, 15);
+    const cast = actorNames.map((name: string, i: number) => ({ name, photo: actorPhotos[i] }));
 
     if (isCompact) {
         return (
             <div className="flex flex-wrap gap-4 pt-1">
-                {topCast.slice(0, 8).map((actor: any) => (
-                    <Link href={`/dien-vien/${encodeURIComponent(String(actor.name))}`} key={actor.id || actor.name} className="flex flex-col items-center gap-2 w-[4.5rem] group" title={actor.name}>
+                {cast.map((actor) => (
+                    <Link
+                        href={`/dien-vien/${encodeURIComponent(actor.name)}`}
+                        key={actor.name}
+                        className="flex flex-col items-center gap-2 w-[4.5rem] group"
+                        title={actor.name}
+                    >
                         <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border border-white/10 group-hover:border-[#F4C84A] transition-colors relative bg-white/5">
-                            {actor.profile_url || actor.profile_path ? (
-                                <Image src={actor.profile_url || actor.profile_path} alt={actor.name || "Actor"} fill className="object-cover" />
+                            {actor.photo ? (
+                                <Image src={actor.photo} alt={actor.name} fill className="object-cover" unoptimized />
                             ) : (
-                                <div className="w-full h-full flex items-center justify-center text-[10px] text-gray-500 text-center leading-tight">N/A</div>
+                                <ActorInitials name={actor.name} />
                             )}
                         </div>
-                        <p className="text-[11px] text-gray-400 group-hover:text-white transition-colors text-center font-medium leading-tight line-clamp-2 w-full">{actor.name}</p>
+                        <p className="text-[11px] text-gray-400 group-hover:text-white transition-colors text-center font-medium leading-tight line-clamp-2 w-full">
+                            {actor.name}
+                        </p>
                     </Link>
                 ))}
             </div>
@@ -49,24 +85,20 @@ export default async function MovieCast({ movie, slug, isCompact = false }: { mo
                 Diễn Viên
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                {topCast.map((actor: any) => (
-                    <Link href={`/dien-vien/${encodeURIComponent(String(actor.name))}`} key={actor.id || actor.name} className="bg-white/5 rounded-lg p-2 text-center group hover:bg-white/10 transition-colors block">
+                {cast.map((actor) => (
+                    <Link
+                        href={`/dien-vien/${encodeURIComponent(actor.name)}`}
+                        key={actor.name}
+                        className="bg-white/5 rounded-lg p-2 text-center group hover:bg-white/10 transition-colors block"
+                    >
                         <div className="relative w-24 h-24 mx-auto mb-2 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-yellow-500 transition-colors">
-                            {actor.profile_url || actor.profile_path ? (
-                                <Image
-                                    src={actor.profile_url || actor.profile_path.replace('/w185', '/w500')}
-                                    alt={actor.name || "Actor"}
-                                    fill
-                                    className="object-cover"
-                                />
+                            {actor.photo ? (
+                                <Image src={actor.photo} alt={actor.name} fill className="object-cover" unoptimized />
                             ) : (
-                                <div className="w-full h-full bg-gray-700 flex items-center justify-center text-xs text-gray-400">
-                                    No Image
-                                </div>
+                                <ActorInitials name={actor.name} />
                             )}
                         </div>
                         <p className="text-white text-sm font-medium truncate group-hover:text-yellow-500 transition-colors">{actor.name}</p>
-                        <p className="text-gray-400 text-xs truncate">{actor.character}</p>
                     </Link>
                 ))}
             </div>

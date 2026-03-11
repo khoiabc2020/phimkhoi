@@ -181,8 +181,8 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                     })()}
 
                     <div className="text-xs sm:text-sm text-gray-300 flex flex-wrap items-center gap-2 sm:gap-4 py-1 sm:py-2 drop-shadow-md">
-                        {tmdbDetails?.credits?.crew?.find((c: { job?: string; name?: string }) => c.job === "Director")?.name || (movie?.director && movie.director.length > 0 && !movie.director.includes("Đang cập nhật")) ? (
-                            <span><span className="text-gray-500">Đạo diễn:</span> {tmdbDetails?.credits?.crew?.find((c: { job?: string; name?: string }) => c.job === "Director")?.name || movie?.director?.join(", ")}</span>
+                        {(movie?.director && movie.director.length > 0 && !movie.director.includes("Đang cập nhật")) || tmdbDetails?.credits?.crew?.find((c: { job?: string; name?: string }) => c.job === "Director") ? (
+                            <span><span className="text-gray-500">Đạo diễn:</span> {movie?.director?.join(", ") || tmdbDetails?.credits?.crew?.find((c: { job?: string; name?: string }) => c.job === "Director")?.name}</span>
                         ) : null}
                         <span className="w-1 h-1 bg-gray-600 rounded-full hidden sm:block" />
                         <span><span className="text-gray-500">Thời lượng:</span> {movie?.time || "N/A"}</span>
