@@ -816,6 +816,35 @@ export default function NativePlayer({
                     </Animated.View>
                 )}
 
+                {/* Skip Ad Button */}
+                {status.isLoaded && status.positionMillis >= 900000 && status.positionMillis <= 930000 && !isInPipMode && (
+                    <TouchableOpacity
+                        style={{
+                            position: 'absolute',
+                            right: 20,
+                            bottom: 100,
+                            backgroundColor: 'rgba(0,0,0,0.7)',
+                            paddingHorizontal: 16,
+                            paddingVertical: 10,
+                            borderRadius: 6,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            gap: 8,
+                            zIndex: 50,
+                            borderWidth: 1,
+                            borderColor: 'rgba(255,255,255,0.2)'
+                        }}
+                        onPress={() => {
+                            if (video.current) {
+                                video.current.setPositionAsync(931000); // Skip to 15:31 to be safe
+                            }
+                        }}
+                    >
+                        <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 14 }}>Bỏ qua quảng cáo</Text>
+                        <Ionicons name="play-skip-forward" size={16} color="white" />
+                    </TouchableOpacity>
+                )}
+
                 {/* CONTROLS - ẩn trong PiP để cửa sổ chỉ hiển thị video */}
                 {showControls && !isInPipMode && (
                     <View style={styles.overlay} pointerEvents="box-none">
