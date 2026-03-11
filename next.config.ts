@@ -5,20 +5,15 @@ const nextConfig: NextConfig = {
   compress: true,           // gzip/brotli responses
   poweredByHeader: false,
   images: {
-    // Keep unoptimized — VPS doesn't have capacity to proxy/resize images on-the-fly
-    unoptimized: true,
+    // Sử dụng custom loader wsrv.nl thay cho Next.js optimization (không tiêu tốn CPU của VPS)
+    unoptimized: false,
+    loader: "custom",
+    loaderFile: "./src/imageLoader.ts",
+    // Vẫn duy trì các pattern để an toàn (tuy ko bắt buộc khi có custom loader)
     remotePatterns: [
-      { protocol: "https", hostname: "phimimg.com" },
-      { protocol: "https", hostname: "phimapi.com" },
-      { protocol: "https", hostname: "image.tmdb.org" },
-      { protocol: "https", hostname: "ui-avatars.com" },
-      { protocol: "https", hostname: "img.ophim.live" },
-      { protocol: "https", hostname: "img.ophim1.com" },
-      { protocol: "https", hostname: "**.ophim.live" },
-      { protocol: "https", hostname: "assets.nflxext.com" },
+      { protocol: "https", hostname: "**" },
     ],
-    // Minimize layout shift for images loaded from external URLs
-    minimumCacheTTL: 86400, // 24 hours browser-level cache for optimized images
+    minimumCacheTTL: 86400, // 24 hours browser-level cache
   },
   experimental: {
     staleTimes: {

@@ -16,6 +16,7 @@ import {
     ActivityIndicator,
 } from 'react-native';
 import { Audio, Video, AVPlaybackStatus, ResizeMode } from 'expo-av';
+import { WebView } from 'react-native-webview';
 import Slider from '@react-native-community/slider';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import * as ScreenOrientation from 'expo-screen-orientation';
@@ -79,6 +80,9 @@ export default function NativePlayer({
     const { isInPipMode } = ExpoPip.useIsInPip?.() ?? { isInPipMode: false };
     const video = useRef<Video>(null);
     const [videoSource, setVideoSource] = useState({ uri: url });
+
+    // Check if the source is likely an iframe (not mp4, not m3u8)
+    const isIframe = !url.toLowerCase().includes('.mp4') && !url.toLowerCase().includes('.m3u8');
 
     // Update video source when prop changes
     useEffect(() => {
@@ -630,20 +634,32 @@ export default function NativePlayer({
 
     return (
         <View style={{ flex: 1, backgroundColor: 'black' }}>
-            <View style={styles.container} {...(!showEpisodes && !showServers ? panResponder.panHandlers : {})}>
-                <Video
-                    ref={video}
-                    style={StyleSheet.absoluteFill}
-                    source={videoSource}
-                    useNativeControls={false}
-                    resizeMode={resizeMode}
-                    onPlaybackStatusUpdate={onPlaybackStatusUpdate}
-                    onError={handleVideoError}
-                    shouldPlay={true}
-                />
+            <View style={styles.container} {...(!showEpisodes && !showServers && !isIframe ? panResponder.panHandlers : {})}>
+                {isIframe ? (
+                    <WebView
+                        source={{ uri: videoSource.uri }}
+                        allowsInlineMediaPlayback
+                        mediaPlaybackRequiresUserAction={false}
+                        allowsFullscreenVideo
+                        javaScriptEnabled
+                        style={StyleSheet.absoluteFill}
+                        containerStyle={{ backgroundColor: 'black' }}
+                    />
+                ) : (
+                    <Video
+                        ref={video}
+                        style={StyleSheet.absoluteFill}
+                        source={videoSource}
+                        useNativeControls={false}
+                        resizeMode={resizeMode}
+                        onPlaybackStatusUpdate={onPlaybackStatusUpdate}
+                        onError={handleVideoError}
+                        shouldPlay={true}
+                    />
+                )}
 
                 {/* Loading/Buffering indicator - Only show when first loading metadata, NOT when buffering mid-stream */}
-                {(!('isLoaded' in status) || !status.isLoaded) && !error && (
+                {!isIframe && (!('isLoaded' in status) || !status.isLoaded) && !error && (
                     <View style={styles.loadingOverlay} pointerEvents="none">
                         <ActivityIndicator size="large" color="#fbbf24" />
                         <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, marginTop: 8, fontWeight: '500' }}>
@@ -846,7 +862,7 @@ export default function NativePlayer({
                 )}
 
                 {/* CONTROLS - ẩn trong PiP để cửa sổ chỉ hiển thị video */}
-                {showControls && !isInPipMode && (
+                {showControls && !isInPipMode && !isIframe && (
                     <View style={styles.overlay} pointerEvents="box-none">
 
                         {/* Header */}
@@ -889,6 +905,13 @@ export default function NativePlayer({
                                         <Ionicons name="server-outline" size={24} color="white" />
                                     </TouchableOpacity>
                                 </View>
+                            </LinearGradient>
+                        )}
+                        {!locked && isIframe && (
+                            <LinearGradient colors={['rgba(0,0,0,0.8)', 'transparent']} style={styles.header}>
+                                <TouchableOpacity onPress={onClose} style={styles.backBtn}>
+                                    <Ionicons name="arrow-back" size={26} color="white" />
+                                </TouchableOpacity>
                             </LinearGradient>
                         )}
 
@@ -1013,10 +1036,19 @@ export default function NativePlayer({
 
                     </View>
                 )}
+
+                {/* Fallback back button if it's an iframe and controls are hidden via panresponder disabled */}
+                {isIframe && (
+                    <View style={[styles.header, { position: 'absolute', top: 0, left: 0, paddingHorizontal: 20 }]}>
+                        <TouchableOpacity onPress={onClose} style={styles.backBtn}>
+                            <Ionicons name="arrow-back" size={26} color="white" />
+                        </TouchableOpacity>
+                    </View>
+                )}
             </View>
 
             {/* Episode Selector Overlay - không hiện trong PiP */}
-            {!isInPipMode && (
+            {!isInPipMode && !isIframe && (
                 <View style={[StyleSheet.absoluteFill, { zIndex: 100, elevation: 100, overflow: 'hidden' }]} pointerEvents={showEpisodes ? 'auto' : 'none'}>
                     {/* Dark Overlay */}
                     <Animated.View style={[

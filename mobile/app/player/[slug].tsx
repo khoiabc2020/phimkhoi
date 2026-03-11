@@ -88,12 +88,19 @@ export default function PlayerScreen() {
         setCurrentEpisodeSlug(epObj.slug);
         setEpisodeTitle(epObj.name);
 
-        if (epObj.link_m3u8 && !epObj.link_m3u8.includes('youtube')) {
+        const serverName = data.episodes[serverIndex]?.server_name || '';
+        const isNguonC = /nguonc/i.test(serverName);
+
+        if (isNguonC && epObj.link_embed) {
+            // Nguon C's m3u8 is often broken or blocked, force iframe embed.
+            setVideoUrl(epObj.link_embed);
+            setIsNative(true); // Use NativePlayer which now has a WebView fallback
+        } else if (epObj.link_m3u8 && !epObj.link_m3u8.includes('youtube')) {
             setVideoUrl(epObj.link_m3u8);
             setIsNative(true);
         } else {
             setVideoUrl(epObj.link_embed ?? '');
-            setIsNative(false);
+            setIsNative(true); // Always pass to NativePlayer as it handles iframes now
         }
 
         const idx = serverData.findIndex((e: any) => e.slug === epObj!.slug);

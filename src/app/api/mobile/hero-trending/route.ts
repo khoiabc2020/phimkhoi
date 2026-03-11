@@ -68,15 +68,24 @@ async function findInVietnamese(query: string, year?: number) {
         allItems.push(...items);
     }
 
-    if (allItems.length === 0) return null;
+    // Filter out movies that are just trailers or have no valid episode status
+    const isValidStream = (m: any) => {
+        const ep = String(m.episode_current || m.status || m.current_episode || '').toLowerCase();
+        // Skip unreleased movies or placeholders without actual links
+        return !ep.includes('trailer') && !ep.includes('sắp chiếu') && !ep.includes('đang cập nhật');
+    };
+
+    const validItems = allItems.filter(isValidStream);
+
+    if (validItems.length === 0) return null;
 
     // Best match: prefer same year, then first result
     if (year) {
-        const yearMatch = allItems.find(m => m.year === year || m.year === year - 1 || m.year === year + 1);
+        const yearMatch = validItems.find(m => m.year === year || m.year === year - 1 || m.year === year + 1);
         if (yearMatch) return yearMatch;
     }
 
-    return allItems[0];
+    return validItems[0];
 }
 
 export async function GET() {

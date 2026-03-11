@@ -47,13 +47,17 @@ export default function HeroSection({ movies }: HeroSectionProps) {
     }, []);
 
     const getBackdropUri = useCallback((m: Movie) => {
-        const tmdb = (m as any).tmdbData;
+        const anyM = m as any;
+        if (anyM.tmdb_backdrop) return anyM.tmdb_backdrop;
+        const tmdb = anyM.tmdbData;
         if (tmdb?.backdrop_path) return tmdbImage(tmdb.backdrop_path, 'w780');
         return getImageUrl(m.thumb_url || m.poster_url);
     }, [tmdbImage]);
 
     const getPosterUri = useCallback((m: Movie) => {
-        const tmdb = (m as any).tmdbData;
+        const anyM = m as any;
+        if (anyM.tmdb_poster) return anyM.tmdb_poster;
+        const tmdb = anyM.tmdbData;
         if (tmdb?.poster_path) return tmdbImage(tmdb.poster_path, 'w342');
         return getImageUrl(m.poster_url || m.thumb_url);
     }, [tmdbImage]);
@@ -187,7 +191,8 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                 />
             </View>
 
-            <View style={{ marginTop: 15 }}>
+            {/* Push content down below safe area/header, but leave background full bleed */}
+            <View style={{ paddingTop: 110 }}>
                 <Carousel
                     width={width}
                     height={CAROUSEL_HEIGHT}
@@ -230,109 +235,122 @@ const HeroSlide = React.memo(function HeroSlide({
 }: { movie: Movie; index: number; isFav: boolean; onToggleFav: () => void }) {
     const router = useRouter();
     const posterUri = (() => {
-        const tmdb = (movie as any).tmdbData;
+        const anyM = movie as any;
+        if (anyM.tmdb_poster) return anyM.tmdb_poster;
+        const tmdb = anyM.tmdbData;
         if (tmdb?.poster_path) {
             const p = String(tmdb.poster_path);
             return `https://image.tmdb.org/t/p/w342${p.startsWith('/') ? p : `/${p}`}`;
         }
         return getImageUrl(movie.poster_url || movie.thumb_url);
     })();
-    const rating = (movie as any).tmdbData?.vote_average
-        ? Number((movie as any).tmdbData.vote_average).toFixed(1)
-        : null;
+    const rating = (() => {
+        const anyM = movie as any;
+        if (anyM.tmdb_vote) return Number(anyM.tmdb_vote).toFixed(1);
+        if (anyM.tmdbData?.vote_average) return Number(anyM.tmdbData.vote_average).toFixed(1);
+        return null;
+    })();
 
     return (
-        <Pressable
-            style={styles.slideContainer}
-            onPress={() => router.push(`/movie/${movie.slug}` as any)}
-        >
+        <View style={styles.slideContainer}>
             <View style={styles.posterWrapper}>
-                <Image
-                    source={{ uri: posterUri }}
+                <Pressable
                     style={StyleSheet.absoluteFill}
-                    contentFit="cover"
-                    priority={index === 0 ? 'high' : 'normal'}
-                    cachePolicy="memory-disk"
-                    transition={180}
-                />
-
-                {/* Gradient Nền */}
-                {isTablet ? (
-                    <LinearGradient
-                        colors={['rgba(11,13,24,0.9)', 'rgba(11,13,24,0.4)', 'transparent']}
-                        start={{ x: 0, y: 0.5 }}
-                        end={{ x: 1, y: 0.5 }}
+                    onPress={() => router.push(`/movie/${movie.slug}` as any)}
+                >
+                    <Image
+                        source={{ uri: posterUri }}
                         style={StyleSheet.absoluteFill}
+                        contentFit="cover"
+                        priority={index === 0 ? 'high' : 'normal'}
+                        cachePolicy="memory-disk"
+                        transition={180}
                     />
-                ) : (
-                    <LinearGradient
-                        colors={['transparent', 'rgba(0,0,0,0.25)', 'rgba(0,0,0,0.92)']}
-                        style={StyleSheet.absoluteFill}
-                    />
-                )}
 
-                {/* Tags on top-right */}
-                <View style={styles.badgesRow}>
-                    {movie.quality && (
-                        <View style={styles.badgeQuality}>
-                            <Text style={styles.badgeQualityText}>{movie.quality}</Text>
-                        </View>
+                    {/* Gradient Nền */}
+                    {isTablet ? (
+                        <LinearGradient
+                            colors={['rgba(11,13,24,0.9)', 'rgba(11,13,24,0.4)', 'transparent']}
+                            start={{ x: 0, y: 0.5 }}
+                            end={{ x: 1, y: 0.5 }}
+                            style={StyleSheet.absoluteFill}
+                        />
+                    ) : (
+                        <LinearGradient
+                            colors={['transparent', 'rgba(0,0,0,0.25)', 'rgba(0,0,0,0.92)']}
+                            style={StyleSheet.absoluteFill}
+                        />
                     )}
-                    {rating && (
-                        <View style={styles.badgeRating}>
-                            <Ionicons name="star" size={12} color="#E6BF5C" />
-                            <Text style={styles.badgeRatingText}>{rating}</Text>
-                        </View>
-                    )}
-                </View>
+
+                    {/* Tags on top-right */}
+                    <View style={styles.badgesRow}>
+                        {movie.quality && (
+                            <View style={styles.badgeQuality}>
+                                <Text style={styles.badgeQualityText}>{movie.quality}</Text>
+                            </View>
+                        )}
+                        {rating && (
+                            <View style={styles.badgeRating}>
+                                <Ionicons name="star" size={12} color="#E6BF5C" />
+                                <Text style={styles.badgeRatingText}>{rating}</Text>
+                            </View>
+                        )}
+                    </View>
+
+                </Pressable>
 
                 {/* Info block overlaid */}
-                <View style={[styles.infoBlock, isTablet && styles.infoBlockTablet]}>
+                <View style={[styles.infoBlock, isTablet && styles.infoBlockTablet]} pointerEvents="box-none">
+                    {/* Top 10 Badge for the first 3 items */}
+                    {index < 3 && (
+                        <View style={styles.top10Badge}>
+                            <View style={styles.top10Square}>
+                                <Text style={styles.top10SquareText}>TOP</Text>
+                                <Text style={styles.top10SquareNumber}>10</Text>
+                            </View>
+                            <Text style={styles.top10Text}>Phim phổ biến hôm nay</Text>
+                        </View>
+                    )}
+
                     <Text style={[styles.title, isTablet && styles.titleTablet]} numberOfLines={2} adjustsFontSizeToFit>{movie.name}</Text>
                     <View style={[styles.metaRow, isTablet && styles.metaRowTablet]}>
                         {movie.year && <Text style={styles.metaText}>{movie.year}</Text>}
-                        {movie.category?.slice(0, 2).map((c: any) => (
+                        {movie.category?.slice(0, 3).map((c: any) => (
                             <Text key={c.id || c.name} style={styles.metaDot}>· {c.name}</Text>
                         ))}
                     </View>
 
-                    <View style={[styles.actionRow, isTablet && styles.actionRowTablet]}>
-                        <Pressable
-                            style={[styles.playBtn, isTablet && { flex: 0, width: 140 }]}
-                            onPress={(e) => {
-                                e.stopPropagation();
-                                router.push(`/movie/${movie.slug}?autoPlay=true` as any);
-                            }}
-                        >
-                            <Ionicons name="play" size={18} color="#0B0D12" />
-                            <Text style={styles.playBtnText}>XEM</Text>
-                        </Pressable>
-
-                        <Pressable
-                            style={[styles.detailBtn, isTablet && { flex: 0, width: 140 }]}
-                            onPress={(e) => {
-                                e.stopPropagation();
-                                router.push(`/movie/${movie.slug}` as any);
-                            }}
-                        >
-                            <Ionicons name="information-circle-outline" size={18} color="#FFFFFF" />
-                            <Text style={styles.detailBtnText}>CHI TIẾT</Text>
-                        </Pressable>
-
+                    <View style={[styles.actionRow, isTablet && styles.actionRowTablet]} pointerEvents="box-none">
                         <TouchableOpacity
-                            style={[styles.circleBtn, isFav && styles.circleBtnFav]}
-                            onPress={(e) => {
-                                e.stopPropagation();
-                                onToggleFav();
-                            }}
+                            style={styles.colBtn}
+                            onPress={() => onToggleFav()}
                             activeOpacity={0.8}
                         >
-                            <Ionicons name={isFav ? 'heart' : 'heart-outline'} size={20} color={isFav ? COLORS.accent : 'rgba(255,255,255,0.9)'} />
+                            <Ionicons name={isFav ? 'checkmark' : 'add'} size={28} color="#FFFFFF" />
+                            <Text style={styles.colBtnText}>Danh sách</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={[styles.playBtn, isTablet && { flex: 0, width: 160 }]}
+                            onPress={() => router.push(`/movie/${movie.slug}?autoPlay=true` as any)}
+                            activeOpacity={0.8}
+                        >
+                            <Ionicons name="play" size={24} color="#000000" />
+                            <Text style={styles.playBtnText}>Phát</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={styles.colBtn}
+                            onPress={() => router.push(`/movie/${movie.slug}` as any)}
+                            activeOpacity={0.8}
+                        >
+                            <Ionicons name="information-circle-outline" size={28} color="#FFFFFF" />
+                            <Text style={styles.colBtnText}>Thông tin</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
             </View>
-        </Pressable>
+        </View>
     );
 });
 
@@ -349,21 +367,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     posterWrapper: {
-        width: '90%',
-        height: '98%',
-        borderRadius: 24,
+        width: '100%',
+        height: '100%',
+        borderRadius: 0,
         overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.12)',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.7,
-        shadowRadius: 16,
-        elevation: 12,
     },
     badgesRow: {
         position: 'absolute',
-        top: 14,
+        top: 110,
         right: 14,
         flexDirection: 'row',
         gap: 6,
@@ -440,61 +451,62 @@ const styles = StyleSheet.create({
     actionRow: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '100%',
+        paddingHorizontal: 10,
+        marginTop: 4,
+    },
+    colBtn: {
+        alignItems: 'center',
         justifyContent: 'center',
-        gap: 12,
+        width: 80,
+        gap: 4,
+    },
+    colBtnText: {
+        color: '#FFFFFF',
+        fontSize: 12,
+        fontWeight: '500',
     },
     playBtn: {
         flex: 1,
-        height: 48,
-        borderRadius: 24,
-        backgroundColor: '#E6BF5C',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 8,
-        shadowColor: '#E6BF5C',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 8,
-    },
-    playBtnText: {
-        color: '#0B0D12',
-        fontWeight: '900',
-        fontSize: 14,
-        letterSpacing: 0.5,
-    },
-    detailBtn: {
-        flex: 1,
-        height: 48,
-        borderRadius: 24,
-        backgroundColor: 'rgba(255,255,255,0.15)',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.2)',
+        maxWidth: 160,
+        height: 44,
+        borderRadius: 4,
+        backgroundColor: '#FFFFFF',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 6,
     },
-    detailBtnText: {
-        color: '#FFFFFF',
-        fontWeight: '700',
-        fontSize: 13,
-        letterSpacing: 0.5,
+    playBtnText: {
+        color: '#000000',
+        fontWeight: 'bold',
+        fontSize: 16,
     },
-    circleBtn: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        backgroundColor: 'rgba(255,255,255,0.15)',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.2)',
+    top10Badge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 8,
+        gap: 8,
+    },
+    top10Square: {
+        backgroundColor: '#E50914',
+        borderRadius: 4,
+        paddingHorizontal: 4,
+        paddingVertical: 2,
         alignItems: 'center',
         justifyContent: 'center',
     },
-    circleBtnFav: {
-        backgroundColor: 'rgba(244,200,74,0.15)',
-        borderColor: 'rgba(244,200,74,0.4)',
+    top10SquareText: { color: '#FFFFFF', fontSize: 8, fontWeight: '900', letterSpacing: 1 },
+    top10SquareNumber: { color: '#FFFFFF', fontSize: 12, fontWeight: '900', marginTop: -2 },
+    top10Text: {
+        color: '#FFFFFF',
+        fontWeight: 'bold',
+        fontSize: 13,
+        textShadowColor: 'rgba(0,0,0,0.8)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 2,
     },
     dotsRow: {
         flexDirection: 'row',

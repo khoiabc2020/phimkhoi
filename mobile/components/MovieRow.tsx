@@ -35,7 +35,6 @@ const MovieRow = memo(({ title, movies, slug, subtitle, type = 'list' }: MovieRo
             {/* Section Header */}
             <View style={styles.header}>
                 <View style={styles.titleGroup}>
-                    {/* Yellow accent bar */}
                     <View style={styles.accentBar} />
                     <View>
                         <Text style={styles.title}>{title}</Text>
@@ -87,15 +86,15 @@ const styles = StyleSheet.create({
     },
     accentBar: {
         width: 3,
-        height: 18,
+        height: 20,
         borderRadius: 2,
         backgroundColor: '#fbbf24',
     },
     title: {
         color: '#ffffff',
-        fontSize: 16,
-        fontWeight: '700',
-        letterSpacing: -0.3,
+        fontSize: 20,
+        fontWeight: '800',
+        letterSpacing: -0.5,
     },
     subtitle: {
         color: 'rgba(255,255,255,0.45)',

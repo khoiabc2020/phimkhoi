@@ -10,6 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Animated, { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, interpolate, Extrapolation } from 'react-native-reanimated';
 
 import HeroSection from '@/components/HeroSection';
 import MovieRow from '@/components/MovieRow';
@@ -37,6 +38,19 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
   const { user, syncHistory } = useAuth();
+
+  const scrollY = useSharedValue(0);
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
+  const headerBgStyle = useAnimatedStyle(() => {
+    return {
+      opacity: interpolate(scrollY.value, [0, 80], [0, 1], Extrapolation.CLAMP),
+    };
+  });
 
   const [data, setData] = useState<{
     heroMovies: Movie[];
@@ -159,12 +173,14 @@ export default function HomeScreen() {
       />
 
       <View style={styles.headerWrapper}>
-        <LinearGradient
-          colors={['rgba(11,13,18,0.85)', 'rgba(11,13,18,0.4)', 'transparent']}
-          locations={[0.2, 0.7, 1]}
-          style={StyleSheet.absoluteFill}
-        />
-        <BlurView intensity={Platform.OS === 'ios' ? BLUR.header : 80} tint="dark" style={StyleSheet.absoluteFill} />
+        <Animated.View style={[StyleSheet.absoluteFill, headerBgStyle]}>
+          <LinearGradient
+            colors={['rgba(11,13,18,0.95)', 'rgba(11,13,18,0.7)', 'transparent']}
+            locations={[0.2, 0.7, 1]}
+            style={StyleSheet.absoluteFill}
+          />
+          <BlurView intensity={Platform.OS === 'ios' ? BLUR.header : 80} tint="dark" style={StyleSheet.absoluteFill} />
+        </Animated.View>
         <SafeAreaView edges={['top']} style={styles.headerContent}>
           <View style={styles.headerRow}>
             <View style={[styles.logoRow, { paddingLeft: 8 }]}>
@@ -225,7 +241,9 @@ export default function HomeScreen() {
         </SafeAreaView>
       </View>
 
-      <ScrollView
+      <Animated.ScrollView
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -288,11 +306,8 @@ export default function HomeScreen() {
             <View style={styles.movieRows}>
               {/* Đề xuất cho bạn — đồng bộ web */}
               {(data.phimChieuRap.length > 0 || data.phimMoi.length > 0) && (
-                <View style={styles.sectionBlock}>
-                  <View style={styles.sectionTitleRow}>
-                    <View style={styles.accentBar} />
-                    <Text style={styles.sectionTitleText}>Đề xuất cho bạn</Text>
-                  </View>
+                <View style={[styles.sectionBlock, { marginTop: 10 }]}>
+                  <Text style={styles.sectionTitleText}>Đề xuất cho bạn</Text>
                   {data.phimChieuRap.length > 0 && (
                     <MovieRow title="Phim Chiếu Rạp Mới" movies={data.phimChieuRap} slug="phim-chieu-rap" type="category" />
                   )}
@@ -305,10 +320,7 @@ export default function HomeScreen() {
               {/* Phim theo quốc gia */}
               {(data.hanQuoc.length > 0 || data.trungQuoc.length > 0) && (
                 <View style={styles.sectionBlock}>
-                  <View style={styles.sectionTitleRow}>
-                    <View style={styles.accentBar} />
-                    <Text style={styles.sectionTitleText}>Phim theo quốc gia</Text>
-                  </View>
+                  <Text style={styles.sectionTitleText}>Phim theo quốc gia</Text>
                   {data.hanQuoc.length > 0 && (
                     <MovieRow title="Hàn Quốc" movies={data.hanQuoc} slug="han-quoc" type="country" />
                   )}
@@ -320,10 +332,7 @@ export default function HomeScreen() {
 
               {/* Mới cập nhật */}
               <View style={styles.sectionBlock}>
-                <View style={styles.sectionTitleRow}>
-                  <View style={styles.accentBar} />
-                  <Text style={styles.sectionTitleText}>Mới cập nhật</Text>
-                </View>
+                <Text style={styles.sectionTitleText}>Mới cập nhật</Text>
                 {data.phimSapChieu.length > 0 && (
                   <MovieRow title="Phim Sắp Chiếu" movies={data.phimSapChieu} slug="phim-sap-chieu" type="list" />
                 )}
@@ -333,10 +342,7 @@ export default function HomeScreen() {
 
               {/* Thể loại */}
               <View style={styles.sectionBlock}>
-                <View style={styles.sectionTitleRow}>
-                  <View style={styles.accentBar} />
-                  <Text style={styles.sectionTitleText}>Thể loại</Text>
-                </View>
+                <Text style={styles.sectionTitleText}>Thể loại</Text>
                 {data.hanhDong.length > 0 && (
                   <MovieRow title="Hành Động" movies={data.hanhDong} slug="hanh-dong" type="category" />
                 )}
@@ -349,7 +355,7 @@ export default function HomeScreen() {
             </View>
           )
         }
-      </ScrollView >
+      </Animated.ScrollView >
     </View >
   );
 }
@@ -406,7 +412,7 @@ const styles = StyleSheet.create({
   pillTextActive: { color: COLORS.accent, fontWeight: '800' },
 
   // Content
-  scrollContent: { paddingTop: 130, paddingBottom: 100 },
+  scrollContent: { paddingTop: 0, paddingBottom: 100 },
 
   // Categories Compact
   catSection: { marginVertical: 10, paddingLeft: SPACING.md },
@@ -421,8 +427,6 @@ const styles = StyleSheet.create({
   catText: { color: 'rgba(255,255,255,0.8)', fontSize: 13, fontWeight: '500' },
 
   movieRows: { gap: 10 },
-  sectionBlock: { marginBottom: 24 },
-  sectionTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8, paddingHorizontal: 16 },
-  accentBar: { width: 3, height: 18, borderRadius: 2, backgroundColor: '#fbbf24' },
-  sectionTitleText: { color: COLORS.textPrimary, fontSize: 16, fontWeight: '700' },
+  sectionBlock: { marginBottom: 32 },
+  sectionTitleText: { color: COLORS.textPrimary, fontSize: 20, fontWeight: '800', marginBottom: 16, paddingHorizontal: 16, letterSpacing: -0.5 },
 });
