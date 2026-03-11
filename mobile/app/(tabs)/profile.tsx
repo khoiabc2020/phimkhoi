@@ -4,6 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Linking from 'expo-linking';
 import { StatusBar } from 'expo-status-bar';
+import * as FileSystem from 'expo-file-system';
+import * as IntentLauncher from 'expo-intent-launcher';
 import { useAuth } from '@/context/auth';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -77,7 +79,10 @@ export default function ProfileScreen() {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
+  const [userMenuVisible, setUserMenuVisible] = useState(false);
   const [checking, setChecking] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState(0);
 
   const [alertConfig, setAlertConfig] = useState<{
     visible: boolean;
@@ -114,7 +119,7 @@ export default function ProfileScreen() {
           if (isManual) {
             showAlert('Cập nhật mới!', `v${data.version} đã sẵn sàng`, [
               { text: 'Để sau', style: 'cancel' },
-              { text: 'Cập nhật', onPress: () => Linking.openURL(data.download_url) }
+              { text: 'Tải về & Cài đặt', onPress: () => handleDownloadAndInstall(data.download_url) }
             ], 'success');
           }
         } else if (isManual) {
@@ -127,6 +132,44 @@ export default function ProfileScreen() {
       // Chỉ show lỗi khi user chủ động nhấn nút, không hiện khi auto-check lúc mở app
       if (isManual) showAlert('Lỗi', 'Không thể kết nối máy chủ. Kiểm tra lại kết nối mạng.', undefined, 'warning');
     } finally { setChecking(false); }
+  };
+
+  const handleDownloadAndInstall = async (url: string) => {
+    try {
+      setDownloading(true);
+      setDownloadProgress(0);
+
+      const fileUri = `${FileSystem.documentDirectory}update.apk`;
+
+      const downloadResumable = FileSystem.createDownloadResumable(
+        url,
+        fileUri,
+        {},
+        (downloadProgress) => {
+          const progress = downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite;
+          setDownloadProgress(progress);
+        }
+      );
+
+      const result = await downloadResumable.downloadAsync();
+
+      if (result && result.uri) {
+        // Lấy content URi qua FileProvider
+        const cUri = await FileSystem.getContentUriAsync(result.uri);
+        await IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
+          data: cUri,
+          flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
+          type: 'application/vnd.android.package-archive'
+        });
+      }
+
+    } catch (error) {
+      console.error(error);
+      showAlert('Lỗi tải xuống', 'Không thể tải bản cập nhật, vui lòng thử lại sau', undefined, 'error');
+    } finally {
+      setDownloading(false);
+      setDownloadProgress(0);
+    }
   };
 
   const handleLogout = () => {
@@ -335,10 +378,10 @@ export default function ProfileScreen() {
                 <Text style={{ color: 'white', fontSize: 15, fontWeight: '600' }}>
                   {updateInfo ? `Bản mới v${updateInfo.version}` : 'Phiên bản mới nhất'}
                 </Text>
-                <Text style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>v{APP_VERSION} · Build {APP_BUILD}</Text>
+                <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, textAlign: 'center' }}>Phiên bản {APP_VERSION} (Build {APP_BUILD})</Text>
               </View>
               {updateInfo ? (
-                <TouchableOpacity onPress={() => Linking.openURL(updateInfo.download_url)} style={{ backgroundColor: '#E6BF5C', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}>
+                <TouchableOpacity onPress={() => handleDownloadAndInstall(updateInfo.download_url)} style={{ backgroundColor: '#E6BF5C', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}>
                   <Text style={{ color: '#000', fontSize: 12, fontWeight: '800' }}>Cập nhật</Text>
                 </TouchableOpacity>
               ) : (

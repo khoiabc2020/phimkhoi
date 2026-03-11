@@ -85,19 +85,16 @@ export default function ModernAlert({
         }
     };
 
-    const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
-
     return (
         <Modal transparent visible={visible} animationType="fade" onRequestClose={onClose}>
             <View style={styles.overlay}>
-                {/* Background Dim */}
-                <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)', opacity: opacityValue }]} />
+                {/* Background Dim - always show Blur */}
+                <BlurView intensity={20} tint="dark" style={StyleSheet.absoluteFill}>
+                    <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.4)', opacity: opacityValue }]} />
+                </BlurView>
 
-                <AnimatedBlurView
-                    intensity={80}
-                    tint="dark"
-                    style={[styles.alertBox, { transform: [{ scale: scaleValue }], opacity: opacityValue }]}
-                >
+                {/* Animated Box without AnimatedBlurView wrapper for performance & visibility on Android */}
+                <Animated.View style={[styles.alertBox, { transform: [{ scale: scaleValue }], opacity: opacityValue }]}>
                     <View style={[styles.iconContainer, { backgroundColor: getIconBackground() }]}>
                         {getIcon()}
                     </View>
@@ -136,7 +133,7 @@ export default function ModernAlert({
                             );
                         })}
                     </View>
-                </AnimatedBlurView>
+                </Animated.View>
             </View>
         </Modal>
     );
@@ -153,7 +150,7 @@ const styles = StyleSheet.create({
     alertBox: {
         width: '100%',
         maxWidth: 320,
-        backgroundColor: 'rgba(25, 27, 33, 0.65)', // More translucent for strong blur
+        backgroundColor: 'rgba(22, 25, 32, 0.98)', // Dark near-opaque for consistent visibility on low-end
         borderRadius: 28,
         paddingTop: 32,
         paddingBottom: 24,
@@ -165,7 +162,7 @@ const styles = StyleSheet.create({
         shadowRadius: 32,
         elevation: 20,
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.15)',
+        borderColor: 'rgba(255,255,255,0.1)',
         overflow: 'hidden',
     },
     iconContainer: {
