@@ -32,8 +32,9 @@ npm run build
 
 # Copy fresh static assets into standalone (will force-overwrite if already exists)
 echo "Copying static assets to standalone..."
-cp -rf public .next/standalone/public
-cp -rf .next/static .next/standalone/.next/static
+mkdir -p .next/standalone/public
+cp -a public/. .next/standalone/public/
+cp -a .next/static/. .next/standalone/.next/static/
 # Copy env file if it exists (Crucial for Standalone)
 if [ -f .env.local ]; then
     cp .env.local .next/standalone/.env.local
