@@ -53,26 +53,26 @@ export default function Footer() {
                         <p className="text-[13px] text-gray-500 leading-relaxed max-w-[220px]">
                             Xem hàng ngàn bộ phim chất lượng cao, vietsub chuẩn, miễn phí — cập nhật hàng ngày.
                         </p>
-                        <div className="flex gap-2.5 mt-1">
-                            <a href="https://moviebox.io.vn/api/download/apk"
-                                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#F4C84A] text-black text-[12px] font-bold hover:bg-[#e6b83e] transition-colors">
-                                <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
-                                    <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.4c1.42.07 2.41.74 3.23.8 1.23-.24 2.41-.93 3.73-.84 1.58.14 2.77.71 3.53 1.81-3.24 1.93-2.27 5.85.51 6.99-.6 1.45-1.24 2.88-3 4.12zM13 3.5c.17-2 1.91-3.37 3.37-3.5.29 2.22-1.63 3.75-3.37 3.5z" />
-                                </svg>
-                                Tải App
+                        <a href="https://khoiphim.io.vn/api/download/apk"
+                            className="inline-flex items-center gap-2 self-start px-3.5 py-1.5 rounded-full border border-[#F4C84A]/40 text-[#F4C84A] text-[12px] font-medium hover:bg-[#F4C84A]/10 transition-all duration-200 mt-1">
+                            <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3">
+                                <path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm0 18a8 8 0 110-16 8 8 0 010 16zm-1-5h2v2h-2zm0-8h2v6h-2z" />
+                            </svg>
+                            Tải APK Android
+                        </a>
+                        <div className="flex gap-2.5 mt-2">
+                            {/* Facebook */}
+                            <a href="#" aria-label="Facebook" className="w-8 h-8 rounded-full border border-white/[0.08] flex items-center justify-center text-gray-600 hover:border-white/20 hover:text-white transition-all duration-200">
+                                <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" /></svg>
                             </a>
-                        </div>
-                        <div className="flex gap-3 mt-1">
-                            {[
-                                { label: "FB", href: "#" },
-                                { label: "IG", href: "#" },
-                                { label: "TG", href: "#" },
-                            ].map(({ label, href }) => (
-                                <a key={label} href={href}
-                                    className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-[11px] text-gray-400 hover:border-[#F4C84A] hover:text-[#F4C84A] transition-all">
-                                    {label}
-                                </a>
-                            ))}
+                            {/* Instagram */}
+                            <a href="#" aria-label="Instagram" className="w-8 h-8 rounded-full border border-white/[0.08] flex items-center justify-center text-gray-600 hover:border-white/20 hover:text-white transition-all duration-200">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" /></svg>
+                            </a>
+                            {/* Telegram */}
+                            <a href="#" aria-label="Telegram" className="w-8 h-8 rounded-full border border-white/[0.08] flex items-center justify-center text-gray-600 hover:border-white/20 hover:text-white transition-all duration-200">
+                                <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5"><path d="M21.94 3.3a1 1 0 00-1.02-.15l-18 7a1 1 0 00.08 1.88l4.5 1.5 1.5 5.25a1 1 0 001.72.37L13 17.06l4.6 3.45a1 1 0 001.55-.72l2-15a1 1 0 00-.21-.49z" /></svg>
+                            </a>
                         </div>
                     </div>
 
