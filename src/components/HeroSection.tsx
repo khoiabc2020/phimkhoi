@@ -258,8 +258,9 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                 <div className="flex items-center gap-2 mt-3">
                     <Link
                         href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                        className="flex flex-1 items-center justify-center h-10 rounded-full bg-[#F4C84A] text-black font-extrabold text-[13px] active:scale-[0.97] transition-transform"
+                        className="flex flex-1 items-center justify-center gap-1.5 h-10 rounded-full bg-[#F4C84A] text-black font-bold text-[14px] active:scale-[0.97] transition-transform"
                     >
+                        <Play className="w-3.5 h-3.5 fill-black shrink-0" />
                         Xem Ngay
                     </Link>
                     <Link
@@ -422,8 +423,9 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         >
                             <Link
                                 href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                className="flex items-center justify-center h-12 px-7 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-black text-[15px] transition-all duration-200 hover:scale-105 active:scale-95"
+                                className="flex items-center justify-center gap-2 h-12 px-7 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-bold text-[15px] transition-all duration-200 hover:scale-105 active:scale-95"
                             >
+                                <Play className="w-4 h-4 fill-black shrink-0" />
                                 Xem Ngay
                             </Link>
                             <Link
