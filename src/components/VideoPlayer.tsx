@@ -95,7 +95,10 @@ export default function VideoPlayer({
 
     const streamUrl = m3u8 || url;
     const [fallbackIframe, setFallbackIframe] = useState(false);
+    const [showSkipAd, setShowSkipAd] = useState(false);
     const shouldUseArtPlayer = !fallbackIframe && isDirectStream(streamUrl);
+    const AD_START = 900;  // 15:00
+    const AD_END = 930;    // 15:30
 
     // Realtime watch history save — throttled every 15s
     const saveHistory = useCallback(async (currentTime: number, duration: number) => {
@@ -330,49 +333,12 @@ export default function VideoPlayer({
 
                 // Realtime history save
                 art.on("timeupdate", () => {
+                    // Skip Ad: check first, regardless of paused state
+                    const ct = Math.floor(art.currentTime);
+                    setShowSkipAd(ct >= AD_START && ct <= AD_END);
+
                     if (!art.playing) return;
                     saveHistory(art.currentTime, art.duration);
-
-                    // Skip Ad button: KKPhim embeds ads from ~15:00 to 15:30 (900s - 930s)
-                    const ct = Math.floor(art.currentTime);
-                    const AD_START = 900;  // 15:00
-                    const AD_END = 930;    // 15:30
-                    const skipBtnId = "skip-ad-btn";
-                    let skipBtn = document.getElementById(skipBtnId);
-
-                    if (ct >= AD_START && ct <= AD_END) {
-                        if (!skipBtn && artRef.current) {
-                            // Append inside .art-video-player which has position:relative
-                            const playerContainer = artRef.current.querySelector('.art-video-player') as HTMLElement || artRef.current;
-                            skipBtn = document.createElement("button");
-                            skipBtn.id = skipBtnId;
-                            skipBtn.innerHTML = `
-                                <span style="display:flex;align-items:center;gap:6px;">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M6 18l8.5-6L6 6v12zm2-8.14L11.03 12 8 14.14V9.86zM16 6h2v12h-2z"/></svg>
-                                    Bỏ qua quảng cáo
-                                </span>
-                            `;
-                            skipBtn.style.cssText = `
-                                position:absolute; bottom:72px; right:12px; z-index:9999;
-                                background:rgba(0,0,0,0.8); color:white;
-                                border:1.5px solid rgba(255,255,255,0.35); border-radius:6px;
-                                padding:7px 16px; font-size:13px; font-weight:600;
-                                cursor:pointer; backdrop-filter:blur(6px);
-                                transition:all 0.15s ease;
-                                font-family: inherit; letter-spacing:0.01em;
-                                box-shadow: 0 2px 12px rgba(0,0,0,0.4);
-                            `;
-                            skipBtn.onmouseover = () => { skipBtn!.style.background = "rgba(244,200,74,0.95)"; skipBtn!.style.color = "black"; skipBtn!.style.borderColor = "transparent"; };
-                            skipBtn.onmouseout = () => { skipBtn!.style.background = "rgba(0,0,0,0.8)"; skipBtn!.style.color = "white"; skipBtn!.style.borderColor = "rgba(255,255,255,0.35)"; };
-                            skipBtn.onclick = () => {
-                                if (art) art.currentTime = AD_END + 1;
-                                skipBtn?.remove();
-                            };
-                            playerContainer.appendChild(skipBtn);
-                        }
-                    } else if (skipBtn) {
-                        skipBtn.remove();
-                    }
                 });
 
                 // Save volume/rate config
@@ -487,7 +453,42 @@ export default function VideoPlayer({
 
     return (
         <>
-            <div ref={artRef} className="w-full h-full bg-black art-ios-theme relative" style={{ minHeight: "200px" }} />
+            <div className="relative w-full h-full">
+                <div ref={artRef} className="w-full h-full bg-black art-ios-theme" style={{ minHeight: "200px" }} />
+                {showSkipAd && (
+                    <button
+                        onClick={() => {
+                            if (artInstance.current) artInstance.current.currentTime = AD_END + 1;
+                            setShowSkipAd(false);
+                        }}
+                        style={{
+                            position: 'absolute',
+                            bottom: '72px',
+                            right: '12px',
+                            zIndex: 9999,
+                            background: 'rgba(0,0,0,0.82)',
+                            color: 'white',
+                            border: '1.5px solid rgba(255,255,255,0.3)',
+                            borderRadius: '6px',
+                            padding: '7px 16px',
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            backdropFilter: 'blur(6px)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            boxShadow: '0 2px 14px rgba(0,0,0,0.5)',
+                            fontFamily: 'inherit',
+                        }}
+                        onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(244,200,74,0.95)'; (e.currentTarget as HTMLButtonElement).style.color = 'black'; }}
+                        onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,0,0,0.82)'; (e.currentTarget as HTMLButtonElement).style.color = 'white'; }}
+                    >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zm2-8.14L11.03 12 8 14.14V9.86zM16 6h2v12h-2z" /></svg>
+                        Bỏ qua quảng cáo
+                    </button>
+                )}
+            </div>
             <style jsx global>{`
                 .art-ios-theme.art-video-player .art-bottom {
                     padding-bottom: 8px;
