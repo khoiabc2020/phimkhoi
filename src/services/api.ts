@@ -546,6 +546,15 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
             return !duplicate;
         });
 
+        // Filter out trailer-only / unreleased movies (unless explicitly browsing that category)
+        if (type !== 'phim-sap-chieu') {
+            uniqueItems = uniqueItems.filter(item => {
+                const ep = (item.episode_current || '').toLowerCase();
+                const st = ((item as any).status || '').toLowerCase();
+                return !ep.includes('trailer') && !st.includes('trailer');
+            });
+        }
+
         // Optional client-side quality filter (e.g. 4K only)
         if (quality) {
             const q = String(quality).toUpperCase();
