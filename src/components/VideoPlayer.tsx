@@ -332,6 +332,44 @@ export default function VideoPlayer({
                 art.on("timeupdate", () => {
                     if (!art.playing) return;
                     saveHistory(art.currentTime, art.duration);
+
+                    // Skip Ad button: KKPhim embeds ads from ~15:00 to 15:30 (900s - 930s)
+                    const ct = Math.floor(art.currentTime);
+                    const AD_START = 900;  // 15:00
+                    const AD_END = 930;    // 15:30
+                    const skipBtnId = "skip-ad-btn";
+                    let skipBtn = document.getElementById(skipBtnId);
+
+                    if (ct >= AD_START && ct <= AD_END) {
+                        if (!skipBtn && artRef.current) {
+                            skipBtn = document.createElement("button");
+                            skipBtn.id = skipBtnId;
+                            skipBtn.innerHTML = `
+                                <span style="display:flex;align-items:center;gap:6px;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M6 18l8.5-6L6 6v12zm2-8.14L11.03 12 8 14.14V9.86zM16 6h2v12h-2z"/></svg>
+                                    Bỏ qua quảng cáo
+                                </span>
+                            `;
+                            skipBtn.style.cssText = `
+                                position:absolute; bottom:72px; right:12px; z-index:999;
+                                background:rgba(0,0,0,0.75); color:white;
+                                border:1px solid rgba(255,255,255,0.3); border-radius:6px;
+                                padding:6px 14px; font-size:13px; font-weight:600;
+                                cursor:pointer; backdrop-filter:blur(4px);
+                                transition:background 0.2s, transform 0.1s;
+                                font-family: inherit;
+                            `;
+                            skipBtn.onmouseover = () => { skipBtn!.style.background = "rgba(244,200,74,0.9)"; skipBtn!.style.color = "black"; };
+                            skipBtn.onmouseout = () => { skipBtn!.style.background = "rgba(0,0,0,0.75)"; skipBtn!.style.color = "white"; };
+                            skipBtn.onclick = () => {
+                                if (art) art.currentTime = AD_END + 1;
+                                skipBtn?.remove();
+                            };
+                            artRef.current.appendChild(skipBtn);
+                        }
+                    } else if (skipBtn) {
+                        skipBtn.remove();
+                    }
                 });
 
                 // Save volume/rate config

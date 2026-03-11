@@ -93,8 +93,10 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     const { isFavorite: isFav } = isFavResult.status === 'fulfilled' ? isFavResult.value : { isFavorite: false };
     const inWatchlist = isWatchlistResult.status === 'fulfilled' ? isWatchlistResult.value.isInWatchlist : false;
 
-    const posterUrl = tmdbDetails?.poster_path ? getTMDBImage(tmdbDetails.poster_path, "original") : getImageUrl(movie?.poster_url || movie?.thumb_url);
-    const backdropUrl = tmdbDetails?.backdrop_path ? getTMDBImage(tmdbDetails.backdrop_path, "original") : getImageUrl(movie?.poster_url || movie?.thumb_url);
+    // Always use source images (Ophim/KKPhim) for poster & backdrop — TMDB images may be wrong when the search fails
+    const sourceImage = getImageUrl(movie?.poster_url || movie?.thumb_url);
+    const posterUrl = sourceImage;
+    const backdropUrl = getImageUrl(movie?.thumb_url || movie?.poster_url);
     const rating = tmdbDetails?.vote_average ? tmdbDetails.vote_average.toFixed(1) : "9.7";
 
     const jsonLd = {
