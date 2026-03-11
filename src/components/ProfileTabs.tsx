@@ -73,7 +73,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                         </h2>
 
                         {favorites.length === 0 ? (
-                            <div className="text-gray-400 text-center py-20 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
+                            <div className="text-gray-400 text-center py-20 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10">
                                 <Heart className="w-12 h-12 mx-auto mb-4 text-gray-600" />
                                 <p>Chưa có phim yêu thích nào.</p>
                                 <Link href="/" className="text-[#fbbf24] mt-2 inline-block hover:underline font-medium">Khám phá ngay</Link>
@@ -151,7 +151,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                         </h2>
 
                         {history.length === 0 ? (
-                            <div className="text-gray-400 text-center py-20 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
+                            <div className="text-gray-400 text-center py-20 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10">
                                 <Clock className="w-12 h-12 mx-auto mb-4 text-gray-600" />
                                 <p>Chưa có lịch sử xem.</p>
                                 <Link href="/" className="text-[#fbbf24] mt-2 inline-block hover:underline font-medium">Xem phim ngay</Link>
@@ -229,7 +229,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                                 <Loader2 className="w-8 h-8 text-[#fbbf24] animate-spin" />
                             </div>
                         ) : playlists.length === 0 ? (
-                            <div className="text-gray-400 text-center py-20 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
+                            <div className="text-gray-400 text-center py-20 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10">
                                 <ListVideo className="w-12 h-12 mx-auto mb-4 text-gray-600" />
                                 <p className="text-lg font-medium text-white mb-2">Chưa có danh sách nào</p>
                                 <p className="text-sm">Hãy tạo danh sách phim của riêng bạn để dễ dàng theo dõi.</p>
@@ -243,8 +243,8 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10 [contain:layout_paint]">
                                 {playlists.map(list => (
-                                    <div key={list._id} className="bg-white/5 border border-white/10 hover:border-[#fbbf24]/50 p-5 rounded-xl relative group transition-all h-full flex flex-col">
-                                        <div className="absolute -inset-0.5 bg-gradient-to-r from-[#fbbf24] to-[#f59e0b] rounded-xl blur opacity-0 group-hover:opacity-10 transition duration-500 pointer-events-none"></div>
+                                    <div key={list._id} className="bg-white/5 border border-white/10 hover:border-[#fbbf24]/50 p-5 rounded-lg relative group transition-all h-full flex flex-col">
+                                        <div className="absolute -inset-0.5 bg-gradient-to-r from-[#fbbf24] to-[#f59e0b] rounded-lg blur opacity-0 group-hover:opacity-10 transition duration-500 pointer-events-none"></div>
                                         <div className="relative flex-1 flex flex-col">
                                             <div className="flex items-start justify-between gap-4 mb-4">
                                                 <h3 className="text-white font-bold text-lg group-hover:text-[#fbbf24] transition-colors leading-tight line-clamp-2" title={list.name}>
@@ -280,7 +280,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                 return (
                     <div>
                         <h2 className="text-2xl font-bold text-white mb-6">Thông tin tài khoản</h2>
-                        <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 max-w-2xl relative overflow-hidden">
+                        <div className="bg-white/5 backdrop-blur-sm rounded-lg p-8 border border-white/10 max-w-2xl relative overflow-hidden">
                             <div className="absolute top-0 right-0 p-32 bg-[#fbbf24] rounded-full blur-[100px] opacity-5 -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
 
                             <div className="flex items-start gap-8 relative z-10">
@@ -325,13 +325,13 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
         <div className="flex flex-col md:flex-row gap-8 min-h-[600px]">
             {/* Sidebar Navigation */}
             <div className="w-full md:w-64 flex-shrink-0">
-                <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 h-full flex flex-col sticky top-24">
+                <div className="bg-white/5 backdrop-blur-md rounded-lg p-6 border border-white/10 h-full flex flex-col sticky top-24">
                     <h1 className="text-lg font-black text-white mb-6 px-2 uppercase tracking-tight">Quản lý</h1>
 
                     <nav className="flex-1 space-y-1">
                         <button
                             onClick={() => setActiveTab("account")}
-                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm ${activeTab === "account" ? "text-black bg-[#fbbf24] shadow-[0_0_15px_#FBBF2466]" : "text-white/60 hover:text-white hover:bg-white/10"}`}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-bold text-sm ${activeTab === "account" ? "text-black bg-[#fbbf24] shadow-[0_0_15px_#FBBF2466]" : "text-white/60 hover:text-white hover:bg-white/10"}`}
                         >
                             <User className="w-5 h-5" />
                             Quản lý tài khoản
@@ -339,7 +339,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
 
                         <button
                             onClick={() => setActiveTab("favorites")}
-                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm ${activeTab === "favorites" ? "text-black bg-[#fbbf24] shadow-[0_0_15px_#FBBF2466]" : "text-white/60 hover:text-white hover:bg-white/10"}`}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-bold text-sm ${activeTab === "favorites" ? "text-black bg-[#fbbf24] shadow-[0_0_15px_#FBBF2466]" : "text-white/60 hover:text-white hover:bg-white/10"}`}
                         >
                             <Heart className="w-5 h-5" />
                             Danh sách yêu thích
@@ -347,7 +347,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
 
                         <button
                             onClick={() => setActiveTab("history")}
-                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm ${activeTab === "history" ? "text-black bg-[#fbbf24] shadow-[0_0_15px_#FBBF2466]" : "text-white/60 hover:text-white hover:bg-white/10"}`}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-bold text-sm ${activeTab === "history" ? "text-black bg-[#fbbf24] shadow-[0_0_15px_#FBBF2466]" : "text-white/60 hover:text-white hover:bg-white/10"}`}
                         >
                             <History className="w-5 h-5" />
                             Lịch sử xem phim
@@ -355,7 +355,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
 
                         <button
                             onClick={() => setActiveTab("lists")}
-                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm ${activeTab === "lists" ? "text-black bg-[#fbbf24] shadow-[0_0_15px_#FBBF2466]" : "text-white/60 hover:text-white hover:bg-white/10"}`}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-bold text-sm ${activeTab === "lists" ? "text-black bg-[#fbbf24] shadow-[0_0_15px_#FBBF2466]" : "text-white/60 hover:text-white hover:bg-white/10"}`}
                         >
                             <Plus className="w-4 h-4" /> Danh sách
                         </button>

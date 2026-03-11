@@ -146,13 +146,13 @@ export default function MobileMenu({
                             </div>
                             <div className="grid grid-cols-2 gap-2">
                                 <Link href="/lich-su-xem" onClick={onClose}
-                                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-[13px] text-white/60 hover:text-white transition-colors"
+                                    className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-[13px] text-white/60 hover:text-white transition-colors"
                                     style={{ background: "#FFFFFF0D" }}
                                 >
                                     <History className="w-3.5 h-3.5" strokeWidth={1.5} /> Lịch sử
                                 </Link>
                                 <Link href="/phim-yeu-thich" onClick={onClose}
-                                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-[13px] text-white/60 hover:text-white transition-colors"
+                                    className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-[13px] text-white/60 hover:text-white transition-colors"
                                     style={{ background: "#FFFFFF0D" }}
                                 >
                                     <Heart className="w-3.5 h-3.5" strokeWidth={1.5} /> Yêu thích

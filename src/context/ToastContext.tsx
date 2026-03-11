@@ -77,7 +77,7 @@ function ToastItem({ toast, onRemove }: { toast: ToastData; onRemove: () => void
         <div
             className={`
                 flex items-center gap-3 px-4 py-3
-                rounded-2xl border shadow-2xl
+                rounded-lg border shadow-2xl
                 ${cfg.border}
                 transition-all duration-350 ease-out
                 ${visible && !exiting

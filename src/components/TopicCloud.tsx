@@ -10,7 +10,7 @@ const tags = [
 
 export default function TopicCloud() {
     return (
-        <div className="rounded-2xl bg-[#020617]/80 border border-white/10 p-5 overflow-hidden">
+        <div className="rounded-lg bg-[#020617]/80 border border-white/10 p-5 overflow-hidden">
             <h3 className="text-white font-bold text-base mb-4 uppercase flex items-center gap-2">
                 <span className="w-1 h-4 bg-[#F4C84A] rounded-sm shrink-0" />
                 Từ khóa hot

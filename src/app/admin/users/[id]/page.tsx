@@ -44,7 +44,7 @@ export default function AdminUserDetailPage() {
             </button>
 
             {/* Profile Header */}
-            <div className="bg-[#1a1a1a] rounded-2xl border border-white/10 p-8 flex flex-col md:flex-row items-center gap-8 shadow-2xl">
+            <div className="bg-[#1a1a1a] rounded-lg border border-white/10 p-8 flex flex-col md:flex-row items-center gap-8 shadow-2xl">
                 <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white/10 shadow-lg">
                     <img
                         src={user.image ? getImageUrl(user.image) : `https://ui-avatars.com/api/?name=${user.name}&background=random`}
@@ -69,11 +69,11 @@ export default function AdminUserDetailPage() {
                     </div>
                 </div>
                 <div className="flex flex-col gap-3">
-                    <button className="px-6 py-3 bg-primary text-black font-bold rounded-xl hover:bg-yellow-400 transition-colors shadow-lg shadow-primary/20 flex items-center gap-2">
+                    <button className="px-6 py-3 bg-primary text-black font-bold rounded-lg hover:bg-yellow-400 transition-colors shadow-lg shadow-primary/20 flex items-center gap-2">
                         <Save className="w-5 h-5" /> Lưu thay đổi
                     </button>
                     {/* Role Toggle Mock */}
-                    <button className="px-6 py-3 bg-white/5 text-white font-bold rounded-xl hover:bg-white/10 transition-colors border border-white/10">
+                    <button className="px-6 py-3 bg-white/5 text-white font-bold rounded-lg hover:bg-white/10 transition-colors border border-white/10">
                         Đổi mật khẩu
                     </button>
                 </div>
@@ -88,7 +88,7 @@ export default function AdminUserDetailPage() {
                 {user.history && user.history.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {user.history.map((item: any, index: number) => (
-                            <Link href={`/phim/${item.slug}`} key={index} className="bg-[#1a1a1a] p-4 rounded-xl border border-white/10 hover:border-primary/50 transition-all group flex gap-4">
+                            <Link href={`/phim/${item.slug}`} key={index} className="bg-[#1a1a1a] p-4 rounded-lg border border-white/10 hover:border-primary/50 transition-all group flex gap-4">
                                 <div className="w-16 h-24 bg-gray-800 rounded-lg overflow-hidden shrink-0">
                                     <img
                                         src={`https://phimimg.com/${item.slug}/thumb.jpg`} // Placeholder heuristic
@@ -110,7 +110,7 @@ export default function AdminUserDetailPage() {
                         ))}
                     </div>
                 ) : (
-                    <div className="p-10 bg-[#1a1a1a] rounded-2xl border border-white/10 text-center text-gray-500">
+                    <div className="p-10 bg-[#1a1a1a] rounded-lg border border-white/10 text-center text-gray-500">
                         Người dùng này chưa xem phim nào.
                     </div>
                 )}

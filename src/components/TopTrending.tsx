@@ -39,7 +39,7 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
                     <Link
                         key={movie._id}
                         href={`/phim/${movie.slug}`}
-                        className="group flex items-center gap-4 p-2 rounded-xl hover:bg-white/5 transition-colors border border-transparent hover:border-white/5"
+                        className="group flex items-center gap-4 p-2 rounded-lg hover:bg-white/5 transition-colors border border-transparent hover:border-white/5"
                     >
                         {/* Rank Number */}
                         <div className={cn(

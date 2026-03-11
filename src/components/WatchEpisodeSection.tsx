@@ -95,7 +95,7 @@ export default function WatchEpisodeSection({
     const serverName = activeServerName || servers[0]?.server_name || "VIP";
 
     return (
-        <div className="bg-[#08090C] rounded-[24px] border border-white/[0.05] overflow-hidden mb-6 sm:mb-8 mt-4 mx-3 sm:mx-4 md:mx-0 shadow-2xl">
+        <div className="bg-[#08090C] rounded-[16px] border border-white/[0.05] overflow-hidden mb-6 sm:mb-8 mt-4 mx-3 sm:mx-4 md:mx-0 shadow-2xl">
             {/* Header: DANH SÁCH TẬP */}
             <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-4 sm:py-5 border-b border-white/[0.05] bg-white/[0.01]">
                 <div className="flex items-center gap-2">

@@ -82,12 +82,12 @@ export default function AdminCommentsPage() {
                     {selectedComments.length > 0 && (
                         <button
                             onClick={handleDelete}
-                            className="px-4 py-2 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors flex items-center gap-2 shadow-lg shadow-red-500/20"
+                            className="px-4 py-2 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 transition-colors flex items-center gap-2 shadow-lg shadow-red-500/20"
                         >
                             <Trash2 className="w-4 h-4" /> Xóa ({selectedComments.length})
                         </button>
                     )}
-                    <button className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl border border-white/10 transition-colors flex items-center gap-2">
+                    <button className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 transition-colors flex items-center gap-2">
                         <Filter className="w-4 h-4" /> Bộ lọc
                     </button>
                 </div>
@@ -101,12 +101,12 @@ export default function AdminCommentsPage() {
                     placeholder="Tìm kiếm nội dung, người dùng, tên phim..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full bg-[#1a1a1a] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-primary transition-all shadow-xl"
+                    className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg py-4 pl-12 pr-4 text-white focus:outline-none focus:border-primary transition-all shadow-xl"
                 />
             </div>
 
             {/* Comments Table */}
-            <div className="bg-[#1a1a1a] rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+            <div className="bg-[#1a1a1a] rounded-lg border border-white/10 overflow-hidden shadow-2xl">
                 {loading ? (
                     <div className="p-20 text-center text-gray-500">Đang tải bình luận...</div>
                 ) : (

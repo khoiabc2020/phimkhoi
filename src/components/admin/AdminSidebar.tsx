@@ -38,7 +38,7 @@ export default function AdminSidebar() {
                             key={item.href}
                             href={item.href}
                             className={cn(
-                                "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group",
+                                "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group",
                                 isActive
                                     ? "bg-primary text-black font-bold shadow-[0_0_15px_rgba(234,179,8,0.3)]"
                                     : "text-gray-400 hover:text-white hover:bg-white/10"
@@ -55,7 +55,7 @@ export default function AdminSidebar() {
             <div className="p-4 border-t border-white/10">
                 <button
                     onClick={() => signOut({ callbackUrl: "/" })}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-500/10 transition-colors"
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-500 hover:bg-red-500/10 transition-colors"
                 >
                     <LogOut className="w-5 h-5" />
                     <span>Đăng xuất</span>

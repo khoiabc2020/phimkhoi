@@ -194,7 +194,7 @@ h2 {
   }
 
   .glass-panel {
-    @apply bg-[#0c0f16]/95 border border-white/[0.08] shadow-[0_18px_40px_#00000090] rounded-[24px];
+    @apply bg-[#0c0f16]/95 border border-white/[0.08] shadow-[0_18px_40px_#00000090] rounded-[16px];
   }
 
   .glass-pill {

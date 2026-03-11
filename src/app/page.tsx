@@ -19,13 +19,13 @@ const contentSkeleton = (
     <div className="h-6 w-48 bg-white/10 rounded animate-pulse" />
     <div className="flex gap-4 overflow-hidden">
       {[1, 2, 3, 4, 5].map((i) => (
-        <div key={i} className="min-w-[130px] aspect-[2/3] rounded-xl bg-white/10 animate-pulse" />
+        <div key={i} className="min-w-[130px] aspect-[2/3] rounded-lg bg-white/10 animate-pulse" />
       ))}
     </div>
     <div className="h-6 w-40 bg-white/10 rounded animate-pulse mt-8" />
     <div className="flex gap-4 overflow-hidden">
       {[1, 2, 3, 4, 5].map((i) => (
-        <div key={i} className="min-w-[130px] aspect-[2/3] rounded-xl bg-white/10 animate-pulse" />
+        <div key={i} className="min-w-[130px] aspect-[2/3] rounded-lg bg-white/10 animate-pulse" />
       ))}
     </div>
   </div>
@@ -157,7 +157,7 @@ async function HomeContentStream() {
 
         <div className="xl:col-span-3 space-y-12">
           <LazySection minHeight={520}>
-            <Suspense fallback={<div className="h-[600px] bg-white/5 rounded-xl animate-pulse" />}>
+            <Suspense fallback={<div className="h-[600px] bg-white/5 rounded-lg animate-pulse" />}>
               <AsyncTopTrending title="Top Phim Bộ" slug="/danh-sach/phim-bo" type="tv" />
             </Suspense>
           </LazySection>
@@ -167,7 +167,7 @@ async function HomeContentStream() {
           </LazySection>
 
           <LazySection minHeight={520}>
-            <Suspense fallback={<div className="h-[600px] bg-white/5 rounded-xl animate-pulse mt-8" />}>
+            <Suspense fallback={<div className="h-[600px] bg-white/5 rounded-lg animate-pulse mt-8" />}>
               <AsyncTopTrending title="Top Phim Lẻ" slug="/danh-sach/phim-le" type="movie" />
             </Suspense>
           </LazySection>

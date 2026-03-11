@@ -9,7 +9,7 @@ import Image from "next/image";
 
 const CommentSection = dynamic(() => import("@/components/CommentSection"), {
     ssr: true,
-    loading: () => <div className="h-32 rounded-xl bg-white/5 animate-pulse" />,
+    loading: () => <div className="h-32 rounded-lg bg-white/5 animate-pulse" />,
 });
 import MovieTabs from "@/components/MovieTabs";
 import MovieCast from "@/components/MovieCast";

@@ -23,7 +23,7 @@ export default async function RelatedMovies({ categorySlug, currentMovieId, mode
             <div className="space-y-3 [contain:layout_paint]">
                 {movies.slice(0, 5).map((movie: any) => (
                     <Link key={movie._id} href={`/phim/${movie.slug}`}
-                        className="flex gap-3 group rounded-xl p-2 transition-all duration-200 hover:bg-white/[0.04]">
+                        className="flex gap-3 group rounded-lg p-2 transition-all duration-200 hover:bg-white/[0.04]">
                         {/* Poster */}
                         <div className="relative w-16 aspect-[2/3] rounded-lg overflow-hidden shrink-0 ring-1 ring-white/[0.08] group-hover:ring-yellow-400/50 transition-all duration-200 shadow-md">
                             <Image

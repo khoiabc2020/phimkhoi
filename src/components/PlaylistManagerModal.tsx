@@ -79,7 +79,7 @@ export default function PlaylistManagerModal({ isOpen, onClose, onSuccess, mode,
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl relative">
+            <div className="bg-[#1a1a1a] border border-white/10 rounded-lg w-full max-w-md overflow-hidden shadow-2xl relative">
                 {/* Header */}
                 <div className="flex items-center justify-between p-5 border-b border-white/10 bg-white/5">
                     <h3 className="text-xl font-bold text-white">
@@ -100,7 +100,7 @@ export default function PlaylistManagerModal({ isOpen, onClose, onSuccess, mode,
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 placeholder="VD: Phim Cày Đêm, Hành Động Hay..."
-                                className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-[#fbbf24] focus:ring-1 focus:ring-[#fbbf24] transition-all"
+                                className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-[#fbbf24] focus:ring-1 focus:ring-[#fbbf24] transition-all"
                                 autoFocus
                             />
                             {error && <p className="text-red-500 text-xs mt-2 font-medium">{error}</p>}
@@ -110,14 +110,14 @@ export default function PlaylistManagerModal({ isOpen, onClose, onSuccess, mode,
                             <button
                                 type="button"
                                 onClick={onClose}
-                                className="flex-1 py-3 px-4 rounded-xl font-bold text-white bg-white/10 hover:bg-white/20 transition-colors"
+                                className="flex-1 py-3 px-4 rounded-lg font-bold text-white bg-white/10 hover:bg-white/20 transition-colors"
                             >
                                 Hủy bỏ
                             </button>
                             <button
                                 type="submit"
                                 disabled={isLoading || isDeleting}
-                                className="flex-1 py-3 px-4 rounded-xl font-bold text-black bg-[#fbbf24] hover:brightness-110 transition-colors flex items-center justify-center disabled:opacity-50"
+                                className="flex-1 py-3 px-4 rounded-lg font-bold text-black bg-[#fbbf24] hover:brightness-110 transition-colors flex items-center justify-center disabled:opacity-50"
                             >
                                 {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : (mode === "create" ? "Tạo mới" : "Lưu thay đổi")}
                             </button>
@@ -130,7 +130,7 @@ export default function PlaylistManagerModal({ isOpen, onClose, onSuccess, mode,
                                 type="button"
                                 onClick={handleDelete}
                                 disabled={isDeleting || isLoading}
-                                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-red-500 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-colors disabled:opacity-50"
+                                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-bold text-red-500 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-colors disabled:opacity-50"
                             >
                                 {isDeleting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
                                 Xoá danh sách này

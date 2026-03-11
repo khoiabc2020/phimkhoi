@@ -68,7 +68,7 @@ export default async function ActorPage({ params, searchParams }: { params: Prom
                     {/* Left Sidebar: Poster & Info */}
                     <div className="w-full md:w-[260px] lg:w-[320px] flex-shrink-0">
                         {/* Profile Image */}
-                        <div className="w-full aspect-[2/3] relative rounded-xl overflow-hidden bg-[#1f1f1f] border border-white/5 shadow-2xl mb-6">
+                        <div className="w-full aspect-[2/3] relative rounded-lg overflow-hidden bg-[#1f1f1f] border border-white/5 shadow-2xl mb-6">
                             {profileUrl ? (
                                 <img src={profileUrl} alt={decodedName} className="w-full h-full object-cover" />
                             ) : (
@@ -169,7 +169,7 @@ export default async function ActorPage({ params, searchParams }: { params: Prom
 
                             {/* Movie Grid */}
                             {items.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center py-16 text-center bg-white/5 rounded-2xl border border-white/10">
+                                <div className="flex flex-col items-center justify-center py-16 text-center bg-white/5 rounded-lg border border-white/10">
                                     <AlertCircle className="w-16 h-16 text-gray-500 mb-4" />
                                     <h2 className="text-xl font-bold text-white mb-2">Chưa có dữ liệu phim</h2>
                                     <p className="text-gray-400">Hệ thống đang cập nhật danh sách phim của {decodedName}.</p>

@@ -43,7 +43,7 @@ export default function ForgotPasswordPage() {
             <div className="absolute inset-0 bg-[url('https://phimimg.com/upload/vod/20240801-1/5b35c0293375815615d1858564245598.jpg')] bg-cover bg-center opacity-20 blur-sm" />
             <div className="absolute inset-0 bg-black/60" />
 
-            <div className="relative z-10 w-full max-w-md p-8 bg-black/85 border border-white/10 rounded-2xl shadow-2xl animate-in fade-in zoom-in duration-500">
+            <div className="relative z-10 w-full max-w-md p-8 bg-black/85 border border-white/10 rounded-lg shadow-2xl animate-in fade-in zoom-in duration-500">
                 <Link href="/login" className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors">
                     <ArrowLeft className="w-4 h-4" /> Quay lại đăng nhập
                 </Link>
@@ -54,7 +54,7 @@ export default function ForgotPasswordPage() {
                 </div>
 
                 {message ? (
-                    <div className="p-4 bg-green-500/20 border border-green-500/50 rounded-xl text-green-400 text-center">
+                    <div className="p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400 text-center">
                         <p>{message}</p>
                     </div>
                 ) : (

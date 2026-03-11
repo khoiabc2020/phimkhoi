@@ -47,7 +47,7 @@ function RegisterForm() {
     };
 
     return (
-        <div className="relative z-10 w-full max-w-[450px] mx-4 p-8 md:p-12 bg-black/80 border border-white/10 rounded-2xl shadow-2xl flex flex-col items-center">
+        <div className="relative z-10 w-full max-w-[450px] mx-4 p-8 md:p-12 bg-black/80 border border-white/10 rounded-lg shadow-2xl flex flex-col items-center">
             <h1 className="text-3xl font-bold text-white mb-2 text-center w-full">Tạo tài khoản</h1>
             <p className="text-[#a3a3a3] text-[15px] mb-6 text-center w-full">Tham gia cộng đồng yêu phim ngay hôm nay.</p>
 
@@ -195,7 +195,7 @@ export default function RegisterPage() {
                 <div className="absolute inset-0 bg-black/50 bg-gradient-to-t from-black via-black/20 to-black/60" />
             </div>
 
-            <Suspense fallback={<div className="text-white relative z-10 w-full max-w-[450px] p-12 bg-black/70 backdrop-blur-2xl rounded-xl h-[400px] flex items-center justify-center border border-white/10 transform -translate-y-8">Đang tải...</div>}>
+            <Suspense fallback={<div className="text-white relative z-10 w-full max-w-[450px] p-12 bg-black/70 backdrop-blur-2xl rounded-lg h-[400px] flex items-center justify-center border border-white/10 transform -translate-y-8">Đang tải...</div>}>
                 <RegisterForm />
             </Suspense>
         </main>

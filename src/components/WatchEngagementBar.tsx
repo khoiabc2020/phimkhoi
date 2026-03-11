@@ -76,7 +76,7 @@ export default function WatchEngagementBar({
     };
 
     return (
-        <div className="rounded-2xl border border-white/[0.06] overflow-hidden"
+        <div className="rounded-lg border border-white/[0.06] overflow-hidden"
             style={{ background: '#11131A' }}>
 
             {/* Controls bar */}
@@ -161,7 +161,7 @@ export default function WatchEngagementBar({
             <div className="flex flex-row gap-4 p-4 md:p-5 items-start">
                 {/* Poster */}
                 <div className="flex-shrink-0">
-                    <div className="relative w-20 h-[112px] md:w-24 md:h-[134px] rounded-xl overflow-hidden shadow-xl ring-1 ring-white/10">
+                    <div className="relative w-20 h-[112px] md:w-24 md:h-[134px] rounded-lg overflow-hidden shadow-xl ring-1 ring-white/10">
                         <Image
                             src={getImageUrl(movie.poster_url || movie.thumb_url)}
                             alt={movie.name}

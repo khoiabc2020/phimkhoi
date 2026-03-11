@@ -136,7 +136,7 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug, tmdbDe
             <div className="animate-in fade-in duration-300">
                 {/* EPISODES TAB */}
                 {activeTab === "episodes" && (
-                    <div className="bg-[#08090C] border border-white/[0.05] rounded-[24px] p-3 sm:p-6 shadow-2xl">
+                    <div className="bg-[#08090C] border border-white/[0.05] rounded-[16px] p-3 sm:p-6 shadow-2xl">
                         {episodes && episodes.length > 0 ? (
                             <div className="space-y-6">
                                 {/* Language Tabs Row */}
@@ -285,9 +285,9 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug, tmdbDe
 
                 {/* TRAILER TAB */}
                 {activeTab === "trailer" && (
-                    <div className="bg-[#0B0E14] border border-white/[0.04] rounded-2xl p-4 sm:p-6 space-y-4">
+                    <div className="bg-[#0B0E14] border border-white/[0.04] rounded-lg p-4 sm:p-6 space-y-4">
                         {/* Main player */}
-                        <div className="aspect-video w-full rounded-xl overflow-hidden bg-[#111113] border border-white/[0.04] shadow-2xl">
+                        <div className="aspect-video w-full rounded-lg overflow-hidden bg-[#111113] border border-white/[0.04] shadow-2xl">
                             {activeVideo ? (
                                 <iframe
                                     key={activeVideo.key}
@@ -380,7 +380,7 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug, tmdbDe
 
                 {/* RELATED TAB */}
                 {activeTab === "related" && (
-                    <div className="bg-[#0B0E14] border border-white/[0.04] rounded-2xl p-6">
+                    <div className="bg-[#0B0E14] border border-white/[0.04] rounded-lg p-6">
                         {relatedMovies.length > 0 ? (
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 [contain:layout_paint]">
                                 {relatedMovies.map((m) => (

@@ -415,7 +415,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                                         setIsSearchOpen(false);
                                                                         setSearchQuery("");
                                                                     }}
-                                                                    className="flex items-center gap-3 px-3 py-2 hover:bg-white/10 rounded-xl transition-colors group"
+                                                                    className="flex items-center gap-3 px-3 py-2 hover:bg-white/10 rounded-lg transition-colors group"
                                                                 >
                                                                     <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-800 shrink-0 border border-white/10 group-hover:border-primary/50 transition-colors">
                                                                         {actor.profile_url ? (
@@ -445,7 +445,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                                         setIsSearchOpen(false);
                                                                         setSearchQuery("");
                                                                     }}
-                                                                    className="flex items-center gap-3 px-3 py-2 hover:bg-white/10 rounded-xl transition-colors group"
+                                                                    className="flex items-center gap-3 px-3 py-2 hover:bg-white/10 rounded-lg transition-colors group"
                                                                 >
                                                                     <div className="w-10 h-14 rounded-md overflow-hidden bg-gray-800 shrink-0 border border-white/10 group-hover:border-primary/50 transition-colors">
                                                                         <Image src={getImageUrl(movie.poster_url || movie.thumb_url)} alt={movie.name} width={40} height={56} className="w-full h-full object-cover" unoptimized />
@@ -528,7 +528,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                                             setSearchQuery("");
                                                                         }
                                                                     }}
-                                                                    className="flex items-center gap-3 px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-colors text-left"
+                                                                    className="flex items-center gap-3 px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors text-left"
                                                                 >
                                                                     <Clock className="w-3.5 h-3.5 text-white/40 shrink-0" />
                                                                     <span className="truncate">{item}</span>
@@ -577,22 +577,22 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                         </div>
                                     </button>
                                     {/* Dropdown Menu */}
-                                    <div className="absolute right-0 top-full mt-3 w-60 bg-[#0B0D12] border border-white/10 rounded-2xl p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right shadow-2xl ring-1 ring-black/50">
+                                    <div className="absolute right-0 top-full mt-3 w-60 bg-[#0B0D12] border border-white/10 rounded-lg p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right shadow-2xl ring-1 ring-black/50">
                                         <div className="px-4 py-3 border-b border-white/10 mb-2">
                                             <p className="text-sm font-bold text-white truncate">{session.user?.name}</p>
                                             <p className="text-xs text-white/50 truncate">{session.user?.email}</p>
                                         </div>
-                                        <Link href="/thong-tin-tai-khoan" className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-colors">
+                                        <Link href="/thong-tin-tai-khoan" className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
                                             <User className="w-4 h-4" /> Tài khoản
                                         </Link>
                                         {(session.user as any)?.role === "admin" && (
-                                            <Link href="/admin" className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-colors">
+                                            <Link href="/admin" className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
                                                 <Settings className="w-4 h-4" /> Quản trị
                                             </Link>
                                         )}
                                         <button
                                             onClick={() => signOut()}
-                                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-colors mt-1"
+                                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors mt-1"
                                         >
                                             <LogOut className="w-4 h-4" /> Đăng xuất
                                         </button>

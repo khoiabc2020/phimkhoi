@@ -204,7 +204,7 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                 })}
 
                 {/* Poster Stack always on top */}
-                <div className="absolute bottom-3 left-3 z-20 w-[68px] h-[96px] rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+                <div className="absolute bottom-3 left-3 z-20 w-[68px] h-[96px] rounded-lg overflow-hidden shadow-2xl ring-1 ring-white/10">
                     {movies.map((m: any, i) => {
                         const isActive = i === index;
                         const po = getHeroImage(m, "poster", "mobile");
@@ -466,7 +466,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
 
                     {/* Right: Poster Stack (Preloaded) */}
                     <div className="col-span-12 md:col-span-4 lg:col-span-5 xl:col-span-6 hidden md:flex justify-end items-end pr-0 lg:pr-8 xl:pr-12">
-                        <div className="relative w-[200px] lg:w-[260px] xl:w-[310px] aspect-[2/3] rounded-2xl lg:rounded-3xl overflow-hidden ring-1 ring-white/10 shadow-2xl shadow-black/60 group/poster hover:scale-[1.02] transition-transform duration-300 ease-out animate-hero-in animation-delay-100">
+                        <div className="relative w-[200px] lg:w-[260px] xl:w-[310px] aspect-[2/3] rounded-lg lg:rounded-lg overflow-hidden ring-1 ring-white/10 shadow-2xl shadow-black/60 group/poster hover:scale-[1.02] transition-transform duration-300 ease-out animate-hero-in animation-delay-100">
                             {movies.map((m: any, i) => {
                                 const isActive = i === index;
                                 return (

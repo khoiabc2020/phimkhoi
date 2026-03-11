@@ -6,13 +6,13 @@ export default function Loading() {
                 <div className="h-6 w-48 bg-white/10 rounded animate-pulse" />
                 <div className="flex gap-4 overflow-hidden">
                     {[1, 2, 3, 4, 5].map((i) => (
-                        <div key={i} className="min-w-[130px] aspect-[2/3] rounded-xl bg-white/10 animate-pulse" />
+                        <div key={i} className="min-w-[130px] aspect-[2/3] rounded-lg bg-white/10 animate-pulse" />
                     ))}
                 </div>
                 <div className="h-6 w-40 bg-white/10 rounded animate-pulse mt-8" />
                 <div className="flex gap-4 overflow-hidden">
                     {[1, 2, 3, 4, 5].map((i) => (
-                        <div key={i} className="min-w-[130px] aspect-[2/3] rounded-xl bg-white/10 animate-pulse" />
+                        <div key={i} className="min-w-[130px] aspect-[2/3] rounded-lg bg-white/10 animate-pulse" />
                     ))}
                 </div>
             </div>

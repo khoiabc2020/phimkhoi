@@ -111,7 +111,7 @@ export default function QuickNav() {
                             key={index}
                             href={item.href}
                             aria-label={`Xem ${item.label}`}
-                            className="quick-nav-card flex-[0_0_40%] sm:flex-[0_0_28%] md:flex-[0_0_22%] lg:flex-[0_0_16%] aspect-[1.5/1] md:aspect-[16/9] lg:aspect-[1.5/1] relative rounded-2xl overflow-hidden snap-start border border-white/[0.07] group hover:border-white/20 transition-all duration-200 hover:scale-[1.03] hover:shadow-lg"
+                            className="quick-nav-card flex-[0_0_40%] sm:flex-[0_0_28%] md:flex-[0_0_22%] lg:flex-[0_0_16%] aspect-[1.5/1] md:aspect-[16/9] lg:aspect-[1.5/1] relative rounded-lg overflow-hidden snap-start border border-white/[0.07] group hover:border-white/20 transition-all duration-200 hover:scale-[1.03] hover:shadow-lg"
                             style={{ background: `linear-gradient(135deg, ${item.from}, ${item.to})` }}
                         >
                             {/* Subtle shine top-right */}

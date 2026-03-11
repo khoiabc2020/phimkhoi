@@ -134,7 +134,7 @@ export default function AddToPlaylistButton({ movieData, className, variant = "i
             {/* The Modal */}
             {isOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl relative">
+                    <div className="bg-[#1a1a1a] border border-white/10 rounded-lg w-full max-w-sm overflow-hidden shadow-2xl relative">
                         {/* Header */}
                         <div className="flex items-center justify-between p-4 border-b border-white/10 bg-white/5">
                             <h3 className="font-bold text-white flex items-center gap-2 text-base">
@@ -162,7 +162,7 @@ export default function AddToPlaylistButton({ movieData, className, variant = "i
                                         return (
                                             <label
                                                 key={playlist._id}
-                                                className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl cursor-pointer transition-colors"
+                                                className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-lg cursor-pointer transition-colors"
                                             >
                                                 <div className={cn(
                                                     "w-5 h-5 rounded border flex items-center justify-center transition-colors shadow-sm",

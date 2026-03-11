@@ -84,7 +84,7 @@ export default async function WatchlistPage() {
                     </Link>
 
                     <div className="flex items-center gap-4 mb-2">
-                        <div className="w-14 h-14 rounded-2xl bg-primary/15 border border-primary/30 flex items-center justify-center">
+                        <div className="w-14 h-14 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center">
                             <Bookmark className="w-7 h-7 text-primary fill-primary/30" />
                         </div>
                         <div>
@@ -116,7 +116,7 @@ export default async function WatchlistPage() {
                         {validMovies.map((movie: any) => (
                             <div key={movie.slug} className="group relative">
                                 <Link href={`/phim/${movie.slug}`}>
-                                    <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-white/5 shadow-md">
+                                    <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-white/5 shadow-md">
                                         <Image
                                             src={getImageUrl(movie.poster_url || movie.thumb_url)}
                                             alt={movie.name}

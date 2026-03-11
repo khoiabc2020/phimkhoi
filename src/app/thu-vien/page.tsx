@@ -169,7 +169,7 @@ export default function ThuvienPage() {
                                     }
                                     className="block"
                                 >
-                                    <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-white/5 shadow-lg ring-1 ring-white/[0.06] group-hover:ring-yellow-400/30 transition-all duration-300">
+                                    <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-white/5 shadow-lg ring-1 ring-white/[0.06] group-hover:ring-yellow-400/30 transition-all duration-300">
                                         <Image
                                             src={getImageUrl(movie.poster || "")}
                                             alt={movie.name}
