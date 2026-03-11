@@ -118,7 +118,7 @@ export default function ProfileScreen() {
             ], 'success');
           }
         } else if (isManual) {
-          showAlert('Phiên bản mới nhất', 'Bạn đang dùng phiên bản mới nhất rồi! 🎉', undefined, 'success');
+          showAlert('Phiên bản mới nhất', 'Bạn đang dùng phiên bản mới nhất rồi!', undefined, 'success');
         }
       } else if (isManual) {
         showAlert('Lỗi', 'Không thể kiểm tra cập nhật. Vui lòng thử lại.', undefined, 'error');
