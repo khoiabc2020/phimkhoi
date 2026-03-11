@@ -47,21 +47,15 @@ export default function HeroSection({ movies }: HeroSectionProps) {
     }, []);
 
     const getBackdropUri = useCallback((m: Movie) => {
-        // Always prefer source image first — TMDB may be wrong for Asian movies
-        const sourceUrl = getImageUrl(m.thumb_url || m.poster_url);
-        if (sourceUrl) return sourceUrl;
         const tmdb = (m as any).tmdbData;
         if (tmdb?.backdrop_path) return tmdbImage(tmdb.backdrop_path, 'w780');
-        return '';
+        return getImageUrl(m.thumb_url || m.poster_url);
     }, [tmdbImage]);
 
     const getPosterUri = useCallback((m: Movie) => {
-        // Always prefer source image first
-        const sourceUrl = getImageUrl(m.poster_url || m.thumb_url);
-        if (sourceUrl) return sourceUrl;
         const tmdb = (m as any).tmdbData;
         if (tmdb?.poster_path) return tmdbImage(tmdb.poster_path, 'w342');
-        return '';
+        return getImageUrl(m.poster_url || m.thumb_url);
     }, [tmdbImage]);
 
     // Shared value for background cross-fade
@@ -79,9 +73,12 @@ export default function HeroSection({ movies }: HeroSectionProps) {
         const uris = top
             .flatMap((m) => [getBackdropUri(m), getPosterUri(m)])
             .filter(Boolean);
-        // expo-image supports prefetching for smoother first interactions
-        // @ts-expect-error - static method exists on expo-image Image
-        Image.prefetch?.(uris).catch?.(() => { });
+        if ((Image as any).clearDiskCache) {
+            (Image as any).clearDiskCache();
+        }
+        if ((Image as any).clearMemoryCache) {
+            (Image as any).clearMemoryCache();
+        }
     }, [movies, getBackdropUri, getPosterUri]);
 
     // Load favorites — prefer user.favorites from API (already in memory) to avoid slow AsyncStorage loop
@@ -232,15 +229,17 @@ const HeroSlide = React.memo(function HeroSlide({
     movie, index, isFav, onToggleFav,
 }: { movie: Movie; index: number; isFav: boolean; onToggleFav: () => void }) {
     const router = useRouter();
-    const posterUri = getImageUrl(movie.poster_url || movie.thumb_url);
+    const posterUri = (() => {
+        const tmdb = (movie as any).tmdbData;
+        if (tmdb?.poster_path) {
+            const p = String(tmdb.poster_path);
+            return `https://image.tmdb.org/t/p/w342${p.startsWith('/') ? p : `/${p}`}`;
+        }
+        return getImageUrl(movie.poster_url || movie.thumb_url);
+    })();
     const rating = (movie as any).tmdbData?.vote_average
         ? Number((movie as any).tmdbData.vote_average).toFixed(1)
         : null;
-
-    const ep = movie.episode_current || '';
-    const isCompleted = ep.toLowerCase().includes('hoàn tất') || ep.toLowerCase().includes('full');
-    const epNum = ep.replace(/hoàn tất/gi, '').replace(/\(.*?\)/g, '').replace(/tập\s*/gi, '').trim() || '1';
-    const total = movie.episode_total || '';
 
     return (
         <Pressable
@@ -295,21 +294,6 @@ const HeroSlide = React.memo(function HeroSlide({
                         {movie.category?.slice(0, 2).map((c: any) => (
                             <Text key={c.id || c.name} style={styles.metaDot}>· {c.name}</Text>
                         ))}
-                        {/* Episode status chip */}
-                        {ep && (
-                            <View style={{
-                                paddingHorizontal: 7, paddingVertical: 2, borderRadius: 10,
-                                backgroundColor: isCompleted ? 'rgba(34,197,94,0.2)' : 'rgba(234,179,8,0.2)',
-                                borderWidth: 0.5,
-                                borderColor: isCompleted ? '#22c55e' : '#E6BF5C',
-                                flexDirection: 'row', alignItems: 'center', gap: 4,
-                            }}>
-                                <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: isCompleted ? '#22c55e' : '#E6BF5C' }} />
-                                <Text style={{ color: isCompleted ? '#22c55e' : '#E6BF5C', fontSize: 9, fontWeight: '700' }}>
-                                    {isCompleted ? `Hoàn Tất ${total ? `· ${total} tập` : ''}` : `Tập ${epNum}${total ? ` / ${total}` : ''}`}
-                                </Text>
-                            </View>
-                        )}
                     </View>
 
                     <View style={[styles.actionRow, isTablet && styles.actionRowTablet]}>

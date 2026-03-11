@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, Modal, Animated, StyleSheet, Dimensions } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { Info, AlertCircle, CheckCircle2 } from 'lucide-react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export interface AlertButton {
     text: string;
@@ -69,10 +69,10 @@ export default function ModernAlert({
 
     const getIcon = () => {
         switch (type) {
-            case 'success': return <CheckCircle2 size={36} color="#10b981" />;
-            case 'warning': return <AlertCircle size={36} color="#f59e0b" />;
-            case 'error': return <AlertCircle size={36} color="#ef4444" />;
-            default: return <Info size={36} color="#3b82f6" />;
+            case 'success': return <Ionicons name="checkmark-circle" size={36} color="#10b981" />;
+            case 'warning': return <Ionicons name="warning" size={36} color="#f59e0b" />;
+            case 'error': return <Ionicons name="close-circle" size={36} color="#ef4444" />;
+            default: return <Ionicons name="information-circle" size={36} color="#3b82f6" />;
         }
     };
 

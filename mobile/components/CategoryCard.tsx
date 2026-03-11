@@ -10,7 +10,7 @@ interface CategoryCardProps {
     width?: number;
     height?: number;
     subtitle?: string;
-    iconName?: keyof typeof import('@expo/vector-icons/build/Icons/Ionicons').default.glyphMap;
+    iconName?: any;
 }
 
 export default function CategoryCard({ title, slug, colors, width = 160, height = 100, subtitle, iconName = 'film-outline' }: CategoryCardProps) {

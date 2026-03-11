@@ -825,14 +825,3 @@ export const getOphimImages = async (slug: string) => {
 
 
 
-
-export const getOphimImages = async (slug: string) => {
-    try {
-        if (!slug) return null;
-        const res = await fetch(`${OPHIM_API}/phim/${slug}/images`);
-        return await res.json();
-    } catch (error) {
-        console.error(`OPhim Images Error [${slug}]:`, error);
-        return null;
-    }
-};
