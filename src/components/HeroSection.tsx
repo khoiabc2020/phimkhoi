@@ -408,9 +408,9 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         >
                             <Link
                                 href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                className="flex items-center gap-2 h-12 px-7 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-black text-[15px] transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg shadow-[#F4C84A]/20"
+                                className="flex items-center gap-2 h-12 px-7 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-white font-black text-[15px] transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg shadow-[#F4C84A]/20"
                             >
-                                <Play className="w-5 h-5 fill-black shrink-0" />
+                                <Play className="w-5 h-5 fill-white shrink-0" />
                                 Xem Ngay
                             </Link>
                             <Link
