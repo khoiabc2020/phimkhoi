@@ -186,7 +186,7 @@ export default function VideoPlayer({
                     pip: true,
                     mutex: true,
                     fullscreen: true,
-                    fullscreenWeb: true,
+                    fullscreenWeb: false,
                     subtitleOffset: true,
                     miniProgressBar: true,
                     screenshot: true,
