@@ -139,6 +139,13 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                             </span>
                         )}
                     </div>
+                    {/* Rating Badge bottom-right */}
+                    {(movie as any).vote_average && (movie as any).vote_average > 0 && (
+                        <div className="absolute bottom-2 right-2 z-10 pointer-events-none flex items-center gap-0.5 bg-black/70 backdrop-blur-sm rounded px-1.5 py-0.5">
+                            <Star className="w-2.5 h-2.5 fill-[#F4C84A] text-[#F4C84A]" />
+                            <span className="text-[9px] font-bold text-white/90">{((movie as any).vote_average).toFixed(1)}</span>
+                        </div>
+                    )}
                 </div>
 
                 <div className="mt-2 space-y-0.5 px-0.5">

@@ -374,20 +374,35 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                             {decodeHtml(movie.name)}
                         </h1>
 
-                        {/* Origin + Genres */}
+                        {/* Origin + Genre chips + Country + Episode */}
                         <div
                             key={`meta-${index}`}
-                            className="flex items-center gap-2.5 flex-wrap animate-hero-in animation-delay-100"
+                            className="flex items-center gap-2 flex-wrap animate-hero-in animation-delay-100"
                         >
                             {movie.origin_name && (
-                                <span className="text-[#F4C84A] text-sm font-medium opacity-90 truncate max-w-[200px]">
+                                <span className="text-[#F4C84A] text-sm font-medium opacity-90 truncate max-w-[240px]">
                                     {decodeHtml(movie.origin_name)}
                                 </span>
                             )}
-                            {movie.category?.slice(0, 3).map((c: any) => (
-                                <span key={c.id || c.name} className="text-white/50 text-xs font-medium">
-                                    · {c.name}
+                            {movie.country?.[0] && (
+                                <span className="text-white/40 text-xs">
+                                    · {movie.country[0].name}
                                 </span>
+                            )}
+                            {movie.time && (
+                                <span className="text-white/40 text-xs">
+                                    · {movie.time}
+                                </span>
+                            )}
+                            {/* Clickable genre chips */}
+                            {movie.category?.slice(0, 4).map((c: any) => (
+                                <Link
+                                    key={c.id || c.name}
+                                    href={`/the-loai/${c.slug}`}
+                                    className="text-[11px] text-white/60 hover:text-white border border-white/10 hover:border-white/30 px-2.5 py-0.5 rounded-full transition-all duration-150 hover:bg-white/10"
+                                >
+                                    {c.name}
+                                </Link>
                             ))}
                         </div>
 
