@@ -196,9 +196,8 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         {serverData.length > 0 && (
                             <Link
                                 href={`/xem-phim/${movie?.slug}/${serverData[0].slug}`}
-                                className="flex items-center gap-2 bg-[#F4C84A] text-black px-5 sm:px-6 py-2.5 rounded-full font-bold text-sm hover:brightness-110 hover:scale-105 transition-all"
+                                className="flex items-center justify-center bg-[#F4C84A] text-black px-5 sm:px-6 py-2.5 rounded-full font-bold text-sm hover:brightness-110 hover:scale-105 transition-all"
                             >
-                                <Play className="w-4 h-4 fill-current" />
                                 CHIẾU PHÁT
                             </Link>
                         )}

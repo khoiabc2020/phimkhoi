@@ -258,16 +258,15 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                 <div className="flex items-center gap-2 mt-3">
                     <Link
                         href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                        className="flex flex-1 items-center justify-center gap-1.5 h-10 rounded-full bg-[#F4C84A] text-black font-extrabold text-[13px] active:scale-[0.97] transition-transform"
+                        className="flex flex-1 items-center justify-center h-10 rounded-full bg-[#F4C84A] text-black font-extrabold text-[13px] active:scale-[0.97] transition-transform"
                     >
-                        <Play className="w-3.5 h-3.5 fill-black shrink-0" />
-                        Xem ngay
+                        Xem Ngay
                     </Link>
                     <Link
                         href={`/phim/${movie.slug}`}
-                        className="w-10 h-10 flex items-center justify-center rounded-full bg-white/8 border border-white/12 active:scale-[0.97] transition-transform shrink-0"
+                        className="flex items-center justify-center px-4 h-10 rounded-full bg-white/8 border border-white/12 text-white font-medium text-[13px] active:scale-[0.97] transition-transform shrink-0"
                     >
-                        <Info className="w-4 h-4 text-white shrink-0" />
+                        Chi Tiết
                     </Link>
                     <div className="w-10 h-10 flex items-center justify-center rounded-full bg-white/8 border border-white/12 active:scale-[0.97] transition-transform shrink-0">
                         <FavoriteButton movieData={getFavoriteData(movie)} size="sm" />
@@ -423,17 +422,16 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         >
                             <Link
                                 href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                className="flex items-center gap-2 h-12 px-7 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-white font-black text-[15px] transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg shadow-[#F4C84A]/20"
+                                className="flex items-center justify-center h-12 px-7 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-black text-[15px] transition-all duration-200 hover:scale-105 active:scale-95"
                             >
-                                <Play className="w-5 h-5 fill-white shrink-0" />
                                 Xem Ngay
                             </Link>
                             <Link
                                 href={`/phim/${movie.slug}`}
-                                className="flex items-center gap-2 h-12 px-6 rounded-full bg-white/10 hover:bg-white/18 border border-white/15 text-white font-bold text-[15px] transition-all hover:scale-105 active:scale-95 backdrop-blur-sm"
+                                className="flex items-center justify-center h-12 px-6 rounded-full bg-white/10 hover:bg-white/18 border border-white/15 text-white font-bold text-[15px] transition-all hover:scale-105 active:scale-95 backdrop-blur-sm"
                             >
-                                <Info className="w-4 h-4 text-white/80 shrink-0" />
-                                <span className="hidden sm:inline">Chi tiết</span>
+                                <span className="hidden sm:inline">Chi Tiết</span>
+                                <span className="sm:hidden">Chi Tiết</span>
                             </Link>
                             <div className="h-12 w-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/18 border border-white/15 transition-all hover:scale-110 cursor-pointer backdrop-blur-sm">
                                 <FavoriteButton movieData={getFavoriteData(movie)} size="md" />
