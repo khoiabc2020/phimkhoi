@@ -244,6 +244,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             relatedMovies={relatedMovies}
                             episodes={episodes}
                             slug={slug}
+                            tmdbDetails={tmdbDetails}
                         />
                         {/* Comment Section below tabs */}
                         <div className="mt-8 sm:mt-12">

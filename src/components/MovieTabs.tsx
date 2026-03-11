@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { Video, LayoutGrid, ChevronDown, Database, Subtitles, Mic, Volume2 } from "lucide-react";
+import { Video, LayoutGrid, ChevronDown, Database, Subtitles, Mic, Volume2, Play } from "lucide-react";
 import { Movie } from "@/services/api";
 import MovieCard from "./MovieCard";
 import { cn } from "@/lib/utils";
@@ -17,16 +17,30 @@ interface MovieTabsProps {
     relatedMovies: any[];
     episodes: { server_name: string; server_data: any[] }[];
     slug: string;
+    tmdbDetails?: any;
 }
 
 const EPISODES_PER_CHUNK = 50;
 
-export default function MovieTabs({ movie, relatedMovies, episodes, slug }: MovieTabsProps) {
+export default function MovieTabs({ movie, relatedMovies, episodes, slug, tmdbDetails }: MovieTabsProps) {
     const defaultTab = (episodes && episodes.length > 0) ? "episodes" : "related";
     const [activeTab, setActiveTab] = useState<"episodes" | "trailer" | "related">(defaultTab);
     const [activeServer, setActiveServer] = useState(0);
     const [currentChunk, setCurrentChunk] = useState(0);
     const [activeLangTab, setActiveLangTab] = useState<string>("");
+    const [activeTrailerIdx, setActiveTrailerIdx] = useState(0);
+
+    // Get YouTube trailers from TMDB videos
+    const tmdbVideos = useMemo(() => {
+        const videos: any[] = tmdbDetails?.videos?.results || [];
+        // Prefer trailers, then teasers, then anything
+        const trailers = videos.filter((v: any) => v.site === "YouTube" && v.type === "Trailer");
+        const teasers = videos.filter((v: any) => v.site === "YouTube" && v.type === "Teaser");
+        const others = videos.filter((v: any) => v.site === "YouTube" && v.type !== "Trailer" && v.type !== "Teaser");
+        return [...trailers, ...teasers, ...others].slice(0, 6);
+    }, [tmdbDetails]);
+
+    const activeVideo = tmdbVideos[activeTrailerIdx] || null;
 
     // Parse language from server name
     const getLanguageGroup = (name: string) => {
@@ -271,9 +285,19 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
 
                 {/* TRAILER TAB */}
                 {activeTab === "trailer" && (
-                    <div className="bg-[#0B0E14] border border-white/[0.04] rounded-2xl p-6">
+                    <div className="bg-[#0B0E14] border border-white/[0.04] rounded-2xl p-4 sm:p-6 space-y-4">
+                        {/* Main player */}
                         <div className="aspect-video w-full rounded-xl overflow-hidden bg-[#111113] border border-white/[0.04] shadow-2xl">
-                            {movie.trailer_url && movie.trailer_url.includes("youtube") ? (
+                            {activeVideo ? (
+                                <iframe
+                                    key={activeVideo.key}
+                                    src={`https://www.youtube.com/embed/${activeVideo.key}?autoplay=0&rel=0&modestbranding=1`}
+                                    className="w-full h-full"
+                                    allowFullScreen
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    title={activeVideo.name}
+                                />
+                            ) : movie.trailer_url && movie.trailer_url.includes("youtube") ? (
                                 <iframe
                                     src={movie.trailer_url.replace("watch?v=", "embed/")}
                                     className="w-full h-full"
@@ -281,12 +305,76 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug }: Movi
                                     title="Trailer"
                                 />
                             ) : (
-                                <div className="w-full h-full flex flex-col items-center justify-center text-[#71717A] gap-2">
-                                    <Video className="w-12 h-12 opacity-20" />
-                                    <p className="text-sm">Trailer đang được cập nhật</p>
+                                <div className="w-full h-full flex flex-col items-center justify-center text-[#71717A] gap-3">
+                                    <Video className="w-14 h-14 opacity-15" />
+                                    <p className="text-sm font-medium">Trailer đang được cập nhật</p>
+                                    <p className="text-xs text-gray-600">Quay lại sau khi có thêm thông tin từ nhà phát hành</p>
                                 </div>
                             )}
                         </div>
+
+                        {/* Video selector — only show when multiple videos */}
+                        {tmdbVideos.length > 1 && (
+                            <div className="space-y-2">
+                                <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Video khác ({tmdbVideos.length})</p>
+                                <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                                    {tmdbVideos.map((v: any, i: number) => (
+                                        <button
+                                            key={v.key}
+                                            onClick={() => setActiveTrailerIdx(i)}
+                                            className={cn(
+                                                "flex-shrink-0 relative w-32 sm:w-40 rounded-lg overflow-hidden border transition-all",
+                                                activeTrailerIdx === i
+                                                    ? "border-[#F4C84A] ring-1 ring-[#F4C84A]/40"
+                                                    : "border-white/10 hover:border-white/25"
+                                            )}
+                                        >
+                                            <img
+                                                src={`https://img.youtube.com/vi/${v.key}/mqdefault.jpg`}
+                                                alt={v.name}
+                                                className="w-full aspect-video object-cover"
+                                            />
+                                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                                {activeTrailerIdx === i ? (
+                                                    <div className="w-6 h-6 rounded-full bg-[#F4C84A] flex items-center justify-center">
+                                                        <Play className="w-3 h-3 fill-black text-black" />
+                                                    </div>
+                                                ) : (
+                                                    <div className="w-6 h-6 rounded-full bg-black/60 border border-white/20 flex items-center justify-center">
+                                                        <Play className="w-3 h-3 fill-white text-white ml-0.5" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="p-1.5">
+                                                <p className="text-[10px] text-gray-400 truncate text-left">{v.name}</p>
+                                                <p className={cn(
+                                                    "text-[10px] font-bold mt-0.5",
+                                                    v.type === "Trailer" ? "text-[#F4C84A]" : "text-gray-500"
+                                                )}>{v.type}</p>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Active video info */}
+                        {activeVideo && (
+                            <div className="flex items-start justify-between gap-3">
+                                <div>
+                                    <p className="text-sm font-bold text-white">{activeVideo.name}</p>
+                                    <p className="text-xs text-gray-500 mt-0.5">{activeVideo.type} · {activeVideo.published_at ? new Date(activeVideo.published_at).getFullYear() : ""}</p>
+                                </div>
+                                <a
+                                    href={`https://www.youtube.com/watch?v=${activeVideo.key}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex-shrink-0 text-xs text-[#F4C84A] hover:text-white border border-[#F4C84A]/30 hover:border-white/20 px-3 py-1.5 rounded-full transition-colors"
+                                >
+                                    YouTube ↗
+                                </a>
+                            </div>
+                        )}
                     </div>
                 )}
 

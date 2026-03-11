@@ -1,0 +1,30 @@
+{
+    "name": "MovieBox - Xem Phim Online",
+    "short_name": "MovieBox",
+    "description": "Xem hàng ngàn bộ phim chất lượng cao, vietsub chuẩn, miễn phí - cập nhật hàng ngày.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#020617",
+    "theme_color": "#020617",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/logo.webp",
+            "sizes": "192x192",
+            "type": "image/webp",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/logo.webp",
+            "sizes": "512x512",
+            "type": "image/webp",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": [
+        "entertainment"
+    ],
+    "lang": "vi",
+    "dir": "ltr",
+    "screenshots": []
+}
