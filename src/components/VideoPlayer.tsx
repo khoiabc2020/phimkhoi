@@ -342,6 +342,8 @@ export default function VideoPlayer({
 
                     if (ct >= AD_START && ct <= AD_END) {
                         if (!skipBtn && artRef.current) {
+                            // Append inside .art-video-player which has position:relative
+                            const playerContainer = artRef.current.querySelector('.art-video-player') as HTMLElement || artRef.current;
                             skipBtn = document.createElement("button");
                             skipBtn.id = skipBtnId;
                             skipBtn.innerHTML = `
@@ -351,21 +353,22 @@ export default function VideoPlayer({
                                 </span>
                             `;
                             skipBtn.style.cssText = `
-                                position:absolute; bottom:72px; right:12px; z-index:999;
-                                background:rgba(0,0,0,0.75); color:white;
-                                border:1px solid rgba(255,255,255,0.3); border-radius:6px;
-                                padding:6px 14px; font-size:13px; font-weight:600;
-                                cursor:pointer; backdrop-filter:blur(4px);
-                                transition:background 0.2s, transform 0.1s;
-                                font-family: inherit;
+                                position:absolute; bottom:72px; right:12px; z-index:9999;
+                                background:rgba(0,0,0,0.8); color:white;
+                                border:1.5px solid rgba(255,255,255,0.35); border-radius:6px;
+                                padding:7px 16px; font-size:13px; font-weight:600;
+                                cursor:pointer; backdrop-filter:blur(6px);
+                                transition:all 0.15s ease;
+                                font-family: inherit; letter-spacing:0.01em;
+                                box-shadow: 0 2px 12px rgba(0,0,0,0.4);
                             `;
-                            skipBtn.onmouseover = () => { skipBtn!.style.background = "rgba(244,200,74,0.9)"; skipBtn!.style.color = "black"; };
-                            skipBtn.onmouseout = () => { skipBtn!.style.background = "rgba(0,0,0,0.75)"; skipBtn!.style.color = "white"; };
+                            skipBtn.onmouseover = () => { skipBtn!.style.background = "rgba(244,200,74,0.95)"; skipBtn!.style.color = "black"; skipBtn!.style.borderColor = "transparent"; };
+                            skipBtn.onmouseout = () => { skipBtn!.style.background = "rgba(0,0,0,0.8)"; skipBtn!.style.color = "white"; skipBtn!.style.borderColor = "rgba(255,255,255,0.35)"; };
                             skipBtn.onclick = () => {
                                 if (art) art.currentTime = AD_END + 1;
                                 skipBtn?.remove();
                             };
-                            artRef.current.appendChild(skipBtn);
+                            playerContainer.appendChild(skipBtn);
                         }
                     } else if (skipBtn) {
                         skipBtn.remove();
@@ -484,7 +487,7 @@ export default function VideoPlayer({
 
     return (
         <>
-            <div ref={artRef} className="w-full h-full bg-black art-ios-theme" style={{ minHeight: "200px" }} />
+            <div ref={artRef} className="w-full h-full bg-black art-ios-theme relative" style={{ minHeight: "200px" }} />
             <style jsx global>{`
                 .art-ios-theme.art-video-player .art-bottom {
                     padding-bottom: 8px;

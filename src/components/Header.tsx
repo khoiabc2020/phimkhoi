@@ -438,7 +438,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                             <div className="px-3 py-1 text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Phim</div>
                                                             {searchResults.movies.map((movie: any) => (
                                                                 <Link
-                                                                    href={`/xem-phim/${movie.slug}`}
+                                                                    href={`/phim/${movie.slug}`}
                                                                     key={movie._id || movie.slug}
                                                                     onClick={() => {
                                                                         saveHistoryItem("movies", movie.name);
