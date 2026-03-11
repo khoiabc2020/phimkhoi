@@ -125,7 +125,7 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug, tmdbDe
                         >
                             {tab.label}
                             {isActive && (
-                                <span className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-[#F4C84A] shadow-[0_0_10px_#F4C84A]" />
+                                <span className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-[#F4C84A]" />
                             )}
                         </button>
                     );
@@ -166,7 +166,7 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug, tmdbDe
                                                     <Icon className={cn("w-[14px] h-[14px] sm:w-[16px] sm:h-[16px]", isActive ? "text-[#F4C84A]" : "text-gray-500")} />
                                                     {lang}
                                                     {isActive && (
-                                                        <span className="absolute bottom-[-1px] left-0 right-0 h-[3px] rounded-t-full bg-[#F4C84A] shadow-[0_0_12px_#F4C84A99]" />
+                                                        <span className="absolute bottom-[-1px] left-0 right-0 h-[3px] rounded-t-full bg-[#F4C84A]" />
                                                     )}
                                                 </button>
                                             );
@@ -202,7 +202,7 @@ export default function MovieTabs({ movie, relatedMovies, episodes, slug, tmdbDe
                                                     className={cn(
                                                         "h-[32px] sm:h-[38px] px-3 sm:px-5 rounded-full text-[12px] sm:text-[13px] font-bold transition-all duration-300 border flex items-center gap-2 shadow-sm",
                                                         isActive
-                                                            ? "bg-[#F4C84A] border-[#F4C84A] text-[#08090C] shadow-[0_4px_14px_#F4C84A40] scale-105 transform"
+                                                            ? "bg-[#F4C84A] border-[#F4C84A] text-[#08090C] scale-105 transform"
                                                             : "bg-white/[0.03] border-white/[0.08] text-[#A1A1AA] hover:text-white hover:border-white/[0.15] hover:bg-white/[0.06] active:scale-95"
                                                     )}
                                                 >
