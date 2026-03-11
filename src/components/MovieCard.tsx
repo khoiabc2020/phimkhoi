@@ -283,14 +283,14 @@ function OnflixHoverCard({
                     </div>
 
                     {/* Card body */}
-                    <div className="px-4 pb-4 pt-0 space-y-3 relative z-10 -mt-4">
+                    <div className="px-4 pb-4 pt-2 space-y-3 relative z-10 bg-[#141414] rounded-b-2xl">
                         {/* Title and Subtitle */}
                         <div>
-                            <h3 className="text-white font-bold text-lg leading-tight truncate">
+                            <h3 className="text-white font-bold text-[15px] leading-snug line-clamp-2">
                                 {decodeHtml(movie.name) || movie.slug || "—"}
                             </h3>
                             {movie.origin_name && (
-                                <p className="text-white/50 text-[13px] leading-tight truncate mt-0.5">
+                                <p className="text-white/50 text-[12px] leading-tight line-clamp-1 mt-0.5">
                                     {decodeHtml(movie.origin_name)}
                                 </p>
                             )}
