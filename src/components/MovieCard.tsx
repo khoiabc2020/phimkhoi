@@ -111,7 +111,7 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                 <div className={`relative ${orientation === 'landscape' ? 'aspect-video' : 'aspect-[2/3]'} rounded-xl overflow-hidden bg-[#1a1a1a] shadow-lg`}>
                     <Link href={`/phim/${movie.slug}`} className="block h-full w-full absolute inset-0 z-0" prefetch={false}>
                         <Image
-                            src={displayPoster || "/placeholder.jpg"}
+                            src={displayPoster || "/placeholder.svg"}
                             alt={decodeHtml(movie.name) || movie.slug || "Phim"}
                             fill
                             className="object-cover transition-transform duration-300 ease-out group-hover/static-card:scale-105"
@@ -121,6 +121,7 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                             priority={true}
                             placeholder="blur"
                             blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
+                            onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
                         />
                         <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
                     </Link>
@@ -257,7 +258,7 @@ function OnflixHoverCard({
                             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/[0.02] animate-pulse" />
                         )}
                         <Image
-                            src={displayBackdrop || "/placeholder.jpg"}
+                            src={displayBackdrop || "/placeholder.svg"}
                             alt={decodeHtml(movie.name) || movie.slug || "Phim"}
                             fill
                             className={`object-cover transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
