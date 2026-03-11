@@ -398,6 +398,13 @@ export default function MovieDetailScreen() {
                                 </View>
                             );
                         })()}
+                        {/* Director from source data (always correct) */}
+                        {movie.director && movie.director.length > 0 && !movie.director.includes('Đang cập nhật') && (
+                            <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, marginTop: 6 }}>
+                                <Text style={{ color: 'rgba(255,255,255,0.35)' }}>Đạo diễn: </Text>
+                                {movie.director.join(', ')}
+                            </Text>
+                        )}
                     </View>
 
                 </View>
@@ -669,17 +676,32 @@ export default function MovieDetailScreen() {
 
                         {selectedTab === 'actors' && (
                             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-                                {cast.length > 0 ? cast.map((actor: any) => (
-                                    <View key={actor.id || actor.name} style={{ width: '31%', marginBottom: 12 }}>
-                                        <Image
-                                            source={{ uri: actor.profile_url || (actor.profile_path ? `https://image.tmdb.org/t/p/w185${actor.profile_path}` : 'https://ui-avatars.com/api/?name=' + actor.name) }}
-                                            style={{ width: '100%', aspectRatio: 2 / 3, borderRadius: 8, marginBottom: 4, backgroundColor: '#333' }}
-                                            contentFit="cover"
-                                        />
-                                        <Text numberOfLines={1} style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>{actor.name}</Text>
-                                        <Text numberOfLines={1} style={{ color: 'gray', fontSize: 11 }}>{actor.character}</Text>
-                                    </View>
-                                )) : (
+                                {cast.length > 0 ? cast.map((actor: any) => {
+                                    const photoUrl = actor.profile_url || actor.profile_path;
+                                    const initials = actor.name
+                                        ? actor.name.trim().split(' ').filter(Boolean).map((w: string) => w[0]).slice(0, 2).join('').toUpperCase()
+                                        : '?';
+                                    const colors = ['#1e3a6b', '#6b1212', '#2d1654', '#0f2030', '#5a1a00', '#1a3668'];
+                                    const bgColor = colors[(actor.name?.charCodeAt(0) || 0) % colors.length];
+                                    return (
+                                        <View key={actor.id || actor.name} style={{ width: '31%', marginBottom: 12 }}>
+                                            <View style={{ width: '100%', aspectRatio: 2 / 3, borderRadius: 8, marginBottom: 4, backgroundColor: '#222', overflow: 'hidden' }}>
+                                                {photoUrl ? (
+                                                    <Image
+                                                        source={{ uri: photoUrl }}
+                                                        style={{ width: '100%', height: '100%' }}
+                                                        contentFit="cover"
+                                                    />
+                                                ) : (
+                                                    <View style={{ flex: 1, backgroundColor: bgColor, alignItems: 'center', justifyContent: 'center' }}>
+                                                        <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 20 }}>{initials}</Text>
+                                                    </View>
+                                                )}
+                                            </View>
+                                            <Text numberOfLines={2} style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>{actor.name}</Text>
+                                        </View>
+                                    );
+                                }) : (
                                     <Text style={{ color: 'rgba(255,255,255,0.4)', textAlign: 'center', width: '100%', marginTop: 20, fontSize: 14 }}>
                                         Chưa có thông tin diễn viên.
                                     </Text>

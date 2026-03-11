@@ -764,86 +764,67 @@ export const getOphimCast = async (
     slug: string,
     origin_name?: string,
     year?: number,
-    movie?: Movie   // Pass full movie to grab actor[] as last resort
+    movie?: Movie
 ) => {
     try {
-        if (!slug) return [];
-        let ophimCast: any[] = [];
-        let tmdbCast: any[] = [];
+        // Get actor names from source data (always correct)
+        let actorNames: string[] = [];
 
-        // Chạy song song: OPhim cast + TMDB cast (thử origin_name, rồi Vietnamese vietsub title)
-        await Promise.allSettled([
-            fetch(`${OPHIM_API}/phim/${slug}/peoples`).then(async (res) => {
-                if (res.ok) {
+        // Prefer movie.actor[] (Ophim source - Vietnamese/Hán Việt names)
+        if (movie?.actor && movie.actor.length > 0) {
+            actorNames = movie.actor.filter((n: string) =>
+                n && !n.toLowerCase().includes('đang cập nhật') && !n.toLowerCase().includes('updating')
+            ).slice(0, 15);
+        }
+
+        if (actorNames.length === 0) return [];
+
+        // Search TMDB for each actor by name INDIVIDUALLY — decoupled from (potentially wrong) movie match
+        const castWithPhotos = await Promise.all(
+            actorNames.map(async (name: string) => {
+                try {
+                    const res = await fetchWithTimeout(
+                        `https://api.themoviedb.org/3/search/person?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(name)}&language=vi-VN`,
+                        {},
+                        5000
+                    );
+                    if (!res.ok) return { id: name, name, character: '', profile_path: null };
                     const data = await res.json();
-                    ophimCast = data.cast || [];
+                    const person = (data.results || [])[0];
+                    return {
+                        id: person?.id || name,
+                        name,  // Always use source name (Vietnamese)
+                        character: '',
+                        profile_path: person?.profile_path
+                            ? `https://image.tmdb.org/t/p/w185${person.profile_path}`
+                            : null,
+                    };
+                } catch {
+                    return { id: name, name, character: '', profile_path: null };
                 }
-            }),
-            (async () => {
-                if (!origin_name || !year) return;
-
-                // Determine most likely TMDB media type based on episode_total
-                const mediaType: 'tv' | 'movie' = (movie?.episode_total && parseInt(movie.episode_total) > 1)
-                    ? 'tv'
-                    : 'movie';
-
-                // Try 1: search by original title (most accurate for Asian films)
-                tmdbCast = await getTMDBCast(origin_name, year, mediaType, 'en-US');
-
-                // Try 2: if origin_name is the same as Vietnamese name (no foreign title), 
-                //         search TMDB with language=vi-VN to get localized matches
-                if (!tmdbCast.length && movie?.name && movie.name !== origin_name) {
-                    tmdbCast = await getTMDBCast(movie.name, year, mediaType, 'vi-VN');
-                }
-
-                // Try 3: Retry as the opposite media type (tv/movie swap)
-                if (!tmdbCast.length) {
-                    const altType = mediaType === 'tv' ? 'movie' : 'tv';
-                    tmdbCast = await getTMDBCast(origin_name, year, altType, 'en-US');
-                }
-            })()
-        ]);
-
-        // Lấy list tên diễn viên đã việt hóa (Hán Việt) từ Ophim
-        const cleanOphim = ophimCast.filter(
-            (c: any) => !c.name?.toLowerCase().includes('đang cập nhật') && !c.name?.toLowerCase().includes('updating')
+            })
         );
-        const localizedActors = cleanOphim.length > 0 ? cleanOphim.map((c: any) => c.name) : (movie?.actor || []);
 
-        if (tmdbCast.length > 0) {
-            return tmdbCast.map((c: any, index: number) => {
-                let displayName = c.name;
-                if (localizedActors[index] && localizedActors[index].trim().length > 1) {
-                    displayName = localizedActors[index];
-                }
-                return {
-                    id: c.id,
-                    name: displayName,
-                    character: c.character,
-                    profile_path: c.profile_path,
-                };
-            });
-        }
-
-        if (cleanOphim.length > 0) return cleanOphim;
-
-        // Last resort: convert movie.actor[] string list to actor cards (no photo)
-        if (movie?.actor?.length) {
-            return movie.actor.slice(0, 15).map((name: string, i: number) => ({
-                id: `actor-${i}`,
-                name,
-                character: '',
-                profile_path: null,
-            }));
-        }
-
-        return [];
-
+        return castWithPhotos;
     } catch (error) {
-        console.error(`OPhim Cast/TMDB Error [${slug}]:`, error);
+        console.error(`OPhim Cast Error [${slug}]:`, error);
         return [];
     }
 };
+
+export const getOphimImages = async (slug: string) => {
+    try {
+        if (!slug) return null;
+        const res = await fetch(`${OPHIM_API}/phim/${slug}/images`);
+        return await res.json();
+    } catch (error) {
+        console.error(`OPhim Images Error [${slug}]:`, error);
+        return null;
+    }
+};
+
+
+
 
 export const getOphimImages = async (slug: string) => {
     try {
