@@ -140,7 +140,7 @@ export default async function WatchHistoryPage() {
                                 <History className="w-5 h-5 text-gray-400" />
                                 Tất cả đã xem
                             </h2>
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-x-4 gap-y-8 [contain:layout_paint]">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-8 [contain:layout_paint]">
                                 {history.map((item: any) => (
                                     <Link
                                         key={item._id}

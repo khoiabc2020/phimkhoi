@@ -84,7 +84,7 @@ export default async function MovieCast({ movie, slug, isCompact = false }: { mo
             <h3 className="text-xl font-bold text-white mb-4 border-l-4 border-yellow-500 pl-3">
                 Diễn Viên
             </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">
                 {cast.map((actor) => (
                     <Link
                         href={`/dien-vien/${encodeURIComponent(actor.name)}`}
