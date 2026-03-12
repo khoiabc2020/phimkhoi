@@ -15,8 +15,15 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         keyword.length >= 2 ? searchTMDBPerson(keyword) : Promise.resolve([])
     ]);
 
+    // Deduplicate movies by slug to avoid showing the same title multiple times
+    const uniqueMovies = Array.from(
+        new Map(
+            (movies || []).map((movie: any) => [movie.slug || movie._id, movie])
+        ).values()
+    );
+
     // Client-side filtering because search API doesn't support complex filters
-    const filteredMovies = movies.filter((movie: any) => {
+    const filteredMovies = uniqueMovies.filter((movie: any) => {
         if (category && category !== "all") {
             const hasCategory = movie.category?.some((c: { slug: string }) => c.slug === category);
             if (!hasCategory) return false;
@@ -44,7 +51,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                     </h1>
                     <p className="text-gray-400 text-sm mt-1">
                         Tìm thấy {filteredMovies.length} phim {hasActors && `và ${actors.length} diễn viên`}
-                        {movies.length !== filteredMovies.length && ` (từ ${movies.length} phim gốc)`}
+                        {uniqueMovies.length !== filteredMovies.length && ` (từ ${uniqueMovies.length} phim gốc)`}
                     </p>
 
                     {/* Add Filter Bar */}
@@ -114,7 +121,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                         )}
                         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2 sm:gap-3 md:gap-4 [contain:layout_paint]">
                             {filteredMovies.map((movie: any) => (
-                                <MovieCard key={movie._id} movie={movie} />
+                                <MovieCard key={movie._id || movie.slug} movie={movie} />
                             ))}
                         </div>
                     </>
