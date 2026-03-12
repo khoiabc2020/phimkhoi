@@ -811,6 +811,7 @@ export const getMoviesByActor = async (actorName: string, page: number = 1, limi
         const TMDB_KEY = process.env.TMDB_API_KEY;
         const searchNames: string[] = [actorName];
         const tmdbCreditTitles: string[] = [];
+        const normalizeStr = (s: string) => s.toLowerCase().replace(/\s+/g, ' ').trim();
 
         // Phase 1: Try to get TMDB person to get English/original name + credit list
         if (TMDB_KEY) {
@@ -899,7 +900,6 @@ export const getMoviesByActor = async (actorName: string, page: number = 1, limi
 
                 // For name-searches: check actor list for match
                 // For title-searches: movie itself may not have actor list, include it
-                const normalizeStr = (s: string) => s.toLowerCase().replace(/\s+/g, ' ').trim();
                 const isActorMatch = searchNames.some(name => {
                     const searchActorNorm = normalizeStr(name);
                     if (item.actor && Array.isArray(item.actor)) {
@@ -921,6 +921,65 @@ export const getMoviesByActor = async (actorName: string, page: number = 1, limi
                     items.push(item);
                 }
             }
+        }
+
+        // Fallback: some API search responses omit actor lists, causing false "0 phim".
+        // If strict matching finds nothing, verify candidates via movie detail actor credits.
+        if (items.length === 0) {
+            const fallbackSearches = await Promise.all(
+                searchNames.slice(0, 3).map(name => searchMovies(name))
+            );
+
+            const fallbackCandidates = Array.from(
+                new Map(
+                    fallbackSearches
+                        .flat()
+                        .filter((m: any) => m?.slug)
+                        .map((m: any) => [m.slug, m])
+                ).values()
+            ).slice(0, 40);
+
+            const verified = await Promise.all(
+                fallbackCandidates.map(async (candidate: any) => {
+                    try {
+                        const detail = await getMovieDetail(candidate.slug);
+                        const movieDetail: any = detail?.movie;
+                        if (!movieDetail) return null;
+
+                        const detailActors: string[] = Array.isArray(movieDetail.actor) ? movieDetail.actor : [];
+                        const hasActor = searchNames.some(name => {
+                            const searchNorm = normalizeStr(name);
+                            return detailActors.some((a: string) => {
+                                const actorNorm = normalizeStr(a || "");
+                                return actorNorm.includes(searchNorm) || searchNorm.includes(actorNorm);
+                            });
+                        });
+
+                        if (!hasActor) return null;
+
+                        return {
+                            ...candidate,
+                            actor: movieDetail.actor || candidate.actor || [],
+                            director: movieDetail.director || candidate.director || [],
+                            category: movieDetail.category || candidate.category || [],
+                            country: movieDetail.country || candidate.country || [],
+                            quality: movieDetail.quality || candidate.quality || 'HD',
+                            episode_current: movieDetail.episode_current || candidate.episode_current || '',
+                            episode_total: movieDetail.episode_total || candidate.episode_total || '',
+                            year: movieDetail.year || candidate.year,
+                        };
+                    } catch {
+                        return null;
+                    }
+                })
+            );
+
+            verified.filter(Boolean).forEach((movie: any) => {
+                if (movie?.slug && !seen.has(movie.slug)) {
+                    seen.add(movie.slug);
+                    items.push(movie);
+                }
+            });
         }
 
         // Sort by year descending
