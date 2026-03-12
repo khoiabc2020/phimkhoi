@@ -68,22 +68,52 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
         if (tmdbRes?.vote_average) (movie as any).vote_average = tmdbRes.vote_average;
         const episodeImageMap: Record<string, TMDBEpisodeMeta> = tmdbEpisodeImages || {};
 
-        // Map image by episode number to each source episode slug
-        const extractEpisodeNumber = (name: string) => {
-            const match = String(name || "").match(/(\d+)/);
+        // Map image by episode number to each source episode slug.
+        // Some providers use "01" while TMDB returns "1", so normalize both forms.
+        const extractEpisodeNumber = (value: string) => {
+            const match = String(value || "").match(/(\d+)/);
             return match ? match[1] : null;
+        };
+        const buildEpisodeKeyCandidates = (ep: any, indexInServer: number): string[] => {
+            const seen = new Set<string>();
+            const pushKey = (raw: unknown) => {
+                const val = String(raw ?? "").trim();
+                if (!val || seen.has(val)) return;
+                seen.add(val);
+            };
+
+            const fromName = extractEpisodeNumber(ep?.name);
+            const fromSlug = extractEpisodeNumber(ep?.slug);
+            const parsed = Number(fromName || fromSlug);
+
+            if (fromName) pushKey(fromName);
+            if (fromSlug) pushKey(fromSlug);
+            if (Number.isFinite(parsed) && parsed > 0) {
+                pushKey(String(parsed));
+                pushKey(String(parsed).padStart(2, "0"));
+                pushKey(String(parsed).padStart(3, "0"));
+            }
+
+            // Fallback by index for sources with non-standard labels
+            const byIndex = indexInServer + 1;
+            pushKey(String(byIndex));
+            pushKey(String(byIndex).padStart(2, "0"));
+
+            return Array.from(seen);
         };
         episodeThumbnails = {};
         (servers || []).forEach((serverItem: any) => {
-            (serverItem?.server_data || []).forEach((ep: any) => {
-                const epNo = extractEpisodeNumber(ep?.name);
-                if (!epNo) return;
-                const data = episodeImageMap[epNo];
-                if (data?.image && ep?.slug) {
-                    episodeThumbnails[ep.slug] = data.image;
+            (serverItem?.server_data || []).forEach((ep: any, indexInServer: number) => {
+                const candidates = buildEpisodeKeyCandidates(ep, indexInServer);
+                const matchedData = candidates
+                    .map((key) => episodeImageMap[key])
+                    .find(Boolean);
+
+                if (matchedData?.image && ep?.slug) {
+                    episodeThumbnails[ep.slug] = matchedData.image;
                 }
-                if (data && ep?.slug) {
-                    episodeMetadata[ep.slug] = data;
+                if (matchedData && ep?.slug) {
+                    episodeMetadata[ep.slug] = matchedData;
                 }
             });
         });
@@ -151,7 +181,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
 
 
                             {/* Movie description */}
-                            <div className="rounded-lg border border-white/[0.04] overflow-hidden bg-[#18181A]">
+                            <div className="rounded-lg border border-slate-700/35 overflow-hidden bg-[#020617]/80">
                                 <div className="px-6 pt-5 pb-4 border-b border-white/[0.04]">
                                     <h3 className="text-white font-bold text-[15px] flex items-center gap-2 tracking-wide">
                                         <Info className="w-4 h-4 text-[#F4C84A]" /> Thông tin mở rộng
@@ -200,7 +230,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
                             </div>
 
                             {/* Comments */}
-                            <div className="rounded-lg border border-white/[0.04] overflow-hidden bg-[#18181A]">
+                            <div className="rounded-lg border border-slate-700/35 overflow-hidden bg-[#020617]/80">
                                 <div className="px-6 pt-5 pb-4 border-b border-white/[0.04]">
                                     <h3 className="text-white font-bold text-[15px] flex items-center gap-2 tracking-wide">
                                         <Users className="w-4 h-4 text-[#F4C84A]" /> Bình luận
@@ -216,7 +246,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
                         <div className="lg:col-span-3 space-y-5">
                             {/* Genre pills */}
                             {movie.category && movie.category.length > 0 && (
-                                <div className="rounded-lg border border-white/[0.04] overflow-hidden bg-[#18181A]">
+                                <div className="rounded-lg border border-slate-700/35 overflow-hidden bg-[#020617]/80">
                                     <div className="px-5 pt-5 pb-4 border-b border-white/[0.04]">
                                         <h3 className="text-white font-bold text-[15px] tracking-wide">Thể loại</h3>
                                     </div>
@@ -234,7 +264,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
 
                             {/* Related movies */}
                             {movie.category?.[0]?.slug && (
-                                <div className="rounded-lg border border-white/[0.04] overflow-hidden bg-[#18181A]">
+                                <div className="rounded-lg border border-slate-700/35 overflow-hidden bg-[#020617]/80">
                                     <div className="px-5 pt-5 pb-4 border-b border-white/[0.04] flex items-center gap-2">
                                         <div className="w-1.5 h-4 rounded-full bg-[#F4C84A]" />
                                         <h3 className="text-white font-bold text-[15px] tracking-wide">Phim đề xuất</h3>
