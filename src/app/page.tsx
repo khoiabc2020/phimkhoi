@@ -33,16 +33,30 @@ const contentSkeleton = (
 
 // Wrapper cho Sidebar Trending
 async function AsyncTopTrending({ title, slug, type }: { title: string, slug: string, type: 'tv' | 'movie' }) {
-  const data: any[] = await getTrendMovies(type).catch((): any[] => []);
+  let data: any[] = await getTrendMovies(type).catch((): any[] => []);
+
+  // Deduplicate by poster/thumb to avoid visually identical duplicates
+  const seenMedia = new Set<string>();
+  data = data.filter((item) => {
+    const mediaUrl = item.poster_url || item.thumb_url;
+    if (!mediaUrl) return true;
+    if (seenMedia.has(mediaUrl)) return false;
+    seenMedia.add(mediaUrl);
+    return true;
+  });
 
   if (data.length < 10) {
-    const backup = await getMoviesList(type === 'tv' ? 'phim-bo' : 'phim-le', { limit: 10 });
+    const backup = await getMoviesList(type === 'tv' ? 'phim-bo' : 'phim-le', { limit: 20 });
     const sourceIds = new Set(data.map((m: { _id?: string }) => m._id));
     for (const item of (backup?.items || [])) {
       if (data.length >= 10) break;
       if (!sourceIds.has(item._id)) {
+        const mediaUrl = item.poster_url || item.thumb_url;
+        if (mediaUrl && seenMedia.has(mediaUrl)) continue; // Also deduplicate backups
+
         data.push(item);
         sourceIds.add(item._id);
+        if (mediaUrl) seenMedia.add(mediaUrl);
       }
     }
   }
