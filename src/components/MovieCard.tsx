@@ -236,7 +236,7 @@ function OnflixHoverCard({
     if (left + CARD_WIDTH > window.innerWidth - 10) left = window.innerWidth - CARD_WIDTH - 10;
 
     // Smart positioning: don't go off-screen vertically
-    const ESTIMATED_CARD_HEIGHT = 340;
+    const ESTIMATED_CARD_HEIGHT = 380;
     let top = position.top - 10;
 
     // Nếu sát mép dưới màn hình thì bật ngược lên trên
@@ -259,19 +259,21 @@ function OnflixHoverCard({
         >
             <div className="relative animate-in fade-in zoom-in-95 duration-200 ease-out origin-top">
                 {/* Card */}
-                <div className="relative glass-panel overflow-hidden">
+                <div className="relative overflow-hidden rounded-[12px] border border-white/[0.09] bg-[#0c0f16]/95 shadow-[0_20px_48px_#00000099]">
 
-                    {/* Backdrop Image - 16:9 — skeleton + fade-in khi load xong */}
-                    <div className="relative aspect-video w-full overflow-hidden bg-[#1a1a1a]">
+                    {/* Overlay media — taller and less cropped so faces are easier to see */}
+                    <div className="relative aspect-[16/8.6] w-full overflow-hidden bg-[#1a1a1a]">
                         {/* Skeleton hiển thị khi ảnh chưa load xong */}
                         {!imgLoaded && !hasError && (
                             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/[0.02] animate-pulse" />
                         )}
                         <Image
-                            src={displayBackdrop || "/placeholder.svg"}
+                            src={(orientation === "portrait"
+                                ? getImageUrl(movie.poster_url || movie.thumb_url)
+                                : displayBackdrop) || "/placeholder.svg"}
                             alt={decodeHtml(movie.name) || movie.slug || "Phim"}
                             fill
-                            className={`object-cover transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+                            className={`object-cover object-top transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
                             unoptimized
                             priority
                             onLoad={() => setImgLoaded(true)}
@@ -294,7 +296,7 @@ function OnflixHoverCard({
                     </div>
 
                     {/* Card body */}
-                    <div className="px-4 pb-4 pt-2 space-y-3 relative z-10 bg-[#141414] rounded-b-2xl">
+                    <div className="px-4 pb-5 pt-2 space-y-3 relative z-10 bg-[#141414]">
                         {/* Title and Subtitle */}
                         <div>
                             <h3 className="text-white font-bold text-[15px] leading-snug line-clamp-2">
@@ -378,6 +380,13 @@ function OnflixHoverCard({
                             <div className="text-[13px] text-white/70 font-medium truncate mt-1">
                                 {movie.category.slice(0, 4).map((cat) => cat.name).join(' • ')}
                             </div>
+                        )}
+
+                        {/* Short description to avoid empty-looking bottom area */}
+                        {movie.content && (
+                            <p className="text-[12px] text-white/45 line-clamp-2 leading-relaxed">
+                                {decodeHtml(movie.content).replace(/<[^>]+>/g, "")}
+                            </p>
                         )}
                     </div>
                 </div>
