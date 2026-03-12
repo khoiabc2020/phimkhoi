@@ -141,17 +141,17 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
                     />
                 )}
-                {/* Overlay: tối dần từ trên xuống + mờ đậm bên trái, rõ dần sang phải giống layout tham chiếu */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/80 to-[#020617]/20" />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#020617] via-[#020617]/65 to-transparent" />
+                {/* Overlay: giảm độ tối để thấy backdrop rõ hơn nhưng vẫn giữ độ tương phản cho text */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/90 via-[#020617]/62 to-[#020617]/10" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#020617]/88 via-[#020617]/48 to-transparent" />
 
                 {/* Hero Info Content aligned left/bottom */}
                 <div className="relative z-10 w-full max-w-[1920px] mx-auto space-y-2 sm:space-y-4">
-                    <div className="flex items-center gap-2 mb-1">
-                        <span className="inline-flex items-center bg-[#22c55e] text-white px-3 py-1 text-[11px] font-extrabold rounded-lg shadow-sm uppercase leading-none">
+                    <div className="flex items-end gap-3 sm:gap-4 mb-1">
+                        <span className="inline-flex items-center justify-center h-9 sm:h-10 bg-[#22c55e] text-white px-4 sm:px-5 text-sm sm:text-base font-black rounded-xl shadow-sm uppercase leading-none tracking-tight">
                             {movie?.quality || "FHD"}
                         </span>
-                        <span className="inline-flex items-center text-white px-1 py-0.5 text-[40px] sm:text-[44px] font-bold leading-none tracking-tight">
+                        <span className="inline-flex items-center text-white text-[52px] sm:text-[64px] font-black leading-[0.9] tracking-tight">
                             {movie?.year}
                         </span>
                     </div>
