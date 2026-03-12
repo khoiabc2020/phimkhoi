@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn, getImageUrl } from "@/lib/utils";
 import VideoPlayer from "@/components/VideoPlayer";
 import WatchEngagementBar from "@/components/WatchEngagementBar";
 import WatchEpisodeSection from "@/components/WatchEpisodeSection";
@@ -82,13 +82,30 @@ export default function WatchContainer({
         }
     }, [isTheaterMode]);
 
+    const backdropUrl = getImageUrl(movie.thumb_url || movie.poster_url);
+
     return (
         <div className={cn("relative transition-all duration-500", isLightOff ? "z-[60]" : "")}>
+
+            {/* Global backdrop behind watch page – blurred and darkened for cinema feel */}
+            {backdropUrl && (
+                <div
+                    className="pointer-events-none fixed inset-0 -z-[1] bg-cover bg-center"
+                    style={{
+                        backgroundImage: `url(${backdropUrl})`,
+                        filter: "blur(24px) brightness(0.45)",
+                        transform: "scale(1.06)",
+                    }}
+                />
+            )}
+            {/* Overlay gradient to keep focus on center/left — synced with movie detail hero */}
+            <div className="pointer-events-none fixed inset-0 -z-[0] bg-gradient-to-t from-[#020617] via-[#020617]/80 to-[#020617]/20" />
+            <div className="pointer-events-none fixed inset-0 -z-[0] bg-gradient-to-r from-[#020617] via-[#020617]/65 to-transparent" />
 
             {/* Light Off Overlay */}
             {isLightOff && (
                 <div
-                    className="fixed inset-0 bg-black/90 z-40 transition-opacity duration-500"
+                    className="fixed inset-0 bg-black/80 z-40 transition-opacity duration-500"
                     onClick={() => setIsLightOff(false)}
                 />
             )}

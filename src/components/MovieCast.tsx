@@ -1,16 +1,52 @@
 import Image from "next/image";
 import Link from "next/link";
-import { searchTMDBPerson } from "@/services/tmdb";
+import { getActorDetailsFromTMDB } from "@/app/actions/tmdb";
 
-async function getActorPhoto(actorName: string): Promise<string | null> {
+type CastItem = {
+    name: string;
+    photo: string | null;
+    genderLabel?: string;
+    originalName?: string | null;
+    departmentLabel?: string | null;
+};
+
+async function getActorInfo(actorName: string): Promise<CastItem> {
     try {
-        const results = await searchTMDBPerson(actorName);
-        if (results && results.length > 0 && results[0].profile_path) {
-            return `https://image.tmdb.org/t/p/w185${results[0].profile_path}`;
+        const details = await getActorDetailsFromTMDB(actorName);
+        if (!details) {
+            return { name: actorName, photo: null };
         }
-        return null;
+
+        const photo = details.profile_path
+            ? `https://image.tmdb.org/t/p/w185${details.profile_path}`
+            : null;
+
+        const genderLabel =
+            details.gender === 1 ? "Nữ" :
+                details.gender === 2 ? "Nam" :
+                    undefined;
+
+        const originalName =
+            details.also_known_as && details.also_known_as.length > 0
+                ? details.also_known_as[0]
+                : null;
+
+        let departmentLabel: string | null = null;
+        if (details.known_for_department) {
+            if (details.known_for_department === "Acting") departmentLabel = "Diễn viên";
+            else if (details.known_for_department === "Directing") departmentLabel = "Đạo diễn";
+            else departmentLabel = details.known_for_department;
+        }
+
+        return {
+            name: actorName,
+            photo,
+            genderLabel,
+            originalName,
+            departmentLabel,
+        };
     } catch {
-        return null;
+        return { name: actorName, photo: null };
     }
 }
 
@@ -46,12 +82,10 @@ export default async function MovieCast({ movie, slug, isCompact = false }: { mo
 
     if (actorNames.length === 0) return null;
 
-    // Fetch photos by actor name individually — decoupled from (potentially wrong) movie TMDB match
-    const actorPhotos = await Promise.all(
-        actorNames.map((name: string) => getActorPhoto(name))
+    // Fetch richer TMDB info per actor so we can render "mini actor cards"
+    const cast: CastItem[] = await Promise.all(
+        actorNames.map((name: string) => getActorInfo(name))
     );
-
-    const cast = actorNames.map((name: string, i: number) => ({ name, photo: actorPhotos[i] }));
 
     if (isCompact) {
         return (
@@ -81,24 +115,49 @@ export default async function MovieCast({ movie, slug, isCompact = false }: { mo
 
     return (
         <div className="mt-8">
-            <h3 className="text-xl font-bold text-white mb-4 border-l-4 border-yellow-500 pl-3">
-                Diễn Viên
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">
+            <div className="flex items-center gap-2 mb-4">
+                <div className="w-1.5 h-5 bg-[#F4C84A] rounded-full" />
+                <h3 className="text-xl font-bold text-white">Diễn Viên</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {cast.map((actor) => (
                     <Link
                         href={`/dien-vien/${encodeURIComponent(actor.name)}`}
                         key={actor.name}
-                        className="bg-white/5 rounded-lg p-2 text-center group hover:bg-white/10 transition-colors block"
+                        className="relative flex items-center gap-3 bg-white/5 rounded-lg p-3 group hover:bg-white/10 transition-colors border border-white/5 hover:border-[#F4C84A]/60"
                     >
-                        <div className="relative w-24 h-24 mx-auto mb-2 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-yellow-500 transition-colors">
+                        <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-[#F4C84A] transition-colors shrink-0">
                             {actor.photo ? (
                                 <Image src={actor.photo} alt={actor.name} fill className="object-cover" unoptimized />
                             ) : (
                                 <ActorInitials name={actor.name} />
                             )}
                         </div>
-                        <p className="text-white text-sm font-medium truncate group-hover:text-yellow-500 transition-colors">{actor.name}</p>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-white truncate group-hover:text-[#F4C84A] transition-colors">
+                                {actor.name}
+                            </p>
+                            {actor.originalName && actor.originalName !== actor.name && (
+                                <p className="text-xs text-gray-400 truncate italic mt-0.5">
+                                    {actor.originalName}
+                                </p>
+                            )}
+                            <div className="flex flex-wrap items-center gap-2 mt-1 text-[11px] text-gray-400">
+                                {actor.departmentLabel && (
+                                    <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 uppercase tracking-wide">
+                                        {actor.departmentLabel}
+                                    </span>
+                                )}
+                                {actor.genderLabel && (
+                                    <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10">
+                                        {actor.genderLabel}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                        <span className="hidden sm:inline text-[11px] font-semibold text-gray-400 group-hover:text-[#F4C84A] transition-colors ml-2">
+                            Xem trang
+                        </span>
                     </Link>
                 ))}
             </div>
