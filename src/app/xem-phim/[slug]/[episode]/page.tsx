@@ -10,7 +10,7 @@ import WatchEngagementBar from "@/components/WatchEngagementBar";
 import WatchContainer from "@/components/WatchContainer";
 import { Info, Users } from "lucide-react";
 import { getWatchHistoryForEpisode } from "@/app/actions/watchHistory";
-import { getMovieCast, getTMDBDataForCard, getTMDBEpisodeImages } from "@/app/actions/tmdb";
+import { getMovieCast, getTMDBDataForCard, getTMDBEpisodeImages, TMDBEpisodeMeta } from "@/app/actions/tmdb";
 import RelatedMovies from "@/components/RelatedMovies";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -54,6 +54,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
     let session = null;
     let cast: Record<string, unknown>[] = [];
     let episodeThumbnails: Record<string, string> = {};
+    let episodeMetadata: Record<string, TMDBEpisodeMeta> = {};
 
     try {
         const [sessionRes, castRes, tmdbRes, tmdbEpisodeImages] = await Promise.all([
@@ -65,7 +66,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
         session = sessionRes;
         cast = castRes || [];
         if (tmdbRes?.vote_average) (movie as any).vote_average = tmdbRes.vote_average;
-        const episodeImageMap = tmdbEpisodeImages || {};
+        const episodeImageMap: Record<string, TMDBEpisodeMeta> = tmdbEpisodeImages || {};
 
         // Map image by episode number to each source episode slug
         const extractEpisodeNumber = (name: string) => {
@@ -77,9 +78,12 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
             (serverItem?.server_data || []).forEach((ep: any) => {
                 const epNo = extractEpisodeNumber(ep?.name);
                 if (!epNo) return;
-                const thumb = episodeImageMap[epNo];
-                if (thumb && ep?.slug) {
-                    episodeThumbnails[ep.slug] = thumb;
+                const data = episodeImageMap[epNo];
+                if (data?.image && ep?.slug) {
+                    episodeThumbnails[ep.slug] = data.image;
+                }
+                if (data && ep?.slug) {
+                    episodeMetadata[ep.slug] = data;
                 }
             });
         });
@@ -139,6 +143,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
                                 episodes={episodes}
                                 servers={servers}
                                 episodeThumbnails={episodeThumbnails}
+                                episodeMetadata={episodeMetadata}
                                 initialProgress={initialProgress}
                                 movieData={movieData}
                                 initialServerName={servers[usedIndex]?.server_name || servers[0]?.server_name || ""}

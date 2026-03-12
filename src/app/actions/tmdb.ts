@@ -2,6 +2,15 @@
 
 import { searchTMDBMovie, getTMDBDetails, getTMDBPersonDetails, getTMDBSeasonDetails } from "@/services/tmdb";
 
+export type TMDBEpisodeMeta = {
+    image?: string;
+    title?: string;
+    overview?: string;
+    airDate?: string;
+    runtime?: number;
+    voteAverage?: number;
+};
+
 export async function getTMDBDataForCard(
     query: string,
     year?: number,
@@ -175,19 +184,25 @@ export async function getTMDBEpisodeImages(
             seasonList.map((s: any) => getTMDBSeasonDetails(tv.id, Number(s.season_number)))
         );
 
-        const imagesByEpisodeNumber: Record<string, string> = {};
+        const episodeDataByNumber: Record<string, TMDBEpisodeMeta> = {};
         seasonDetails.forEach((season: any) => {
             if (!season?.episodes) return;
             season.episodes.forEach((ep: any) => {
                 const epNo = String(ep?.episode_number || "");
-                if (!epNo || imagesByEpisodeNumber[epNo]) return;
-                if (ep?.still_path) {
-                    imagesByEpisodeNumber[epNo] = `https://image.tmdb.org/t/p/w780${ep.still_path}`;
-                }
+                if (!epNo) return;
+                const existing = episodeDataByNumber[epNo] || {};
+                episodeDataByNumber[epNo] = {
+                    image: existing.image || (ep?.still_path ? `https://image.tmdb.org/t/p/w780${ep.still_path}` : undefined),
+                    title: existing.title || ep?.name || undefined,
+                    overview: existing.overview || ep?.overview || undefined,
+                    airDate: existing.airDate || ep?.air_date || undefined,
+                    runtime: existing.runtime || ep?.runtime || undefined,
+                    voteAverage: existing.voteAverage || ep?.vote_average || undefined,
+                };
             });
         });
 
-        return imagesByEpisodeNumber;
+        return episodeDataByNumber;
     } catch (error) {
         console.error("TMDB Episode Images Error:", error);
         return {};

@@ -27,6 +27,7 @@ interface WatchContainerProps {
     episodes: Episode[];
     servers: Server[];
     episodeThumbnails?: Record<string, string>;
+    episodeMetadata?: Record<string, { title?: string; overview?: string; airDate?: string; runtime?: number; voteAverage?: number }>;
     initialProgress: number;
     movieData: any;
     initialServerName: string;
@@ -38,6 +39,7 @@ export default function WatchContainer({
     episodes: initialEpisodes,
     servers,
     episodeThumbnails,
+    episodeMetadata,
     initialProgress,
     movieData,
     initialServerName,
@@ -284,6 +286,7 @@ export default function WatchContainer({
                         movieName={movie.name}
                         servers={servers}
                         episodeThumbnails={episodeThumbnails}
+                        episodeMetadata={episodeMetadata}
                         currentEpisodeSlug={currentEpisodeSlug}
                         activeServerName={activeServerName}
                         onServerChange={setActiveServerName}

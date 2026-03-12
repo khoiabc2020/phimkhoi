@@ -21,6 +21,7 @@ interface WatchEpisodeSectionProps {
     movieName: string;
     servers: Server[];
     episodeThumbnails?: Record<string, string>;
+    episodeMetadata?: Record<string, { title?: string; overview?: string; airDate?: string; runtime?: number; voteAverage?: number }>;
     currentEpisodeSlug: string;
     activeServerName: string;
     onServerChange: (serverName: string) => void;
@@ -31,6 +32,7 @@ export default function WatchEpisodeSection({
     movieName,
     servers,
     episodeThumbnails = {},
+    episodeMetadata = {},
     currentEpisodeSlug,
     activeServerName,
     onServerChange,
@@ -272,35 +274,54 @@ export default function WatchEpisodeSection({
                             const isActive = ep.slug === currentEpisodeSlug;
                             const displayNum = getEpisodeNumber(ep.name) || ep.name;
                             const thumb = episodeThumbnails?.[ep.slug];
+                            const meta = episodeMetadata?.[ep.slug];
+                            const episodeTitle = meta?.title || `Tập ${displayNum}`;
+                            const episodeOverview = meta?.overview || "";
+                            const dateText = meta?.airDate ? new Date(meta.airDate).toLocaleDateString("vi-VN") : "";
+                            const runtimeText = meta?.runtime ? `${meta.runtime}m` : "";
 
                             return (
                                 <Link
                                     key={ep.slug}
                                     href={`/xem-phim/${movieSlug}/${ep.slug}?server=${safeIndex}`}
                                     className={cn(
-                                        "group relative aspect-video rounded-[12px] overflow-hidden border transition-all duration-200 touch-manipulation",
+                                        "group rounded-[12px] overflow-hidden border transition-all duration-200 touch-manipulation bg-[#11141d]",
                                         isActive
                                             ? "border-[#F4C84A]/70 ring-1 ring-[#F4C84A]/45 shadow-[0_0_18px_#F4C84A33]"
                                             : "border-white/[0.07] hover:border-white/[0.2] hover:-translate-y-[1px]"
                                     )}
                                 >
-                                    {thumb ? (
-                                        <div
-                                            className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-[1.03]"
-                                            style={{ backgroundImage: `url(${getImageUrl(thumb)})` }}
-                                        />
-                                    ) : (
-                                        <div className="absolute inset-0 bg-gradient-to-br from-[#212632] to-[#13161e]" />
-                                    )}
+                                    <div className="relative aspect-video overflow-hidden">
+                                        {thumb ? (
+                                            <div
+                                                className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-[1.03]"
+                                                style={{ backgroundImage: `url(${getImageUrl(thumb)})` }}
+                                            />
+                                        ) : (
+                                            <div className="absolute inset-0 bg-gradient-to-br from-[#212632] to-[#13161e]" />
+                                        )}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                                        <div className="absolute left-2.5 bottom-2 text-white font-bold text-[16px] drop-shadow-md">
+                                            Tập {displayNum}
+                                        </div>
+                                    </div>
 
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
-
-                                    <div className="absolute left-3 bottom-2.5 text-white font-bold text-[18px] drop-shadow-md">
-                                        Tập {displayNum}
+                                    <div className="px-3 py-2.5">
+                                        <p className="text-[13px] font-bold text-white line-clamp-1">{episodeTitle}</p>
+                                        {episodeOverview && (
+                                            <p className="text-[12px] text-gray-400 line-clamp-2 mt-1 leading-relaxed">
+                                                {episodeOverview}
+                                            </p>
+                                        )}
+                                        {(dateText || runtimeText) && (
+                                            <p className="text-[11px] text-gray-500 mt-1">
+                                                {dateText}{dateText && runtimeText ? " · " : ""}{runtimeText}
+                                            </p>
+                                        )}
                                     </div>
 
                                     {isActive && (
-                                        <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-[#F4C84A] text-black text-[10px] font-black uppercase">
+                                        <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-[#F4C84A] text-black text-[10px] font-black uppercase shadow-sm">
                                             Đang xem
                                         </div>
                                     )}
