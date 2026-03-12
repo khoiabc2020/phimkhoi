@@ -146,7 +146,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
                 <div className="absolute inset-0 bg-gradient-radial from-[#1a1f35]/30 via-[#080b12] to-[#080b12]" />
             </div>
 
-            <div className="relative z-10 pt-20 md:pt-24 pb-16">
+            <div className="relative z-10 pt-14 md:pt-16 pb-16">
 
 
 
@@ -156,15 +156,6 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
 
                         {/* Left (9 cols) */}
                         <div className="lg:col-span-9 space-y-5">
-
-                            {/* Breadcrumb */}
-                            <div className="flex items-center gap-2 text-xs text-gray-200 font-medium px-3 py-2 rounded-lg border border-white/[0.08] bg-[#11131A]/85">
-                                <Link href="/" className="hover:text-yellow-400 transition-colors">Trang chủ</Link>
-                                <span className="text-gray-500">/</span>
-                                <Link href={`/phim/${movie.slug}`} className="hover:text-yellow-400 transition-colors truncate max-w-[180px]">{movie.name}</Link>
-                                <span className="text-gray-500">/</span>
-                                <span className="text-yellow-300 font-semibold">{displayEpisodeName(currentEpisode?.name || episode)}</span>
-                            </div>
 
                             {/* Player */}
                             <WatchContainer
