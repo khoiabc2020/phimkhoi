@@ -56,7 +56,7 @@ export default function QuickNav() {
                     Bạn đang quan tâm gì?
                 </h2>
 
-                <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2 snap-x">
+                <div className="flex gap-3 overflow-x-auto no-scrollbar py-2 px-1 -mx-1 snap-x">
                     {NAV_ITEMS.map((item, index) => (
                         <Link
                             key={index}
