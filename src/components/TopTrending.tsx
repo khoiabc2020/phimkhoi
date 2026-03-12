@@ -34,12 +34,12 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
             </div>
 
             {/* List Container */}
-            <div className="flex flex-col gap-4 [contain:layout_paint]">
+            <div className="flex lg:flex-col gap-4 overflow-x-auto lg:overflow-visible no-scrollbar pb-4 lg:pb-0 snap-x lg:snap-none [contain:layout_paint]">
                 {topMovies.map((movie, index) => (
                     <Link
                         key={movie._id}
                         href={`/phim/${movie.slug}`}
-                        className="group flex items-center gap-4 p-2 rounded-lg hover:bg-white/5 transition-colors border border-transparent hover:border-white/5"
+                        className="group flex items-center gap-4 p-2 md:p-3 rounded-lg hover:bg-white/5 transition-colors border border-white/5 lg:border-transparent hover:border-white/10 lg:hover:border-white/5 min-w-[280px] sm:min-w-[320px] lg:min-w-0 lg:w-full snap-start bg-white/5 lg:bg-transparent"
                     >
                         {/* Rank Number */}
                         <div className={cn(
