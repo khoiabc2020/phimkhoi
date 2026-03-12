@@ -52,6 +52,23 @@ export default function MovieTabs({
     }, [tmdbDetails]);
 
     const activeVideo = tmdbVideos[activeTrailerIdx] || null;
+    const backdropFallbacks = useMemo(() => {
+        const paths = new Set<string>();
+
+        const directBackdrop = tmdbDetails?.backdrop_path;
+        if (directBackdrop) {
+            paths.add(`https://image.tmdb.org/t/p/w1280${directBackdrop}`);
+        }
+
+        const tmdbBackdrops = tmdbDetails?.images?.backdrops || [];
+        tmdbBackdrops.forEach((item: any) => {
+            if (item?.file_path) {
+                paths.add(`https://image.tmdb.org/t/p/w1280${item.file_path}`);
+            }
+        });
+
+        return Array.from(paths);
+    }, [tmdbDetails]);
 
     // Parse language from server name
     const getLanguageGroup = (name: string) => {
@@ -288,7 +305,7 @@ export default function MovieTabs({
                                 {/* Episode Grid */}
                                 {showEpisodeImages ? (
                                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3 max-h-[520px] overflow-y-auto custom-scrollbar pr-1 sm:pr-2 pb-1 [contain:layout_paint]">
-                                        {paginatedEpisodes.map((ep: { slug?: string; name?: string }) => {
+                                        {paginatedEpisodes.map((ep: { slug?: string; name?: string }, index: number) => {
                                             if (!ep?.slug) return null;
                                             const rawName = String(ep?.name || "");
                                             let displayName = rawName || "1";
@@ -298,7 +315,10 @@ export default function MovieTabs({
                                             }
 
                                             const meta = episodeMetadata?.[ep.slug];
-                                            const thumb = episodeThumbnails?.[ep.slug];
+                                            const fallbackBackdrop = backdropFallbacks.length > 0
+                                                ? backdropFallbacks[(currentChunk * EPISODES_PER_CHUNK + index) % backdropFallbacks.length]
+                                                : getImageUrl(movie?.thumb_url || movie?.poster_url || "");
+                                            const thumb = episodeThumbnails?.[ep.slug] || fallbackBackdrop;
                                             const episodeOverview = meta?.overview?.trim() || "Nội dung tập đang được cập nhật.";
                                             const dateText = meta?.airDate ? new Date(meta.airDate).toLocaleDateString("vi-VN") : "";
                                             const runtimeText = meta?.runtime ? `${meta.runtime}m` : "";
