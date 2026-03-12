@@ -138,7 +138,7 @@ export default async function ActorPage({ params, searchParams }: { params: Prom
                         {/* Biography */}
                         <div className="mt-8 mb-10">
                             <div className="flex items-center gap-2 mb-4">
-                                <div className="w-1.5 h-5 bg-[#1ce783] rounded-full" />
+                                <div className="w-1.5 h-5 bg-[#F4C84A] rounded-full" />
                                 <h3 className="text-xl font-bold text-white">Tiểu sử</h3>
                             </div>
                             <p className="text-[#a1a1aa] leading-relaxed text-[15px] whitespace-pre-wrap">
@@ -149,7 +149,7 @@ export default async function ActorPage({ params, searchParams }: { params: Prom
                         {/* Filmography */}
                         <div>
                             <div className="flex items-center gap-2 mb-4">
-                                <div className="w-1.5 h-5 bg-[#1ce783] rounded-full" />
+                                <div className="w-1.5 h-5 bg-[#F4C84A] rounded-full" />
                                 <h3 className="text-xl font-bold text-white">
                                     Phim tham gia <span className="font-normal text-gray-500 text-lg">({pagination?.totalItems || 0})</span>
                                 </h3>
