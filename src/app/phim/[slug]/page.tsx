@@ -148,10 +148,10 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 {/* Hero Info Content aligned left/bottom */}
                 <div className="relative z-10 w-full max-w-[1920px] mx-auto space-y-2 sm:space-y-4">
                     <div className="flex items-center gap-2 sm:gap-2.5 mb-1">
-                        <span className="inline-flex items-center justify-center h-6 sm:h-7 bg-[#F4C84A] text-black px-2.5 sm:px-3 text-[10px] sm:text-[11px] font-black rounded-lg shadow-sm uppercase leading-none tracking-tight">
+                        <span className="inline-flex items-center justify-center h-5.5 sm:h-6 bg-[#F4C84A] text-black px-2 sm:px-2.5 text-[9px] sm:text-[10px] font-black rounded-md shadow-sm uppercase leading-none tracking-tight">
                             {movie?.quality || "FHD"}
                         </span>
-                        <span className="inline-flex items-center text-white text-[26px] sm:text-[30px] font-extrabold leading-none tracking-tight">
+                        <span className="inline-flex items-center text-white text-[22px] sm:text-[24px] font-extrabold leading-none tracking-tight">
                             {movie?.year}
                         </span>
                     </div>

@@ -31,24 +31,92 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         return file.replace(/\.(jpg|jpeg|png|webp|avif)$/i, "");
     };
 
+    const qualityRank = (quality: string | undefined | null) => {
+        const q = normalizeText(quality);
+        if (!q) return 0;
+        if (q.includes("4k") || q.includes("uhd")) return 5;
+        if (q.includes("full hd") || q.includes("fullhd") || q.includes("fhd")) return 4;
+        if (q.includes("hd")) return 3;
+        if (q.includes("sd")) return 2;
+        if (q.includes("cam")) return 1;
+        return 0;
+    };
+
+    const metadataScore = (movie: any) => {
+        let score = 0;
+        if (movie?.name) score += 2;
+        if (movie?.origin_name) score += 2;
+        if (movie?.thumb_url) score += 2;
+        if (movie?.poster_url) score += 2;
+        if (movie?.episode_current) score += 2;
+        if (movie?.episode_total) score += 1;
+        if (movie?.year) score += 1;
+        if (Array.isArray(movie?.category) && movie.category.length > 0) score += 2;
+        if (Array.isArray(movie?.country) && movie.country.length > 0) score += 2;
+        if (Array.isArray(movie?.actor) && movie.actor.length > 0) score += 1;
+        if (Array.isArray(movie?.director) && movie.director.length > 0) score += 1;
+        score += qualityRank(movie?.quality) * 2;
+        return score;
+    };
+
+    const mergeArraysBySlug = (a: any[] = [], b: any[] = []) => {
+        const merged = [...a, ...b];
+        return Array.from(
+            new Map(
+                merged.map((item: any) => [normalizeText(item?.slug || item?.name || item?.id), item])
+            ).values()
+        ).filter(Boolean);
+    };
+
+    const mergeMovieData = (preferred: any, other: any) => ({
+        ...other,
+        ...preferred,
+        name: preferred?.name || other?.name,
+        origin_name: preferred?.origin_name || other?.origin_name,
+        slug: preferred?.slug || other?.slug,
+        _id: preferred?._id || other?._id,
+        poster_url: preferred?.poster_url || other?.poster_url,
+        thumb_url: preferred?.thumb_url || other?.thumb_url,
+        episode_current: preferred?.episode_current || other?.episode_current,
+        episode_total: preferred?.episode_total || other?.episode_total,
+        quality: preferred?.quality || other?.quality,
+        year: preferred?.year || other?.year,
+        category: mergeArraysBySlug(preferred?.category, other?.category),
+        country: mergeArraysBySlug(preferred?.country, other?.country),
+        actor: Array.from(new Set([...(preferred?.actor || []), ...(other?.actor || [])])),
+        director: Array.from(new Set([...(preferred?.director || []), ...(other?.director || [])])),
+    });
+
     // Deduplicate aggressively across mixed providers (same movie can have different slug/_id/quality)
-    const uniqueMovies = Array.from(
-        new Map(
-            (movies || []).map((movie: any) => {
-                const slugKey = normalizeText(movie.slug);
-                const nameKey = normalizeText(movie.name);
-                const originKey = normalizeText(movie.origin_name);
-                const yearKey = String(movie.year || "");
-                const posterKey = imageSignature(movie.poster_url || movie.thumb_url);
-                // Prefer identity by title + year; quality/source-specific slug should not create duplicates.
-                const titleYearKey = `${nameKey}|${originKey}|${yearKey}`.replace(/\|+/g, "|");
-                const dedupeKey = titleYearKey !== "||"
-                    ? titleYearKey
-                    : (posterKey ? `${nameKey}|${yearKey}|${posterKey}` : slugKey || `${nameKey}|${yearKey}`);
-                return [dedupeKey, movie];
-            })
-        ).values()
-    );
+    const dedupedMap = (movies || []).reduce((acc: Map<string, any>, movie: any) => {
+        const slugKey = normalizeText(movie.slug);
+        const nameKey = normalizeText(movie.name);
+        const originKey = normalizeText(movie.origin_name);
+        const yearKey = String(movie.year || "");
+        const posterKey = imageSignature(movie.poster_url || movie.thumb_url);
+
+        // Prefer identity by title + year; quality/source-specific slug should not create duplicates.
+        const titleYearKey = `${nameKey}|${originKey}|${yearKey}`.replace(/\|+/g, "|");
+        const dedupeKey = titleYearKey !== "||"
+            ? titleYearKey
+            : (posterKey ? `${nameKey}|${yearKey}|${posterKey}` : slugKey || `${nameKey}|${yearKey}`);
+
+        const current = acc.get(dedupeKey);
+        if (!current) {
+            acc.set(dedupeKey, movie);
+            return acc;
+        }
+
+        // Keep richer, higher-quality metadata when duplicates exist
+        const currentScore = metadataScore(current);
+        const candidateScore = metadataScore(movie);
+        const preferred = candidateScore >= currentScore ? movie : current;
+        const secondary = candidateScore >= currentScore ? current : movie;
+        acc.set(dedupeKey, mergeMovieData(preferred, secondary));
+        return acc;
+    }, new Map<string, any>());
+
+    const uniqueMovies = Array.from(dedupedMap.values());
 
     // Client-side filtering because search API doesn't support complex filters
     const filteredMovies = uniqueMovies.filter((movie: any) => {
