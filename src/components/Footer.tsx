@@ -37,10 +37,10 @@ export default function Footer() {
     const year = new Date().getFullYear();
 
     return (
-        <footer className="bg-[#0a0b0f] border-t border-white/5 w-full mb-16 lg:mb-0">
+        <footer className="bg-[#0a0b0f] border-t border-white/5 w-full mb-0 lg:mb-0">
 
             {/* Main grid */}
-            <div className="max-w-screen-xl mx-auto px-5 md:px-8 pt-14 pb-8">
+            <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12 pt-14 pb-4">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-10">
 
                     {/* Brand column */}
@@ -117,17 +117,7 @@ export default function Footer() {
 
                 </div>
 
-                {/* Genre tags */}
-                <div className="py-5 border-t border-white/5">
-                    <div className="flex flex-wrap gap-2">
-                        {GENRES.map(({ label, slug }) => (
-                            <Link key={slug} href={`/the-loai/${slug}`}
-                                className="px-3 py-1 rounded-full text-[12px] text-gray-600 border border-white/8 hover:text-[#F4C84A] hover:border-[#F4C84A]/40 transition-all">
-                                {label}
-                            </Link>
-                        ))}
-                    </div>
-                </div>
+
 
                 {/* Bottom */}
                 <div className="pt-5 border-t border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
