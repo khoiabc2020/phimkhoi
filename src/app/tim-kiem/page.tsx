@@ -15,10 +15,35 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         keyword.length >= 2 ? searchTMDBPerson(keyword) : Promise.resolve([])
     ]);
 
-    // Deduplicate movies by slug to avoid showing the same title multiple times
+    const normalizeText = (value: string | undefined | null) =>
+        String(value || "")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, " ")
+            .trim();
+
+    const imageSignature = (value: string | undefined | null) => {
+        const raw = String(value || "").trim().toLowerCase();
+        if (!raw) return "";
+        const noQuery = raw.split("?")[0];
+        const file = noQuery.split("/").pop() || "";
+        return file.replace(/\.(jpg|jpeg|png|webp|avif)$/i, "");
+    };
+
+    // Deduplicate aggressively across mixed providers (same movie can have different slug/_id)
     const uniqueMovies = Array.from(
         new Map(
-            (movies || []).map((movie: any) => [movie.slug || movie._id, movie])
+            (movies || []).map((movie: any) => {
+                const slugKey = normalizeText(movie.slug);
+                const nameKey = normalizeText(movie.name);
+                const originKey = normalizeText(movie.origin_name);
+                const yearKey = String(movie.year || "");
+                const posterKey = imageSignature(movie.poster_url || movie.thumb_url);
+
+                const dedupeKey = slugKey || `${nameKey}|${originKey}|${yearKey}|${posterKey}`;
+                return [dedupeKey, movie];
+            })
         ).values()
     );
 
@@ -33,7 +58,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
             if (!hasCountry) return false;
         }
         if (year && year !== "all") {
-            if (movie.year !== parseInt(year)) return false;
+            if (Number(movie.year) !== parseInt(year, 10)) return false;
         }
         return true;
     });

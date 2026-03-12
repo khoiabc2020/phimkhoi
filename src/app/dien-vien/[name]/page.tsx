@@ -37,10 +37,12 @@ export default async function ActorPage({ params, searchParams }: { params: Prom
     const { name } = await params;
     const paramsQuery = await searchParams;
     const page = typeof paramsQuery.page === 'string' ? parseInt(paramsQuery.page) : 1;
+    const view = paramsQuery.view === 'time' ? 'time' : 'movies';
     const decodedName = decodeURIComponent(name);
 
-    const [{ items, pagination }, tmdbDetails, favResult] = await Promise.all([
+    const [{ items, pagination }, timelineResult, tmdbDetails, favResult] = await Promise.all([
         getMoviesByActor(decodedName, page, 24),
+        view === 'time' ? getMoviesByActor(decodedName, 1, 200) : Promise.resolve(null),
         getActorDetailsFromTMDB(decodedName),
         checkFavoriteActor(decodedName)
     ]);
@@ -59,6 +61,39 @@ export default async function ActorPage({ params, searchParams }: { params: Prom
     const originalName = tmdbDetails?.also_known_as && tmdbDetails.also_known_as.length > 0
         ? tmdbDetails.also_known_as[0]
         : null;
+
+    // Remove cross-source duplicates before rendering (same movie can appear with different slugs)
+    const dedupeMovies = (movies: any[]) => {
+        const seen = new Set<string>();
+        return movies.filter((movie) => {
+            const key = [
+                String(movie?.origin_name || "").trim().toLowerCase(),
+                String(movie?.name || "").trim().toLowerCase(),
+                String(movie?.year || ""),
+                String(movie?.poster_url || movie?.thumb_url || "").trim().toLowerCase(),
+            ].join("|");
+            if (!key || seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
+    };
+
+    const pagedItems = dedupeMovies(items || []);
+    const timelineItems = dedupeMovies(timelineResult?.items || items || []).sort(
+        (a, b) => (Number(b?.year) || 0) - (Number(a?.year) || 0)
+    );
+
+    const timelineByYear = timelineItems.reduce((acc, movie) => {
+        const year = Number(movie?.year) || 0;
+        if (!year) return acc;
+        if (!acc[year]) acc[year] = [];
+        acc[year].push(movie);
+        return acc;
+    }, {} as Record<number, any[]>);
+
+    const timelineYears = Object.keys(timelineByYear)
+        .map((y) => Number(y))
+        .sort((a, b) => b - a);
 
     return (
         <main className="min-h-screen pt-20 md:pt-24 pb-12 bg-[#0b0b0b]">
@@ -157,27 +192,39 @@ export default async function ActorPage({ params, searchParams }: { params: Prom
 
                             {/* Tabs */}
                             <div className="flex items-center gap-1 mb-6 border-b border-white/[0.08]">
-                                <button className="flex items-center gap-2 px-6 py-3 text-sm font-semibold border-b-2 text-white border-white transition-all">
-                                    <Grid className="w-4 h-4 text-yellow-400" />
+                                <Link
+                                    href={`/dien-vien/${name}`}
+                                    className={`flex items-center gap-2 px-6 py-3 text-sm font-semibold border-b-2 transition-all ${view === 'movies'
+                                        ? 'text-white border-white'
+                                        : 'text-gray-500 border-transparent hover:text-white'
+                                        }`}
+                                >
+                                    <Grid className={`w-4 h-4 ${view === 'movies' ? 'text-yellow-400' : ''}`} />
                                     Phim
-                                </button>
-                                <button className="flex items-center gap-2 px-6 py-3 text-sm font-semibold text-gray-500 border-b-2 border-transparent hover:text-white transition-all cursor-not-allowed">
-                                    <Clock className="w-4 h-4" />
+                                </Link>
+                                <Link
+                                    href={`/dien-vien/${name}?view=time`}
+                                    className={`flex items-center gap-2 px-6 py-3 text-sm font-semibold border-b-2 transition-all ${view === 'time'
+                                        ? 'text-white border-white'
+                                        : 'text-gray-500 border-transparent hover:text-white'
+                                        }`}
+                                >
+                                    <Clock className={`w-4 h-4 ${view === 'time' ? 'text-yellow-400' : ''}`} />
                                     Thời gian
-                                </button>
+                                </Link>
                             </div>
 
-                            {/* Movie Grid */}
-                            {items.length === 0 ? (
+                            {/* Movie Grid / Timeline */}
+                            {view === 'movies' && pagedItems.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-16 text-center bg-white/5 rounded-lg border border-white/10">
                                     <AlertCircle className="w-16 h-16 text-gray-500 mb-4" />
                                     <h2 className="text-xl font-bold text-white mb-2">Chưa có dữ liệu phim</h2>
                                     <p className="text-gray-400">Hệ thống đang cập nhật danh sách phim của {decodedName}.</p>
                                 </div>
-                            ) : (
+                            ) : view === 'movies' ? (
                                 <>
                                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
-                                        {items.map((movie: any) => (
+                                        {pagedItems.map((movie: any) => (
                                             <MovieCard key={movie._id || movie.slug} movie={movie} />
                                         ))}
                                     </div>
@@ -193,6 +240,30 @@ export default async function ActorPage({ params, searchParams }: { params: Prom
                                         </div>
                                     )}
                                 </>
+                            ) : timelineYears.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center py-16 text-center bg-white/5 rounded-lg border border-white/10">
+                                    <AlertCircle className="w-16 h-16 text-gray-500 mb-4" />
+                                    <h2 className="text-xl font-bold text-white mb-2">Chưa có dữ liệu theo năm</h2>
+                                    <p className="text-gray-400">Không có mốc thời gian phim cho {decodedName}.</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-10">
+                                    {timelineYears.map((year) => (
+                                        <div key={year} className="grid grid-cols-[auto_1fr] gap-4 sm:gap-6">
+                                            <div className="pt-1">
+                                                <div className="text-2xl font-black text-emerald-400 leading-none">{year}</div>
+                                            </div>
+                                            <div className="relative border-l border-white/10 pl-4 sm:pl-6">
+                                                <div className="absolute left-0 top-2 w-2 h-2 -translate-x-1/2 rounded-full bg-[#F4C84A]" />
+                                                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                                                    {timelineByYear[year].map((movie: any) => (
+                                                        <MovieCard key={`${year}-${movie._id || movie.slug || movie.name}`} movie={movie} />
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             )}
                         </div>
 
