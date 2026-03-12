@@ -18,6 +18,7 @@ import { isFavorite } from "@/app/actions/favorites";
 import { isInWatchlist } from "@/app/actions/watchlist";
 import WatchlistButton from "@/components/WatchlistButton";
 import ShareButton from "@/components/ShareButton";
+import { getTMDBEpisodeImages, TMDBEpisodeMeta } from "@/app/actions/tmdb";
 
 // Revalidate every 5 minutes (was 60s). ISR means first visitor triggers refresh, others get cache.
 export const revalidate = 300;
@@ -71,7 +72,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     }
 
     // ==> TỐI ƯU: Fetch song song tất cả dữ liệu phụ (TMDB + Related + isFavorite + isInWatchlist)
-    const [tmdbSearch, relatedMoviesRaw, isFavResult, isWatchlistResult] = await Promise.allSettled([
+    const [tmdbSearch, relatedMoviesRaw, isFavResult, isWatchlistResult, tmdbEpisodeImagesRes] = await Promise.allSettled([
         searchTMDBMovie(
             movie?.origin_name || movie?.name,
             movie?.year ? parseInt(movie.year.toString().split("-")[0]) : undefined,
@@ -83,6 +84,11 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
             : Promise.resolve(null),
         isFavorite(movie?._id),
         isInWatchlist(movie?.slug),
+        getTMDBEpisodeImages(
+            movie?.origin_name || movie?.name,
+            movie?.year ? parseInt(movie.year.toString().split("-")[0]) : undefined,
+            { originalName: movie?.origin_name, countrySlug: movie?.country?.[0]?.slug }
+        ),
     ]);
 
     const tmdbSearchResult = tmdbSearch.status === 'fulfilled' ? tmdbSearch.value : null;
@@ -92,6 +98,57 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
         : [];
     const { isFavorite: isFav } = isFavResult.status === 'fulfilled' ? isFavResult.value : { isFavorite: false };
     const inWatchlist = isWatchlistResult.status === 'fulfilled' ? isWatchlistResult.value.isInWatchlist : false;
+    const episodeImageMap: Record<string, TMDBEpisodeMeta> = tmdbEpisodeImagesRes.status === "fulfilled" ? (tmdbEpisodeImagesRes.value || {}) : {};
+
+    const extractEpisodeNumber = (value: string) => {
+        const match = String(value || "").match(/(\d+)/);
+        return match ? match[1] : null;
+    };
+    const buildEpisodeKeyCandidates = (ep: any, indexInServer: number): string[] => {
+        const seen = new Set<string>();
+        const pushKey = (raw: unknown) => {
+            const val = String(raw ?? "").trim();
+            if (!val || seen.has(val)) return;
+            seen.add(val);
+        };
+
+        const fromName = extractEpisodeNumber(ep?.name);
+        const fromSlug = extractEpisodeNumber(ep?.slug);
+        const parsed = Number(fromName || fromSlug);
+
+        if (fromName) pushKey(fromName);
+        if (fromSlug) pushKey(fromSlug);
+        if (Number.isFinite(parsed) && parsed > 0) {
+            pushKey(String(parsed));
+            pushKey(String(parsed).padStart(2, "0"));
+            pushKey(String(parsed).padStart(3, "0"));
+        }
+
+        const byIndex = indexInServer + 1;
+        pushKey(String(byIndex));
+        pushKey(String(byIndex).padStart(2, "0"));
+
+        return Array.from(seen);
+    };
+
+    const episodeThumbnails: Record<string, string> = {};
+    const episodeMetadata: Record<string, TMDBEpisodeMeta> = {};
+    (episodes || []).forEach((serverItem: any) => {
+        (serverItem?.server_data || []).forEach((ep: any, indexInServer: number) => {
+            if (!ep?.slug) return;
+            const candidates = buildEpisodeKeyCandidates(ep, indexInServer);
+            const matchedData = candidates
+                .map((key) => episodeImageMap[key])
+                .find(Boolean);
+
+            if (matchedData?.image) {
+                episodeThumbnails[ep.slug] = matchedData.image;
+            }
+            if (matchedData) {
+                episodeMetadata[ep.slug] = matchedData;
+            }
+        });
+    });
 
     // Always use source images (Ophim/KKPhim) for poster & backdrop — TMDB images may be wrong when the search fails
     const sourceImage = getImageUrl(movie?.poster_url || movie?.thumb_url);
@@ -253,6 +310,8 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             episodes={episodes}
                             slug={slug}
                             tmdbDetails={tmdbDetails}
+                            episodeThumbnails={episodeThumbnails}
+                            episodeMetadata={episodeMetadata}
                         />
                         {/* Comment Section below tabs */}
                         <div className="mt-8 sm:mt-12">

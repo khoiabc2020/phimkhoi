@@ -105,9 +105,9 @@ export default function WatchEpisodeSection({
     };
 
     return (
-        <div className="bg-[#020617]/90 rounded-[16px] border border-slate-700/40 overflow-hidden mb-6 sm:mb-8 mt-4 mx-3 sm:mx-4 md:mx-0 shadow-2xl">
+        <div className="bg-[#11131A] rounded-[16px] border border-white/[0.08] overflow-hidden mb-6 sm:mb-8 mt-4 mx-3 sm:mx-4 md:mx-0 shadow-2xl">
             {/* Header: DANH SÁCH TẬP */}
-            <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-700/40 bg-[#0b1220]/80">
+            <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-4 sm:py-5 border-b border-white/[0.08] bg-white/[0.02]">
                 <div className="flex items-center gap-2">
                     <List className="w-[18px] h-[18px] text-[#F4C84A]" />
                     <h3 className="text-[14px] font-bold text-white uppercase tracking-wider">
@@ -134,7 +134,7 @@ export default function WatchEpisodeSection({
 
                 {/* Language Tabs Row */}
                 {activeLanguageGroups.length > 0 && (
-                    <div className="flex items-center gap-3 sm:gap-6 border-b border-slate-700/35 mb-3 sm:mb-5 overflow-x-auto no-scrollbar pb-1">
+                    <div className="flex items-center gap-3 sm:gap-6 border-b border-white/[0.06] mb-3 sm:mb-5 overflow-x-auto no-scrollbar pb-1">
                         {activeLanguageGroups.map((lang) => {
                             const isActive = activeLangTab === lang;
                             const Icon = lang === "Lồng Tiếng" ? Mic : lang === "Thuyết Minh" ? Volume2 : Subtitles;
@@ -152,10 +152,10 @@ export default function WatchEpisodeSection({
                                     }}
                                     className={cn(
                                         "flex items-center gap-1.5 sm:gap-2 pb-2 sm:pb-3 text-[12px] sm:text-[14px] font-bold transition-all relative whitespace-nowrap uppercase tracking-wider",
-                                        isActive ? "text-[#F4C84A]" : "text-slate-400 hover:text-slate-200"
+                                        isActive ? "text-[#F4C84A]" : "text-gray-400 hover:text-gray-200"
                                     )}
                                 >
-                                    <Icon className={cn("w-[14px] h-[14px] sm:w-[16px] sm:h-[16px]", isActive ? "text-[#F4C84A]" : "text-slate-500")} />
+                                    <Icon className={cn("w-[14px] h-[14px] sm:w-[16px] sm:h-[16px]", isActive ? "text-[#F4C84A]" : "text-gray-500")} />
                                     {lang}
                                     {isActive && (
                                         <span className="absolute bottom-[-1px] left-0 right-0 h-[3px] rounded-t-full bg-[#F4C84A] shadow-[0_0_12px_#F4C84A99]" />
@@ -168,8 +168,8 @@ export default function WatchEpisodeSection({
 
                 {/* Server selector - compact inline on all sizes */}
                 <div className="flex flex-row items-center gap-2 sm:gap-3 mb-3 sm:mb-6 flex-wrap">
-                    <div className="flex items-center gap-1.5 text-slate-400 text-[11px] sm:text-[12px] font-bold uppercase tracking-widest shrink-0">
-                        <Database className="w-[13px] h-[13px] sm:w-[15px] sm:h-[15px] text-slate-500" strokeWidth={2.5} />
+                    <div className="flex items-center gap-1.5 text-gray-400 text-[11px] sm:text-[12px] font-bold uppercase tracking-widest shrink-0">
+                        <Database className="w-[13px] h-[13px] sm:w-[15px] sm:h-[15px] text-gray-500" strokeWidth={2.5} />
                         Máy Chủ:
                     </div>
 
@@ -193,7 +193,7 @@ export default function WatchEpisodeSection({
                                                 "h-[32px] sm:h-[38px] px-3 sm:px-5 rounded-full text-[12px] sm:text-[13px] font-bold transition-all duration-300 border flex items-center justify-center gap-2 shadow-sm",
                                                 isServerActive
                                                     ? "bg-[#F4C84A] border-[#F4C84A] text-[#08090C] shadow-[0_4px_14px_#F4C84A40] scale-105 transform"
-                                                    : "bg-slate-900/60 border-slate-700/50 text-slate-300 hover:text-white hover:border-slate-500/70 hover:bg-slate-800/70 active:scale-95"
+                                                    : "bg-white/[0.04] border-white/[0.10] text-gray-300 hover:text-white hover:border-white/[0.2] hover:bg-white/[0.08] active:scale-95"
                                             )}
                                         >
                                             <span className="truncate max-w-[120px] sm:max-w-[150px]">{displayName}</span>
@@ -204,10 +204,10 @@ export default function WatchEpisodeSection({
                                 });
                             })()
                         ) : (
-                            <button className="h-[32px] sm:h-[38px] px-3 sm:px-5 rounded-full text-[12px] sm:text-[13px] font-bold bg-slate-900/60 border border-slate-700/50 text-slate-300 shadow-sm flex items-center justify-center gap-2">
+                            <button className="h-[32px] sm:h-[38px] px-3 sm:px-5 rounded-full text-[12px] sm:text-[13px] font-bold bg-white/[0.04] border border-white/[0.10] text-gray-300 shadow-sm flex items-center justify-center gap-2">
                                 {serverName}
                                 <span className="w-[2px] h-3 bg-white/10 rounded-full" />
-                                <span className="font-semibold text-slate-400">{episodes.length}</span>
+                                <span className="font-semibold text-gray-400">{episodes.length}</span>
                             </button>
                         )}
                     </div>
@@ -217,7 +217,7 @@ export default function WatchEpisodeSection({
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
                     <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
                         {/* Subtitle count */}
-                        <div className="text-[13px] sm:text-[14px] text-slate-300">
+                        <div className="text-[13px] sm:text-[14px] text-gray-300">
                             Danh sách tập ( <span className="text-[#E4E4E5] font-bold">{episodes.length}</span> / <span className="text-[#F4C84A] font-bold">{episodes.length}</span> )
                         </div>
 
@@ -225,7 +225,7 @@ export default function WatchEpisodeSection({
                         {episodes.length > EPISODES_PER_CHUNK && (
                             <div className="relative">
                                 <select
-                                    className="appearance-none bg-[#0b1220] border border-slate-600/60 text-slate-100 font-semibold text-[13px] rounded-lg pl-4 pr-10 py-2 focus:outline-none focus:border-[#F4C84A]/50 transition-colors cursor-pointer shadow-sm"
+                                    className="appearance-none bg-[#171B24] border border-white/[0.10] text-gray-100 font-semibold text-[13px] rounded-lg pl-4 pr-10 py-2 focus:outline-none focus:border-[#F4C84A]/50 transition-colors cursor-pointer shadow-sm"
                                     value={currentChunk}
                                     onChange={(e) => setCurrentChunk(Number(e.target.value))}
                                 >
@@ -233,20 +233,20 @@ export default function WatchEpisodeSection({
                                         const start = i * EPISODES_PER_CHUNK + 1;
                                         const end = Math.min((i + 1) * EPISODES_PER_CHUNK, episodes.length);
                                         return (
-                                            <option key={i} value={i} className="bg-[#0b1220] text-white">
+                                            <option key={i} value={i} className="bg-[#171B24] text-white">
                                                 Tập {start} - {end}
                                             </option>
                                         );
                                     })}
                                 </select>
-                                <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 pointer-events-none" />
+                                <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 pointer-events-none" />
                             </div>
                         )}
                     </div>
 
                     {/* Toggle Collapse */}
                     <div className="flex items-center gap-3 shrink-0">
-                        <span className="text-[12px] sm:text-[13px] text-slate-300 font-medium">Hiện ảnh</span>
+                        <span className="text-[12px] sm:text-[13px] text-gray-300 font-medium">Hiện ảnh</span>
                         <button
                             type="button"
                             role="switch"
@@ -254,7 +254,7 @@ export default function WatchEpisodeSection({
                             onClick={() => setIsCollapsed(!isCollapsed)}
                             className={cn(
                                 "w-10 h-6 rounded-full transition-colors relative border border-white/10",
-                                isCollapsed ? "bg-slate-800/90" : "bg-slate-600/90"
+                                isCollapsed ? "bg-white/15" : "bg-white/30"
                             )}
                         >
                             <span
@@ -275,7 +275,6 @@ export default function WatchEpisodeSection({
                             const displayNum = getEpisodeNumber(ep.name) || ep.name;
                             const thumb = episodeThumbnails?.[ep.slug];
                             const meta = episodeMetadata?.[ep.slug];
-                            const episodeTitle = meta?.title || `Tập ${displayNum}`;
                             const episodeOverview = meta?.overview || "";
                             const dateText = meta?.airDate ? new Date(meta.airDate).toLocaleDateString("vi-VN") : "";
                             const runtimeText = meta?.runtime ? `${meta.runtime}m` : "";
@@ -285,10 +284,10 @@ export default function WatchEpisodeSection({
                                     key={ep.slug}
                                     href={`/xem-phim/${movieSlug}/${ep.slug}?server=${safeIndex}`}
                                     className={cn(
-                                        "group rounded-[12px] overflow-hidden border transition-all duration-200 touch-manipulation bg-[#0b1220]",
+                                        "group rounded-[12px] overflow-hidden border transition-all duration-200 touch-manipulation bg-[#151924]",
                                         isActive
                                             ? "border-[#F4C84A]/70 ring-1 ring-[#F4C84A]/45 shadow-[0_0_18px_#F4C84A33]"
-                                            : "border-slate-700/45 hover:border-slate-400/60 hover:-translate-y-[1px]"
+                                            : "border-white/[0.08] hover:border-white/[0.22] hover:-translate-y-[1px]"
                                     )}
                                 >
                                     <div className="relative aspect-video overflow-hidden">
@@ -307,14 +306,11 @@ export default function WatchEpisodeSection({
                                     </div>
 
                                     <div className="px-3 py-2.5">
-                                        <p className="text-[13px] font-bold text-white line-clamp-1">{episodeTitle}</p>
-                                        {episodeOverview && (
-                                            <p className="text-[12px] text-slate-300 line-clamp-2 mt-1 leading-relaxed">
-                                                {episodeOverview}
-                                            </p>
-                                        )}
+                                        <p className="text-[12px] text-gray-200 line-clamp-2 leading-relaxed min-h-[34px]">
+                                            {episodeOverview || "Nội dung tập đang được cập nhật."}
+                                        </p>
                                         {(dateText || runtimeText) && (
-                                            <p className="text-[11px] text-slate-400 mt-1">
+                                            <p className="text-[11px] text-gray-400 mt-1">
                                                 {dateText}{dateText && runtimeText ? " · " : ""}{runtimeText}
                                             </p>
                                         )}
@@ -342,7 +338,7 @@ export default function WatchEpisodeSection({
                                         "h-[40px] sm:h-[44px] rounded-[12px] flex items-center justify-center gap-1.5 text-[13px] sm:text-[14px] font-semibold transition-all duration-200 border backdrop-blur-md touch-manipulation",
                                         isActive
                                             ? "bg-[#F4C84A]/[0.15] border-[#F4C84A]/60 text-[#F4C84A] shadow-[0_0_16px_#F4C84A1F]"
-                                            : "bg-slate-900/55 border-slate-700/40 text-slate-300 hover:text-slate-100 hover:bg-slate-800/60 hover:border-slate-500/70 hover:-translate-y-[1px] active:scale-95"
+                                            : "bg-white/[0.04] border-white/[0.08] text-gray-300 hover:text-white hover:bg-white/[0.08] hover:border-white/[0.16] hover:-translate-y-[1px] active:scale-95"
                                     )}
                                 >
                                     {isActive && <span className="w-1.5 h-1.5 rounded-full bg-[#F4C84A] flex-shrink-0" />}

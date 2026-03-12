@@ -181,7 +181,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
 
 
                             {/* Movie description */}
-                            <div className="rounded-lg border border-slate-700/35 overflow-hidden bg-[#020617]/80">
+                            <div className="rounded-lg border border-white/[0.08] overflow-hidden bg-[#11131A]">
                                 <div className="px-6 pt-5 pb-4 border-b border-white/[0.04]">
                                     <h3 className="text-white font-bold text-[15px] flex items-center gap-2 tracking-wide">
                                         <Info className="w-4 h-4 text-[#F4C84A]" /> Thông tin mở rộng
@@ -193,7 +193,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
                                             <Image src={getImageUrl(movie.poster_url || movie.thumb_url)} alt={movie.name} fill className="object-cover" />
                                         </div>
                                         <div className="flex-1">
-                                            <p className="text-gray-400 text-sm leading-relaxed mb-4" style={{ lineHeight: 1.75 }}>
+                                            <p className="text-gray-300 text-sm leading-relaxed mb-4" style={{ lineHeight: 1.75 }}>
                                                 {(movie.content || "").replace(/<[^>]*>/g, "")}
                                             </p>
                                             {/* Metadata pills */}
@@ -204,20 +204,20 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
                                                     { label: "Thời lượng", value: movie.time },
                                                     { label: "Ngôn ngữ", value: movie.lang || "Vietsub" },
                                                 ].filter((i) => i.value).map((item) => (
-                                                    <span key={item.label} className="px-2.5 py-1 rounded-full text-gray-300 border border-white/[0.08]"
-                                                        style={{ background: "rgba(255,255,255,0.05)" }}>
-                                                        <span className="text-gray-500">{item.label}: </span>{item.value}
+                                                    <span key={item.label} className="px-2.5 py-1 rounded-full text-gray-200 border border-white/[0.10]"
+                                                        style={{ background: "rgba(255,255,255,0.06)" }}>
+                                                        <span className="text-gray-400">{item.label}: </span>{item.value}
                                                     </span>
                                                 ))}
                                             </div>
                                             {cast.length > 0 && (
                                                 <div>
-                                                    <h4 className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2">Diễn viên</h4>
+                                                    <h4 className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-2">Diễn viên</h4>
                                                     <div className="flex flex-wrap gap-1.5">
                                                         {cast.slice(0, 10).map((actor: any) => (
                                                             <span key={actor.id}
-                                                                className="text-xs px-2.5 py-1 rounded-full text-gray-300 border border-white/[0.08]"
-                                                                style={{ background: "rgba(255,255,255,0.05)" }}>
+                                                                className="text-xs px-2.5 py-1 rounded-full text-gray-200 border border-white/[0.10]"
+                                                                style={{ background: "rgba(255,255,255,0.06)" }}>
                                                                 {actor.name}
                                                             </span>
                                                         ))}
@@ -230,7 +230,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
                             </div>
 
                             {/* Comments */}
-                            <div className="rounded-lg border border-slate-700/35 overflow-hidden bg-[#020617]/80">
+                            <div className="rounded-lg border border-white/[0.08] overflow-hidden bg-[#11131A]">
                                 <div className="px-6 pt-5 pb-4 border-b border-white/[0.04]">
                                     <h3 className="text-white font-bold text-[15px] flex items-center gap-2 tracking-wide">
                                         <Users className="w-4 h-4 text-[#F4C84A]" /> Bình luận
@@ -246,15 +246,15 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
                         <div className="lg:col-span-3 space-y-5">
                             {/* Genre pills */}
                             {movie.category && movie.category.length > 0 && (
-                                <div className="rounded-lg border border-slate-700/35 overflow-hidden bg-[#020617]/80">
+                                <div className="rounded-lg border border-white/[0.08] overflow-hidden bg-[#11131A]">
                                     <div className="px-5 pt-5 pb-4 border-b border-white/[0.04]">
                                         <h3 className="text-white font-bold text-[15px] tracking-wide">Thể loại</h3>
                                     </div>
                                     <div className="p-5 flex flex-wrap gap-2">
                                         {movie.category.map((c: { id: React.Key | null | undefined; slug: string; name: string }) => (
                                             <Link key={c.id} href={`/the-loai/${c.slug}`}
-                                                className="text-xs px-3 py-1.5 rounded-full text-gray-300 border border-white/[0.08] hover:border-yellow-400/40 hover:text-yellow-300 transition-colors"
-                                                style={{ background: "rgba(255,255,255,0.05)" }}>
+                                                className="text-xs px-3 py-1.5 rounded-full text-gray-200 border border-white/[0.10] hover:border-yellow-400/40 hover:text-yellow-300 transition-colors"
+                                                style={{ background: "rgba(255,255,255,0.06)" }}>
                                                 {c.name}
                                             </Link>
                                         ))}
@@ -264,7 +264,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
 
                             {/* Related movies */}
                             {movie.category?.[0]?.slug && (
-                                <div className="rounded-lg border border-slate-700/35 overflow-hidden bg-[#020617]/80">
+                                <div className="rounded-lg border border-white/[0.08] overflow-hidden bg-[#11131A]">
                                     <div className="px-5 pt-5 pb-4 border-b border-white/[0.04] flex items-center gap-2">
                                         <div className="w-1.5 h-4 rounded-full bg-[#F4C84A]" />
                                         <h3 className="text-white font-bold text-[15px] tracking-wide">Phim đề xuất</h3>

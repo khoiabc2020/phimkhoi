@@ -121,18 +121,18 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
     };
 
     return (
-        <div className="bg-[#020617]/75 p-4 md:p-6 rounded-lg border border-slate-700/35 scroll-mt-24">
+        <div className="bg-[#11131A] p-4 md:p-6 rounded-lg border border-white/[0.08] scroll-mt-24">
             <div className="flex items-center gap-2 mb-6">
                 <MessageCircle className="w-6 h-6 text-[#fbbf24] fill-[#fbbf24]/20" />
                 <h3 className="text-xl font-bold text-white tracking-wide">
-                    Bình luận <span className="text-slate-400 text-sm font-normal">({total})</span>
+                    Bình luận <span className="text-gray-400 text-sm font-normal">({total})</span>
                 </h3>
             </div>
 
             {/* Comment Form */}
             {session ? (
                 <form onSubmit={handleSubmit} className="mb-8">
-                    <div className="bg-[#0b1220]/85 rounded-lg border border-slate-700/35 p-4 relative">
+                    <div className="bg-[#171B24] rounded-lg border border-white/[0.08] p-4 relative">
                         <div className="flex gap-4">
                             <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-800 flex-shrink-0">
                                 {session.user?.image ? (
@@ -148,10 +148,10 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                                     value={newComment}
                                     onChange={(e) => setNewComment(e.target.value)}
                                     placeholder="Viết bình luận của bạn..."
-                                    className="w-full bg-transparent border-none text-white focus:outline-none min-h-[60px] text-[15px] resize-none placeholder:text-slate-400"
+                                    className="w-full bg-transparent border-none text-white focus:outline-none min-h-[60px] text-[15px] resize-none placeholder:text-gray-400"
                                     maxLength={1000}
                                 />
-                                <div className="absolute right-0 bottom-2 text-slate-400 hover:text-white cursor-pointer transition-colors">
+                                <div className="absolute right-0 bottom-2 text-gray-400 hover:text-white cursor-pointer transition-colors">
                                     <Smile className="w-5 h-5" />
                                 </div>
                             </div>
@@ -169,7 +169,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                     </div>
                 </form>
             ) : (
-                <div className="bg-slate-900/55 text-slate-300 p-4 rounded-lg mb-8 text-center border border-slate-700/45 text-sm">
+                <div className="bg-white/[0.04] text-gray-300 p-4 rounded-lg mb-8 text-center border border-white/[0.10] text-sm">
                     Vui lòng <a href="/login" className="text-[#F4C84A] hover:underline font-bold">đăng nhập</a> để bình luận.
                 </div>
             )}
@@ -196,7 +196,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                                 <div className="flex flex-col mb-1.5">
                                     <div className="flex items-center gap-2">
                                         <h4 className="font-bold text-white text-[15px]">{comment.userName}</h4>
-                                        <span className="text-[13px] text-slate-400 font-medium">
+                                        <span className="text-[13px] text-gray-400 font-medium">
                                             {formatTimeAgo(comment.createdAt)}
                                         </span>
                                         {/* Dynamic Episode Tag */}
@@ -210,7 +210,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                                         {comment.userRole || "Thành viên"}
                                     </div>
                                 </div>
-                                <p className="text-slate-100 text-[15px] leading-relaxed mb-3 whitespace-pre-wrap">{comment.content}</p>
+                                <p className="text-gray-100 text-[15px] leading-relaxed mb-3 whitespace-pre-wrap">{comment.content}</p>
 
                                 {/* Actions */}
                                 <div className="flex items-center gap-5 touch-manipulation">
@@ -219,7 +219,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                                         disabled={!session}
                                         className={`flex items-center gap-1.5 text-[13px] font-medium transition-colors ${session && comment.likedBy.includes(session.user?.id as string)
                                             ? "text-[#F4C84A]"
-                                            : "text-slate-300 hover:text-white"
+                                            : "text-gray-300 hover:text-white"
                                             } disabled:opacity-50`}
                                     >
                                         <ThumbsUp className="w-4 h-4" />
@@ -229,13 +229,13 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                                         disabled={!session}
                                         className={`flex items-center gap-1.5 text-[13px] font-medium transition-colors ${session && comment.dislikedBy.includes(session.user?.id as string)
                                             ? "text-red-400"
-                                            : "text-slate-300 hover:text-white"
+                                            : "text-gray-300 hover:text-white"
                                             } disabled:opacity-50`}
                                     >
                                         <ThumbsDown className="w-4 h-4" />
                                     </button>
 
-                                    <button className="flex items-center gap-1.5 text-[13px] text-slate-300 font-medium hover:text-white transition-colors">
+                                    <button className="flex items-center gap-1.5 text-[13px] text-gray-300 font-medium hover:text-white transition-colors">
                                         <Reply className="w-4 h-4" />
                                         <span>Trả lời</span>
                                     </button>
@@ -243,7 +243,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                                     {session && comment.userId === session.user?.id && (
                                         <button
                                             onClick={() => handleDelete(comment._id)}
-                                            className="flex items-center gap-1.5 text-[12px] text-slate-400 hover:text-red-400 transition-colors ml-2"
+                                            className="flex items-center gap-1.5 text-[12px] text-gray-400 hover:text-red-400 transition-colors ml-2"
                                         >
                                             <Trash2 className="w-3.5 h-3.5" />
                                             <span className="hidden md:inline">Xóa</span>
@@ -254,7 +254,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                         </div>
                     ))}
                     {comments.length === 0 && (
-                        <p className="text-slate-400 text-center py-8">Chưa có bình luận nào. Hãy là người đầu tiên!</p>
+                        <p className="text-gray-400 text-center py-8">Chưa có bình luận nào. Hãy là người đầu tiên!</p>
                     )}
                 </div>
             )}
