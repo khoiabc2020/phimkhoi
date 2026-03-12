@@ -368,7 +368,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         {/* Title — key triggers re-animation on slide change */}
                         <h1
                             key={`title-${index}`}
-                            className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black text-white leading-[1.05] tracking-tight drop-shadow-xl line-clamp-2 animate-hero-in"
+                            className="font-display text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black text-white leading-[1.12] tracking-[-0.015em] drop-shadow-xl line-clamp-2 pt-1 animate-hero-in"
                             title={decodeHtml(movie.name)}
                         >
                             {decodeHtml(movie.name)}

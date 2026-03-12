@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Be_Vietnam_Pro } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
 import Script from "next/script";
@@ -12,6 +12,12 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const beVietnamPro = Be_Vietnam_Pro({
+  variable: "--font-display",
+  subsets: ["latin", "vietnamese"],
+  weight: ["700", "800", "900"],
 });
 
 export const metadata: Metadata = {
@@ -66,7 +72,7 @@ export default async function RootLayout({
         <link rel="dns-prefetch" href="https://img.youtube.com" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased pb-20 lg:pb-0`}
+        className={`${geistSans.variable} ${geistMono.variable} ${beVietnamPro.variable} antialiased pb-20 lg:pb-0`}
       >
         <Providers>
           <Header categories={categories} countries={countries} />

@@ -157,7 +157,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             {movie?.quality || "FHD"}
                         </span>
                     </div>
-                    <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight drop-shadow-2xl">{movie?.name}</h1>
+                    <h1 className="font-display text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black text-white leading-[1.12] tracking-[-0.015em] pt-1 drop-shadow-2xl">{movie?.name}</h1>
                     <h2 className="hidden sm:block text-base md:text-2xl text-gray-300 font-medium tracking-wide drop-shadow-md">{movie?.origin_name}</h2>
 
                     {(() => {

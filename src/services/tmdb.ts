@@ -190,6 +190,19 @@ export const getTMDBDetails = async (tmdbId: number, type: 'movie' | 'tv' = 'mov
     }
 };
 
+export const getTMDBSeasonDetails = async (tmdbId: number, seasonNumber: number) => {
+    try {
+        if (!TMDB_API_KEY) return null;
+        const url = `${TMDB_API_URL}/tv/${tmdbId}/season/${seasonNumber}?api_key=${TMDB_API_KEY}&language=vi-VN`;
+        const res = await fetch(url, { next: { revalidate: 86400 } });
+        if (!res.ok) return null;
+        return await res.json();
+    } catch (error) {
+        console.error("TMDB Season Details Error:", error);
+        return null;
+    }
+};
+
 // ... existing code ...
 export const getTMDBImage = (path: string, size: "w342" | "w500" | "w780" | "w1280" | "original" = "w500") => {
     if (!path) return "";

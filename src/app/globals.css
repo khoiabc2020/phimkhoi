@@ -16,6 +16,7 @@
 
   --font-sans: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   --font-mono: "SF Mono", "Fira Code", monospace;
+  --font-display: "Be Vietnam Pro", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 
   /* Custom Animations */
   --animate-float: float 6s ease-in-out infinite;
@@ -188,6 +189,11 @@ h2 {
 
 /* iOS 26 Glassmorphism Utilities — Vibrant and ultra-smooth */
 @layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+    font-feature-settings: "ss01" on, "ss02" on;
+  }
+
   .glass {
     /* Performance-first: no heavy blur, chỉ hơi trong nhẹ */
     @apply bg-black/70 border-b border-white/[0.08] shadow-[0_10px_28px_0_#00000055];

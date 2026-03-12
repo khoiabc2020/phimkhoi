@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { ChevronDown, List, ChevronLeft, Database, Mic, Subtitles, Volume2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, getImageUrl } from "@/lib/utils";
 import { parseServerLabel } from "@/services/api";
 
 interface Episode {
@@ -20,6 +20,7 @@ interface WatchEpisodeSectionProps {
     movieSlug: string;
     movieName: string;
     servers: Server[];
+    episodeThumbnails?: Record<string, string>;
     currentEpisodeSlug: string;
     activeServerName: string;
     onServerChange: (serverName: string) => void;
@@ -29,6 +30,7 @@ export default function WatchEpisodeSection({
     movieSlug,
     movieName,
     servers,
+    episodeThumbnails = {},
     currentEpisodeSlug,
     activeServerName,
     onServerChange,
@@ -93,6 +95,12 @@ export default function WatchEpisodeSection({
 
 
     const serverName = activeServerName || servers[0]?.server_name || "VIP";
+
+    const pageEpisodes = episodes.slice(currentChunk * EPISODES_PER_CHUNK, (currentChunk + 1) * EPISODES_PER_CHUNK);
+    const getEpisodeNumber = (name: string) => {
+        const match = String(name || "").match(/(\d+)/);
+        return match ? match[1] : null;
+    };
 
     return (
         <div className="bg-[#08090C] rounded-[16px] border border-white/[0.05] overflow-hidden mb-6 sm:mb-8 mt-4 mx-3 sm:mx-4 md:mx-0 shadow-2xl">
@@ -258,15 +266,53 @@ export default function WatchEpisodeSection({
                 </div>
 
                 {/* Episode grid */}
-                {!isCollapsed && (
-                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-3 max-h-[360px] sm:max-h-[440px] overflow-y-auto custom-scrollbar pr-1 sm:pr-2 [contain:layout_paint]">
-                        {episodes.slice(currentChunk * EPISODES_PER_CHUNK, (currentChunk + 1) * EPISODES_PER_CHUNK).map((ep) => {
+                {!isCollapsed ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3 max-h-[520px] overflow-y-auto custom-scrollbar pr-1 sm:pr-2 [contain:layout_paint]">
+                        {pageEpisodes.map((ep) => {
                             const isActive = ep.slug === currentEpisodeSlug;
+                            const displayNum = getEpisodeNumber(ep.name) || ep.name;
+                            const thumb = episodeThumbnails?.[ep.slug];
 
-                            // Extract just the number if it's "Tập X" for a cleaner look
-                            const match = ep.name.match(/Tập\s+(\d+)/i);
-                            const displayNum = match ? match[1].padStart(2, '0') : (/^\d+$/.test(ep.name) ? ep.name.padStart(2, '0') : ep.name);
+                            return (
+                                <Link
+                                    key={ep.slug}
+                                    href={`/xem-phim/${movieSlug}/${ep.slug}?server=${safeIndex}`}
+                                    className={cn(
+                                        "group relative aspect-video rounded-[12px] overflow-hidden border transition-all duration-200 touch-manipulation",
+                                        isActive
+                                            ? "border-[#F4C84A]/70 ring-1 ring-[#F4C84A]/45 shadow-[0_0_18px_#F4C84A33]"
+                                            : "border-white/[0.07] hover:border-white/[0.2] hover:-translate-y-[1px]"
+                                    )}
+                                >
+                                    {thumb ? (
+                                        <div
+                                            className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-[1.03]"
+                                            style={{ backgroundImage: `url(${getImageUrl(thumb)})` }}
+                                        />
+                                    ) : (
+                                        <div className="absolute inset-0 bg-gradient-to-br from-[#212632] to-[#13161e]" />
+                                    )}
 
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+
+                                    <div className="absolute left-3 bottom-2.5 text-white font-bold text-[18px] drop-shadow-md">
+                                        Tập {displayNum}
+                                    </div>
+
+                                    {isActive && (
+                                        <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-[#F4C84A] text-black text-[10px] font-black uppercase">
+                                            Đang xem
+                                        </div>
+                                    )}
+                                </Link>
+                            );
+                        })}
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-3 max-h-[360px] sm:max-h-[440px] overflow-y-auto custom-scrollbar pr-1 sm:pr-2 [contain:layout_paint]">
+                        {pageEpisodes.map((ep) => {
+                            const isActive = ep.slug === currentEpisodeSlug;
+                            const displayNum = getEpisodeNumber(ep.name)?.padStart(2, '0') || ep.name;
                             return (
                                 <Link
                                     key={ep.slug}

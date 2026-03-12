@@ -1,6 +1,6 @@
 "use server";
 
-import { searchTMDBMovie, getTMDBDetails, getTMDBPersonDetails } from "@/services/tmdb";
+import { searchTMDBMovie, getTMDBDetails, getTMDBPersonDetails, getTMDBSeasonDetails } from "@/services/tmdb";
 
 export async function getTMDBDataForCard(
     query: string,
@@ -152,5 +152,44 @@ export async function getActorDetailsFromTMDB(actorName: string) {
     } catch (error) {
         console.error("Fetch Actor Details Error:", error);
         return null;
+    }
+}
+
+export async function getTMDBEpisodeImages(
+    query: string,
+    year?: number,
+    verification?: { originalName?: string; countrySlug?: string }
+) {
+    try {
+        const tv = await searchTMDBMovie(query, year, "tv", verification);
+        if (!tv?.id) return {};
+
+        const details = await getTMDBDetails(tv.id, "tv");
+        const seasons = (details?.seasons || [])
+            .filter((s: any) => Number(s?.season_number) > 0)
+            .sort((a: any, b: any) => Number(a.season_number) - Number(b.season_number));
+
+        // Keep it safe on latency/rate limit: fetch up to first 5 seasons
+        const seasonList = seasons.slice(0, 5);
+        const seasonDetails = await Promise.all(
+            seasonList.map((s: any) => getTMDBSeasonDetails(tv.id, Number(s.season_number)))
+        );
+
+        const imagesByEpisodeNumber: Record<string, string> = {};
+        seasonDetails.forEach((season: any) => {
+            if (!season?.episodes) return;
+            season.episodes.forEach((ep: any) => {
+                const epNo = String(ep?.episode_number || "");
+                if (!epNo || imagesByEpisodeNumber[epNo]) return;
+                if (ep?.still_path) {
+                    imagesByEpisodeNumber[epNo] = `https://image.tmdb.org/t/p/w780${ep.still_path}`;
+                }
+            });
+        });
+
+        return imagesByEpisodeNumber;
+    } catch (error) {
+        console.error("TMDB Episode Images Error:", error);
+        return {};
     }
 }

@@ -10,7 +10,7 @@ import WatchEngagementBar from "@/components/WatchEngagementBar";
 import WatchContainer from "@/components/WatchContainer";
 import { Info, Users } from "lucide-react";
 import { getWatchHistoryForEpisode } from "@/app/actions/watchHistory";
-import { getMovieCast, getTMDBDataForCard } from "@/app/actions/tmdb";
+import { getMovieCast, getTMDBDataForCard, getTMDBEpisodeImages } from "@/app/actions/tmdb";
 import RelatedMovies from "@/components/RelatedMovies";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -53,16 +53,36 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
 
     let session = null;
     let cast: Record<string, unknown>[] = [];
+    let episodeThumbnails: Record<string, string> = {};
 
     try {
-        const [sessionRes, castRes, tmdbRes] = await Promise.all([
+        const [sessionRes, castRes, tmdbRes, tmdbEpisodeImages] = await Promise.all([
             getServerSession(authOptions).catch((): any => null),
             getMovieCast(movie.origin_name || movie.name, movie.year, movie.type === "series" ? "tv" : "movie").catch((): any[] => []),
             getTMDBDataForCard(movie.origin_name || movie.name, movie.year, movie.type === "series" ? "tv" : "movie").catch((): any => null),
+            getTMDBEpisodeImages(movie.origin_name || movie.name, movie.year, { originalName: movie.origin_name, countrySlug: movie.country?.[0]?.slug }).catch((): any => ({})),
         ]);
         session = sessionRes;
         cast = castRes || [];
         if (tmdbRes?.vote_average) (movie as any).vote_average = tmdbRes.vote_average;
+        const episodeImageMap = tmdbEpisodeImages || {};
+
+        // Map image by episode number to each source episode slug
+        const extractEpisodeNumber = (name: string) => {
+            const match = String(name || "").match(/(\d+)/);
+            return match ? match[1] : null;
+        };
+        episodeThumbnails = {};
+        (servers || []).forEach((serverItem: any) => {
+            (serverItem?.server_data || []).forEach((ep: any) => {
+                const epNo = extractEpisodeNumber(ep?.name);
+                if (!epNo) return;
+                const thumb = episodeImageMap[epNo];
+                if (thumb && ep?.slug) {
+                    episodeThumbnails[ep.slug] = thumb;
+                }
+            });
+        });
     } catch { }
 
     let initialProgress = 0;
@@ -118,6 +138,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
                                 currentEpisode={currentEpisode}
                                 episodes={episodes}
                                 servers={servers}
+                                episodeThumbnails={episodeThumbnails}
                                 initialProgress={initialProgress}
                                 movieData={movieData}
                                 initialServerName={servers[usedIndex]?.server_name || servers[0]?.server_name || ""}
