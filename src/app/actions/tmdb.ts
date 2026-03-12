@@ -170,22 +170,71 @@ export async function getTMDBEpisodeImages(
     verification?: { originalName?: string; countrySlug?: string }
 ) {
     try {
-        const tv = await searchTMDBMovie(query, year, "tv", verification);
+        const toNumberOrUndefined = (value: unknown): number | undefined => {
+            const parsed = Number(value);
+            return Number.isFinite(parsed) ? parsed : undefined;
+        };
+
+        const detectPreferredSeason = (...values: Array<string | undefined>) => {
+            const text = values.filter(Boolean).join(" ").toLowerCase();
+            const match = text.match(/(?:phần|phan|season|ss)\s*(\d{1,2})/i);
+            if (!match) return undefined;
+            const n = Number(match[1]);
+            return Number.isFinite(n) && n > 0 ? n : undefined;
+        };
+
+        const stripSeasonSuffix = (value: string) =>
+            String(value || "")
+                .replace(/(?:phần|phan|season|ss)\s*\d{1,2}/gi, "")
+                .replace(/\s+/g, " ")
+                .trim();
+
+        const normalizedYear = toNumberOrUndefined(year);
+        const preferredSeason = detectPreferredSeason(query, verification?.originalName);
+
+        let tv =
+            await searchTMDBMovie(query, normalizedYear, "tv", verification) ||
+            await searchTMDBMovie(query, undefined, "tv", verification);
+
+        // Extra fallback for titles containing "phần X / season X"
+        if (!tv?.id) {
+            const baseQuery = stripSeasonSuffix(verification?.originalName || query);
+            if (baseQuery) {
+                tv = await searchTMDBMovie(
+                    baseQuery,
+                    undefined,
+                    "tv",
+                    { originalName: stripSeasonSuffix(verification?.originalName || ""), countrySlug: verification?.countrySlug }
+                );
+            }
+        }
+
         if (!tv?.id) return {};
 
         const details = await getTMDBDetails(tv.id, "tv");
-        const seasons = (details?.seasons || [])
+        const seasons: Array<{ season_number: number }> = (details?.seasons || [])
             .filter((s: any) => Number(s?.season_number) > 0)
             .sort((a: any, b: any) => Number(a.season_number) - Number(b.season_number));
 
-        // Keep it safe on latency/rate limit: fetch up to first 5 seasons
-        const seasonList = seasons.slice(0, 5);
+        const seasonNumbers = seasons.map((s) => Number(s.season_number)).filter((n) => Number.isFinite(n));
+        const prioritizedSeasons = preferredSeason && seasonNumbers.includes(preferredSeason)
+            ? [preferredSeason, ...seasonNumbers.filter((n) => n !== preferredSeason)]
+            : seasonNumbers;
+
+        // Keep latency safe while still covering many titles.
+        const seasonList = prioritizedSeasons.slice(0, 8).map((seasonNumber) => ({ season_number: seasonNumber }));
         const seasonDetails = await Promise.all(
             seasonList.map((s: any) => getTMDBSeasonDetails(tv.id, Number(s.season_number)))
         );
 
+        // If query points to a specific season, prefer that season first.
+        const preferredSeasonDetails = preferredSeason
+            ? seasonDetails.find((s: any) => Number(s?.season_number) === preferredSeason)
+            : null;
+        const seasonsToUse = preferredSeasonDetails ? [preferredSeasonDetails] : seasonDetails;
+
         const episodeDataByNumber: Record<string, TMDBEpisodeMeta> = {};
-        seasonDetails.forEach((season: any) => {
+        seasonsToUse.forEach((season: any) => {
             if (!season?.episodes) return;
             season.episodes.forEach((ep: any) => {
                 const epNo = String(ep?.episode_number || "");

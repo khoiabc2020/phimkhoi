@@ -38,6 +38,7 @@ export default function MovieTabs({
     const [activeServer, setActiveServer] = useState(0);
     const [currentChunk, setCurrentChunk] = useState(0);
     const [activeLangTab, setActiveLangTab] = useState<string>("");
+    const [showEpisodeImages, setShowEpisodeImages] = useState(false);
     const [activeTrailerIdx, setActiveTrailerIdx] = useState(0);
 
     // Get YouTube trailers from TMDB videos
@@ -234,86 +235,134 @@ export default function MovieTabs({
                                     </div>
                                 </div>
 
-                                {/* Pagination Header */}
-                                {totalChunks > 1 && (
-                                    <div className="flex items-center justify-between">
+                                {/* Header + toggle */}
+                                <div className="flex items-center justify-between gap-3">
+                                    <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
                                         <div className="text-sm font-bold text-gray-200">
                                             Danh sách tập <span className="text-[#F4C84A]">({currentServerData.length})</span>
                                         </div>
-                                        <div className="relative">
-                                            <select
-                                                value={currentChunk}
-                                                onChange={(e) => setCurrentChunk(Number(e.target.value))}
-                                                className="appearance-none bg-[#171B24] border border-white/[0.10] text-white text-sm font-medium py-2 px-4 pr-10 rounded-lg outline-none focus:border-[#F4C84A]/50 transition-colors cursor-pointer"
-                                            >
-                                                {Array.from({ length: totalChunks }).map((_, idx) => {
-                                                    const start = idx * EPISODES_PER_CHUNK + 1;
-                                                    const end = Math.min((idx + 1) * EPISODES_PER_CHUNK, currentServerData.length);
-                                                    return (
-                                                        <option key={idx} value={idx}>
-                                                            Tập {start} - {end}
-                                                        </option>
-                                                    );
-                                                })}
-                                            </select>
-                                            <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                                        </div>
+                                        {totalChunks > 1 && (
+                                            <div className="relative">
+                                                <select
+                                                    value={currentChunk}
+                                                    onChange={(e) => setCurrentChunk(Number(e.target.value))}
+                                                    className="appearance-none bg-[#171B24] border border-white/[0.10] text-white text-sm font-medium py-2 px-4 pr-10 rounded-lg outline-none focus:border-[#F4C84A]/50 transition-colors cursor-pointer"
+                                                >
+                                                    {Array.from({ length: totalChunks }).map((_, idx) => {
+                                                        const start = idx * EPISODES_PER_CHUNK + 1;
+                                                        const end = Math.min((idx + 1) * EPISODES_PER_CHUNK, currentServerData.length);
+                                                        return (
+                                                            <option key={idx} value={idx}>
+                                                                Tập {start} - {end}
+                                                            </option>
+                                                        );
+                                                    })}
+                                                </select>
+                                                <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                            </div>
+                                        )}
                                     </div>
-                                )}
+
+                                    <div className="flex items-center gap-2.5 shrink-0">
+                                        <span className="text-[12px] sm:text-[13px] text-gray-300 font-medium">Hiện ảnh</span>
+                                        <button
+                                            type="button"
+                                            role="switch"
+                                            aria-checked={showEpisodeImages}
+                                            onClick={() => setShowEpisodeImages(!showEpisodeImages)}
+                                            className={cn(
+                                                "w-10 h-6 rounded-full transition-colors relative border border-white/10",
+                                                showEpisodeImages ? "bg-white/30" : "bg-white/15"
+                                            )}
+                                        >
+                                            <span
+                                                className={cn(
+                                                    "absolute top-[2px] w-[18px] h-[18px] rounded-full bg-white shadow transition-all",
+                                                    showEpisodeImages ? "left-[19px]" : "left-[3px]"
+                                                )}
+                                            />
+                                        </button>
+                                    </div>
+                                </div>
 
                                 {/* Episode Grid */}
-                                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3 max-h-[520px] overflow-y-auto custom-scrollbar pr-1 sm:pr-2 pb-1 [contain:layout_paint]">
-                                    {paginatedEpisodes.map((ep: { slug?: string; name?: string }) => {
-                                        if (!ep?.slug) return null;
-                                        const rawName = String(ep?.name || "");
-                                        let displayName = rawName || "1";
-                                        const match = rawName.match(/(\d+)/);
-                                        if (match) {
-                                            displayName = String(Number(match[1]));
-                                        }
+                                {showEpisodeImages ? (
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3 max-h-[520px] overflow-y-auto custom-scrollbar pr-1 sm:pr-2 pb-1 [contain:layout_paint]">
+                                        {paginatedEpisodes.map((ep: { slug?: string; name?: string }) => {
+                                            if (!ep?.slug) return null;
+                                            const rawName = String(ep?.name || "");
+                                            let displayName = rawName || "1";
+                                            const match = rawName.match(/(\d+)/);
+                                            if (match) {
+                                                displayName = String(Number(match[1]));
+                                            }
 
-                                        const meta = episodeMetadata?.[ep.slug];
-                                        const thumb = episodeThumbnails?.[ep.slug];
-                                        const episodeOverview = meta?.overview?.trim() || "Nội dung tập đang được cập nhật.";
-                                        const dateText = meta?.airDate ? new Date(meta.airDate).toLocaleDateString("vi-VN") : "";
-                                        const runtimeText = meta?.runtime ? `${meta.runtime}m` : "";
+                                            const meta = episodeMetadata?.[ep.slug];
+                                            const thumb = episodeThumbnails?.[ep.slug];
+                                            const episodeOverview = meta?.overview?.trim() || "Nội dung tập đang được cập nhật.";
+                                            const dateText = meta?.airDate ? new Date(meta.airDate).toLocaleDateString("vi-VN") : "";
+                                            const runtimeText = meta?.runtime ? `${meta.runtime}m` : "";
 
-                                        return (
-                                            <Link
-                                                key={ep.slug}
-                                                href={`/xem-phim/${slug}/${ep.slug}?server=${activeServer}`}
-                                                className="group rounded-[12px] overflow-hidden border transition-all duration-200 touch-manipulation bg-[#151924] border-white/[0.08] hover:border-white/[0.22] hover:-translate-y-[1px]"
-                                                title={rawName}
-                                            >
-                                                <div className="relative aspect-video overflow-hidden">
-                                                    {thumb ? (
-                                                        <div
-                                                            className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-[1.03]"
-                                                            style={{ backgroundImage: `url(${getImageUrl(thumb)})` }}
-                                                        />
-                                                    ) : (
-                                                        <div className="absolute inset-0 bg-gradient-to-br from-[#2A2F3D] to-[#181B24]" />
-                                                    )}
-                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                                                    <div className="absolute left-2.5 bottom-2 text-white font-bold text-[16px] drop-shadow-md">
-                                                        Tập {displayName}
+                                            return (
+                                                <Link
+                                                    key={ep.slug}
+                                                    href={`/xem-phim/${slug}/${ep.slug}?server=${activeServer}`}
+                                                    className="group rounded-[12px] overflow-hidden border transition-all duration-200 touch-manipulation bg-[#151924] border-white/[0.08] hover:border-white/[0.22] hover:-translate-y-[1px]"
+                                                    title={rawName}
+                                                >
+                                                    <div className="relative aspect-video overflow-hidden">
+                                                        {thumb ? (
+                                                            <div
+                                                                className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-[1.03]"
+                                                                style={{ backgroundImage: `url(${getImageUrl(thumb)})` }}
+                                                            />
+                                                        ) : (
+                                                            <div className="absolute inset-0 bg-gradient-to-br from-[#2A2F3D] to-[#181B24]" />
+                                                        )}
+                                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                                                        <div className="absolute left-2.5 bottom-2 text-white font-bold text-[16px] drop-shadow-md">
+                                                            Tập {displayName}
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                                <div className="px-3 py-2.5">
-                                                    <p className="text-[12px] text-gray-200 line-clamp-2 leading-relaxed min-h-[34px]">
-                                                        {episodeOverview}
-                                                    </p>
-                                                    {(dateText || runtimeText) && (
-                                                        <p className="text-[11px] text-gray-400 mt-1">
-                                                            {dateText}{dateText && runtimeText ? " · " : ""}{runtimeText}
+                                                    <div className="px-3 py-2.5">
+                                                        <p className="text-[12px] text-gray-200 line-clamp-2 leading-relaxed min-h-[34px]">
+                                                            {episodeOverview}
                                                         </p>
-                                                    )}
-                                                </div>
-                                            </Link>
-                                        );
-                                    })}
-                                </div>
+                                                        {(dateText || runtimeText) && (
+                                                            <p className="text-[11px] text-gray-400 mt-1">
+                                                                {dateText}{dateText && runtimeText ? " · " : ""}{runtimeText}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-3 max-h-[360px] sm:max-h-[440px] overflow-y-auto custom-scrollbar pr-1 sm:pr-2 pb-1 [contain:layout_paint]">
+                                        {paginatedEpisodes.map((ep: { slug?: string; name?: string }) => {
+                                            if (!ep?.slug) return null;
+                                            const rawName = String(ep?.name || "");
+                                            let displayName = rawName || "1";
+                                            const match = rawName.match(/(\d+)/);
+                                            if (match) {
+                                                displayName = match[1].padStart(2, "0");
+                                            }
+
+                                            return (
+                                                <Link
+                                                    key={ep.slug}
+                                                    href={`/xem-phim/${slug}/${ep.slug}?server=${activeServer}`}
+                                                    className="h-[40px] sm:h-[44px] rounded-[12px] text-[13px] sm:text-[14px] font-semibold flex items-center justify-center gap-1.5 transition-all duration-200 border bg-white/[0.04] border-white/[0.08] text-gray-300 hover:text-white hover:bg-white/[0.08] hover:border-white/[0.16] hover:-translate-y-[1px] active:scale-95 truncate shadow-sm touch-manipulation px-2"
+                                                    title={rawName}
+                                                >
+                                                    <span>Tập {displayName}</span>
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             <div className="text-center py-8 text-gray-400 text-sm">

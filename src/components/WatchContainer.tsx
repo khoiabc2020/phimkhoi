@@ -5,9 +5,8 @@ import Link from "next/link";
 import { cn, getImageUrl } from "@/lib/utils";
 import VideoPlayer from "@/components/VideoPlayer";
 import WatchEngagementBar from "@/components/WatchEngagementBar";
-import WatchEpisodeSection from "@/components/WatchEpisodeSection";
 import { Movie } from "@/services/api";
-import { List as ListIcon, Monitor, ChevronLeft, ChevronRight, SkipForward } from "lucide-react";
+import { Monitor, ChevronLeft, ChevronRight, SkipForward } from "lucide-react";
 
 interface Episode {
     slug: string;
@@ -38,8 +37,6 @@ export default function WatchContainer({
     currentEpisode: initialCurrentEpisode,
     episodes: initialEpisodes,
     servers,
-    episodeThumbnails,
-    episodeMetadata,
     initialProgress,
     movieData,
     initialServerName,
@@ -273,26 +270,6 @@ export default function WatchContainer({
                 />
             </div>
 
-            {/* Episodes Section */}
-            {servers && servers.length > 0 && (
-                <div
-                    className={cn(
-                        "relative mx-auto w-full",
-                        isTheaterMode ? "max-w-[1500px]" : "w-full lg:max-w-none"
-                    )}
-                >
-                    <WatchEpisodeSection
-                        movieSlug={movie.slug}
-                        movieName={movie.name}
-                        servers={servers}
-                        episodeThumbnails={episodeThumbnails}
-                        episodeMetadata={episodeMetadata}
-                        currentEpisodeSlug={currentEpisodeSlug}
-                        activeServerName={activeServerName}
-                        onServerChange={setActiveServerName}
-                    />
-                </div>
-            )}
         </div>
     );
 }
