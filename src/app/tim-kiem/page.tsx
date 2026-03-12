@@ -31,7 +31,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         return file.replace(/\.(jpg|jpeg|png|webp|avif)$/i, "");
     };
 
-    // Deduplicate aggressively across mixed providers (same movie can have different slug/_id)
+    // Deduplicate aggressively across mixed providers (same movie can have different slug/_id/quality)
     const uniqueMovies = Array.from(
         new Map(
             (movies || []).map((movie: any) => {
@@ -40,8 +40,11 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                 const originKey = normalizeText(movie.origin_name);
                 const yearKey = String(movie.year || "");
                 const posterKey = imageSignature(movie.poster_url || movie.thumb_url);
-
-                const dedupeKey = slugKey || `${nameKey}|${originKey}|${yearKey}|${posterKey}`;
+                // Prefer identity by title + year; quality/source-specific slug should not create duplicates.
+                const titleYearKey = `${nameKey}|${originKey}|${yearKey}`.replace(/\|+/g, "|");
+                const dedupeKey = titleYearKey !== "||"
+                    ? titleYearKey
+                    : (posterKey ? `${nameKey}|${yearKey}|${posterKey}` : slugKey || `${nameKey}|${yearKey}`);
                 return [dedupeKey, movie];
             })
         ).values()

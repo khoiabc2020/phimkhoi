@@ -55,19 +55,22 @@ function ActorInitials({ name }: { name: string }) {
     const initials = parts.length >= 2
         ? parts[0][0] + parts[parts.length - 1][0]
         : name.slice(0, 2);
-    // Pick a consistent color based on name char
+    // Pick a consistent but elegant palette based on name hash
     const colors = [
-        "from-blue-600 to-blue-800",
-        "from-rose-600 to-rose-800",
-        "from-violet-600 to-violet-800",
-        "from-emerald-600 to-emerald-800",
-        "from-orange-600 to-orange-800",
-        "from-teal-600 to-teal-800",
+        "from-[#5B8CFF] to-[#3454D1]",
+        "from-[#A855F7] to-[#6D28D9]",
+        "from-[#10B981] to-[#0F766E]",
+        "from-[#EC4899] to-[#BE185D]",
+        "from-[#F97316] to-[#C2410C]",
+        "from-[#14B8A6] to-[#0F766E]",
     ];
     const colorIdx = (name.charCodeAt(0) || 0) % colors.length;
     return (
-        <div className={`w-full h-full bg-gradient-to-br ${colors[colorIdx]} flex items-center justify-center`}>
-            <span className="text-white font-bold text-[11px] uppercase tracking-wider">{initials}</span>
+        <div className={`relative w-full h-full bg-gradient-to-br ${colors[colorIdx]} flex items-center justify-center`}>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_25%,rgba(255,255,255,0.28),transparent_45%)]" />
+            <span className="relative text-white font-black text-[12px] uppercase tracking-wide drop-shadow-md">
+                {initials}
+            </span>
         </div>
     );
 }
@@ -97,7 +100,7 @@ export default async function MovieCast({ movie, slug, isCompact = false }: { mo
                         className="flex flex-col items-center gap-2 w-[4.5rem] group"
                         title={actor.name}
                     >
-                        <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border border-white/10 group-hover:border-[#F4C84A] transition-colors relative bg-white/5">
+                        <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border border-white/15 group-hover:border-[#F4C84A] transition-colors relative bg-white/5 ring-1 ring-white/5 group-hover:ring-[#F4C84A]/40">
                             {actor.photo ? (
                                 <Image src={actor.photo} alt={actor.name} fill className="object-cover" unoptimized />
                             ) : (
