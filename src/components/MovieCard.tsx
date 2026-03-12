@@ -127,18 +127,21 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                     </Link>
 
                     {/* Badges */}
-                    <div className="absolute top-2 left-2 flex flex-col gap-1 z-10 pointer-events-none">
-                        {formatQualityLabel(movie.quality) && (
-                            <span className="bg-black/75 shadow-md border border-white/10 text-white/90 text-[9px] font-extrabold px-1.5 py-0.5 rounded tracking-[0.08em] max-w-[56px] truncate">
-                                {formatQualityLabel(movie.quality)}
-                            </span>
-                        )}
-                        {movie.episode_current && (
+                    {movie.episode_current && (
+                        <div className="absolute top-2 left-2 z-10 pointer-events-none">
                             <span className="bg-primary/90 text-black text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm">
                                 {movie.episode_current}
                             </span>
-                        )}
-                    </div>
+                        </div>
+                    )}
+
+                    {formatQualityLabel(movie.quality) && (
+                        <div className="absolute top-2 right-2 z-10 pointer-events-none flex flex-col items-end gap-1">
+                            <span className="bg-black/75 shadow-md border border-white/10 text-white/90 text-[9px] font-extrabold px-1.5 py-0.5 rounded tracking-[0.08em] max-w-[56px] truncate">
+                                {formatQualityLabel(movie.quality)}
+                            </span>
+                        </div>
+                    )}
                     {/* Rating Badge bottom-right */}
                     {(movie as any).vote_average && (movie as any).vote_average > 0 && (
                         <div className="absolute bottom-2 right-2 z-10 pointer-events-none flex items-center gap-0.5 bg-black/70 backdrop-blur-sm rounded px-1.5 py-0.5">
