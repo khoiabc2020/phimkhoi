@@ -5,6 +5,7 @@ import Link from "next/link";
 import { cn, getImageUrl } from "@/lib/utils";
 import VideoPlayer from "@/components/VideoPlayer";
 import WatchEngagementBar from "@/components/WatchEngagementBar";
+import WatchEpisodeSection from "@/components/WatchEpisodeSection";
 import { Movie } from "@/services/api";
 import { Monitor, ChevronLeft, ChevronRight, SkipForward } from "lucide-react";
 
@@ -37,6 +38,8 @@ export default function WatchContainer({
     currentEpisode: initialCurrentEpisode,
     episodes: initialEpisodes,
     servers,
+    episodeThumbnails,
+    episodeMetadata,
     initialProgress,
     movieData,
     initialServerName,
@@ -182,7 +185,7 @@ export default function WatchContainer({
                     <div className="flex items-center gap-2 min-w-0 pr-2">
                         <Link
                             href={`/phim/${movie.slug}`}
-                            className="text-gray-400 hover:text-white transition-colors flex-shrink-0 w-8 h-8 hidden sm:flex items-center justify-center rounded-full hover:bg-white/10"
+                            className="text-gray-300 hover:text-white transition-colors flex-shrink-0 w-8 h-8 hidden sm:flex items-center justify-center rounded-full hover:bg-white/10"
                         >
                             <ChevronLeft className="w-5 h-5" />
                         </Link>
@@ -190,7 +193,7 @@ export default function WatchContainer({
                             <h1 className="text-white font-bold text-base sm:text-lg truncate leading-tight">
                                 {movie.name}
                             </h1>
-                            <p className="text-yellow-400/80 text-xs sm:text-sm mt-0.5 truncate">
+                            <p className="text-yellow-300 text-xs sm:text-sm mt-0.5 truncate font-semibold">
                                 {activeEpisode ? displayEpisodeName(activeEpisode.name) : ""}
                             </p>
                         </div>
@@ -269,6 +272,27 @@ export default function WatchContainer({
                     currentEpisodeName={activeEpisode ? displayEpisodeName(activeEpisode.name) : undefined}
                 />
             </div>
+
+            {/* Episodes Section */}
+            {servers && servers.length > 0 && (
+                <div
+                    className={cn(
+                        "relative mx-auto w-full",
+                        isTheaterMode ? "max-w-[1500px]" : "w-full lg:max-w-none"
+                    )}
+                >
+                    <WatchEpisodeSection
+                        movieSlug={movie.slug}
+                        movieName={movie.name}
+                        servers={servers}
+                        episodeThumbnails={episodeThumbnails}
+                        episodeMetadata={episodeMetadata}
+                        currentEpisodeSlug={currentEpisodeSlug}
+                        activeServerName={activeServerName}
+                        onServerChange={setActiveServerName}
+                    />
+                </div>
+            )}
 
         </div>
     );
