@@ -121,7 +121,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
     };
 
     return (
-        <div className="bg-[#11131A] p-4 md:p-6 rounded-lg border border-white/[0.08] scroll-mt-24">
+        <div className="bg-[#202636] p-4 md:p-6 rounded-lg border border-white/[0.14] shadow-lg shadow-black/25 scroll-mt-24">
             <div className="flex items-center gap-2 mb-6">
                 <MessageCircle className="w-6 h-6 text-[#fbbf24] fill-[#fbbf24]/20" />
                 <h3 className="text-xl font-bold text-white tracking-wide">
@@ -132,7 +132,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
             {/* Comment Form */}
             {session ? (
                 <form onSubmit={handleSubmit} className="mb-8">
-                    <div className="bg-[#171B24] rounded-lg border border-white/[0.08] p-4 relative">
+                    <div className="bg-[#252C3E] rounded-lg border border-white/[0.14] p-4 relative">
                         <div className="flex gap-4">
                             <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-800 flex-shrink-0">
                                 {session.user?.image ? (
@@ -169,7 +169,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                     </div>
                 </form>
             ) : (
-                <div className="bg-white/[0.04] text-gray-300 p-4 rounded-lg mb-8 text-center border border-white/[0.10] text-sm">
+                <div className="bg-white/[0.08] text-gray-200 p-4 rounded-lg mb-8 text-center border border-white/[0.14] text-sm">
                     Vui lòng <a href="/login" className="text-[#F4C84A] hover:underline font-bold">đăng nhập</a> để bình luận.
                 </div>
             )}

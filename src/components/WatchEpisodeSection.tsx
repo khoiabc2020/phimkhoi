@@ -37,7 +37,7 @@ export default function WatchEpisodeSection({
     activeServerName,
     onServerChange,
 }: WatchEpisodeSectionProps) {
-    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(true);
     const [currentChunk, setCurrentChunk] = useState(0);
     const [activeLangTab, setActiveLangTab] = useState<string>("");
 
