@@ -5,7 +5,7 @@ import WatchlistInlineButton from "@/components/WatchlistInlineButton";
 import Link from "next/link";
 import Image from "next/image";
 import { Play, Info, Star, ChevronDown } from "lucide-react";
-import { getImageUrl, decodeHtml } from "@/lib/utils";
+import { getImageUrl, decodeHtml, cn } from "@/lib/utils";
 import { Movie } from "@/services/api";
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
