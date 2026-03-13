@@ -76,19 +76,19 @@ export default function WatchEngagementBar({
     };
 
     return (
-        <div className="rounded-lg border border-white/[0.06] overflow-hidden"
-            style={{ background: '#11131A' }}>
+        <div className="rounded-lg border border-white/[0.10] overflow-hidden"
+            style={{ background: '#151924' }}>
 
             {/* Controls bar */}
-            <div className="flex items-center gap-4 py-3 px-5 border-b border-white/[0.05] overflow-x-auto hide-scrollbar md:flex-wrap md:justify-between md:overflow-visible"
-                style={{ background: 'rgba(0,0,0,0.3)' }}>
+            <div className="flex items-center gap-4 py-3 px-5 border-b border-white/[0.08] overflow-x-auto hide-scrollbar md:flex-wrap md:justify-between md:overflow-visible"
+                style={{ background: '#10141d' }}>
 
                 {/* Left */}
                 <div className="flex items-center shrink-0 gap-4">
                     <FavoriteButton
                         movieData={movieData}
                         size="sm"
-                        className="!bg-transparent !border-0 text-gray-400 hover:text-yellow-400 flex items-center gap-2 !w-auto !h-auto !p-0 transition-colors"
+                        className="!bg-transparent !border-0 text-gray-200 hover:text-yellow-400 flex items-center gap-2 !w-auto !h-auto !p-0 transition-colors"
                     />
                     <div className="h-4 w-[1px] bg-white/10" />
                     <WatchlistInlineButton
@@ -97,7 +97,7 @@ export default function WatchEngagementBar({
                         moviePoster={movie.poster_url || movie.thumb_url}
                         showLabel={true}
                         size="sm"
-                        className="!bg-transparent !border-0 !rounded-none !w-auto text-gray-400 hover:text-primary gap-1.5 px-0 text-xs font-semibold uppercase tracking-wide"
+                        className="!bg-transparent !border-0 !rounded-none !w-auto text-gray-200 hover:text-primary gap-1.5 px-0 text-xs font-semibold uppercase tracking-wide"
                     />
                     <div className="h-4 w-[1px] bg-white/10" />
                     {onAutoNextToggle && (
@@ -106,13 +106,13 @@ export default function WatchEngagementBar({
                                 onClick={onAutoNextToggle}
                                 className={cn(
                                     "flex items-center gap-2 text-xs font-semibold transition-all",
-                                    autoNext ? "text-yellow-400" : "text-gray-500 hover:text-white"
+                                    autoNext ? "text-yellow-400" : "text-gray-300 hover:text-white"
                                 )}
                             >
                                 Chuyển tập
                                 <span className={cn(
                                     "px-1.5 py-0.5 rounded text-[10px] font-bold border",
-                                    autoNext ? "bg-yellow-400/15 text-yellow-400 border-yellow-400/30" : "bg-white/5 text-gray-500 border-white/10"
+                                    autoNext ? "bg-yellow-400/15 text-yellow-400 border-yellow-400/30" : "bg-white/8 text-gray-200 border-white/15"
                                 )}>
                                     {autoNext ? "ON" : "OFF"}
                                 </span>
@@ -125,27 +125,27 @@ export default function WatchEngagementBar({
                 {/* Center Toggles */}
                 <div className="flex items-center shrink-0 gap-5">
                     {toggleTheater && <button onClick={toggleTheater}
-                        className={cn("flex items-center gap-2 text-xs font-semibold transition-all", isTheaterMode ? "text-yellow-400" : "text-gray-400 hover:text-white")}>
+                        className={cn("flex items-center gap-2 text-xs font-semibold transition-all", isTheaterMode ? "text-yellow-400" : "text-gray-200 hover:text-white")}>
                         <Monitor className="w-4 h-4" /> Rạp phim
                         <span className={cn("px-1.5 py-0.5 rounded text-[10px] font-bold border", isTheaterMode
                             ? "bg-yellow-400/15 text-yellow-400 border-yellow-400/30"
-                            : "bg-white/5 text-gray-500 border-white/10")}>
+                            : "bg-white/8 text-gray-200 border-white/15")}>
                             {isTheaterMode ? "ON" : "OFF"}
                         </span>
                     </button>}
                     {toggleLight && <button onClick={toggleLight}
-                        className={cn("flex items-center gap-2 text-xs font-semibold transition-all", isLightOff ? "text-yellow-400" : "text-gray-400 hover:text-white")}>
+                        className={cn("flex items-center gap-2 text-xs font-semibold transition-all", isLightOff ? "text-yellow-400" : "text-gray-200 hover:text-white")}>
                         <Moon className="w-4 h-4" /> Đèn
                         <span className={cn("px-1.5 py-0.5 rounded text-[10px] font-bold border", isLightOff
                             ? "bg-yellow-400/15 text-yellow-400 border-yellow-400/30"
-                            : "bg-white/5 text-gray-500 border-white/10")}>
+                            : "bg-white/8 text-gray-200 border-white/15")}>
                             {isLightOff ? "OFF" : "ON"}
                         </span>
                     </button>}
                 </div>
 
                 {/* Right */}
-                <div className="flex items-center shrink-0 gap-4 text-gray-400">
+                <div className="flex items-center shrink-0 gap-4 text-gray-200">
                     <button type="button" onClick={handleShare} className="flex items-center gap-2 hover:text-white transition-all text-xs font-semibold group">
                         <Share2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
                         <span className="hidden sm:inline">Chia sẻ</span>
@@ -178,20 +178,20 @@ export default function WatchEngagementBar({
                         {movie.name}
                     </h1>
                     {/* Tên gốc */}
-                    <span className="text-[13px] font-medium text-[#F4C84A] leading-snug line-clamp-1">{movie.origin_name}</span>
+                    <span className="text-[13px] font-medium text-[#F6D56A] leading-snug line-clamp-1">{movie.origin_name}</span>
                     {/* Meta: năm • chất lượng • thời lượng */}
-                    <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1" style={{ fontSize: '12px', color: '#6b7280' }}>
+                    <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1" style={{ fontSize: '12px', color: '#cbd5e1' }}>
                         {movie.year && <><span className="w-1 h-1 rounded-full bg-gray-600 inline-block" /><span>{movie.year}</span></>}
                         {movie.quality && <><span className="w-1 h-1 rounded-full bg-gray-600 inline-block" />
-                            <span className="px-1.5 py-0.5 rounded font-semibold text-white" style={{ background: 'rgba(255,255,255,0.1)', fontSize: '11px' }}>{movie.quality}</span></>}
+                            <span className="px-1.5 py-0.5 rounded font-semibold text-white" style={{ background: 'rgba(255,255,255,0.16)', fontSize: '11px' }}>{movie.quality}</span></>}
                         {movie.time && <><span className="w-1 h-1 rounded-full bg-gray-600 inline-block" /><span>{movie.time}</span></>}
                     </div>
                     {/* Genres + IMDB badge cùng hàng */}
                     <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
                         {(movie.category as { id: string; name: string }[])?.slice(0, 3).map(c => (
                             <span key={c.id}
-                                className="text-[11px] px-2 py-0.5 rounded-full text-gray-300 border border-white/[0.08]"
-                                style={{ background: 'rgba(255,255,255,0.05)' }}>
+                                className="text-[11px] px-2 py-0.5 rounded-full text-gray-100 border border-white/[0.14]"
+                                style={{ background: 'rgba(255,255,255,0.10)' }}>
                                 {c.name}
                             </span>
                         ))}
@@ -199,7 +199,7 @@ export default function WatchEngagementBar({
                         {movie.vote_average && movie.vote_average > 0 ? (
                             <div className="flex items-center gap-1 shrink-0"
                                 style={{
-                                    background: 'rgba(255,255,255,0.05)',
+                                    background: 'rgba(255,255,255,0.10)',
                                     backdropFilter: 'blur(12px)',
                                     WebkitBackdropFilter: 'blur(12px)',
                                     border: '1px solid rgba(255,255,255,0.1)',
@@ -213,7 +213,7 @@ export default function WatchEngagementBar({
                                 <span className="font-bold text-white" style={{ fontSize: '13px' }}>
                                     {movie.vote_average.toFixed(1)}
                                 </span>
-                                <span className="text-white/30" style={{ fontSize: '10px' }}>/10</span>
+                                <span className="text-white/50" style={{ fontSize: '10px' }}>/10</span>
                             </div>
                         ) : null}
                     </div>
