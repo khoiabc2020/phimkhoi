@@ -21,6 +21,7 @@ const MovieCard = memo(({ movie, width: propsWidth, height: propsHeight }: Movie
     const dynamicHeight = propsHeight ?? DEFAULT_CARD_HEIGHT;
 
     if (!movie || !movie.slug) return null;
+    const usesThumbFallbackInPortrait = !movie.poster_url && !!movie.thumb_url;
     const imageUrl = getImageUrl(movie.poster_url || movie.thumb_url);
 
     return (
@@ -30,11 +31,20 @@ const MovieCard = memo(({ movie, width: propsWidth, height: propsHeight }: Movie
                 style={{ width: dynamicWidth, borderRadius: 14, padding: 2 }}
                 focusStyle={{ borderWidth: 2, borderColor: '#fbbf24', transform: [{ scale: 1.05 }] }}
             >
-                <View style={{ width: dynamicWidth, height: dynamicHeight, borderRadius: 14, overflow: 'hidden', position: 'relative' }}>
+                <View
+                    style={{
+                        width: dynamicWidth,
+                        height: dynamicHeight,
+                        borderRadius: 14,
+                        overflow: 'hidden',
+                        position: 'relative',
+                        backgroundColor: usesThumbFallbackInPortrait ? '#0a0f1a' : 'transparent',
+                    }}
+                >
                     <Image
                         source={{ uri: imageUrl }}
                         style={{ width: dynamicWidth, height: dynamicHeight }}
-                        contentFit="cover"
+                        contentFit={usesThumbFallbackInPortrait ? "contain" : "cover"}
                         transition={200}
                         cachePolicy="memory-disk"
                     />

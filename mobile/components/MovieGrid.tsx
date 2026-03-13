@@ -1,17 +1,14 @@
-import React from 'react';
-import { View, ActivityIndicator, Text, Dimensions } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, ActivityIndicator, Text, useWindowDimensions } from 'react-native';
 import MovieCard from './MovieCard';
 import Skeleton from './Skeleton';
 import { Movie } from '@/services/api';
 import { Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
 
-const { width } = Dimensions.get('window');
-// Calculate card size consistent with other screens
-// 3 gaps of 16px (left, middle, right) -> (width - 48) / 2
 const GAP = 16;
 const PADDING = 16;
-const CARD_WIDTH = (width - PADDING * 2 - GAP) / 2;
+const MIN_CARD_WIDTH = 140;
 
 interface MovieGridProps {
     movies: Movie[];
@@ -34,6 +31,14 @@ export default function MovieGrid({
     ListHeaderComponent,
     emptyText = "Không tìm thấy phim"
 }: MovieGridProps) {
+    const { width } = useWindowDimensions();
+    const layout = useMemo(() => {
+        const safeW = Math.max(320, width || 0);
+        const contentW = safeW - PADDING * 2;
+        const cols = Math.max(2, Math.min(6, Math.floor((contentW + GAP) / (MIN_CARD_WIDTH + GAP))));
+        const cardW = Math.floor((contentW - GAP * (cols - 1)) / cols);
+        return { cols, cardW };
+    }, [width]);
 
     if (loading && movies.length === 0) {
         return (
@@ -41,8 +46,8 @@ export default function MovieGrid({
                 {ListHeaderComponent}
                 <View className="flex-row flex-wrap justify-between">
                     {[1, 2, 3, 4, 5, 6].map((i) => (
-                        <View key={i} style={{ width: CARD_WIDTH, marginBottom: 16 }}>
-                            <Skeleton width="100%" height={CARD_WIDTH * 1.5} borderRadius={12} />
+                        <View key={i} style={{ width: layout.cardW, marginBottom: 16 }}>
+                            <Skeleton width="100%" height={layout.cardW * 1.5} borderRadius={12} />
                             <View className="mt-2">
                                 <Skeleton width="80%" height={16} borderRadius={4} />
                             </View>
@@ -57,7 +62,7 @@ export default function MovieGrid({
         <View style={{ flex: 1, height: '100%', width: '100%' }}>
             <FlashList
                 data={movies}
-                numColumns={2}
+                numColumns={layout.cols}
                 estimatedItemSize={250}
                 keyExtractor={(item) => item._id || item.slug} // Fallback to slug if _id missing
                 contentContainerStyle={{ paddingBottom: 40, paddingHorizontal: 16, paddingTop: 16 }}
@@ -79,9 +84,15 @@ export default function MovieGrid({
                         </View>
                     ) : null
                 }
-                renderItem={({ item }) => (
-                    <View style={{ width: CARD_WIDTH, marginBottom: 16, marginRight: 16 }}>
-                        <MovieCard movie={item} width={CARD_WIDTH} height={CARD_WIDTH * 1.5} />
+                renderItem={({ item, index }) => (
+                    <View
+                        style={{
+                            width: layout.cardW,
+                            marginBottom: 16,
+                            marginRight: (index % layout.cols) === (layout.cols - 1) ? 0 : GAP,
+                        }}
+                    >
+                        <MovieCard movie={item} width={layout.cardW} height={layout.cardW * 1.5} />
                     </View>
                 )}
             />
