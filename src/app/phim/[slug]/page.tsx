@@ -324,7 +324,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
 
                     {/* LEFT SIDEBAR (shown after tabs on mobile, beside on desktop) */}
                     <div className="w-full lg:col-span-4 xl:col-span-3 order-2 lg:order-1 space-y-6 sm:space-y-8 lg:pr-4">
-                        <div className="rounded-[16px] border border-white/[0.10] bg-[#1A1F2B] p-4 sm:p-5 shadow-2xl space-y-6 sm:space-y-8">
+                        <div className="rounded-[12px] border border-white/[0.10] bg-[#1A1F2B] p-4 sm:p-5 shadow-2xl space-y-6 sm:space-y-8">
                         {/* Nội dung */}
                         <div>
                             <div className="flex items-center gap-2 mb-3 sm:mb-4 border-l-2 border-[#F4C84A] pl-3">

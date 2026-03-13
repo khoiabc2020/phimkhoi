@@ -172,7 +172,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
 
 
                             {/* Movie description */}
-                            <div className="relative z-30 rounded-[16px] border border-white/[0.10] overflow-hidden bg-[#1A1F2B] shadow-2xl shadow-black/30">
+                            <div className="relative z-30 rounded-[12px] border border-white/[0.10] overflow-hidden bg-[#1A1F2B] shadow-2xl shadow-black/30">
                                 <div className="px-6 pt-5 pb-4 border-b border-white/[0.10] bg-[#151B26]">
                                     <h3 className="text-white font-bold text-[15px] flex items-center gap-2 tracking-wide">
                                         <Info className="w-4 h-4 text-[#F4C84A]" /> Thông tin mở rộng
@@ -221,7 +221,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
                             </div>
 
                             {/* Comments */}
-                            <div className="relative z-30 rounded-[16px] border border-white/[0.10] overflow-hidden bg-[#1A1F2B] shadow-2xl shadow-black/30">
+                            <div className="relative z-30 rounded-[12px] border border-white/[0.10] overflow-hidden bg-[#1A1F2B] shadow-2xl shadow-black/30">
                                 <div className="px-6 pt-5 pb-4 border-b border-white/[0.10] bg-[#151B26]">
                                     <h3 className="text-white font-bold text-[15px] flex items-center gap-2 tracking-wide">
                                         <Users className="w-4 h-4 text-[#F4C84A]" /> Bình luận
@@ -237,7 +237,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
                         <div className="lg:col-span-3 space-y-5">
                             {/* Genre pills */}
                             {movie.category && movie.category.length > 0 && (
-                                <div className="relative z-30 rounded-[16px] border border-white/[0.10] overflow-hidden bg-[#1A1F2B] shadow-2xl shadow-black/30">
+                                <div className="relative z-30 rounded-[12px] border border-white/[0.10] overflow-hidden bg-[#1A1F2B] shadow-2xl shadow-black/30">
                                     <div className="px-5 pt-5 pb-4 border-b border-white/[0.10] bg-[#151B26]">
                                         <h3 className="text-white font-bold text-[15px] tracking-wide">Thể loại</h3>
                                     </div>
@@ -255,7 +255,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
 
                             {/* Related movies */}
                             {movie.category?.[0]?.slug && (
-                                <div className="relative z-30 rounded-[16px] border border-white/[0.10] overflow-hidden bg-[#1A1F2B] shadow-2xl shadow-black/30">
+                                <div className="relative z-30 rounded-[12px] border border-white/[0.10] overflow-hidden bg-[#1A1F2B] shadow-2xl shadow-black/30">
                                     <div className="px-5 pt-5 pb-4 border-b border-white/[0.10] flex items-center gap-2 bg-[#151B26]">
                                         <div className="w-1.5 h-4 rounded-full bg-[#F4C84A]" />
                                         <h3 className="text-white font-bold text-[15px] tracking-wide">Phim đề xuất</h3>

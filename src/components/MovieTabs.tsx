@@ -164,7 +164,7 @@ export default function MovieTabs({
             <div className="animate-in fade-in duration-300">
                 {/* EPISODES TAB */}
                 {activeTab === "episodes" && (
-                    <div className="bg-[#1A1F2B] border border-white/[0.10] rounded-[16px] p-3 sm:p-6 shadow-2xl">
+                    <div className="bg-[#1A1F2B] border border-white/[0.10] rounded-[12px] p-3 sm:p-6 shadow-2xl">
                         {episodes && episodes.length > 0 ? (
                             <div className="space-y-6">
                                 {/* Language Tabs Row */}
@@ -394,7 +394,7 @@ export default function MovieTabs({
 
                 {/* TRAILER TAB */}
                 {activeTab === "trailer" && (
-                    <div className="bg-[#1A1F2B] border border-white/[0.10] rounded-[16px] p-4 sm:p-6 space-y-4 shadow-2xl">
+                    <div className="bg-[#1A1F2B] border border-white/[0.10] rounded-[12px] p-4 sm:p-6 space-y-4 shadow-2xl">
                         {/* Main player */}
                         <div className="aspect-video w-full rounded-lg overflow-hidden bg-[#151B26] border border-white/[0.10] shadow-2xl">
                             {activeVideo ? (
@@ -489,7 +489,7 @@ export default function MovieTabs({
 
                 {/* RELATED TAB */}
                 {activeTab === "related" && (
-                    <div className="bg-[#1A1F2B] border border-white/[0.10] rounded-[16px] p-6 shadow-2xl">
+                    <div className="bg-[#1A1F2B] border border-white/[0.10] rounded-[12px] p-6 shadow-2xl">
                         {relatedMovies.length > 0 ? (
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 [contain:layout_paint]">
                                 {relatedMovies.map((m) => (

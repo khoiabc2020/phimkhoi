@@ -121,7 +121,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
     };
 
     return (
-        <div className="bg-[#1A1F2B] p-4 md:p-6 rounded-[16px] border border-white/[0.10] shadow-2xl shadow-black/30 scroll-mt-24">
+        <div className="bg-[#1A1F2B] p-4 md:p-6 rounded-[12px] border border-white/[0.10] shadow-2xl shadow-black/30 scroll-mt-24">
             <div className="flex items-center gap-2 mb-6">
                 <MessageCircle className="w-6 h-6 text-[#fbbf24] fill-[#fbbf24]/20" />
                 <h3 className="text-xl font-bold text-white tracking-wide">

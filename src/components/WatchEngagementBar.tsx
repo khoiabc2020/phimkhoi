@@ -76,7 +76,7 @@ export default function WatchEngagementBar({
     };
 
     return (
-        <div className="relative z-30 rounded-[16px] border border-white/[0.10] overflow-hidden shadow-2xl shadow-black/30 bg-[#1A1F2B]">
+        <div className="relative z-30 rounded-[12px] border border-white/[0.10] overflow-hidden shadow-2xl shadow-black/30 bg-[#1A1F2B]">
 
             {/* Controls bar */}
             <div className="flex items-center gap-4 py-3 px-5 border-b border-white/[0.10] overflow-x-auto hide-scrollbar md:flex-wrap md:justify-between md:overflow-visible bg-[#151B26]">
