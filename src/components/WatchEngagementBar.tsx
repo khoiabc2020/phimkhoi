@@ -76,12 +76,12 @@ export default function WatchEngagementBar({
     };
 
     return (
-        <div className="rounded-lg border border-white/[0.12] overflow-hidden"
-            style={{ background: '#1A1F2B' }}>
+        <div className="rounded-lg border border-white/[0.16] overflow-hidden"
+            style={{ background: '#202636' }}>
 
             {/* Controls bar */}
-            <div className="flex items-center gap-4 py-3 px-5 border-b border-white/[0.10] overflow-x-auto hide-scrollbar md:flex-wrap md:justify-between md:overflow-visible"
-                style={{ background: '#151B26' }}>
+            <div className="flex items-center gap-4 py-3 px-5 border-b border-white/[0.14] overflow-x-auto hide-scrollbar md:flex-wrap md:justify-between md:overflow-visible"
+                style={{ background: '#1A2230' }}>
 
                 {/* Left */}
                 <div className="flex items-center shrink-0 gap-4">
@@ -158,7 +158,8 @@ export default function WatchEngagementBar({
             </div>
 
             {/* Movie Info - luôn nằm ngang trên mọi thiết bị */}
-            <div className="flex flex-row gap-4 p-4 md:p-5 items-start">
+            <div className="flex flex-row gap-4 p-4 md:p-5 items-start border-t border-white/[0.08]"
+                style={{ background: '#242B3D' }}>
                 {/* Poster */}
                 <div className="flex-shrink-0">
                     <div className="relative w-20 h-[112px] md:w-24 md:h-[134px] rounded-lg overflow-hidden shadow-xl ring-1 ring-white/10">
@@ -174,13 +175,13 @@ export default function WatchEngagementBar({
                 {/* Info bên phải */}
                 <div className="flex-grow min-w-0 flex flex-col justify-start gap-1.5">
                     {/* Tên Tiếng Việt */}
-                    <h1 className="text-[16px] md:text-[18px] font-semibold text-white leading-snug tracking-tight line-clamp-2">
+                    <h1 className="text-[16px] md:text-[18px] font-bold text-white leading-snug tracking-tight line-clamp-2 drop-shadow-sm">
                         {movie.name}
                     </h1>
                     {/* Tên gốc */}
-                    <span className="text-[13px] font-medium text-[#F6D56A] leading-snug line-clamp-1">{movie.origin_name}</span>
+                    <span className="text-[13px] font-semibold text-[#F7D772] leading-snug line-clamp-1">{movie.origin_name}</span>
                     {/* Meta: năm • chất lượng • thời lượng */}
-                    <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1" style={{ fontSize: '12px', color: '#cbd5e1' }}>
+                    <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1" style={{ fontSize: '12px', color: '#e2e8f0' }}>
                         {movie.year && <><span className="w-1 h-1 rounded-full bg-gray-600 inline-block" /><span>{movie.year}</span></>}
                         {movie.quality && <><span className="w-1 h-1 rounded-full bg-gray-600 inline-block" />
                             <span className="px-1.5 py-0.5 rounded font-semibold text-white" style={{ background: 'rgba(255,255,255,0.16)', fontSize: '11px' }}>{movie.quality}</span></>}
@@ -190,8 +191,8 @@ export default function WatchEngagementBar({
                     <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
                         {(movie.category as { id: string; name: string }[])?.slice(0, 3).map(c => (
                             <span key={c.id}
-                                className="text-[11px] px-2 py-0.5 rounded-full text-gray-100 border border-white/[0.14]"
-                                style={{ background: 'rgba(255,255,255,0.10)' }}>
+                                className="text-[11px] px-2 py-0.5 rounded-full text-gray-100 border border-white/[0.20]"
+                                style={{ background: 'rgba(255,255,255,0.16)' }}>
                                 {c.name}
                             </span>
                         ))}
@@ -199,10 +200,10 @@ export default function WatchEngagementBar({
                         {movie.vote_average && movie.vote_average > 0 ? (
                             <div className="flex items-center gap-1 shrink-0"
                                 style={{
-                                    background: 'rgba(255,255,255,0.10)',
+                                    background: 'rgba(17,24,39,0.75)',
                                     backdropFilter: 'blur(12px)',
                                     WebkitBackdropFilter: 'blur(12px)',
-                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    border: '1px solid rgba(255,255,255,0.2)',
                                     borderRadius: '999px',
                                     padding: '3px 8px 3px 5px',
                                 }}>

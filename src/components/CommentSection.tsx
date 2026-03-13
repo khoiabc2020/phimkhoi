@@ -121,7 +121,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
     };
 
     return (
-        <div className="bg-[#202636] p-4 md:p-6 rounded-lg border border-white/[0.14] shadow-lg shadow-black/25 scroll-mt-24">
+        <div className="bg-[#2A3144] p-4 md:p-6 rounded-lg border border-white/[0.18] shadow-lg shadow-black/30 scroll-mt-24">
             <div className="flex items-center gap-2 mb-6">
                 <MessageCircle className="w-6 h-6 text-[#fbbf24] fill-[#fbbf24]/20" />
                 <h3 className="text-xl font-bold text-white tracking-wide">
@@ -132,7 +132,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
             {/* Comment Form */}
             {session ? (
                 <form onSubmit={handleSubmit} className="mb-8">
-                    <div className="bg-[#252C3E] rounded-lg border border-white/[0.14] p-4 relative">
+                    <div className="bg-[#313A52] rounded-lg border border-white/[0.18] p-4 relative">
                         <div className="flex gap-4">
                             <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-800 flex-shrink-0">
                                 {session.user?.image ? (
