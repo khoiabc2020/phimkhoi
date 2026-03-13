@@ -76,12 +76,12 @@ export default function WatchEngagementBar({
     };
 
     return (
-        <div className="rounded-lg border border-white/[0.16] overflow-hidden"
-            style={{ background: '#202636' }}>
+        <div className="relative z-30 rounded-lg border border-white/[0.20] overflow-hidden shadow-xl shadow-black/30"
+            style={{ background: '#2A3144' }}>
 
             {/* Controls bar */}
-            <div className="flex items-center gap-4 py-3 px-5 border-b border-white/[0.14] overflow-x-auto hide-scrollbar md:flex-wrap md:justify-between md:overflow-visible"
-                style={{ background: '#1A2230' }}>
+            <div className="flex items-center gap-4 py-3 px-5 border-b border-white/[0.18] overflow-x-auto hide-scrollbar md:flex-wrap md:justify-between md:overflow-visible"
+                style={{ background: '#313A52' }}>
 
                 {/* Left */}
                 <div className="flex items-center shrink-0 gap-4">
@@ -90,7 +90,7 @@ export default function WatchEngagementBar({
                         size="sm"
                         className="!bg-transparent !border-0 text-gray-200 hover:text-yellow-400 flex items-center gap-2 !w-auto !h-auto !p-0 transition-colors"
                     />
-                    <div className="h-4 w-[1px] bg-white/10" />
+                    <div className="h-4 w-[1px] bg-white/20" />
                     <WatchlistInlineButton
                         slug={movie.slug}
                         movieName={movie.name}
@@ -99,7 +99,7 @@ export default function WatchEngagementBar({
                         size="sm"
                         className="!bg-transparent !border-0 !rounded-none !w-auto text-gray-200 hover:text-primary gap-1.5 px-0 text-xs font-semibold uppercase tracking-wide"
                     />
-                    <div className="h-4 w-[1px] bg-white/10" />
+                    <div className="h-4 w-[1px] bg-white/20" />
                     {onAutoNextToggle && (
                         <>
                             <button
@@ -112,12 +112,12 @@ export default function WatchEngagementBar({
                                 Chuyển tập
                                 <span className={cn(
                                     "px-1.5 py-0.5 rounded text-[10px] font-bold border",
-                                    autoNext ? "bg-yellow-400/15 text-yellow-400 border-yellow-400/30" : "bg-white/8 text-gray-200 border-white/15"
+                                    autoNext ? "bg-yellow-400/15 text-yellow-400 border-yellow-400/30" : "bg-white/10 text-gray-100 border-white/25"
                                 )}>
                                     {autoNext ? "ON" : "OFF"}
                                 </span>
                             </button>
-                            <div className="h-4 w-[1px] bg-white/10" />
+                            <div className="h-4 w-[1px] bg-white/20" />
                         </>
                     )}
                 </div>
@@ -129,7 +129,7 @@ export default function WatchEngagementBar({
                         <Monitor className="w-4 h-4" /> Rạp phim
                         <span className={cn("px-1.5 py-0.5 rounded text-[10px] font-bold border", isTheaterMode
                             ? "bg-yellow-400/15 text-yellow-400 border-yellow-400/30"
-                            : "bg-white/8 text-gray-200 border-white/15")}>
+                            : "bg-white/10 text-gray-100 border-white/25")}>
                             {isTheaterMode ? "ON" : "OFF"}
                         </span>
                     </button>}
@@ -138,7 +138,7 @@ export default function WatchEngagementBar({
                         <Moon className="w-4 h-4" /> Đèn
                         <span className={cn("px-1.5 py-0.5 rounded text-[10px] font-bold border", isLightOff
                             ? "bg-yellow-400/15 text-yellow-400 border-yellow-400/30"
-                            : "bg-white/8 text-gray-200 border-white/15")}>
+                            : "bg-white/10 text-gray-100 border-white/25")}>
                             {isLightOff ? "OFF" : "ON"}
                         </span>
                     </button>}
@@ -158,11 +158,11 @@ export default function WatchEngagementBar({
             </div>
 
             {/* Movie Info - luôn nằm ngang trên mọi thiết bị */}
-            <div className="flex flex-row gap-4 p-4 md:p-5 items-start border-t border-white/[0.08]"
-                style={{ background: '#242B3D' }}>
+            <div className="flex flex-row gap-4 p-4 md:p-5 items-start border-t border-white/[0.14]"
+                style={{ background: '#3A445E' }}>
                 {/* Poster */}
                 <div className="flex-shrink-0">
-                    <div className="relative w-20 h-[112px] md:w-24 md:h-[134px] rounded-lg overflow-hidden shadow-xl ring-1 ring-white/10">
+                    <div className="relative w-20 h-[112px] md:w-24 md:h-[134px] rounded-lg overflow-hidden shadow-xl ring-1 ring-white/20">
                         <Image
                             src={getImageUrl(movie.poster_url || movie.thumb_url)}
                             alt={movie.name}
@@ -181,11 +181,11 @@ export default function WatchEngagementBar({
                     {/* Tên gốc */}
                     <span className="text-[13px] font-semibold text-[#F7D772] leading-snug line-clamp-1">{movie.origin_name}</span>
                     {/* Meta: năm • chất lượng • thời lượng */}
-                    <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1" style={{ fontSize: '12px', color: '#e2e8f0' }}>
-                        {movie.year && <><span className="w-1 h-1 rounded-full bg-gray-600 inline-block" /><span>{movie.year}</span></>}
-                        {movie.quality && <><span className="w-1 h-1 rounded-full bg-gray-600 inline-block" />
+                    <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1" style={{ fontSize: '12px', color: '#f1f5f9' }}>
+                        {movie.year && <><span className="w-1 h-1 rounded-full bg-white/50 inline-block" /><span>{movie.year}</span></>}
+                        {movie.quality && <><span className="w-1 h-1 rounded-full bg-white/50 inline-block" />
                             <span className="px-1.5 py-0.5 rounded font-semibold text-white" style={{ background: 'rgba(255,255,255,0.16)', fontSize: '11px' }}>{movie.quality}</span></>}
-                        {movie.time && <><span className="w-1 h-1 rounded-full bg-gray-600 inline-block" /><span>{movie.time}</span></>}
+                        {movie.time && <><span className="w-1 h-1 rounded-full bg-white/50 inline-block" /><span>{movie.time}</span></>}
                     </div>
                     {/* Genres + IMDB badge cùng hàng */}
                     <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
