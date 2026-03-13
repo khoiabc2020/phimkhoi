@@ -36,6 +36,8 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+    const hasPosterSource = Boolean(movie.poster_url);
+    const usesThumbFallbackInPortrait = orientation === "portrait" && !hasPosterSource && Boolean(movie.thumb_url);
     const displayPoster = orientation === 'landscape'
         ? getImageUrl(movie.thumb_url || movie.poster_url)
         : getImageUrl(movie.poster_url || movie.thumb_url);
@@ -114,7 +116,10 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                             src={displayPoster || "/placeholder.svg"}
                             alt={decodeHtml(movie.name) || movie.slug || "Phim"}
                             fill
-                            className="object-cover transition-transform duration-300 ease-out group-hover/static-card:scale-105"
+                            className={cn(
+                                "transition-transform duration-300 ease-out group-hover/static-card:scale-105",
+                                usesThumbFallbackInPortrait ? "object-contain bg-[#0a0f1a]" : "object-cover"
+                            )}
                             sizes={orientation === 'landscape' ? "(max-width: 768px) 60vw, 30vw" : "(max-width: 768px) 40vw, 15vw"}
                             unoptimized
                             loading="eager"

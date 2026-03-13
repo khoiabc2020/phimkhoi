@@ -105,9 +105,9 @@ export default function WatchEpisodeSection({
     };
 
     return (
-        <div className="bg-[#1A1F2B] rounded-[12px] border border-white/[0.10] overflow-hidden mb-6 sm:mb-8 mt-4 mx-3 sm:mx-4 md:mx-0 shadow-2xl">
+        <div className="bg-[#0D1320] rounded-[12px] border border-white/[0.10] overflow-hidden mb-6 sm:mb-8 mt-4 mx-3 sm:mx-4 md:mx-0 shadow-2xl">
             {/* Header: DANH SÁCH TẬP */}
-            <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-4 sm:py-5 border-b border-white/[0.10] bg-[#151B26]">
+            <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-4 sm:py-5 border-b border-white/[0.10] bg-[#0A101A]">
                 <div className="flex items-center gap-2">
                     <List className="w-[18px] h-[18px] text-[#F4C84A]" />
                     <h3 className="text-[14px] font-bold text-white uppercase tracking-wider">
