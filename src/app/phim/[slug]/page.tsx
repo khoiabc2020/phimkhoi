@@ -323,7 +323,8 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                     </div>
 
                     {/* LEFT SIDEBAR (shown after tabs on mobile, beside on desktop) */}
-                    <div className="w-full lg:col-span-4 xl:col-span-3 order-2 lg:order-1 space-y-6 sm:space-y-8 lg:pr-4 lg:border-r lg:border-white/[0.04]">
+                    <div className="w-full lg:col-span-4 xl:col-span-3 order-2 lg:order-1 space-y-6 sm:space-y-8 lg:pr-4">
+                        <div className="rounded-[16px] border border-white/[0.10] bg-[#1A1F2B] p-4 sm:p-5 shadow-2xl space-y-6 sm:space-y-8">
                         {/* Nội dung */}
                         <div>
                             <div className="flex items-center gap-2 mb-3 sm:mb-4 border-l-2 border-[#F4C84A] pl-3">
@@ -334,35 +335,36 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
 
                         {/* Đạo diễn */}
                         <div>
-                            <div className="text-[11px] font-medium text-gray-500 uppercase tracking-widest mb-2">Đạo diễn</div>
+                            <div className="text-[11px] font-medium text-gray-400 uppercase tracking-widest mb-2">Đạo diễn</div>
                             <div className="text-[13px] font-bold text-white">{movie?.director?.join(", ") || "Đang cập nhật"}</div>
                         </div>
 
                         {/* Diễn viên */}
                         <div>
-                            <div className="text-[11px] font-medium text-gray-500 uppercase tracking-widest mb-3">Diễn viên</div>
+                            <div className="text-[11px] font-medium text-gray-400 uppercase tracking-widest mb-3">Diễn viên</div>
                             <MovieCast movie={movie} slug={movie.slug} isCompact={true} />
                         </div>
 
                         {/* Thể loại */}
                         <div>
-                            <div className="text-[11px] font-medium text-gray-500 uppercase tracking-widest mb-3">Thể loại</div>
+                            <div className="text-[11px] font-medium text-gray-400 uppercase tracking-widest mb-3">Thể loại</div>
                             <div className="flex flex-wrap gap-2">
                                 {movie?.category?.map((c: { slug?: string; name?: string; id?: string }) => (
-                                    <Link key={c.id} href={`/the-loai/${c.slug}`} className="text-[11px] font-medium text-gray-400 bg-white/5 border border-white/5 py-1.5 px-3 rounded-full hover:text-white hover:border-[#F4C84A]/50 transition-colors uppercase tracking-wider">{c.name}</Link>
+                                    <Link key={c.id} href={`/the-loai/${c.slug}`} className="text-[11px] font-medium text-gray-300 bg-white/[0.08] border border-white/[0.14] py-1.5 px-3 rounded-full hover:text-white hover:border-[#F4C84A]/50 transition-colors uppercase tracking-wider">{c.name}</Link>
                                 ))}
                             </div>
                         </div>
 
                         {/* Thông tin thêm */}
                         <div>
-                            <div className="text-[11px] font-medium text-gray-500 uppercase tracking-widest mb-3">Thông tin thêm</div>
+                            <div className="text-[11px] font-medium text-gray-400 uppercase tracking-widest mb-3">Thông tin thêm</div>
                             <div className="space-y-2 text-[13px]">
-                                <div className="flex justify-between border-b border-white/[0.04] pb-2"><span className="text-gray-500">Quốc gia:</span><span className="text-gray-300 font-medium">{movie?.country?.[0]?.name || "Đang cập nhật"}</span></div>
-                                <div className="flex justify-between border-b border-white/[0.04] pb-2"><span className="text-gray-500">Năm:</span><span className="text-gray-300 font-medium">{movie?.year || "Đang cập nhật"}</span></div>
-                                <div className="flex justify-between border-b border-white/[0.04] pb-2"><span className="text-gray-500">Chất lượng:</span><span className="text-gray-300 font-medium">{movie?.quality || "HD"}</span></div>
-                                <div className="flex justify-between"><span className="text-gray-500">Ngôn ngữ:</span><span className="text-gray-300 font-medium">{movie?.lang || "Đang cập nhật"}</span></div>
+                                <div className="flex justify-between border-b border-white/[0.08] pb-2"><span className="text-gray-400">Quốc gia:</span><span className="text-gray-200 font-medium">{movie?.country?.[0]?.name || "Đang cập nhật"}</span></div>
+                                <div className="flex justify-between border-b border-white/[0.08] pb-2"><span className="text-gray-400">Năm:</span><span className="text-gray-200 font-medium">{movie?.year || "Đang cập nhật"}</span></div>
+                                <div className="flex justify-between border-b border-white/[0.08] pb-2"><span className="text-gray-400">Chất lượng:</span><span className="text-gray-200 font-medium">{movie?.quality || "HD"}</span></div>
+                                <div className="flex justify-between"><span className="text-gray-400">Ngôn ngữ:</span><span className="text-gray-200 font-medium">{movie?.lang || "Đang cập nhật"}</span></div>
                             </div>
+                        </div>
                         </div>
                     </div>
 
