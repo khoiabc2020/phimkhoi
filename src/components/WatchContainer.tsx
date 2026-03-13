@@ -89,12 +89,12 @@ export default function WatchContainer({
     const backdropUrl = getImageUrl(movie.thumb_url || movie.poster_url);
 
     return (
-        <div className={cn("relative transition-all duration-500", isLightOff ? "z-[60]" : "")}>
+        <div className={cn("relative isolate transition-all duration-500", isLightOff ? "z-[60]" : "")}>
 
             {/* Global backdrop behind watch page – blurred and darkened for cinema feel */}
             {backdropUrl && (
                 <div
-                    className="pointer-events-none fixed inset-0 -z-[1] bg-cover bg-center"
+                    className="pointer-events-none fixed inset-0 -z-[3] bg-cover bg-center"
                     style={{
                         backgroundImage: `url(${backdropUrl})`,
                         filter: "blur(24px) brightness(0.45)",
@@ -103,8 +103,8 @@ export default function WatchContainer({
                 />
             )}
             {/* Overlay gradient to keep focus on center/left — synced with movie detail hero */}
-            <div className="pointer-events-none fixed inset-0 -z-[0] bg-gradient-to-t from-[#020617] via-[#020617]/80 to-[#020617]/20" />
-            <div className="pointer-events-none fixed inset-0 -z-[0] bg-gradient-to-r from-[#020617] via-[#020617]/65 to-transparent" />
+            <div className="pointer-events-none fixed inset-0 -z-[2] bg-gradient-to-t from-[#020617] via-[#020617]/80 to-[#020617]/20" />
+            <div className="pointer-events-none fixed inset-0 -z-[2] bg-gradient-to-r from-[#020617] via-[#020617]/65 to-transparent" />
 
             {/* Light Off Overlay */}
             {isLightOff && (
