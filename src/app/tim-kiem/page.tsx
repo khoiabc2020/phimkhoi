@@ -215,7 +215,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                                 <h2 className="text-base font-bold text-white">Phim</h2>
                             </div>
                         )}
-                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2 sm:gap-3 md:gap-4 [contain:layout_paint]">
+                        <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(160px,1fr))] md:grid-cols-[repeat(auto-fill,minmax(175px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(190px,1fr))] xl:grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-2 sm:gap-3 md:gap-4 [contain:layout_paint]">
                             {filteredMovies.map((movie: any) => (
                                 <MovieCard key={movie._id || movie.slug} movie={movie} />
                             ))}
