@@ -76,12 +76,12 @@ export default function WatchEngagementBar({
     };
 
     return (
-        <div className="rounded-lg border border-white/[0.10] overflow-hidden"
-            style={{ background: '#151924' }}>
+        <div className="rounded-lg border border-white/[0.12] overflow-hidden"
+            style={{ background: '#1A1F2B' }}>
 
             {/* Controls bar */}
-            <div className="flex items-center gap-4 py-3 px-5 border-b border-white/[0.08] overflow-x-auto hide-scrollbar md:flex-wrap md:justify-between md:overflow-visible"
-                style={{ background: '#10141d' }}>
+            <div className="flex items-center gap-4 py-3 px-5 border-b border-white/[0.10] overflow-x-auto hide-scrollbar md:flex-wrap md:justify-between md:overflow-visible"
+                style={{ background: '#151B26' }}>
 
                 {/* Left */}
                 <div className="flex items-center shrink-0 gap-4">

@@ -180,7 +180,7 @@ export default function WatchContainer({
                 </div>{/* end outer player card */}
 
                 {/* Info Bar below player - Inline Layout */}
-                <div className="mt-3 px-1 flex flex-row items-center justify-between gap-2 overflow-hidden">
+                <div className="mt-3 px-3 py-2.5 flex flex-row items-center justify-between gap-2 overflow-hidden rounded-lg border border-white/[0.10] bg-[#171B24] shadow-sm">
                     {/* Left: Title + Episode name */}
                     <div className="flex items-center gap-2 min-w-0 pr-2">
                         <Link
@@ -212,7 +212,7 @@ export default function WatchContainer({
                                 <span className="hidden sm:inline ml-1">Tập trước</span>
                             </Link>
                         ) : (
-                            <div className="flex items-center justify-center text-xs font-semibold text-white/20 w-9 h-9 sm:w-auto sm:px-3 sm:py-2 rounded-lg bg-white/[0.03] border border-white/5 cursor-not-allowed">
+                            <div className="flex items-center justify-center text-xs font-semibold text-gray-500 w-9 h-9 sm:w-auto sm:px-3 sm:py-2 rounded-lg bg-[#232836] border border-white/10 cursor-not-allowed">
                                 <ChevronLeft className="w-4 h-4" />
                                 <span className="hidden sm:inline ml-1">Tập trước</span>
                             </div>
@@ -226,10 +226,10 @@ export default function WatchContainer({
                                 "flex items-center justify-center transition-all w-9 h-9 sm:w-auto sm:px-3 sm:py-2 rounded-lg border touch-manipulation active:scale-95",
                                 autoNext
                                     ? "bg-yellow-400/15 text-yellow-400 border-yellow-400/30 hover:bg-yellow-400/25"
-                                    : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10"
+                                    : "bg-white/8 text-gray-200 border-white/15 hover:bg-white/12"
                             )}
                         >
-                            <SkipForward className={cn("w-3.5 h-3.5", autoNext ? "text-yellow-400" : "text-gray-500")} />
+                            <SkipForward className={cn("w-3.5 h-3.5", autoNext ? "text-yellow-400" : "text-gray-300")} />
                             <span className="hidden sm:inline ml-1.5 text-xs font-bold">Tự chuyển</span>
                             <span className={cn(
                                 "hidden sm:inline ml-1.5 px-1 py-0.5 rounded text-[10px] font-bold",
@@ -250,7 +250,7 @@ export default function WatchContainer({
                                 <ChevronRight className="w-4 h-4" />
                             </Link>
                         ) : (
-                            <div className="flex items-center justify-center text-xs font-semibold text-white/20 w-9 h-9 sm:w-auto sm:px-3 sm:py-2 rounded-lg bg-white/[0.03] border border-white/5 cursor-not-allowed">
+                            <div className="flex items-center justify-center text-xs font-semibold text-gray-500 w-9 h-9 sm:w-auto sm:px-3 sm:py-2 rounded-lg bg-[#232836] border border-white/10 cursor-not-allowed">
                                 <span className="hidden sm:inline mr-1">Tập sau</span>
                                 <ChevronRight className="w-4 h-4" />
                             </div>

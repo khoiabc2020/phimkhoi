@@ -105,9 +105,9 @@ export default function WatchEpisodeSection({
     };
 
     return (
-        <div className="bg-[#11131A] rounded-[16px] border border-white/[0.08] overflow-hidden mb-6 sm:mb-8 mt-4 mx-3 sm:mx-4 md:mx-0 shadow-2xl">
+        <div className="bg-[#1A1F2B] rounded-[16px] border border-white/[0.10] overflow-hidden mb-6 sm:mb-8 mt-4 mx-3 sm:mx-4 md:mx-0 shadow-2xl">
             {/* Header: DANH SÁCH TẬP */}
-            <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-4 sm:py-5 border-b border-white/[0.08] bg-white/[0.02]">
+            <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-4 sm:py-5 border-b border-white/[0.10] bg-[#151B26]">
                 <div className="flex items-center gap-2">
                     <List className="w-[18px] h-[18px] text-[#F4C84A]" />
                     <h3 className="text-[14px] font-bold text-white uppercase tracking-wider">
@@ -155,7 +155,7 @@ export default function WatchEpisodeSection({
                                         isActive ? "text-[#F4C84A]" : "text-gray-400 hover:text-gray-200"
                                     )}
                                 >
-                                    <Icon className={cn("w-[14px] h-[14px] sm:w-[16px] sm:h-[16px]", isActive ? "text-[#F4C84A]" : "text-gray-500")} />
+                                    <Icon className={cn("w-[14px] h-[14px] sm:w-[16px] sm:h-[16px]", isActive ? "text-[#F4C84A]" : "text-gray-400")} />
                                     {lang}
                                     {isActive && (
                                         <span className="absolute bottom-[-1px] left-0 right-0 h-[3px] rounded-t-full bg-[#F4C84A] shadow-[0_0_12px_#F4C84A99]" />
@@ -169,7 +169,7 @@ export default function WatchEpisodeSection({
                 {/* Server selector - compact inline on all sizes */}
                 <div className="flex flex-row items-center gap-2 sm:gap-3 mb-3 sm:mb-6 flex-wrap">
                     <div className="flex items-center gap-1.5 text-gray-400 text-[11px] sm:text-[12px] font-bold uppercase tracking-widest shrink-0">
-                        <Database className="w-[13px] h-[13px] sm:w-[15px] sm:h-[15px] text-gray-500" strokeWidth={2.5} />
+                        <Database className="w-[13px] h-[13px] sm:w-[15px] sm:h-[15px] text-gray-400" strokeWidth={2.5} />
                         Máy Chủ:
                     </div>
 
@@ -198,7 +198,7 @@ export default function WatchEpisodeSection({
                                         >
                                             <span className="truncate max-w-[120px] sm:max-w-[150px]">{displayName}</span>
                                             <span className={cn("w-[2px] h-3 rounded-full", isServerActive ? "bg-black/20" : "bg-white/10")} />
-                                            <span className={cn("font-bold", isServerActive ? "" : "text-gray-500")}>{s.server_data.length}</span>
+                                            <span className={cn("font-bold", isServerActive ? "" : "text-gray-300")}>{s.server_data.length}</span>
                                         </button>
                                     );
                                 });
