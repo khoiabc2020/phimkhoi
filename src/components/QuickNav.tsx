@@ -49,25 +49,25 @@ const NAV_ITEMS = [
 
 export default function QuickNav() {
     return (
-        <div className="w-full py-2 pb-8">
-            <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12 mb-4">
-                <h2 className="text-[17px] font-bold text-white mb-5 flex items-center gap-2">
+        <div className="w-full py-2 pb-6">
+            <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 mb-3">
+                <h2 className="text-[16px] md:text-[18px] font-extrabold text-white mb-4 flex items-center gap-2 tracking-tight">
                     <span className="w-1 h-5 bg-[#F4C84A] rounded-sm inline-block" />
                     Bạn đang quan tâm gì?
                 </h2>
 
-                <div className="flex gap-3 overflow-x-auto no-scrollbar py-2 px-1 -mx-1 snap-x">
+                <div className="flex gap-2.5 overflow-x-auto no-scrollbar py-1 px-0.5 -mx-0.5 snap-x">
                     {NAV_ITEMS.map((item, index) => (
                         <Link
                             key={index}
                             href={item.href}
                             aria-label={`Xem ${item.label}`}
-                            className="quick-nav-card flex-[0_0_150px] sm:flex-[0_0_180px] md:flex-[0_0_200px] lg:flex-[1] aspect-[1.8/1] relative rounded-lg overflow-hidden snap-start transition-all duration-300 hover:scale-[1.02] shadow-sm hover:shadow-md"
+                            className="quick-nav-card flex-[0_0_138px] sm:flex-[0_0_170px] md:flex-[0_0_190px] lg:flex-[1] aspect-[1.8/1] relative rounded-[12px] overflow-hidden snap-start transition-all duration-300 hover:scale-[1.02] shadow-sm hover:shadow-md"
                             style={{ background: `linear-gradient(135deg, ${item.from}, ${item.to})` }}
                         >
                             {/* Bottom content */}
                             <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4 flex flex-col justify-end h-full">
-                                <h3 className="text-white font-bold text-[16px] sm:text-[18px] leading-tight mb-1">
+                                <h3 className="text-white font-bold text-[15px] sm:text-[17px] leading-tight mb-1">
                                     {item.label}
                                 </h3>
                                 <p className="text-white/80 text-[11px] sm:text-[12px] font-medium flex items-center gap-1 group-hover:gap-1.5 transition-all">
