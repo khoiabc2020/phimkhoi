@@ -173,8 +173,8 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                                     alt=""
                                     fill
                                     className="object-cover object-top"
-                                    priority={true}
-                                    loading="eager"
+                                    priority={isActive && i < 2}
+                                    loading={isActive ? "eager" : "lazy"}
                                     sizes="100vw"
                                     placeholder="blur"
                                     blurDataURL={blurData}
@@ -227,9 +227,9 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                                     placeholder="blur"
                                     blurDataURL={blurData}
                                     unoptimized
-                                    loading="eager"
+                                    loading={isActive ? "eager" : "lazy"}
                                     decoding="async"
-                                    priority={true}
+                                    priority={isActive && i < 2}
                                 />
                             </Link>
                         );
@@ -314,8 +314,8 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                             alt=""
                             fill
                             className="object-cover"
-                            priority={true}
-                            loading="eager"
+                            priority={isActive && i < 2}
+                            loading={isActive ? "eager" : "lazy"}
                             unoptimized
                             sizes="100vw"
                             placeholder="blur"
@@ -483,8 +483,8 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                                             alt={decodeHtml(m.name)}
                                             fill
                                             className="object-cover group-hover/poster:scale-105 transition-transform duration-300 ease-out"
-                                            priority={true}
-                                            loading="eager"
+                                            priority={isActive && i < 2}
+                                            loading={isActive ? "eager" : "lazy"}
                                             unoptimized
                                             sizes="(min-width: 1280px) 310px, (min-width: 1024px) 260px, 200px"
                                             placeholder="blur"

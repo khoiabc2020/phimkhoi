@@ -72,12 +72,12 @@ export default function FilterBar() {
     ];
 
     return (
-        <div className="flex flex-wrap gap-4 py-6">
+        <div className="flex flex-wrap gap-2 sm:gap-3 py-4">
             {/* Category Dropdown */}
             <div className="relative group">
                 <select
                     onChange={(e) => handleFilterChange("category", e.target.value)}
-                    className="appearance-none bg-black border border-gray-700 text-white py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:border-primary cursor-pointer"
+                    className="appearance-none min-w-[126px] bg-[#0d1422] border border-white/[0.10] text-white/90 py-2 px-3 pr-8 rounded-xl leading-tight focus:outline-none focus:border-[#F4C84A]/40 cursor-pointer text-sm"
                     value={searchParams.get("category") || "all"}
                 >
                     {categories.map((c) => (
@@ -86,7 +86,7 @@ export default function FilterBar() {
                         </option>
                     ))}
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/70">
                     <ChevronDown className="w-4 h-4" />
                 </div>
             </div>
@@ -95,7 +95,7 @@ export default function FilterBar() {
             <div className="relative group">
                 <select
                     onChange={(e) => handleFilterChange("country", e.target.value)}
-                    className="appearance-none bg-black border border-gray-700 text-white py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:border-primary cursor-pointer"
+                    className="appearance-none min-w-[126px] bg-[#0d1422] border border-white/[0.10] text-white/90 py-2 px-3 pr-8 rounded-xl leading-tight focus:outline-none focus:border-[#F4C84A]/40 cursor-pointer text-sm"
                     value={searchParams.get("country") || "all"}
                 >
                     {countries.map((c) => (
@@ -104,7 +104,7 @@ export default function FilterBar() {
                         </option>
                     ))}
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/70">
                     <ChevronDown className="w-4 h-4" />
                 </div>
             </div>
@@ -113,7 +113,7 @@ export default function FilterBar() {
             <div className="relative group">
                 <select
                     onChange={(e) => handleFilterChange("year", e.target.value)}
-                    className="appearance-none bg-black border border-gray-700 text-white py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:border-primary cursor-pointer"
+                    className="appearance-none min-w-[110px] bg-[#0d1422] border border-white/[0.10] text-white/90 py-2 px-3 pr-8 rounded-xl leading-tight focus:outline-none focus:border-[#F4C84A]/40 cursor-pointer text-sm"
                     value={searchParams.get("year") || "all"}
                 >
                     {years.map((y) => (
@@ -122,7 +122,7 @@ export default function FilterBar() {
                         </option>
                     ))}
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/70">
                     <ChevronDown className="w-4 h-4" />
                 </div>
             </div>
