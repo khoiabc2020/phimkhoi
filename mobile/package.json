@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
-    "android:build": "cd android && ./gradlew assembleRelease",
+    "android:build": "cd android && gradlew.bat assembleRelease",
     "build:android": "eas build --platform android --profile production",
     "build:ios": "eas build --platform ios --profile production",
     "android": "expo run:android",
