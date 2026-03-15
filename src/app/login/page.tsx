@@ -78,7 +78,7 @@ function LoginForm() {
     };
 
     return (
-        <div className="relative z-10 w-full max-w-[450px] mx-4 p-8 md:p-12 bg-black/80 border border-white/10 rounded-lg shadow-2xl flex flex-col items-center">
+        <div className="relative z-10 w-full max-w-[450px] mx-4 p-8 md:p-12 bg-black/70 border border-white/15 rounded-2xl shadow-2xl flex flex-col items-center backdrop-blur-xl">
             <h1 className="text-3xl font-bold text-white mb-2 text-center w-full">Chào mừng trở lại</h1>
             <p className="text-[#a3a3a3] text-[15px] mb-8 text-center w-full">Cùng thưởng thức những bộ phim tuyệt vời nhất.</p>
 
