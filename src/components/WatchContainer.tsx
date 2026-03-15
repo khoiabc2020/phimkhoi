@@ -163,7 +163,7 @@ export default function WatchContainer({
                 </div>{/* end outer player card */}
 
                 {/* Info Bar below player - Inline Layout */}
-                <div className="mt-3 px-3 py-2.5 flex flex-row items-center justify-between gap-2 overflow-hidden rounded-lg border border-white/[0.10] bg-[#171B24] shadow-sm">
+                <div className="mt-2 px-3 py-2.5 flex flex-row items-center justify-between gap-2 overflow-hidden rounded-lg border border-white/[0.10] bg-[#171B24] shadow-sm">
                     {/* Left: Title + Episode name */}
                     <div className="flex items-center gap-2 min-w-0 pr-2">
                         <Link
