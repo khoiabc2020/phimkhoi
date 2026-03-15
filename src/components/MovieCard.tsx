@@ -36,33 +36,36 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    const hasPosterSource = Boolean(movie.poster_url);
-    const usesThumbFallbackInPortrait = orientation === "portrait" && !hasPosterSource && Boolean(movie.thumb_url);
-
-    // Poster (ảnh dọc): luôn ưu tiên trường poster_url từ các nguồn,
-    // nếu không có thì tới TMDB poster, cuối cùng mới rơi xuống thumb_url.
+    // Poster (ảnh dọc) – luôn ưu tiên đúng nguồn poster, hạn chế tối đa việc dùng ảnh ngang
     const tmdbPoster =
         (movie as any).tmdbData?.poster_path
             ? getTMDBImage((movie as any).tmdbData.poster_path)
             : null;
 
     const portraitPosterSource =
-        movie.poster_url ||
-        tmdbPoster ||
-        movie.thumb_url ||
+        movie.poster_url ||        // poster từ KKPhim/OPhim/NguonC (thường là ảnh dọc)
+        tmdbPoster ||              // poster TMDB (đảm bảo ảnh dọc)
+        movie.thumb_url ||         // chỉ fallback sang thumb nếu bắt buộc
         "";
+
+    const usingThumbAsPortrait =
+        orientation === "portrait" &&
+        !movie.poster_url &&
+        !tmdbPoster &&
+        Boolean(movie.thumb_url);
 
     const displayPoster = orientation === "landscape"
         ? getImageUrl(movie.thumb_url || movie.poster_url || portraitPosterSource)
         : getImageUrl(portraitPosterSource);
 
-    // Backdrop/overlay (ảnh ngang): ưu tiên TMDB backdrop, sau đó tới thumb_url, rồi poster.
+    // Backdrop/overlay (ảnh ngang): ưu tiên TMDB backdrop, sau đó thumb (thường là ảnh ngang).
+    // Không fallback sang poster để tránh dùng ảnh dọc cho overlay.
     const tmdbBackdrop =
         (movie as any).tmdbData?.backdrop_path
             ? getTMDBImage((movie as any).tmdbData.backdrop_path)
             : null;
 
-    const displayBackdrop = tmdbBackdrop || getImageUrl(movie.thumb_url || movie.poster_url);
+    const displayBackdrop = tmdbBackdrop || (movie.thumb_url ? getImageUrl(movie.thumb_url) : null);
 
     const handleMouseEnter = () => {
         if (leaveTimeoutRef.current) {
@@ -138,7 +141,7 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                             fill
                             className={cn(
                                 "transition-transform duration-300 ease-out group-hover/static-card:scale-105",
-                                usesThumbFallbackInPortrait ? "object-contain bg-[#0a0f1a]" : "object-cover"
+                                usingThumbAsPortrait ? "object-contain bg-[#0a0f1a]" : "object-cover"
                             )}
                             sizes={orientation === 'landscape' ? "(max-width: 768px) 60vw, 30vw" : "(max-width: 768px) 40vw, 15vw"}
                             unoptimized
@@ -292,18 +295,20 @@ function OnflixHoverCard({
                         {!imgLoaded && !hasError && (
                             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/[0.02] animate-pulse" />
                         )}
-                        <Image
-                            src={(orientation === "portrait"
-                                ? getImageUrl(movie.poster_url || movie.thumb_url)
-                                : displayBackdrop) || "/placeholder.svg"}
-                            alt={decodeHtml(movie.name) || movie.slug || "Phim"}
-                            fill
-                            className={`object-cover object-top transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
-                            unoptimized
-                            priority
-                            onLoad={() => setImgLoaded(true)}
-                            onError={() => { setImgLoaded(true); setHasError(true); }}
-                        />
+                        {displayBackdrop ? (
+                            <Image
+                                src={displayBackdrop}
+                                alt={decodeHtml(movie.name) || movie.slug || "Phim"}
+                                fill
+                                className={`object-cover object-top transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+                                unoptimized
+                                priority
+                                onLoad={() => setImgLoaded(true)}
+                                onError={() => { setImgLoaded(true); setHasError(true); }}
+                            />
+                        ) : (
+                            <div className="absolute inset-0 bg-gradient-to-br from-[#151823] to-[#0b0d13]" />
+                        )}
 
                         {trailerKey && (
                             <div className="absolute inset-0 z-10 w-[300%] h-[300%] -left-[100%] -top-[100%] pointer-events-none">
