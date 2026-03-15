@@ -171,6 +171,8 @@ export default function VideoPlayer({
                 const Artplayer = (await import("artplayer")).default;
                 const isHls = streamUrl.includes(".m3u8");
 
+                const isMobileNarrow = typeof window !== "undefined" && window.innerWidth <= 768;
+
                 art = new Artplayer({
                     container: artRef.current!,
                     url: streamUrl,
@@ -194,7 +196,7 @@ export default function VideoPlayer({
                     i18n: { "vi": VI_LOCALE },
                     lang: "vi",
                     moreVideoAttr: { crossOrigin: "anonymous" },
-                    // Controls: skip -10, skip +10
+                    // Controls: skip -10, skip +10 (luôn giữ), auto-next + next-episode chỉ trên màn lớn
                     controls: [
                         // Skip back 10s
                         {
@@ -222,8 +224,8 @@ export default function VideoPlayer({
                             tooltip: "Tua tiếp 10s",
                             click: () => { if (art) art.currentTime = Math.min(art.duration, art.currentTime + 10); },
                         },
-                        // Auto Next Episode Toggle
-                        {
+                        // Auto Next Episode Toggle (ẩn trên màn mobile dọc)
+                        ...(!isMobileNarrow ? [{
                             position: "right",
                             name: "auto-next",
                             index: 10,
@@ -266,9 +268,9 @@ export default function VideoPlayer({
                                     }
                                 }
                             }
-                        },
-                        // Next Episode Button
-                        {
+                        } as any] : []),
+                        // Next Episode Button (ẩn trên màn mobile dọc)
+                        ...(!isMobileNarrow ? [{
                             position: "right",
                             name: "next-episode",
                             index: 11,
@@ -284,7 +286,7 @@ export default function VideoPlayer({
                                     router.push(nextEpisodeUrlRef.current);
                                 }
                             },
-                        },
+                        } as any] : []),
                     ],
                     customType: {
                         m3u8: async (video: HTMLVideoElement, src: string) => {
