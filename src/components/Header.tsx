@@ -361,7 +361,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                         "absolute right-0 z-20 w-10 h-10 flex items-center justify-center rounded-full border transition-all duration-300",
                                         isSearchOpen
                                             ? "bg-transparent border-transparent pointer-events-none"
-                                            : "bg-white/[0.08] hover:bg-white/[0.15] border-white/[0.08] hover:scale-105 active:scale-95"
+                                            : "bg-[#0f1626]/85 hover:bg-[#182237]/95 border-white/[0.12] hover:scale-105 active:scale-95"
                                     )}
                                 >
                                     <Search className={cn("w-4 h-4 transition-colors", isSearchOpen ? "hidden" : "text-white/80")} />
@@ -378,7 +378,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         onFocus={() => setShowHistory(true)}
                                         placeholder="Tìm kiếm..."
-                                        className="w-full h-10 bg-[#0c0f18]/95 border border-white/[0.12] rounded-full pl-4 pr-10 text-sm text-white outline-none focus:border-primary/50 transition-all duration-300 shadow-xl backdrop-blur-md"
+                                        className="w-full h-10 bg-[#0f1626]/96 border border-white/[0.14] rounded-full pl-4 pr-10 text-sm text-white outline-none focus:border-primary/40 transition-all duration-300 shadow-[0_12px_36px_rgba(0,0,0,0.45)] backdrop-blur-md"
                                     />
 
                                     {isSearchOpen && (

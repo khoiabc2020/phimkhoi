@@ -19,30 +19,30 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
     const topMovies = movies.slice(0, 10);
 
     return (
-        <div className={cn("w-full relative py-4", className)}>
+        <div className={cn("w-full relative py-2", className)}>
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-bold text-white capitalize flex items-center gap-3">
+            <div className="flex items-center justify-between mb-4">
+                <h2 className="text-[17px] font-extrabold text-white capitalize flex items-center gap-2.5 tracking-tight">
                     <span className="w-1 h-5 bg-[#fbbf24] rounded-full"></span>
                     <span className="leading-tight">{title}</span>
                 </h2>
                 {slug && (
-                    <Link href={slug} className="text-xs font-medium text-[#fbbf24] hover:text-white flex items-center gap-1 transition-colors group">
+                    <Link href={slug} className="text-xs font-semibold text-[#fbbf24] hover:text-white flex items-center gap-1 transition-colors group">
                         Xem tất cả <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </Link>
                 )}
             </div>
 
             {/* List Container */}
-            <div className="flex lg:flex-col gap-4 lg:gap-5 overflow-x-auto lg:overflow-visible no-scrollbar pb-4 lg:pb-0 snap-x lg:snap-none [contain:layout_paint]">
+            <div className="flex lg:flex-col gap-3 lg:gap-3 overflow-x-auto lg:overflow-visible no-scrollbar pb-3 lg:pb-0 snap-x lg:snap-none [contain:layout_paint]">
                 {topMovies.map((movie, index) => (
                     <Link
                         key={movie._id}
                         href={`/phim/${movie.slug}`}
-                        className="group flex flex-col lg:flex-row gap-3 p-2 rounded-lg lg:hover:bg-white/5 transition-colors border border-transparent lg:hover:border-white/5 w-[140px] md:w-[160px] lg:w-full shrink-0 snap-start bg-white/5 lg:bg-transparent"
+                        className="group flex flex-col lg:flex-row gap-2.5 p-2.5 rounded-[12px] transition-colors border border-white/[0.06] hover:border-white/[0.16] hover:bg-white/[0.03] w-[138px] md:w-[156px] lg:w-full shrink-0 snap-start bg-[#0b1220]"
                     >
                         {/* Poster Container */}
-                        <div className="relative w-full lg:w-[100px] xl:w-[120px] aspect-[2/3] rounded-md overflow-hidden flex-shrink-0 shadow-md">
+                        <div className="relative w-full lg:w-[92px] xl:w-[104px] aspect-[2/3] rounded-[10px] overflow-hidden flex-shrink-0 shadow-md">
                             <Image
                                 src={getImageUrl(movie.poster_url || movie.thumb_url)}
                                 alt={movie.name}
@@ -53,7 +53,7 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
                             />
 
                             {/* Rank Number (Inside Image) */}
-                            <div className="absolute top-0 left-0 w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-black/70 backdrop-blur-md rounded-br-lg z-20">
+                            <div className="absolute top-0 left-0 w-8 h-8 md:w-9 md:h-9 flex items-center justify-center bg-black/75 backdrop-blur-md rounded-br-lg z-20">
                                 <span className={cn(
                                     "font-black text-lg md:text-xl italic",
                                     index === 0 ? "text-[#fbbf24]" :

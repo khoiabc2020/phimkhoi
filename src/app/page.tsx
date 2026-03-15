@@ -15,7 +15,7 @@ export const revalidate = 3600;
 
 const heroSkeleton = <div className="w-full h-[60vh] md:h-[80vh] bg-[#020617] animate-pulse" />;
 const contentSkeleton = (
-  <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12 py-8 space-y-8">
+  <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 py-8 space-y-8">
     <div className="h-6 w-48 bg-white/10 rounded animate-pulse" />
     <div className="flex gap-4 overflow-hidden">
       {[1, 2, 3, 4, 5].map((i) => (
@@ -67,7 +67,9 @@ async function AsyncTopTrending({ title, slug, type }: { title: string, slug: st
 
 async function AsyncHeroSection({ initialMovies }: { initialMovies: any[] }) {
   const enhancedHeroData = await Promise.all(
-    initialMovies.map(async (movie) => {
+    initialMovies.map(async (movie, idx) => {
+      // Chỉ enrich TMDB cho các slide đầu để giảm thời gian render trang chủ
+      if (idx > 2) return { ...movie, tmdbData: null };
       const year = movie.year ? parseInt(movie.year.toString().split("-")[0]) : undefined;
       let type: 'movie' | 'tv' = 'movie';
       if (movie.type === 'phim-bo' || movie.type === 'tv-shows' || movie.type === 'hoat-hinh') type = 'tv';
@@ -108,12 +110,12 @@ async function HomeContentStream() {
   const homeData = await getHomeData();
 
   return (
-    <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12 relative z-20 pb-16">
+    <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 relative z-20 pb-16">
       <div className="mb-6">
         <QuickNav />
       </div>
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
-        <div className="xl:col-span-9 space-y-12 md:space-y-14">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-10">
+        <div className="xl:col-span-9 space-y-10 md:space-y-12">
           <LazySection minHeight={360}>
             <HomeSection title="Đề xuất cho bạn">
               <ContinueWatchingRow />
