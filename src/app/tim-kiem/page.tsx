@@ -7,9 +7,30 @@ import Link from "next/link";
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q: string; category?: string; country?: string; year?: string }> }) {
     const { q, category, country, year } = await searchParams;
-    const keyword = q || "";
+    const keyword = (q || "").trim();
 
-    // Fetch movies + actors concurrently for best performance
+    if (!keyword) {
+        return (
+            <main className="min-h-screen pb-20">
+                <div className="w-full max-w-[1920px] mx-auto px-4 pt-24">
+                    <div className="mb-6">
+                        <h1 className="text-lg md:text-xl font-bold text-white flex items-center gap-2">
+                            <span className="w-1 h-5 bg-[#fbbf24] rounded-full"></span>
+                            Tìm kiếm
+                        </h1>
+                        <p className="text-gray-400 text-sm mt-1">
+                            Nhập từ khóa để bắt đầu tìm phim.
+                        </p>
+                        <div className="mt-6">
+                            <FilterBar />
+                        </div>
+                    </div>
+                </div>
+            </main>
+        );
+    }
+
+    // Fetch movies + actors concurrently (giới hạn kết quả để nhanh hơn trên mobile)
     const [movies, actors] = await Promise.all([
         searchMovies(keyword),
         keyword.length >= 2 ? searchTMDBPerson(keyword) : Promise.resolve([])

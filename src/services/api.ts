@@ -400,10 +400,14 @@ export const NGUONC_API = "https://phim.nguonc.com";
 
 export const searchMovies = async (keyword: string) => {
     try {
+        const q = String(keyword || "").trim();
+        if (q.length < 2) return [];
+
+        const encoded = encodeURIComponent(q);
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
-            fetch(`${API_URL}/v1/api/tim-kiem?keyword=${keyword}&limit=20`).then(r => r.json()),
-            fetch(`${OPHIM_API}/v1/api/tim-kiem?keyword=${keyword}&limit=20`).then(r => r.json()),
-            fetch(`${NGUONC_API}/api/films/search?keyword=${keyword}`).then(r => r.json())
+            fetch(`${API_URL}/v1/api/tim-kiem?keyword=${encoded}&limit=12`).then(r => r.json()),
+            fetch(`${OPHIM_API}/v1/api/tim-kiem?keyword=${encoded}&limit=12`).then(r => r.json()),
+            fetch(`${NGUONC_API}/api/films/search?keyword=${encoded}`).then(r => r.json())
         ]);
 
         let results: Movie[] = [];

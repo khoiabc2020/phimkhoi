@@ -553,7 +553,7 @@ export default function VideoPlayer({
                         width: 22px !important;
                         height: 22px !important;
                     }
-                    /* Hide less important controls on tiny screens */
+                    /* Hide less important controls on small screens */
                     .art-ios-theme.art-video-player .art-screenshot { display: none !important; }
                     /* Force fullscreen button always visible on mobile */
                     .art-ios-theme.art-video-player .art-fullscreen,
@@ -566,7 +566,7 @@ export default function VideoPlayer({
                     .art-ios-theme.art-video-player .art-pip { display: none !important; }
                 }
 
-                /* Hide "Chuyển tập" text on small mobile, only keep toggle */
+                /* Extra-compact controls on very small mobile (dọc) */
                 @media (max-width: 540px) {
                     #auto-next-toggle > span:first-child {
                         display: none !important;
@@ -584,6 +584,12 @@ export default function VideoPlayer({
                     .art-ios-theme.art-video-player .art-time {
                         font-size: 11px !important;
                         margin: 0 4px !important;
+                    }
+                    /* Ẩn bớt icon Setting / Aspect / Speed để thanh không bị chật */
+                    .art-ios-theme.art-video-player .art-setting,
+                    .art-ios-theme.art-video-player .art-playbackRate,
+                    .art-ios-theme.art-video-player .art-aspect-ratio {
+                        display: none !important;
                     }
                 }
             `}</style>
