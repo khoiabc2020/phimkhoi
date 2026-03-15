@@ -77,20 +77,20 @@ export default function MobileMenu({
         <>
             {/* Backdrop */}
             {isOpen && (
-                <div className="fixed inset-0 z-[9999] lg:hidden bg-black/85" onClick={onClose} />
+                <div className="fixed inset-0 z-[9999] lg:hidden bg-black/72 backdrop-blur-[2px]" onClick={onClose} />
             )}
 
             {/* Drawer */}
             <div
                 className={cn(
-                    "fixed top-0 left-0 bottom-0 z-[10000] lg:hidden w-[320px] flex flex-col transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
-                    "border-r border-white/[0.06]",
+                    "fixed top-0 left-0 bottom-0 z-[10000] lg:hidden w-[min(360px,92vw)] flex flex-col transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] shadow-[0_18px_60px_rgba(0,0,0,0.55)]",
+                    "border-r border-white/[0.10] backdrop-blur-xl",
                     isOpen ? "translate-x-0" : "-translate-x-full"
                 )}
-                style={{ background: "linear-gradient(180deg, #0e1118 0%, #0a0d14 100%)" }}
+                style={{ background: "linear-gradient(180deg, #0d1320 0%, #090e18 100%)" }}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between px-5 h-[68px] shrink-0 border-b border-white/[0.06]">
+                <div className="flex items-center justify-between px-5 h-[72px] shrink-0 border-b border-white/[0.10] bg-[#0b1220]/88">
                     <Link href="/" onClick={onClose} className="flex items-center gap-2.5">
                         <Image
                             src="/logo.png"
@@ -99,7 +99,7 @@ export default function MobileMenu({
                             height={34}
                             className="w-[34px] h-[34px] rounded-[10px] object-cover shadow-[0_0_12px_#F4C84A40] ring-1 ring-white/10"
                         />
-                        <span className="text-[17px] font-black text-white tracking-tighter">MOVIE<span className="text-[#F4C84A]">BOX</span></span>
+                        <span className="text-[18px] font-black text-white tracking-tight">MOVIE<span className="text-[#F4C84A]">BOX</span></span>
                     </Link>
                     <button
                         onClick={onClose}
@@ -115,19 +115,19 @@ export default function MobileMenu({
 
                     {/* Search Bar */}
                     <form onSubmit={handleSearch} className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" strokeWidth={2} />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/35" strokeWidth={2} />
                         <input
                             type="text"
                             value={searchQ}
                             onChange={e => setSearchQ(e.target.value)}
                             placeholder="Tìm phim, diễn viên..."
-                            className="w-full bg-white/[0.06] border border-white/[0.08] rounded-[12px] pl-9 pr-4 py-2.5 text-[14px] text-white placeholder:text-white/30 outline-none focus:border-[#F4C84A]/40 focus:bg-white/[0.08] transition-all"
+                            className="w-full bg-white/[0.05] border border-white/[0.12] rounded-[14px] pl-9 pr-4 py-2.5 text-[14px] text-white placeholder:text-white/32 outline-none focus:border-[#F4C84A]/45 focus:bg-white/[0.08] transition-all"
                         />
                     </form>
 
                     {/* User Card */}
                     {session ? (
-                        <div className="rounded-[18px] p-4 border border-white/[0.07]" style={{ background: "#FFFFFF0A" }}>
+                        <div className="rounded-[16px] p-4 border border-white/[0.10]" style={{ background: "rgba(255,255,255,0.035)" }}>
                             <div className="flex items-center gap-3 mb-3">
                                 <div className="w-11 h-11 rounded-full overflow-hidden border border-[#F4C84A]/30 shrink-0 ring-2 ring-[#F4C84A]/10">
                                     <img
@@ -160,10 +160,10 @@ export default function MobileMenu({
                             </div>
                         </div>
                     ) : (
-                        <div className="rounded-[18px] p-4 border border-[#F4C84A]/15 text-center" style={{ background: "#F4C84A0F" }}>
+                        <div className="rounded-[16px] p-4 border border-white/[0.10] text-center" style={{ background: "rgba(255,255,255,0.03)" }}>
                             <p className="text-white/45 mb-3 text-[13px] leading-relaxed">Đăng nhập để lưu phim yêu thích và lịch sử xem</p>
                             <Link href="/login" onClick={onClose}
-                                className="block w-full bg-[#F4C84A] text-black font-bold py-2.5 rounded-[12px] text-[14px] hover:brightness-105 transition-all"
+                            className="block w-full bg-[#F4C84A] text-black font-bold py-2.5 rounded-[12px] text-[14px] hover:brightness-105 transition-all"
                             >
                                 Đăng Nhập / Đăng Ký
                             </Link>
@@ -184,7 +184,7 @@ export default function MobileMenu({
                                 key={href}
                                 href={href}
                                 onClick={onClose}
-                                className="flex items-center gap-3 px-3 py-2.5 rounded-[12px] text-[14px] font-medium text-white/70 hover:text-white hover:bg-white/[0.06] transition-all group"
+                                className="flex items-center gap-3 px-3 py-2.5 rounded-[12px] text-[15px] font-semibold text-white/74 hover:text-white hover:bg-white/[0.06] transition-all group"
                             >
                                 <Icon className="w-[17px] h-[17px] text-white/35 group-hover:text-[#F4C84A]/80 transition-colors" strokeWidth={1.5} />
                                 <span className="flex-1">{label}</span>
@@ -211,19 +211,19 @@ export default function MobileMenu({
                                 />
                             </button>
                             {isCategoriesOpen && (
-                                <div className="mx-1 mt-1 mb-1 rounded-[14px] p-3 grid grid-cols-2 gap-1" style={{ background: "rgba(255,255,255,0.03)" }}>
+                                <div className="mx-1 mt-1 mb-1 rounded-[14px] p-3 grid grid-cols-3 gap-1.5 max-h-[230px] overflow-y-auto custom-scrollbar" style={{ background: "rgba(255,255,255,0.03)" }}>
                                     {displayCategories.slice(0, 10).map((cat) => (
                                         <Link
                                             key={cat.slug}
                                             href={`/the-loai/${cat.slug}`}
                                             onClick={onClose}
-                                            className="text-white/50 text-[13px] hover:text-white px-3 py-2 rounded-[10px] text-center transition-colors hover:bg-white/[0.06]"
+                                            className="text-white/55 text-[12px] hover:text-white px-2 py-2 rounded-[10px] text-center transition-colors hover:bg-white/[0.06]"
                                         >
                                             {cat.name}
                                         </Link>
                                     ))}
                                     <Link href="/the-loai" onClick={onClose}
-                                        className="text-[#F4C84A]/70 text-[12px] hover:text-[#F4C84A] px-3 py-2 rounded-[10px] text-center transition-colors col-span-2 font-medium"
+                                        className="text-[#F4C84A]/80 text-[12px] hover:text-[#F4C84A] px-3 py-2 rounded-[10px] text-center transition-colors col-span-3 font-medium"
                                     >
                                         Xem tất cả thể loại →
                                     </Link>
@@ -248,13 +248,13 @@ export default function MobileMenu({
                                 />
                             </button>
                             {isCountriesOpen && (
-                                <div className="mx-1 mt-1 mb-1 rounded-[14px] p-3 grid grid-cols-2 gap-1" style={{ background: "rgba(255,255,255,0.03)" }}>
+                                <div className="mx-1 mt-1 mb-1 rounded-[14px] p-3 grid grid-cols-3 gap-1.5 max-h-[240px] overflow-y-auto custom-scrollbar" style={{ background: "rgba(255,255,255,0.03)" }}>
                                     {displayCountries.map((c) => (
                                         <Link
                                             key={c.slug}
                                             href={`/quoc-gia/${c.slug}`}
                                             onClick={onClose}
-                                            className="text-white/50 text-[13px] hover:text-white px-3 py-2 rounded-[10px] text-center transition-colors hover:bg-white/[0.06]"
+                                            className="text-white/55 text-[12px] hover:text-white px-2 py-2 rounded-[10px] text-center transition-colors hover:bg-white/[0.06]"
                                         >
                                             {c.name}
                                         </Link>

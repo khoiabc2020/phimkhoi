@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Search, Bell, User, LogOut, Shield, Trash2, Clock, History, Heart, Settings, Menu, X, ChevronDown, Play, Film, Video, LayoutGrid, Download, Loader2, Bookmark } from "lucide-react";
+import { Search, Bell, User, LogOut, Shield, Trash2, Clock, History, Heart, Settings, X, ChevronDown, Play, Film, Video, LayoutGrid, Download, Loader2, Bookmark } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
@@ -206,9 +206,14 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         {/* Mobile Menu Button */}
                         <button
                             onClick={() => setIsMobileMenuOpen(true)}
-                            className="lg:hidden p-2 -ml-2 text-white hover:bg-white/10 rounded-full transition-colors order-1 md:order-none"
+                            className="lg:hidden w-10 h-10 -ml-1 rounded-xl bg-white/[0.96] hover:bg-white text-[#0b0f18] shadow-[0_6px_18px_rgba(0,0,0,0.28)] border border-black/10 transition-all active:scale-95 flex items-center justify-center order-1 md:order-none"
+                            aria-label="Mở menu"
                         >
-                            <Menu className="w-6 h-6" />
+                            <span className="relative flex h-5 w-6 flex-col items-start justify-center gap-1.5">
+                                <span className="h-[3px] w-6 rounded-full bg-current" />
+                                <span className="h-[3px] w-4 rounded-full bg-current" />
+                                <span className="h-[3px] w-5 rounded-full bg-current" />
+                            </span>
                         </button>
 
                         {/* Logo */}
@@ -293,7 +298,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                 onClick={() =>
                                     setOpenDropdown(prev => (prev === "countries" ? null : "countries"))
                                 }
-                                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text白/70 hover:text-white hover:bg-white/5 rounded-full transition-all whitespace-nowrap"
+                                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-full transition-all whitespace-nowrap"
                             >
                                 Quốc gia{" "}
                                 <ChevronDown

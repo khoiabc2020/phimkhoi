@@ -145,8 +145,8 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                             )}
                             sizes={orientation === 'landscape' ? "(max-width: 768px) 60vw, 30vw" : "(max-width: 768px) 40vw, 15vw"}
                             unoptimized
-                            loading="eager"
-                            priority={true}
+                            loading="lazy"
+                            priority={false}
                             placeholder="blur"
                             blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
                             onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
