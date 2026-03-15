@@ -269,62 +269,88 @@ export default function WatchEpisodeSection({
 
                 {/* Episode grid */}
                 {!isCollapsed ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3 max-h-[520px] overflow-y-auto custom-scrollbar pr-1 sm:pr-2 [contain:layout_paint]">
-                        {pageEpisodes.map((ep) => {
-                            const isActive = ep.slug === currentEpisodeSlug;
-                            const displayNum = getEpisodeNumber(ep.name) || ep.name;
-                            const thumb = episodeThumbnails?.[ep.slug];
-                            const meta = episodeMetadata?.[ep.slug];
-                            const episodeOverview = meta?.overview || "";
-                            const dateText = meta?.airDate ? new Date(meta.airDate).toLocaleDateString("vi-VN") : "";
-                            const runtimeText = meta?.runtime ? `${meta.runtime}m` : "";
+                    <>
+                        {/* Desktop/tablet: thẻ có thumbnail + mô tả chi tiết */}
+                        <div className="hidden sm:grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-3 max-h-[520px] overflow-y-auto custom-scrollbar pr-1 sm:pr-2 [contain:layout_paint]">
+                            {pageEpisodes.map((ep) => {
+                                const isActive = ep.slug === currentEpisodeSlug;
+                                const displayNum = getEpisodeNumber(ep.name) || ep.name;
+                                const thumb = episodeThumbnails?.[ep.slug];
+                                const meta = episodeMetadata?.[ep.slug];
+                                const episodeOverview = meta?.overview || "";
+                                const dateText = meta?.airDate ? new Date(meta.airDate).toLocaleDateString("vi-VN") : "";
+                                const runtimeText = meta?.runtime ? `${meta.runtime}m` : "";
 
-                            return (
-                                <Link
-                                    key={ep.slug}
-                                    href={`/xem-phim/${movieSlug}/${ep.slug}?server=${safeIndex}`}
-                                    className={cn(
-                                        "group rounded-[12px] overflow-hidden border transition-all duration-200 touch-manipulation bg-[#151924]",
-                                        isActive
-                                            ? "border-[#F4C84A]/70 ring-1 ring-[#F4C84A]/45 shadow-[0_0_18px_#F4C84A33]"
-                                            : "border-white/[0.08] hover:border-white/[0.22] hover:-translate-y-[1px]"
-                                    )}
-                                >
-                                    <div className="relative aspect-video overflow-hidden">
-                                        {thumb ? (
-                                            <div
-                                                className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-[1.03]"
-                                                style={{ backgroundImage: `url(${getImageUrl(thumb)})` }}
-                                            />
-                                        ) : (
-                                            <div className="absolute inset-0 bg-gradient-to-br from-[#212632] to-[#13161e]" />
+                                return (
+                                    <Link
+                                        key={ep.slug}
+                                        href={`/xem-phim/${movieSlug}/${ep.slug}?server=${safeIndex}`}
+                                        className={cn(
+                                            "group rounded-[12px] overflow-hidden border transition-all duration-200 touch-manipulation bg-[#151924]",
+                                            isActive
+                                                ? "border-[#F4C84A]/70 ring-1 ring-[#F4C84A]/45 shadow-[0_0_18px_#F4C84A33]"
+                                                : "border-white/[0.08] hover:border-white/[0.22] hover:-translate-y-[1px]"
                                         )}
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                                        <div className="absolute left-2.5 bottom-2 text-white font-bold text-[16px] drop-shadow-md">
-                                            Tập {displayNum}
+                                    >
+                                        <div className="relative aspect-video overflow-hidden">
+                                            {thumb ? (
+                                                <div
+                                                    className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-[1.03]"
+                                                    style={{ backgroundImage: `url(${getImageUrl(thumb)})` }}
+                                                />
+                                            ) : (
+                                                <div className="absolute inset-0 bg-gradient-to-br from-[#212632] to-[#13161e]" />
+                                            )}
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                                            <div className="absolute left-2.5 bottom-2 text-white font-bold text-[16px] drop-shadow-md">
+                                                Tập {displayNum}
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div className="px-3 py-2.5">
-                                        <p className="text-[12px] text-gray-200 line-clamp-2 leading-relaxed min-h-[34px]">
-                                            {episodeOverview || "Nội dung tập đang được cập nhật."}
-                                        </p>
-                                        {(dateText || runtimeText) && (
-                                            <p className="text-[11px] text-gray-400 mt-1">
-                                                {dateText}{dateText && runtimeText ? " · " : ""}{runtimeText}
+                                        <div className="px-3 py-2.5">
+                                            <p className="text-[12px] text-gray-200 line-clamp-2 leading-relaxed min-h-[34px]">
+                                                {episodeOverview || "Nội dung tập đang được cập nhật."}
                                             </p>
-                                        )}
-                                    </div>
-
-                                    {isActive && (
-                                        <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-[#F4C84A] text-black text-[10px] font-black uppercase shadow-sm">
-                                            Đang xem
+                                            {(dateText || runtimeText) && (
+                                                <p className="text-[11px] text-gray-400 mt-1">
+                                                    {dateText}{dateText && runtimeText ? " · " : ""}{runtimeText}
+                                                </p>
+                                            )}
                                         </div>
-                                    )}
-                                </Link>
-                            );
-                        })}
-                    </div>
+
+                                        {isActive && (
+                                            <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-[#F4C84A] text-black text-[10px] font-black uppercase shadow-sm">
+                                                Đang xem
+                                            </div>
+                                        )}
+                                    </Link>
+                                );
+                            })}
+                        </div>
+
+                        {/* Mobile: chỉ các nút tập đơn giản, không thumbnail để gọn như app */}
+                        <div className="grid grid-cols-3 sm:hidden gap-2 max-h-[360px] overflow-y-auto custom-scrollbar pr-1 [contain:layout_paint]">
+                            {pageEpisodes.map((ep) => {
+                                const isActive = ep.slug === currentEpisodeSlug;
+                                const displayNum = getEpisodeNumber(ep.name)?.padStart(2, "0") || ep.name;
+                                return (
+                                    <Link
+                                        key={ep.slug}
+                                        href={`/xem-phim/${movieSlug}/${ep.slug}?server=${safeIndex}`}
+                                        className={cn(
+                                            "h-[38px] rounded-full flex items-center justify-center gap-1.5 text-[13px] font-semibold transition-all duration-200 border backdrop-blur-md touch-manipulation",
+                                            isActive
+                                                ? "bg-[#F4C84A]/[0.15] border-[#F4C84A]/60 text-[#F4C84A] shadow-[0_0_16px_#F4C84A1F]"
+                                                : "bg-white/[0.04] border-white/[0.08] text-gray-300 hover:text-white hover:bg-white/[0.08] hover:border-white/[0.16] hover:-translate-y-[1px] active:scale-95"
+                                        )}
+                                    >
+                                        {isActive && <span className="w-1.5 h-1.5 rounded-full bg-[#F4C84A] flex-shrink-0" />}
+                                        <span>Tập {displayNum}</span>
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </>
                 ) : (
                     <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-3 max-h-[360px] sm:max-h-[440px] overflow-y-auto custom-scrollbar pr-1 sm:pr-2 [contain:layout_paint]">
                         {pageEpisodes.map((ep) => {

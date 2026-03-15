@@ -106,7 +106,7 @@ export default function WatchContainer({
                     "transition-all duration-300",
                     isTheaterMode
                         ? "fixed top-[70px] md:top-[80px] left-0 right-0 bottom-0 z-[100] bg-[#080b12] overflow-y-auto w-full px-4 md:px-10 lg:px-20 py-6 pb-32"
-                        : "relative z-10 w-full"
+                        : "relative z-10 w-full -mx-4 sm:mx-0"
                 )}
             >
                 {/* Theater Mode Close Button */}
@@ -124,7 +124,7 @@ export default function WatchContainer({
                     </div>
                 )}
 
-                {/* Player Card — trên mobile cho cảm giác phẳng, sát mép; trên desktop vẫn có shadow/ring */}
+                {/* Player Card — trên mobile full-bleed, desktop có shadow/ring */}
                 <div
                     className={cn(
                         "relative z-10 mx-auto transition-all duration-500",
@@ -166,7 +166,7 @@ export default function WatchContainer({
                 </div>{/* end outer player card */}
 
                 {/* Info Bar below player - Inline Layout */}
-                <div className="mt-1.5 px-2.5 py-2 sm:px-3 sm:py-2.5 flex flex-row items-center justify-between gap-2 overflow-hidden rounded-lg border border-white/[0.10] bg-[#171B24] shadow-sm">
+                <div className="mt-1 px-3 py-2 sm:px-3 sm:py-2.5 flex flex-row items-center justify-between gap-2 overflow-hidden bg-black/40 sm:bg-[#171B24] border-t border-white/[0.10] sm:rounded-lg sm:border sm:shadow-sm">
                     {/* Left: Title + Episode name */}
                     <div className="flex items-center gap-2 min-w-0 pr-2">
                         <Link
@@ -246,7 +246,7 @@ export default function WatchContainer({
             </div>
 
             {/* Engagement Bar */}
-            <div className="mt-4 relative z-10">
+            <div className="mt-3 sm:mt-4 relative z-10 -mx-4 sm:mx-0 px-3 sm:px-0">
                 <WatchEngagementBar
                     movie={movie}
                     isTheaterMode={isTheaterMode}
