@@ -106,7 +106,7 @@ export default function WatchContainer({
                     "transition-all duration-300",
                     isTheaterMode
                         ? "fixed top-[70px] md:top-[80px] left-0 right-0 bottom-0 z-[100] bg-[#080b12] overflow-y-auto w-full px-4 md:px-10 lg:px-20 py-6 pb-32"
-                        : "relative z-10 w-full -mx-4 sm:mx-0"
+                        : "relative z-10 w-full"
                 )}
             >
                 {/* Theater Mode Close Button */}
@@ -246,7 +246,7 @@ export default function WatchContainer({
             </div>
 
             {/* Engagement Bar */}
-            <div className="mt-3 sm:mt-4 relative z-10 -mx-4 sm:mx-0 px-3 sm:px-0">
+            <div className="mt-3 sm:mt-4 relative z-10 px-3 sm:px-0">
                 <WatchEngagementBar
                     movie={movie}
                     isTheaterMode={isTheaterMode}
