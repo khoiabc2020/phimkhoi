@@ -70,20 +70,4 @@ exit /b 0
 
 :no_commit
 echo Khong co thay doi moi de commit. Van tien hanh deploy len VPS...
-
-set "AHEAD=0"
-for /f %%i in ('git rev-list --count origin/main..HEAD 2^>nul') do set "AHEAD=%%i"
-if not "%AHEAD%"=="0" (
-    echo [3/4] Local ahead %AHEAD% commit(s) - dang push len origin/main...
-    git push origin main
-    if errorlevel 1 (
-        echo.
-        echo [LOI] Push that bai khi dong bo commit dang ahead.
-        pause
-        exit /b 1
-    )
-) else (
-    echo [3/4] Khong co commit nao can push.
-)
-
 goto :do_deploy
