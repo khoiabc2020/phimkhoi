@@ -38,11 +38,31 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
 
     const hasPosterSource = Boolean(movie.poster_url);
     const usesThumbFallbackInPortrait = orientation === "portrait" && !hasPosterSource && Boolean(movie.thumb_url);
-    const displayPoster = orientation === 'landscape'
-        ? getImageUrl(movie.thumb_url || movie.poster_url)
-        : getImageUrl(movie.poster_url || movie.thumb_url);
 
-    const displayBackdrop = getImageUrl(movie.thumb_url || movie.poster_url);
+    // Poster (ảnh dọc): luôn ưu tiên trường poster_url từ các nguồn,
+    // nếu không có thì tới TMDB poster, cuối cùng mới rơi xuống thumb_url.
+    const tmdbPoster =
+        (movie as any).tmdbData?.poster_path
+            ? getTMDBImage((movie as any).tmdbData.poster_path)
+            : null;
+
+    const portraitPosterSource =
+        movie.poster_url ||
+        tmdbPoster ||
+        movie.thumb_url ||
+        "";
+
+    const displayPoster = orientation === "landscape"
+        ? getImageUrl(movie.thumb_url || movie.poster_url || portraitPosterSource)
+        : getImageUrl(portraitPosterSource);
+
+    // Backdrop/overlay (ảnh ngang): ưu tiên TMDB backdrop, sau đó tới thumb_url, rồi poster.
+    const tmdbBackdrop =
+        (movie as any).tmdbData?.backdrop_path
+            ? getTMDBImage((movie as any).tmdbData.backdrop_path)
+            : null;
+
+    const displayBackdrop = tmdbBackdrop || getImageUrl(movie.thumb_url || movie.poster_url);
 
     const handleMouseEnter = () => {
         if (leaveTimeoutRef.current) {

@@ -146,6 +146,25 @@ export const parseServerLabel = (
     return finalLabel;
 };
 
+// Merge image fields from multiple sources for the same movie slug.
+// Ưu tiên: nguồn được push trước (KKPhim) giữ làm gốc, nhưng nếu thiếu poster/thumbnail
+// thì lấy bù từ các nguồn sau (OPhim, NguonC, ...), sau đó mới tới TMDB ở các bước khác.
+const mergeMovieImages = (primary: Movie, candidate: Movie): Movie => {
+    if (!candidate) return primary;
+    const merged: Movie = { ...primary };
+
+    const isEmpty = (v?: string) => !v || String(v).trim() === "";
+
+    if (isEmpty(merged.poster_url) && !isEmpty(candidate.poster_url)) {
+        merged.poster_url = candidate.poster_url;
+    }
+    if (isEmpty(merged.thumb_url) && !isEmpty(candidate.thumb_url)) {
+        merged.thumb_url = candidate.thumb_url;
+    }
+
+    return merged;
+};
+
 // --- Ophim Native Extensions ---
 
 export const getOphimCast = async (slug: string) => {
@@ -448,13 +467,18 @@ export const searchMovies = async (keyword: string) => {
             results = [...results, ...items];
         }
 
-        // Deduplicate
-        const seen = new Set<string>();
-        return results.filter(item => {
-            const duplicate = seen.has(item.slug);
-            seen.add(item.slug);
-            return !duplicate;
-        });
+        // Deduplicate + merge images across KKPhim, OPhim, NguonC (ưu tiên thứ tự fetch)
+        const bySlug = new Map<string, Movie>();
+        for (const item of results as Movie[]) {
+            if (!item?.slug) continue;
+            const existing = bySlug.get(item.slug);
+            if (!existing) {
+                bySlug.set(item.slug, item);
+            } else {
+                bySlug.set(item.slug, mergeMovieImages(existing, item));
+            }
+        }
+        return Array.from(bySlug.values());
 
     } catch (error) {
         console.error(`Error searching movies [${keyword}]:`, error);
@@ -542,13 +566,18 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
             items = [...items, ...nguoncItems];
         }
 
-        // Deduplicate by Slug
-        const seen = new Set<string>();
-        let uniqueItems = items.filter(item => {
-            const duplicate = seen.has(item.slug);
-            seen.add(item.slug);
-            return !duplicate;
-        });
+        // Deduplicate by Slug + merge images theo thứ tự nguồn (KKPhim -> OPhim -> NguonC)
+        const bySlug = new Map<string, Movie>();
+        for (const item of items) {
+            if (!item?.slug) continue;
+            const existing = bySlug.get(item.slug);
+            if (!existing) {
+                bySlug.set(item.slug, item);
+            } else {
+                bySlug.set(item.slug, mergeMovieImages(existing, item));
+            }
+        }
+        let uniqueItems = Array.from(bySlug.values());
 
         // Filter out trailer-only / unreleased movies (unless explicitly browsing that category)
         if (type !== 'phim-sap-chieu') {
@@ -626,16 +655,20 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
             items = [...items, ...nguoncItems];
         }
 
-        // Deduplicate
-        const seen = new Set<string>();
-        const uniqueItems = items.filter(item => {
-            const duplicate = seen.has(item.slug);
-            seen.add(item.slug);
-            return !duplicate;
-        });
+        // Deduplicate + merge images
+        const bySlug = new Map<string, Movie>();
+        for (const item of items) {
+            if (!item?.slug) continue;
+            const existing = bySlug.get(item.slug);
+            if (!existing) {
+                bySlug.set(item.slug, item);
+            } else {
+                bySlug.set(item.slug, mergeMovieImages(existing, item));
+            }
+        }
 
         return {
-            items: uniqueItems,
+            items: Array.from(bySlug.values()),
             pagination: kkPagination
         };
     } catch (error) {
