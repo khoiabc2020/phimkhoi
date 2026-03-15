@@ -124,16 +124,19 @@ export default function WatchContainer({
                     </div>
                 )}
 
-                {/* Player Card — overflow-hidden hides ArtPlayer controls on mobile,
-                    so on small screens we let the player container clip only the video */}
+                {/* Player Card — trên mobile cho cảm giác phẳng, sát mép; trên desktop vẫn có shadow/ring */}
                 <div
                     className={cn(
-                        "rounded-lg shadow-[0_20px_60px_#00000099] ring-1 ring-white/[0.08] relative z-10 mx-auto transition-all duration-500",
+                        "relative z-10 mx-auto transition-all duration-500",
                         isTheaterMode
-                            ? "w-full max-w-[1500px] aspect-video md:aspect-[21/9] h-auto overflow-hidden"
-                            : "w-full overflow-hidden"
+                            ? "w-full max-w-[1500px] aspect-video md:aspect-[21/9] h-auto overflow-hidden rounded-xl shadow-[0_20px_60px_#00000099] ring-1 ring-white/[0.08] bg-[#0F121AF2]"
+                            : [
+                                // Mobile: full-bleed, không bo góc, không shadow để giống app native
+                                "w-full overflow-hidden bg-black",
+                                // Từ sm trở lên: bo góc + shadow nhẹ như layout desktop
+                                "sm:bg-[#0F121AF2] sm:rounded-xl sm:shadow-[0_20px_60px_#00000099] sm:ring-1 sm:ring-white/[0.08]",
+                            ]
                     )}
-                    style={{ background: "#0F121AF2" }}
                 >
                     {/* Inner wrapper: luôn có aspect-ratio để container có chiều cao xác định, tránh màn đen khi chế độ rạp phim */}
                     <div className={cn(
