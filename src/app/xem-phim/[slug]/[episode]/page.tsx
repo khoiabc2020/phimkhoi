@@ -146,7 +146,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
                 <div className="absolute inset-0 bg-gradient-radial from-[#1a1f35]/30 via-[#080b12] to-[#080b12]" />
             </div>
 
-            <div className="relative z-10 pt-24 md:pt-28 pb-16">
+            <div className="relative z-10 pt-16 md:pt-24 pb-16">
 
 
 
