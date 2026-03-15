@@ -206,7 +206,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         {/* Mobile Menu Button */}
                         <button
                             onClick={() => setIsMobileMenuOpen(true)}
-                            className="lg:hidden w-10 h-10 -ml-1 rounded-xl bg-white/[0.96] hover:bg-white text-[#0b0f18] shadow-[0_6px_18px_rgba(0,0,0,0.28)] border border-black/10 transition-all active:scale-95 flex items-center justify-center order-1 md:order-none"
+                            className="lg:hidden w-10 h-10 -ml-1 rounded-xl bg-transparent hover:bg-white/[0.08] text-white transition-all active:scale-95 flex items-center justify-center order-1 md:order-none"
                             aria-label="Mở menu"
                         >
                             <span className="relative flex h-5 w-6 flex-col items-start justify-center gap-1.5">

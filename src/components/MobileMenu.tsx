@@ -90,7 +90,7 @@ export default function MobileMenu({
                 style={{ background: "linear-gradient(180deg, #0d1320 0%, #090e18 100%)" }}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between px-5 h-[72px] shrink-0 border-b border-white/[0.10] bg-[#0b1220]/88">
+                <div className="flex items-center justify-between px-5 h-[72px] shrink-0 border-b border-white/[0.08] bg-[#0b1220]/78">
                     <Link href="/" onClick={onClose} className="flex items-center gap-2.5">
                         <Image
                             src="/logo.png"
@@ -115,13 +115,13 @@ export default function MobileMenu({
 
                     {/* Search Bar */}
                     <form onSubmit={handleSearch} className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/35" strokeWidth={2} />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/28" strokeWidth={2} />
                         <input
                             type="text"
                             value={searchQ}
                             onChange={e => setSearchQ(e.target.value)}
                             placeholder="Tìm phim, diễn viên..."
-                            className="w-full bg-white/[0.05] border border-white/[0.12] rounded-[14px] pl-9 pr-4 py-2.5 text-[14px] text-white placeholder:text-white/32 outline-none focus:border-[#F4C84A]/45 focus:bg-white/[0.08] transition-all"
+                            className="w-full bg-[#11192b]/80 border border-white/[0.08] rounded-[14px] pl-9 pr-4 py-2.5 text-[14px] text-white/90 placeholder:text-white/30 outline-none focus:border-[#F4C84A]/30 focus:bg-[#141f34] transition-all"
                         />
                     </form>
 
@@ -211,8 +211,8 @@ export default function MobileMenu({
                                 />
                             </button>
                             {isCategoriesOpen && (
-                                <div className="mx-1 mt-1 mb-1 rounded-[14px] p-3 grid grid-cols-3 gap-1.5 max-h-[230px] overflow-y-auto custom-scrollbar" style={{ background: "rgba(255,255,255,0.03)" }}>
-                                    {displayCategories.slice(0, 10).map((cat) => (
+                                <div className="mx-1 mt-1 mb-1 rounded-[14px] p-3 grid grid-cols-3 gap-1.5 max-h-[240px] overflow-y-auto custom-scrollbar" style={{ background: "rgba(255,255,255,0.03)" }}>
+                                    {displayCategories.map((cat) => (
                                         <Link
                                             key={cat.slug}
                                             href={`/the-loai/${cat.slug}`}
