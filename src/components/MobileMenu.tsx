@@ -6,10 +6,9 @@ import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import {
     Film, Video, LayoutGrid, Download, History, Heart, LogOut, Globe,
-    X, ChevronDown, Home, Tv, Search, Star, MonitorPlay, Smartphone, Clapperboard
+    X, ChevronDown, Home, Tv, Star, MonitorPlay, Smartphone, Clapperboard
 } from "lucide-react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 interface MobileMenuProps {
     isOpen: boolean;
@@ -29,8 +28,6 @@ export default function MobileMenu({
     countries = []
 }: MobileMenuProps) {
     const { data: session } = useSession();
-    const router = useRouter();
-    const [searchQ, setSearchQ] = useState("");
     const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
     const [isCountriesOpen, setIsCountriesOpen] = useState(false);
 
@@ -65,14 +62,6 @@ export default function MobileMenu({
         { href: "/danh-sach/phim-chieu-rap", label: "Chiếu Rạp", id: "cinema", icon: MonitorPlay, badge: "HOT" },
     ];
 
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (searchQ.trim()) {
-            onClose();
-            router.push(`/tim-kiem?q=${encodeURIComponent(searchQ.trim())}`);
-        }
-    };
-
     return (
         <>
             {/* Backdrop */}
@@ -95,11 +84,11 @@ export default function MobileMenu({
                         <Image
                             src="/logo.png"
                             alt="MovieBox Logo"
-                            width={34}
-                            height={34}
-                            className="w-[34px] h-[34px] rounded-[10px] object-cover shadow-[0_0_12px_#F4C84A40] ring-1 ring-white/10"
+                            width={40}
+                            height={40}
+                            className="w-[40px] h-[40px] rounded-[11px] object-cover shadow-[0_0_12px_#F4C84A40] ring-1 ring-white/10"
                         />
-                        <span className="text-[18px] font-black text-white tracking-tight">MOVIE<span className="text-[#F4C84A]">BOX</span></span>
+                        <span className="text-[20px] font-black text-white tracking-tight">Movie<span className="text-[#F4C84A]">Box</span></span>
                     </Link>
                     <button
                         onClick={onClose}
@@ -112,18 +101,6 @@ export default function MobileMenu({
 
                 {/* Scrollable Content */}
                 <div className="flex-1 overflow-y-auto min-h-0 px-4 py-4 space-y-4">
-
-                    {/* Search Bar */}
-                    <form onSubmit={handleSearch} className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/28" strokeWidth={2} />
-                        <input
-                            type="text"
-                            value={searchQ}
-                            onChange={e => setSearchQ(e.target.value)}
-                            placeholder="Tìm phim, diễn viên..."
-                            className="w-full bg-[#11192b]/80 border border-white/[0.08] rounded-[14px] pl-9 pr-4 py-2.5 text-[14px] text-white/90 placeholder:text-white/30 outline-none focus:border-[#F4C84A]/30 focus:bg-[#141f34] transition-all"
-                        />
-                    </form>
 
                     {/* User Card */}
                     {session ? (
