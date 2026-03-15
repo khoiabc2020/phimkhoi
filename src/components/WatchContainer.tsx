@@ -124,46 +124,48 @@ export default function WatchContainer({
                     </div>
                 )}
 
-                {/* Player Card — trên mobile full-bleed, desktop có shadow/ring */}
-                <div
-                    className={cn(
-                        "relative z-10 mx-auto transition-all duration-500",
-                        isTheaterMode
-                            ? "w-full max-w-[1500px] aspect-video md:aspect-[21/9] h-auto overflow-hidden rounded-xl shadow-[0_20px_60px_#00000099] ring-1 ring-white/[0.08] bg-[#0F121AF2]"
-                            : [
-                                // Mobile: full-bleed, không bo góc, không shadow để giống app native
-                                "w-full overflow-hidden bg-black",
-                                // Từ sm trở lên: bo góc + shadow nhẹ như layout desktop
-                                "sm:bg-[#0F121AF2] sm:rounded-xl sm:shadow-[0_20px_60px_#00000099] sm:ring-1 sm:ring-white/[0.08]",
-                            ]
-                    )}
-                >
-                    {/* Inner wrapper: luôn có aspect-ratio để container có chiều cao xác định, tránh màn đen khi chế độ rạp phim */}
-                    <div className={cn(
-                        "relative w-full min-h-0",
-                        isTheaterMode ? "aspect-video md:aspect-[21/9]" : "aspect-video"
-                    )}>
-
-                        {activeEpisode ? (
-                            <VideoPlayer
-                                url={activeEpisode.link_embed}
-                                m3u8={effectiveM3u8}
-                                slug={movie.slug}
-                                episode={displayEpisodeName(activeEpisode.name)}
-                                movieData={movieData}
-                                initialProgress={initialProgress}
-                                autoNext={autoNext}
-                                nextEpisodeUrl={nextEpisodeUrl}
-                                isTheaterMode={isTheaterMode}
-                            />
-                        ) : (
-                            <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-white gap-3">
-                                <span className="text-4xl">🎬</span>
-                                <p className="text-gray-400 text-sm">Tập phim không khả dụng.</p>
-                            </div>
+                {/* Player Card — trên mobile full-bleed sát mép, desktop có shadow/ring */}
+                <div className="relative -mx-4 sm:mx-0">
+                    <div
+                        className={cn(
+                            "relative z-10 mx-auto transition-all duration-500",
+                            isTheaterMode
+                                ? "w-full max-w-[1500px] aspect-video md:aspect-[21/9] h-auto overflow-hidden rounded-xl shadow-[0_20px_60px_#00000099] ring-1 ring-white/[0.08] bg-[#0F121AF2]"
+                                : [
+                                    // Mobile: full-bleed, không bo góc, không shadow để giống app native
+                                    "w-full overflow-hidden bg-black",
+                                    // Từ sm trở lên: bo góc + shadow nhẹ như layout desktop
+                                    "sm:bg-[#0F121AF2] sm:rounded-xl sm:shadow-[0_20px_60px_#00000099] sm:ring-1 sm:ring-white/[0.08]",
+                                ]
                         )}
-                    </div>{/* end inner aspect-video wrapper */}
-                </div>{/* end outer player card */}
+                    >
+                        {/* Inner wrapper: luôn có aspect-ratio để container có chiều cao xác định, tránh màn đen khi chế độ rạp phim */}
+                        <div className={cn(
+                            "relative w-full min-h-0",
+                            isTheaterMode ? "aspect-video md:aspect-[21/9]" : "aspect-video"
+                        )}>
+
+                            {activeEpisode ? (
+                                <VideoPlayer
+                                    url={activeEpisode.link_embed}
+                                    m3u8={effectiveM3u8}
+                                    slug={movie.slug}
+                                    episode={displayEpisodeName(activeEpisode.name)}
+                                    movieData={movieData}
+                                    initialProgress={initialProgress}
+                                    autoNext={autoNext}
+                                    nextEpisodeUrl={nextEpisodeUrl}
+                                    isTheaterMode={isTheaterMode}
+                                />
+                            ) : (
+                                <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-white gap-3">
+                                    <span className="text-4xl">🎬</span>
+                                    <p className="text-gray-400 text-sm">Tập phim không khả dụng.</p>
+                                </div>
+                            )}
+                        </div>{/* end inner aspect-video wrapper */}
+                    </div>{/* end outer player card */}
+                </div>
 
                 {/* Info Bar below player - Inline Layout */}
                 <div className="mt-1 px-3 py-2 sm:px-3 sm:py-2.5 flex flex-row items-center justify-between gap-2 overflow-hidden bg-black/40 sm:bg-[#171B24] border-t border-white/[0.10] sm:rounded-lg sm:border sm:shadow-sm">
