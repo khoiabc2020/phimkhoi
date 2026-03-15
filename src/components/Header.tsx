@@ -305,7 +305,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             </button>
                             <div
                                 className={
-                                    "absolute top-full left-1/2 -translate-x-1/2 w-72 max-h-[60vh] overflow-y-auto custom-scrollbar glass-panel p-3 transition-all duration-300 transform grid grid-cols-2 gap-1 z-50 mt-2 " +
+                                    "absolute top-full left-1/2 -translate-x-1/2 w-[420px] max-h-[60vh] overflow-y-auto custom-scrollbar glass-panel p-3 transition-all duration-300 transform grid grid-cols-3 gap-1.5 z-50 mt-2 " +
                                     (openDropdown === "countries"
                                         ? "opacity-100 visible translate-y-0 scale-100"
                                         : "opacity-0 invisible -translate-y-2 scale-95 pointer-events-none")
