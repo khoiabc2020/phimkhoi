@@ -597,15 +597,16 @@ export const getMovieDetail = async (slug: string) => {
 export const OPHIM_API = "https://ophim1.com";
 export const NGUONC_API = "https://phim.nguonc.com";
 
-export const searchMovies = async (keyword: string) => {
+export const searchMovies = async (keyword: string, options: { enrichTMDB?: boolean; limit?: number } = {}) => {
     try {
         const q = String(keyword || "").trim();
         if (q.length < 2) return [];
+        const { enrichTMDB = true, limit = 12 } = options;
 
         const encoded = encodeURIComponent(q);
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
-            fetch(`${API_URL}/v1/api/tim-kiem?keyword=${encoded}&limit=12`).then(r => r.json()),
-            fetch(`${OPHIM_API}/v1/api/tim-kiem?keyword=${encoded}&limit=12`).then(r => r.json()),
+            fetch(`${API_URL}/v1/api/tim-kiem?keyword=${encoded}&limit=${limit}`).then(r => r.json()),
+            fetch(`${OPHIM_API}/v1/api/tim-kiem?keyword=${encoded}&limit=${limit}`).then(r => r.json()),
             fetch(`${NGUONC_API}/api/films/search?keyword=${encoded}`).then(r => r.json())
         ]);
 
@@ -659,6 +660,9 @@ export const searchMovies = async (keyword: string) => {
             }
         }
         const normalized = Array.from(bySlug.values()).map(normalizeMovieImageRoles);
+        if (!enrichTMDB) {
+            return normalized;
+        }
         return await enrichMoviesWithTMDB(normalized, 20);
 
     } catch (error) {

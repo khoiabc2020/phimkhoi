@@ -14,7 +14,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
             <main className="min-h-screen pb-20">
                 <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 pt-24">
                     <div className="mb-6 rounded-[10px] border border-white/[0.05] bg-[#09090c]/55 px-3 sm:px-4 py-3 sm:py-4">
-                        <h1 className="text-lg md:text-xl font-bold text-white flex items-center gap-2">
+                        <h1 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
                             <span className="w-1 h-5 bg-[#fbbf24] rounded-full"></span>
                             Tìm kiếm
                         </h1>
@@ -32,7 +32,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 
     // Fetch movies + actors concurrently (giới hạn kết quả để nhanh hơn trên mobile)
     const [movies, actors] = await Promise.all([
-        searchMovies(keyword),
+        searchMovies(keyword, { enrichTMDB: false, limit: 10 }),
         keyword.length >= 3 ? searchTMDBPerson(keyword) : Promise.resolve([])
     ]);
 
@@ -155,8 +155,8 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         return true;
     });
 
-    const visibleActors = (actors || []).slice(0, 12);
-    const visibleMovies = filteredMovies.slice(0, 72);
+    const visibleActors = (actors || []).slice(0, 8);
+    const visibleMovies = filteredMovies.slice(0, 54);
 
     const hasActors = visibleActors.length > 0;
     const hasMovies = visibleMovies.length > 0;
@@ -165,7 +165,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         <main className="min-h-screen pb-20">
             <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 pt-24">
                 <div className="mb-5 rounded-[10px] border border-white/[0.06] bg-[#07070b]/78 px-3 sm:px-4 py-3 sm:py-3.5 shadow-[0_8px_20px_#00000055]">
-                    <h1 className="text-[18px] md:text-[22px] font-extrabold text-white flex items-center gap-2 tracking-tight">
+                    <h1 className="text-[20px] md:text-[26px] font-extrabold text-white flex items-center gap-2 tracking-tight">
                         <span className="w-1 h-5 bg-[#fbbf24] rounded-full"></span>
                         Kết quả: <span className="text-primary truncate max-w-[200px] md:max-w-md">"{keyword}"</span>
                     </h1>

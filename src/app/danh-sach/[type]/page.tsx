@@ -92,7 +92,7 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
                         Danh sách / {typeName}
                     </p>
                     <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
-                        <h1 className="text-[18px] md:text-[22px] font-extrabold text-white tracking-tight flex items-center gap-2">
+                        <h1 className="text-[20px] md:text-[26px] font-extrabold text-white tracking-tight flex items-center gap-2">
                             <span className="w-1 h-5 bg-[#fbbf24] rounded-full"></span>
                             {typeName}
                         </h1>
@@ -103,7 +103,7 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
                 </div>
 
                 {/* Filter Bar */}
-                <div className="sticky top-[56px] z-20 bg-[#050507]/92 backdrop-blur-md rounded-[10px] px-1 border border-white/[0.06]">
+                <div className="relative z-10 md:sticky md:top-[56px] md:z-20 bg-[#050507]/92 backdrop-blur-md rounded-[10px] px-1 border border-white/[0.06]">
                     <FilterBar />
                 </div>
 

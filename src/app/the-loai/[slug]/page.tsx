@@ -32,13 +32,13 @@ export default async function CategoryPage({ params, searchParams }: { params: P
                     <p className="text-[11px] uppercase tracking-[0.16em] text-white/40 mb-1">
                         Thể loại
                     </p>
-                    <h1 className="text-[18px] md:text-[22px] font-extrabold text-white capitalize flex items-center gap-2 tracking-tight">
+                    <h1 className="text-[20px] md:text-[26px] font-extrabold text-white capitalize flex items-center gap-2 tracking-tight">
                         <span className="w-1 h-5 bg-[#fbbf24] rounded-full"></span>
                         {slug.replace(/-/g, " ")}
                     </h1>
                 </div>
 
-                <div className="sticky top-[56px] z-20 bg-[#050507]/92 backdrop-blur-md rounded-[10px] px-1 border border-white/[0.06]">
+                <div className="relative z-10 md:sticky md:top-[56px] md:z-20 bg-[#050507]/92 backdrop-blur-md rounded-[10px] px-1 border border-white/[0.06]">
                     <FilterBar />
                 </div>
 
