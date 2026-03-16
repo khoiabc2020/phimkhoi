@@ -190,17 +190,17 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 {/* Base dark layer */}
                 <div className="absolute inset-0 bg-[#020617]" />
 
-                {/* Right-side media area: keep 16:9 feeling and avoid aggressive crop */}
+                {/* Backdrop layer: full canvas, anchored right to keep subject in right half */}
                 {backdropUrl && (
-                    <div className="absolute inset-y-0 right-0 w-full sm:w-[70%] lg:w-[66%] xl:w-[64%]">
+                    <div className="absolute inset-0">
                         <Image
                             src={backdropUrl}
                             alt={movie?.name || ""}
                             fill
                             priority
                             unoptimized
-                            className="object-cover object-right"
-                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 70vw, 64vw"
+                            className="object-cover object-right opacity-[0.95]"
+                            sizes="100vw"
                             placeholder="blur"
                             blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
                         />
@@ -208,9 +208,9 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 )}
 
                 {/* Softer cinematic feather blend: tránh đường chia cứng trái/phải */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#020617] via-[#020617]/90 to-[#020617]/18" />
-                <div className="absolute inset-y-0 left-[46%] w-[30%] bg-gradient-to-r from-[#020617]/92 via-[#020617]/52 to-transparent blur-2xl" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/95 via-[#020617]/45 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#020617] via-[#020617]/96 via-[38%] to-[#020617]/18" />
+                <div className="absolute inset-y-0 left-[34%] w-[40%] bg-gradient-to-r from-[#020617]/90 via-[#020617]/40 to-transparent blur-3xl" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/96 via-[#020617]/42 to-transparent" />
                 <div className="absolute inset-0 bg-gradient-to-b from-[#020617]/34 via-transparent to-transparent" />
 
                 {/* Hero Info Content aligned left/bottom */}
