@@ -51,7 +51,7 @@ export default function QuickNav() {
     return (
         <div className="w-full py-2 pb-6">
             <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 mb-3">
-                <h2 className="text-[16px] md:text-[18px] font-extrabold text-white mb-4 flex items-center gap-2 tracking-tight">
+                <h2 className="text-[20px] md:text-[24px] font-extrabold text-white mb-4 flex items-center gap-2 tracking-tight">
                     <span className="w-1 h-5 bg-[#F4C84A] rounded-sm inline-block" />
                     Bạn đang quan tâm gì?
                 </h2>
@@ -67,7 +67,7 @@ export default function QuickNav() {
                         >
                             {/* Bottom content */}
                             <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4 flex flex-col justify-end h-full">
-                                <h3 className="text-white font-bold text-[15px] sm:text-[17px] leading-tight mb-1">
+                                <h3 className="text-white font-bold text-[16px] sm:text-[20px] leading-tight mb-1">
                                     {item.label}
                                 </h3>
                                 <p className="text-white/80 text-[11px] sm:text-[12px] font-medium flex items-center gap-1 group-hover:gap-1.5 transition-all">

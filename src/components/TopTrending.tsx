@@ -34,12 +34,12 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
         <div className={cn("w-full relative py-2", className)}>
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
-                <h2 className="text-[17px] font-extrabold text-white capitalize flex items-center gap-2.5 tracking-tight">
-                    <span className="w-1 h-5 bg-[#8fa7c5] rounded-full"></span>
+                <h2 className="text-[20px] md:text-[24px] font-extrabold text-white capitalize flex items-center gap-2.5 tracking-tight">
+                    <span className="w-1 h-6 bg-[#8fa7c5] rounded-full"></span>
                     <span className="leading-tight">{title}</span>
                 </h2>
                 {slug && (
-                    <Link href={slug} className="text-xs font-semibold text-[#a8bad3] hover:text-white flex items-center gap-1 transition-colors group">
+                    <Link href={slug} className="text-sm md:text-base font-semibold text-[#a8bad3] hover:text-white flex items-center gap-1 transition-colors group">
                         Xem tất cả <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </Link>
                 )}

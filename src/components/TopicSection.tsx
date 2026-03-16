@@ -21,8 +21,8 @@ export default function TopicSection() {
     return (
         <section className="w-full max-w-[1920px] mx-auto px-4 md:px-12 pt-5 pb-3 md:pt-3">
             <div className="flex items-center gap-2 mb-3 px-1">
-                <span className="w-1 h-5 bg-[#F4C84A] rounded-sm inline-block" />
-                <h2 className="text-[17px] font-bold text-white">Khám phá nhanh</h2>
+                <span className="w-1 h-6 bg-[#F4C84A] rounded-sm inline-block" />
+                <h2 className="text-[20px] md:text-[24px] font-bold text-white">Khám phá nhanh</h2>
             </div>
 
             <div className="flex gap-2.5 overflow-x-auto no-scrollbar pb-1 scroll-smooth">
@@ -33,7 +33,7 @@ export default function TopicSection() {
                         className="group flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-full border border-white/[0.08] hover:border-white/[0.16] bg-[#0B0B10] hover:bg-[#111117] transition-all duration-200 active:scale-[0.97]"
                     >
                         <span
-                            className="text-[13px] font-semibold whitespace-nowrap"
+                            className="text-[14px] md:text-[15px] font-semibold whitespace-nowrap"
                             style={{ color: topic.color }}
                         >
                             {topic.name}

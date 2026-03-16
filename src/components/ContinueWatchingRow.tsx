@@ -119,7 +119,7 @@ function ContinueWatchingRowInner() {
             <div className="space-y-2.5">
                 <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
-                        <h2 className="text-lg md:text-xl font-[800] text-white leading-tight flex items-center gap-2 min-w-0">
+                        <h2 className="text-xl md:text-2xl font-[800] text-white leading-tight flex items-center gap-2 min-w-0">
                             <span className="truncate">Xem tiếp của bạn</span>
                             <ChevronRight className="w-4 h-4 text-white/45 shrink-0" />
                         </h2>

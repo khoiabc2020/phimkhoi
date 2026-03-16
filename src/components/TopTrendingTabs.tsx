@@ -51,7 +51,7 @@ export default function TopTrendingTabs({ allMovies, weekMovies, monthMovies, tv
               type="button"
               onClick={() => setActiveTab(key)}
               className={[
-                "h-8 px-3.5 rounded-[10px] text-[12px] font-semibold whitespace-nowrap transition-all border",
+                "h-9 px-3.5 rounded-[10px] text-[13px] md:text-sm font-semibold whitespace-nowrap transition-all border",
                 active
                   ? "bg-[#263243] text-[#d8e3f2] border-[#33435a]"
                   : "bg-[#0B0B10] text-white/72 border-white/[0.08] hover:text-white hover:border-white/[0.14]",
