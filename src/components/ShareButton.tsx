@@ -3,7 +3,7 @@
 import { Share2 } from "lucide-react";
 import { useState } from "react";
 
-export default function ShareButton({ title, text, className }: { title?: string; text?: string; className?: string }) {
+export default function ShareButton({ title, text, className, iconOnlyOnMobile = false }: { title?: string; text?: string; className?: string; iconOnlyOnMobile?: boolean }) {
     const [copied, setCopied] = useState(false);
 
     const handleShare = async () => {
@@ -43,7 +43,7 @@ export default function ShareButton({ title, text, className }: { title?: string
             title="Chia sẻ phim này"
         >
             <Share2 className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors shrink-0" />
-            <span>{copied ? "Đã chép Link!" : "Chia sẻ"}</span>
+            <span className={iconOnlyOnMobile ? "hidden sm:inline" : ""}>{copied ? "Đã chép Link!" : "Chia sẻ"}</span>
         </button>
     );
 }
