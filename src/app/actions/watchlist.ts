@@ -11,16 +11,35 @@ function isValidId(id: string | undefined | null): boolean {
     return !!id && mongoose.isValidObjectId(id);
 }
 
+async function resolveSessionUser(session: any) {
+    if (!session?.user) return null;
+    await dbConnect();
+
+    const sessionId = session.user.id as string | undefined;
+    if (isValidId(sessionId)) {
+        const byId = await User.findById(sessionId);
+        if (byId) return byId;
+    }
+
+    // OAuth sessions can carry provider IDs instead of Mongo ObjectId.
+    // Fallback to email to keep watchlist/favorite actions working.
+    const email = session.user.email as string | undefined;
+    if (email) {
+        const byEmail = await User.findOne({ email });
+        if (byEmail) return byEmail;
+    }
+
+    return null;
+}
+
 export async function addToWatchlist(slug: string) {
     try {
         const session = await getServerSession(authOptions);
-        if (!isValidId(session?.user?.id)) {
+        if (!session?.user) {
             return { success: false, error: "Unauthorized" };
         }
 
-        await dbConnect();
-
-        const user = await User.findById(session!.user.id);
+        const user = await resolveSessionUser(session);
         if (!user) return { success: false, error: "User not found" };
 
         if (!user.watchlist.includes(slug)) {
@@ -29,6 +48,8 @@ export async function addToWatchlist(slug: string) {
         }
 
         revalidatePath(`/phim/${slug}`);
+        revalidatePath("/xem-sau");
+        revalidatePath("/thu-vien");
         return { success: true };
     } catch (error) {
         console.error("Add watchlist error:", error);
@@ -39,13 +60,11 @@ export async function addToWatchlist(slug: string) {
 export async function removeFromWatchlist(slug: string) {
     try {
         const session = await getServerSession(authOptions);
-        if (!isValidId(session?.user?.id)) {
+        if (!session?.user) {
             return { success: false, error: "Unauthorized" };
         }
 
-        await dbConnect();
-
-        const user = await User.findById(session!.user.id);
+        const user = await resolveSessionUser(session);
         if (!user) return { success: false, error: "User not found" };
 
         user.watchlist = user.watchlist.filter((s: string) => s !== slug);
@@ -53,6 +72,7 @@ export async function removeFromWatchlist(slug: string) {
 
         revalidatePath(`/phim/${slug}`);
         revalidatePath("/xem-sau");
+        revalidatePath("/thu-vien");
         return { success: true };
     } catch (error) {
         console.error("Remove watchlist error:", error);
@@ -63,13 +83,11 @@ export async function removeFromWatchlist(slug: string) {
 export async function isInWatchlist(slug: string) {
     try {
         const session = await getServerSession(authOptions);
-        if (!isValidId(session?.user?.id)) {
+        if (!session?.user) {
             return { success: true, isInWatchlist: false };
         }
 
-        await dbConnect();
-
-        const user = await User.findById(session!.user.id);
+        const user = await resolveSessionUser(session);
         const exists = user && user.watchlist ? user.watchlist.includes(slug) : false;
 
         return { success: true, isInWatchlist: exists };

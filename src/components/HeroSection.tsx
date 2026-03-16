@@ -69,7 +69,8 @@ function getHeroImage(movie: any, type: "poster" | "backdrop", variant: "mobile"
         if (type === "backdrop" && tmdb.backdrop_path)
             return getImageUrl(tmdbImage(tmdb.backdrop_path, variant === "desktop" ? "w1280" : "w780"), true);
     }
-    const api = type === "backdrop" ? movie.thumb_url || movie.poster_url : movie.poster_url || movie.thumb_url;
+    // Backdrop must stay landscape-only, do not fallback to poster here.
+    const api = type === "backdrop" ? movie.thumb_url : movie.poster_url || movie.thumb_url;
     return api ? getImageUrl(api, true) : "/placeholder.jpg";
 }
 
@@ -292,7 +293,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
 
     return (
         <div
-            className="relative w-full h-[58vh] lg:h-[72vh] xl:h-[85vh] overflow-hidden bg-[#020617]"
+            className="relative w-full h-[56vh] lg:h-[70vh] xl:h-[82vh] overflow-hidden bg-[#020617]"
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}
         >
@@ -329,7 +330,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
             {/* ── Gradient overlays (always on top) ── */}
             <div className="absolute inset-0 z-[2] pointer-events-none">
                 {/* Left text readability */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#020617]/90 via-[#020617]/50 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#020617]/92 via-[#020617]/58 to-transparent" />
                 {/* Bottom blend into page */}
                 <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#020617] via-[#020617]/70 to-transparent" />
                 {/* Top subtle vignette */}
@@ -368,7 +369,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         {/* Title — key triggers re-animation on slide change */}
                         <h1
                             key={`title-${index}`}
-                            className="font-display text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black text-white leading-[1.12] tracking-[-0.015em] drop-shadow-xl line-clamp-2 pt-1 animate-hero-in"
+                            className="font-display text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black text-white leading-[1.12] tracking-[-0.015em] line-clamp-2 pt-1 animate-hero-in"
                             title={decodeHtml(movie.name)}
                         >
                             {decodeHtml(movie.name)}
@@ -423,19 +424,19 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         >
                             <Link
                                 href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                className="flex items-center justify-center gap-2 h-12 px-7 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-bold text-[15px] transition-all duration-200 hover:scale-105 active:scale-95"
+                                className="flex items-center justify-center gap-2 h-11 px-6 rounded-[10px] bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-bold text-[15px] transition-colors duration-150 active:scale-95"
                             >
                                 <Play className="w-4 h-4 fill-black shrink-0" />
                                 Xem Ngay
                             </Link>
                             <Link
                                 href={`/phim/${movie.slug}`}
-                                className="flex items-center justify-center h-12 px-6 rounded-full bg-white/10 hover:bg-white/18 border border-white/15 text-white font-bold text-[15px] transition-all hover:scale-105 active:scale-95 backdrop-blur-sm"
+                                className="flex items-center justify-center h-11 px-5 rounded-[10px] bg-white/8 hover:bg-white/14 border border-white/12 text-white font-bold text-[14px] transition-colors duration-150 active:scale-95 backdrop-blur-sm"
                             >
                                 <span className="hidden sm:inline">Chi Tiết</span>
                                 <span className="sm:hidden">Chi Tiết</span>
                             </Link>
-                            <div className="h-12 w-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/18 border border-white/15 transition-all hover:scale-110 cursor-pointer backdrop-blur-sm">
+                            <div className="h-11 w-11 flex items-center justify-center rounded-[10px] bg-white/8 hover:bg-white/14 border border-white/12 transition-colors duration-150 cursor-pointer backdrop-blur-sm">
                                 <FavoriteButton movieData={getFavoriteData(movie)} size="md" />
                             </div>
                         </div>
@@ -466,7 +467,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
 
                     {/* Right: Poster Stack (Preloaded) */}
                     <div className="col-span-12 md:col-span-4 lg:col-span-5 xl:col-span-6 hidden md:flex justify-end items-end pr-0 lg:pr-8 xl:pr-12">
-                        <div className="relative w-[200px] lg:w-[260px] xl:w-[310px] aspect-[2/3] rounded-lg lg:rounded-lg overflow-hidden ring-1 ring-white/10 shadow-2xl shadow-black/60 group/poster hover:scale-[1.02] transition-transform duration-300 ease-out animate-hero-in animation-delay-100">
+                        <div className="relative w-[200px] lg:w-[260px] xl:w-[310px] aspect-[2/3] rounded-[10px] overflow-hidden ring-1 ring-white/10 shadow-[0_20px_42px_#00000088] group/poster transition-transform duration-200 ease-out animate-hero-in animation-delay-100">
                             {movies.map((m: any, i) => {
                                 const isActive = i === index;
                                 return (
@@ -482,7 +483,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                                             src={getHeroImage(m, "poster", "desktop")}
                                             alt={decodeHtml(m.name)}
                                             fill
-                                            className="object-cover group-hover/poster:scale-105 transition-transform duration-300 ease-out"
+                                            className="object-cover group-hover/poster:scale-[1.03] transition-transform duration-200 ease-out"
                                             priority={isActive && i < 2}
                                             loading={isActive ? "eager" : "lazy"}
                                             unoptimized

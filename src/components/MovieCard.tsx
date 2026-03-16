@@ -10,7 +10,6 @@ import { Movie } from "@/services/api";
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { getTMDBImage } from "@/services/tmdb";
-import { getMovieTrailer } from "@/app/actions/tmdb";
 
 // Tiny LQIP blur placeholder shared across all movie cards
 const BLUR_PLACEHOLDER = "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA==";
@@ -36,21 +35,36 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    // Poster (ảnh dọc) – luôn ưu tiên đúng nguồn poster, hạn chế tối đa việc dùng ảnh ngang
+    const looksLandscapeAsset = (url?: string | null) => {
+        if (!url) return false;
+        const u = url.toLowerCase();
+        return (
+            u.includes("thumb") ||
+            u.includes("backdrop") ||
+            u.includes("banner") ||
+            u.includes("landscape")
+        );
+    };
+
+    // Poster (ảnh dọc) – ưu tiên poster thật, tránh nhầm thumb/backdrop vào slot dọc
     const tmdbPoster =
         (movie as any).tmdbData?.poster_path
             ? getTMDBImage((movie as any).tmdbData.poster_path)
             : null;
 
+    const sourcePoster = movie.poster_url && !looksLandscapeAsset(movie.poster_url)
+        ? movie.poster_url
+        : null;
+
     const portraitPosterSource =
-        movie.poster_url ||        // poster từ KKPhim/OPhim/NguonC (thường là ảnh dọc)
+        sourcePoster ||            // poster từ KKPhim/OPhim/NguonC (ảnh dọc hợp lệ)
         tmdbPoster ||              // poster TMDB (đảm bảo ảnh dọc)
         movie.thumb_url ||         // chỉ fallback sang thumb nếu bắt buộc
         "";
 
     const usingThumbAsPortrait =
         orientation === "portrait" &&
-        !movie.poster_url &&
+        !sourcePoster &&
         !tmdbPoster &&
         Boolean(movie.thumb_url);
     const noCropPortrait = orientation === "portrait";
@@ -134,14 +148,14 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
-                <div className={`relative ${orientation === 'landscape' ? 'aspect-video' : 'aspect-[2/3]'} rounded-md overflow-hidden bg-[#1a1a1a] shadow-lg`}>
+                <div className={`relative ${orientation === 'landscape' ? 'aspect-video' : 'aspect-[2/3]'} rounded-[10px] overflow-hidden bg-[#0b101a]`}>
                     <Link href={`/phim/${movie.slug}`} className="block h-full w-full absolute inset-0 z-0" prefetch={false}>
                         <Image
                             src={displayPoster || "/placeholder.svg"}
                             alt={decodeHtml(movie.name) || movie.slug || "Phim"}
                             fill
                             className={cn(
-                                "transition-transform duration-300 ease-out group-hover/static-card:scale-105",
+                                "transition-transform duration-200 ease-out group-hover/static-card:scale-[1.03]",
                                 noCropPortrait ? "object-contain bg-[#0a0f1a]" : "object-cover",
                                 usingThumbAsPortrait ? "bg-[#0a0f1a]" : ""
                             )}
@@ -230,32 +244,7 @@ function OnflixHoverCard({
 }) {
     const [imgLoaded, setImgLoaded] = useState(false);
     const [hasError, setHasError] = useState(false);
-    const [trailerKey, setTrailerKey] = useState<string | null>(null);
-
-    useEffect(() => {
-        let active = true;
-        const fetchTrailer = async () => {
-            let type: 'movie' | 'tv' = 'movie';
-            if (movie.type === 'phim-bo' || movie.type === 'tv-shows' || movie.type === 'hoat-hinh') type = 'tv';
-
-            const year = movie.year ? parseInt(movie.year.toString().split("-")[0]) : undefined;
-            const key = await getMovieTrailer(
-                movie.origin_name || movie.name,
-                isNaN(year!) ? undefined : year,
-                type,
-                { originalName: movie.origin_name, countrySlug: movie.country?.[0]?.slug }
-            );
-            if (active && key) {
-                setTrailerKey(key);
-            }
-        };
-
-        const timer = setTimeout(fetchTrailer, 1000); // 1s hover delay
-        return () => {
-            active = false;
-            clearTimeout(timer);
-        };
-    }, [movie]);
+    // Disable trailer iframe in hover card for faster UI response and less jank.
 
     const CARD_WIDTH = 320;
     const offsetLeft = (CARD_WIDTH - position.width) / 2;
@@ -287,9 +276,9 @@ function OnflixHoverCard({
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
         >
-            <div className="relative animate-in fade-in zoom-in-95 duration-200 ease-out origin-top">
+            <div className="relative animate-in fade-in zoom-in-95 duration-150 ease-out origin-top">
                 {/* Card */}
-                <div className="relative overflow-hidden rounded-[12px] border border-white/[0.09] bg-[#0c0f16]/95 shadow-[0_20px_48px_#00000099]">
+                <div className="relative overflow-hidden rounded-[10px] border border-white/[0.08] bg-[#0c1018]/95 shadow-[0_12px_30px_#00000080]">
 
                     {/* Overlay media — taller and less cropped so faces are easier to see */}
                     <div className="relative aspect-[16/8.6] w-full overflow-hidden bg-[#1a1a1a]">
@@ -310,17 +299,6 @@ function OnflixHoverCard({
                             />
                         ) : (
                             <div className="absolute inset-0 bg-gradient-to-br from-[#151823] to-[#0b0d13]" />
-                        )}
-
-                        {trailerKey && (
-                            <div className="absolute inset-0 z-10 w-[300%] h-[300%] -left-[100%] -top-[100%] pointer-events-none">
-                                <iframe
-                                    src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=1&controls=0&loop=1&playlist=${trailerKey}&modestbranding=1&playsinline=1`}
-                                    allow="autoplay"
-                                    className="w-full h-full animate-in fade-in duration-1000"
-                                    frameBorder="0"
-                                />
-                            </div>
                         )}
 
                         {/* Gradient fading into card body */}

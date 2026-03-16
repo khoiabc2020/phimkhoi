@@ -27,9 +27,9 @@ export default function HomeSection({
             className={compact ? "space-y-2" : "space-y-4"}
             style={{ contain: "layout style paint", scrollMarginTop: "6rem" }}
         >
-            <div className="flex items-center justify-between gap-4 px-1">
-                <h2 id={headingId} className="text-[17px] md:text-[20px] font-extrabold text-white flex items-center gap-2 tracking-tight">
-                    <span className="w-1 h-5 md:h-6 bg-[#F4C84A] rounded-sm shrink-0" aria-hidden />
+            <div className="flex items-center justify-between gap-4 px-0.5">
+                <h2 id={headingId} className="text-[18px] md:text-[22px] font-bold text-white flex items-center gap-2.5 tracking-[-0.01em]">
+                    <span className="w-0.5 h-5 md:h-6 bg-[#F4C84A] shrink-0" aria-hidden />
                     <span>{title}</span>
                 </h2>
                 {viewAllHref && (

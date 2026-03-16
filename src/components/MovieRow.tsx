@@ -86,10 +86,10 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
 
     // Default Layout
     return (
-        <section className="py-3">
+        <section className="py-2.5">
             <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8">
-                <div className="space-y-3 rounded-[12px] border border-white/[0.08] bg-[#0a1220] overflow-hidden">
-                    <div className="flex items-center justify-between px-3 sm:px-4 pt-3">
+                <div className="space-y-2.5 rounded-[10px] border border-white/[0.06] bg-[#080d15] overflow-hidden">
+                    <div className="flex items-center justify-between px-3 sm:px-4 pt-2.5">
                         <h2 className="text-[15px] sm:text-[16px] font-extrabold text-white flex items-center gap-2 tracking-tight">
                             <span className="w-1 h-4 sm:h-5 bg-[#fbbf24] rounded-sm" />
                             <span>{title}</span>
@@ -108,14 +108,14 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
                     <div className="relative group/row pb-3">
                         <button
                             onClick={() => scroll("left")}
-                            className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-40 w-8 h-8 flex items-center justify-center rounded-full bg-[#0b1220]/95 border border-white/20 text-white hover:bg-[#F4C84A] hover:border-[#F4C84A] hover:text-black opacity-0 group-hover/row:opacity-100 transition-all duration-200 hover:scale-105 pointer-events-none group-hover/row:pointer-events-auto"
+                            className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-40 w-8 h-8 flex items-center justify-center rounded-[10px] bg-[#0b1220]/92 border border-white/14 text-white hover:bg-[#F4C84A] hover:border-[#F4C84A] hover:text-black opacity-0 group-hover/row:opacity-100 transition-all duration-150 pointer-events-none group-hover/row:pointer-events-auto"
                         >
                             <ChevronLeft className="w-4 h-4" />
                         </button>
 
                         <div
                             ref={rowRef}
-                            className="flex gap-2.5 overflow-x-auto overflow-y-hidden px-2 sm:px-3 pb-3 pt-1 no-scrollbar snap-x scroll-smooth"
+                            className="flex gap-2.5 overflow-x-auto overflow-y-hidden px-2 sm:px-3 pb-2.5 pt-1 no-scrollbar snap-x scroll-smooth"
                             style={{ scrollbarWidth: "none", msOverflowStyle: "none", scrollBehavior: "smooth", contain: "layout paint" }}
                         >
                             {movies.map((movie) => (
@@ -127,7 +127,7 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
 
                         <button
                             onClick={() => scroll("right")}
-                            className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-40 w-8 h-8 flex items-center justify-center rounded-full bg-[#0b1220]/95 border border-white/20 text-white hover:bg-[#F4C84A] hover:border-[#F4C84A] hover:text-black opacity-0 group-hover/row:opacity-100 transition-all duration-200 hover:scale-105 pointer-events-none group-hover/row:pointer-events-auto"
+                            className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-40 w-8 h-8 flex items-center justify-center rounded-[10px] bg-[#0b1220]/92 border border-white/14 text-white hover:bg-[#F4C84A] hover:border-[#F4C84A] hover:text-black opacity-0 group-hover/row:opacity-100 transition-all duration-150 pointer-events-none group-hover/row:pointer-events-auto"
                         >
                             <ChevronRight className="w-4 h-4" />
                         </button>

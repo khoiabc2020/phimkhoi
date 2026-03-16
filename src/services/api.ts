@@ -64,7 +64,9 @@ function normalizeNguoncItem(item: Record<string, unknown>): Movie {
         type: (item.type as string) || "single",
         status: "",
         thumb_url: (item.thumb_url as string) || "",
-        poster_url: (item.poster_url as string) || (item.thumb_url as string) || "",
+        // Poster must stay "poster-only". Do not auto-fallback to thumb here,
+        // otherwise portrait slots get landscape images too early.
+        poster_url: (item.poster_url as string) || "",
         is_copyright: false,
         sub_docquyen: false,
         chieurap: false,
@@ -88,8 +90,8 @@ function normalizeNguoncItem(item: Record<string, unknown>): Movie {
 
 // Safe URI concatenation
 const combineUrl = (base: string, path: string) => {
+    if (!path) return "";
     if (!base) return path;
-    if (!path) return base;
     const cleanBase = base.endsWith('/') ? base.slice(0, -1) : base;
     const cleanPath = path.startsWith('/') ? path : `/${path}`;
     return `${cleanBase}${cleanPath}`;
@@ -482,7 +484,7 @@ export const searchMovies = async (keyword: string) => {
                 slug: item.slug as string,
                 origin_name: (item.original_name || item.name) as string,
                 thumb_url: item.thumb_url as string,
-                poster_url: item.poster_url as string,
+                poster_url: (item.poster_url as string) || "",
                 year: parseInt(item.year as string) || new Date().getFullYear(),
                 quality: (item.quality as string) || 'FHD',
             })) as Movie[];
@@ -581,7 +583,7 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
                 slug: item.slug as string,
                 origin_name: (item.original_name || item.name) as string,
                 thumb_url: item.thumb_url as string,
-                poster_url: item.poster_url as string,
+                poster_url: (item.poster_url as string) || "",
                 year: parseInt(item.year as string) || new Date().getFullYear(),
                 quality: (item.quality as string) || 'FHD',
             })) as Movie[];
@@ -670,7 +672,7 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
                 slug: item.slug as string,
                 origin_name: (item.original_name || item.name) as string,
                 thumb_url: item.thumb_url as string,
-                poster_url: item.poster_url as string,
+                poster_url: (item.poster_url as string) || "",
                 year: parseInt(item.year as string) || new Date().getFullYear(),
                 quality: (item.quality as string) || 'FHD',
             })) as Movie[];
@@ -747,12 +749,18 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
             items = [...items, ...nguoncItems];
         }
 
-        const seen = new Set<string>();
-        const uniqueItems = items.filter(item => {
-            const duplicate = seen.has(item.slug);
-            seen.add(item.slug);
-            return !duplicate;
-        });
+        // Deduplicate + merge images theo thứ tự nguồn (KKPhim -> OPhim -> NguonC)
+        const bySlug = new Map<string, Movie>();
+        for (const item of items) {
+            if (!item?.slug) continue;
+            const existing = bySlug.get(item.slug);
+            if (!existing) {
+                bySlug.set(item.slug, item);
+            } else {
+                bySlug.set(item.slug, mergeMovieImages(existing, item));
+            }
+        }
+        const uniqueItems = Array.from(bySlug.values());
 
         return {
             items: uniqueItems,

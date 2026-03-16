@@ -199,14 +199,14 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         : "bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none"
                 )}
             >
-                <div className="max-w-[1920px] mx-auto px-4 lg:px-8 h-[52px] flex items-center justify-between gap-4 flex-nowrap pointer-events-auto">
+                <div className="max-w-[1920px] mx-auto px-4 lg:px-8 h-[50px] flex items-center justify-between gap-4 flex-nowrap pointer-events-auto">
 
                     {/* Left Section: Logo & Mobile Menu */}
                     <div className="flex items-center gap-4 shrink-0">
                         {/* Mobile Menu Button */}
                         <button
                             onClick={() => setIsMobileMenuOpen(true)}
-                            className="lg:hidden w-10 h-10 -ml-1 rounded-xl bg-transparent hover:bg-white/[0.08] text-white transition-all active:scale-95 flex items-center justify-center order-1 md:order-none"
+                            className="lg:hidden w-10 h-10 -ml-1 rounded-[10px] bg-transparent hover:bg-white/[0.06] text-white transition-all active:scale-95 flex items-center justify-center order-1 md:order-none"
                             aria-label="Mở menu"
                         >
                             <span className="relative flex h-5 w-6 flex-col items-start justify-center gap-1.5">
@@ -219,13 +219,13 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         {/* Logo */}
                         <Link href="/" className="flex items-center gap-2 group shrink-0 order-2 md:order-none">
                             <div className="relative w-8 h-8 flex items-center justify-center">
-                                <div className="absolute inset-0 bg-primary/10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                                <div className="absolute inset-0 bg-primary/10 rounded-[10px] opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                                 <Image
                                     src="/logo.png"
                                     alt="MovieBox Logo"
                                     width={34}
                                     height={34}
-                                    className="relative w-full h-full rounded-[10px] object-cover shadow-lg ring-1 ring-white/10 group-hover:scale-105 group-hover:ring-white/20 transition-all duration-300"
+                                    className="relative w-full h-full rounded-[10px] object-cover ring-1 ring-white/8 group-hover:ring-white/15 transition-all duration-200"
                                 />
                             </div>
                             <div className="flex flex-col justify-center">
@@ -250,7 +250,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         ref={navRef}
                         className="hidden lg:flex items-center gap-1 xl:gap-2 absolute left-1/2 -translate-x-1/2"
                     >
-                        <Link href="/" className="px-2.5 py-2 text-sm font-medium text-white/65 hover:text-white hover:bg-white/[0.06] rounded-full transition-all whitespace-nowrap">
+                        <Link href="/" className="px-2.5 py-2 text-sm font-medium text-white/65 hover:text-white hover:bg-white/[0.04] rounded-[10px] transition-all whitespace-nowrap">
                             Trang chủ
                         </Link>
 
@@ -261,7 +261,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                 onClick={() =>
                                     setOpenDropdown(prev => (prev === "categories" ? null : "categories"))
                                 }
-                                className="flex items-center gap-1.5 px-2.5 py-2 text-sm font-medium text-white/65 hover:text-white hover:bg-white/[0.06] rounded-full transition-all whitespace-nowrap"
+                                className="flex items-center gap-1.5 px-2.5 py-2 text-sm font-medium text-white/65 hover:text-white hover:bg-white/[0.04] rounded-[10px] transition-all whitespace-nowrap"
                             >
                                 Thể loại{" "}
                                 <ChevronDown
@@ -298,7 +298,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                 onClick={() =>
                                     setOpenDropdown(prev => (prev === "countries" ? null : "countries"))
                                 }
-                                className="flex items-center gap-1.5 px-2.5 py-2 text-sm font-medium text-white/65 hover:text-white hover:bg-white/[0.06] rounded-full transition-all whitespace-nowrap"
+                                className="flex items-center gap-1.5 px-2.5 py-2 text-sm font-medium text-white/65 hover:text-white hover:bg-white/[0.04] rounded-[10px] transition-all whitespace-nowrap"
                             >
                                 Quốc gia{" "}
                                 <ChevronDown
@@ -328,13 +328,13 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             </div>
                         </div>
 
-                        <Link href="/danh-sach/phim-le" className="px-2.5 py-2 text-sm font-medium text-white/65 hover:text-white hover:bg-white/[0.06] rounded-full transition-all whitespace-nowrap">
+                        <Link href="/danh-sach/phim-le" className="px-2.5 py-2 text-sm font-medium text-white/65 hover:text-white hover:bg-white/[0.04] rounded-[10px] transition-all whitespace-nowrap">
                             Phim lẻ
                         </Link>
-                        <Link href="/danh-sach/phim-bo" className="px-2.5 py-2 text-sm font-medium text-white/65 hover:text-white hover:bg-white/[0.06] rounded-full transition-all whitespace-nowrap">
+                        <Link href="/danh-sach/phim-bo" className="px-2.5 py-2 text-sm font-medium text-white/65 hover:text-white hover:bg-white/[0.04] rounded-[10px] transition-all whitespace-nowrap">
                             Phim bộ
                         </Link>
-                        <Link href="/danh-sach/hoat-hinh" className="px-2.5 py-2 text-sm font-medium text-white/65 hover:text-white hover:bg-white/[0.06] rounded-full transition-all whitespace-nowrap">
+                        <Link href="/danh-sach/hoat-hinh" className="px-2.5 py-2 text-sm font-medium text-white/65 hover:text-white hover:bg-white/[0.04] rounded-[10px] transition-all whitespace-nowrap">
                             Hoạt hình
                         </Link>
                     </nav>

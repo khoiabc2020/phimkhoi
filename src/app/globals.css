@@ -196,11 +196,11 @@ h2 {
 
   .glass {
     /* Cleaner header: darker, flatter, less glow */
-    @apply bg-[#070b12]/88 border-b border-white/[0.07] shadow-[0_6px_18px_0_#00000040];
+    @apply bg-[#070b12]/90 border-b border-white/[0.06] shadow-[0_4px_12px_0_#00000033];
   }
 
   .glass-panel {
-    @apply bg-[#0b111c]/94 border border-white/[0.08] shadow-[0_10px_24px_#00000066] rounded-[12px];
+    @apply bg-[#0b111c]/94 border border-white/[0.07] shadow-[0_8px_18px_#00000055] rounded-[10px];
   }
 
   .glass-pill {
@@ -223,9 +223,9 @@ h2 {
   }
 
   .card-hover-3d:hover {
-    transform: scale(1.025) translateY(-3px) translateZ(0);
+    transform: scale(1.015) translateY(-2px) translateZ(0);
     /* box-shadow paint is kept off transition to avoid repaint triggering */
-    box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.44);
   }
 
   /* Button Styles */
@@ -234,8 +234,8 @@ h2 {
   }
 
   .btn-ios:hover {
-    transform: scale(1.02);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+    transform: scale(1.01);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
 
   /* Apple Scrollbar */
@@ -373,7 +373,7 @@ html {
 
 .quick-nav-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
 .quick-nav-card:not(:hover) {
@@ -393,3 +393,10 @@ html {
 .quick-nav-card:hover .quick-nav-shine {
   animation: shine-sweep 0.55s ease-out forwards;
 }
+
+/* System-wide radius tuning: bớt bo cong để giao diện clean hơn */
+.rounded-\[16px\] { border-radius: 12px !important; }
+.rounded-\[14px\] { border-radius: 11px !important; }
+.rounded-\[12px\] { border-radius: 10px !important; }
+.rounded-md { border-radius: 8px !important; }
+.rounded-lg { border-radius: 10px !important; }
