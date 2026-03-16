@@ -38,6 +38,10 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
     const looksLandscapeAsset = (url?: string | null) => {
         if (!url) return false;
         const u = url.toLowerCase();
+        // OPhim currently uses *-thumb.jpg as portrait poster assets.
+        if (u.includes("img.ophim.live") && (u.includes("-thumb.") || u.includes("/thumb-"))) {
+            return false;
+        }
         return (
             u.includes("thumb") ||
             u.includes("backdrop") ||

@@ -156,11 +156,32 @@ const mergeMovieImages = (primary: Movie, candidate: Movie): Movie => {
     const merged: Movie = { ...primary };
 
     const isEmpty = (v?: string) => !v || String(v).trim() === "";
+    const toLower = (v?: string) => String(v || "").toLowerCase();
+    const isOphimAsset = (v?: string) => toLower(v).includes("img.ophim.live");
+    const looksPortrait = (v?: string) => {
+        const u = toLower(v);
+        // OPhim thực tế hay dùng *-thumb.jpg làm ảnh dọc card.
+        if (isOphimAsset(v) && (u.includes("-thumb.") || u.includes("/thumb-"))) return true;
+        return u.includes("poster-vertical") || u.includes("portrait");
+    };
+    const looksLandscape = (v?: string) => {
+        const u = toLower(v);
+        if (u.includes("backdrop") || u.includes("banner") || u.includes("landscape")) return true;
+        // Với OPhim, *-poster.jpg thường là ảnh ngang.
+        if (isOphimAsset(v) && (u.includes("-poster.") || u.includes("/poster-"))) return true;
+        return false;
+    };
 
     if (isEmpty(merged.poster_url) && !isEmpty(candidate.poster_url)) {
         merged.poster_url = candidate.poster_url;
+    } else if (!isEmpty(candidate.poster_url) && looksLandscape(merged.poster_url) && looksPortrait(candidate.poster_url)) {
+        // Nếu poster hiện tại có dấu hiệu ảnh ngang nhưng candidate là dọc hơn thì ưu tiên candidate.
+        merged.poster_url = candidate.poster_url;
     }
     if (isEmpty(merged.thumb_url) && !isEmpty(candidate.thumb_url)) {
+        merged.thumb_url = candidate.thumb_url;
+    } else if (!isEmpty(candidate.thumb_url) && looksPortrait(merged.thumb_url) && looksLandscape(candidate.thumb_url)) {
+        // Thumb dùng làm overlay/backdrop -> ưu tiên ảnh ngang.
         merged.thumb_url = candidate.thumb_url;
     }
 
@@ -513,14 +534,28 @@ export const searchMovies = async (keyword: string) => {
 
 // Helper to normalize OPhim data to match our Movie interface
 const normalizeOphimItem = (item: any, pathImage: string): Movie => {
+    const rawThumb = (typeof item.thumb_url === 'string' && item.thumb_url.startsWith('http'))
+        ? item.thumb_url
+        : combineUrl(pathImage, item.thumb_url as string);
+    const rawPoster = (typeof item.poster_url === 'string' && item.poster_url.startsWith('http'))
+        ? item.poster_url
+        : combineUrl(pathImage, item.poster_url as string);
+
+    // OPhim feed hiện tại: thumb thường là ảnh dọc, poster thường là ảnh ngang.
+    // Chuẩn hóa về semantics nội bộ:
+    // - poster_url => ảnh dọc cho card portrait
+    // - thumb_url  => ảnh ngang cho overlay/backdrop
+    const normalizedPoster = rawThumb || rawPoster;
+    const normalizedThumb = rawPoster || rawThumb;
+
     return {
         ...item,
         _id: item._id as string,
         name: item.name as string,
         slug: item.slug as string,
         origin_name: item.origin_name as string,
-        thumb_url: (typeof item.thumb_url === 'string' && item.thumb_url.startsWith('http')) ? item.thumb_url : combineUrl(pathImage, item.thumb_url as string),
-        poster_url: (typeof item.poster_url === 'string' && item.poster_url.startsWith('http')) ? item.poster_url : combineUrl(pathImage, item.poster_url as string),
+        thumb_url: normalizedThumb,
+        poster_url: normalizedPoster,
         type: (item.type as string) || 'unknown',
         sub_docquyen: !!item.sub_docquyen,
         chieurap: !!item.chieurap,

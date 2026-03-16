@@ -424,19 +424,19 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         >
                             <Link
                                 href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                className="flex items-center justify-center gap-2 h-11 px-6 rounded-[10px] bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-bold text-[15px] transition-colors duration-150 active:scale-95"
+                                className="flex items-center justify-center gap-2 h-12 px-7 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-bold text-[15px] transition-all duration-200 hover:scale-105 active:scale-95"
                             >
                                 <Play className="w-4 h-4 fill-black shrink-0" />
                                 Xem Ngay
                             </Link>
                             <Link
                                 href={`/phim/${movie.slug}`}
-                                className="flex items-center justify-center h-11 px-5 rounded-[10px] bg-white/8 hover:bg-white/14 border border-white/12 text-white font-bold text-[14px] transition-colors duration-150 active:scale-95 backdrop-blur-sm"
+                                className="flex items-center justify-center h-12 px-6 rounded-full bg-white/10 hover:bg-white/18 border border-white/15 text-white font-bold text-[15px] transition-all hover:scale-105 active:scale-95 backdrop-blur-sm"
                             >
                                 <span className="hidden sm:inline">Chi Tiết</span>
                                 <span className="sm:hidden">Chi Tiết</span>
                             </Link>
-                            <div className="h-11 w-11 flex items-center justify-center rounded-[10px] bg-white/8 hover:bg-white/14 border border-white/12 transition-colors duration-150 cursor-pointer backdrop-blur-sm">
+                            <div className="h-12 w-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/18 border border-white/15 transition-all hover:scale-110 cursor-pointer backdrop-blur-sm">
                                 <FavoriteButton movieData={getFavoriteData(movie)} size="md" />
                             </div>
                         </div>
