@@ -1,13 +1,14 @@
 "use client";
 
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useTransition } from "react";
 import { ChevronDown } from "lucide-react";
 
 export default function FilterBar() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
+    const [isPending, startTransition] = useTransition();
 
     const createQueryString = useCallback(
         (name: string, value: string) => {
@@ -23,7 +24,11 @@ export default function FilterBar() {
     );
 
     const handleFilterChange = (name: string, value: string) => {
-        router.push(`${pathname}?${createQueryString(name, value)}`);
+        const nextPath = `${pathname}?${createQueryString(name, value)}`;
+        router.prefetch(nextPath);
+        startTransition(() => {
+            router.replace(nextPath);
+        });
     };
 
     const categories = [
@@ -72,60 +77,73 @@ export default function FilterBar() {
     ];
 
     return (
-        <div className="flex flex-wrap gap-2 sm:gap-3 py-3">
-            {/* Category Dropdown */}
-            <div className="relative group">
-                <select
-                    onChange={(e) => handleFilterChange("category", e.target.value)}
-                    className="appearance-none min-w-[126px] bg-[#0b0b10] border border-white/[0.08] text-white/90 py-2 px-3 pr-8 rounded-[10px] leading-tight focus:outline-none focus:border-[#F4C84A]/35 cursor-pointer text-sm"
-                    value={searchParams.get("category") || "all"}
-                >
-                    {categories.map((c) => (
-                        <option key={c.value} value={c.value}>
-                            {c.name}
-                        </option>
-                    ))}
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/70">
-                    <ChevronDown className="w-4 h-4" />
+        <div>
+            <div className="flex flex-wrap gap-2 sm:gap-3 py-3">
+                {/* Category Dropdown */}
+                <div className="relative group">
+                    <select
+                        onChange={(e) => handleFilterChange("category", e.target.value)}
+                        className="appearance-none min-w-[126px] bg-[#0b0b10] border border-white/[0.08] text-white/90 py-2 px-3 pr-8 rounded-[10px] leading-tight focus:outline-none focus:border-[#33445c] cursor-pointer text-sm"
+                        value={searchParams.get("category") || "all"}
+                        disabled={isPending}
+                    >
+                        {categories.map((c) => (
+                            <option key={c.value} value={c.value}>
+                                {c.name}
+                            </option>
+                        ))}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/70">
+                        <ChevronDown className="w-4 h-4" />
+                    </div>
+                </div>
+
+                {/* Country Dropdown */}
+                <div className="relative group">
+                    <select
+                        onChange={(e) => handleFilterChange("country", e.target.value)}
+                        className="appearance-none min-w-[126px] bg-[#0b0b10] border border-white/[0.08] text-white/90 py-2 px-3 pr-8 rounded-[10px] leading-tight focus:outline-none focus:border-[#33445c] cursor-pointer text-sm"
+                        value={searchParams.get("country") || "all"}
+                        disabled={isPending}
+                    >
+                        {countries.map((c) => (
+                            <option key={c.value} value={c.value}>
+                                {c.name}
+                            </option>
+                        ))}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/70">
+                        <ChevronDown className="w-4 h-4" />
+                    </div>
+                </div>
+
+                {/* Year Dropdown */}
+                <div className="relative group">
+                    <select
+                        onChange={(e) => handleFilterChange("year", e.target.value)}
+                        className="appearance-none min-w-[110px] bg-[#0b0b10] border border-white/[0.08] text-white/90 py-2 px-3 pr-8 rounded-[10px] leading-tight focus:outline-none focus:border-[#33445c] cursor-pointer text-sm"
+                        value={searchParams.get("year") || "all"}
+                        disabled={isPending}
+                    >
+                        {years.map((y) => (
+                            <option key={y.value} value={y.value}>
+                                {y.name}
+                            </option>
+                        ))}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/70">
+                        <ChevronDown className="w-4 h-4" />
+                    </div>
                 </div>
             </div>
 
-            {/* Country Dropdown */}
-            <div className="relative group">
-                <select
-                    onChange={(e) => handleFilterChange("country", e.target.value)}
-                    className="appearance-none min-w-[126px] bg-[#0b0b10] border border-white/[0.08] text-white/90 py-2 px-3 pr-8 rounded-[10px] leading-tight focus:outline-none focus:border-[#F4C84A]/35 cursor-pointer text-sm"
-                    value={searchParams.get("country") || "all"}
-                >
-                    {countries.map((c) => (
-                        <option key={c.value} value={c.value}>
-                            {c.name}
-                        </option>
+            {isPending && (
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 sm:gap-2.5 md:gap-3 pt-1 [contain:layout_paint]">
+                    {Array.from({ length: 12 }).map((_, i) => (
+                        <div key={i} className="aspect-[2/3] rounded-lg bg-white/[0.06] border border-white/[0.06] animate-pulse" />
                     ))}
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/70">
-                    <ChevronDown className="w-4 h-4" />
                 </div>
-            </div>
-
-            {/* Year Dropdown */}
-            <div className="relative group">
-                <select
-                    onChange={(e) => handleFilterChange("year", e.target.value)}
-                    className="appearance-none min-w-[110px] bg-[#0b0b10] border border-white/[0.08] text-white/90 py-2 px-3 pr-8 rounded-[10px] leading-tight focus:outline-none focus:border-[#F4C84A]/35 cursor-pointer text-sm"
-                    value={searchParams.get("year") || "all"}
-                >
-                    {years.map((y) => (
-                        <option key={y.value} value={y.value}>
-                            {y.name}
-                        </option>
-                    ))}
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/70">
-                    <ChevronDown className="w-4 h-4" />
-                </div>
-            </div>
+            )}
         </div>
     );
 }

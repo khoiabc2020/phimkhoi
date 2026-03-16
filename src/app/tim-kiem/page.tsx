@@ -15,7 +15,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                 <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 pt-24">
                     <div className="mb-6 rounded-[10px] border border-white/[0.05] bg-[#09090c]/55 px-3 sm:px-4 py-3 sm:py-4">
                         <h1 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
-                            <span className="w-1 h-5 bg-[#fbbf24] rounded-full"></span>
+                            <span className="w-1 h-5 bg-[#8fa7c5] rounded-full"></span>
                             Tìm kiếm
                         </h1>
                         <p className="text-gray-400 text-sm mt-1">
@@ -166,8 +166,8 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
             <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 pt-24">
                 <div className="mb-5 rounded-[10px] border border-white/[0.06] bg-[#07070b]/78 px-3 sm:px-4 py-3 sm:py-3.5 shadow-[0_8px_20px_#00000055]">
                     <h1 className="text-[20px] md:text-[26px] font-extrabold text-white flex items-center gap-2 tracking-tight">
-                        <span className="w-1 h-5 bg-[#fbbf24] rounded-full"></span>
-                        Kết quả: <span className="text-primary truncate max-w-[200px] md:max-w-md">"{keyword}"</span>
+                        <span className="w-1 h-5 bg-[#8fa7c5] rounded-full"></span>
+                        Kết quả: <span className="text-[#c7d7ea] truncate max-w-[200px] md:max-w-md">"{keyword}"</span>
                     </h1>
                     <p className="text-gray-400 text-sm mt-1">
                         Tìm thấy {filteredMovies.length} phim {hasActors && `và ${visibleActors.length} diễn viên`}
@@ -194,7 +194,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                 {hasActors && (
                     <div className="mb-10">
                         <div className="flex items-center gap-2 mb-4">
-                            <span className="w-1 h-5 bg-[#F4C84A] rounded-full"></span>
+                            <span className="w-1 h-5 bg-[#8fa7c5] rounded-full"></span>
                             <h2 className="text-base font-bold text-white">Diễn viên / Đạo diễn</h2>
                         </div>
                         <div className="flex gap-4 overflow-x-auto pb-3 scrollbar-none">
@@ -210,7 +210,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                                         href={`/dien-vien/${encodeURIComponent(actorName)}`}
                                         className="flex-shrink-0 flex flex-col items-center gap-2 group"
                                     >
-                                        <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-[#F4C84A] transition-colors bg-white/5">
+                                        <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-[#8fa7c5] transition-colors bg-white/5">
                                             {profileImg ? (
                                                 <img
                                                     src={profileImg}
@@ -224,7 +224,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                                             )}
                                         </div>
                                         <div className="text-center max-w-[88px]">
-                                            <p className="text-xs font-semibold text-white group-hover:text-[#F4C84A] transition-colors truncate">
+                                            <p className="text-xs font-semibold text-white group-hover:text-[#c7d7ea] transition-colors truncate">
                                                 {actorName}
                                             </p>
                                             {actor.known_for_department && (
@@ -245,7 +245,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                     <>
                         {hasActors && (
                             <div className="flex items-center gap-2 mb-4">
-                                <span className="w-1 h-5 bg-[#F4C84A] rounded-full"></span>
+                                <span className="w-1 h-5 bg-[#8fa7c5] rounded-full"></span>
                                 <h2 className="text-base font-bold text-white">Phim</h2>
                             </div>
                         )}
@@ -262,7 +262,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                         </div>
                         <h2 className="text-xl md:text-2xl font-bold text-white mb-2">Không tìm thấy phim này</h2>
                         <p className="text-gray-400 max-w-md mx-auto">
-                            Rất tiếc, chúng tôi không tìm thấy kết quả nào phù hợp với từ khóa <span className="text-yellow-500">"{keyword}"</span>
+                            Rất tiếc, chúng tôi không tìm thấy kết quả nào phù hợp với từ khóa <span className="text-[#c7d7ea]">"{keyword}"</span>
                             {(category || country || year) && " và bộ lọc hiện tại"}.
                         </p>
                         <p className="text-gray-500 text-sm mt-4">

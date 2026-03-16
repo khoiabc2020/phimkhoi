@@ -65,7 +65,6 @@ if errorlevel 1 (
 echo.
 echo [XONG] VPS da duoc dong bo thanh cong!
 echo        Kiem tra tai: https://khoiphim.io.vn
-pause
 exit /b 0
 
 :no_commit

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Search, Bell, User, LogOut, Shield, Trash2, Clock, History, Heart, Settings, X, ChevronDown, Play, Film, Video, LayoutGrid, Download, Loader2, Bookmark } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useTransition } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { cn, getImageUrl } from "@/lib/utils";
@@ -23,6 +23,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
     const [movieSearchHistory, setMovieSearchHistory] = useState<string[]>([]);
     const [showHistory, setShowHistory] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
+    const [isSearchNavigating, startSearchTransition] = useTransition();
     const [searchResults, setSearchResults] = useState<any>(null);
     const [openDropdown, setOpenDropdown] = useState<"categories" | "countries" | null>(null);
     const router = useRouter();
@@ -51,8 +52,11 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
         if (searchTerm.trim()) {
             // Save ONLY movie-search history for /tim-kiem
             saveHistoryItem("movies", searchTerm);
-
-            router.push(`/tim-kiem?q=${encodeURIComponent(searchTerm)}`);
+            const nextPath = `/tim-kiem?q=${encodeURIComponent(searchTerm)}`;
+            router.prefetch(nextPath);
+            startSearchTransition(() => {
+                router.push(nextPath);
+            });
             setIsSearchOpen(false);
             setShowHistory(false);
             setSearchQuery("");
@@ -382,7 +386,13 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                             }}
                                             className="absolute right-0 top-0 w-10 h-10 flex items-center justify-center z-30 text-white/50 hover:text-white transition-colors"
                                         >
-                                            {searchQuery ? <Search className="w-4 h-4" /> : <X className="w-4 h-4" />}
+                                            {isSearchNavigating ? (
+                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                            ) : searchQuery ? (
+                                                <Search className="w-4 h-4" />
+                                            ) : (
+                                                <X className="w-4 h-4" />
+                                            )}
                                         </button>
                                     )}
 
