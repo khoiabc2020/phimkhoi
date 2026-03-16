@@ -164,7 +164,7 @@ export default function MovieTabs({
             <div className="animate-in fade-in duration-300">
                 {/* EPISODES TAB */}
                 {activeTab === "episodes" && (
-                    <div className="bg-[#09090c]/55 border border-white/[0.05] rounded-[10px] p-3 sm:p-5">
+                    <div className="bg-[#07070b]/78 border border-white/[0.05] rounded-[10px] p-3 sm:p-5 shadow-[0_10px_26px_#00000055]">
                         {episodes && episodes.length > 0 ? (
                             <div className="space-y-6">
                                 {/* Language Tabs Row */}
@@ -203,7 +203,7 @@ export default function MovieTabs({
                                 )}
 
                                 {/* Servers Row - compact inline */}
-                                    <div className="flex flex-row items-center gap-2 sm:gap-3 border-b border-white/[0.05] pb-3 sm:pb-4 flex-wrap">
+                                <div className="flex flex-row items-center gap-2 sm:gap-3 border-b border-white/[0.05] pb-3 sm:pb-4 flex-wrap">
                                     <div className="flex items-center gap-1.5 text-gray-400 text-[11px] sm:text-[12px] font-bold uppercase tracking-widest shrink-0">
                                         <Database className="w-[13px] h-[13px] sm:w-[15px] sm:h-[15px] text-gray-600" strokeWidth={2.5} />
                                         Máy Chủ:
@@ -263,7 +263,7 @@ export default function MovieTabs({
                                                 <select
                                                     value={currentChunk}
                                                     onChange={(e) => setCurrentChunk(Number(e.target.value))}
-                                                    className="appearance-none bg-[#171B24] border border-white/[0.10] text-white text-sm font-medium py-2 px-4 pr-10 rounded-lg outline-none focus:border-[#F4C84A]/50 transition-colors cursor-pointer"
+                                                    className="appearance-none bg-[#0B0B10] border border-white/[0.08] text-white text-sm font-medium py-2 px-4 pr-10 rounded-lg outline-none focus:border-[#F4C84A]/40 transition-colors cursor-pointer"
                                                 >
                                                     {Array.from({ length: totalChunks }).map((_, idx) => {
                                                         const start = idx * EPISODES_PER_CHUNK + 1;
@@ -327,7 +327,7 @@ export default function MovieTabs({
                                                 <Link
                                                     key={ep.slug}
                                                     href={`/xem-phim/${slug}/${ep.slug}?server=${activeServer}`}
-                                                    className="group rounded-[12px] overflow-hidden border transition-all duration-200 touch-manipulation bg-[#151924] border-white/[0.08] hover:border-white/[0.22] hover:-translate-y-[1px]"
+                                                    className="group rounded-[12px] overflow-hidden border transition-all duration-200 touch-manipulation bg-[#0C0C12] border-white/[0.08] hover:border-white/[0.20] hover:-translate-y-[1px]"
                                                     title={rawName}
                                                 >
                                                     <div className="relative aspect-video overflow-hidden">
@@ -394,9 +394,9 @@ export default function MovieTabs({
 
                 {/* TRAILER TAB */}
                 {activeTab === "trailer" && (
-                    <div className="bg-[#09090c]/55 border border-white/[0.05] rounded-[10px] p-4 sm:p-5 space-y-4">
+                    <div className="bg-[#07070b]/78 border border-white/[0.05] rounded-[10px] p-4 sm:p-5 space-y-4 shadow-[0_10px_26px_#00000055]">
                         {/* Main player */}
-                        <div className="aspect-video w-full rounded-lg overflow-hidden bg-[#0A101A] border border-white/[0.10] shadow-2xl">
+                        <div className="aspect-video w-full rounded-lg overflow-hidden bg-[#0A0A0E] border border-white/[0.08] shadow-[0_10px_24px_#00000066]">
                             {activeVideo ? (
                                 <iframe
                                     key={activeVideo.key}
@@ -489,9 +489,9 @@ export default function MovieTabs({
 
                 {/* RELATED TAB */}
                 {activeTab === "related" && (
-                    <div className="bg-[#09090c]/55 border border-white/[0.05] rounded-[10px] p-5">
+                    <div className="bg-[#07070b]/78 border border-white/[0.05] rounded-[10px] p-5 shadow-[0_10px_26px_#00000055]">
                         {relatedMovies.length > 0 ? (
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 [contain:layout_paint]">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5 [contain:layout_paint]">
                                 {relatedMovies.map((m) => (
                                     <MovieCard key={m._id} movie={m} />
                                 ))}

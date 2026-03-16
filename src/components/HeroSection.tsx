@@ -67,7 +67,7 @@ function getHeroImage(movie: any, type: "poster" | "backdrop", variant: "mobile"
         if (type === "poster" && tmdb.poster_path)
             return getImageUrl(tmdbImage(tmdb.poster_path, variant === "desktop" ? "w500" : "w342"), true);
         if (type === "backdrop" && tmdb.backdrop_path)
-            return getImageUrl(tmdbImage(tmdb.backdrop_path, variant === "desktop" ? "original" : "w780"), true);
+            return getImageUrl(tmdbImage(tmdb.backdrop_path, variant === "desktop" ? "original" : "w1280"), true);
     }
     // Backdrop must stay landscape-only, do not fallback to poster here.
     const api = type === "backdrop" ? movie.thumb_url : movie.poster_url || movie.thumb_url;
@@ -168,12 +168,12 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                             aria-hidden={!isActive}
                         >
                             {/* Backdrop */}
-                            <div className="relative w-full h-[210px] sm:h-[260px] overflow-hidden bg-[#080d18]">
+                            <div className="relative w-full h-[240px] sm:h-[300px] overflow-hidden bg-[#080d18]">
                                 <Image
                                     src={bg}
                                     alt=""
                                     fill
-                                    className="object-cover object-top"
+                                    className="object-cover object-[60%_20%]"
                                     priority={isActive && i < 2}
                                     loading={isActive ? "eager" : "lazy"}
                                     sizes="100vw"
@@ -293,7 +293,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
 
     return (
         <div
-            className="relative w-full h-[62vh] lg:h-[78vh] xl:h-[90vh] overflow-hidden bg-[#020617]"
+            className="relative w-full h-[68vh] lg:h-[84vh] xl:h-[96vh] overflow-hidden bg-[#050507]"
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}
         >
@@ -314,7 +314,20 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                             src={bg}
                             alt=""
                             fill
-                            className="object-contain object-right"
+                            className="object-cover object-[64%_18%] opacity-[0.3] scale-[1.04] blur-2xl"
+                            priority={isActive && i < 2}
+                            loading={isActive ? "eager" : "lazy"}
+                            unoptimized
+                            sizes="100vw"
+                            placeholder="blur"
+                            blurDataURL={blurData}
+                            decoding="async"
+                        />
+                        <Image
+                            src={bg}
+                            alt=""
+                            fill
+                            className="object-contain object-right opacity-[0.96]"
                             priority={isActive && i < 2}
                             loading={isActive ? "eager" : "lazy"}
                             unoptimized
@@ -330,11 +343,11 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
             {/* ── Gradient overlays (always on top) ── */}
             <div className="absolute inset-0 z-[2] pointer-events-none">
                 {/* Left text readability */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#020617]/92 via-[#020617]/58 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#050507]/94 via-[#050507]/58 to-transparent" />
                 {/* Bottom blend into page */}
-                <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#020617] via-[#020617]/70 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#050507] via-[#050507]/70 to-transparent" />
                 {/* Top subtle vignette */}
-                <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-[#020617]/40 to-transparent" />
+                <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-[#050507]/42 to-transparent" />
             </div>
 
             {/* ── Content ── */}

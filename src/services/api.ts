@@ -158,34 +158,111 @@ const mergeMovieImages = (primary: Movie, candidate: Movie): Movie => {
     const isEmpty = (v?: string) => !v || String(v).trim() === "";
     const toLower = (v?: string) => String(v || "").toLowerCase();
     const isOphimAsset = (v?: string) => toLower(v).includes("img.ophim.live");
-    const looksPortrait = (v?: string) => {
+    const detectByDimensionToken = (v?: string): "portrait" | "landscape" | "unknown" => {
         const u = toLower(v);
-        // OPhim thực tế hay dùng *-thumb.jpg làm ảnh dọc card.
-        if (isOphimAsset(v) && (u.includes("-thumb.") || u.includes("/thumb-"))) return true;
-        return u.includes("poster-vertical") || u.includes("portrait");
+        const m = u.match(/(\d{2,4})x(\d{2,4})/);
+        if (!m) return "unknown";
+        const w = parseInt(m[1], 10);
+        const h = parseInt(m[2], 10);
+        if (!Number.isFinite(w) || !Number.isFinite(h)) return "unknown";
+        if (w === h) return "unknown";
+        return h > w ? "portrait" : "landscape";
     };
-    const looksLandscape = (v?: string) => {
+    const detectOrientation = (v?: string): "portrait" | "landscape" | "unknown" => {
         const u = toLower(v);
-        if (u.includes("backdrop") || u.includes("banner") || u.includes("landscape")) return true;
+        if (!u) return "unknown";
+        // OPhim thực tế hay dùng *-thumb.jpg làm ảnh dọc card.
+        if (isOphimAsset(v) && (u.includes("-thumb.") || u.includes("/thumb-"))) return "portrait";
         // Với OPhim, *-poster.jpg thường là ảnh ngang.
-        if (isOphimAsset(v) && (u.includes("-poster.") || u.includes("/poster-"))) return true;
-        return false;
+        if (isOphimAsset(v) && (u.includes("-poster.") || u.includes("/poster-"))) return "landscape";
+        if (u.includes("backdrop") || u.includes("banner") || u.includes("landscape") || u.includes("horizontal")) return "landscape";
+        if (u.includes("poster-vertical") || u.includes("portrait") || u.includes("vertical")) return "portrait";
+        if (u.includes("/poster") || u.includes("poster.")) return "portrait";
+        return detectByDimensionToken(v);
+    };
+    const looksPortrait = (v?: string) => detectOrientation(v) === "portrait";
+    const looksLandscape = (v?: string) => detectOrientation(v) === "landscape";
+    const pickFirstNonEmpty = (arr: (string | undefined)[]) => arr.find(v => !isEmpty(v)) || "";
+    const pickPortrait = (arr: (string | undefined)[]) => {
+        for (const v of arr) if (!isEmpty(v) && looksPortrait(v)) return v as string;
+        for (const v of arr) if (!isEmpty(v) && detectOrientation(v) === "unknown") return v as string;
+        return "";
+    };
+    const pickLandscape = (arr: (string | undefined)[]) => {
+        for (const v of arr) if (!isEmpty(v) && looksLandscape(v)) return v as string;
+        for (const v of arr) if (!isEmpty(v) && detectOrientation(v) === "unknown") return v as string;
+        return "";
     };
 
-    if (isEmpty(merged.poster_url) && !isEmpty(candidate.poster_url)) {
-        merged.poster_url = candidate.poster_url;
-    } else if (!isEmpty(candidate.poster_url) && looksLandscape(merged.poster_url) && looksPortrait(candidate.poster_url)) {
-        // Nếu poster hiện tại có dấu hiệu ảnh ngang nhưng candidate là dọc hơn thì ưu tiên candidate.
-        merged.poster_url = candidate.poster_url;
-    }
-    if (isEmpty(merged.thumb_url) && !isEmpty(candidate.thumb_url)) {
-        merged.thumb_url = candidate.thumb_url;
-    } else if (!isEmpty(candidate.thumb_url) && looksPortrait(merged.thumb_url) && looksLandscape(candidate.thumb_url)) {
-        // Thumb dùng làm overlay/backdrop -> ưu tiên ảnh ngang.
-        merged.thumb_url = candidate.thumb_url;
-    }
+    // Enforce semantics:
+    // - poster_url: portrait-first
+    // - thumb_url: landscape-first
+    const portrait = pickPortrait([
+        merged.poster_url,
+        candidate.poster_url,
+        merged.thumb_url,
+        candidate.thumb_url,
+    ]);
+    const landscape = pickLandscape([
+        merged.thumb_url,
+        candidate.thumb_url,
+        merged.poster_url,
+        candidate.poster_url,
+    ]);
+
+    merged.poster_url = portrait || merged.poster_url || candidate.poster_url || "";
+    merged.thumb_url =
+        landscape ||
+        merged.thumb_url ||
+        candidate.thumb_url ||
+        pickFirstNonEmpty([merged.poster_url, candidate.poster_url]);
 
     return merged;
+};
+
+const normalizeMovieImageRoles = (movie: Movie): Movie => {
+    const isEmpty = (v?: string) => !v || String(v).trim() === "";
+    const toLower = (v?: string) => String(v || "").toLowerCase();
+    const isOphimAsset = (v?: string) => toLower(v).includes("img.ophim.live");
+    const detectByDimensionToken = (v?: string): "portrait" | "landscape" | "unknown" => {
+        const u = toLower(v);
+        const m = u.match(/(\d{2,4})x(\d{2,4})/);
+        if (!m) return "unknown";
+        const w = parseInt(m[1], 10);
+        const h = parseInt(m[2], 10);
+        if (!Number.isFinite(w) || !Number.isFinite(h)) return "unknown";
+        if (w === h) return "unknown";
+        return h > w ? "portrait" : "landscape";
+    };
+    const detectOrientation = (v?: string): "portrait" | "landscape" | "unknown" => {
+        const u = toLower(v);
+        if (!u) return "unknown";
+        if (isOphimAsset(v) && (u.includes("-thumb.") || u.includes("/thumb-"))) return "portrait";
+        if (isOphimAsset(v) && (u.includes("-poster.") || u.includes("/poster-"))) return "landscape";
+        if (u.includes("backdrop") || u.includes("banner") || u.includes("landscape") || u.includes("horizontal")) return "landscape";
+        if (u.includes("poster-vertical") || u.includes("portrait") || u.includes("vertical")) return "portrait";
+        if (u.includes("/poster") || u.includes("poster.")) return "portrait";
+        return detectByDimensionToken(v);
+    };
+    const pickPortrait = (arr: (string | undefined)[]) => {
+        for (const v of arr) if (!isEmpty(v) && detectOrientation(v) === "portrait") return v as string;
+        for (const v of arr) if (!isEmpty(v) && detectOrientation(v) === "unknown") return v as string;
+        return "";
+    };
+    const pickLandscape = (arr: (string | undefined)[]) => {
+        for (const v of arr) if (!isEmpty(v) && detectOrientation(v) === "landscape") return v as string;
+        for (const v of arr) if (!isEmpty(v) && detectOrientation(v) === "unknown") return v as string;
+        return "";
+    };
+
+    const portrait = pickPortrait([movie.poster_url, movie.thumb_url]);
+    const landscape = pickLandscape([movie.thumb_url, movie.poster_url]);
+
+    return {
+        ...movie,
+        poster_url: portrait || movie.poster_url || "",
+        thumb_url: landscape || movie.thumb_url || movie.poster_url || "",
+    };
 };
 
 // --- Ophim Native Extensions ---
@@ -318,7 +395,7 @@ export const getHomeData = async () => {
                     bySlug.set(item.slug, mergeMovieImages(existing, item));
                 }
             }
-            return Array.from(bySlug.values());
+            return Array.from(bySlug.values()).map(normalizeMovieImageRoles);
         };
 
         const [
@@ -523,7 +600,7 @@ export const searchMovies = async (keyword: string) => {
                 bySlug.set(item.slug, mergeMovieImages(existing, item));
             }
         }
-        return Array.from(bySlug.values());
+        return Array.from(bySlug.values()).map(normalizeMovieImageRoles);
 
     } catch (error) {
         console.error(`Error searching movies [${keyword}]:`, error);
@@ -636,7 +713,7 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
                 bySlug.set(item.slug, mergeMovieImages(existing, item));
             }
         }
-        let uniqueItems = Array.from(bySlug.values());
+        let uniqueItems = Array.from(bySlug.values()).map(normalizeMovieImageRoles);
 
         // Filter out trailer-only / unreleased movies (unless explicitly browsing that category)
         if (type !== 'phim-sap-chieu') {
@@ -727,7 +804,7 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
         }
 
         return {
-            items: Array.from(bySlug.values()),
+            items: Array.from(bySlug.values()).map(normalizeMovieImageRoles),
             pagination: kkPagination
         };
     } catch (error) {
@@ -795,7 +872,7 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
                 bySlug.set(item.slug, mergeMovieImages(existing, item));
             }
         }
-        const uniqueItems = Array.from(bySlug.values());
+        const uniqueItems = Array.from(bySlug.values()).map(normalizeMovieImageRoles);
 
         return {
             items: uniqueItems,

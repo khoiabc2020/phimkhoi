@@ -186,9 +186,9 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
             {/* Hero Section (Onflix-like: backdrop 16:9 on right, left side darker) */}
-            <div className="relative w-full pt-20 sm:pt-28 md:pt-32 pb-8 px-4 md:px-8 xl:px-16 flex items-end min-h-[420px] sm:min-h-[500px] overflow-hidden">
+            <div className="relative w-full pt-20 sm:pt-28 md:pt-32 pb-8 px-4 md:px-8 xl:px-16 flex items-end min-h-[460px] sm:min-h-[560px] overflow-hidden">
                 {/* Base dark layer */}
-                <div className="absolute inset-0 bg-[#020617]" />
+                <div className="absolute inset-0 bg-[#050507]" />
 
                 {/* Backdrop layer: full canvas, anchored right to keep subject in right half */}
                 {backdropUrl && (
@@ -199,7 +199,18 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             fill
                             priority
                             unoptimized
-                            className="object-contain object-right opacity-[0.96]"
+                            className="object-cover object-[68%_22%] opacity-[0.32] scale-[1.06] blur-2xl"
+                            sizes="100vw"
+                            placeholder="blur"
+                            blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
+                        />
+                        <Image
+                            src={backdropUrl}
+                            alt={movie?.name || ""}
+                            fill
+                            priority
+                            unoptimized
+                            className="object-contain object-right opacity-[0.95]"
                             sizes="100vw"
                             placeholder="blur"
                             blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
@@ -208,10 +219,10 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 )}
 
                 {/* Softer cinematic feather blend: tránh đường chia cứng trái/phải */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#020617] via-[#020617]/95 via-[40%] to-[#020617]/16" />
-                <div className="absolute inset-y-0 left-[36%] w-[34%] bg-gradient-to-r from-[#020617]/88 via-[#020617]/34 to-transparent blur-xl" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/96 via-[#020617]/42 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-b from-[#020617]/34 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#050507] via-[#050507]/94 via-[43%] to-[#050507]/20" />
+                <div className="absolute inset-y-0 left-[34%] w-[38%] bg-gradient-to-r from-[#050507]/86 via-[#050507]/28 to-transparent blur-2xl" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#050507]/96 via-[#050507]/44 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#050507]/36 via-transparent to-transparent" />
 
                 {/* Hero Info Content aligned left/bottom */}
                 <div className="relative z-10 w-full max-w-[1920px] mx-auto space-y-2 sm:space-y-4 max-w-[760px]">
@@ -335,7 +346,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
 
                     {/* LEFT SIDEBAR (shown after tabs on mobile, beside on desktop) */}
                     <div className="w-full lg:col-span-4 xl:col-span-3 order-2 lg:order-1 space-y-6 sm:space-y-8 lg:pr-4">
-                        <div className="rounded-[10px] border border-white/[0.05] bg-[#09090c]/55 p-4 sm:p-5 space-y-6 sm:space-y-8">
+                        <div className="rounded-[10px] border border-white/[0.06] bg-[#07070b]/78 p-4 sm:p-5 space-y-6 sm:space-y-8 shadow-[0_10px_24px_#00000066]">
                         {/* Nội dung */}
                         <div>
                             <div className="flex items-center gap-2 mb-3 sm:mb-4 border-l-2 border-[#F4C84A] pl-3">

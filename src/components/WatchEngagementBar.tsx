@@ -76,10 +76,10 @@ export default function WatchEngagementBar({
     };
 
     return (
-        <div className="relative z-30 rounded-[12px] border border-white/[0.10] overflow-hidden shadow-2xl shadow-black/30 bg-[#0D1320]">
+        <div className="relative z-30 rounded-[10px] border border-white/[0.06] overflow-hidden shadow-[0_12px_28px_#00000066] bg-[#07070b]/82">
 
             {/* Controls bar */}
-            <div className="flex items-center gap-4 py-3 px-5 border-b border-white/[0.10] overflow-x-auto hide-scrollbar md:flex-wrap md:justify-between md:overflow-visible bg-[#0A101A]">
+            <div className="flex items-center gap-4 py-3 px-5 border-b border-white/[0.06] overflow-x-auto hide-scrollbar md:flex-wrap md:justify-between md:overflow-visible bg-[#09090d]">
 
                 {/* Left */}
                 <div className="flex items-center shrink-0 gap-4">
@@ -156,7 +156,7 @@ export default function WatchEngagementBar({
             </div>
 
             {/* Movie Info - luôn nằm ngang trên mọi thiết bị */}
-            <div className="flex flex-row gap-4 p-4 md:p-5 items-start border-t border-white/[0.10] bg-[#0D1320]">
+            <div className="flex flex-row gap-4 p-4 md:p-5 items-start border-t border-white/[0.06] bg-[#07070b]/78">
                 {/* Poster */}
                 <div className="flex-shrink-0">
                     <div className="relative w-20 h-[112px] md:w-24 md:h-[134px] rounded-lg overflow-hidden shadow-xl ring-1 ring-white/20">

@@ -35,19 +35,35 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    const looksLandscapeAsset = (url?: string | null) => {
-        if (!url) return false;
+    const detectOrientation = (url?: string | null): "portrait" | "landscape" | "unknown" => {
+        if (!url) return "unknown";
         const u = url.toLowerCase();
         // OPhim currently uses *-thumb.jpg as portrait poster assets.
         if (u.includes("img.ophim.live") && (u.includes("-thumb.") || u.includes("/thumb-"))) {
-            return false;
+            return "portrait";
         }
-        return (
-            u.includes("thumb") ||
-            u.includes("backdrop") ||
-            u.includes("banner") ||
-            u.includes("landscape")
-        );
+        // OPhim currently uses *-poster.jpg as landscape backdrops.
+        if (u.includes("img.ophim.live") && (u.includes("-poster.") || u.includes("/poster-"))) {
+            return "landscape";
+        }
+        if (u.includes("backdrop") || u.includes("banner") || u.includes("landscape") || u.includes("horizontal")) {
+            return "landscape";
+        }
+        if (u.includes("portrait") || u.includes("vertical")) {
+            return "portrait";
+        }
+        if (u.includes("/poster") || u.includes("poster.")) {
+            return "portrait";
+        }
+        const dim = u.match(/(\d{2,4})x(\d{2,4})/);
+        if (dim) {
+            const w = parseInt(dim[1], 10);
+            const h = parseInt(dim[2], 10);
+            if (Number.isFinite(w) && Number.isFinite(h) && w !== h) {
+                return h > w ? "portrait" : "landscape";
+            }
+        }
+        return "unknown";
     };
 
     // Poster (ảnh dọc) – ưu tiên poster thật, tránh nhầm thumb/backdrop vào slot dọc
@@ -56,12 +72,16 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
             ? getTMDBImage((movie as any).tmdbData.poster_path)
             : null;
 
-    const sourcePoster = movie.poster_url && !looksLandscapeAsset(movie.poster_url)
+    const sourcePoster = movie.poster_url && detectOrientation(movie.poster_url) !== "landscape"
         ? movie.poster_url
+        : null;
+    const thumbAsPoster = movie.thumb_url && detectOrientation(movie.thumb_url) === "portrait"
+        ? movie.thumb_url
         : null;
 
     const portraitPosterSource =
         sourcePoster ||            // poster từ KKPhim/OPhim/NguonC (ảnh dọc hợp lệ)
+        thumbAsPoster ||           // fallback khi source trả nhầm field nhưng ảnh vẫn dọc
         tmdbPoster ||              // poster TMDB (đảm bảo ảnh dọc)
         "";
     const noCropPortrait = orientation === "portrait";

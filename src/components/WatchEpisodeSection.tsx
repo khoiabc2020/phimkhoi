@@ -105,9 +105,9 @@ export default function WatchEpisodeSection({
     };
 
     return (
-        <div className="bg-[#0D1320] rounded-[12px] border border-white/[0.10] overflow-hidden mb-6 sm:mb-8 mt-4 mx-3 sm:mx-4 md:mx-0 shadow-2xl">
+        <div className="bg-[#07070b]/82 rounded-[10px] border border-white/[0.06] overflow-hidden mb-6 sm:mb-8 mt-4 mx-3 sm:mx-4 md:mx-0 shadow-[0_12px_28px_#00000066]">
             {/* Header: DANH SÁCH TẬP */}
-            <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-4 sm:py-5 border-b border-white/[0.10] bg-[#0A101A]">
+            <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-4 sm:py-5 border-b border-white/[0.06] bg-[#09090d]">
                 <div className="flex items-center gap-2">
                     <List className="w-[18px] h-[18px] text-[#F4C84A]" />
                     <h3 className="text-[14px] font-bold text-white uppercase tracking-wider">
@@ -193,7 +193,7 @@ export default function WatchEpisodeSection({
                                                 "h-[32px] sm:h-[38px] px-3 sm:px-5 rounded-full text-[12px] sm:text-[13px] font-bold transition-all duration-300 border flex items-center justify-center gap-2 shadow-sm",
                                                 isServerActive
                                                     ? "bg-[#F4C84A] border-[#F4C84A] text-[#08090C] shadow-[0_4px_14px_#F4C84A40] scale-105 transform"
-                                                    : "bg-white/[0.04] border-white/[0.10] text-gray-300 hover:text-white hover:border-white/[0.2] hover:bg-white/[0.08] active:scale-95"
+                                                    : "bg-[#0B0B10] border-white/[0.10] text-gray-300 hover:text-white hover:border-white/[0.2] hover:bg-white/[0.06] active:scale-95"
                                             )}
                                         >
                                             <span className="truncate max-w-[120px] sm:max-w-[150px]">{displayName}</span>
@@ -204,7 +204,7 @@ export default function WatchEpisodeSection({
                                 });
                             })()
                         ) : (
-                            <button className="h-[32px] sm:h-[38px] px-3 sm:px-5 rounded-full text-[12px] sm:text-[13px] font-bold bg-white/[0.04] border border-white/[0.10] text-gray-300 shadow-sm flex items-center justify-center gap-2">
+                            <button className="h-[32px] sm:h-[38px] px-3 sm:px-5 rounded-full text-[12px] sm:text-[13px] font-bold bg-[#0B0B10] border border-white/[0.10] text-gray-300 shadow-sm flex items-center justify-center gap-2">
                                 {serverName}
                                 <span className="w-[2px] h-3 bg-white/10 rounded-full" />
                                 <span className="font-semibold text-gray-400">{episodes.length}</span>
@@ -225,7 +225,7 @@ export default function WatchEpisodeSection({
                         {episodes.length > EPISODES_PER_CHUNK && (
                             <div className="relative">
                                 <select
-                                    className="appearance-none bg-[#171B24] border border-white/[0.10] text-gray-100 font-semibold text-[13px] rounded-lg pl-4 pr-10 py-2 focus:outline-none focus:border-[#F4C84A]/50 transition-colors cursor-pointer shadow-sm"
+                                    className="appearance-none bg-[#0B0B10] border border-white/[0.10] text-gray-100 font-semibold text-[13px] rounded-lg pl-4 pr-10 py-2 focus:outline-none focus:border-[#F4C84A]/50 transition-colors cursor-pointer shadow-sm"
                                     value={currentChunk}
                                     onChange={(e) => setCurrentChunk(Number(e.target.value))}
                                 >
@@ -233,7 +233,7 @@ export default function WatchEpisodeSection({
                                         const start = i * EPISODES_PER_CHUNK + 1;
                                         const end = Math.min((i + 1) * EPISODES_PER_CHUNK, episodes.length);
                                         return (
-                                            <option key={i} value={i} className="bg-[#171B24] text-white">
+                                            <option key={i} value={i} className="bg-[#0B0B10] text-white">
                                                 Tập {start} - {end}
                                             </option>
                                         );
@@ -341,7 +341,7 @@ export default function WatchEpisodeSection({
                                             "h-[38px] rounded-full flex items-center justify-center gap-1.5 text-[13px] font-semibold transition-all duration-200 border backdrop-blur-md touch-manipulation",
                                             isActive
                                                 ? "bg-[#F4C84A]/[0.15] border-[#F4C84A]/60 text-[#F4C84A] shadow-[0_0_16px_#F4C84A1F]"
-                                                : "bg-white/[0.04] border-white/[0.08] text-gray-300 hover:text-white hover:bg-white/[0.08] hover:border-white/[0.16] hover:-translate-y-[1px] active:scale-95"
+                                                : "bg-[#0B0B10] border-white/[0.08] text-gray-300 hover:text-white hover:bg-white/[0.06] hover:border-white/[0.16] hover:-translate-y-[1px] active:scale-95"
                                         )}
                                     >
                                         {isActive && <span className="w-1.5 h-1.5 rounded-full bg-[#F4C84A] flex-shrink-0" />}
@@ -364,7 +364,7 @@ export default function WatchEpisodeSection({
                                         "h-[40px] sm:h-[44px] rounded-[12px] flex items-center justify-center gap-1.5 text-[13px] sm:text-[14px] font-semibold transition-all duration-200 border backdrop-blur-md touch-manipulation",
                                         isActive
                                             ? "bg-[#F4C84A]/[0.15] border-[#F4C84A]/60 text-[#F4C84A] shadow-[0_0_16px_#F4C84A1F]"
-                                            : "bg-white/[0.04] border-white/[0.08] text-gray-300 hover:text-white hover:bg-white/[0.08] hover:border-white/[0.16] hover:-translate-y-[1px] active:scale-95"
+                                            : "bg-[#0B0B10] border-white/[0.08] text-gray-300 hover:text-white hover:bg-white/[0.06] hover:border-white/[0.16] hover:-translate-y-[1px] active:scale-95"
                                     )}
                                 >
                                     {isActive && <span className="w-1.5 h-1.5 rounded-full bg-[#F4C84A] flex-shrink-0" />}

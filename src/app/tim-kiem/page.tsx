@@ -164,7 +164,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     return (
         <main className="min-h-screen pb-20">
             <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 pt-24">
-                <div className="mb-6 rounded-[10px] border border-white/[0.05] bg-[#09090c]/55 px-3 sm:px-4 py-3 sm:py-4">
+                <div className="mb-5 rounded-[10px] border border-white/[0.06] bg-[#07070b]/78 px-3 sm:px-4 py-3 sm:py-3.5 shadow-[0_8px_20px_#00000055]">
                     <h1 className="text-[18px] md:text-[22px] font-extrabold text-white flex items-center gap-2 tracking-tight">
                         <span className="w-1 h-5 bg-[#fbbf24] rounded-full"></span>
                         Kết quả: <span className="text-primary truncate max-w-[200px] md:max-w-md">"{keyword}"</span>
@@ -175,8 +175,17 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                         {filteredMovies.length > visibleMovies.length && ` · hiển thị ${visibleMovies.length} kết quả đầu để tải nhanh`}
                     </p>
 
+                    <div className="mt-3 flex items-center gap-2">
+                        <span className="inline-flex items-center h-8 px-3 rounded-full bg-white/[0.08] border border-white/[0.10] text-white text-xs font-bold">
+                            Phim ({filteredMovies.length})
+                        </span>
+                        <span className="inline-flex items-center h-8 px-3 rounded-full bg-[#0B0B10] border border-white/[0.08] text-gray-300 text-xs font-semibold">
+                            Diễn viên ({visibleActors.length})
+                        </span>
+                    </div>
+
                     {/* Add Filter Bar */}
-                    <div className="mt-4">
+                    <div className="mt-2">
                         <FilterBar />
                     </div>
                 </div>
@@ -240,7 +249,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                                 <h2 className="text-base font-bold text-white">Phim</h2>
                             </div>
                         )}
-                        <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(140px,1fr))] md:grid-cols-[repeat(auto-fill,minmax(160px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(180px,1fr))] xl:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] 2xl:grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-2 sm:gap-3 md:gap-4 [contain:layout_paint]">
+                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-2 sm:gap-2.5 md:gap-3 [contain:layout_paint]">
                             {visibleMovies.map((movie: any) => (
                                 <MovieCard key={movie._id || movie.slug} movie={movie} />
                             ))}
