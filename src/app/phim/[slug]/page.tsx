@@ -183,24 +183,31 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
-            {/* Hero Section (Backdrop + Info Overlay) */}
-            <div className="relative w-full pt-20 sm:pt-28 md:pt-32 pb-8 px-4 md:px-8 xl:px-16 flex items-end min-h-[420px] sm:min-h-[500px]">
-                {/* Backdrop ảnh — dùng Next/Image với priority=true để load sớm nhất + blur placeholder */}
+            {/* Hero Section (Onflix-like: backdrop 16:9 on right, left side darker) */}
+            <div className="relative w-full pt-20 sm:pt-28 md:pt-32 pb-8 px-4 md:px-8 xl:px-16 flex items-end min-h-[420px] sm:min-h-[500px] overflow-hidden">
+                {/* Base dark layer */}
+                <div className="absolute inset-0 bg-[#020617]" />
+
+                {/* Right-side media area: keep 16:9 feeling and avoid aggressive crop */}
                 {backdropUrl && (
-                    <Image
-                        src={backdropUrl}
-                        alt={movie?.name || ""}
-                        fill
-                        priority
-                        unoptimized
-                        className="absolute inset-0 object-cover object-top"
-                        placeholder="blur"
-                        blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
-                    />
+                    <div className="absolute inset-y-0 right-0 w-full sm:w-[68%] lg:w-[64%]">
+                        <Image
+                            src={backdropUrl}
+                            alt={movie?.name || ""}
+                            fill
+                            priority
+                            unoptimized
+                            className="object-contain object-right"
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 68vw, 64vw"
+                            placeholder="blur"
+                            blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
+                        />
+                    </div>
                 )}
-                {/* Overlay: giảm độ tối để thấy backdrop rõ hơn nhưng vẫn giữ độ tương phản cho text */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/90 via-[#020617]/62 to-[#020617]/10" />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#020617]/88 via-[#020617]/48 to-transparent" />
+
+                {/* Left black gradient + bottom blend (clear typography like Onflix) */}
+                <div className="absolute inset-0 bg-gradient-to-r from-[#020617] via-[#020617]/88 to-[#020617]/16" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/96 via-[#020617]/55 to-transparent" />
 
                 {/* Hero Info Content aligned left/bottom */}
                 <div className="relative z-10 w-full max-w-[1920px] mx-auto space-y-2 sm:space-y-4">
