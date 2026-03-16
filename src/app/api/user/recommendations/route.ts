@@ -7,6 +7,7 @@ import { getMovieDetail, getMoviesByCategory, getMoviesByCountry, Movie } from "
 
 type TagItem = { slug?: string; name?: string };
 type TagScore = { slug: string; name: string; count: number };
+type MovieDetailResult = Awaited<ReturnType<typeof getMovieDetail>>;
 
 const countTags = (map: Map<string, TagScore>, tags: TagItem[] = []) => {
   for (const t of tags) {
@@ -61,9 +62,13 @@ export async function GET() {
     );
 
     const detailResults = await Promise.all(
-      recentWatched.map(async (w: { movieSlug?: string }) => {
+      recentWatched.map(async (w: { movieSlug?: string }): Promise<MovieDetailResult | null> => {
         if (!w.movieSlug) return null;
-        return getMovieDetail(w.movieSlug).catch(() => null);
+        try {
+          return await getMovieDetail(w.movieSlug);
+        } catch {
+          return null;
+        }
       })
     );
 
