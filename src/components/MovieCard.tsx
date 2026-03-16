@@ -96,10 +96,32 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
         tmdbPoster ||              // poster TMDB (đảm bảo ảnh dọc)
         "";
     const noCropPortrait = orientation === "portrait";
+    const relaxedPosterSource = movie.poster_url || movie.thumb_url || tmdbPoster || "";
 
-    const displayPoster = orientation === "landscape"
-        ? getImageUrl(movie.thumb_url || movie.poster_url || "")
-        : (portraitPosterSource ? getImageUrl(portraitPosterSource) : "/placeholder.svg");
+    // Build robust fallback candidates to avoid blank placeholder cards.
+    // Priority:
+    // - portrait cards: strict portrait source -> relaxed source -> opposite field -> tmdb
+    // - landscape cards: thumb -> poster -> tmdb backdrop -> tmdb poster
+    const posterCandidates = Array.from(
+        new Set(
+            (orientation === "landscape"
+                ? [
+                    movie.thumb_url,
+                    movie.poster_url,
+                    (movie as any).tmdbData?.backdrop_path ? getTMDBImage((movie as any).tmdbData.backdrop_path, "w780") : null,
+                    tmdbPoster,
+                ]
+                : [
+                    portraitPosterSource,
+                    relaxedPosterSource,
+                    movie.thumb_url,
+                    movie.poster_url,
+                    tmdbPoster,
+                ]).filter(Boolean) as string[]
+        )
+    );
+    const [posterIndex, setPosterIndex] = useState(0);
+    const activePosterSrc = posterCandidates[posterIndex] ? getImageUrl(posterCandidates[posterIndex]) : "/placeholder.svg";
 
     // Backdrop/overlay (ảnh ngang): ưu tiên TMDB backdrop, sau đó thumb (thường là ảnh ngang).
     // Không fallback sang poster để tránh dùng ảnh dọc cho overlay.
@@ -110,6 +132,11 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
 
     const displayBackdrop = tmdbBackdrop || (movie.thumb_url ? getImageUrl(movie.thumb_url) : null);
     const trailerId = getYouTubeId(movie.trailer_url);
+
+    // Reset fallback state when card movie changes
+    useEffect(() => {
+        setPosterIndex(0);
+    }, [movie.slug, orientation]);
 
     const handleMouseEnter = () => {
         if (leaveTimeoutRef.current) {
@@ -180,7 +207,7 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                 <div className={`relative ${orientation === 'landscape' ? 'aspect-video' : 'aspect-[2/3]'} rounded-[10px] overflow-hidden bg-[#0b101a]`}>
                     <Link href={`/phim/${movie.slug}`} className="block h-full w-full absolute inset-0 z-0" prefetch={false}>
                         <Image
-                            src={displayPoster || "/placeholder.svg"}
+                            src={activePosterSrc || "/placeholder.svg"}
                             alt={decodeHtml(movie.name) || movie.slug || "Phim"}
                             fill
                             className={cn(
@@ -193,7 +220,13 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                             priority={false}
                             placeholder="blur"
                             blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
-                            onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
+                            onError={(e) => {
+                                if (posterIndex < posterCandidates.length - 1) {
+                                    setPosterIndex((prev) => prev + 1);
+                                    return;
+                                }
+                                (e.target as HTMLImageElement).src = "/placeholder.svg";
+                            }}
                         />
                         {isHovered && trailerId && (
                             <div className="hidden lg:block absolute inset-0 z-[2] pointer-events-none">
