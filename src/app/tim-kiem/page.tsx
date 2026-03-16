@@ -13,7 +13,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         return (
             <main className="min-h-screen pb-20">
                 <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 pt-24">
-                    <div className="mb-6">
+                    <div className="mb-6 rounded-[10px] border border-white/[0.05] bg-[#09090c]/55 px-3 sm:px-4 py-3 sm:py-4">
                         <h1 className="text-lg md:text-xl font-bold text-white flex items-center gap-2">
                             <span className="w-1 h-5 bg-[#fbbf24] rounded-full"></span>
                             Tìm kiếm
@@ -21,7 +21,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                         <p className="text-gray-400 text-sm mt-1">
                             Nhập từ khóa để bắt đầu tìm phim.
                         </p>
-                        <div className="mt-6">
+                        <div className="mt-4">
                             <FilterBar />
                         </div>
                     </div>
@@ -164,7 +164,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     return (
         <main className="min-h-screen pb-20">
             <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 pt-24">
-                <div className="mb-6">
+                <div className="mb-6 rounded-[10px] border border-white/[0.05] bg-[#09090c]/55 px-3 sm:px-4 py-3 sm:py-4">
                     <h1 className="text-[18px] md:text-[22px] font-extrabold text-white flex items-center gap-2 tracking-tight">
                         <span className="w-1 h-5 bg-[#fbbf24] rounded-full"></span>
                         Kết quả: <span className="text-primary truncate max-w-[200px] md:max-w-md">"{keyword}"</span>
@@ -176,7 +176,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                     </p>
 
                     {/* Add Filter Bar */}
-                    <div className="mt-6">
+                    <div className="mt-4">
                         <FilterBar />
                     </div>
                 </div>

@@ -87,7 +87,7 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
     return (
         <main className="min-h-screen pb-20">
             <div className="pt-24 w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8">
-                <div className="mb-5 rounded-[14px] border border-white/[0.08] bg-[#0b1220] px-3 sm:px-4 py-3 sm:py-4">
+                <div className="mb-5 rounded-[10px] border border-white/[0.05] bg-[#09090c]/55 px-3 sm:px-4 py-3 sm:py-4">
                     <p className="text-[11px] uppercase tracking-[0.16em] text-white/40 mb-1">
                         Danh sách / {typeName}
                     </p>
@@ -103,7 +103,7 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
                 </div>
 
                 {/* Filter Bar */}
-                <div className="sticky top-[56px] z-20 bg-[#080b12]/95 backdrop-blur-md rounded-xl px-1">
+                <div className="sticky top-[56px] z-20 bg-[#050507]/92 backdrop-blur-md rounded-[10px] px-1 border border-white/[0.05]">
                     <FilterBar />
                 </div>
 

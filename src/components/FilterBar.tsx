@@ -72,12 +72,12 @@ export default function FilterBar() {
     ];
 
     return (
-        <div className="flex flex-wrap gap-2 sm:gap-3 py-4">
+        <div className="flex flex-wrap gap-2 sm:gap-3 py-3">
             {/* Category Dropdown */}
             <div className="relative group">
                 <select
                     onChange={(e) => handleFilterChange("category", e.target.value)}
-                    className="appearance-none min-w-[126px] bg-[#0d1422] border border-white/[0.10] text-white/90 py-2 px-3 pr-8 rounded-xl leading-tight focus:outline-none focus:border-[#F4C84A]/40 cursor-pointer text-sm"
+                    className="appearance-none min-w-[126px] bg-[#0b0b10] border border-white/[0.08] text-white/90 py-2 px-3 pr-8 rounded-[10px] leading-tight focus:outline-none focus:border-[#F4C84A]/35 cursor-pointer text-sm"
                     value={searchParams.get("category") || "all"}
                 >
                     {categories.map((c) => (
@@ -95,7 +95,7 @@ export default function FilterBar() {
             <div className="relative group">
                 <select
                     onChange={(e) => handleFilterChange("country", e.target.value)}
-                    className="appearance-none min-w-[126px] bg-[#0d1422] border border-white/[0.10] text-white/90 py-2 px-3 pr-8 rounded-xl leading-tight focus:outline-none focus:border-[#F4C84A]/40 cursor-pointer text-sm"
+                    className="appearance-none min-w-[126px] bg-[#0b0b10] border border-white/[0.08] text-white/90 py-2 px-3 pr-8 rounded-[10px] leading-tight focus:outline-none focus:border-[#F4C84A]/35 cursor-pointer text-sm"
                     value={searchParams.get("country") || "all"}
                 >
                     {countries.map((c) => (
@@ -113,7 +113,7 @@ export default function FilterBar() {
             <div className="relative group">
                 <select
                     onChange={(e) => handleFilterChange("year", e.target.value)}
-                    className="appearance-none min-w-[110px] bg-[#0d1422] border border-white/[0.10] text-white/90 py-2 px-3 pr-8 rounded-xl leading-tight focus:outline-none focus:border-[#F4C84A]/40 cursor-pointer text-sm"
+                    className="appearance-none min-w-[110px] bg-[#0b0b10] border border-white/[0.08] text-white/90 py-2 px-3 pr-8 rounded-[10px] leading-tight focus:outline-none focus:border-[#F4C84A]/35 cursor-pointer text-sm"
                     value={searchParams.get("year") || "all"}
                 >
                     {years.map((y) => (
