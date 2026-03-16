@@ -249,12 +249,14 @@ export const getHomeData = async () => {
                     .then((res) => res.json())
                     .finally(() => clearTimeout(timeoutId));
 
-            const [kkRes, nguoncRes] = await Promise.allSettled([
+            const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
                 doFetch(`${API_URL}/v1/api/${endpoint}/${slug}?limit=12`),
+                doFetch(`${OPHIM_API}/v1/api/${endpoint}/${slug}?limit=12`),
                 doFetch(nguoncUrl),
             ]);
 
             let items: Movie[] = [];
+            // Source 1: KKPhim
             if (kkRes.status === 'fulfilled' && kkRes.value?.data?.items) {
                 const data = kkRes.value;
                 const pathImage = data.pathImage || data.data?.pathImage || "";
@@ -264,16 +266,36 @@ export const getHomeData = async () => {
                     poster_url: item.poster_url?.startsWith('http') ? item.poster_url : combineUrl(pathImage, item.poster_url)
                 }))];
             }
+
+            // Source 2: OPhim
+            if (ophimRes.status === 'fulfilled' && ophimRes.value?.data?.items) {
+                const data = ophimRes.value;
+                let pathImage = data.pathImage || data.data?.APP_DOMAIN_CDN_IMAGE || "https://img.ophim.live/uploads/movies/";
+                if (pathImage === "https://img.ophim.live" || pathImage === "https://img.ophim.live/") {
+                    pathImage = "https://img.ophim.live/uploads/movies/";
+                }
+                const ophimItems = getItems(data).map(item => normalizeOphimItem(item, pathImage));
+                items = [...items, ...ophimItems];
+            }
+
+            // Source 3: NguonC
             if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
                 const nguoncItems = ((nguoncRes.value.items || []) as Record<string, unknown>[]).map(normalizeNguoncItem);
                 items = [...items, ...nguoncItems];
             }
-            const seen = new Set<string>();
-            return items.filter(item => {
-                const duplicate = seen.has(item.slug);
-                seen.add(item.slug);
-                return !duplicate;
-            });
+
+            // Merge by slug: giữ thứ tự nguồn, lấy bổ sung poster/thumb từ nguồn sau nếu thiếu
+            const bySlug = new Map<string, Movie>();
+            for (const item of items) {
+                if (!item?.slug) continue;
+                const existing = bySlug.get(item.slug);
+                if (!existing) {
+                    bySlug.set(item.slug, item);
+                } else {
+                    bySlug.set(item.slug, mergeMovieImages(existing, item));
+                }
+            }
+            return Array.from(bySlug.values());
         };
 
         const [
