@@ -89,6 +89,13 @@ function ContinueWatchingRowInner() {
         }
     };
 
+    const displayMovies = useMemo(() => {
+        if (viewMode === "nearlyDone") {
+            return [...movies].sort((a, b) => (b.progress || 0) - (a.progress || 0));
+        }
+        return movies;
+    }, [movies, viewMode]);
+
     if (loading) {
         return (
             <div className="space-y-4 py-4">
@@ -104,12 +111,6 @@ function ContinueWatchingRowInner() {
             </div>
         );
     }
-    const displayMovies = useMemo(() => {
-        if (viewMode === "nearlyDone") {
-            return [...movies].sort((a, b) => (b.progress || 0) - (a.progress || 0));
-        }
-        return movies;
-    }, [movies, viewMode]);
 
     if (!session || !movies || movies.length === 0) return null;
 
