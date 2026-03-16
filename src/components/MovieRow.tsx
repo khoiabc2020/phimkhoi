@@ -88,7 +88,7 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
     return (
         <section className="py-2.5">
             <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8">
-                <div className="space-y-2.5 rounded-[10px] border border-white/[0.06] bg-[#080d15] overflow-hidden">
+                <div className="space-y-2.5 rounded-[10px] bg-transparent overflow-hidden">
                     <div className="flex items-center justify-between px-3 sm:px-4 pt-2.5">
                         <h2 className="text-[15px] sm:text-[16px] font-extrabold text-white flex items-center gap-2 tracking-tight">
                             <span className="w-1 h-4 sm:h-5 bg-[#fbbf24] rounded-sm" />

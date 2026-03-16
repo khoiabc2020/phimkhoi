@@ -105,7 +105,7 @@ export default function WatchContainer({
                 className={cn(
                     "transition-all duration-300",
                     isTheaterMode
-                        ? "fixed top-[70px] md:top-[80px] left-0 right-0 bottom-0 z-[100] bg-[#080b12] overflow-y-auto w-full px-4 md:px-10 lg:px-20 py-6 pb-32"
+                        ? "fixed top-[70px] md:top-[80px] left-0 right-0 bottom-0 z-[100] bg-[#050507] overflow-y-auto w-full px-4 md:px-10 lg:px-20 py-6 pb-32"
                         : "relative z-10 w-full"
                 )}
             >
@@ -130,12 +130,12 @@ export default function WatchContainer({
                         className={cn(
                             "relative z-10 mx-auto transition-all duration-500",
                             isTheaterMode
-                                ? "w-full max-w-[1500px] aspect-video md:aspect-[21/9] h-auto overflow-hidden rounded-xl shadow-[0_20px_60px_#00000099] ring-1 ring-white/[0.08] bg-[#0F121AF2]"
+                                ? "w-full max-w-[1500px] aspect-video md:aspect-[21/9] h-auto overflow-hidden rounded-xl shadow-[0_20px_60px_#00000099] ring-1 ring-white/[0.06] bg-[#0B0B10F2]"
                                 : [
                                     // Mobile: full-bleed, không bo góc, không shadow để giống app native
                                     "w-full overflow-hidden bg-black",
                                     // Từ sm trở lên: bo góc + shadow nhẹ như layout desktop
-                                    "sm:bg-[#0F121AF2] sm:rounded-xl sm:shadow-[0_20px_60px_#00000099] sm:ring-1 sm:ring-white/[0.08]",
+                                    "sm:bg-[#0B0B10F2] sm:rounded-xl sm:shadow-[0_20px_60px_#00000099] sm:ring-1 sm:ring-white/[0.06]",
                                 ]
                         )}
                     >
@@ -168,7 +168,7 @@ export default function WatchContainer({
                 </div>
 
                 {/* Info Bar below player - Inline Layout */}
-                <div className="mt-1 px-3 py-2 sm:px-3 sm:py-2.5 flex flex-row items-center justify-between gap-2 overflow-hidden bg-black/40 sm:bg-[#171B24] border-t border-white/[0.10] sm:rounded-lg sm:border sm:shadow-sm">
+                <div className="mt-1 px-3 py-2 sm:px-3 sm:py-2.5 flex flex-row items-center justify-between gap-2 overflow-hidden bg-black/40 sm:bg-[#0B0B10] border-t border-white/[0.08] sm:rounded-lg sm:border sm:shadow-sm">
                     {/* Left: Title + Episode name */}
                     <div className="flex items-center gap-2 min-w-0 pr-2">
                         <Link

@@ -137,7 +137,7 @@
 }
 
 :root {
-  --background: #0B0D12;
+  --background: #050507;
   --foreground: #ffffff;
 }
 
@@ -148,7 +148,7 @@ html {
 
 body {
   /* Đồng bộ với body::before — một tông duy nhất */
-  background-color: #020617;
+  background-color: #050507;
   color: var(--foreground);
   font-family: var(--font-sans);
   font-size: 16px;
@@ -166,7 +166,7 @@ body::before {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background: #020617;
+  background: #050507;
   /* Composite on GPU — no repaint on scroll */
   will-change: transform;
   transform: translateZ(0);
@@ -196,11 +196,11 @@ h2 {
 
   .glass {
     /* Cleaner header: darker, flatter, less glow */
-    @apply bg-[#070b12]/90 border-b border-white/[0.06] shadow-[0_4px_12px_0_#00000033];
+    @apply bg-[#060608]/92 border-b border-white/[0.05] shadow-[0_4px_12px_0_#0000002e];
   }
 
   .glass-panel {
-    @apply bg-[#0b111c]/94 border border-white/[0.07] shadow-[0_8px_18px_#00000055] rounded-[10px];
+    @apply bg-[#0b0b10]/94 border border-white/[0.05] shadow-[0_8px_18px_#00000055] rounded-[10px];
   }
 
   .glass-pill {

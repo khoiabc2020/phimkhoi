@@ -164,7 +164,7 @@ export default function MovieTabs({
             <div className="animate-in fade-in duration-300">
                 {/* EPISODES TAB */}
                 {activeTab === "episodes" && (
-                    <div className="bg-[#0D1320] border border-white/[0.10] rounded-[12px] p-3 sm:p-6 shadow-2xl">
+                    <div className="bg-[#09090c]/55 border border-white/[0.05] rounded-[10px] p-3 sm:p-5">
                         {episodes && episodes.length > 0 ? (
                             <div className="space-y-6">
                                 {/* Language Tabs Row */}
@@ -203,7 +203,7 @@ export default function MovieTabs({
                                 )}
 
                                 {/* Servers Row - compact inline */}
-                                <div className="flex flex-row items-center gap-2 sm:gap-3 border-b border-white/[0.06] pb-3 sm:pb-5 flex-wrap">
+                                    <div className="flex flex-row items-center gap-2 sm:gap-3 border-b border-white/[0.05] pb-3 sm:pb-4 flex-wrap">
                                     <div className="flex items-center gap-1.5 text-gray-400 text-[11px] sm:text-[12px] font-bold uppercase tracking-widest shrink-0">
                                         <Database className="w-[13px] h-[13px] sm:w-[15px] sm:h-[15px] text-gray-600" strokeWidth={2.5} />
                                         Máy Chủ:
@@ -394,7 +394,7 @@ export default function MovieTabs({
 
                 {/* TRAILER TAB */}
                 {activeTab === "trailer" && (
-                    <div className="bg-[#0D1320] border border-white/[0.10] rounded-[12px] p-4 sm:p-6 space-y-4 shadow-2xl">
+                    <div className="bg-[#09090c]/55 border border-white/[0.05] rounded-[10px] p-4 sm:p-5 space-y-4">
                         {/* Main player */}
                         <div className="aspect-video w-full rounded-lg overflow-hidden bg-[#0A101A] border border-white/[0.10] shadow-2xl">
                             {activeVideo ? (
@@ -489,7 +489,7 @@ export default function MovieTabs({
 
                 {/* RELATED TAB */}
                 {activeTab === "related" && (
-                    <div className="bg-[#0D1320] border border-white/[0.10] rounded-[12px] p-6 shadow-2xl">
+                    <div className="bg-[#09090c]/55 border border-white/[0.05] rounded-[10px] p-5">
                         {relatedMovies.length > 0 ? (
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 [contain:layout_paint]">
                                 {relatedMovies.map((m) => (

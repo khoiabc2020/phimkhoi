@@ -141,9 +141,9 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
     };
 
     return (
-        <div className="min-h-screen bg-[#080b12] text-gray-300" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+        <div className="min-h-screen bg-[#050507] text-gray-300" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
             <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute inset-0 bg-gradient-radial from-[#1a1f35]/30 via-[#080b12] to-[#080b12]" />
+                <div className="absolute inset-0 bg-gradient-radial from-[#121218]/25 via-[#050507] to-[#050507]" />
             </div>
 
             <div className="relative z-10 pt-12 md:pt-24 pb-16">
@@ -172,8 +172,8 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
 
 
                             {/* Movie description */}
-                            <div className="relative z-30 rounded-[12px] border border-white/[0.10] overflow-hidden bg-[#0D1320] shadow-2xl shadow-black/30">
-                                <div className="px-6 pt-5 pb-4 border-b border-white/[0.10] bg-[#0A101A]">
+                            <div className="relative z-30 rounded-[10px] border border-white/[0.05] overflow-hidden bg-[#09090c]/55">
+                                <div className="px-6 pt-5 pb-4 border-b border-white/[0.06] bg-[#0A0A0E]">
                                     <h3 className="text-white font-bold text-[15px] flex items-center gap-2 tracking-wide">
                                         <Info className="w-4 h-4 text-[#F4C84A]" /> Thông tin mở rộng
                                     </h3>
@@ -221,8 +221,8 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
                             </div>
 
                             {/* Comments */}
-                            <div className="relative z-30 rounded-[12px] border border-white/[0.10] overflow-hidden bg-[#0D1320] shadow-2xl shadow-black/30">
-                                <div className="px-6 pt-5 pb-4 border-b border-white/[0.10] bg-[#0A101A]">
+                            <div className="relative z-30 rounded-[10px] border border-white/[0.05] overflow-hidden bg-[#09090c]/55">
+                                <div className="px-6 pt-5 pb-4 border-b border-white/[0.06] bg-[#0A0A0E]">
                                     <h3 className="text-white font-bold text-[15px] flex items-center gap-2 tracking-wide">
                                         <Users className="w-4 h-4 text-[#F4C84A]" /> Bình luận
                                     </h3>
@@ -237,8 +237,8 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
                         <div className="lg:col-span-3 space-y-5">
                             {/* Genre pills */}
                             {movie.category && movie.category.length > 0 && (
-                                <div className="relative z-30 rounded-[12px] border border-white/[0.10] overflow-hidden bg-[#0D1320] shadow-2xl shadow-black/30">
-                                    <div className="px-5 pt-5 pb-4 border-b border-white/[0.10] bg-[#0A101A]">
+                                <div className="relative z-30 rounded-[10px] border border-white/[0.05] overflow-hidden bg-[#09090c]/55">
+                                    <div className="px-5 pt-5 pb-4 border-b border-white/[0.06] bg-[#0A0A0E]">
                                         <h3 className="text-white font-bold text-[15px] tracking-wide">Thể loại</h3>
                                     </div>
                                     <div className="p-5 flex flex-wrap gap-2">
@@ -255,8 +255,8 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
 
                             {/* Related movies */}
                             {movie.category?.[0]?.slug && (
-                                <div className="relative z-30 rounded-[12px] border border-white/[0.10] overflow-hidden bg-[#0D1320] shadow-2xl shadow-black/30">
-                                    <div className="px-5 pt-5 pb-4 border-b border-white/[0.10] flex items-center gap-2 bg-[#0A101A]">
+                                <div className="relative z-30 rounded-[10px] border border-white/[0.05] overflow-hidden bg-[#09090c]/55">
+                                    <div className="px-5 pt-5 pb-4 border-b border-white/[0.06] flex items-center gap-2 bg-[#0A0A0E]">
                                         <div className="w-1.5 h-4 rounded-full bg-[#F4C84A]" />
                                         <h3 className="text-white font-bold text-[15px] tracking-wide">Phim đề xuất</h3>
                                     </div>
