@@ -52,17 +52,17 @@ export default async function WatchHistoryPage() {
 
             <div className="w-full max-w-[1920px] mx-auto px-3 sm:px-4 md:px-12 relative z-10">
                 {/* Header */}
-                <div className="flex items-center justify-between mb-6 md:mb-8">
-                    <div className="flex items-center gap-4">
-                        <Link href="/thong-tin-tai-khoan" className="w-10 h-10 rounded-full bg-[#0B0B10] border border-white/[0.08] flex items-center justify-center text-white/60 hover:text-white hover:bg-[#111117] transition-all group">
-                            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                <div className="flex items-center justify-between mb-4 md:mb-8">
+                    <div className="flex items-center gap-3">
+                        <Link href="/thong-tin-tai-khoan" className="w-9 h-9 rounded-full bg-[#0B0B10] border border-white/[0.08] flex items-center justify-center text-white/60 hover:text-white hover:bg-[#111117] transition-all group">
+                            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                         </Link>
                         <div>
                             <div className="flex items-center gap-2 text-[#fbbf24] text-xs font-bold uppercase tracking-widest mb-1">
                                 <History className="w-3.5 h-3.5" />
                                 <span>Thư viện cá nhân</span>
                             </div>
-                            <h1 className="text-[38px] leading-[0.9] md:text-4xl font-black text-white tracking-tight uppercase">Lịch Sử Xem</h1>
+                            <h1 className="text-[24px] leading-[1.02] md:text-4xl font-black text-white tracking-tight uppercase">Lịch Sử Xem</h1>
                         </div>
                     </div>
                     {history.length > 0 && <ClearHistoryButton />}
@@ -82,8 +82,8 @@ export default async function WatchHistoryPage() {
                         {/* Continue Watching Section */}
                         {continueWatching.length > 0 && (
                             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                <h2 className="text-xl font-bold text-white mb-5 flex items-center gap-2 border-l-4 border-[#fbbf24] pl-3">
-                                    <Play className="w-5 h-5 text-[#fbbf24] fill-current" />
+                                <h2 className="text-[18px] md:text-xl font-bold text-white mb-5 flex items-center gap-2 border-l-4 border-[#fbbf24] pl-3">
+                                    <Play className="w-4 h-4 md:w-5 md:h-5 text-[#fbbf24] fill-current" />
                                     Tiếp tục xem
                                 </h2>
                                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 [contain:layout_paint]">
@@ -136,8 +136,8 @@ export default async function WatchHistoryPage() {
 
                         {/* Full History */}
                         <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
-                            <h2 className="text-xl font-bold text-white mb-5 flex items-center gap-2 border-l-4 border-gray-600 pl-3">
-                                <History className="w-5 h-5 text-gray-400" />
+                            <h2 className="text-[18px] md:text-xl font-bold text-white mb-5 flex items-center gap-2 border-l-4 border-gray-600 pl-3">
+                                <History className="w-4 h-4 md:w-5 md:h-5 text-gray-400" />
                                 Tất cả đã xem
                             </h2>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 md:gap-x-4 gap-y-6 [contain:layout_paint]">

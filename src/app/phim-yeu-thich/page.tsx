@@ -48,17 +48,17 @@ export default async function FavoritesPage() {
         <div className="min-h-screen bg-[#050507] pt-24 md:pt-28 pb-12">
             <div className="w-full max-w-[1920px] mx-auto px-3 sm:px-4 md:px-12">
                 {/* Header */}
-                <div className="flex items-center justify-between mb-6 md:mb-8">
-                    <div className="flex items-center gap-4">
-                        <Link href="/" className="w-10 h-10 rounded-full bg-[#0B0B10] border border-white/[0.08] flex items-center justify-center text-white/60 hover:text-white hover:bg-[#111117] transition-all">
-                            <ArrowLeft className="w-5 h-5" />
+                <div className="flex items-center justify-between mb-4 md:mb-8">
+                    <div className="flex items-center gap-3">
+                        <Link href="/" className="w-9 h-9 rounded-full bg-[#0B0B10] border border-white/[0.08] flex items-center justify-center text-white/60 hover:text-white hover:bg-[#111117] transition-all">
+                            <ArrowLeft className="w-4 h-4" />
                         </Link>
-                        <div className="flex items-center gap-3">
-                            <Heart className="w-8 h-8 text-red-400" />
-                            <h1 className="text-[38px] leading-[0.9] md:text-4xl font-bold text-white">
+                        <div className="flex items-center gap-2.5">
+                            <Heart className="w-6 h-6 text-red-400" />
+                            <h1 className="text-[24px] leading-[1.02] md:text-4xl font-bold text-white">
                                 Phim Yêu Thích
                                 {favorites.length > 0 && (
-                                    <span className="ml-3 text-lg text-gray-400">({favorites.length})</span>
+                                    <span className="ml-2 text-base text-gray-400">({favorites.length})</span>
                                 )}
                             </h1>
                         </div>
