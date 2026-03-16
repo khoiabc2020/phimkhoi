@@ -2,8 +2,10 @@ import { Suspense } from 'react';
 import HeroSection from "@/components/HeroSection";
 import MovieRow from "@/components/MovieRow";
 import TopTrending from "@/components/TopTrending";
+import TopTrendingTabs from "@/components/TopTrendingTabs";
 import QuickNav from "@/components/QuickNav";
 import ContinueWatchingRow from "@/components/ContinueWatchingRow";
+import PersonalizedRow from "@/components/PersonalizedRow";
 import TopicSection from "@/components/TopicSection";
 import TopicCloud from "@/components/TopicCloud";
 import HomeSection from "@/components/HomeSection";
@@ -31,12 +33,14 @@ const contentSkeleton = (
   </div>
 );
 
-// Wrapper cho Sidebar Trending
-async function AsyncTopTrending({ title, slug, type }: { title: string, slug: string, type: 'tv' | 'movie' }) {
-  let data: any[] = await getTrendMovies(type).catch((): any[] => []);
-
-  // Deduplicate by poster/thumb to avoid visually identical duplicates
+async function buildTopList(
+  sourceType: "all" | "tv" | "movie",
+  backupSlug: "phim-moi" | "phim-bo" | "phim-le",
+  timeWindow: "day" | "week" = "day"
+) {
+  let data: any[] = await getTrendMovies(sourceType, timeWindow).catch((): any[] => []);
   const seenMedia = new Set<string>();
+
   data = data.filter((item) => {
     const mediaUrl = item.poster_url || item.thumb_url;
     if (!mediaUrl) return true;
@@ -46,14 +50,13 @@ async function AsyncTopTrending({ title, slug, type }: { title: string, slug: st
   });
 
   if (data.length < 10) {
-    const backup = await getMoviesList(type === 'tv' ? 'phim-bo' : 'phim-le', { limit: 20 });
+    const backup = await getMoviesList(backupSlug, { limit: 20 });
     const sourceIds = new Set(data.map((m: { _id?: string }) => m._id));
-    for (const item of (backup?.items || [])) {
+    for (const item of backup?.items || []) {
       if (data.length >= 10) break;
       if (!sourceIds.has(item._id)) {
         const mediaUrl = item.poster_url || item.thumb_url;
-        if (mediaUrl && seenMedia.has(mediaUrl)) continue; // Also deduplicate backups
-
+        if (mediaUrl && seenMedia.has(mediaUrl)) continue;
         data.push(item);
         sourceIds.add(item._id);
         if (mediaUrl) seenMedia.add(mediaUrl);
@@ -61,8 +64,54 @@ async function AsyncTopTrending({ title, slug, type }: { title: string, slug: st
     }
   }
 
+  return data.slice(0, 10);
+}
+
+function mergeTopPools(...pools: any[][]) {
+  const bySlug = new Map<string, any>();
+  for (const pool of pools) {
+    for (const item of pool || []) {
+      if (!item?.slug) continue;
+      if (!bySlug.has(item.slug)) bySlug.set(item.slug, item);
+      if (bySlug.size >= 12) break;
+    }
+    if (bySlug.size >= 12) break;
+  }
+  return [...bySlug.values()].slice(0, 10);
+}
+
+// Wrapper cho Sidebar Trending
+async function AsyncTopTrending({ title, slug, type }: { title: string, slug: string, type: 'tv' | 'movie' }) {
+  const data = await buildTopList(type, type === "tv" ? "phim-bo" : "phim-le");
+
   if (!data?.length) return null;
   return <TopTrending title={title} movies={data.slice(0, 10)} slug={slug} className={type === 'movie' ? "mt-8" : ""} />;
+}
+
+// Mobile/tablet: expose quick-switch top tabs earlier (Top ngày / Top bộ / Top lẻ)
+async function AsyncTopTrendingHub() {
+  const [allMovies, weekMovies, tvMovies, movieMovies, monthBackup] = await Promise.all([
+    buildTopList("all", "phim-moi"),
+    buildTopList("all", "phim-moi", "week"),
+    buildTopList("tv", "phim-bo"),
+    buildTopList("movie", "phim-le"),
+    getMoviesList("phim-moi", { limit: 30 }).then((res) => (res.items || []).slice(0, 12)).catch((): any[] => []),
+  ]);
+  const monthMovies = mergeTopPools(weekMovies, allMovies, monthBackup);
+
+  if (!allMovies.length && !weekMovies.length && !monthMovies.length && !tvMovies.length && !movieMovies.length) return null;
+
+  return (
+    <div className="xl:hidden mt-1">
+      <TopTrendingTabs
+        allMovies={allMovies}
+        weekMovies={weekMovies}
+        monthMovies={monthMovies}
+        tvMovies={tvMovies}
+        movieMovies={movieMovies}
+      />
+    </div>
+  );
 }
 
 async function AsyncHeroSection({ initialMovies }: { initialMovies: any[] }) {
@@ -114,11 +163,17 @@ async function HomeContentStream() {
       <div className="mb-6">
         <QuickNav />
       </div>
+      <LazySection minHeight={280}>
+        <Suspense fallback={<div className="h-[260px] bg-white/5 rounded-lg animate-pulse xl:hidden" />}>
+          <AsyncTopTrendingHub />
+        </Suspense>
+      </LazySection>
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-10">
         <div className="xl:col-span-9 space-y-10 md:space-y-12">
           <LazySection minHeight={360}>
             <HomeSection title="Đề xuất cho bạn">
               <ContinueWatchingRow />
+              <PersonalizedRow />
               {homeData.phimChieuRap?.length ? (
                 <MovieRow title="Phim Chiếu Rạp Mới" movies={homeData.phimChieuRap} slug={HOME_SECTION_SLUGS.phimChieuRap} />
               ) : null}

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Movie } from "@/services/api";
 import { getImageUrl, decodeHtml, cn } from "@/lib/utils";
-import { memo } from "react";
+import { memo, useState } from "react";
 
 interface TopTrendingProps {
     title: string;
@@ -14,9 +14,21 @@ interface TopTrendingProps {
     className?: string;
 }
 
+const getYouTubeId = (url?: string) => {
+    if (!url) return "";
+    const vMatch = url.match(/[?&]v=([^&#]+)/);
+    if (vMatch?.[1]) return vMatch[1];
+    const shortMatch = url.match(/youtu\.be\/([^?&#/]+)/);
+    if (shortMatch?.[1]) return shortMatch[1];
+    const embedMatch = url.match(/youtube\.com\/embed\/([^?&#/]+)/);
+    if (embedMatch?.[1]) return embedMatch[1];
+    return "";
+};
+
 function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) {
     // Top 10 only
     const topMovies = movies.slice(0, 10);
+    const [hoveredMovieId, setHoveredMovieId] = useState<string | null>(null);
 
     return (
         <div className={cn("w-full relative py-2", className)}>
@@ -35,11 +47,15 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
 
             {/* List Container */}
             <div className="flex lg:flex-col gap-3 lg:gap-3 overflow-x-auto lg:overflow-visible no-scrollbar pb-3 lg:pb-0 snap-x lg:snap-none [contain:layout_paint]">
-                {topMovies.map((movie, index) => (
+                {topMovies.map((movie, index) => {
+                    const trailerId = getYouTubeId(movie.trailer_url);
+                    return (
                     <Link
                         key={movie._id}
                         href={`/phim/${movie.slug}`}
                         className="group flex flex-col lg:flex-row gap-2.5 p-2.5 rounded-[10px] transition-colors border border-white/[0.06] hover:border-white/[0.12] hover:bg-white/[0.03] w-[138px] md:w-[156px] lg:w-full shrink-0 snap-start bg-[#07070b]/82 shadow-[0_8px_18px_#00000055]"
+                        onMouseEnter={() => setHoveredMovieId(movie._id)}
+                        onMouseLeave={() => setHoveredMovieId(null)}
                     >
                         {/* Poster Container */}
                         <div className="relative w-full lg:w-[92px] xl:w-[104px] aspect-[2/3] rounded-[10px] overflow-hidden flex-shrink-0 shadow-md bg-[#0B0B10]">
@@ -51,6 +67,18 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
                                 className="object-contain bg-[#0a0f1a] transition-transform duration-300 group-hover:scale-105"
                                 sizes="(max-width: 1024px) 160px, 120px"
                             />
+                            {hoveredMovieId === movie._id && trailerId && (
+                                <div className="hidden lg:block absolute inset-0 z-10">
+                                    <iframe
+                                        src={`https://www.youtube.com/embed/${trailerId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${trailerId}&modestbranding=1&playsinline=1&rel=0`}
+                                        title={`Trailer ${movie.name}`}
+                                        className="w-full h-full pointer-events-none"
+                                        allow="autoplay; encrypted-media"
+                                        loading="lazy"
+                                    />
+                                    <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/70 to-transparent" />
+                                </div>
+                            )}
 
                             {/* Rank Number (Inside Image) */}
                             <div className="absolute top-0 left-0 w-8 h-8 md:w-9 md:h-9 flex items-center justify-center bg-black/75 backdrop-blur-md rounded-br-lg z-20">
@@ -83,7 +111,7 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
                             </div>
                         </div>
                     </Link>
-                ))}
+                )})}
             </div>
         </div>
     );

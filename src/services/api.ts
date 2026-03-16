@@ -959,9 +959,12 @@ function isSameMovieByYear(tmdbItem: any, movie: Movie): boolean {
     return Math.abs(tmdbYear - sourceYear) <= 2;
 }
 
-export const getTrendMovies = async (type: 'movie' | 'tv' | 'all' = 'all') => {
+export const getTrendMovies = async (
+    type: 'movie' | 'tv' | 'all' = 'all',
+    timeWindow: 'day' | 'week' = 'day'
+) => {
     try {
-        const trendList = await getTMDBTrending(type);
+        const trendList = await getTMDBTrending(type, timeWindow);
 
         const movies = await Promise.all(trendList.slice(0, 15).map(async (tmdbItem: any) => {
             const query = tmdbItem.original_name || tmdbItem.original_title || tmdbItem.name || tmdbItem.title;

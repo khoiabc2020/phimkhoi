@@ -66,7 +66,7 @@ export default function MobileMenu({
         <>
             {/* Backdrop */}
             {isOpen && (
-                <div className="fixed inset-0 z-[9999] lg:hidden bg-black/72 backdrop-blur-[2px]" onClick={onClose} />
+                <div className="fixed inset-0 z-[9999] lg:hidden bg-black/78 backdrop-blur-[3px]" onClick={onClose} />
             )}
 
             {/* Drawer */}
@@ -76,19 +76,19 @@ export default function MobileMenu({
                     "border-r border-white/[0.10] backdrop-blur-xl",
                     isOpen ? "translate-x-0" : "-translate-x-full"
                 )}
-                style={{ background: "linear-gradient(180deg, #0d1320 0%, #090e18 100%)" }}
+                style={{ background: "linear-gradient(180deg, #09090d 0%, #050507 100%)" }}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between px-5 h-[72px] shrink-0 border-b border-white/[0.08] bg-[#0b1220]/78">
+                <div className="flex items-center justify-between px-5 h-[72px] shrink-0 border-b border-white/[0.06] bg-[#09090d]/92">
                     <Link href="/" onClick={onClose} className="flex items-center gap-2.5">
                         <Image
                             src="/logo.png"
                             alt="MovieBox Logo"
                             width={40}
                             height={40}
-                            className="w-[40px] h-[40px] rounded-[11px] object-cover shadow-[0_0_12px_#F4C84A40] ring-1 ring-white/10"
+                            className="w-[40px] h-[40px] rounded-[11px] object-cover shadow-[0_0_10px_#F4C84A2A] ring-1 ring-white/8"
                         />
-                        <span className="text-[20px] font-black text-white tracking-tight">Movie<span className="text-[#F4C84A]">Box</span></span>
+                        <span className="text-[18px] font-bold text-white tracking-tight">Movie<span className="text-[#F4C84A]">Box</span></span>
                     </Link>
                     <button
                         onClick={onClose}
@@ -104,9 +104,9 @@ export default function MobileMenu({
 
                     {/* User Card */}
                     {session ? (
-                        <div className="rounded-[16px] p-4 border border-white/[0.10]" style={{ background: "rgba(255,255,255,0.035)" }}>
+                        <div className="rounded-[12px] p-4 border border-white/[0.08] bg-[#0B0B10]">
                             <div className="flex items-center gap-3 mb-3">
-                                <div className="w-11 h-11 rounded-full overflow-hidden border border-[#F4C84A]/30 shrink-0 ring-2 ring-[#F4C84A]/10">
+                                <div className="w-11 h-11 rounded-full overflow-hidden border border-[#F4C84A]/26 shrink-0 ring-1 ring-[#F4C84A]/14">
                                     <img
                                         src={session.user?.image || `https://ui-avatars.com/api/?name=${session.user?.name}&background=1e2235&color=F4C84A&bold=true`}
                                         alt={session.user?.name || "User"}
@@ -123,21 +123,19 @@ export default function MobileMenu({
                             </div>
                             <div className="grid grid-cols-2 gap-2">
                                 <Link href="/lich-su-xem" onClick={onClose}
-                                    className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-[13px] text-white/60 hover:text-white transition-colors"
-                                    style={{ background: "#FFFFFF0D" }}
+                                    className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-[13px] text-white/70 hover:text-white transition-colors bg-white/[0.04] hover:bg-white/[0.07]"
                                 >
                                     <History className="w-3.5 h-3.5" strokeWidth={1.5} /> Lịch sử
                                 </Link>
                                 <Link href="/phim-yeu-thich" onClick={onClose}
-                                    className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-[13px] text-white/60 hover:text-white transition-colors"
-                                    style={{ background: "#FFFFFF0D" }}
+                                    className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-[13px] text-white/70 hover:text-white transition-colors bg-white/[0.04] hover:bg-white/[0.07]"
                                 >
                                     <Heart className="w-3.5 h-3.5" strokeWidth={1.5} /> Yêu thích
                                 </Link>
                             </div>
                         </div>
                     ) : (
-                        <div className="rounded-[16px] p-4 border border-white/[0.10] text-center" style={{ background: "rgba(255,255,255,0.03)" }}>
+                        <div className="rounded-[12px] p-4 border border-white/[0.08] text-center bg-[#0B0B10]">
                             <p className="text-white/45 mb-3 text-[13px] leading-relaxed">Đăng nhập để lưu phim yêu thích và lịch sử xem</p>
                             <Link href="/login" onClick={onClose}
                             className="block w-full bg-[#F4C84A] text-black font-bold py-2.5 rounded-[12px] text-[14px] hover:brightness-105 transition-all"
@@ -161,7 +159,7 @@ export default function MobileMenu({
                                 key={href}
                                 href={href}
                                 onClick={onClose}
-                                className="flex items-center gap-3 px-3 py-2.5 rounded-[12px] text-[15px] font-semibold text-white/74 hover:text-white hover:bg-white/[0.06] transition-all group"
+                                className="flex items-center gap-3 px-3 py-2.5 rounded-[12px] text-[15px] font-semibold text-white/80 hover:text-white hover:bg-white/[0.05] transition-all group"
                             >
                                 <Icon className="w-[17px] h-[17px] text-white/35 group-hover:text-[#F4C84A]/80 transition-colors" strokeWidth={1.5} />
                                 <span className="flex-1">{label}</span>
@@ -178,7 +176,7 @@ export default function MobileMenu({
                                 className="w-full flex items-center justify-between px-3 py-2.5 rounded-[12px] text-[14px] font-medium text-white/70 hover:text-white hover:bg-white/[0.06] transition-all group"
                             >
                                 <span className="flex items-center gap-3">
-                                    <LayoutGrid className="w-[17px] h-[17px] text-white/35 group-hover:text-[#F4C84A]/80 transition-colors" strokeWidth={1.5} />
+                                    <LayoutGrid className="w-[17px] h-[17px] text-white/30 group-hover:text-[#F4C84A]/80 transition-colors" strokeWidth={1.5} />
                                     Thể Loại
                                 </span>
                                 <ChevronDown
@@ -188,7 +186,7 @@ export default function MobileMenu({
                                 />
                             </button>
                             {isCategoriesOpen && (
-                                <div className="mx-1 mt-1 mb-1 rounded-[14px] p-3 grid grid-cols-3 gap-1.5 max-h-[240px] overflow-y-auto custom-scrollbar" style={{ background: "rgba(255,255,255,0.03)" }}>
+                                <div className="mx-1 mt-1 mb-1 rounded-[12px] p-3 grid grid-cols-3 gap-1.5 max-h-[240px] overflow-y-auto custom-scrollbar bg-white/[0.03]">
                                     {displayCategories.map((cat) => (
                                         <Link
                                             key={cat.slug}
@@ -215,7 +213,7 @@ export default function MobileMenu({
                                 className="w-full flex items-center justify-between px-3 py-2.5 rounded-[12px] text-[14px] font-medium text-white/70 hover:text-white hover:bg-white/[0.06] transition-all group"
                             >
                                 <span className="flex items-center gap-3">
-                                    <Globe className="w-[17px] h-[17px] text-white/35 group-hover:text-[#F4C84A]/80 transition-colors" strokeWidth={1.5} />
+                                    <Globe className="w-[17px] h-[17px] text-white/30 group-hover:text-[#F4C84A]/80 transition-colors" strokeWidth={1.5} />
                                     Quốc Gia
                                 </span>
                                 <ChevronDown
@@ -225,7 +223,7 @@ export default function MobileMenu({
                                 />
                             </button>
                             {isCountriesOpen && (
-                                <div className="mx-1 mt-1 mb-1 rounded-[14px] p-3 grid grid-cols-3 gap-1.5 max-h-[240px] overflow-y-auto custom-scrollbar" style={{ background: "rgba(255,255,255,0.03)" }}>
+                                <div className="mx-1 mt-1 mb-1 rounded-[12px] p-3 grid grid-cols-3 gap-1.5 max-h-[240px] overflow-y-auto custom-scrollbar bg-white/[0.03]">
                                     {displayCountries.map((c) => (
                                         <Link
                                             key={c.slug}
@@ -245,10 +243,10 @@ export default function MobileMenu({
                     <div className="h-px bg-white/[0.05]" />
 
                     {/* Download App Banner */}
-                    <div className="rounded-[18px] overflow-hidden border border-[#F4C84A]/20" style={{ background: "linear-gradient(135deg, #F4C84A1F 0%, #F4C84A0A 100%)" }}>
+                    <div className="rounded-[14px] overflow-hidden border border-white/[0.08] bg-[#0B0B10]">
                         <div className="p-4">
                             <div className="flex items-center gap-3 mb-3">
-                                <div className="w-10 h-10 rounded-[12px] bg-[#F4C84A]/15 flex items-center justify-center border border-[#F4C84A]/20">
+                                <div className="w-10 h-10 rounded-[12px] bg-[#F4C84A]/12 flex items-center justify-center border border-[#F4C84A]/16">
                                     <Smartphone className="w-5 h-5 text-[#F4C84A]" strokeWidth={1.5} />
                                 </div>
                                 <div>
@@ -259,7 +257,7 @@ export default function MobileMenu({
                             <a
                                 href={APK_DOWNLOAD_URL}
                                 download="PhimKhoi-Release.apk"
-                                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-[12px] text-[13px] font-bold text-[#0a0d14] bg-[#F4C84A] hover:brightness-105 transition-all shadow-[0_4px_16px_#F4C84A33]"
+                                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-[12px] text-[13px] font-bold text-[#0a0d14] bg-[#F4C84A] hover:brightness-105 transition-all shadow-[0_4px_12px_#F4C84A28]"
                             >
                                 <Download className="w-4 h-4" strokeWidth={2.5} />
                                 Tải APK Android

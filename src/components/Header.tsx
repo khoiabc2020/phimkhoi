@@ -188,20 +188,20 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         : "bg-[#050507]/92 border-b border-white/[0.05] pointer-events-none lg:bg-gradient-to-b lg:from-black/80 lg:via-black/40 lg:to-transparent lg:border-b-0"
                 )}
             >
-                <div className="max-w-[1920px] mx-auto px-3 sm:px-4 lg:px-8 h-[50px] lg:h-[50px] flex items-center justify-between gap-3 flex-nowrap pointer-events-auto">
+                <div className="max-w-[1920px] mx-auto px-3 sm:px-4 lg:px-8 h-[48px] lg:h-[50px] flex items-center justify-between gap-3 flex-nowrap pointer-events-auto">
 
                     {/* Left Section: Logo & Mobile Menu */}
                     <div className="flex items-center gap-3 shrink-0">
                         {/* Mobile Menu Button */}
                         <button
                             onClick={() => setIsMobileMenuOpen(true)}
-                            className="lg:hidden w-10 h-10 -ml-1 rounded-[10px] bg-transparent hover:bg-white/[0.06] text-white transition-all active:scale-95 flex items-center justify-center order-1 md:order-none"
+                            className="lg:hidden w-9 h-9 -ml-1 rounded-[10px] bg-transparent hover:bg-white/[0.06] text-white/95 transition-all active:scale-95 flex items-center justify-center order-1 md:order-none"
                             aria-label="Mở menu"
                         >
-                            <span className="relative flex h-5 w-6 flex-col items-start justify-center gap-1.5">
-                                <span className="h-[3px] w-6 rounded-full bg-current" />
-                                <span className="h-[3px] w-4 rounded-full bg-current" />
-                                <span className="h-[3px] w-5 rounded-full bg-current" />
+                            <span className="relative flex h-4 w-5 flex-col items-start justify-center gap-1">
+                                <span className="h-[2px] w-5 rounded-full bg-current" />
+                                <span className="h-[2px] w-3.5 rounded-full bg-current" />
+                                <span className="h-[2px] w-4.5 rounded-full bg-current" />
                             </span>
                         </button>
 
@@ -218,7 +218,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                 />
                             </div>
                             <div className="flex flex-col justify-center">
-                                <span className="text-[15px] md:text-[18px] font-semibold text-white/95 tracking-tight leading-none font-sans whitespace-nowrap">
+                                <span className="text-[14px] md:text-[18px] font-semibold text-white/95 tracking-tight leading-none font-sans whitespace-nowrap">
                                     Movie<span className="text-primary">Box</span>
                                 </span>
                             </div>

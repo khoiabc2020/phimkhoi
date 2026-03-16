@@ -209,12 +209,14 @@ export const getTMDBImage = (path: string, size: "w342" | "w500" | "w780" | "w12
     return `https://image.tmdb.org/t/p/${size}${path}`;
 };
 
-export const getTMDBTrending = async (type: 'movie' | 'tv' | 'all' = 'all') => {
+export const getTMDBTrending = async (
+    type: 'movie' | 'tv' | 'all' = 'all',
+    timeWindow: 'day' | 'week' = 'day'
+) => {
     try {
         if (!TMDB_API_KEY) return [];
 
-        // Fetch day trending
-        const url = `${TMDB_API_URL}/trending/${type}/day?api_key=${TMDB_API_KEY}&language=vi-VN`;
+        const url = `${TMDB_API_URL}/trending/${type}/${timeWindow}?api_key=${TMDB_API_KEY}&language=vi-VN`;
         const res = await fetch(url, { next: { revalidate: 3600 } });
         const data = await res.json();
 

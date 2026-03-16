@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect, memo } from "react";
+import { useRef, useState, useEffect, useMemo, memo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Play, ChevronLeft, ChevronRight, X } from "lucide-react";
@@ -17,6 +17,7 @@ const getImageUrl = (url: string) => {
 function ContinueWatchingRowInner() {
     const { data: session } = useSession();
     const [movies, setMovies] = useState<any[]>([]);
+    const [viewMode, setViewMode] = useState<"recent" | "nearlyDone">("recent");
     const [loading, setLoading] = useState(true);
     const rowRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
@@ -103,22 +104,56 @@ function ContinueWatchingRowInner() {
             </div>
         );
     }
+    const displayMovies = useMemo(() => {
+        if (viewMode === "nearlyDone") {
+            return [...movies].sort((a, b) => (b.progress || 0) - (a.progress || 0));
+        }
+        return movies;
+    }, [movies, viewMode]);
+
     if (!session || !movies || movies.length === 0) return null;
 
     return (
         <div className="space-y-4 group relative py-4">
             <div className="flex items-center justify-between gap-3">
-                <h2 className="text-lg md:text-xl font-[800] text-white flex items-center gap-2">
-                    Xem tiếp của bạn
-                    <ChevronRight className="w-4 h-4 text-gray-500 shrink-0" />
-                </h2>
-                <Link
-                    href="/lich-su-xem"
-                    className="text-sm font-semibold text-[#fbbf24] hover:text-[#fcd34d] whitespace-nowrap flex items-center gap-1"
-                >
-                    Lịch sử
-                    <ChevronRight className="w-3.5 h-3.5" />
-                </Link>
+                <div className="flex items-center gap-2 min-w-0">
+                    <h2 className="text-lg md:text-xl font-[800] text-white flex items-center gap-2">
+                        Xem tiếp của bạn
+                        <ChevronRight className="w-4 h-4 text-gray-500 shrink-0" />
+                    </h2>
+                    <span className="text-[11px] md:text-xs px-2 py-0.5 rounded-md bg-white/[0.06] border border-white/[0.08] text-white/70 shrink-0">
+                        {movies.length} phim
+                    </span>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                    <button
+                        type="button"
+                        onClick={() => setViewMode("recent")}
+                        className={`h-7 px-2.5 rounded-[9px] text-[11px] font-semibold border transition-colors ${viewMode === "recent"
+                            ? "bg-[#F4C84A] border-[#F4C84A] text-[#0a0d14]"
+                            : "bg-[#0B0B10] border-white/[0.08] text-white/70 hover:text-white"
+                            }`}
+                    >
+                        Mới xem
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setViewMode("nearlyDone")}
+                        className={`h-7 px-2.5 rounded-[9px] text-[11px] font-semibold border transition-colors ${viewMode === "nearlyDone"
+                            ? "bg-[#F4C84A] border-[#F4C84A] text-[#0a0d14]"
+                            : "bg-[#0B0B10] border-white/[0.08] text-white/70 hover:text-white"
+                            }`}
+                    >
+                        Sắp xong
+                    </button>
+                    <Link
+                        href="/lich-su-xem"
+                        className="text-sm font-semibold text-[#fbbf24] hover:text-[#fcd34d] whitespace-nowrap flex items-center gap-1"
+                    >
+                        Lịch sử
+                        <ChevronRight className="w-3.5 h-3.5" />
+                    </Link>
+                </div>
             </div>
 
             <div className="relative group/row">
@@ -136,7 +171,7 @@ function ContinueWatchingRowInner() {
                     className="flex gap-3 md:gap-4 overflow-x-auto pb-4 pt-2 no-scrollbar snap-x px-1"
                     style={{ scrollbarWidth: "none", msOverflowStyle: "none", scrollBehavior: "smooth", contain: "layout paint" }}
                 >
-                    {movies.map((item) => (
+                    {displayMovies.map((item) => (
                         <div key={item._id} className="relative group/card flex-[0_0_160px] sm:flex-[0_0_200px] md:flex-[0_0_240px] snap-start">
                             <Link
                                 href={`/xem-phim/${item.movieSlug}/${item.episodeSlug}`}
@@ -184,6 +219,12 @@ function ContinueWatchingRowInner() {
                                     <div className="flex items-center justify-between mt-0.5">
                                         <span className="text-white/50 text-xs truncate mr-1">{item.episodeName || "Tiếp tục xem"}</span>
                                         <span className="text-[#fbbf24]/80 text-[10px] font-medium shrink-0">{item.progress}%</span>
+                                    </div>
+                                    <div className="mt-1.5">
+                                        <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-[#F4C84A]/14 border border-[#F4C84A]/20 text-[#F4C84A] text-[10px] font-semibold">
+                                            <Play className="w-3 h-3 fill-current" />
+                                            Xem ngay
+                                        </span>
                                     </div>
                                 </div>
                             </Link>

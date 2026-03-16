@@ -70,6 +70,10 @@ export default async function RootLayout({
         <link rel="dns-prefetch" href="https://phimapi.com" />
         <link rel="dns-prefetch" href="https://ophim1.com" />
         <link rel="dns-prefetch" href="https://img.youtube.com" />
+        <link rel="preconnect" href="https://www.youtube.com" />
+        <link rel="preconnect" href="https://i.ytimg.com" />
+        <link rel="dns-prefetch" href="https://www.youtube.com" />
+        <link rel="dns-prefetch" href="https://i.ytimg.com" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${beVietnamPro.variable} antialiased pb-20 lg:pb-0`}
