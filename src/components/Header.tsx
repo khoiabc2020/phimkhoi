@@ -188,10 +188,10 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         : "bg-[#050507]/92 border-b border-white/[0.05] pointer-events-none lg:bg-gradient-to-b lg:from-black/80 lg:via-black/40 lg:to-transparent lg:border-b-0"
                 )}
             >
-                <div className="max-w-[1920px] mx-auto px-4 lg:px-8 h-[52px] lg:h-[50px] flex items-center justify-between gap-4 flex-nowrap pointer-events-auto">
+                <div className="max-w-[1920px] mx-auto px-3 sm:px-4 lg:px-8 h-[50px] lg:h-[50px] flex items-center justify-between gap-3 flex-nowrap pointer-events-auto">
 
                     {/* Left Section: Logo & Mobile Menu */}
-                    <div className="flex items-center gap-4 shrink-0">
+                    <div className="flex items-center gap-3 shrink-0">
                         {/* Mobile Menu Button */}
                         <button
                             onClick={() => setIsMobileMenuOpen(true)}
@@ -206,19 +206,19 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         </button>
 
                         {/* Logo */}
-                        <Link href="/" className="flex items-center gap-2.5 group shrink-0 order-2 md:order-none">
-                            <div className="relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center">
+                        <Link href="/" className="flex items-center gap-2 group shrink-0 order-2 md:order-none">
+                            <div className="relative w-8 h-8 md:w-9 md:h-9 flex items-center justify-center">
                                 <div className="absolute inset-0 bg-primary/10 rounded-[10px] opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                                 <Image
                                     src="/logo.png"
                                     alt="MovieBox Logo"
-                                    width={40}
-                                    height={40}
+                                    width={36}
+                                    height={36}
                                     className="relative w-full h-full rounded-[10px] object-cover ring-1 ring-white/8 group-hover:ring-white/15 transition-all duration-200"
                                 />
                             </div>
                             <div className="flex flex-col justify-center">
-                                <span className="text-[22px] md:text-[24px] font-bold text-white tracking-tight leading-none font-sans whitespace-nowrap">
+                                <span className="text-[15px] md:text-[18px] font-semibold text-white/95 tracking-tight leading-none font-sans whitespace-nowrap">
                                     Movie<span className="text-primary">Box</span>
                                 </span>
                             </div>

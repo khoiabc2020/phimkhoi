@@ -210,7 +210,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             fill
                             priority
                             unoptimized
-                            className="object-contain object-right opacity-[0.95]"
+                            className="object-cover object-[62%_20%] sm:object-contain sm:object-right opacity-[0.95]"
                             sizes="100vw"
                             placeholder="blur"
                             blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
@@ -225,21 +225,8 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 <div className="absolute inset-0 bg-gradient-to-b from-[#050507]/36 via-transparent to-transparent" />
 
                 {/* Hero Info Content aligned left/bottom */}
-                <div className="relative z-10 w-full max-w-[1920px] mx-auto space-y-2 sm:space-y-4 max-w-[760px] text-center sm:text-left">
-                    <div className="sm:hidden flex justify-center mb-2">
-                        <div className="relative w-[128px] h-[186px] rounded-[10px] overflow-hidden border border-white/[0.12] shadow-[0_18px_36px_#00000099]">
-                            <Image
-                                src={posterUrl || "/placeholder.jpg"}
-                                alt={movie?.name || ""}
-                                fill
-                                className="object-cover"
-                                unoptimized
-                                sizes="128px"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
+                <div className="relative z-10 w-full max-w-[1920px] mx-auto space-y-2 sm:space-y-4 max-w-[760px]">
+                    <div className="flex items-center gap-2 mb-1">
                         {movie?.year && (
                             <span className="px-2.5 py-0.5 rounded border border-white/15 bg-white/[0.06] text-white/80 text-[11px] font-semibold leading-none">
                                 {movie?.year}
@@ -249,8 +236,8 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             {movie?.quality || "FHD"}
                         </span>
                     </div>
-                    <h1 className="font-display text-[34px] sm:text-3xl md:text-4xl lg:text-5xl font-black text-white leading-[1.12] tracking-[-0.012em] pt-1 drop-shadow-2xl">{movie?.name}</h1>
-                    <h2 className="text-sm sm:text-base md:text-2xl text-gray-300 font-medium tracking-wide drop-shadow-md">{movie?.origin_name}</h2>
+                    <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white leading-[1.14] tracking-[-0.012em] pt-1 drop-shadow-2xl">{movie?.name}</h1>
+                    <h2 className="hidden sm:block text-base md:text-2xl text-gray-300 font-medium tracking-wide drop-shadow-md">{movie?.origin_name}</h2>
 
                     {(() => {
                         const epCurrent = movie?.episode_current || "";
@@ -259,7 +246,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         // Extract episode number, removing "Tập " strings to avoid duplication
                         const epNum = epCurrent.replace(/hoàn tất/gi, "").replace(/\(.*?\)/g, "").replace(/tập\s*/gi, "").trim() || "1";
                         return (
-                            <div className="flex items-center justify-center sm:justify-start gap-2 font-bold text-sm mt-2 drop-shadow-md">
+                            <div className="flex items-center gap-2 font-bold text-sm mt-2 drop-shadow-md">
                                 {isCompleted ? (
                                     <>
                                         <span className="inline-flex items-center gap-1.5 bg-green-500/20 text-green-400 border border-green-500/30 px-2.5 py-0.5 rounded-full text-xs font-bold">
@@ -281,23 +268,23 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         );
                     })()}
 
-                    <div className="hidden sm:flex text-xs sm:text-sm text-gray-300 flex-wrap items-center gap-2 sm:gap-4 py-1 sm:py-2 drop-shadow-md">
+                    <div className="text-xs sm:text-sm text-gray-300 flex flex-wrap items-center gap-2 sm:gap-4 py-1 sm:py-2 drop-shadow-md">
                         {(movie?.director && movie.director.length > 0 && !movie.director.includes("Đang cập nhật")) || tmdbDetails?.credits?.crew?.find((c: { job?: string; name?: string }) => c.job === "Director") ? (
                             <span><span className="text-gray-500">Đạo diễn:</span> {movie?.director?.join(", ") || tmdbDetails?.credits?.crew?.find((c: { job?: string; name?: string }) => c.job === "Director")?.name}</span>
                         ) : null}
                         <span className="w-1 h-1 bg-gray-600 rounded-full hidden sm:block" />
                         <span><span className="text-gray-500">Thời lượng:</span> {movie?.time || "N/A"}</span>
                     </div>
-                    <div className="hidden sm:block text-xs sm:text-sm text-gray-300 mb-3 sm:mb-6 line-clamp-2 max-w-3xl drop-shadow-md">
+                    <div className="text-xs sm:text-sm text-gray-300 mb-3 sm:mb-6 line-clamp-2 max-w-3xl drop-shadow-md">
                         <span className="text-gray-500">Diễn viên:</span> {movie?.actor?.join(", ") || tmdbDetails?.credits?.cast?.slice(0, 5).map((c: { name?: string }) => c.name).join(", ") || "Đang cập nhật"}
                     </div>
 
                     {/* Action Buttons -- bigger touch targets on mobile */}
-                    <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3 pt-2 sm:pt-4">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-2 sm:pt-4">
                         {serverData.length > 0 && (
                             <Link
                                 href={`/xem-phim/${movie?.slug}/${serverData[0].slug}`}
-                                className="flex items-center justify-center bg-[#F4C84A] text-black w-full sm:w-auto px-5 sm:px-6 py-2.5 rounded-full font-bold text-sm hover:brightness-110 hover:scale-105 transition-all"
+                                className="flex items-center justify-center bg-[#F4C84A] text-black px-5 sm:px-6 py-2.5 rounded-full font-bold text-sm hover:brightness-110 hover:scale-105 transition-all"
                             >
                                 CHIẾU PHÁT
                             </Link>
@@ -316,20 +303,16 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                         movieQuality: movie.quality || "HD",
                                         movieCategories: movie.category?.map((c: { name?: string }) => c.name) || [],
                                     }}
-                                    className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/5 rounded-full !w-11 !h-11 sm:!w-auto sm:!h-auto sm:!px-4 sm:!py-2"
-                                    showLabel={false}
+                                    className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/5 rounded-full"
+                                    showLabel={true}
                                 />
                                 <WatchlistButton
                                     slug={movie.slug}
                                     initialInWatchlist={inWatchlist}
-                                    className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/5 rounded-full !w-11 !h-11 sm:!w-auto sm:!h-auto sm:!px-4 sm:!py-2"
-                                    showLabel={false}
+                                    className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/5 rounded-full"
+                                    showLabel={true}
                                 />
-                                <ShareButton
-                                    title={`Xem phim ${movie.name} trên MovieBox`}
-                                    className="!w-11 !h-11 !px-0 !py-0 sm:!w-auto sm:!h-auto sm:!px-4 sm:!py-2"
-                                    iconOnlyOnMobile
-                                />
+                                <ShareButton title={`Xem phim ${movie.name} trên MovieBox`} />
                             </>
                         )}
                     </div>
