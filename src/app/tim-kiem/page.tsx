@@ -33,7 +33,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     // Fetch movies + actors concurrently (giới hạn kết quả để nhanh hơn trên mobile)
     const [movies, actors] = await Promise.all([
         searchMovies(keyword),
-        keyword.length >= 2 ? searchTMDBPerson(keyword) : Promise.resolve([])
+        keyword.length >= 3 ? searchTMDBPerson(keyword) : Promise.resolve([])
     ]);
 
     const normalizeText = (value: string | undefined | null) =>
@@ -155,8 +155,11 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         return true;
     });
 
-    const hasActors = actors.length > 0;
-    const hasMovies = filteredMovies.length > 0;
+    const visibleActors = (actors || []).slice(0, 12);
+    const visibleMovies = filteredMovies.slice(0, 72);
+
+    const hasActors = visibleActors.length > 0;
+    const hasMovies = visibleMovies.length > 0;
 
     return (
         <main className="min-h-screen pb-20">
@@ -167,8 +170,9 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                         Kết quả: <span className="text-primary truncate max-w-[200px] md:max-w-md">"{keyword}"</span>
                     </h1>
                     <p className="text-gray-400 text-sm mt-1">
-                        Tìm thấy {filteredMovies.length} phim {hasActors && `và ${actors.length} diễn viên`}
+                        Tìm thấy {filteredMovies.length} phim {hasActors && `và ${visibleActors.length} diễn viên`}
                         {uniqueMovies.length !== filteredMovies.length && ` (từ ${uniqueMovies.length} phim gốc)`}
+                        {filteredMovies.length > visibleMovies.length && ` · hiển thị ${visibleMovies.length} kết quả đầu để tải nhanh`}
                     </p>
 
                     {/* Add Filter Bar */}
@@ -185,7 +189,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                             <h2 className="text-base font-bold text-white">Diễn viên / Đạo diễn</h2>
                         </div>
                         <div className="flex gap-4 overflow-x-auto pb-3 scrollbar-none">
-                            {actors.map((actor: any) => {
+                            {visibleActors.map((actor: any) => {
                                 const profileImg = actor.profile_path
                                     ? `https://image.tmdb.org/t/p/w185${actor.profile_path}`
                                     : null;
@@ -237,7 +241,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                             </div>
                         )}
                         <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(140px,1fr))] md:grid-cols-[repeat(auto-fill,minmax(160px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(180px,1fr))] xl:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] 2xl:grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-2 sm:gap-3 md:gap-4 [contain:layout_paint]">
-                            {filteredMovies.map((movie: any) => (
+                            {visibleMovies.map((movie: any) => (
                                 <MovieCard key={movie._id || movie.slug} movie={movie} />
                             ))}
                         </div>

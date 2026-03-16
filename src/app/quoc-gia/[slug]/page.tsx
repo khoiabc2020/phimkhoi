@@ -27,15 +27,20 @@ export default async function CountryPage({ params, searchParams }: { params: Pr
 
     return (
         <main className="min-h-screen pb-20">
-            <div className="pt-24 w-full max-w-[1920px] mx-auto px-4 md:px-12">
-                <div className="mb-8">
-                    <h1 className="text-xl md:text-2xl font-bold text-white capitalize flex items-center gap-2">
-                        <span className="w-1 h-6 bg-[#fbbf24] rounded-full"></span>
-                        Quốc gia: <span className="text-primary">{slug.replace(/-/g, " ")}</span>
+            <div className="pt-24 w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8">
+                <div className="mb-5 rounded-[14px] border border-white/[0.08] bg-[#0b1220] px-3 sm:px-4 py-3 sm:py-4">
+                    <p className="text-[11px] uppercase tracking-[0.16em] text-white/40 mb-1">
+                        Quốc gia
+                    </p>
+                    <h1 className="text-[18px] md:text-[22px] font-extrabold text-white capitalize flex items-center gap-2 tracking-tight">
+                        <span className="w-1 h-5 bg-[#fbbf24] rounded-full"></span>
+                        {slug.replace(/-/g, " ")}
                     </h1>
                 </div>
 
-                <FilterBar />
+                <div className="sticky top-[56px] z-20 bg-[#080b12]/95 backdrop-blur-md rounded-xl px-1">
+                    <FilterBar />
+                </div>
 
                 {/* Optimized Grid for Mobile */}
                 <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(140px,1fr))] md:grid-cols-[repeat(auto-fill,minmax(160px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(180px,1fr))] xl:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] 2xl:grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-2 sm:gap-3 md:gap-4 mt-6 [contain:layout_paint]">

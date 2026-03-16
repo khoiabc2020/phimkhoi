@@ -87,21 +87,25 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
     return (
         <main className="min-h-screen pb-20">
             <div className="pt-24 w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8">
-                {/* Title & Badge */}
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
-                    <div>
-                        <h1 className="text-[18px] md:text-[22px] font-extrabold text-white mb-2 tracking-tight flex items-center gap-2">
+                <div className="mb-5 rounded-[14px] border border-white/[0.08] bg-[#0b1220] px-3 sm:px-4 py-3 sm:py-4">
+                    <p className="text-[11px] uppercase tracking-[0.16em] text-white/40 mb-1">
+                        Danh sách / {typeName}
+                    </p>
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
+                        <h1 className="text-[18px] md:text-[22px] font-extrabold text-white tracking-tight flex items-center gap-2">
                             <span className="w-1 h-5 bg-[#fbbf24] rounded-full"></span>
                             {typeName}
                         </h1>
-                        <p className="text-gray-400 text-sm">
+                        <p className="text-white/55 text-sm">
                             Trang {pagination?.currentPage} / {pagination?.totalPages}
                         </p>
                     </div>
                 </div>
 
                 {/* Filter Bar */}
-                <FilterBar />
+                <div className="sticky top-[56px] z-20 bg-[#080b12]/95 backdrop-blur-md rounded-xl px-1">
+                    <FilterBar />
+                </div>
 
                 {/* Grid: content-visibility giúp giảm CPU khi cuộn */}
                 <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(140px,1fr))] md:grid-cols-[repeat(auto-fill,minmax(160px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(180px,1fr))] xl:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] 2xl:grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-2 sm:gap-3 md:gap-4 mt-6 [contain:layout_paint]">
