@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { Send, ThumbsUp, ThumbsDown, Reply, Flag, Trash2, Edit2, Star, Loader2, MessageCircle, Smile } from "lucide-react";
 import { addComment, getComments, likeComment, dislikeComment, deleteComment, reportComment } from "@/app/actions/comments";
@@ -59,6 +59,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
     const [submitting, setSubmitting] = useState(false);
     const [replyingTo, setReplyingTo] = useState<string | null>(null);
     const [total, setTotal] = useState(0);
+    const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
     const fetchComments = async () => {
         setLoading(true);
@@ -120,8 +121,18 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
         alert("Đã báo cáo bình luận!");
     };
 
+    const handleReply = (comment: CommentData) => {
+        if (!session) return;
+        const mention = `@${comment.userName} `;
+        setReplyingTo(comment._id);
+        setNewComment((prev) => (prev.trim() ? `${mention}${prev}` : mention));
+        requestAnimationFrame(() => {
+            textareaRef.current?.focus();
+        });
+    };
+
     return (
-        <div className="bg-[#0D1320] p-4 md:p-6 rounded-[12px] border border-white/[0.10] shadow-2xl shadow-black/30 scroll-mt-24">
+        <div className="bg-[#07070b]/82 p-4 md:p-6 rounded-[10px] border border-white/[0.06] shadow-[0_12px_28px_#00000066] scroll-mt-24">
             <div className="flex items-center gap-2 mb-6">
                 <MessageCircle className="w-6 h-6 text-[#fbbf24] fill-[#fbbf24]/20" />
                 <h3 className="text-xl font-bold text-white tracking-wide">
@@ -132,7 +143,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
             {/* Comment Form */}
             {session ? (
                 <form onSubmit={handleSubmit} className="mb-8">
-                    <div className="bg-[#0A101A] rounded-lg border border-white/[0.10] p-4 relative">
+                    <div className="bg-[#09090d] rounded-[10px] border border-white/[0.06] p-4 relative">
                         <div className="flex gap-4">
                             <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-800 flex-shrink-0">
                                 {session.user?.image ? (
@@ -145,6 +156,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                             </div>
                             <div className="flex-1 relative">
                                 <textarea
+                                    ref={textareaRef}
                                     value={newComment}
                                     onChange={(e) => setNewComment(e.target.value)}
                                     placeholder="Viết bình luận của bạn..."
@@ -156,7 +168,10 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                                 </div>
                             </div>
                         </div>
-                        <div className="flex justify-end mt-2 pt-3">
+                        <div className="flex items-center justify-between mt-2 pt-3">
+                            <div className="text-xs text-gray-400">
+                                {replyingTo ? "Đang trả lời bình luận" : ""}
+                            </div>
                             <button
                                 type="submit"
                                 disabled={submitting || !newComment.trim()}
@@ -169,7 +184,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                     </div>
                 </form>
             ) : (
-                <div className="bg-[#0A101A] text-gray-200 p-4 rounded-lg mb-8 text-center border border-white/[0.10] text-sm">
+                <div className="bg-[#09090d] text-gray-200 p-4 rounded-[10px] mb-8 text-center border border-white/[0.06] text-sm">
                     Vui lòng <a href="/login" className="text-[#F4C84A] hover:underline font-bold">đăng nhập</a> để bình luận.
                 </div>
             )}
@@ -235,7 +250,10 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                                         <ThumbsDown className="w-4 h-4" />
                                     </button>
 
-                                    <button className="flex items-center gap-1.5 text-[13px] text-gray-300 font-medium hover:text-white transition-colors">
+                                    <button
+                                        onClick={() => handleReply(comment)}
+                                        className="flex items-center gap-1.5 text-[13px] text-gray-300 font-medium hover:text-white transition-colors"
+                                    >
                                         <Reply className="w-4 h-4" />
                                         <span>Trả lời</span>
                                     </button>

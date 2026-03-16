@@ -13,7 +13,7 @@ import { getTMDBDataForCard } from "@/app/actions/tmdb";
 
 export const revalidate = 3600;
 
-const heroSkeleton = <div className="w-full h-[60vh] md:h-[80vh] bg-[#020617] animate-pulse" />;
+const heroSkeleton = <div className="w-full h-[66vh] md:h-[88vh] bg-[#050507] animate-pulse" />;
 const contentSkeleton = (
   <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 py-8 space-y-8">
     <div className="h-6 w-48 bg-white/10 rounded animate-pulse" />
@@ -195,12 +195,12 @@ async function HomeContentStream() {
 
 export default function Home() {
   return (
-    <main className="min-h-screen pb-16 bg-[#080b12]">
+    <main className="min-h-screen pb-16 bg-[#050507]">
       <Suspense fallback={heroSkeleton}>
         <HeroStream />
       </Suspense>
 
-      <div className="relative z-20 -mt-6 md:-mt-10 lg:-mt-14 mb-4 pt-4 md:pt-6 bg-[#080b12]">
+      <div className="relative z-20 -mt-6 md:-mt-10 lg:-mt-14 mb-4 pt-4 md:pt-6 bg-[#050507]">
         <TopicSection />
       </div>
 

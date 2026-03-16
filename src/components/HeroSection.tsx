@@ -168,12 +168,12 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                             aria-hidden={!isActive}
                         >
                             {/* Backdrop */}
-                            <div className="relative w-full h-[240px] sm:h-[300px] overflow-hidden bg-[#080d18]">
+                            <div className="relative w-full h-[260px] sm:h-[330px] overflow-hidden bg-[#050507]">
                                 <Image
                                     src={bg}
                                     alt=""
                                     fill
-                                    className="object-cover object-[60%_20%]"
+                                    className="object-cover object-[62%_20%]"
                                     priority={isActive && i < 2}
                                     loading={isActive ? "eager" : "lazy"}
                                     sizes="100vw"
@@ -183,8 +183,8 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                                     decoding="async"
                                 />
                                 {/* Gradient overlay */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/30 to-transparent" />
-                                <div className="absolute inset-0 bg-gradient-to-r from-[#020617]/50 via-transparent to-transparent" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#050507] via-[#050507]/36 to-transparent" />
+                                <div className="absolute inset-0 bg-gradient-to-r from-[#050507]/56 via-transparent to-transparent" />
 
                                 {/* Quality + rating badges */}
                                 <div className="absolute top-3 right-3 flex flex-col items-end gap-1.5 z-20">
@@ -293,7 +293,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
 
     return (
         <div
-            className="relative w-full h-[68vh] lg:h-[84vh] xl:h-[96vh] overflow-hidden bg-[#050507]"
+            className="relative w-full h-[76vh] lg:h-[92vh] xl:h-[104vh] overflow-hidden bg-[#050507]"
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}
         >
@@ -314,7 +314,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                             src={bg}
                             alt=""
                             fill
-                            className="object-cover object-[64%_18%] opacity-[0.3] scale-[1.04] blur-2xl"
+                            className="object-cover object-[66%_18%] opacity-[0.32] scale-[1.06] blur-2xl"
                             priority={isActive && i < 2}
                             loading={isActive ? "eager" : "lazy"}
                             unoptimized
@@ -327,7 +327,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                             src={bg}
                             alt=""
                             fill
-                            className="object-contain object-right opacity-[0.96]"
+                            className="object-cover object-[66%_18%] opacity-[0.94]"
                             priority={isActive && i < 2}
                             loading={isActive ? "eager" : "lazy"}
                             unoptimized
@@ -343,7 +343,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
             {/* ── Gradient overlays (always on top) ── */}
             <div className="absolute inset-0 z-[2] pointer-events-none">
                 {/* Left text readability */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#050507]/94 via-[#050507]/58 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#050507]/95 via-[#050507]/62 to-transparent" />
                 {/* Bottom blend into page */}
                 <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#050507] via-[#050507]/70 to-transparent" />
                 {/* Top subtle vignette */}
