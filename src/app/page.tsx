@@ -88,7 +88,7 @@ async function AsyncTopTrending({ title, slug, type }: { title: string, slug: st
   return <TopTrending title={title} movies={data.slice(0, 10)} slug={slug} className={type === 'movie' ? "mt-8" : ""} />;
 }
 
-// Mobile/tablet: expose quick-switch top tabs earlier (Top ngày / Top bộ / Top lẻ)
+// Expose quick-switch top tabs on all screens (Top ngày / Top tuần / Top tháng / Top bộ / Top lẻ)
 async function AsyncTopTrendingHub() {
   const [allMovies, weekMovies, tvMovies, movieMovies, monthBackup] = await Promise.all([
     buildTopList("all", "phim-moi"),
@@ -102,7 +102,7 @@ async function AsyncTopTrendingHub() {
   if (!allMovies.length && !weekMovies.length && !monthMovies.length && !tvMovies.length && !movieMovies.length) return null;
 
   return (
-    <div className="xl:hidden mt-1">
+    <div className="mt-1">
       <TopTrendingTabs
         allMovies={allMovies}
         weekMovies={weekMovies}
@@ -164,7 +164,7 @@ async function HomeContentStream() {
         <QuickNav />
       </div>
       <LazySection minHeight={280}>
-        <Suspense fallback={<div className="h-[260px] bg-white/5 rounded-lg animate-pulse xl:hidden" />}>
+        <Suspense fallback={<div className="h-[260px] bg-white/5 rounded-lg animate-pulse" />}>
           <AsyncTopTrendingHub />
         </Suspense>
       </LazySection>
