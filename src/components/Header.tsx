@@ -250,7 +250,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         ref={navRef}
                         className="hidden lg:flex items-center gap-1 xl:gap-2 absolute left-1/2 -translate-x-1/2"
                     >
-                        <Link href="/" className="px-3 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-full transition-all whitespace-nowrap">
+                        <Link href="/" className="px-2.5 py-2 text-sm font-medium text-white/65 hover:text-white hover:bg-white/[0.06] rounded-full transition-all whitespace-nowrap">
                             Trang chủ
                         </Link>
 
@@ -261,7 +261,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                 onClick={() =>
                                     setOpenDropdown(prev => (prev === "categories" ? null : "categories"))
                                 }
-                                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-full transition-all whitespace-nowrap"
+                                className="flex items-center gap-1.5 px-2.5 py-2 text-sm font-medium text-white/65 hover:text-white hover:bg-white/[0.06] rounded-full transition-all whitespace-nowrap"
                             >
                                 Thể loại{" "}
                                 <ChevronDown
@@ -298,7 +298,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                 onClick={() =>
                                     setOpenDropdown(prev => (prev === "countries" ? null : "countries"))
                                 }
-                                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-full transition-all whitespace-nowrap"
+                                className="flex items-center gap-1.5 px-2.5 py-2 text-sm font-medium text-white/65 hover:text-white hover:bg-white/[0.06] rounded-full transition-all whitespace-nowrap"
                             >
                                 Quốc gia{" "}
                                 <ChevronDown
@@ -328,13 +328,13 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             </div>
                         </div>
 
-                        <Link href="/danh-sach/phim-le" className="px-3 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-full transition-all whitespace-nowrap">
+                        <Link href="/danh-sach/phim-le" className="px-2.5 py-2 text-sm font-medium text-white/65 hover:text-white hover:bg-white/[0.06] rounded-full transition-all whitespace-nowrap">
                             Phim lẻ
                         </Link>
-                        <Link href="/danh-sach/phim-bo" className="px-3 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-full transition-all whitespace-nowrap">
+                        <Link href="/danh-sach/phim-bo" className="px-2.5 py-2 text-sm font-medium text-white/65 hover:text-white hover:bg-white/[0.06] rounded-full transition-all whitespace-nowrap">
                             Phim bộ
                         </Link>
-                        <Link href="/danh-sach/hoat-hinh" className="px-3 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-full transition-all whitespace-nowrap">
+                        <Link href="/danh-sach/hoat-hinh" className="px-2.5 py-2 text-sm font-medium text-white/65 hover:text-white hover:bg-white/[0.06] rounded-full transition-all whitespace-nowrap">
                             Hoạt hình
                         </Link>
                     </nav>
@@ -562,7 +562,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         <div className="hidden lg:flex items-center gap-3">
                             <Link
                                 href="/thu-vien"
-                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.08] transition-all hover:scale-105 active:scale-95 group text-sm font-medium text-white/70 hover:text-white"
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.10] border border-white/[0.09] transition-all active:scale-95 group text-sm font-medium text-white/70 hover:text-white"
                                 title="Thư viện của bạn"
                             >
                                 <Bookmark className="w-4 h-4 text-white/60 group-hover:text-primary transition-colors" />

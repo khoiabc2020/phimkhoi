@@ -195,12 +195,12 @@ h2 {
   }
 
   .glass {
-    /* Performance-first: no heavy blur, chỉ hơi trong nhẹ */
-    @apply bg-black/70 border-b border-white/[0.08] shadow-[0_10px_28px_0_#00000055];
+    /* Cleaner header: darker, flatter, less glow */
+    @apply bg-[#070b12]/88 border-b border-white/[0.07] shadow-[0_6px_18px_0_#00000040];
   }
 
   .glass-panel {
-    @apply bg-[#0c0f16]/95 border border-white/[0.08] shadow-[0_18px_40px_#00000090] rounded-[12px];
+    @apply bg-[#0b111c]/94 border border-white/[0.08] shadow-[0_10px_24px_#00000066] rounded-[12px];
   }
 
   .glass-pill {
@@ -234,8 +234,8 @@ h2 {
   }
 
   .btn-ios:hover {
-    transform: scale(1.03);
-    box-shadow: 0 0 20px rgba(244, 200, 74, 0.3);
+    transform: scale(1.02);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
   }
 
   /* Apple Scrollbar */
@@ -372,8 +372,8 @@ html {
 }
 
 .quick-nav-card:hover {
-  animation: piano-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), 0 4px 12px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
 }
 
 .quick-nav-card:not(:hover) {
