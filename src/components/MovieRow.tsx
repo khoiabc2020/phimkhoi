@@ -90,14 +90,14 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
             <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8">
                 <div className="space-y-2.5 rounded-[10px] bg-transparent overflow-hidden">
                     <div className="flex items-center justify-between px-3 sm:px-4 pt-2.5">
-                        <h2 className="text-[18px] sm:text-[20px] md:text-[22px] font-extrabold text-white flex items-center gap-2 tracking-tight">
-                            <span className="w-1 h-5 sm:h-6 bg-[#fbbf24] rounded-sm" />
+                        <h2 className="text-[16px] sm:text-[18px] md:text-[20px] font-bold text-white flex items-center gap-2 tracking-tight">
+                            <span className="w-1 h-4 sm:h-5 bg-[#fbbf24] rounded-sm" />
                             <span>{title}</span>
                         </h2>
                         {slug && (
                             <a
                                 href={slug.startsWith('/') ? slug : `/danh-sach/${slug}`}
-                                className="text-sm md:text-base font-semibold text-[#fbbf24] hover:text-white flex items-center gap-1 transition-colors group/link"
+                                className="text-xs sm:text-sm font-semibold text-[#fbbf24] hover:text-white flex items-center gap-1 transition-colors group/link"
                             >
                                 Xem tất cả
                                 <ChevronRight className="w-4 h-4 transition-transform group-hover/link:translate-x-1" />
