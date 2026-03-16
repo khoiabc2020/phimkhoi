@@ -153,7 +153,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     // Prefer source poster (dọc). For backdrop hero, ưu tiên TMDB backdrop để tránh watermark từ nguồn phim.
     const sourceImage = getImageUrl(movie?.poster_url || movie?.thumb_url);
     const posterUrl = sourceImage;
-    const tmdbBackdrop = tmdbDetails?.backdrop_path ? getTMDBImage(tmdbDetails.backdrop_path) : "";
+    const tmdbBackdrop = tmdbDetails?.backdrop_path ? getTMDBImage(tmdbDetails.backdrop_path, "original") : "";
     const sourceBackdrop = movie?.thumb_url ? getImageUrl(movie.thumb_url) : "";
     const backdropUrl = tmdbBackdrop || sourceBackdrop || getImageUrl(movie?.poster_url || "");
     const rating = tmdbDetails?.vote_average ? tmdbDetails.vote_average.toFixed(1) : "9.7";
@@ -199,7 +199,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             fill
                             priority
                             unoptimized
-                            className="object-cover object-right opacity-[0.95]"
+                            className="object-contain object-right opacity-[0.96]"
                             sizes="100vw"
                             placeholder="blur"
                             blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
@@ -208,8 +208,8 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 )}
 
                 {/* Softer cinematic feather blend: tránh đường chia cứng trái/phải */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#020617] via-[#020617]/96 via-[38%] to-[#020617]/18" />
-                <div className="absolute inset-y-0 left-[34%] w-[40%] bg-gradient-to-r from-[#020617]/90 via-[#020617]/40 to-transparent blur-3xl" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#020617] via-[#020617]/95 via-[40%] to-[#020617]/16" />
+                <div className="absolute inset-y-0 left-[36%] w-[34%] bg-gradient-to-r from-[#020617]/88 via-[#020617]/34 to-transparent blur-xl" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/96 via-[#020617]/42 to-transparent" />
                 <div className="absolute inset-0 bg-gradient-to-b from-[#020617]/34 via-transparent to-transparent" />
 
