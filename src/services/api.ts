@@ -78,7 +78,7 @@ function normalizeNguoncItem(item: Record<string, unknown>): Movie {
         lang: "",
         notify: "",
         showtimes: "",
-        year: parseInt(item.year as string) || new Date().getFullYear(),
+        year: toValidYear(item.year as string) || 0,
         view: 0,
         actor: [],
         director: [],
@@ -95,6 +95,13 @@ const combineUrl = (base: string, path: string) => {
     const cleanBase = base.endsWith('/') ? base.slice(0, -1) : base;
     const cleanPath = path.startsWith('/') ? path : `/${path}`;
     return `${cleanBase}${cleanPath}`;
+};
+
+const toValidYear = (value: unknown): number | undefined => {
+    const parsed = parseInt(String(value || "").substring(0, 4), 10);
+    if (!Number.isFinite(parsed)) return undefined;
+    if (parsed < 1900 || parsed > 2100) return undefined;
+    return parsed;
 };
 
 // --- Utilities ---
@@ -263,6 +270,57 @@ const normalizeMovieImageRoles = (movie: Movie): Movie => {
         poster_url: portrait || movie.poster_url || "",
         thumb_url: landscape || movie.thumb_url || movie.poster_url || "",
     };
+};
+
+const inferTmdbType = (movie: Movie): "movie" | "tv" => {
+    const t = String(movie?.type || "").toLowerCase();
+    if (t.includes("series") || t.includes("tv") || t.includes("phim-bo") || t.includes("hoat-hinh")) {
+        return "tv";
+    }
+    return "movie";
+};
+
+const enrichMoviesWithTMDB = async (movies: Movie[], maxItems = 18): Promise<Movie[]> => {
+    if (!Array.isArray(movies) || movies.length === 0) return movies;
+    if (!process.env.TMDB_API_KEY) return movies;
+
+    const limit = Math.max(0, Math.min(maxItems, movies.length));
+    const head = movies.slice(0, limit);
+    const tail = movies.slice(limit);
+
+    const enrichedHead = await Promise.all(head.map(async (movie) => {
+        try {
+            const query = movie.origin_name || movie.name;
+            if (!query) return movie;
+            const tmdb = await searchTMDBMovie(
+                query,
+                toValidYear(movie.year),
+                inferTmdbType(movie),
+                { originalName: movie.origin_name, countrySlug: movie.country?.[0]?.slug }
+            );
+            if (!tmdb) return movie;
+
+            const tmdbYear = toValidYear((tmdb as any).release_date || (tmdb as any).first_air_date);
+            const tmdbPoster = (tmdb as any).poster_path ? `https://image.tmdb.org/t/p/w500${(tmdb as any).poster_path}` : "";
+            const tmdbBackdrop = (tmdb as any).backdrop_path ? `https://image.tmdb.org/t/p/w1280${(tmdb as any).backdrop_path}` : "";
+
+            return normalizeMovieImageRoles({
+                ...movie,
+                year: tmdbYear || movie.year || 0,
+                poster_url: movie.poster_url || tmdbPoster,
+                thumb_url: movie.thumb_url || tmdbBackdrop,
+                tmdbData: {
+                    vote_average: (tmdb as any).vote_average,
+                    poster_path: (tmdb as any).poster_path,
+                    backdrop_path: (tmdb as any).backdrop_path,
+                },
+            } as Movie);
+        } catch {
+            return movie;
+        }
+    }));
+
+    return [...enrichedHead, ...tail];
 };
 
 // --- Ophim Native Extensions ---
@@ -509,7 +567,7 @@ export const getMovieDetail = async (slug: string) => {
                     episode_total: data.total_episodes,
                     quality: data.quality || "FHD",
                     lang: data.language || "Vietsub",
-                    year: parseInt(data.category?.['3']?.list?.[0]?.name || new Date().getFullYear()),
+                    year: toValidYear(data.category?.['3']?.list?.[0]?.name) || 0,
                     actor: data.casts?.split(',') || [],
                     director: data.director?.split(',') || [],
                     category: data.category?.['2']?.list || [],
@@ -583,7 +641,7 @@ export const searchMovies = async (keyword: string) => {
                 origin_name: (item.original_name || item.name) as string,
                 thumb_url: item.thumb_url as string,
                 poster_url: (item.poster_url as string) || "",
-                year: parseInt(item.year as string) || new Date().getFullYear(),
+                year: toValidYear(item.year as string) || 0,
                 quality: (item.quality as string) || 'FHD',
             })) as Movie[];
             results = [...results, ...items];
@@ -600,7 +658,8 @@ export const searchMovies = async (keyword: string) => {
                 bySlug.set(item.slug, mergeMovieImages(existing, item));
             }
         }
-        return Array.from(bySlug.values()).map(normalizeMovieImageRoles);
+        const normalized = Array.from(bySlug.values()).map(normalizeMovieImageRoles);
+        return await enrichMoviesWithTMDB(normalized, 20);
 
     } catch (error) {
         console.error(`Error searching movies [${keyword}]:`, error);
@@ -640,7 +699,7 @@ const normalizeOphimItem = (item: any, pathImage: string): Movie => {
         episode_current: (item.episode_current as string) || '',
         quality: (item.quality as string) || '',
         lang: (item.lang as string) || '',
-        year: (item.year as number) || new Date().getFullYear(),
+        year: toValidYear(item.year as number) || 0,
         category: (item.category as { id: string, name: string, slug: string }[]) || [],
         country: (item.country as { id: string, name: string, slug: string }[]) || [],
     } as Movie;
@@ -696,7 +755,7 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
                 origin_name: (item.original_name || item.name) as string,
                 thumb_url: item.thumb_url as string,
                 poster_url: (item.poster_url as string) || "",
-                year: parseInt(item.year as string) || new Date().getFullYear(),
+                year: toValidYear(item.year as string) || 0,
                 quality: (item.quality as string) || 'FHD',
             })) as Movie[];
             items = [...items, ...nguoncItems];
@@ -785,7 +844,7 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
                 origin_name: (item.original_name || item.name) as string,
                 thumb_url: item.thumb_url as string,
                 poster_url: (item.poster_url as string) || "",
-                year: parseInt(item.year as string) || new Date().getFullYear(),
+                year: toValidYear(item.year as string) || 0,
                 quality: (item.quality as string) || 'FHD',
             })) as Movie[];
             items = [...items, ...nguoncItems];
@@ -855,7 +914,7 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
                 origin_name: (item.original_name || item.name) as string,
                 thumb_url: item.thumb_url as string,
                 poster_url: item.poster_url as string,
-                year: parseInt(item.year as string) || new Date().getFullYear(),
+                year: toValidYear(item.year as string) || 0,
                 quality: (item.quality as string) || 'FHD',
             })) as Movie[];
             items = [...items, ...nguoncItems];
@@ -886,7 +945,7 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
 
 
 // ... existing code ...
-import { getTMDBTrending } from "./tmdb";
+import { getTMDBTrending, searchTMDBMovie } from "./tmdb";
 
 // Kiểm tra năm TMDB vs phim nguồn có khớp (cùng phim) để dùng ảnh TMDB chất lượng cao
 function isSameMovieByYear(tmdbItem: any, movie: Movie): boolean {

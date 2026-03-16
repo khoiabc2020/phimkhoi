@@ -72,7 +72,7 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
             ? getTMDBImage((movie as any).tmdbData.poster_path)
             : null;
 
-    const sourcePoster = movie.poster_url && detectOrientation(movie.poster_url) !== "landscape"
+    const sourcePoster = movie.poster_url && detectOrientation(movie.poster_url) === "portrait"
         ? movie.poster_url
         : null;
     const thumbAsPoster = movie.thumb_url && detectOrientation(movie.thumb_url) === "portrait"
@@ -221,7 +221,7 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                                 {decodeHtml(movie.origin_name)}
                             </p>
                         )}
-                        <span className="text-white/30 text-[10px] font-medium">{movie.year || 2024}</span>
+                        <span className="text-white/30 text-[10px] font-medium">{movie.year && Number(movie.year) > 0 ? movie.year : ""}</span>
                     </div>
                 </div>
             </div>
