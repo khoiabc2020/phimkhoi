@@ -59,19 +59,12 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
     const portraitPosterSource =
         sourcePoster ||            // poster từ KKPhim/OPhim/NguonC (ảnh dọc hợp lệ)
         tmdbPoster ||              // poster TMDB (đảm bảo ảnh dọc)
-        movie.thumb_url ||         // chỉ fallback sang thumb nếu bắt buộc
         "";
-
-    const usingThumbAsPortrait =
-        orientation === "portrait" &&
-        !sourcePoster &&
-        !tmdbPoster &&
-        Boolean(movie.thumb_url);
     const noCropPortrait = orientation === "portrait";
 
     const displayPoster = orientation === "landscape"
-        ? getImageUrl(movie.thumb_url || movie.poster_url || portraitPosterSource)
-        : getImageUrl(portraitPosterSource);
+        ? getImageUrl(movie.thumb_url || movie.poster_url || "")
+        : (portraitPosterSource ? getImageUrl(portraitPosterSource) : "/placeholder.svg");
 
     // Backdrop/overlay (ảnh ngang): ưu tiên TMDB backdrop, sau đó thumb (thường là ảnh ngang).
     // Không fallback sang poster để tránh dùng ảnh dọc cho overlay.
@@ -156,8 +149,7 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                             fill
                             className={cn(
                                 "transition-transform duration-200 ease-out group-hover/static-card:scale-[1.03]",
-                                noCropPortrait ? "object-contain bg-[#0a0f1a]" : "object-cover",
-                                usingThumbAsPortrait ? "bg-[#0a0f1a]" : ""
+                                noCropPortrait ? "object-contain bg-[#0a0f1a]" : "object-cover"
                             )}
                             sizes={orientation === 'landscape' ? "(max-width: 768px) 60vw, 30vw" : "(max-width: 768px) 40vw, 15vw"}
                             unoptimized
