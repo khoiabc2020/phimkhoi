@@ -8,7 +8,7 @@ import { getImageUrl, cn } from "@/lib/utils";
 import CommentSection from "@/components/CommentSection";
 import WatchEngagementBar from "@/components/WatchEngagementBar";
 import WatchContainer from "@/components/WatchContainer";
-import { Info, Users } from "lucide-react";
+import { Info } from "lucide-react";
 import { getWatchHistoryForEpisode } from "@/app/actions/watchHistory";
 import { getMovieCast, getTMDBDataForCard, getTMDBEpisodeImages, TMDBEpisodeMeta } from "@/app/actions/tmdb";
 import RelatedMovies from "@/components/RelatedMovies";
@@ -143,10 +143,10 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
     return (
         <div className="min-h-screen bg-[#050507] text-gray-300" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
             <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute inset-0 bg-gradient-radial from-[#121218]/25 via-[#050507] to-[#050507]" />
+                <div className="absolute inset-0 bg-gradient-radial from-[#101014]/22 via-[#050507] to-[#050507]" />
             </div>
 
-            <div className="relative z-10 pt-12 md:pt-24 pb-16">
+            <div className="relative z-10 pt-10 md:pt-24 pb-16">
 
 
 
@@ -172,13 +172,13 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
 
 
                             {/* Movie description */}
-                            <div className="relative z-30 rounded-[10px] border border-white/[0.06] overflow-hidden bg-[#07070b]/82 shadow-[0_10px_24px_#00000066]">
-                                <div className="px-6 pt-5 pb-4 border-b border-white/[0.06] bg-[#09090d]">
-                                    <h3 className="text-white font-bold text-[15px] flex items-center gap-2 tracking-wide">
-                                        <Info className="w-4 h-4 text-[#F4C84A]" /> Thông tin mở rộng
+                            <div className="relative z-30 rounded-[10px] border border-white/[0.06] overflow-hidden bg-[#07070b]/82 shadow-[0_10px_24px_#00000066] mx-3 sm:mx-0">
+                                <div className="px-5 sm:px-6 pt-4 pb-3 border-b border-white/[0.06] bg-[#09090d]">
+                                    <h3 className="text-white font-bold text-[14px] sm:text-[15px] flex items-center gap-2 tracking-wide uppercase">
+                                        <Info className="w-4 h-4 text-[#F4C84A]" /> Nội dung
                                     </h3>
                                 </div>
-                                <div className="p-6">
+                                <div className="p-5 sm:p-6">
                                     <div className="flex flex-col md:flex-row gap-6">
                                         <div className="shrink-0 w-24 md:w-32 aspect-[2/3] relative rounded-lg overflow-hidden shadow-xl ring-1 ring-white/10 hidden md:block">
                                             <Image src={getImageUrl(movie.poster_url || movie.thumb_url)} alt={movie.name} fill className="object-cover" />
@@ -221,15 +221,8 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
                             </div>
 
                             {/* Comments */}
-                            <div className="relative z-30 rounded-[10px] border border-white/[0.06] overflow-hidden bg-[#07070b]/82 shadow-[0_10px_24px_#00000066]">
-                                <div className="px-6 pt-5 pb-4 border-b border-white/[0.06] bg-[#09090d]">
-                                    <h3 className="text-white font-bold text-[15px] flex items-center gap-2 tracking-wide">
-                                        <Users className="w-4 h-4 text-[#F4C84A]" /> Bình luận
-                                    </h3>
-                                </div>
-                                <div className="p-6">
-                                    <CommentSection movieId={movie._id} movieSlug={movie.slug} episodeName={movieData.episodeName} />
-                                </div>
+                            <div className="mx-3 sm:mx-0">
+                                <CommentSection movieId={movie._id} movieSlug={movie.slug} episodeName={movieData.episodeName} />
                             </div>
                         </div>
 

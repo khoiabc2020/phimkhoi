@@ -168,7 +168,7 @@ export default function WatchContainer({
                 </div>
 
                 {/* Info Bar below player - Inline Layout */}
-                <div className="mt-1 px-3 py-2 sm:px-3 sm:py-2.5 flex flex-row items-center justify-between gap-2 overflow-hidden bg-black/40 sm:bg-[#0B0B10] border-t border-white/[0.08] sm:rounded-lg sm:border sm:shadow-sm">
+                <div className="mt-1 px-3 py-2 sm:px-3 sm:py-2.5 flex flex-row items-center justify-between gap-2 overflow-hidden bg-[#09090d]/95 sm:bg-[#0B0B10] border-t border-white/[0.06] sm:rounded-[10px] sm:border sm:shadow-[0_8px_18px_#00000055]">
                     {/* Left: Title + Episode name */}
                     <div className="flex items-center gap-2 min-w-0 pr-2">
                         <Link
@@ -178,7 +178,7 @@ export default function WatchContainer({
                             <ChevronLeft className="w-5 h-5" />
                         </Link>
                         <div className="min-w-0 flex-1">
-                            <h1 className="text-white font-bold text-base sm:text-lg truncate leading-tight">
+                            <h1 className="text-white font-extrabold text-[15px] sm:text-lg truncate leading-tight">
                                 {movie.name}
                             </h1>
                             <p className="text-yellow-300 text-xs sm:text-sm mt-0.5 truncate font-semibold">
@@ -194,13 +194,13 @@ export default function WatchContainer({
                             <Link
                                 href={prevEpisodeUrl}
                                 title="Tập trước"
-                                className="flex items-center justify-center text-xs font-semibold text-gray-300 hover:text-white transition-all w-8 h-8 sm:w-auto sm:px-3 sm:py-2 rounded-lg bg-white/5 hover:bg-white/12 border border-white/10 hover:border-white/20 touch-manipulation active:scale-95"
+                                className="flex items-center justify-center text-xs font-semibold text-gray-300 hover:text-white transition-all w-8 h-8 sm:w-auto sm:px-3 sm:py-2 rounded-[10px] bg-[#0B0B10] hover:bg-white/[0.08] border border-white/[0.10] hover:border-white/[0.20] touch-manipulation active:scale-95"
                             >
                                 <ChevronLeft className="w-4 h-4" />
                                 <span className="hidden sm:inline ml-1">Tập trước</span>
                             </Link>
                         ) : (
-                            <div className="flex items-center justify-center text-xs font-semibold text-gray-500 w-8 h-8 sm:w-auto sm:px-3 sm:py-2 rounded-lg bg-[#232836] border border-white/10 cursor-not-allowed">
+                            <div className="flex items-center justify-center text-xs font-semibold text-gray-500 w-8 h-8 sm:w-auto sm:px-3 sm:py-2 rounded-[10px] bg-[#14161d] border border-white/[0.10] cursor-not-allowed">
                                 <ChevronLeft className="w-4 h-4" />
                                 <span className="hidden sm:inline ml-1">Tập trước</span>
                             </div>
@@ -211,7 +211,7 @@ export default function WatchContainer({
                             onClick={() => setAutoNext(!autoNext)}
                             title="Tự động chuyển tập"
                             className={cn(
-                                "flex items-center justify-center transition-all w-8 h-8 sm:w-auto sm:px-3 sm:py-2 rounded-lg border touch-manipulation active:scale-95",
+                                "flex items-center justify-center transition-all w-8 h-8 sm:w-auto sm:px-3 sm:py-2 rounded-[10px] border touch-manipulation active:scale-95",
                                 autoNext
                                     ? "bg-yellow-400/15 text-yellow-400 border-yellow-400/30 hover:bg-yellow-400/25"
                                     : "bg-white/8 text-gray-200 border-white/15 hover:bg-white/12"
@@ -232,13 +232,13 @@ export default function WatchContainer({
                             <Link
                                 href={nextEpisodeUrl}
                                 title="Tập sau"
-                                className="flex items-center justify-center text-xs font-bold text-white bg-[#F4C84A] hover:bg-yellow-300 transition-all w-8 h-8 sm:w-auto sm:px-3 sm:py-2 rounded-lg touch-manipulation active:scale-95 shadow-md shadow-yellow-400/20"
+                                className="flex items-center justify-center text-xs font-bold text-white bg-[#F4C84A] hover:bg-yellow-300 transition-all w-8 h-8 sm:w-auto sm:px-3 sm:py-2 rounded-[10px] touch-manipulation active:scale-95 shadow-md shadow-yellow-400/20"
                             >
                                 <span className="hidden sm:inline mr-1">Tập sau</span>
                                 <ChevronRight className="w-4 h-4" />
                             </Link>
                         ) : (
-                            <div className="flex items-center justify-center text-xs font-semibold text-gray-500 w-8 h-8 sm:w-auto sm:px-3 sm:py-2 rounded-lg bg-[#232836] border border-white/10 cursor-not-allowed">
+                            <div className="flex items-center justify-center text-xs font-semibold text-gray-500 w-8 h-8 sm:w-auto sm:px-3 sm:py-2 rounded-[10px] bg-[#14161d] border border-white/[0.10] cursor-not-allowed">
                                 <span className="hidden sm:inline mr-1">Tập sau</span>
                                 <ChevronRight className="w-4 h-4" />
                             </div>
