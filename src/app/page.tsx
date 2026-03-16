@@ -13,6 +13,7 @@ import { getMoviesList, getTrendMovies, getHomeData, HOME_SECTION_SLUGS } from "
 import { getTMDBDataForCard } from "@/app/actions/tmdb";
 
 export const revalidate = 3600;
+const ROW_LIMIT = 10;
 
 const heroSkeleton = <div className="w-full h-[66vh] md:h-[88vh] bg-[#050507] animate-pulse" />;
 const contentSkeleton = (
@@ -166,10 +167,10 @@ async function HomeContentStream() {
             <MyListRow />
             <PersonalizedRow />
             {homeData.phimChieuRap?.length ? (
-              <MovieRow title="Phim Chiếu Rạp Mới" movies={homeData.phimChieuRap} slug={HOME_SECTION_SLUGS.phimChieuRap} />
+              <MovieRow title="Phim Chiếu Rạp Mới" movies={homeData.phimChieuRap.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.phimChieuRap} />
             ) : null}
             {homeData.phimMoi?.length ? (
-              <MovieRow title="Phim Mới Cập Nhật" movies={homeData.phimMoi.slice(0, 12)} slug={HOME_SECTION_SLUGS.phimMoi} />
+              <MovieRow title="Phim Mới Cập Nhật" movies={homeData.phimMoi.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.phimMoi} />
             ) : null}
           </HomeSection>
         </LazySection>
@@ -177,10 +178,10 @@ async function HomeContentStream() {
         <LazySection minHeight={340}>
           <HomeSection title="Phim theo quốc gia" viewAllHref={HOME_SECTION_SLUGS.hanQuoc} viewAllLabel="Xem thêm">
             {homeData.hanQuoc?.length ? (
-              <MovieRow title="Hàn Quốc" movies={homeData.hanQuoc.slice(0, 12)} slug={HOME_SECTION_SLUGS.hanQuoc} />
+              <MovieRow title="Hàn Quốc" movies={homeData.hanQuoc.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.hanQuoc} />
             ) : null}
             {homeData.trungQuoc?.length ? (
-              <MovieRow title="Trung Quốc" movies={homeData.trungQuoc.slice(0, 12)} slug={HOME_SECTION_SLUGS.trungQuoc} />
+              <MovieRow title="Trung Quốc" movies={homeData.trungQuoc.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.trungQuoc} />
             ) : null}
           </HomeSection>
         </LazySection>
@@ -188,13 +189,13 @@ async function HomeContentStream() {
         <LazySection minHeight={360}>
           <HomeSection title="Mới cập nhật" viewAllHref={HOME_SECTION_SLUGS.phimMoi}>
             {homeData.phimSapChieu?.length ? (
-              <MovieRow title="Phim Sắp Chiếu" movies={homeData.phimSapChieu.slice(0, 12)} slug={HOME_SECTION_SLUGS.phimSapChieu} />
+              <MovieRow title="Phim Sắp Chiếu" movies={homeData.phimSapChieu.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.phimSapChieu} />
             ) : null}
             {homeData.phimLe?.length ? (
-              <MovieRow title="Phim Lẻ Mới" movies={homeData.phimLe} slug={HOME_SECTION_SLUGS.phimLe} />
+              <MovieRow title="Phim Lẻ Mới" movies={homeData.phimLe.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.phimLe} />
             ) : null}
             {homeData.phimBo?.length ? (
-              <MovieRow title="Phim Bộ Mới" movies={homeData.phimBo} slug={HOME_SECTION_SLUGS.phimBo} />
+              <MovieRow title="Phim Bộ Mới" movies={homeData.phimBo.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.phimBo} />
             ) : null}
           </HomeSection>
         </LazySection>
@@ -202,16 +203,16 @@ async function HomeContentStream() {
         <LazySection minHeight={360}>
           <HomeSection title="Thể loại" viewAllHref={HOME_SECTION_SLUGS.hanhDong} viewAllLabel="Xem thêm">
             {homeData.hanhDong?.length ? (
-              <MovieRow title="Hành Động" movies={homeData.hanhDong.slice(0, 12)} slug={HOME_SECTION_SLUGS.hanhDong} />
+              <MovieRow title="Hành Động" movies={homeData.hanhDong.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.hanhDong} />
             ) : null}
             {homeData.tinhCam?.length ? (
-              <MovieRow title="Tình Cảm" movies={homeData.tinhCam.slice(0, 12)} slug={HOME_SECTION_SLUGS.tinhCam} />
+              <MovieRow title="Tình Cảm" movies={homeData.tinhCam.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.tinhCam} />
             ) : null}
             {homeData.hoatHinh?.length ? (
-              <MovieRow title="Hoạt Hình" movies={homeData.hoatHinh.slice(0, 12)} slug={HOME_SECTION_SLUGS.hoatHinh} />
+              <MovieRow title="Hoạt Hình" movies={homeData.hoatHinh.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.hoatHinh} />
             ) : null}
             {homeData.tvShows?.length ? (
-              <MovieRow title="TV Shows" movies={homeData.tvShows.slice(0, 12)} slug={HOME_SECTION_SLUGS.tvShows} />
+              <MovieRow title="TV Shows" movies={homeData.tvShows.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.tvShows} />
             ) : null}
           </HomeSection>
         </LazySection>

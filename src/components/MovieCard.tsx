@@ -80,7 +80,7 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
     // Poster (ảnh dọc) – ưu tiên poster thật, tránh nhầm thumb/backdrop vào slot dọc
     const tmdbPoster =
         (movie as any).tmdbData?.poster_path
-            ? getTMDBImage((movie as any).tmdbData.poster_path)
+            ? getTMDBImage((movie as any).tmdbData.poster_path, "w780")
             : null;
 
     const sourcePoster = movie.poster_url && detectOrientation(movie.poster_url) === "portrait"
@@ -214,7 +214,7 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                                 "transition-transform duration-200 ease-out group-hover/static-card:scale-[1.03]",
                                 noCropPortrait ? "object-contain bg-[#0a0f1a]" : "object-cover"
                             )}
-                            sizes={orientation === 'landscape' ? "(max-width: 768px) 60vw, 30vw" : "(max-width: 768px) 40vw, 15vw"}
+                            sizes={orientation === 'landscape' ? "(max-width: 768px) 68vw, 36vw" : "(max-width: 768px) 48vw, (max-width: 1280px) 220px, 250px"}
                             unoptimized
                             loading="lazy"
                             priority={false}

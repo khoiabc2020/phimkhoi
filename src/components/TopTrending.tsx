@@ -53,7 +53,7 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
                     <Link
                         key={movie._id}
                         href={`/phim/${movie.slug}`}
-                        className="group flex flex-col gap-2.5 p-2.5 rounded-[10px] transition-colors border border-white/[0.06] hover:border-white/[0.12] hover:bg-white/[0.03] w-[138px] sm:w-[156px] md:w-[170px] lg:w-[188px] xl:w-[205px] shrink-0 snap-start bg-[#07070b]/82 shadow-[0_8px_18px_#00000055]"
+                        className="group flex flex-col gap-2.5 p-2.5 rounded-[10px] transition-colors border border-white/[0.06] hover:border-white/[0.12] hover:bg-white/[0.03] w-[156px] sm:w-[176px] md:w-[192px] lg:w-[210px] xl:w-[228px] shrink-0 snap-start bg-[#07070b]/82 shadow-[0_8px_18px_#00000055]"
                         onMouseEnter={() => setHoveredMovieId(movie._id)}
                         onMouseLeave={() => setHoveredMovieId(null)}
                     >
@@ -64,8 +64,8 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
                                 alt={movie.name}
                                 fill
                                 loading="lazy"
-                                className="object-contain bg-[#0a0f1a] transition-transform duration-300 group-hover:scale-105"
-                                sizes="(max-width: 1024px) 160px, 120px"
+                                className="object-cover bg-[#0a0f1a] transition-transform duration-300 group-hover:scale-105"
+                                sizes="(max-width: 768px) 48vw, (max-width: 1280px) 220px, 240px"
                             />
                             {hoveredMovieId === movie._id && trailerId && (
                                 <div className="hidden lg:block absolute inset-0 z-10">
