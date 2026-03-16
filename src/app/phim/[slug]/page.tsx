@@ -150,10 +150,12 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
         });
     });
 
-    // Always use source images (Ophim/KKPhim) for poster & backdrop — TMDB images may be wrong when the search fails
+    // Prefer source poster (dọc). For backdrop hero, ưu tiên TMDB backdrop để tránh watermark từ nguồn phim.
     const sourceImage = getImageUrl(movie?.poster_url || movie?.thumb_url);
     const posterUrl = sourceImage;
-    const backdropUrl = getImageUrl(movie?.thumb_url || movie?.poster_url);
+    const tmdbBackdrop = tmdbDetails?.backdrop_path ? getTMDBImage(tmdbDetails.backdrop_path) : "";
+    const sourceBackdrop = movie?.thumb_url ? getImageUrl(movie.thumb_url) : "";
+    const backdropUrl = tmdbBackdrop || sourceBackdrop || getImageUrl(movie?.poster_url || "");
     const rating = tmdbDetails?.vote_average ? tmdbDetails.vote_average.toFixed(1) : "9.7";
 
     const jsonLd = {
@@ -190,27 +192,29 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
 
                 {/* Right-side media area: keep 16:9 feeling and avoid aggressive crop */}
                 {backdropUrl && (
-                    <div className="absolute inset-y-0 right-0 w-full sm:w-[68%] lg:w-[64%]">
+                    <div className="absolute inset-y-0 right-0 w-full sm:w-[70%] lg:w-[66%] xl:w-[64%]">
                         <Image
                             src={backdropUrl}
                             alt={movie?.name || ""}
                             fill
                             priority
                             unoptimized
-                            className="object-contain object-right"
-                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 68vw, 64vw"
+                            className="object-cover object-right"
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 70vw, 64vw"
                             placeholder="blur"
                             blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
                         />
                     </div>
                 )}
 
-                {/* Left black gradient + bottom blend (clear typography like Onflix) */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#020617] via-[#020617]/88 to-[#020617]/16" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/96 via-[#020617]/55 to-transparent" />
+                {/* Softer cinematic feather blend: tránh đường chia cứng trái/phải */}
+                <div className="absolute inset-0 bg-gradient-to-r from-[#020617] via-[#020617]/90 to-[#020617]/18" />
+                <div className="absolute inset-y-0 left-[46%] w-[30%] bg-gradient-to-r from-[#020617]/92 via-[#020617]/52 to-transparent blur-2xl" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/95 via-[#020617]/45 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#020617]/34 via-transparent to-transparent" />
 
                 {/* Hero Info Content aligned left/bottom */}
-                <div className="relative z-10 w-full max-w-[1920px] mx-auto space-y-2 sm:space-y-4">
+                <div className="relative z-10 w-full max-w-[1920px] mx-auto space-y-2 sm:space-y-4 max-w-[760px]">
                     <div className="flex items-center gap-2 mb-1">
                         {movie?.year && (
                             <span className="px-2.5 py-0.5 rounded border border-white/15 bg-white/[0.06] text-white/80 text-[11px] font-semibold leading-none">
