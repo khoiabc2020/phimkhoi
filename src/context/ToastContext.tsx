@@ -26,6 +26,8 @@ export function useToast() {
 
 function getImageUrl(url: string) {
     if (!url) return "/placeholder.jpg";
+    // Keep internal app routes as-is (e.g. /api/img-proxy?...).
+    if (url.startsWith("/")) return url;
     if (url.startsWith("http")) return url;
     return `https://phimimg.com/${url}`;
 }
@@ -114,7 +116,7 @@ function ToastItem({ toast, onRemove }: { toast: ToastData; onRemove: () => void
             <div className="flex-1 min-w-0">
                 {/* Type label + icon */}
                 <div className={`flex items-center gap-1.5 ${cfg.color} text-[11px] font-semibold uppercase tracking-wide mb-0.5`}>
-                    {cfg.icon}
+                    {!toast.poster && cfg.icon}
                     <span>{toast.title}</span>
                 </div>
                 {toast.description && (
@@ -140,8 +142,15 @@ function ToastItem({ toast, onRemove }: { toast: ToastData; onRemove: () => void
 
 export function ToastProvider({ children }: { children: ReactNode }) {
     const [toasts, setToasts] = useState<ToastData[]>([]);
+    const lastToastRef = useRef<{ signature: string; at: number } | null>(null);
 
     const showToast = useCallback((toast: Omit<ToastData, "id">) => {
+        const now = Date.now();
+        const signature = `${toast.type}|${toast.title}|${toast.description || ""}`;
+        if (lastToastRef.current && lastToastRef.current.signature === signature && now - lastToastRef.current.at < 800) {
+            return;
+        }
+        lastToastRef.current = { signature, at: now };
         const id = Math.random().toString(36).slice(2);
         // Keep max 2 toasts at a time
         setToasts((prev) => [...prev.slice(-1), { ...toast, id }]);
