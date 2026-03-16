@@ -48,7 +48,7 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
                                 alt={movie.name}
                                 fill
                                 loading="lazy"
-                                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                                className="object-contain bg-[#0a0f1a] transition-transform duration-300 group-hover:scale-105"
                                 sizes="(max-width: 1024px) 160px, 120px"
                             />
 

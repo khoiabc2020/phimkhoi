@@ -53,6 +53,7 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
         !movie.poster_url &&
         !tmdbPoster &&
         Boolean(movie.thumb_url);
+    const noCropPortrait = orientation === "portrait";
 
     const displayPoster = orientation === "landscape"
         ? getImageUrl(movie.thumb_url || movie.poster_url || portraitPosterSource)
@@ -141,7 +142,8 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                             fill
                             className={cn(
                                 "transition-transform duration-300 ease-out group-hover/static-card:scale-105",
-                                usingThumbAsPortrait ? "object-contain bg-[#0a0f1a]" : "object-cover"
+                                noCropPortrait ? "object-contain bg-[#0a0f1a]" : "object-cover",
+                                usingThumbAsPortrait ? "bg-[#0a0f1a]" : ""
                             )}
                             sizes={orientation === 'landscape' ? "(max-width: 768px) 60vw, 30vw" : "(max-width: 768px) 40vw, 15vw"}
                             unoptimized
