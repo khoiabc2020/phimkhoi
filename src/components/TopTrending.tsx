@@ -35,11 +35,11 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-[17px] font-extrabold text-white capitalize flex items-center gap-2.5 tracking-tight">
-                    <span className="w-1 h-5 bg-[#fbbf24] rounded-full"></span>
+                    <span className="w-1 h-5 bg-[#8fa7c5] rounded-full"></span>
                     <span className="leading-tight">{title}</span>
                 </h2>
                 {slug && (
-                    <Link href={slug} className="text-xs font-semibold text-[#fbbf24] hover:text-white flex items-center gap-1 transition-colors group">
+                    <Link href={slug} className="text-xs font-semibold text-[#a8bad3] hover:text-white flex items-center gap-1 transition-colors group">
                         Xem tất cả <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </Link>
                 )}
@@ -84,7 +84,7 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
                             <div className="absolute top-0 left-0 w-8 h-8 md:w-9 md:h-9 flex items-center justify-center bg-black/75 backdrop-blur-md rounded-br-lg z-20">
                                 <span className={cn(
                                     "font-black text-lg md:text-xl italic",
-                                    index === 0 ? "text-[#fbbf24]" :
+                                    index === 0 ? "text-[#c6d6ea]" :
                                         index === 1 ? "text-gray-200" :
                                             index === 2 ? "text-orange-400" : "text-white"
                                 )} style={{ fontFamily: 'var(--font-outfit)' }}>
@@ -95,7 +95,7 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
 
                         {/* Metadata Container */}
                         <div className="flex-1 min-w-0 flex flex-col lg:justify-center gap-1">
-                            <h3 className="text-white text-[13px] sm:text-sm font-bold line-clamp-2 md:line-clamp-1 group-hover:text-[#fbbf24] transition-colors leading-snug">
+                            <h3 className="text-white text-[13px] sm:text-sm font-bold line-clamp-2 md:line-clamp-1 group-hover:text-[#c6d6ea] transition-colors leading-snug">
                                 {decodeHtml(movie.name)}
                             </h3>
                             <p className="text-white/50 text-xs truncate">
@@ -105,7 +105,7 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
                                 <span className="text-[10px] items-center px-1.5 py-0.5 rounded-sm bg-white/10 text-white/70 border border-white/5 whitespace-nowrap">
                                     {movie.year}
                                 </span>
-                                <span className="text-[10px] items-center px-1.5 py-0.5 rounded-sm bg-[#fbbf24]/10 text-[#fbbf24] border border-[#fbbf24]/20 font-bold whitespace-nowrap">
+                                <span className="text-[10px] items-center px-1.5 py-0.5 rounded-sm bg-[#253143] text-[#c7d7ea] border border-[#33455f] font-bold whitespace-nowrap">
                                     {movie.quality}
                                 </span>
                             </div>

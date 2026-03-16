@@ -53,7 +53,7 @@ export default function TopTrendingTabs({ allMovies, weekMovies, monthMovies, tv
               className={[
                 "h-8 px-3.5 rounded-[10px] text-[12px] font-semibold whitespace-nowrap transition-all border",
                 active
-                  ? "bg-[#F4C84A] text-[#0a0d14] border-[#F4C84A]"
+                  ? "bg-[#263243] text-[#d8e3f2] border-[#33435a]"
                   : "bg-[#0B0B10] text-white/72 border-white/[0.08] hover:text-white hover:border-white/[0.14]",
               ].join(" ")}
             >

@@ -125,7 +125,7 @@ function PersonalizedRowInner() {
           {reasonTags.slice(0, 3).map((tag) => (
             <span
               key={tag}
-              className="inline-flex items-center h-6 px-2 rounded-md text-[10px] sm:text-[11px] font-semibold bg-[#F4C84A]/12 border border-[#F4C84A]/20 text-[#F4C84A]/90"
+              className="inline-flex items-center h-6 px-2 rounded-md text-[10px] sm:text-[11px] font-semibold bg-[#242f3f]/55 border border-[#33445c] text-[#c9d6e9]"
             >
               Cùng gu: {tag}
             </span>
@@ -142,7 +142,7 @@ function PersonalizedRowInner() {
               className={[
                 "h-8 px-3 rounded-[10px] text-[11px] sm:text-[12px] font-semibold border whitespace-nowrap transition-colors",
                 activeFilter === key
-                  ? "bg-[#F4C84A] border-[#F4C84A] text-[#0a0d14]"
+                  ? "bg-[#263243] border-[#33435a] text-[#d8e3f2]"
                   : "bg-[#0B0B10] border-white/[0.08] text-white/70 hover:text-white hover:border-white/[0.14]",
               ].join(" ")}
             >

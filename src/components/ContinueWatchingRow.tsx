@@ -116,23 +116,33 @@ function ContinueWatchingRowInner() {
 
     return (
         <div className="space-y-4 group relative py-4">
-            <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 min-w-0">
-                    <h2 className="text-lg md:text-xl font-[800] text-white flex items-center gap-2">
-                        Xem tiếp của bạn
-                        <ChevronRight className="w-4 h-4 text-gray-500 shrink-0" />
-                    </h2>
-                    <span className="text-[11px] md:text-xs px-2 py-0.5 rounded-md bg-white/[0.06] border border-white/[0.08] text-white/70 shrink-0">
-                        {movies.length} phim
-                    </span>
+            <div className="space-y-2.5">
+                <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                        <h2 className="text-lg md:text-xl font-[800] text-white leading-tight flex items-center gap-2 min-w-0">
+                            <span className="truncate">Xem tiếp của bạn</span>
+                            <ChevronRight className="w-4 h-4 text-white/45 shrink-0" />
+                        </h2>
+                        <span className="text-[11px] md:text-xs px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/[0.08] text-white/65 shrink-0">
+                            {movies.length} phim
+                        </span>
+                    </div>
+                    <Link
+                        href="/lich-su-xem"
+                        className="text-[13px] font-semibold text-[#9aa7bb] hover:text-[#c5d0e2] whitespace-nowrap flex items-center gap-1 shrink-0"
+                    >
+                        Lịch sử
+                        <ChevronRight className="w-3.5 h-3.5" />
+                    </Link>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
+
+                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5">
                     <button
                         type="button"
                         onClick={() => setViewMode("recent")}
-                        className={`h-7 px-2.5 rounded-[9px] text-[11px] font-semibold border transition-colors ${viewMode === "recent"
-                            ? "bg-[#F4C84A] border-[#F4C84A] text-[#0a0d14]"
-                            : "bg-[#0B0B10] border-white/[0.08] text-white/70 hover:text-white"
+                        className={`h-8 px-3 rounded-[10px] text-[12px] font-semibold border transition-colors whitespace-nowrap ${viewMode === "recent"
+                            ? "bg-[#263243] border-[#33435a] text-[#d8e3f2]"
+                            : "bg-[#0B0B10] border-white/[0.08] text-white/70 hover:text-white hover:border-white/[0.14]"
                             }`}
                     >
                         Mới xem
@@ -140,20 +150,13 @@ function ContinueWatchingRowInner() {
                     <button
                         type="button"
                         onClick={() => setViewMode("nearlyDone")}
-                        className={`h-7 px-2.5 rounded-[9px] text-[11px] font-semibold border transition-colors ${viewMode === "nearlyDone"
-                            ? "bg-[#F4C84A] border-[#F4C84A] text-[#0a0d14]"
-                            : "bg-[#0B0B10] border-white/[0.08] text-white/70 hover:text-white"
+                        className={`h-8 px-3 rounded-[10px] text-[12px] font-semibold border transition-colors whitespace-nowrap ${viewMode === "nearlyDone"
+                            ? "bg-[#263243] border-[#33435a] text-[#d8e3f2]"
+                            : "bg-[#0B0B10] border-white/[0.08] text-white/70 hover:text-white hover:border-white/[0.14]"
                             }`}
                     >
                         Sắp xong
                     </button>
-                    <Link
-                        href="/lich-su-xem"
-                        className="text-sm font-semibold text-[#fbbf24] hover:text-[#fcd34d] whitespace-nowrap flex items-center gap-1"
-                    >
-                        Lịch sử
-                        <ChevronRight className="w-3.5 h-3.5" />
-                    </Link>
                 </div>
             </div>
 
@@ -163,7 +166,7 @@ function ContinueWatchingRowInner() {
                     onClick={() => scroll("left")}
                     className="absolute left-0 top-0 bottom-0 z-40 bg-gradient-to-r from-[#020617]/80 to-transparent w-10 md:w-12 flex items-center justify-start pl-1 md:pl-2 opacity-60 md:opacity-0 md:group-hover/row:opacity-100 transition-all duration-300 pointer-events-auto md:pointer-events-none md:group-hover/row:pointer-events-auto"
                 >
-                    <ChevronLeft className="w-7 h-7 md:w-8 md:h-8 text-white hover:text-[#fbbf24] transition-colors drop-shadow-lg" />
+                    <ChevronLeft className="w-7 h-7 md:w-8 md:h-8 text-white hover:text-[#c7d4e7] transition-colors drop-shadow-lg" />
                 </button>
 
                 {/* Scroll Container */}
@@ -179,7 +182,7 @@ function ContinueWatchingRowInner() {
                                 className="block w-full"
                             >
                                 {/* Card Image - ảnh đầy đủ không bị che */}
-                                <div className="relative aspect-video rounded-md overflow-hidden bg-white/5 border border-white/10 group-hover/card:border-[#fbbf24]/50 transition-all duration-300">
+                                <div className="relative aspect-video rounded-md overflow-hidden bg-white/5 border border-white/10 group-hover/card:border-[#b4c4da]/45 transition-all duration-300">
                                     <Image
                                         src={getImageUrl(item.moviePoster)}
                                         alt={item.movieName}
@@ -189,8 +192,8 @@ function ContinueWatchingRowInner() {
 
                                     {/* Play button on hover; on mobile always show subtle */}
                                     <div className="absolute inset-0 bg-black/20 md:bg-black/30 md:opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
-                                        <div className="w-10 h-10 rounded-full bg-[#fbbf24] flex items-center justify-center shadow-[0_0_15px_#fbbf24] scale-90 md:scale-0 group-hover/card:scale-100 transition-transform duration-300 delay-75">
-                                            <Play className="w-5 h-5 text-black fill-black ml-0.5" />
+                                        <div className="w-10 h-10 rounded-full bg-[#d3deec] flex items-center justify-center shadow-[0_0_12px_#d3deec55] scale-90 md:scale-0 group-hover/card:scale-100 transition-transform duration-300 delay-75">
+                                            <Play className="w-5 h-5 text-[#0d1119] fill-[#0d1119] ml-0.5" />
                                         </div>
                                     </div>
 
@@ -214,15 +217,15 @@ function ContinueWatchingRowInner() {
 
                                 {/* Text bên dưới ảnh - không che mặt nhân vật */}
                                 <div className="mt-2 px-0.5">
-                                    <h3 className="text-white font-semibold text-sm line-clamp-1 group-hover/card:text-[#fbbf24] transition-colors">
+                                    <h3 className="text-white font-semibold text-sm line-clamp-1 group-hover/card:text-[#d3deec] transition-colors">
                                         {item.movieName}
                                     </h3>
                                     <div className="flex items-center justify-between mt-0.5">
                                         <span className="text-white/50 text-xs truncate mr-1">{item.episodeName || "Tiếp tục xem"}</span>
-                                        <span className="text-[#fbbf24]/80 text-[10px] font-medium shrink-0">{item.progress}%</span>
+                                        <span className="text-[#c6d1e1]/85 text-[10px] font-medium shrink-0">{item.progress}%</span>
                                     </div>
                                     <div className="mt-1.5">
-                                        <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-[#F4C84A]/14 border border-[#F4C84A]/20 text-[#F4C84A] text-[10px] font-semibold">
+                                        <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-[#242f3f]/65 border border-[#33445c] text-[#d3deec] text-[10px] font-semibold">
                                             <Play className="w-3 h-3 fill-current" />
                                             Xem ngay
                                         </span>
@@ -238,7 +241,7 @@ function ContinueWatchingRowInner() {
                     onClick={() => scroll("right")}
                     className="absolute right-0 top-0 bottom-0 z-40 bg-gradient-to-l from-[#020617]/80 to-transparent w-10 md:w-12 flex items-center justify-end pr-1 md:pr-2 opacity-60 md:opacity-0 md:group-hover/row:opacity-100 transition-all duration-300 pointer-events-auto md:pointer-events-none md:group-hover/row:pointer-events-auto"
                 >
-                    <ChevronRight className="w-7 h-7 md:w-8 md:h-8 text-white hover:text-[#fbbf24] transition-colors" />
+                    <ChevronRight className="w-7 h-7 md:w-8 md:h-8 text-white hover:text-[#c7d4e7] transition-colors" />
                 </button>
             </div>
         </div>
