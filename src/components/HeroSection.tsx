@@ -236,24 +236,29 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                         );
                     })}
                 </div>
+
+                {/* Overlay title/meta on hero image (Onflix-like mobile) */}
+                <div className="absolute inset-x-0 bottom-0 z-20 px-4 pb-4">
+                    <div className="pl-[80px]">
+                        <h1
+                            key={`m-title-${index}`}
+                            className="text-[17px] font-black text-white leading-snug line-clamp-2 drop-shadow-[0_2px_14px_rgba(0,0,0,0.75)] animate-hero-in"
+                        >
+                            {decodeHtml(movie.name)}
+                        </h1>
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                            {movie.year && <span className="text-[11px] text-white/75">{movie.year}</span>}
+                            {movie.category?.slice(0, 2).map((c: any) => (
+                                <span key={c.id || c.name} className="text-[11px] text-white/65">· {c.name}</span>
+                            ))}
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {/* ── Content below ── */}
             <div className="px-4 pt-2 pb-2">
-                <div className="pl-[80px] min-h-[64px]">
-                    <h1
-                        key={index}
-                        className="text-[16px] font-black text-white leading-snug line-clamp-2 animate-hero-in"
-                    >
-                        {decodeHtml(movie.name)}
-                    </h1>
-                    <div className="flex items-center gap-2 mt-1 flex-wrap">
-                        {movie.year && <span className="text-[11px] text-gray-400">{movie.year}</span>}
-                        {movie.category?.slice(0, 2).map((c: any) => (
-                            <span key={c.id || c.name} className="text-[11px] text-gray-500">· {c.name}</span>
-                        ))}
-                    </div>
-                </div>
+                <div className="pl-[80px] min-h-[8px]" />
 
                 {/* Buttons */}
                 <div className="flex items-center gap-2 mt-3">

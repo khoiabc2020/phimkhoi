@@ -7,43 +7,43 @@ const NAV_ITEMS = [
         label: "Hàn Quốc",
         sub: "Xem chủ đề",
         href: "/quoc-gia/han-quoc",
-        from: "#6074c7",
-        to: "#c884a6",
+        from: "#2f3654",
+        to: "#4a3450",
     },
     {
         label: "Trung Quốc",
         sub: "Xem chủ đề",
         href: "/quoc-gia/trung-quoc",
-        from: "#559e86",
-        to: "#cfa692",
+        from: "#2f4a46",
+        to: "#52413a",
     },
     {
         label: "Phim Ngắn",
         sub: "Xem chủ đề",
         href: "/the-loai/phim-ngan",
-        from: "#e89f7f",
-        to: "#d66969",
+        from: "#4f3a33",
+        to: "#553338",
     },
     {
         label: "Thuyết Minh",
         sub: "Xem chủ đề",
         href: "/danh-sach/thuyet-minh",
-        from: "#9777bd",
-        to: "#cc7a8c",
+        from: "#3d3555",
+        to: "#533748",
     },
     {
         label: "Phim Mỹ",
         sub: "Xem chủ đề",
         href: "/quoc-gia/my",
-        from: "#c4675b",
-        to: "#bd5755",
+        from: "#4e3433",
+        to: "#4c3132",
     },
     {
         label: "Thái Lan",
         sub: "Xem chủ đề",
         href: "/quoc-gia/thai-lan",
-        from: "#8a8ea3",
-        to: "#d68b8e",
+        from: "#353c4f",
+        to: "#503b41",
     },
 ];
 
@@ -62,9 +62,10 @@ export default function QuickNav() {
                             key={index}
                             href={item.href}
                             aria-label={`Xem ${item.label}`}
-                            className="quick-nav-card flex-[0_0_138px] sm:flex-[0_0_170px] md:flex-[0_0_190px] lg:flex-[1] aspect-[1.8/1] relative rounded-[12px] overflow-hidden snap-start transition-all duration-300 hover:scale-[1.02] shadow-sm hover:shadow-md"
+                            className="quick-nav-card flex-[0_0_138px] sm:flex-[0_0_170px] md:flex-[0_0_190px] lg:flex-[1] aspect-[1.8/1] relative rounded-[10px] overflow-hidden snap-start transition-all duration-300 hover:scale-[1.02] border border-white/[0.08] shadow-[0_6px_16px_#00000055] hover:shadow-[0_10px_22px_#00000075]"
                             style={{ background: `linear-gradient(135deg, ${item.from}, ${item.to})` }}
                         >
+                            <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-black/15 to-black/45" />
                             {/* Bottom content */}
                             <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4 flex flex-col justify-end h-full">
                                 <h3 className="text-white font-bold text-[15px] sm:text-[17px] leading-tight mb-1">

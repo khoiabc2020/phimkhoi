@@ -21,8 +21,6 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [movieSearchHistory, setMovieSearchHistory] = useState<string[]>([]);
-    const [actorSearchHistory, setActorSearchHistory] = useState<string[]>([]);
-    const [historyTab, setHistoryTab] = useState<"movies" | "actors">("movies");
     const [showHistory, setShowHistory] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
     const [searchResults, setSearchResults] = useState<any>(null);
@@ -33,12 +31,12 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
     const searchInputRef = useRef<HTMLInputElement>(null);
     const navRef = useRef<HTMLDivElement | null>(null);
 
-    const saveHistoryItem = (kind: "movies" | "actors", value: string) => {
+    const saveHistoryItem = (kind: "movies", value: string) => {
         const trimmed = value.trim();
         if (!trimmed) return;
-        const key = kind === "movies" ? "searchHistory_movies" : "searchHistory_actors";
-        const setState = kind === "movies" ? setMovieSearchHistory : setActorSearchHistory;
-        const current = kind === "movies" ? movieSearchHistory : actorSearchHistory;
+        const key = "searchHistory_movies";
+        const setState = setMovieSearchHistory;
+        const current = movieSearchHistory;
         const next = [trimmed, ...current.filter(h => h !== trimmed)].slice(0, 10);
         setState(next);
         localStorage.setItem(key, JSON.stringify(next));
@@ -62,13 +60,8 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
     };
 
     const clearHistory = () => {
-        if (historyTab === "movies") {
-            setMovieSearchHistory([]);
-            localStorage.removeItem("searchHistory_movies");
-        } else {
-            setActorSearchHistory([]);
-            localStorage.removeItem("searchHistory_actors");
-        }
+        setMovieSearchHistory([]);
+        localStorage.removeItem("searchHistory_movies");
         setShowHistory(false);
     };
 
@@ -121,12 +114,8 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
     // Load search history from localStorage
     useEffect(() => {
         const savedMovies = localStorage.getItem("searchHistory_movies");
-        const savedActors = localStorage.getItem("searchHistory_actors");
         if (savedMovies) {
             try { setMovieSearchHistory(JSON.parse(savedMovies)); } catch { }
-        }
-        if (savedActors) {
-            try { setActorSearchHistory(JSON.parse(savedActors)); } catch { }
         }
     }, []);
 
@@ -361,7 +350,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                         "absolute right-0 z-20 w-10 h-10 flex items-center justify-center rounded-full border transition-all duration-300",
                                         isSearchOpen
                                             ? "bg-transparent border-transparent pointer-events-none"
-                                            : "bg-[#0f1626]/85 hover:bg-[#182237]/95 border-white/[0.12] hover:scale-105 active:scale-95"
+                                            : "bg-[#0B0B10] hover:bg-[#111117] border-white/[0.10] hover:scale-105 active:scale-95"
                                     )}
                                 >
                                     <Search className={cn("w-4 h-4 transition-colors", isSearchOpen ? "hidden" : "text-white/80")} />
@@ -378,7 +367,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         onFocus={() => setShowHistory(true)}
                                         placeholder="Tìm kiếm..."
-                                        className="w-full h-10 bg-[#0f1626]/96 border border-white/[0.14] rounded-full pl-4 pr-10 text-sm text-white outline-none focus:border-primary/40 transition-all duration-300 shadow-[0_12px_36px_rgba(0,0,0,0.45)] backdrop-blur-md"
+                                        className="w-full h-10 bg-[#0B0B10] border border-white/[0.10] rounded-full pl-4 pr-10 text-sm text-white outline-none focus:border-primary/40 transition-all duration-300 shadow-[0_12px_36px_rgba(0,0,0,0.45)] backdrop-blur-md"
                                     />
 
                                     {isSearchOpen && (
@@ -399,7 +388,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
 
                                     {/* Realtime Search & History Dropdown */}
                                     {isSearchOpen && (showHistory || searchQuery.length > 0) && (
-                                        <div className="absolute top-full left-0 right-0 mt-2 glass-panel z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
+                                        <div className="absolute top-full left-0 right-0 mt-2 bg-[#07070b]/96 border border-white/[0.08] rounded-[10px] shadow-[0_12px_28px_#00000075] z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
                                             {searchQuery.length > 0 ? (
                                                 <div className="flex flex-col max-h-[400px] overflow-y-auto custom-scrollbar p-2">
                                                     <div className="px-3 pb-2 pt-1 border-b border-white/10 flex justify-between items-center mb-2">
@@ -407,40 +396,10 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                         {isSearching && <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />}
                                                     </div>
 
-                                                    {/* Actors */}
-                                                    {searchResults?.actors && searchResults.actors.length > 0 && (
-                                                        <div className="mb-3">
-                                                            <div className="px-3 py-1 text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Diễn viên</div>
-                                                            {searchResults.actors.map((actor: any) => (
-                                                                <Link
-                                                                    href={`/dien-vien/${encodeURIComponent(actor.name)}`}
-                                                                    key={actor.id}
-                                                                    onClick={() => {
-                                                                        saveHistoryItem("actors", actor.name);
-                                                                        setIsSearchOpen(false);
-                                                                        setSearchQuery("");
-                                                                    }}
-                                                                    className="flex items-center gap-3 px-3 py-2 hover:bg-white/10 rounded-lg transition-colors group"
-                                                                >
-                                                                    <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-800 shrink-0 border border-white/10 group-hover:border-primary/50 transition-colors">
-                                                                        {actor.profile_url ? (
-                                                                            <Image src={getImageUrl(actor.profile_url)} alt={actor.name} width={40} height={40} className="w-full h-full object-cover" unoptimized />
-                                                                        ) : (
-                                                                            <User className="w-5 h-5 m-2.5 text-gray-500" />
-                                                                        )}
-                                                                    </div>
-                                                                    <div className="flex-1 min-w-0">
-                                                                        <div className="text-sm font-bold text-white group-hover:text-primary transition-colors truncate">{actor.name}</div>
-                                                                    </div>
-                                                                </Link>
-                                                            ))}
-                                                        </div>
-                                                    )}
-
                                                     {/* Movies */}
                                                     {searchResults?.movies && searchResults.movies.length > 0 && (
                                                         <div className="mb-1">
-                                                            <div className="px-3 py-1 text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Phim</div>
+                                                            <div className="px-3 py-1 text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Kết quả</div>
                                                             {searchResults.movies.map((movie: any) => (
                                                                 <Link
                                                                     href={`/phim/${movie.slug}`}
@@ -465,7 +424,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                     )}
 
                                                     {/* No results or still searching */}
-                                                    {!isSearching && searchResults && searchResults.actors.length === 0 && searchResults.movies.length === 0 && (
+                                                    {!isSearching && searchResults && searchResults.movies.length === 0 && (
                                                         <div className="px-4 py-6 text-center text-sm text-gray-400">
                                                             Không tìm thấy kết quả phù hợp cho "{searchQuery}"
                                                         </div>
@@ -481,57 +440,22 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                     </button>
                                                 </div>
                                             ) : (
-                                                (historyTab === "movies" ? movieSearchHistory.length > 0 : actorSearchHistory.length > 0) && (
+                                                movieSearchHistory.length > 0 && (
                                                     <div className="p-2">
                                                         <div className="flex items-center justify-between px-3 pb-2 pt-1 border-b border-white/10 mb-2">
                                                             <div className="flex items-center gap-2">
                                                                 <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Lịch sử</span>
-                                                                <div className="flex items-center gap-0.5 bg-white/[0.07] rounded-full p-0.5 border border-white/10">
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => setHistoryTab("movies")}
-                                                                        className={cn(
-                                                                            "flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold transition-all duration-200",
-                                                                            historyTab === "movies"
-                                                                                ? "bg-[#F4C84A] text-black shadow-sm"
-                                                                                : "text-white/50 hover:text-white/80"
-                                                                        )}
-                                                                    >
-                                                                        <Film className="w-3 h-3" />
-                                                                        Phim
-                                                                    </button>
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => setHistoryTab("actors")}
-                                                                        className={cn(
-                                                                            "flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold transition-all duration-200",
-                                                                            historyTab === "actors"
-                                                                                ? "bg-[#F4C84A] text-black shadow-sm"
-                                                                                : "text-white/50 hover:text-white/80"
-                                                                        )}
-                                                                    >
-                                                                        <User className="w-3 h-3" />
-                                                                        Diễn viên
-                                                                    </button>
-                                                                </div>
                                                             </div>
                                                             <button type="button" onClick={clearHistory} className="text-xs text-red-400 hover:text-red-300 transition-colors">Xóa</button>
                                                         </div>
                                                         <div className="flex flex-col gap-1 max-h-[300px] overflow-y-auto custom-scrollbar">
-                                                            {(historyTab === "movies" ? movieSearchHistory : actorSearchHistory).map((item, idx) => (
+                                                            {movieSearchHistory.map((item, idx) => (
                                                                 <button
                                                                     key={idx}
                                                                     type="button"
                                                                     onClick={() => {
                                                                         setSearchQuery(item);
-                                                                        if (historyTab === "movies") {
-                                                                            handleSearch(item);
-                                                                        } else {
-                                                                            router.push(`/dien-vien/${encodeURIComponent(item)}`);
-                                                                            setIsSearchOpen(false);
-                                                                            setShowHistory(false);
-                                                                            setSearchQuery("");
-                                                                        }
+                                                                        handleSearch(item);
                                                                     }}
                                                                     className="flex items-center gap-3 px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors text-left"
                                                                 >

@@ -30,7 +30,7 @@ export default function TopicSection() {
                     <Link
                         key={topic.id}
                         href={topic.href}
-                        className="group flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 transition-all duration-200 active:scale-[0.97]"
+                        className="group flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-full border border-white/[0.08] hover:border-white/[0.16] bg-[#0B0B10] hover:bg-[#111117] transition-all duration-200 active:scale-[0.97]"
                     >
                         <span
                             className="text-[13px] font-semibold whitespace-nowrap"
