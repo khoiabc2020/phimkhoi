@@ -67,7 +67,7 @@ function getHeroImage(movie: any, type: "poster" | "backdrop", variant: "mobile"
         if (type === "poster" && tmdb.poster_path)
             return getImageUrl(tmdbImage(tmdb.poster_path, variant === "desktop" ? "w500" : "w342"), true);
         if (type === "backdrop" && tmdb.backdrop_path)
-            return getImageUrl(tmdbImage(tmdb.backdrop_path, variant === "desktop" ? "w1280" : "w780"), true);
+            return getImageUrl(tmdbImage(tmdb.backdrop_path, variant === "desktop" ? "original" : "w780"), true);
     }
     // Backdrop must stay landscape-only, do not fallback to poster here.
     const api = type === "backdrop" ? movie.thumb_url : movie.poster_url || movie.thumb_url;
@@ -293,7 +293,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
 
     return (
         <div
-            className="relative w-full h-[56vh] lg:h-[70vh] xl:h-[82vh] overflow-hidden bg-[#020617]"
+            className="relative w-full h-[62vh] lg:h-[78vh] xl:h-[90vh] overflow-hidden bg-[#020617]"
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}
         >
@@ -314,7 +314,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                             src={bg}
                             alt=""
                             fill
-                            className="object-cover"
+                            className="object-contain object-right"
                             priority={isActive && i < 2}
                             loading={isActive ? "eager" : "lazy"}
                             unoptimized
