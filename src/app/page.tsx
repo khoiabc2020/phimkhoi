@@ -1,13 +1,12 @@
 import { Suspense } from 'react';
 import HeroSection from "@/components/HeroSection";
 import MovieRow from "@/components/MovieRow";
-import TopTrending from "@/components/TopTrending";
 import TopTrendingTabs from "@/components/TopTrendingTabs";
 import QuickNav from "@/components/QuickNav";
 import ContinueWatchingRow from "@/components/ContinueWatchingRow";
+import MyListRow from "@/components/MyListRow";
 import PersonalizedRow from "@/components/PersonalizedRow";
 import TopicSection from "@/components/TopicSection";
-import TopicCloud from "@/components/TopicCloud";
 import HomeSection from "@/components/HomeSection";
 import LazySection from "@/components/LazySection";
 import { getMoviesList, getTrendMovies, getHomeData, HOME_SECTION_SLUGS } from "@/services/api";
@@ -78,14 +77,6 @@ function mergeTopPools(...pools: any[][]) {
     if (bySlug.size >= 12) break;
   }
   return [...bySlug.values()].slice(0, 10);
-}
-
-// Wrapper cho Sidebar Trending
-async function AsyncTopTrending({ title, slug, type }: { title: string, slug: string, type: 'tv' | 'movie' }) {
-  const data = await buildTopList(type, type === "tv" ? "phim-bo" : "phim-le");
-
-  if (!data?.length) return null;
-  return <TopTrending title={title} movies={data.slice(0, 10)} slug={slug} className={type === 'movie' ? "mt-8" : ""} />;
 }
 
 // Expose quick-switch top tabs on all screens (Top ngày / Top tuần / Top tháng / Top bộ / Top lẻ)
@@ -168,81 +159,62 @@ async function HomeContentStream() {
           <AsyncTopTrendingHub />
         </Suspense>
       </LazySection>
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-10">
-        <div className="xl:col-span-9 space-y-10 md:space-y-12">
-          <LazySection minHeight={360}>
-            <HomeSection title="Đề xuất cho bạn">
-              <ContinueWatchingRow />
-              <PersonalizedRow />
-              {homeData.phimChieuRap?.length ? (
-                <MovieRow title="Phim Chiếu Rạp Mới" movies={homeData.phimChieuRap} slug={HOME_SECTION_SLUGS.phimChieuRap} />
-              ) : null}
-              {homeData.phimMoi?.length ? (
-                <MovieRow title="Phim Mới Cập Nhật" movies={homeData.phimMoi.slice(0, 12)} slug={HOME_SECTION_SLUGS.phimMoi} />
-              ) : null}
-            </HomeSection>
-          </LazySection>
+      <div className="space-y-10 md:space-y-12">
+        <LazySection minHeight={360}>
+          <HomeSection title="Đề xuất cho bạn">
+            <ContinueWatchingRow />
+            <MyListRow />
+            <PersonalizedRow />
+            {homeData.phimChieuRap?.length ? (
+              <MovieRow title="Phim Chiếu Rạp Mới" movies={homeData.phimChieuRap} slug={HOME_SECTION_SLUGS.phimChieuRap} />
+            ) : null}
+            {homeData.phimMoi?.length ? (
+              <MovieRow title="Phim Mới Cập Nhật" movies={homeData.phimMoi.slice(0, 12)} slug={HOME_SECTION_SLUGS.phimMoi} />
+            ) : null}
+          </HomeSection>
+        </LazySection>
 
-          <LazySection minHeight={340}>
-            <HomeSection title="Phim theo quốc gia" viewAllHref={HOME_SECTION_SLUGS.hanQuoc} viewAllLabel="Xem thêm">
-              {homeData.hanQuoc?.length ? (
-                <MovieRow title="Hàn Quốc" movies={homeData.hanQuoc.slice(0, 12)} slug={HOME_SECTION_SLUGS.hanQuoc} />
-              ) : null}
-              {homeData.trungQuoc?.length ? (
-                <MovieRow title="Trung Quốc" movies={homeData.trungQuoc.slice(0, 12)} slug={HOME_SECTION_SLUGS.trungQuoc} />
-              ) : null}
-            </HomeSection>
-          </LazySection>
+        <LazySection minHeight={340}>
+          <HomeSection title="Phim theo quốc gia" viewAllHref={HOME_SECTION_SLUGS.hanQuoc} viewAllLabel="Xem thêm">
+            {homeData.hanQuoc?.length ? (
+              <MovieRow title="Hàn Quốc" movies={homeData.hanQuoc.slice(0, 12)} slug={HOME_SECTION_SLUGS.hanQuoc} />
+            ) : null}
+            {homeData.trungQuoc?.length ? (
+              <MovieRow title="Trung Quốc" movies={homeData.trungQuoc.slice(0, 12)} slug={HOME_SECTION_SLUGS.trungQuoc} />
+            ) : null}
+          </HomeSection>
+        </LazySection>
 
-          <LazySection minHeight={360}>
-            <HomeSection title="Mới cập nhật" viewAllHref={HOME_SECTION_SLUGS.phimMoi}>
-              {homeData.phimSapChieu?.length ? (
-                <MovieRow title="Phim Sắp Chiếu" movies={homeData.phimSapChieu.slice(0, 12)} slug={HOME_SECTION_SLUGS.phimSapChieu} />
-              ) : null}
-              {homeData.phimLe?.length ? (
-                <MovieRow title="Phim Lẻ Mới" movies={homeData.phimLe} slug={HOME_SECTION_SLUGS.phimLe} />
-              ) : null}
-              {homeData.phimBo?.length ? (
-                <MovieRow title="Phim Bộ Mới" movies={homeData.phimBo} slug={HOME_SECTION_SLUGS.phimBo} />
-              ) : null}
-            </HomeSection>
-          </LazySection>
+        <LazySection minHeight={360}>
+          <HomeSection title="Mới cập nhật" viewAllHref={HOME_SECTION_SLUGS.phimMoi}>
+            {homeData.phimSapChieu?.length ? (
+              <MovieRow title="Phim Sắp Chiếu" movies={homeData.phimSapChieu.slice(0, 12)} slug={HOME_SECTION_SLUGS.phimSapChieu} />
+            ) : null}
+            {homeData.phimLe?.length ? (
+              <MovieRow title="Phim Lẻ Mới" movies={homeData.phimLe} slug={HOME_SECTION_SLUGS.phimLe} />
+            ) : null}
+            {homeData.phimBo?.length ? (
+              <MovieRow title="Phim Bộ Mới" movies={homeData.phimBo} slug={HOME_SECTION_SLUGS.phimBo} />
+            ) : null}
+          </HomeSection>
+        </LazySection>
 
-          <LazySection minHeight={360}>
-            <HomeSection title="Thể loại" viewAllHref={HOME_SECTION_SLUGS.hanhDong} viewAllLabel="Xem thêm">
-              {homeData.hanhDong?.length ? (
-                <MovieRow title="Hành Động" movies={homeData.hanhDong.slice(0, 12)} slug={HOME_SECTION_SLUGS.hanhDong} />
-              ) : null}
-              {homeData.tinhCam?.length ? (
-                <MovieRow title="Tình Cảm" movies={homeData.tinhCam.slice(0, 12)} slug={HOME_SECTION_SLUGS.tinhCam} />
-              ) : null}
-              {homeData.hoatHinh?.length ? (
-                <MovieRow title="Hoạt Hình" movies={homeData.hoatHinh.slice(0, 12)} slug={HOME_SECTION_SLUGS.hoatHinh} />
-              ) : null}
-              {homeData.tvShows?.length ? (
-                <MovieRow title="TV Shows" movies={homeData.tvShows.slice(0, 12)} slug={HOME_SECTION_SLUGS.tvShows} />
-              ) : null}
-            </HomeSection>
-          </LazySection>
-        </div>
-
-        <div className="xl:col-span-3 space-y-12">
-          <LazySection minHeight={520}>
-            <Suspense fallback={<div className="h-[600px] bg-white/5 rounded-lg animate-pulse" />}>
-              <AsyncTopTrending title="Top Phim Bộ" slug="/danh-sach/phim-bo" type="tv" />
-            </Suspense>
-          </LazySection>
-
-          <LazySection minHeight={220}>
-            <TopicCloud />
-          </LazySection>
-
-          <LazySection minHeight={520}>
-            <Suspense fallback={<div className="h-[600px] bg-white/5 rounded-lg animate-pulse mt-8" />}>
-              <AsyncTopTrending title="Top Phim Lẻ" slug="/danh-sach/phim-le" type="movie" />
-            </Suspense>
-          </LazySection>
-        </div>
+        <LazySection minHeight={360}>
+          <HomeSection title="Thể loại" viewAllHref={HOME_SECTION_SLUGS.hanhDong} viewAllLabel="Xem thêm">
+            {homeData.hanhDong?.length ? (
+              <MovieRow title="Hành Động" movies={homeData.hanhDong.slice(0, 12)} slug={HOME_SECTION_SLUGS.hanhDong} />
+            ) : null}
+            {homeData.tinhCam?.length ? (
+              <MovieRow title="Tình Cảm" movies={homeData.tinhCam.slice(0, 12)} slug={HOME_SECTION_SLUGS.tinhCam} />
+            ) : null}
+            {homeData.hoatHinh?.length ? (
+              <MovieRow title="Hoạt Hình" movies={homeData.hoatHinh.slice(0, 12)} slug={HOME_SECTION_SLUGS.hoatHinh} />
+            ) : null}
+            {homeData.tvShows?.length ? (
+              <MovieRow title="TV Shows" movies={homeData.tvShows.slice(0, 12)} slug={HOME_SECTION_SLUGS.tvShows} />
+            ) : null}
+          </HomeSection>
+        </LazySection>
       </div>
     </div>
   );

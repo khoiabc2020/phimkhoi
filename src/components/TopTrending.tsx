@@ -46,19 +46,19 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
             </div>
 
             {/* List Container */}
-            <div className="flex lg:flex-col gap-3 lg:gap-3 overflow-x-auto lg:overflow-visible no-scrollbar pb-3 lg:pb-0 snap-x lg:snap-none [contain:layout_paint]">
+            <div className="flex gap-3 overflow-x-auto no-scrollbar pb-3 snap-x [contain:layout_paint]">
                 {topMovies.map((movie, index) => {
                     const trailerId = getYouTubeId(movie.trailer_url);
                     return (
                     <Link
                         key={movie._id}
                         href={`/phim/${movie.slug}`}
-                        className="group flex flex-col lg:flex-row gap-2.5 p-2.5 rounded-[10px] transition-colors border border-white/[0.06] hover:border-white/[0.12] hover:bg-white/[0.03] w-[138px] md:w-[156px] lg:w-full shrink-0 snap-start bg-[#07070b]/82 shadow-[0_8px_18px_#00000055]"
+                        className="group flex flex-col gap-2.5 p-2.5 rounded-[10px] transition-colors border border-white/[0.06] hover:border-white/[0.12] hover:bg-white/[0.03] w-[138px] sm:w-[156px] md:w-[170px] lg:w-[188px] xl:w-[205px] shrink-0 snap-start bg-[#07070b]/82 shadow-[0_8px_18px_#00000055]"
                         onMouseEnter={() => setHoveredMovieId(movie._id)}
                         onMouseLeave={() => setHoveredMovieId(null)}
                     >
                         {/* Poster Container */}
-                        <div className="relative w-full lg:w-[92px] xl:w-[104px] aspect-[2/3] rounded-[10px] overflow-hidden flex-shrink-0 shadow-md bg-[#0B0B10]">
+                        <div className="relative w-full aspect-[2/3] rounded-[10px] overflow-hidden flex-shrink-0 shadow-md bg-[#0B0B10]">
                             <Image
                                 src={getImageUrl(movie.poster_url || movie.thumb_url)}
                                 alt={movie.name}
@@ -94,8 +94,8 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
                         </div>
 
                         {/* Metadata Container */}
-                        <div className="flex-1 min-w-0 flex flex-col lg:justify-center gap-1">
-                            <h3 className="text-white text-[13px] sm:text-sm font-bold line-clamp-2 md:line-clamp-1 group-hover:text-[#c6d6ea] transition-colors leading-snug">
+                        <div className="flex-1 min-w-0 flex flex-col gap-1">
+                            <h3 className="text-white text-[13px] sm:text-sm font-bold line-clamp-2 group-hover:text-[#c6d6ea] transition-colors leading-snug">
                                 {decodeHtml(movie.name)}
                             </h3>
                             <p className="text-white/50 text-xs truncate">
