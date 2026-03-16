@@ -39,10 +39,10 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
                     <Link
                         key={movie._id}
                         href={`/phim/${movie.slug}`}
-                        className="group flex flex-col lg:flex-row gap-2.5 p-2.5 rounded-[12px] transition-colors border border-white/[0.05] hover:border-white/[0.12] hover:bg-white/[0.02] w-[138px] md:w-[156px] lg:w-full shrink-0 snap-start bg-[#0a111d]"
+                        className="group flex flex-col lg:flex-row gap-2.5 p-2.5 rounded-[10px] transition-colors border border-white/[0.06] hover:border-white/[0.12] hover:bg-white/[0.03] w-[138px] md:w-[156px] lg:w-full shrink-0 snap-start bg-[#07070b]/82 shadow-[0_8px_18px_#00000055]"
                     >
                         {/* Poster Container */}
-                        <div className="relative w-full lg:w-[92px] xl:w-[104px] aspect-[2/3] rounded-[10px] overflow-hidden flex-shrink-0 shadow-md">
+                        <div className="relative w-full lg:w-[92px] xl:w-[104px] aspect-[2/3] rounded-[10px] overflow-hidden flex-shrink-0 shadow-md bg-[#0B0B10]">
                             <Image
                                 src={getImageUrl(movie.poster_url || movie.thumb_url)}
                                 alt={movie.name}
