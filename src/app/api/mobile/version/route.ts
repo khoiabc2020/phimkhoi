@@ -3,6 +3,13 @@ import dbConnect from '@/lib/db';
 import { AppVersion } from '@/models/AppVersion';
 
 export const dynamic = 'force-dynamic';
+const FALLBACK_VERSION = {
+    version: "1.0.8",
+    build: 9,
+    force_update: false,
+    download_url: "https://khoiphim.io.vn/downloads/PhimKhoi-Release.apk",
+    change_log: "Sửa lỗi đăng ký/đăng nhập mobile và nâng độ ổn định ứng dụng",
+};
 
 export async function GET() {
     try {
@@ -11,7 +18,7 @@ export async function GET() {
         // Lấy phiên bản mới nhất từ database (sắp xếp theo thời gian tạo giảm dần)
         const latestVersion = await AppVersion.findOne().sort({ createdAt: -1 });
 
-        if (latestVersion) {
+        if (latestVersion && Number(latestVersion.build || 0) >= FALLBACK_VERSION.build) {
             return NextResponse.json({
                 version: latestVersion.version,
                 build: latestVersion.build,
@@ -21,14 +28,8 @@ export async function GET() {
             });
         }
 
-        // Nếu DB rỗng, trả về response tạm
-        return NextResponse.json({
-            version: "1.0.7",
-            build: 8,
-            force_update: false,
-            download_url: "https://khoiphim.io.vn/downloads/PhimKhoi-Release.apk",
-            change_log: "Đã cập nhật hệ thống kiểm tra phiên bản mới"
-        });
+        // Nếu DB rỗng hoặc build cũ hơn fallback, trả về bản fallback mới nhất
+        return NextResponse.json(FALLBACK_VERSION);
 
     } catch (error) {
         console.error("Error fetching app version:", error);

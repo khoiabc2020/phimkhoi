@@ -14,7 +14,6 @@ import { CONFIG } from '@/constants/config';
 import * as WebBrowser from 'expo-web-browser';
 import * as AuthSession from 'expo-auth-session';
 import * as Google from 'expo-auth-session/providers/google';
-import ModernAlert, { AlertButton } from '@/components/ModernAlert';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -33,16 +32,21 @@ export default function AuthScreen() {
     const [googleLoading, setGoogleLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    const [alertConfig, setAlertConfig] = useState<{
-        visible: boolean;
-        title: string;
-        message: string;
-        type?: 'info' | 'success' | 'warning' | 'error';
-        buttons?: AlertButton[];
-    }>({ visible: false, title: '', message: '' });
+    const showAlert = (title: string, message: string, buttons?: { text: string; onPress?: () => void }[]) => {
+        Alert.alert(title, message, buttons ?? [{ text: 'OK' }]);
+    };
 
-    const showAlert = (title: string, message: string, buttons?: AlertButton[], type: 'info' | 'success' | 'warning' | 'error' = 'info') => {
-        setAlertConfig({ visible: true, title, message, buttons, type });
+    const parseResponseJson = async (res: Response) => {
+        const contentType = res.headers.get('content-type') || '';
+        const raw = await res.text();
+        if (!contentType.includes('application/json')) {
+            throw new Error('Server phản hồi không hợp lệ, vui lòng thử lại.');
+        }
+        try {
+            return JSON.parse(raw);
+        } catch {
+            throw new Error('Không đọc được dữ liệu từ server.');
+        }
     };
 
     // Android OAuth Client ID (cần tạo riêng trong Google Console cho Android app)
@@ -68,20 +72,22 @@ export default function AuthScreen() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ accessToken: access_token }),
             });
-            const data = await res.json();
+            const data = await parseResponseJson(res);
             if (!res.ok) throw new Error(data.error || 'Đăng nhập Google thất bại');
+            if (!data?.token || !data?.user) throw new Error('Thiếu dữ liệu đăng nhập từ server.');
             await login(data.token, data.user);
             router.replace('/(tabs)/profile');
         } catch (err: any) {
-            showAlert('Lỗi', err.message || 'Không thể đăng nhập bằng Google', undefined, 'error');
+            showAlert('Lỗi', err?.message || 'Không thể đăng nhập bằng Google');
         } finally {
             setGoogleLoading(false);
         }
     };
 
     const handleLogin = async () => {
+        if (loading) return;
         if (!email || !password) {
-            showAlert('Thiếu thông tin', 'Vui lòng nhập email và mật khẩu', undefined, 'warning');
+            showAlert('Thiếu thông tin', 'Vui lòng nhập email và mật khẩu');
             return;
         }
         setLoading(true);
@@ -89,48 +95,48 @@ export default function AuthScreen() {
             const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: email, password }),
+                body: JSON.stringify({ username: email.trim(), password }),
             });
-            const contentType = res.headers.get('content-type') || '';
-            if (!contentType.includes('application/json')) throw new Error('Server lỗi, thử lại sau.');
-            const data = await res.json();
+            const data = await parseResponseJson(res);
             if (!res.ok) throw new Error(data.message || 'Đăng nhập thất bại');
+            if (!data?.token || !data?.user) throw new Error('Thiếu dữ liệu đăng nhập từ server.');
             await login(data.token, data.user);
             router.replace('/(tabs)/profile');
         } catch (error: any) {
-            showAlert('Lỗi', error.message, undefined, 'error');
+            showAlert('Lỗi', error?.message || 'Đăng nhập thất bại');
         } finally {
             setLoading(false);
         }
     };
 
     const handleRegister = async () => {
+        if (loading) return;
         if (!name || !email || !password) {
-            showAlert('Thiếu thông tin', 'Vui lòng điền đầy đủ', undefined, 'warning');
+            showAlert('Thiếu thông tin', 'Vui lòng điền đầy đủ');
             return;
         }
         if (password !== confirmPassword) {
-            showAlert('Lỗi', 'Mật khẩu xác nhận không khớp', undefined, 'warning');
+            showAlert('Lỗi', 'Mật khẩu xác nhận không khớp');
             return;
         }
         if (password.length < 6) {
-            showAlert('Lỗi', 'Mật khẩu tối thiểu 6 ký tự', undefined, 'warning');
+            showAlert('Lỗi', 'Mật khẩu tối thiểu 6 ký tự');
             return;
         }
         setLoading(true);
         try {
-            const res = await fetch(`${CONFIG.BACKEND_URL}/api/auth/register`, {
+            const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, password }),
+                body: JSON.stringify({ name: name.trim(), email: email.trim(), password }),
             });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Đăng ký thất bại');
+            const data = await parseResponseJson(res);
+            if (!res.ok) throw new Error(data.message || data.error || 'Đăng ký thất bại');
             showAlert('Đăng ký thành công!', 'Vui lòng đăng nhập.', [
                 { text: 'OK', onPress: () => setTab('login') }
-            ], 'success');
+            ]);
         } catch (error: any) {
-            showAlert('Lỗi', error.message, undefined, 'error');
+            showAlert('Lỗi', error?.message || 'Đăng ký thất bại');
         } finally {
             setLoading(false);
         }
@@ -356,15 +362,6 @@ export default function AuthScreen() {
                     </ScrollView>
                 </SafeAreaView>
             </KeyboardAvoidingView>
-
-            <ModernAlert
-                visible={alertConfig.visible}
-                title={alertConfig.title}
-                message={alertConfig.message}
-                buttons={alertConfig.buttons}
-                type={alertConfig.type}
-                onClose={() => setAlertConfig(prev => ({ ...prev, visible: false }))}
-            />
         </View>
     );
 }
