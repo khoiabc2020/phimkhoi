@@ -538,7 +538,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                     </div>
                                 </div>
                             ) : (
-                                <Link href="/login" className="bg-[#F4C84A] hover:bg-[#ffe58a] text-black px-5 py-2 rounded-full font-bold text-sm transition-transform duration-200 hover:scale-105 active:scale-95 ml-1 whitespace-nowrap">
+                                <Link href="/login" className="bg-[#8FA7C5] hover:bg-[#a8bdd8] text-[#050507] px-5 py-2 rounded-full font-bold text-sm transition-transform duration-200 hover:scale-105 active:scale-95 ml-1 whitespace-nowrap">
                                     Đăng nhập
                                 </Link>
                             )}

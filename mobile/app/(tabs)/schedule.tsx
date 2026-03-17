@@ -10,6 +10,9 @@ import { CONFIG } from '@/constants/config';
 
 const API_URL = 'https://phimapi.com';
 const BASE_IMG = 'https://phimimg.com/';
+const ACCENT = '#8FA7C5';
+const ACCENT_SOFT = 'rgba(143,167,197,0.14)';
+const ACCENT_BORDER = 'rgba(143,167,197,0.28)';
 
 interface CinemaMovie {
     _id: string;
@@ -146,7 +149,7 @@ export default function ScheduleScreen() {
                         <Text style={styles.headerSub}>Cập nhật phim mới nhất tại rạp</Text>
                     </View>
                     <View style={styles.headerBadge}>
-                        <Ionicons name="film-outline" size={18} color="#E6BF5C" />
+                        <Ionicons name="film-outline" size={18} color={ACCENT} />
                     </View>
                 </View>
 
@@ -180,7 +183,7 @@ export default function ScheduleScreen() {
                             keyExtractor={(item) => item._id || item.slug}
                             renderItem={({ item }) => <MovieRow item={item} />}
                             refreshControl={
-                                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#E6BF5C" />
+                                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={ACCENT} />
                             }
                             contentContainerStyle={{ paddingBottom: 120 }}
                             showsVerticalScrollIndicator={false}
@@ -215,8 +218,8 @@ const styles = StyleSheet.create({
     headerSub: { color: 'rgba(255,255,255,0.4)', fontSize: 12, marginTop: 2 },
     headerBadge: {
         width: 42, height: 42, borderRadius: 14,
-        backgroundColor: 'rgba(244,200,74,0.1)',
-        borderWidth: 1, borderColor: 'rgba(244,200,74,0.2)',
+        backgroundColor: ACCENT_SOFT,
+        borderWidth: 1, borderColor: ACCENT_BORDER,
         alignItems: 'center', justifyContent: 'center',
     },
 
@@ -233,7 +236,7 @@ const styles = StyleSheet.create({
         borderRadius: 11,
     },
     tabBtnActive: {
-        backgroundColor: '#E6BF5C',
+        backgroundColor: ACCENT,
     },
     tabText: { color: 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: '600' },
     tabTextActive: { color: '#000' },
@@ -259,7 +262,7 @@ const styles = StyleSheet.create({
     qualityBadge: {
         position: 'absolute',
         top: 12, left: 12,
-        backgroundColor: 'rgba(244,200,74,0.9)',
+        backgroundColor: ACCENT,
         paddingHorizontal: 5, paddingVertical: 2,
         borderRadius: 5,
     },
@@ -279,7 +282,7 @@ const styles = StyleSheet.create({
 
     watchBtn: {
         flexDirection: 'row', alignItems: 'center', gap: 5,
-        backgroundColor: '#E6BF5C',
+        backgroundColor: ACCENT,
         borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8,
         alignSelf: 'flex-start', marginTop: 6,
     },

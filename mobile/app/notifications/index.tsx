@@ -11,7 +11,7 @@ import * as Linking from 'expo-linking';
 import { COLORS } from '@/constants/theme';
 import { CONFIG } from '@/constants/config';
 
-const ACCENT = COLORS.accent ?? '#E6BF5C';
+const ACCENT = COLORS.accent ?? '#8FA7C5';
 const APP_BUILD = 6; // Constants matching profile.tsx
 
 interface UpdateInfo {
@@ -123,7 +123,7 @@ export default function NotificationsScreen() {
                             <Animated.View style={[styles.iconWrapper, { opacity: iconOpacity, transform: [{ scale: iconScale }] }]}>
                                 <View style={styles.glowOuter}>
                                     <View style={styles.glowInner}>
-                                        <Feather name="bell" size={32} color={`rgba(244,200,74,0.8)`} strokeWidth={1.5} />
+                                        <Feather name="bell" size={32} color={`rgba(143,167,197,0.8)`} strokeWidth={1.5} />
                                     </View>
                                 </View>
                             </Animated.View>
@@ -162,7 +162,7 @@ function FeatureItem({ icon, title, sub }: { icon: any; title: string; sub: stri
     return (
         <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-                <Feather name={icon} size={20} color={`rgba(244,200,74,0.85)`} strokeWidth={1.5} />
+                <Feather name={icon} size={20} color={`rgba(143,167,197,0.85)`} strokeWidth={1.5} />
             </View>
             <View style={styles.featureText}>
                 <Text style={styles.featureTitle}>{title}</Text>
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     iconWrapper: { marginBottom: 20 },
     glowOuter: {
         width: 120, height: 120, borderRadius: 60,
-        backgroundColor: 'rgba(244,200,74,0.06)',
+        backgroundColor: 'rgba(143,167,197,0.06)',
         alignItems: 'center', justifyContent: 'center',
         // Radial glow via shadow
         shadowColor: ACCENT,
@@ -220,9 +220,9 @@ const styles = StyleSheet.create({
     },
     glowInner: {
         width: 76, height: 76, borderRadius: 38,
-        backgroundColor: 'rgba(244,200,74,0.08)',
+        backgroundColor: 'rgba(143,167,197,0.08)',
         borderWidth: 1,
-        borderColor: 'rgba(244,200,74,0.12)',
+        borderColor: 'rgba(143,167,197,0.12)',
         alignItems: 'center', justifyContent: 'center',
     },
 
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
     },
     featureIcon: {
         width: 42, height: 42, borderRadius: 12,
-        backgroundColor: 'rgba(244,200,74,0.08)',
+        backgroundColor: 'rgba(143,167,197,0.08)',
         alignItems: 'center', justifyContent: 'center',
     },
     featureText: { flex: 1 },
@@ -296,11 +296,11 @@ const styles = StyleSheet.create({
 
     // Update Card
     updateCard: {
-        backgroundColor: 'rgba(244,200,74,0.08)',
+        backgroundColor: 'rgba(143,167,197,0.08)',
         borderRadius: 24,
         padding: 20,
         borderWidth: 1,
-        borderColor: 'rgba(244,200,74,0.25)',
+        borderColor: 'rgba(143,167,197,0.25)',
         marginBottom: 20,
     },
     updateHeader: {
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
         width: 52,
         height: 52,
         borderRadius: 26,
-        backgroundColor: 'rgba(244,200,74,0.15)',
+        backgroundColor: 'rgba(143,167,197,0.15)',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     updateVersion: {
-        color: '#E6BF5C',
+        color: '#8FA7C5',
         fontSize: 14,
         fontWeight: '600',
     },
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         gap: 8,
-        backgroundColor: '#E6BF5C',
+        backgroundColor: '#8FA7C5',
         borderRadius: 14,
         paddingVertical: 14,
         width: '100%',

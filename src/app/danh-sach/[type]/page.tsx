@@ -103,7 +103,7 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
                     </p>
                     <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
                         <h1 className="text-[20px] md:text-[26px] font-extrabold text-white tracking-tight flex items-center gap-2">
-                            <span className="w-1 h-5 bg-[#fbbf24] rounded-full"></span>
+                            <span className="w-1 h-5 bg-[#8FA7C5] rounded-full"></span>
                             {typeName}
                         </h1>
                         <p className="text-white/55 text-sm">

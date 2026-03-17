@@ -176,11 +176,11 @@ export default function AuthScreen() {
 
                         {/* Logo */}
                         <View style={{ alignItems: 'center', marginBottom: 32 }}>
-                            <View style={{ width: 80, height: 80, borderRadius: 22, overflow: 'hidden', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.15)', marginBottom: 16, shadowColor: '#E6BF5C', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.3, shadowRadius: 20 }}>
+                            <View style={{ width: 80, height: 80, borderRadius: 22, overflow: 'hidden', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.15)', marginBottom: 16, shadowColor: '#8FA7C5', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.3, shadowRadius: 20 }}>
                                 <Image source={require('../../assets/images/logo.webp')} style={{ width: 80, height: 80 }} resizeMode="cover" />
                             </View>
                             <Text style={{ color: 'white', fontSize: 28, fontWeight: '800', letterSpacing: -0.5 }}>
-                                Movie<Text style={{ color: '#E6BF5C' }}>Box</Text>
+                                Movie<Text style={{ color: '#8FA7C5' }}>Box</Text>
                             </Text>
                             <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, marginTop: 6 }}>
                                 {tab === 'login' ? 'Chào mừng trở lại!' : 'Tạo tài khoản mới'}
@@ -336,7 +336,7 @@ export default function AuthScreen() {
                                 }}
                             >
                                 <LinearGradient
-                                    colors={['#f59e0b', '#E6BF5C']}
+                                    colors={['#7E95B1', '#8FA7C5']}
                                     start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
                                     style={{ position: 'absolute', inset: 0 }}
                                 />

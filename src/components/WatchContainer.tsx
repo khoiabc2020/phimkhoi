@@ -181,7 +181,7 @@ export default function WatchContainer({
                             <h1 className="text-white font-extrabold text-[15px] sm:text-lg truncate leading-tight">
                                 {movie.name}
                             </h1>
-                            <p className="text-yellow-300 text-xs sm:text-sm mt-0.5 truncate font-semibold">
+                            <p className="text-[#8FA7C5] text-xs sm:text-sm mt-0.5 truncate font-semibold">
                                 {activeEpisode ? displayEpisodeName(activeEpisode.name) : ""}
                             </p>
                         </div>
@@ -213,15 +213,15 @@ export default function WatchContainer({
                             className={cn(
                                 "flex items-center justify-center transition-all w-8 h-8 sm:w-auto sm:px-3 sm:py-2 rounded-[10px] border touch-manipulation active:scale-95",
                                 autoNext
-                                    ? "bg-yellow-400/15 text-yellow-400 border-yellow-400/30 hover:bg-yellow-400/25"
+                                    ? "bg-[#8FA7C5]/15 text-[#8FA7C5] border-[#8FA7C5]/30 hover:bg-[#8FA7C5]/25"
                                     : "bg-white/8 text-gray-200 border-white/15 hover:bg-white/12"
                             )}
                         >
-                            <SkipForward className={cn("w-3.5 h-3.5", autoNext ? "text-yellow-400" : "text-gray-300")} />
+                            <SkipForward className={cn("w-3.5 h-3.5", autoNext ? "text-[#8FA7C5]" : "text-gray-300")} />
                             <span className="hidden sm:inline ml-1.5 text-xs font-bold">Tự chuyển</span>
                             <span className={cn(
                                 "hidden sm:inline ml-1.5 px-1 py-0.5 rounded text-[10px] font-bold",
-                                autoNext ? "bg-yellow-400/20" : "bg-white/10"
+                                autoNext ? "bg-[#8FA7C5]/20" : "bg-white/10"
                             )}>
                                 {autoNext ? "BẬT" : "TẮT"}
                             </span>
@@ -232,7 +232,7 @@ export default function WatchContainer({
                             <Link
                                 href={nextEpisodeUrl}
                                 title="Tập sau"
-                                className="flex items-center justify-center text-xs font-bold text-white bg-[#F4C84A] hover:bg-yellow-300 transition-all w-8 h-8 sm:w-auto sm:px-3 sm:py-2 rounded-[10px] touch-manipulation active:scale-95 shadow-md shadow-yellow-400/20"
+                                className="flex items-center justify-center text-xs font-bold text-[#050507] bg-[#8FA7C5] hover:bg-[#a8bdd8] transition-all w-8 h-8 sm:w-auto sm:px-3 sm:py-2 rounded-[10px] touch-manipulation active:scale-95 shadow-md shadow-[#8FA7C5]/20"
                             >
                                 <span className="hidden sm:inline mr-1">Tập sau</span>
                                 <ChevronRight className="w-4 h-4" />

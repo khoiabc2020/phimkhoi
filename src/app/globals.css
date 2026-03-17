@@ -4,15 +4,14 @@
   --color-background: #0B0D12;
   --color-foreground: #ffffff;
 
-  --color-primary: #F4C84A;
-  /* Soft Yellow */
-  --color-primary-foreground: #000000;
+  --color-primary: #8FA7C5;
+  --color-primary-foreground: #050507;
 
   --color-secondary: #1a1a1a;
   --color-secondary-foreground: #ffffff;
 
-  --color-accent: #F4C84A;
-  --color-accent-foreground: #000000;
+  --color-accent: #8FA7C5;
+  --color-accent-foreground: #050507;
 
   --font-sans: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   --font-mono: "SF Mono", "Fira Code", monospace;
@@ -93,11 +92,11 @@
 
     0%,
     100% {
-      box-shadow: 0 0 8px #F4C84A4D;
+      box-shadow: 0 0 8px #8FA7C54D;
     }
 
     50% {
-      box-shadow: 0 0 20px #F4C84A99;
+      box-shadow: 0 0 20px #8FA7C599;
     }
   }
 
@@ -209,7 +208,7 @@ h2 {
 
   /* Premium Text Glow */
   .text-glow {
-    text-shadow: 0 0 25px rgba(244, 200, 74, 0.4);
+    text-shadow: 0 0 25px rgba(143, 167, 197, 0.38);
   }
 
   .text-glow-blue {
@@ -244,26 +243,23 @@ h2 {
     background: transparent;
   }
 
-  /* Override Tailwind Default Yellow-500 across app */
+  /* Override Tailwind Default Yellow-500 to system accent */
   .text-yellow-500 {
-    color: #eab308;
-    /* Soft golden yellow */
+    color: #8fa7c5;
     opacity: 0.85 !important;
   }
 
   .bg-yellow-500 {
-    background-color: #eab308;
-    /* Soft golden yellow */
+    background-color: #8fa7c5;
     opacity: 0.8 !important;
-    /* Dịu mắt hơn, bớt gắt */
   }
 
   .border-yellow-500 {
-    border-color: rgba(234, 179, 8, 0.6) !important;
+    border-color: rgba(143, 167, 197, 0.6) !important;
   }
 
   .hover\:bg-yellow-500:hover {
-    background-color: rgba(234, 179, 8, 0.9) !important;
+    background-color: rgba(143, 167, 197, 0.9) !important;
   }
 }
 
@@ -335,8 +331,7 @@ html {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(244, 200, 74, 0.6);
-  /* System Yellow highlight on hover */
+  background: rgba(143, 167, 197, 0.6);
 }
 
 /* Specific class for inner containers requiring a scrollbar */
@@ -349,7 +344,7 @@ html {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(244, 200, 74, 0.5);
+  background: rgba(143, 167, 197, 0.5);
 }
 
 /* Performance Rendering Classes */

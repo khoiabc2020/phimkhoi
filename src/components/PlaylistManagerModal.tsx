@@ -100,7 +100,7 @@ export default function PlaylistManagerModal({ isOpen, onClose, onSuccess, mode,
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 placeholder="VD: Phim Cày Đêm, Hành Động Hay..."
-                                className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-[#fbbf24] focus:ring-1 focus:ring-[#fbbf24] transition-all"
+                                className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-[#8FA7C5] focus:ring-1 focus:ring-[#8FA7C5] transition-all"
                                 autoFocus
                             />
                             {error && <p className="text-red-500 text-xs mt-2 font-medium">{error}</p>}
@@ -117,7 +117,7 @@ export default function PlaylistManagerModal({ isOpen, onClose, onSuccess, mode,
                             <button
                                 type="submit"
                                 disabled={isLoading || isDeleting}
-                                className="flex-1 py-3 px-4 rounded-lg font-bold text-black bg-[#fbbf24] hover:brightness-110 transition-colors flex items-center justify-center disabled:opacity-50"
+                                className="flex-1 py-3 px-4 rounded-lg font-bold text-[#050507] bg-[#8FA7C5] hover:brightness-110 transition-colors flex items-center justify-center disabled:opacity-50"
                             >
                                 {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : (mode === "create" ? "Tạo mới" : "Lưu thay đổi")}
                             </button>

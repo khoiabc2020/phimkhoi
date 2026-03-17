@@ -100,7 +100,7 @@ export default async function MovieCast({ movie, slug, isCompact = false }: { mo
                         className="flex flex-col items-center gap-2 w-[4.5rem] group"
                         title={actor.name}
                     >
-                        <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border border-white/15 group-hover:border-[#F4C84A] transition-colors relative bg-white/5 ring-1 ring-white/5 group-hover:ring-[#F4C84A]/40">
+                        <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border border-white/15 group-hover:border-[#8FA7C5] transition-colors relative bg-white/5 ring-1 ring-white/5 group-hover:ring-[#8FA7C5]/40">
                             {actor.photo ? (
                                 <Image src={actor.photo} alt={actor.name} fill className="object-cover" unoptimized />
                             ) : (
@@ -119,7 +119,7 @@ export default async function MovieCast({ movie, slug, isCompact = false }: { mo
     return (
         <div className="mt-8">
             <div className="flex items-center gap-2 mb-4">
-                <div className="w-1.5 h-5 bg-[#F4C84A] rounded-full" />
+                <div className="w-1.5 h-5 bg-[#8FA7C5] rounded-full" />
                 <h3 className="text-xl font-bold text-white">Diễn Viên</h3>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -127,9 +127,9 @@ export default async function MovieCast({ movie, slug, isCompact = false }: { mo
                     <Link
                         href={`/dien-vien/${encodeURIComponent(actor.name)}`}
                         key={actor.name}
-                        className="relative flex items-center gap-3 bg-white/5 rounded-lg p-3 group hover:bg-white/10 transition-colors border border-white/5 hover:border-[#F4C84A]/60"
+                        className="relative flex items-center gap-3 bg-white/5 rounded-lg p-3 group hover:bg-white/10 transition-colors border border-white/5 hover:border-[#8FA7C5]/60"
                     >
-                        <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-[#F4C84A] transition-colors shrink-0">
+                        <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-[#8FA7C5] transition-colors shrink-0">
                             {actor.photo ? (
                                 <Image src={actor.photo} alt={actor.name} fill className="object-cover" unoptimized />
                             ) : (
@@ -137,7 +137,7 @@ export default async function MovieCast({ movie, slug, isCompact = false }: { mo
                             )}
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-white truncate group-hover:text-[#F4C84A] transition-colors">
+                            <p className="text-sm font-semibold text-white truncate group-hover:text-[#8FA7C5] transition-colors">
                                 {actor.name}
                             </p>
                             {actor.originalName && actor.originalName !== actor.name && (
@@ -158,7 +158,7 @@ export default async function MovieCast({ movie, slug, isCompact = false }: { mo
                                 )}
                             </div>
                         </div>
-                        <span className="hidden sm:inline text-[11px] font-semibold text-gray-400 group-hover:text-[#F4C84A] transition-colors ml-2">
+                        <span className="hidden sm:inline text-[11px] font-semibold text-gray-400 group-hover:text-[#8FA7C5] transition-colors ml-2">
                             Xem trang
                         </span>
                     </Link>

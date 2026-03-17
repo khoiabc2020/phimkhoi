@@ -428,7 +428,7 @@ export default function MovieDetailScreen() {
                                 <Text style={[styles.chipText, { color: COLORS.accent }]}>{movie.lang || 'Vietsub'}</Text>
                             </View>
                             {typeof rating === 'number' && !isNaN(rating) && (
-                                <View style={[styles.glassChip, { backgroundColor: '#fbbf24', borderColor: '#fbbf24' }]}>
+                                <View style={[styles.glassChip, { backgroundColor: COLORS.accent, borderColor: COLORS.accent }]}>
                                     <Text style={[styles.chipText, { color: 'black', fontWeight: 'bold' }]}>IMDb {rating.toFixed(1)}</Text>
                                 </View>
                             )}
@@ -446,15 +446,15 @@ export default function MovieDetailScreen() {
                                     <View style={{
                                         flexDirection: 'row', alignItems: 'center', gap: 6,
                                         paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20,
-                                        backgroundColor: isCompleted ? 'rgba(34,197,94,0.15)' : 'rgba(234,179,8,0.15)',
+                                        backgroundColor: isCompleted ? 'rgba(34,197,94,0.15)' : 'rgba(143,167,197,0.15)',
                                         borderWidth: 1,
-                                        borderColor: isCompleted ? 'rgba(34,197,94,0.4)' : 'rgba(234,179,8,0.4)',
+                                        borderColor: isCompleted ? 'rgba(34,197,94,0.4)' : 'rgba(143,167,197,0.4)',
                                     }}>
                                         <View style={{
                                             width: 6, height: 6, borderRadius: 3,
-                                            backgroundColor: isCompleted ? '#22c55e' : '#E6BF5C',
+                                            backgroundColor: isCompleted ? '#22c55e' : COLORS.accent,
                                         }} />
-                                        <Text style={{ color: isCompleted ? '#22c55e' : '#E6BF5C', fontSize: 12, fontWeight: '700' }}>
+                                        <Text style={{ color: isCompleted ? '#22c55e' : COLORS.accent, fontSize: 12, fontWeight: '700' }}>
                                             {isCompleted ? 'Hoàn Tất' : 'Đang chiếu'}
                                         </Text>
                                     </View>
@@ -511,7 +511,7 @@ export default function MovieDetailScreen() {
                                 <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, backgroundColor: 'rgba(0,0,0,0.1)' }}>
                                     <View style={{
                                         height: '100%',
-                                        backgroundColor: '#E6BF5C',
+                                        backgroundColor: COLORS.accent,
                                         width: `${Math.min(100, (historyRecord.progress / historyRecord.duration) * 100)}%`
                                     }} />
                                 </View>
@@ -577,13 +577,13 @@ export default function MovieDetailScreen() {
                                                     paddingHorizontal: 14,
                                                     paddingVertical: 8,
                                                     borderRadius: 20,
-                                                    backgroundColor: isActive ? 'rgba(244,200,74,0.15)' : 'rgba(255,255,255,0.05)',
+                                                    backgroundColor: isActive ? 'rgba(143,167,197,0.15)' : 'rgba(255,255,255,0.05)',
                                                     borderWidth: 1,
-                                                    borderColor: isActive ? '#E6BF5C' : 'rgba(255,255,255,0.08)',
+                                                    borderColor: isActive ? COLORS.accent : 'rgba(255,255,255,0.08)',
                                                 }}
                                             >
                                                 <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: isActive ? dotColor : 'rgba(255,255,255,0.25)' }} />
-                                                <Text style={{ color: isActive ? '#E6BF5C' : 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: isActive ? '700' : '500' }}>
+                                                <Text style={{ color: isActive ? COLORS.accent : 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: isActive ? '700' : '500' }}>
                                                     {label}
                                                 </Text>
                                             </Pressable>
@@ -607,10 +607,10 @@ export default function MovieDetailScreen() {
                                                     onPress={() => { setSelectedServer(globalIdx); setSelectedEpRange(0); }}
                                                     style={[
                                                         styles.selectorPill,
-                                                        isActive && { backgroundColor: 'rgba(244,200,74,0.15)', borderColor: '#E6BF5C' }
+                                                        isActive && { backgroundColor: 'rgba(143,167,197,0.15)', borderColor: COLORS.accent }
                                                     ]}
                                                 >
-                                                    <Text style={[styles.selectorText, isActive && { color: '#E6BF5C', fontWeight: '600' }]}>
+                                                    <Text style={[styles.selectorText, isActive && { color: COLORS.accent, fontWeight: '600' }]}>
                                                         {shortName}
                                                     </Text>
                                                 </Pressable>
@@ -902,7 +902,7 @@ const styles = StyleSheet.create({
         height: 44,
         paddingHorizontal: 16,
         borderRadius: 22,
-        backgroundColor: '#E6BF5C',
+        backgroundColor: COLORS.accent,
         minWidth: 88,
         borderWidth: 1,
         borderColor: 'rgba(0,0,0,0.12)',
@@ -948,12 +948,12 @@ const styles = StyleSheet.create({
         gap: 8,
         paddingVertical: 12,
         borderRadius: 14,
-        backgroundColor: 'rgba(244,200,74,0.2)',
+        backgroundColor: 'rgba(143,167,197,0.2)',
         borderWidth: 1,
-        borderColor: 'rgba(244,200,74,0.4)',
+        borderColor: 'rgba(143,167,197,0.4)',
         marginBottom: 16,
     },
-    downloadAllBtnText: { color: '#E6BF5C', fontSize: 15, fontWeight: '600' },
+    downloadAllBtnText: { color: COLORS.accent, fontSize: 15, fontWeight: '600' },
     downloadSheetSub: { color: 'rgba(255,255,255,0.6)', fontSize: 13, marginBottom: 10 },
     downloadEpList: { gap: 6 },
     downloadEpRow: {
@@ -973,7 +973,7 @@ const styles = StyleSheet.create({
         marginTop: 16,
         height: 48,
         borderRadius: 24,
-        backgroundColor: '#E6BF5C',
+        backgroundColor: COLORS.accent,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -981,9 +981,9 @@ const styles = StyleSheet.create({
     startDownloadBtnText: { color: '#0B0D12', fontSize: 16, fontWeight: '700' },
 
     selectorPill: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.05)', marginRight: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-    selectorPillActive: { backgroundColor: 'rgba(244,200,74,0.12)', borderColor: 'rgba(244,200,74,0.4)' },
+    selectorPillActive: { backgroundColor: 'rgba(143,167,197,0.12)', borderColor: 'rgba(143,167,197,0.4)' },
     selectorText: { color: 'rgba(255,255,255,0.55)', fontSize: 14, fontWeight: '500' },
-    selectorTextActive: { color: '#E6BF5C', fontWeight: '600' },
+    selectorTextActive: { color: COLORS.accent, fontWeight: '600' },
 
     // Segmented Tab — liquid glass
     tabContainerWrap: { position: 'relative', borderRadius: 20, marginBottom: 20, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
@@ -1041,9 +1041,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    rangeBtnActive: { backgroundColor: 'rgba(244,200,74,0.12)', borderColor: 'rgba(244,200,74,0.4)' },
+    rangeBtnActive: { backgroundColor: 'rgba(143,167,197,0.12)', borderColor: 'rgba(143,167,197,0.4)' },
     rangeBtnText: { color: 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: '500' },
-    rangeBtnTextActive: { color: '#E6BF5C', fontWeight: '600' },
+    rangeBtnTextActive: { color: COLORS.accent, fontWeight: '600' },
 
     synopsisBox: { marginTop: 24, padding: 16, backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
 });

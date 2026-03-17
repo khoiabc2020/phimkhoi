@@ -25,7 +25,7 @@ export default async function RelatedMovies({ categorySlug, currentMovieId, mode
                     <Link key={movie._id} href={`/phim/${movie.slug}`}
                         className="flex gap-3 group rounded-lg p-2 transition-all duration-200 hover:bg-white/[0.04]">
                         {/* Poster */}
-                        <div className="relative w-16 aspect-[2/3] rounded-lg overflow-hidden shrink-0 ring-1 ring-white/[0.08] group-hover:ring-yellow-400/50 transition-all duration-200 shadow-md">
+                        <div className="relative w-16 aspect-[2/3] rounded-lg overflow-hidden shrink-0 ring-1 ring-white/[0.08] group-hover:ring-[#8FA7C5]/50 transition-all duration-200 shadow-md">
                             <Image
                                 src={getImageUrl(movie.poster_url || movie.thumb_url)}
                                 alt={movie.name}
@@ -36,7 +36,7 @@ export default async function RelatedMovies({ categorySlug, currentMovieId, mode
                         </div>
                         {/* Info */}
                         <div className="flex-1 min-w-0 py-0.5 flex flex-col justify-center">
-                            <h4 className="text-white text-xs font-semibold leading-tight mb-1 group-hover:text-yellow-400 transition-colors line-clamp-2" style={{ fontSize: '13px' }}>
+                            <h4 className="text-white text-xs font-semibold leading-tight mb-1 group-hover:text-[#8FA7C5] transition-colors line-clamp-2" style={{ fontSize: '13px' }}>
                                 {movie.name}
                             </h4>
                             <p className="text-gray-500 text-[11px] mb-1.5 line-clamp-1">{movie.origin_name}</p>

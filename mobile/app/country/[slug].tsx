@@ -41,7 +41,7 @@ export default function CountryScreen() {
       </View>
       {loading ? (
         <View className="flex-1 justify-center items-center">
-          <ActivityIndicator size="large" color="#fbbf24" />
+          <ActivityIndicator size="large" color="#8FA7C5" />
         </View>
       ) : (
         <FlatList

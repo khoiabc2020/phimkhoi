@@ -52,7 +52,7 @@ export default function QuickNav() {
         <div className="w-full py-2 pb-6">
             <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 mb-3">
                 <h2 className="text-[20px] md:text-[24px] font-extrabold text-white mb-4 flex items-center gap-2 tracking-tight">
-                    <span className="w-1 h-5 bg-[#F4C84A] rounded-sm inline-block" />
+                    <span className="w-1 h-5 bg-[#8FA7C5] rounded-sm inline-block" />
                     Bạn đang quan tâm gì?
                 </h2>
 

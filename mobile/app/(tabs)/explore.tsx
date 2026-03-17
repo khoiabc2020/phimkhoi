@@ -15,6 +15,8 @@ const { width } = Dimensions.get('window');
 const COLUMN_COUNT = 3;
 const ITEM_SPACING = 10;
 const ITEM_WIDTH = (width - 32 - (ITEM_SPACING * (COLUMN_COUNT - 1))) / COLUMN_COUNT;
+const ACCENT = '#8FA7C5';
+const ACCENT_SOFT = 'rgba(143,167,197,0.18)';
 
 const HotMovieItem = ({ item, index }: { item: Movie, index: number }) => {
   const badgeColor = index % 2 === 0 ? '#0ea5e9' : '#64748b';
@@ -176,7 +178,7 @@ export default function ExploreScreen() {
     <View className="px-4 mb-4">
       {actorResults.length > 0 && (
         <View className="mb-5">
-          <Text className="text-white text-sm font-bold mb-3" style={{ color: '#E6BF5C' }}>
+          <Text className="text-white text-sm font-bold mb-3" style={{ color: ACCENT }}>
             Diễn viên / Đạo diễn
           </Text>
           <FlashList
@@ -199,7 +201,7 @@ export default function ExploreScreen() {
                   <View style={{
                     width: 64, height: 64, borderRadius: 32,
                     overflow: 'hidden', borderWidth: 2,
-                    borderColor: 'rgba(244,200,74,0.4)',
+                    borderColor: ACCENT_SOFT,
                     backgroundColor: '#1e293b', marginBottom: 6
                   }}>
                     {profileImg ? (
@@ -236,7 +238,7 @@ export default function ExploreScreen() {
   const renderEmptySearch = () => {
     if (searching) return (
       <View className="flex-1 items-center justify-center mt-20">
-        <ActivityIndicator size="large" color="#E6BF5C" />
+        <ActivityIndicator size="large" color={ACCENT} />
         <Text className="text-gray-400 text-center mt-4">Đang tìm...</Text>
       </View>
     );
@@ -251,7 +253,7 @@ export default function ExploreScreen() {
 
     if (search.trim() && filteredResults.length === 0 && actorResults.length > 0) return (
       <View className="px-4 mt-4">
-        <Text style={{ color: '#E6BF5C', fontSize: 13, fontWeight: '700', marginBottom: 12 }}>Diễn viên / Đạo diễn</Text>
+        <Text style={{ color: ACCENT, fontSize: 13, fontWeight: '700', marginBottom: 12 }}>Diễn viên / Đạo diễn</Text>
         <FlashList
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -271,7 +273,7 @@ export default function ExploreScreen() {
               >
                 <View style={{
                   width: 72, height: 72, borderRadius: 36, overflow: 'hidden',
-                  borderWidth: 2, borderColor: 'rgba(244,200,74,0.5)',
+                  borderWidth: 2, borderColor: ACCENT_SOFT,
                   backgroundColor: '#1e293b', marginBottom: 8
                 }}>
                   {profileImg ? (
@@ -307,7 +309,7 @@ export default function ExploreScreen() {
                 Lịch sử tìm kiếm
               </Text>
               <Pressable onPress={clearHistory} hitSlop={10}>
-                <Text style={{ color: '#E6BF5C', fontSize: 12, fontWeight: '600' }}>Xóa tất cả</Text>
+                <Text style={{ color: ACCENT, fontSize: 12, fontWeight: '600' }}>Xóa tất cả</Text>
               </Pressable>
             </View>
             {searchHistory.map((item, index) => (
@@ -382,7 +384,7 @@ export default function ExploreScreen() {
               className="bg-[#1e293b] w-12 h-12 rounded-full items-center justify-center border border-gray-800 relative shadow-sm"
               style={{ elevation: 2 }}
             >
-              <Ionicons name="options-outline" size={22} color={activeFiltersCount > 0 ? "#E6BF5C" : "white"} />
+              <Ionicons name="options-outline" size={22} color={activeFiltersCount > 0 ? ACCENT : "white"} />
               {activeFiltersCount > 0 && (
                 <View className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 border-2 border-[#0f172a] items-center justify-center">
                   <Text className="text-white text-[9px] font-bold">{activeFiltersCount}</Text>
@@ -427,11 +429,11 @@ export default function ExploreScreen() {
             <ScrollView showsVerticalScrollIndicator={false} className="mb-4">
               <Text className="text-white font-semibold mb-3 ml-2 text-lg">Thể Loại</Text>
               <View className="flex-row flex-wrap gap-2 px-2 pb-6">
-                <TouchableOpacity onPress={() => setSelectedCategory('all')} className={`px-4 py-2.5 border rounded-full ${selectedCategory === 'all' ? 'bg-[#E6BF5C] border-[#E6BF5C]' : 'bg-transparent border-white/20'}`}>
+                <TouchableOpacity onPress={() => setSelectedCategory('all')} className={`px-4 py-2.5 border rounded-full ${selectedCategory === 'all' ? 'bg-[#8FA7C5] border-[#8FA7C5]' : 'bg-transparent border-white/20'}`}>
                   <Text className={selectedCategory === 'all' ? 'text-black font-semibold' : 'text-gray-300'}>Tất cả</Text>
                 </TouchableOpacity>
                 {categories.map((c: any) => (
-                  <TouchableOpacity key={c.slug} onPress={() => setSelectedCategory(c.slug)} className={`px-4 py-2.5 border rounded-full ${selectedCategory === c.slug ? 'bg-[#E6BF5C] border-[#E6BF5C]' : 'bg-transparent border-white/20'}`}>
+                  <TouchableOpacity key={c.slug} onPress={() => setSelectedCategory(c.slug)} className={`px-4 py-2.5 border rounded-full ${selectedCategory === c.slug ? 'bg-[#8FA7C5] border-[#8FA7C5]' : 'bg-transparent border-white/20'}`}>
                     <Text className={selectedCategory === c.slug ? 'text-black font-semibold' : 'text-gray-300'}>{c.name}</Text>
                   </TouchableOpacity>
                 ))}
@@ -439,11 +441,11 @@ export default function ExploreScreen() {
 
               <Text className="text-white font-semibold mb-3 ml-2 text-lg">Quốc Gia</Text>
               <View className="flex-row flex-wrap gap-2 px-2 pb-6">
-                <TouchableOpacity onPress={() => setSelectedCountry('all')} className={`px-4 py-2.5 border rounded-full ${selectedCountry === 'all' ? 'bg-[#E6BF5C] border-[#E6BF5C]' : 'bg-transparent border-white/20'}`}>
+                <TouchableOpacity onPress={() => setSelectedCountry('all')} className={`px-4 py-2.5 border rounded-full ${selectedCountry === 'all' ? 'bg-[#8FA7C5] border-[#8FA7C5]' : 'bg-transparent border-white/20'}`}>
                   <Text className={selectedCountry === 'all' ? 'text-black font-semibold' : 'text-gray-300'}>Tất cả</Text>
                 </TouchableOpacity>
                 {countries.map((c: any) => (
-                  <TouchableOpacity key={c.slug} onPress={() => setSelectedCountry(c.slug)} className={`px-4 py-2.5 border rounded-full ${selectedCountry === c.slug ? 'bg-[#E6BF5C] border-[#E6BF5C]' : 'bg-transparent border-white/20'}`}>
+                  <TouchableOpacity key={c.slug} onPress={() => setSelectedCountry(c.slug)} className={`px-4 py-2.5 border rounded-full ${selectedCountry === c.slug ? 'bg-[#8FA7C5] border-[#8FA7C5]' : 'bg-transparent border-white/20'}`}>
                     <Text className={selectedCountry === c.slug ? 'text-black font-semibold' : 'text-gray-300'}>{c.name}</Text>
                   </TouchableOpacity>
                 ))}
@@ -451,11 +453,11 @@ export default function ExploreScreen() {
 
               <Text className="text-white font-semibold mb-3 ml-2 text-lg">Năm Phát Hành</Text>
               <View className="flex-row flex-wrap gap-2 px-2 pb-6">
-                <TouchableOpacity onPress={() => setSelectedYear('all')} className={`px-4 py-2.5 border rounded-full ${selectedYear === 'all' ? 'bg-[#E6BF5C] border-[#E6BF5C]' : 'bg-transparent border-white/20'}`}>
+                <TouchableOpacity onPress={() => setSelectedYear('all')} className={`px-4 py-2.5 border rounded-full ${selectedYear === 'all' ? 'bg-[#8FA7C5] border-[#8FA7C5]' : 'bg-transparent border-white/20'}`}>
                   <Text className={selectedYear === 'all' ? 'text-black font-semibold' : 'text-gray-300'}>Tất cả</Text>
                 </TouchableOpacity>
                 {years.map((y) => (
-                  <TouchableOpacity key={y} onPress={() => setSelectedYear(y.toString())} className={`px-4 py-2.5 border rounded-full ${selectedYear === y.toString() ? 'bg-[#E6BF5C] border-[#E6BF5C]' : 'bg-transparent border-white/20'}`}>
+                  <TouchableOpacity key={y} onPress={() => setSelectedYear(y.toString())} className={`px-4 py-2.5 border rounded-full ${selectedYear === y.toString() ? 'bg-[#8FA7C5] border-[#8FA7C5]' : 'bg-transparent border-white/20'}`}>
                     <Text className={selectedYear === y.toString() ? 'text-black font-semibold' : 'text-gray-300'}>{y}</Text>
                   </TouchableOpacity>
                 ))}
@@ -466,7 +468,7 @@ export default function ExploreScreen() {
               <TouchableOpacity onPress={() => { setSelectedCategory('all'); setSelectedCountry('all'); setSelectedYear('all'); }} className="flex-1 py-4 bg-white/5 rounded-2xl items-center border border-white/10">
                 <Text className="text-white font-bold text-base">Xóa Bô Lọc</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => setIsFilterVisible(false)} className="flex-[1.5] py-4 bg-[#E6BF5C] rounded-2xl items-center shadow-[0_4px_14px_rgba(244,200,74,0.39)]">
+              <TouchableOpacity onPress={() => setIsFilterVisible(false)} className="flex-[1.5] py-4 bg-[#8FA7C5] rounded-2xl items-center shadow-[0_4px_14px_rgba(143,167,197,0.39)]">
                 <Text className="text-black font-bold text-base">Áp Dụng</Text>
               </TouchableOpacity>
             </View>

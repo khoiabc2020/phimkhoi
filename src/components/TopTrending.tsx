@@ -57,7 +57,7 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
                                     "font-black text-lg md:text-xl italic",
                                     index === 0 ? "text-[#c6d6ea]" :
                                         index === 1 ? "text-gray-200" :
-                                            index === 2 ? "text-orange-400" : "text-white"
+                                            index === 2 ? "text-[#8fa7c5]" : "text-white"
                                 )} style={{ fontFamily: 'var(--font-outfit)' }}>
                                     {index + 1}
                                 </span>

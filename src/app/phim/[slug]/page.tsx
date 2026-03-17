@@ -245,7 +245,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                 {movie?.year}
                             </span>
                         )}
-                        <span className="px-2.5 py-0.5 rounded border border-[#F4C84A]/40 bg-[#F4C84A]/10 text-[#F4C84A] text-[11px] font-bold leading-none uppercase">
+                        <span className="px-2.5 py-0.5 rounded border border-[#8FA7C5]/40 bg-[#8FA7C5]/10 text-[#8FA7C5] text-[11px] font-bold leading-none uppercase">
                             {movie?.quality || "FHD"}
                         </span>
                     </div>
@@ -270,8 +270,8 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                     </>
                                 ) : (
                                     <>
-                                        <span className="inline-flex items-center gap-1.5 bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-2.5 py-0.5 rounded-full text-xs font-bold">
-                                            <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse inline-block" />
+                                        <span className="inline-flex items-center gap-1.5 bg-[#8FA7C5]/20 text-[#8FA7C5] border border-[#8FA7C5]/30 px-2.5 py-0.5 rounded-full text-xs font-bold">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-[#8FA7C5] animate-pulse inline-block" />
                                             Đang chiếu
                                         </span>
                                         <span className="text-gray-300 text-xs font-medium">Tập {epNum} / {total}</span>
@@ -297,7 +297,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         {serverData.length > 0 && (
                             <Link
                                 href={`/xem-phim/${movie?.slug}/${serverData[0].slug}`}
-                                className="flex items-center justify-center bg-[#F4C84A] text-black px-5 sm:px-6 py-2.5 rounded-full font-bold text-sm hover:brightness-110 hover:scale-105 transition-all"
+                                className="flex items-center justify-center bg-[#8FA7C5] text-[#050507] px-5 sm:px-6 py-2.5 rounded-full font-bold text-sm hover:brightness-110 hover:scale-105 transition-all"
                             >
                                 CHIẾU PHÁT
                             </Link>
@@ -350,7 +350,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         />
                         {/* Comment Section below tabs */}
                         <div className="mt-8 sm:mt-12">
-                            <div className="flex items-center gap-2 mb-6 border-l-2 border-[#F4C84A] pl-3">
+                            <div className="flex items-center gap-2 mb-6 border-l-2 border-[#8FA7C5] pl-3">
                                 <h3 className="text-[15px] font-bold text-white uppercase tracking-widest">Bình luận</h3>
                             </div>
                             <CommentSection movieId={movie._id} movieSlug={movie.slug} />
@@ -362,7 +362,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         <div className="rounded-[10px] border border-white/[0.06] bg-[#07070b]/78 p-4 sm:p-5 space-y-6 sm:space-y-8 shadow-[0_10px_24px_#00000066]">
                         {/* Nội dung */}
                         <div>
-                            <div className="flex items-center gap-2 mb-3 sm:mb-4 border-l-2 border-[#F4C84A] pl-3">
+                            <div className="flex items-center gap-2 mb-3 sm:mb-4 border-l-2 border-[#8FA7C5] pl-3">
                                 <h3 className="text-[14px] sm:text-[15px] font-bold text-white uppercase tracking-widest">Nội dung</h3>
                             </div>
                             <div className="text-[13px] text-gray-400 leading-relaxed font-light text-justify line-clamp-6 sm:line-clamp-[12]" dangerouslySetInnerHTML={{ __html: movie?.content }} />
@@ -385,7 +385,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             <div className="text-[11px] font-medium text-gray-400 uppercase tracking-widest mb-3">Thể loại</div>
                             <div className="flex flex-wrap gap-2">
                                 {movie?.category?.map((c: { slug?: string; name?: string; id?: string }) => (
-                                    <Link key={c.id} href={`/the-loai/${c.slug}`} className="text-[11px] font-medium text-gray-300 bg-white/[0.08] border border-white/[0.14] py-1.5 px-3 rounded-full hover:text-white hover:border-[#F4C84A]/50 transition-colors uppercase tracking-wider">{c.name}</Link>
+                                    <Link key={c.id} href={`/the-loai/${c.slug}`} className="text-[11px] font-medium text-gray-300 bg-white/[0.08] border border-white/[0.14] py-1.5 px-3 rounded-full hover:text-white hover:border-[#8FA7C5]/50 transition-colors uppercase tracking-wider">{c.name}</Link>
                                 ))}
                             </div>
                         </div>
