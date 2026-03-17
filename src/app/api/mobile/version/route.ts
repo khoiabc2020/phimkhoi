@@ -3,11 +3,24 @@ import dbConnect from '@/lib/db';
 import { AppVersion } from '@/models/AppVersion';
 
 export const dynamic = 'force-dynamic';
+const API_DOWNLOAD_BASE = "https://khoiphim.io.vn/api/download/apk";
+const toVersionTag = (version: string) => {
+    const v = String(version || "").trim();
+    if (!v) return "";
+    return v.startsWith("v") ? v : `v${v}`;
+};
+const buildDownloadUrl = (version: string, explicitUrl?: string) => {
+    if (explicitUrl && explicitUrl.trim()) return explicitUrl;
+    const tag = toVersionTag(version);
+    if (!tag) return API_DOWNLOAD_BASE;
+    return `${API_DOWNLOAD_BASE}?v=${encodeURIComponent(tag)}`;
+};
+
 const FALLBACK_VERSION = {
     version: "1.0.9",
     build: 10,
     force_update: false,
-    download_url: "https://khoiphim.io.vn/downloads/PhimKhoi-Release.apk",
+    download_url: buildDownloadUrl("1.0.9"),
     change_log: "Sửa crash đăng ký/đăng nhập và tối ưu HeroSection vuốt mượt hơn",
 };
 
@@ -19,11 +32,12 @@ export async function GET() {
         const latestVersion = await AppVersion.findOne().sort({ createdAt: -1 });
 
         if (latestVersion && Number(latestVersion.build || 0) >= FALLBACK_VERSION.build) {
+            const latestVersionStr = String(latestVersion.version || "");
             return NextResponse.json({
-                version: latestVersion.version,
+                version: latestVersionStr,
                 build: latestVersion.build,
                 force_update: latestVersion.force_update,
-                download_url: latestVersion.download_url,
+                download_url: buildDownloadUrl(latestVersionStr, latestVersion.download_url),
                 change_log: latestVersion.change_log
             });
         }
@@ -47,7 +61,7 @@ export async function POST(req: Request) {
             version: body.version,
             build: body.build,
             force_update: body.force_update || false,
-            download_url: body.download_url,
+            download_url: buildDownloadUrl(body.version, body.download_url),
             change_log: body.change_log
         });
 
