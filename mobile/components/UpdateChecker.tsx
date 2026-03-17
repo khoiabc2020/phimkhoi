@@ -9,8 +9,8 @@ import { CONFIG } from '@/constants/config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Version hiện tại của ứng dụng — cập nhật mỗi lần build
-const CURRENT_VERSION = '1.0.8';
-const CURRENT_BUILD = 9;
+const CURRENT_VERSION = '1.0.9';
+const CURRENT_BUILD = 10;
 
 const SKIP_KEY = 'skipped_update_build';
 

@@ -4,11 +4,11 @@ import { AppVersion } from '@/models/AppVersion';
 
 export const dynamic = 'force-dynamic';
 const FALLBACK_VERSION = {
-    version: "1.0.8",
-    build: 9,
+    version: "1.0.9",
+    build: 10,
     force_update: false,
     download_url: "https://khoiphim.io.vn/downloads/PhimKhoi-Release.apk",
-    change_log: "Sửa lỗi đăng ký/đăng nhập mobile và nâng độ ổn định ứng dụng",
+    change_log: "Sửa crash đăng ký/đăng nhập và tối ưu HeroSection vuốt mượt hơn",
 };
 
 export async function GET() {

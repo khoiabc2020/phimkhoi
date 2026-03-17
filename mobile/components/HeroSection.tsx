@@ -108,13 +108,21 @@ export default function HeroSection({ movies }: HeroSectionProps) {
     // Smooth cross-fade when active slide changes
     const handleSnapToItem = useCallback((index: number) => {
         if (!movies[index]) return;
-        setActiveIndex(index);
+        setActiveIndex((prev) => (prev === index ? prev : index));
         const newUri = getBackdropUri(movies[index]);
+        // Avoid state churn if the uri does not actually change.
+        let changed = false;
+        setBackdropUris((prev) => {
+            const current = prev[1];
+            if (current === newUri) return prev;
+            changed = true;
+            return [current, newUri];
+        });
+        if (!changed) return;
         // Swap URI first, then fade in the new layer to avoid black flash.
-        setBackdropUris(([, current]) => [current, newUri]);
         bgOpacity.value = 0;
         bgOpacity.value = withTiming(1, { duration: 280, easing: Easing.out(Easing.cubic) });
-    }, [movies, bgOpacity]);
+    }, [movies, bgOpacity, getBackdropUri]);
 
     const bgAnimStyle = useAnimatedStyle(() => ({
         opacity: bgOpacity.value,
@@ -193,18 +201,18 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                     source={{ uri: backdropUris[0] }}
                     style={StyleSheet.absoluteFill}
                     contentFit="cover"
-                    blurRadius={Platform.OS === 'ios' ? 8 : 0}
+                    blurRadius={Platform.OS === 'ios' ? 4 : 0}
                     cachePolicy="memory-disk"
-                    transition={120}
+                    transition={80}
                 />
                 <Animated.View style={[StyleSheet.absoluteFill, bgAnimStyle]}>
                     <Image
                         source={{ uri: activeBackdropUri }}
                         style={StyleSheet.absoluteFill}
                         contentFit="cover"
-                        blurRadius={Platform.OS === 'ios' ? 8 : 0}
+                        blurRadius={Platform.OS === 'ios' ? 4 : 0}
                         cachePolicy="memory-disk"
-                        transition={120}
+                        transition={80}
                     />
                 </Animated.View>
                 <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(11,13,24,0.72)' }]} />
@@ -229,6 +237,10 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                     pagingEnabled={true}
                     snapEnabled={true}
                     windowSize={3}
+                    panGestureHandlerProps={{
+                        activeOffsetX: [-12, 12],
+                        failOffsetY: [-10, 10],
+                    }}
                     onSnapToItem={handleSnapToItem}
                     renderItem={renderHeroItem}
                 />
