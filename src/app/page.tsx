@@ -4,7 +4,6 @@ import MovieRow from "@/components/MovieRow";
 import TopTrendingTabs from "@/components/TopTrendingTabs";
 import QuickNav from "@/components/QuickNav";
 import ContinueWatchingRow from "@/components/ContinueWatchingRow";
-import MyListRow from "@/components/MyListRow";
 import TopicSection from "@/components/TopicSection";
 import HomeSection from "@/components/HomeSection";
 import LazySection from "@/components/LazySection";
@@ -163,7 +162,6 @@ async function HomeContentStream() {
         <LazySection minHeight={360}>
           <HomeSection title="Đề xuất cho bạn">
             <ContinueWatchingRow />
-            <MyListRow />
             {homeData.phimChieuRap?.length ? (
               <MovieRow title="Phim Chiếu Rạp Mới" movies={homeData.phimChieuRap.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.phimChieuRap} />
             ) : null}

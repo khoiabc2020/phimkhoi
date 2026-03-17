@@ -30,17 +30,27 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     if (!movie) return { title: "Không tìm thấy phim - Khôi Phim" };
 
     // Giới hạn description để SEO tốt hơn
-    const desc = movie.content ? movie.content.replace(/<[^>]+>/g, '').substring(0, 160) + '...' : "";
+    const desc = movie.content ? movie.content.replace(/<[^>]+>/g, '').substring(0, 160) + '...' : `Xem phim ${movie.name} chất lượng cao tại MovieBox.`;
+    const poster = getImageUrl(movie.poster_url || movie.thumb_url || "");
+    const url = `https://khoiphim.io.vn/phim/${slug}`;
 
     return {
         title: `${movie.name || "Phim"} - Xem phim tại Khôi Phim`,
         description: desc,
+        alternates: {
+            canonical: url,
+        },
+        robots: {
+            index: true,
+            follow: true,
+        },
         openGraph: {
             title: `${movie.name} | ${movie.origin_name}`,
             description: desc,
+            url,
             images: [
                 {
-                    url: movie.poster_url || movie.thumb_url || "",
+                    url: poster,
                     width: 800,
                     height: 1200,
                     alt: movie.name,
@@ -48,9 +58,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
             ],
             type: "video.movie",
         },
-        alternates: {
-            canonical: `https://khoiphim.com/phim/${slug}`
-        }
+        twitter: {
+            card: "summary_large_image",
+            title: `${movie.name} | MovieBox`,
+            description: desc,
+            images: [poster],
+        },
     };
 }
 

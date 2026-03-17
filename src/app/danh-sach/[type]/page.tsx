@@ -51,9 +51,19 @@ const TYPE_NAMES: Record<string, string> = {
 export async function generateMetadata({ params }: { params: Promise<{ type: string }> }): Promise<Metadata> {
     const { type } = await params;
     const typeName = TYPE_NAMES[type] || "Danh Sách Phim";
+    const canonical = `https://khoiphim.io.vn/danh-sach/${type}`;
     return {
         title: `${typeName} - Khôi Phim`,
         description: `Xem ${typeName} chất lượng cao tại Khôi Phim.`,
+        alternates: {
+            canonical,
+        },
+        openGraph: {
+            title: `${typeName} | MovieBox`,
+            description: `Xem ${typeName} chất lượng cao tại Khôi Phim.`,
+            url: canonical,
+            type: "website",
+        },
     };
 }
 

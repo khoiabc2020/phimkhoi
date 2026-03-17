@@ -4,6 +4,16 @@ import { searchMovies } from "@/services/api";
 import { searchTMDBPerson } from "@/services/tmdb";
 import { SearchX, User } from "lucide-react";
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Tìm kiếm phim",
+    description: "Tìm kiếm phim, diễn viên và nội dung tại MovieBox.",
+    robots: {
+        index: false,
+        follow: true,
+    },
+};
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q: string; category?: string; country?: string; year?: string }> }) {
     const { q, category, country, year } = await searchParams;

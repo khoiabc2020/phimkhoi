@@ -34,6 +34,13 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
     return {
         title: `Xem phim ${movie.name} - Tập ${currentEpisode?.name || episode} | MovieBox`,
         description: `Xem phim ${movie.name} tập ${currentEpisode?.name || episode} vietsub.`,
+        alternates: {
+            canonical: `https://khoiphim.io.vn/phim/${slug}`,
+        },
+        robots: {
+            index: false,
+            follow: true,
+        },
         openGraph: { images: [getImageUrl(movie.poster_url || movie.thumb_url)] },
     };
 }

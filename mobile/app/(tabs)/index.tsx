@@ -54,39 +54,6 @@ const detectBucket = (movie: Partial<Movie>): RecoFilterKey => {
   return 'all';
 };
 
-const normalizeToMovie = (item: any): Movie | null => {
-  const slug = item?.slug || item?.movieSlug || item?.movie?.slug;
-  if (!slug) return null;
-  return {
-    _id: String(item?._id || slug),
-    slug,
-    name: item?.name || item?.movieName || item?.movie?.name || 'Unknown',
-    origin_name: item?.origin_name || item?.movieOriginName || item?.movie?.origin_name || '',
-    content: item?.content || '',
-    type: item?.type || item?.movie?.type || 'movie',
-    status: item?.status || '',
-    thumb_url: item?.thumb_url || item?.moviePoster || item?.movie?.thumb_url || item?.poster_url || '',
-    poster_url: item?.poster_url || item?.moviePoster || item?.movie?.poster_url || item?.thumb_url || '',
-    is_copyright: false,
-    sub_docquyen: false,
-    chieurap: false,
-    trailer_url: '',
-    time: item?.time || '',
-    episode_current: item?.episode_current || '',
-    episode_total: item?.episode_total || '',
-    quality: item?.quality || item?.movieQuality || 'HD',
-    lang: item?.lang || '',
-    notify: '',
-    showtimes: '',
-    year: Number(item?.year || item?.movieYear || new Date().getFullYear()),
-    view: Number(item?.view || 0),
-    actor: Array.isArray(item?.actor) ? item.actor : [],
-    director: Array.isArray(item?.director) ? item.director : [],
-    category: Array.isArray(item?.category) ? item.category : [],
-    country: Array.isArray(item?.country) ? item.country : [],
-    episodes: Array.isArray(item?.episodes) ? item.episodes : [],
-  };
-};
 
 const NAV_PILLS = [
   { label: 'Đề xuất', href: '/(tabs)/explore', active: true },
@@ -248,18 +215,6 @@ export default function HomeScreen() {
       movie: (data.phimLe || []).slice(0, 10),
     };
   }, [data]);
-
-  const watchListMovies = useMemo(() => {
-    const raw = Array.isArray(user?.watchlist) ? user.watchlist : [];
-    const bySlug = new Map<string, Movie>();
-    for (const item of raw) {
-      const normalized = normalizeToMovie(item);
-      if (!normalized || bySlug.has(normalized.slug)) continue;
-      bySlug.set(normalized.slug, normalized);
-      if (bySlug.size >= 12) break;
-    }
-    return Array.from(bySlug.values());
-  }, [user?.watchlist]);
 
   const recommendationBundle = useMemo(() => {
     const historyRaw = Array.isArray(user?.history) ? user.history : [];
@@ -477,12 +432,9 @@ export default function HomeScreen() {
           ) : (
             <View style={styles.movieRows}>
               {/* Đề xuất cho bạn — đồng bộ web */}
-              {(watchListMovies.length > 0 || recommendationBundle.items.length > 0 || data.phimChieuRap.length > 0 || data.phimMoi.length > 0) && (
+              {(recommendationBundle.items.length > 0 || data.phimChieuRap.length > 0 || data.phimMoi.length > 0) && (
                 <View style={[styles.sectionBlock, { marginTop: 10 }]}>
                   <Text style={styles.sectionTitleText}>Đề xuất cho bạn</Text>
-                  {watchListMovies.length > 0 && (
-                    <MovieRow title="Danh sách của bạn" movies={watchListMovies} />
-                  )}
                   {recommendationBundle.items.length > 0 && (
                     <View style={{ marginBottom: 8 }}>
                       {recommendationBundle.seeds.length > 0 && (

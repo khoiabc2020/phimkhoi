@@ -30,11 +30,41 @@ export const metadata: Metadata = {
   keywords: ["xem phim", "phim online", "phim vietsub", "phim hay", "phim mới", "MovieBox"],
   authors: [{ name: "MovieBox" }],
   creator: "MovieBox",
-  robots: { index: true, follow: true },
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-video-preview": -1,
+      "max-snippet": -1,
+    },
+  },
   openGraph: {
+    title: "MovieBox - Xem Phim Online Chất Lượng Cao",
+    description: "Xem phim online chất lượng cao vietsub, lồng tiếng, thuyết minh. Phim mới cập nhật hàng ngày, hoàn toàn miễn phí.",
     type: "website",
+    url: "https://khoiphim.io.vn",
     locale: "vi_VN",
     siteName: "MovieBox",
+    images: [
+      {
+        url: "/logo.png",
+        width: 512,
+        height: 512,
+        alt: "MovieBox",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "MovieBox - Xem Phim Online Chất Lượng Cao",
+    description: "Xem phim online chất lượng cao vietsub, lồng tiếng, thuyết minh. Phim mới cập nhật hàng ngày, hoàn toàn miễn phí.",
+    images: ["/logo.png"],
   },
   manifest: "/manifest.json",
 };
