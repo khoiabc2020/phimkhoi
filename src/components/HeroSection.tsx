@@ -177,7 +177,6 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                                     sizes="100vw"
                                     placeholder="blur"
                                     blurDataURL={blurData}
-                                    unoptimized
                                     decoding="async"
                                 />
                                 {/* Gradient overlay */}
@@ -225,7 +224,6 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                                     sizes="72px"
                                     placeholder="blur"
                                     blurDataURL={blurData}
-                                    unoptimized
                                     loading={isActive ? "eager" : "lazy"}
                                     decoding="async"
                                     priority={isActive && i < 2}
@@ -320,7 +318,6 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                             className="object-cover object-[66%_18%] opacity-[0.32] scale-[1.06] blur-2xl"
                             priority={isActive && i < 2}
                             loading={isActive ? "eager" : "lazy"}
-                            unoptimized
                             sizes="100vw"
                             placeholder="blur"
                             blurDataURL={blurData}
@@ -333,7 +330,6 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                             className="object-cover object-[66%_18%] opacity-[0.94]"
                             priority={isActive && i < 2}
                             loading={isActive ? "eager" : "lazy"}
-                            unoptimized
                             sizes="100vw"
                             placeholder="blur"
                             blurDataURL={blurData}
@@ -502,7 +498,6 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                                             className="object-cover group-hover/poster:scale-[1.03] transition-transform duration-200 ease-out"
                                             priority={isActive && i < 2}
                                             loading={isActive ? "eager" : "lazy"}
-                                            unoptimized
                                             sizes="(min-width: 1280px) 310px, (min-width: 1024px) 260px, 200px"
                                             placeholder="blur"
                                             blurDataURL={blurData}

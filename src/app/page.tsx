@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { cache } from "react";
 import HeroSection from "@/components/HeroSection";
 import MovieRow from "@/components/MovieRow";
 import TopTrendingTabs from "@/components/TopTrendingTabs";
@@ -12,6 +13,7 @@ import { getTMDBDataForCard } from "@/app/actions/tmdb";
 
 export const revalidate = 3600;
 const ROW_LIMIT = 10;
+const getCachedHomeData = cache(getHomeData);
 
 const heroSkeleton = <div className="w-full h-[66vh] md:h-[88vh] bg-[#050507] animate-pulse" />;
 const contentSkeleton = (
@@ -132,7 +134,7 @@ async function HeroStream() {
   const heroTrending = await getTrendMovies('all').catch((): any[] => []);
   let finalHeroData: any[] = (heroTrending || []).slice(0, 5);
   if (finalHeroData.length < 4) {
-    const home = await getHomeData();
+    const home = await getCachedHomeData();
     const heroMixed: any[] = [];
     const len = Math.max((home.phimBo || []).length, (home.phimLe || []).length);
     for (let i = 0; i < len; i++) {
@@ -146,7 +148,7 @@ async function HeroStream() {
 
 /** Nội dung trang chủ: đợi getHomeData (cache 20 phút) → stream khi xong */
 async function HomeContentStream() {
-  const homeData = await getHomeData();
+  const homeData = await getCachedHomeData();
 
   return (
     <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 relative z-20 pb-16">

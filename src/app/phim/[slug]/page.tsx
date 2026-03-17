@@ -211,7 +211,6 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             alt={movie?.name || ""}
                             fill
                             priority
-                            unoptimized
                             className="object-cover object-[68%_22%] opacity-[0.32] scale-[1.06] blur-2xl"
                             sizes="100vw"
                             placeholder="blur"
@@ -222,7 +221,6 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             alt={movie?.name || ""}
                             fill
                             priority
-                            unoptimized
                             className="object-cover object-[62%_20%] sm:object-contain sm:object-right opacity-[0.95]"
                             sizes="100vw"
                             placeholder="blur"

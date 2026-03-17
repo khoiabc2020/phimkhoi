@@ -203,7 +203,6 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                                 noCropPortrait ? "object-contain bg-[#0a0f1a]" : "object-cover"
                             )}
                             sizes={orientation === 'landscape' ? "(max-width: 768px) 68vw, 36vw" : "(max-width: 768px) 48vw, (max-width: 1280px) 220px, 250px"}
-                            unoptimized
                             loading="lazy"
                             priority={false}
                             placeholder="blur"
@@ -341,7 +340,6 @@ function OnflixHoverCard({
                                 alt={decodeHtml(movie.name) || movie.slug || "Phim"}
                                 fill
                                 className={`object-cover object-top transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
-                                unoptimized
                                 priority
                                 onLoad={() => setImgLoaded(true)}
                                 onError={() => { setImgLoaded(true); setHasError(true); }}
