@@ -47,7 +47,7 @@ const ContinueWatchingRow = memo(({ title, items }: ContinueWatchingRowProps) =>
                 </View>
                 <Pressable onPress={() => router.push('/history' as any)} style={styles.seeAllBtn}>
                     <Text style={styles.seeAllText}>Xem tất cả</Text>
-                    <Ionicons name="chevron-forward" size={16} color="#E6BF5C" />
+                    <Ionicons name="chevron-forward" size={16} color="#8FA7C5" />
                 </Pressable>
             </View>
 
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
     },
     seeAllText: {
-        color: '#E6BF5C',
+        color: '#8FA7C5',
         fontSize: 13,
         fontWeight: '600',
     },
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
         width: 3,
         height: 18,
         borderRadius: 2,
-        backgroundColor: '#fbbf24', // Standard App Gold
+        backgroundColor: '#8FA7C5',
     },
     title: {
         color: '#ffffff',
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     },
     progressFill: {
         height: '100%',
-        backgroundColor: '#E6BF5C', // Phục hồi màu vàng gốc
+        backgroundColor: '#8FA7C5',
         borderTopRightRadius: 2,
         borderBottomRightRadius: 2,
     },
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
         marginTop: 4,
     },
     progressText: {
-        color: 'rgba(230,191,92,0.9)',
+        color: '#c7d7ea',
         fontSize: 11,
         fontWeight: '600',
     },

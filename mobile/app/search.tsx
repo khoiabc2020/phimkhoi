@@ -40,6 +40,10 @@ const YEARS = Array.from({ length: 10 }, (_, i) => {
 });
 
 const POPULAR_QUERIES = ['Phim hành động 2024', 'Phim Hàn Quốc', 'Phim kinh dị', 'Phim hoạt hình', 'Phim tình cảm', 'Phim viễn tưởng'];
+const ACCENT = '#8FA7C5';
+const ACCENT_SOFT = 'rgba(143,167,197,0.16)';
+const ACCENT_BORDER = 'rgba(143,167,197,0.36)';
+const SEARCH_CACHE_TTL = 2 * 60 * 1000;
 
 interface SearchResult {
     _id: string; name: string; slug: string; thumb_url: string;
@@ -61,6 +65,9 @@ export default function SearchScreen() {
     const [history, setHistory] = useState<string[]>([]);
     const [popularMovies, setPopularMovies] = useState<SearchResult[]>([]);
     const [popularLoading, setPopularLoading] = useState(true);
+    const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const requestSeqRef = useRef(0);
+    const searchCacheRef = useRef(new Map<string, { ts: number; movies: SearchResult[]; actors: any[] }>());
 
     // Filter state
     const [filterOpen, setFilterOpen] = useState(false);
@@ -105,30 +112,73 @@ export default function SearchScreen() {
 
     const doSearch = useCallback(async (text: string, sMode: SearchMode = mode) => {
         const trimmed = text.trim();
-        setQuery(text);
         if (trimmed.length < 2) {
             setResults([]); setActorResults([]); setSearched(false);
             return;
         }
-        setLoading(true); setSearched(true);
+        setSearched(true);
+        const cacheKey = `${sMode}:${trimmed.toLowerCase()}`;
+        const cacheHit = searchCacheRef.current.get(cacheKey);
+        if (cacheHit && Date.now() - cacheHit.ts < SEARCH_CACHE_TTL) {
+            setResults(cacheHit.movies);
+            setActorResults(cacheHit.actors);
+            setLoading(false);
+            return;
+        }
+
+        const reqId = ++requestSeqRef.current;
+        setLoading(true);
         try {
             if (sMode === 'actor') {
                 const actors = await searchActors(trimmed);
+                if (reqId !== requestSeqRef.current) return;
                 setActorResults(actors); setResults([]);
+                searchCacheRef.current.set(cacheKey, { ts: Date.now(), movies: [], actors });
             } else {
                 const [items, actors] = await Promise.all([
-                    searchMovies(trimmed),
+                    searchMovies(trimmed, 12),
                     searchActors(trimmed)
                 ]);
+                if (reqId !== requestSeqRef.current) return;
                 setResults(items); setActorResults(actors);
+                searchCacheRef.current.set(cacheKey, { ts: Date.now(), movies: items, actors });
             }
-        } catch { setResults([]); setActorResults([]); } finally { setLoading(false); }
+        } catch {
+            if (reqId !== requestSeqRef.current) return;
+            setResults([]);
+            setActorResults([]);
+        } finally {
+            if (reqId === requestSeqRef.current) setLoading(false);
+        }
     }, [mode]);
 
-    const handleSearch = (text: string) => doSearch(text, mode);
+    const handleSearch = (text: string) => {
+        setQuery(text);
+        if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+
+        const trimmed = text.trim();
+        if (trimmed.length < 2) {
+            requestSeqRef.current += 1;
+            setLoading(false);
+            setResults([]);
+            setActorResults([]);
+            setSearched(false);
+            return;
+        }
+
+        setLoading(true); // instant lightweight feedback when query changes
+        setSearched(true);
+        debounceTimerRef.current = setTimeout(() => {
+            doSearch(trimmed, mode);
+        }, 280);
+    };
 
     const handleSubmit = () => {
-        if (query.trim().length >= 2) saveHistory(query.trim());
+        if (query.trim().length >= 2) {
+            if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+            doSearch(query, mode);
+            saveHistory(query.trim());
+        }
     };
 
     const handleHistoryTap = (q: string) => {
@@ -141,6 +191,12 @@ export default function SearchScreen() {
         doSearch(q, mode);
         saveHistory(q);
     };
+
+    useEffect(() => {
+        return () => {
+            if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+        };
+    }, []);
 
     const handleFilterApply = async () => {
         setFilterOpen(false);
@@ -206,7 +262,15 @@ export default function SearchScreen() {
                         clearButtonMode="while-editing"
                     />
                     {query.length > 0 && (
-                        <TouchableOpacity onPress={() => { setQuery(''); setResults([]); setSearched(false); }}>
+                        <TouchableOpacity onPress={() => {
+                            if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+                            requestSeqRef.current += 1;
+                            setQuery('');
+                            setLoading(false);
+                            setResults([]);
+                            setActorResults([]);
+                            setSearched(false);
+                        }}>
                             <Ionicons name="close-circle" size={18} color="rgba(255,255,255,0.4)" />
                         </TouchableOpacity>
                     )}
@@ -216,7 +280,7 @@ export default function SearchScreen() {
                     style={[styles.filterBtn, hasActiveFilter && styles.filterBtnActive]}
                     onPress={() => setFilterOpen(true)}
                 >
-                    <Ionicons name="options-outline" size={20} color={hasActiveFilter ? '#fbbf24' : 'white'} />
+                    <Ionicons name="options-outline" size={20} color={hasActiveFilter ? ACCENT : 'white'} />
                 </TouchableOpacity>
             </View>
 
@@ -240,7 +304,7 @@ export default function SearchScreen() {
 
             {/* Content */}
             {loading ? (
-                <View style={styles.center}><ActivityIndicator size="large" color="#fbbf24" /></View>
+                <View style={styles.center}><ActivityIndicator size="large" color={ACCENT} /></View>
             ) : searched && results.length === 0 && actorResults.length === 0 ? (
                 <View style={styles.center}>
                     <Ionicons name="search-outline" size={56} color="rgba(255,255,255,0.15)" />
@@ -283,7 +347,7 @@ export default function SearchScreen() {
                     {/* Popular Movies */}
                     {popularLoading ? (
                         <View style={{ alignItems: 'center', padding: 20 }}>
-                            <ActivityIndicator size="small" color="#fbbf24" />
+                            <ActivityIndicator size="small" color={ACCENT} />
                         </View>
                     ) : popularMovies.length > 0 && (
                         <View style={styles.section}>
@@ -310,7 +374,7 @@ export default function SearchScreen() {
                     ItemSeparatorComponent={() => <View style={styles.separator} />}
                     ListHeaderComponent={actorResults.length > 0 ? (
                         <View style={{ paddingHorizontal: 16, paddingTop: 12, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)', marginBottom: 4 }}>
-                            <Text style={{ color: '#E6BF5C', fontSize: 11, fontWeight: '700', letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 12 }}>
+                            <Text style={{ color: '#c7d7ea', fontSize: 11, fontWeight: '700', letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 12 }}>
                                 Diễn viên / Đạo diễn
                             </Text>
                             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 16 }}>
@@ -318,7 +382,7 @@ export default function SearchScreen() {
                                     const profileImg = actor.profile_path ? `https://image.tmdb.org/t/p/w185${actor.profile_path}` : null;
                                     return (
                                         <TouchableOpacity key={actor.id} onPress={() => router.push(`/dien-vien/${encodeURIComponent(actor.name)}` as any)} style={{ alignItems: 'center', width: 68 }}>
-                                            <View style={{ width: 60, height: 60, borderRadius: 30, overflow: 'hidden', borderWidth: 2, borderColor: 'rgba(244,200,74,0.4)', backgroundColor: '#1e293b', marginBottom: 6 }}>
+                                            <View style={{ width: 60, height: 60, borderRadius: 30, overflow: 'hidden', borderWidth: 2, borderColor: 'rgba(143,167,197,0.45)', backgroundColor: '#1e293b', marginBottom: 6 }}>
                                                 {profileImg ? (
                                                     <Image source={{ uri: profileImg }} style={{ width: '100%', height: '100%' }} contentFit="cover" />
                                                 ) : (
@@ -419,7 +483,7 @@ const styles = StyleSheet.create({
     },
     backBtn: { padding: 4 },
     filterBtn: { padding: 8, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-    filterBtnActive: { backgroundColor: 'rgba(251,191,36,0.15)', borderColor: '#fbbf24' },
+    filterBtnActive: { backgroundColor: ACCENT_SOFT, borderColor: ACCENT },
     searchBar: {
         flex: 1, flexDirection: 'row', alignItems: 'center',
         backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 14,
@@ -437,7 +501,7 @@ const styles = StyleSheet.create({
         borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.06)',
         borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
     },
-    modeBtnActive: { backgroundColor: '#fbbf24', borderColor: '#fbbf24' },
+    modeBtnActive: { backgroundColor: ACCENT, borderColor: ACCENT_BORDER },
     modeBtnText: { color: 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: '600' },
     modeBtnTextActive: { color: '#0B0D12' },
 
@@ -445,7 +509,7 @@ const styles = StyleSheet.create({
     section: { paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.04)' },
     sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
     sectionTitle: { color: 'rgba(255,255,255,0.9)', fontSize: 14, fontWeight: '700', letterSpacing: 0.3 },
-    sectionAction: { color: '#fbbf24', fontSize: 12, fontWeight: '600' },
+    sectionAction: { color: '#c7d7ea', fontSize: 12, fontWeight: '600' },
     historyItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, gap: 12 },
     historyText: { flex: 1, color: 'rgba(255,255,255,0.7)', fontSize: 14 },
     tagPill: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.07)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
@@ -465,8 +529,8 @@ const styles = StyleSheet.create({
     resultTitle: { color: 'white', fontSize: 14, fontWeight: '600', lineHeight: 20 },
     resultMeta: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     metaText: { color: 'rgba(255,255,255,0.45)', fontSize: 12 },
-    epBadge: { backgroundColor: 'rgba(251,191,36,0.15)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
-    epBadgeText: { color: '#fbbf24', fontSize: 11, fontWeight: '600' },
+    epBadge: { backgroundColor: ACCENT_SOFT, borderWidth: 1, borderColor: ACCENT_BORDER, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
+    epBadgeText: { color: '#c7d7ea', fontSize: 11, fontWeight: '600' },
     separator: { height: 1, backgroundColor: 'rgba(255,255,255,0.04)', marginLeft: 84 },
 
     // Filter Modal
@@ -475,17 +539,17 @@ const styles = StyleSheet.create({
     modalHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.2)', alignSelf: 'center', marginTop: 12, marginBottom: 4 },
     modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 14 },
     modalTitle: { color: 'white', fontSize: 17, fontWeight: '700' },
-    clearFilter: { color: '#fbbf24', fontSize: 13, fontWeight: '600' },
+    clearFilter: { color: '#c7d7ea', fontSize: 13, fontWeight: '600' },
     filterTabs: { flexDirection: 'row', paddingHorizontal: 20, gap: 8, marginBottom: 16 },
     filterTab: { flex: 1, paddingVertical: 10, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.06)', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-    filterTabActive: { backgroundColor: 'rgba(251,191,36,0.15)', borderColor: '#fbbf24' },
+    filterTabActive: { backgroundColor: ACCENT_SOFT, borderColor: ACCENT },
     filterTabText: { color: 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: '600' },
-    filterTabTextActive: { color: '#fbbf24' },
+    filterTabTextActive: { color: '#c7d7ea' },
     filterOptions: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 20, gap: 8, marginBottom: 16 },
     filterOption: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-    filterOptionActive: { backgroundColor: 'rgba(251,191,36,0.15)', borderColor: '#fbbf24' },
+    filterOptionActive: { backgroundColor: ACCENT_SOFT, borderColor: ACCENT },
     filterOptionText: { color: 'rgba(255,255,255,0.6)', fontSize: 13 },
-    filterOptionTextActive: { color: '#fbbf24', fontWeight: '600' },
-    applyBtn: { marginHorizontal: 20, marginTop: 12, paddingVertical: 14, borderRadius: 14, backgroundColor: '#fbbf24', alignItems: 'center' },
-    applyBtnText: { color: '#0B0D12', fontSize: 16, fontWeight: '700' },
+    filterOptionTextActive: { color: '#c7d7ea', fontWeight: '600' },
+    applyBtn: { marginHorizontal: 20, marginTop: 12, paddingVertical: 14, borderRadius: 14, backgroundColor: '#263243', borderWidth: 1, borderColor: ACCENT_BORDER, alignItems: 'center' },
+    applyBtnText: { color: '#d8e3f2', fontSize: 16, fontWeight: '700' },
 });

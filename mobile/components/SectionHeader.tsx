@@ -31,7 +31,7 @@ export default function SectionHeader({
                     <Ionicons
                         name={icon}
                         size={24}
-                        color={Colors.accent.yellow}
+                        color="#8FA7C5"
                         style={styles.icon}
                     />
                 )}
@@ -46,13 +46,13 @@ export default function SectionHeader({
                     <Link href={seeAllHref as any} asChild>
                         <Pressable style={styles.seeAllButton}>
                             <Text style={styles.seeAllText}>Xem tất cả</Text>
-                            <Ionicons name="chevron-forward" size={16} color={Colors.accent.yellow} />
+                            <Ionicons name="chevron-forward" size={16} color="#8FA7C5" />
                         </Pressable>
                     </Link>
                 ) : (
                     <Pressable style={styles.seeAllButton} onPress={onSeeAllPress}>
                         <Text style={styles.seeAllText}>Xem tất cả</Text>
-                        <Ionicons name="chevron-forward" size={16} color={Colors.accent.yellow} />
+                        <Ionicons name="chevron-forward" size={16} color="#8FA7C5" />
                     </Pressable>
                 )
             )}
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     },
     seeAllText: {
         ...Typography.subheadline,
-        color: Colors.accent.yellow,
+        color: '#c7d7ea',
         marginRight: 4,
     },
 });

@@ -1,4 +1,4 @@
-import { View, Text, FlatList, Pressable, RefreshControl, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, Pressable, RefreshControl, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter, useFocusEffect } from 'expo-router';
@@ -9,6 +9,8 @@ import { useAuth } from '@/context/auth';
 import { CONFIG } from '@/constants/config';
 import { getImageUrl } from '@/services/api';
 import { getWatchList, removeFromWatchList } from '@/lib/watchList';
+import { COLORS } from '@/constants/theme';
+import { FlashList } from '@shopify/flash-list';
 
 export default function WatchListScreen() {
     const router = useRouter();
@@ -96,7 +98,7 @@ export default function WatchListScreen() {
             <View style={styles.centered}>
                 <Stack.Screen options={{ headerShown: false }} />
                 <StatusBar style="light" />
-                <ActivityIndicator size="large" color="#E6BF5C" />
+                <ActivityIndicator size="large" color="#8FA7C5" />
             </View>
         );
     }
@@ -125,15 +127,16 @@ export default function WatchListScreen() {
                         <Text style={styles.emptySubText}>Ấn dấu "+" Danh sách trên trang phim để lưu lại xem sau.</Text>
                     </View>
                 ) : (
-                    <FlatList
+                    <FlashList
                         data={movies}
                         keyExtractor={(item, idx) => item._id || item.movieSlug || item.slug || `wl-${idx}`}
+                        estimatedItemSize={146}
                         contentContainerStyle={styles.listContent}
                         refreshControl={
                             <RefreshControl
                                 refreshing={refreshing}
                                 onRefresh={onRefresh}
-                                tintColor="#E6BF5C"
+                                tintColor="#8FA7C5"
                             />
                         }
                         renderItem={({ item }) => {
@@ -177,7 +180,7 @@ export default function WatchListScreen() {
                                         {/* Row actions */}
                                         <View style={styles.actionRow}>
                                             <View style={styles.playBtn}>
-                                                <Ionicons name="play-circle" size={18} color="#E6BF5C" />
+                                                <Ionicons name="play-circle" size={18} color="#8FA7C5" />
                                                 <Text style={styles.playBtnText}>Xem phim</Text>
                                             </View>
 
@@ -203,9 +206,9 @@ export default function WatchListScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#0B0D12' },
+    container: { flex: 1, backgroundColor: COLORS.bg0 },
     safeArea: { flex: 1 },
-    centered: { flex: 1, backgroundColor: '#0B0D12', justifyContent: 'center', alignItems: 'center', gap: 12 },
+    centered: { flex: 1, backgroundColor: COLORS.bg0, justifyContent: 'center', alignItems: 'center', gap: 12 },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -228,12 +231,14 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     countBadge: {
-        backgroundColor: 'rgba(244,200,74,0.15)',
+        backgroundColor: 'rgba(143,167,197,0.14)',
+        borderWidth: 1,
+        borderColor: 'rgba(143,167,197,0.32)',
         paddingHorizontal: 10,
         paddingVertical: 4,
         borderRadius: 12,
     },
-    countText: { color: '#E6BF5C', fontSize: 12, fontWeight: '600' },
+    countText: { color: '#c7d7ea', fontSize: 12, fontWeight: '600' },
     listContent: { paddingHorizontal: 16, paddingBottom: 40 },
     card: {
         flexDirection: 'row',
@@ -253,12 +258,14 @@ const styles = StyleSheet.create({
     qualityBadge: {
         position: 'absolute',
         top: 6, left: 6,
-        backgroundColor: 'rgba(244,200,74,0.9)',
+        backgroundColor: '#263243',
+        borderWidth: 1,
+        borderColor: '#33455F',
         paddingHorizontal: 6,
         paddingVertical: 2,
         borderRadius: 6,
     },
-    qualityBadgeText: { color: '#000000', fontSize: 10, fontWeight: '700' },
+    qualityBadgeText: { color: '#d8e3f2', fontSize: 10, fontWeight: '700' },
     info: {
         flex: 1,
         padding: 12,
@@ -292,7 +299,7 @@ const styles = StyleSheet.create({
         gap: 5,
     },
     playBtnText: {
-        color: '#E6BF5C',
+        color: '#c7d7ea',
         fontSize: 12,
         fontWeight: '600',
     },

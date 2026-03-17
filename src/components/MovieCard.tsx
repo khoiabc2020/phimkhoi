@@ -28,17 +28,6 @@ function formatQualityLabel(quality?: string) {
     return q.length > 6 ? q.slice(0, 6) : q;
 }
 
-function getYouTubeId(url?: string) {
-    if (!url) return "";
-    const vMatch = url.match(/[?&]v=([^&#]+)/);
-    if (vMatch?.[1]) return vMatch[1];
-    const shortMatch = url.match(/youtu\.be\/([^?&#/]+)/);
-    if (shortMatch?.[1]) return shortMatch[1];
-    const embedMatch = url.match(/youtube\.com\/embed\/([^?&#/]+)/);
-    if (embedMatch?.[1]) return embedMatch[1];
-    return "";
-}
-
 function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientation?: 'portrait' | 'landscape' }) {
     const [isHovered, setIsHovered] = useState(false);
     const [position, setPosition] = useState<{ top: number; left: number; width: number; rectTop?: number; innerHeight?: number; rectHeight?: number }>({ top: 0, left: 0, width: 0 });
@@ -131,7 +120,6 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
             : null;
 
     const displayBackdrop = tmdbBackdrop || (movie.thumb_url ? getImageUrl(movie.thumb_url) : null);
-    const trailerId = getYouTubeId(movie.trailer_url);
 
     // Reset fallback state when card movie changes
     useEffect(() => {
@@ -228,18 +216,6 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                                 (e.target as HTMLImageElement).src = "/placeholder.svg";
                             }}
                         />
-                        {isHovered && trailerId && (
-                            <div className="hidden lg:block absolute inset-0 z-[2] pointer-events-none">
-                                <iframe
-                                    src={`https://www.youtube.com/embed/${trailerId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${trailerId}&modestbranding=1&playsinline=1&rel=0`}
-                                    title={`Trailer ${movie.name}`}
-                                    className="w-full h-full"
-                                    allow="autoplay; encrypted-media"
-                                    loading="lazy"
-                                />
-                                <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/70 to-transparent" />
-                            </div>
-                        )}
                         <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
                     </Link>
 

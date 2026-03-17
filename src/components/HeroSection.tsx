@@ -89,12 +89,10 @@ function useAutoplay(count: number, delay: number, paused: boolean) {
     }, [count, delay, paused]);
 
     const next = useCallback(() => {
-        if (timerRef.current) clearInterval(timerRef.current);
         setIndex((p) => (p + 1) % count);
     }, [count]);
 
     const prev = useCallback(() => {
-        if (timerRef.current) clearInterval(timerRef.current);
         setIndex((p) => (p - 1 + count) % count);
     }, [count]);
 
@@ -114,7 +112,7 @@ function Dots({ count, active, onGo }: { count: number; active: number; onGo: (i
                     aria-label={`Slide ${i + 1}`}
                     className={cn(
                         "rounded-full transition-all duration-400 ease-out",
-                        i === active ? "w-7 h-1.5 bg-[#F4C84A]" : "w-1.5 h-1.5 bg-white/30 hover:bg-white/60"
+                        i === active ? "w-7 h-1.5 bg-[#8FA7C5]" : "w-1.5 h-1.5 bg-white/30 hover:bg-white/60"
                     )}
                 />
             ))}
@@ -189,12 +187,12 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                                 {/* Quality + rating badges */}
                                 <div className="absolute top-3 right-3 flex flex-col items-end gap-1.5 z-20">
                                     {m.quality && (
-                                        <span className="bg-[#F4C84A] text-black text-[9px] font-black px-2 py-0.5 rounded tracking-wider shadow-md">
+                                        <span className="bg-[#263243] border border-[#33455F] text-[#d8e3f2] text-[9px] font-black px-2 py-0.5 rounded tracking-wider shadow-md">
                                             {formatQualityLabel(m.quality) || m.quality}
                                         </span>
                                     )}
                                     {m.tmdbData?.vote_average && (
-                                        <span className="bg-black/70 backdrop-blur-sm text-[#F4C84A] text-[9px] font-bold px-2 py-0.5 rounded">
+                                        <span className="bg-black/70 backdrop-blur-sm text-[#c7d7ea] text-[9px] font-bold px-2 py-0.5 rounded border border-white/10">
                                             ★ {m.tmdbData.vote_average.toFixed(1)}
                                         </span>
                                     )}
@@ -264,9 +262,9 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                 <div className="flex items-center gap-2 mt-3">
                     <Link
                         href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                        className="flex flex-1 items-center justify-center gap-1.5 h-10 rounded-full bg-[#F4C84A] text-black font-bold text-[14px] active:scale-[0.97] transition-transform"
+                        className="flex flex-1 items-center justify-center gap-1.5 h-10 rounded-full bg-[#263243] border border-[#33455F] text-[#d8e3f2] font-bold text-[14px] active:scale-[0.97] transition-transform"
                     >
-                        <Play className="w-3.5 h-3.5 fill-black shrink-0" />
+                        <Play className="w-3.5 h-3.5 fill-[#d8e3f2] shrink-0" />
                         Xem Ngay
                     </Link>
                     <Link
@@ -363,7 +361,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                     <div className="col-span-12 md:col-span-8 lg:col-span-7 xl:col-span-6 space-y-4 lg:space-y-5">
                         {/* Tags */}
                         <div className="flex flex-wrap items-center gap-2">
-                            <span className="px-2.5 py-0.5 rounded bg-[#F4C84A] text-black text-[11px] font-black tracking-widest uppercase">
+                            <span className="px-2.5 py-0.5 rounded bg-[#263243] border border-[#33455F] text-[#d8e3f2] text-[11px] font-black tracking-widest uppercase">
                                 Hot
                             </span>
                             {movie.year && (
@@ -372,13 +370,13 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                                 </span>
                             )}
                             {movie.quality && (
-                                <span className="px-2.5 py-0.5 rounded border border-[#F4C84A]/40 bg-[#F4C84A]/10 text-[#F4C84A] text-[11px] font-bold">
+                                <span className="px-2.5 py-0.5 rounded border border-[#33455F] bg-[#263243]/80 text-[#d8e3f2] text-[11px] font-bold">
                                     {formatQualityLabel(movie.quality) || movie.quality}
                                 </span>
                             )}
                             {movie.tmdbData?.vote_average && (
                                 <span className="flex items-center gap-1 text-white/70 text-[11px]">
-                                    <span className="text-[#F4C84A]">★</span>
+                                    <span className="text-[#8FA7C5]">★</span>
                                     {movie.tmdbData.vote_average.toFixed(1)}
                                 </span>
                             )}
@@ -399,7 +397,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                             className="flex items-center gap-2 flex-wrap animate-hero-in animation-delay-100"
                         >
                             {movie.origin_name && (
-                                <span className="text-[#F4C84A] text-sm font-medium opacity-90 truncate max-w-[240px]">
+                                <span className="text-[#c7d7ea] text-sm font-medium opacity-90 truncate max-w-[240px]">
                                     {decodeHtml(movie.origin_name)}
                                 </span>
                             )}
@@ -442,9 +440,9 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         >
                             <Link
                                 href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                className="flex items-center justify-center gap-2 h-12 px-7 rounded-full bg-[#F4C84A] hover:bg-[#ffe58a] text-black font-bold text-[15px] transition-all duration-200 hover:scale-105 active:scale-95"
+                                className="flex items-center justify-center gap-2 h-12 px-7 rounded-full bg-[#263243] hover:bg-[#314156] border border-[#33455F] text-[#d8e3f2] font-bold text-[15px] transition-all duration-200 hover:scale-105 active:scale-95"
                             >
-                                <Play className="w-4 h-4 fill-black shrink-0" />
+                                <Play className="w-4 h-4 fill-[#d8e3f2] shrink-0" />
                                 Xem Ngay
                             </Link>
                             <Link
@@ -466,14 +464,14 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                                 <div className="flex items-center gap-2 ml-auto">
                                     <button
                                         onClick={prev}
-                                        className="w-9 h-9 rounded-full bg-white/10 hover:bg-[#F4C84A] hover:text-black border border-white/10 flex items-center justify-center text-white/60 transition-all duration-200"
+                                        className="w-9 h-9 rounded-full bg-white/10 hover:bg-[#263243] hover:text-[#d8e3f2] border border-white/10 flex items-center justify-center text-white/60 transition-all duration-200"
                                         aria-label="Trước"
                                     >
                                         <ChevronLeft className="w-4 h-4" />
                                     </button>
                                     <button
                                         onClick={next}
-                                        className="w-9 h-9 rounded-full bg-white/10 hover:bg-[#F4C84A] hover:text-black border border-white/10 flex items-center justify-center text-white/60 transition-all duration-200"
+                                        className="w-9 h-9 rounded-full bg-white/10 hover:bg-[#263243] hover:text-[#d8e3f2] border border-white/10 flex items-center justify-center text-white/60 transition-all duration-200"
                                         aria-label="Tiếp"
                                     >
                                         <ChevronRight className="w-4 h-4" />

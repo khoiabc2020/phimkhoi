@@ -8,6 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -49,9 +50,13 @@ const TABS = [
     { id: 'actors', label: 'Diễn viên' },
     { id: 'comments', label: 'Bình luận' },
 ];
+const DETAIL_CACHE_PREFIX = 'movie_detail_cache_v1:';
+const HOME_CACHE_KEY = 'home_screen_cache_v3';
+const DETAIL_CACHE_TTL = 1000 * 60 * 60 * 6; // 6 hours
 
 export default function MovieDetailScreen() {
     const { slug, autoPlay } = useLocalSearchParams();
+    const slugStr = Array.isArray(slug) ? slug[0] : String(slug || '');
     const router = useRouter();
     const { width: winWidth } = useWindowDimensions();
     const screenW = Math.max(Number(winWidth) || dimWidth, 320);
@@ -90,6 +95,62 @@ export default function MovieDetailScreen() {
 
     // Watch History for Resume
     const [historyRecord, setHistoryRecord] = useState<any>(null);
+    const hydratedFromCacheRef = useRef(false);
+
+    const applyMoviePayload = useCallback((payload: any) => {
+        if (!payload?.movie) return;
+        const eps = payload.episodes || [];
+        setMovie(payload.movie);
+        setEpisodes(eps);
+        const firstNonEmpty = eps.findIndex((s: any) => s.server_data && s.server_data.length > 0);
+        const initIndex = firstNonEmpty !== -1 ? firstNonEmpty : 0;
+        setSelectedServer(initIndex);
+        setActiveLangTab(getLanguageGroup(eps[initIndex]?.server_name || ''));
+    }, []);
+
+    const warmStartFromCache = useCallback(async () => {
+        if (!slugStr) return;
+        try {
+            const cacheRaw = await AsyncStorage.getItem(`${DETAIL_CACHE_PREFIX}${slugStr}`);
+            if (cacheRaw) {
+                const parsed = JSON.parse(cacheRaw);
+                if (parsed?.ts && Date.now() - parsed.ts < DETAIL_CACHE_TTL && parsed?.data?.movie) {
+                    applyMoviePayload(parsed.data);
+                    hydratedFromCacheRef.current = true;
+                    setLoading(false);
+                    return;
+                }
+            }
+
+            // Fallback: if detail cache missing, hydrate basic info from home cache.
+            const homeRaw = await AsyncStorage.getItem(HOME_CACHE_KEY);
+            if (homeRaw) {
+                const home = JSON.parse(homeRaw) || {};
+                const pools = [
+                    ...(home.heroMovies || []),
+                    ...(home.phimMoi || []),
+                    ...(home.phimLe || []),
+                    ...(home.phimBo || []),
+                    ...(home.hoatHinh || []),
+                    ...(home.tvShows || []),
+                    ...(home.phimChieuRap || []),
+                    ...(home.phimSapChieu || []),
+                    ...(home.hanQuoc || []),
+                    ...(home.trungQuoc || []),
+                    ...(home.hanhDong || []),
+                    ...(home.tinhCam || []),
+                ];
+                const quickMovie = pools.find((m: any) => m?.slug === slugStr);
+                if (quickMovie) {
+                    setMovie(quickMovie);
+                    hydratedFromCacheRef.current = true;
+                    setLoading(false);
+                }
+            }
+        } catch (e) {
+            // ignore cache errors
+        }
+    }, [slugStr, applyMoviePayload]);
 
     useEffect(() => {
         if (!movie?.slug) return;
@@ -104,57 +165,62 @@ export default function MovieDetailScreen() {
     }, [movie?.slug]);
 
     const fetchData = useCallback(async () => {
+        if (!slugStr) return;
         try {
-            setLoading(true);
-            const data = await getMovieDetail(slug as string);
+            if (!hydratedFromCacheRef.current) setLoading(true);
+            const data = await getMovieDetail(slugStr);
             if (data?.movie) {
-                setMovie(data.movie);
-                const eps = data.episodes || [];
-                setEpisodes(eps);
-
-                // Initialize first non-empty server and its language group immediately
-                const firstNonEmpty = eps.findIndex((s: any) => s.server_data && s.server_data.length > 0);
-                const initIndex = firstNonEmpty !== -1 ? firstNonEmpty : 0;
-                setSelectedServer(initIndex);
-                setActiveLangTab(getLanguageGroup(eps[initIndex]?.server_name || ''));
+                applyMoviePayload(data);
+                setLoading(false); // show detail immediately when core payload is ready
 
                 // Handle AutoPlay flag immediately after data fetches
                 const isAutoPlay = Array.isArray(autoPlay) ? autoPlay[0] === 'true' : autoPlay === 'true';
+                const eps = data.episodes || [];
+                const firstNonEmpty = eps.findIndex((s: any) => s.server_data && s.server_data.length > 0);
+                const initIndex = firstNonEmpty !== -1 ? firstNonEmpty : 0;
                 if (isAutoPlay && eps[initIndex]?.server_data?.[0]) {
                     const firstEp = eps[initIndex].server_data[0].slug;
                     router.replace(`/player/${data.movie.slug}?ep=${firstEp}&server=${initIndex}` as any);
                 }
 
-                // PERF FIX: Run all secondary fetches in parallel — no more sequential awaits
-                const [relatedResult, ratingResult, castResult] = await Promise.allSettled([
+                // cache full detail for instant next open
+                AsyncStorage.setItem(
+                    `${DETAIL_CACHE_PREFIX}${slugStr}`,
+                    JSON.stringify({ ts: Date.now(), data: { movie: data.movie, episodes: eps } })
+                ).catch(() => { });
+
+                // load secondary sections in background (non-blocking)
+                Promise.allSettled([
                     getRelatedMovies(data.movie.category?.[0]?.slug || ''),
                     getTMDBRating(data.movie.name, data.movie.year),
                     getOphimCast(data.movie.slug, data.movie.origin_name || data.movie.name, data.movie.year, data.movie),
-                ]);
-
-                if (relatedResult.status === 'fulfilled') setRelatedMovies(relatedResult.value);
-                if (ratingResult.status === 'fulfilled' && ratingResult.value) setRating(ratingResult.value);
-                if (castResult.status === 'fulfilled' && castResult.value) setCast(castResult.value.slice(0, 15));
+                ]).then(([relatedResult, ratingResult, castResult]) => {
+                    if (relatedResult.status === 'fulfilled') setRelatedMovies(relatedResult.value);
+                    if (ratingResult.status === 'fulfilled' && ratingResult.value) setRating(ratingResult.value);
+                    if (castResult.status === 'fulfilled' && castResult.value) setCast(castResult.value.slice(0, 15));
+                });
             }
         } catch (error) {
             console.error(error);
         } finally {
             setLoading(false);
         }
-    }, [slug, autoPlay, router]);
+    }, [slugStr, autoPlay, router, applyMoviePayload]);
 
     useEffect(() => {
-        if (token && slug) {
+        if (token && slugStr) {
             getHistory(token).then((hist: any[]) => {
-                const match = hist.find(h => h.slug === slug);
+                const match = hist.find(h => h.slug === slugStr);
                 if (match) setHistoryRecord(match);
             }).catch(() => { });
         }
-    }, [token, slug]);
+    }, [token, slugStr]);
 
     useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+        warmStartFromCache().finally(() => {
+            fetchData();
+        });
+    }, [warmStartFromCache, fetchData]);
 
     // Favorite Logic
     const checkFavorite = useCallback(async () => {
@@ -711,7 +777,7 @@ export default function MovieDetailScreen() {
 
                         {selectedTab === 'comments' && (
                             <View style={{ paddingBottom: 20 }}>
-                                <CommentSection movieSlug={slug as string} />
+                                <CommentSection movieSlug={slugStr} />
                             </View>
                         )}
 

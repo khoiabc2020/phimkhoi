@@ -16,12 +16,12 @@ export const Colors = {
 
     // Accent Colors
     accent: {
-        yellow: '#FFD60A',     // iOS Yellow
-        orange: '#FF9F0A',     // iOS Orange
-        red: '#FF453A',        // iOS Red
-        green: '#32D74B',      // iOS Green
-        teal: '#64D2FF',       // iOS Teal
-        purple: '#BF5AF2',     // iOS Purple
+        yellow: '#8FA7C5',     // Synced blue-gray accent
+        orange: '#7E95B1',
+        red: '#FF453A',
+        green: '#32D74B',
+        teal: '#64D2FF',
+        purple: '#BF5AF2',
     },
 
     // Background Colors (Layered)

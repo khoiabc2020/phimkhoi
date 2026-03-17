@@ -3,7 +3,7 @@ import {
   RefreshControl, Platform, StyleSheet, Dimensions
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useRouter, useFocusEffect } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -24,6 +24,69 @@ import { HOT_KEYWORDS, getSectionHref } from '@/constants/sections';
 
 const { width } = Dimensions.get('window');
 const HOME_CACHE_KEY = 'home_screen_cache_v3';
+type TopTabKey = 'day' | 'week' | 'month' | 'tv' | 'movie';
+type RecoFilterKey = 'all' | 'series' | 'single' | 'tv' | 'anime';
+
+const TOP_TABS: { key: TopTabKey; label: string; title: string }[] = [
+  { key: 'day', label: 'Top ngày', title: 'Top 10 hôm nay' },
+  { key: 'week', label: 'Top tuần', title: 'Top tuần nổi bật' },
+  { key: 'month', label: 'Top tháng', title: 'Top tháng tổng hợp' },
+  { key: 'tv', label: 'Top bộ', title: 'Top phim bộ' },
+  { key: 'movie', label: 'Top lẻ', title: 'Top phim lẻ' },
+];
+
+const RECO_FILTER_LABELS: Record<RecoFilterKey, string> = {
+  all: 'Tất cả',
+  series: 'Phim bộ',
+  single: 'Phim lẻ',
+  tv: 'TV Shows',
+  anime: 'Hoạt hình',
+};
+
+const detectBucket = (movie: Partial<Movie>): RecoFilterKey => {
+  const type = String(movie?.type || '').toLowerCase();
+  if (type.includes('hoat-hinh')) return 'anime';
+  if (type.includes('tv')) return 'tv';
+  if (type.includes('phim-bo') || type.includes('series')) return 'series';
+  if (type.includes('phim-le') || type.includes('single')) return 'single';
+  const categories = Array.isArray(movie?.category) ? movie.category : [];
+  if (categories.some((c: any) => String(c?.slug || '').includes('hoat-hinh'))) return 'anime';
+  return 'all';
+};
+
+const normalizeToMovie = (item: any): Movie | null => {
+  const slug = item?.slug || item?.movieSlug || item?.movie?.slug;
+  if (!slug) return null;
+  return {
+    _id: String(item?._id || slug),
+    slug,
+    name: item?.name || item?.movieName || item?.movie?.name || 'Unknown',
+    origin_name: item?.origin_name || item?.movieOriginName || item?.movie?.origin_name || '',
+    content: item?.content || '',
+    type: item?.type || item?.movie?.type || 'movie',
+    status: item?.status || '',
+    thumb_url: item?.thumb_url || item?.moviePoster || item?.movie?.thumb_url || item?.poster_url || '',
+    poster_url: item?.poster_url || item?.moviePoster || item?.movie?.poster_url || item?.thumb_url || '',
+    is_copyright: false,
+    sub_docquyen: false,
+    chieurap: false,
+    trailer_url: '',
+    time: item?.time || '',
+    episode_current: item?.episode_current || '',
+    episode_total: item?.episode_total || '',
+    quality: item?.quality || item?.movieQuality || 'HD',
+    lang: item?.lang || '',
+    notify: '',
+    showtimes: '',
+    year: Number(item?.year || item?.movieYear || new Date().getFullYear()),
+    view: Number(item?.view || 0),
+    actor: Array.isArray(item?.actor) ? item.actor : [],
+    director: Array.isArray(item?.director) ? item.director : [],
+    category: Array.isArray(item?.category) ? item.category : [],
+    country: Array.isArray(item?.country) ? item.country : [],
+    episodes: Array.isArray(item?.episodes) ? item.episodes : [],
+  };
+};
 
 const NAV_PILLS = [
   { label: 'Đề xuất', href: '/(tabs)/explore', active: true },
@@ -38,6 +101,8 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
   const { user, syncHistory } = useAuth();
+  const [activeTopTab, setActiveTopTab] = useState<TopTabKey>('day');
+  const [activeRecoFilter, setActiveRecoFilter] = useState<RecoFilterKey>('all');
 
   const scrollY = useSharedValue(0);
   const scrollHandler = useAnimatedScrollHandler({
@@ -162,12 +227,90 @@ export default function HomeScreen() {
     fetchData();
   }, [fetchData]);
 
+  const topTabData = useMemo(() => {
+    const mergeUnique = (...groups: Movie[][]) => {
+      const bySlug = new Map<string, Movie>();
+      for (const group of groups) {
+        for (const movie of group || []) {
+          if (!movie?.slug || bySlug.has(movie.slug)) continue;
+          bySlug.set(movie.slug, movie);
+          if (bySlug.size >= 12) break;
+        }
+        if (bySlug.size >= 12) break;
+      }
+      return Array.from(bySlug.values());
+    };
+    return {
+      day: (data.heroMovies || []).slice(0, 10),
+      week: (data.phimMoi || []).slice(0, 10),
+      month: mergeUnique(data.phimMoi, data.phimChieuRap, data.heroMovies).slice(0, 10),
+      tv: (data.phimBo || []).slice(0, 10),
+      movie: (data.phimLe || []).slice(0, 10),
+    };
+  }, [data]);
+
+  const watchListMovies = useMemo(() => {
+    const raw = Array.isArray(user?.watchlist) ? user.watchlist : [];
+    const bySlug = new Map<string, Movie>();
+    for (const item of raw) {
+      const normalized = normalizeToMovie(item);
+      if (!normalized || bySlug.has(normalized.slug)) continue;
+      bySlug.set(normalized.slug, normalized);
+      if (bySlug.size >= 12) break;
+    }
+    return Array.from(bySlug.values());
+  }, [user?.watchlist]);
+
+  const recommendationBundle = useMemo(() => {
+    const historyRaw = Array.isArray(user?.history) ? user.history : [];
+    const watchedSet = new Set<string>();
+    const seeds: string[] = [];
+    for (const h of historyRaw) {
+      const slug = h?.slug || h?.movieSlug || h?.movie?.slug;
+      if (slug) watchedSet.add(slug);
+      const seedName = h?.movie?.name || h?.movieName || h?.name;
+      if (seedName && !seeds.includes(seedName)) seeds.push(seedName);
+      if (seeds.length >= 3) break;
+    }
+
+    const sourcePool = [...data.phimBo, ...data.phimLe, ...data.hoatHinh, ...data.tvShows, ...data.phimMoi];
+    const bySlug = new Map<string, Movie>();
+    for (const item of sourcePool) {
+      if (!item?.slug || watchedSet.has(item.slug) || bySlug.has(item.slug)) continue;
+      bySlug.set(item.slug, item);
+      if (bySlug.size >= 24) break;
+    }
+    const items = Array.from(bySlug.values());
+    const filterCounts: Record<RecoFilterKey, number> = { all: items.length, series: 0, single: 0, tv: 0, anime: 0 };
+    for (const movie of items) {
+      const bucket = detectBucket(movie);
+      if (bucket !== 'all') filterCounts[bucket] += 1;
+    }
+    const enabledFilters = (Object.keys(RECO_FILTER_LABELS) as RecoFilterKey[]).filter((key) => key === 'all' || filterCounts[key] > 0);
+    const filtered = activeRecoFilter === 'all'
+      ? items
+      : items.filter((m) => detectBucket(m) === activeRecoFilter);
+
+    return {
+      seeds,
+      filterCounts,
+      enabledFilters,
+      items: filtered.slice(0, 12),
+    };
+  }, [user?.history, data, activeRecoFilter]);
+
+  useEffect(() => {
+    if (!recommendationBundle.enabledFilters.includes(activeRecoFilter)) {
+      setActiveRecoFilter('all');
+    }
+  }, [recommendationBundle.enabledFilters, activeRecoFilter]);
+
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
 
       <LinearGradient
-        colors={[COLORS.bg0, '#121826', COLORS.bg0]}
+        colors={[COLORS.bg0, '#0b111a', COLORS.bg0]}
         locations={[0, 0.4, 0.9]}
         style={StyleSheet.absoluteFill}
       />
@@ -278,6 +421,35 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
+        {topTabData.day.length > 0 && (
+          <View style={styles.topTabsWrap}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.topTabsRow}
+              keyboardShouldPersistTaps="handled"
+              nestedScrollEnabled
+            >
+              {TOP_TABS.map((tab) => {
+                const active = activeTopTab === tab.key;
+                return (
+                  <Pressable
+                    key={tab.key}
+                    onPress={() => setActiveTopTab(tab.key)}
+                    style={[styles.topTabBtn, active && styles.topTabBtnActive]}
+                  >
+                    <Text style={[styles.topTabText, active && styles.topTabTextActive]}>{tab.label}</Text>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+            <MovieRow
+              title={TOP_TABS.find((t) => t.key === activeTopTab)?.title || 'Top phim'}
+              movies={topTabData[activeTopTab]}
+            />
+          </View>
+        )}
+
         {
           !loading && user?.history && user.history.length > 0 ? (
             <View style={{ marginBottom: 10 }}>
@@ -305,9 +477,38 @@ export default function HomeScreen() {
           ) : (
             <View style={styles.movieRows}>
               {/* Đề xuất cho bạn — đồng bộ web */}
-              {(data.phimChieuRap.length > 0 || data.phimMoi.length > 0) && (
+              {(watchListMovies.length > 0 || recommendationBundle.items.length > 0 || data.phimChieuRap.length > 0 || data.phimMoi.length > 0) && (
                 <View style={[styles.sectionBlock, { marginTop: 10 }]}>
                   <Text style={styles.sectionTitleText}>Đề xuất cho bạn</Text>
+                  {watchListMovies.length > 0 && (
+                    <MovieRow title="Danh sách của bạn" movies={watchListMovies} />
+                  )}
+                  {recommendationBundle.items.length > 0 && (
+                    <View style={{ marginBottom: 8 }}>
+                      {recommendationBundle.seeds.length > 0 && (
+                        <Text style={styles.recoSeedText}>
+                          Dựa trên lịch sử xem: <Text style={styles.recoSeedStrong}>{recommendationBundle.seeds.join(' • ')}</Text>
+                        </Text>
+                      )}
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.recoFilterRow}>
+                        {recommendationBundle.enabledFilters.map((key) => {
+                          const active = key === activeRecoFilter;
+                          return (
+                            <Pressable
+                              key={key}
+                              onPress={() => setActiveRecoFilter(key)}
+                              style={[styles.recoChip, active && styles.recoChipActive]}
+                            >
+                              <Text style={[styles.recoChipText, active && styles.recoChipTextActive]}>
+                                {RECO_FILTER_LABELS[key]}{key !== 'all' ? ` (${recommendationBundle.filterCounts[key]})` : ''}
+                              </Text>
+                            </Pressable>
+                          );
+                        })}
+                      </ScrollView>
+                      <MovieRow title="Vì bạn đã xem" movies={recommendationBundle.items} />
+                    </View>
+                  )}
                   {data.phimChieuRap.length > 0 && (
                     <MovieRow title="Phim Chiếu Rạp Mới" movies={data.phimChieuRap} slug="phim-chieu-rap" type="category" />
                   )}
@@ -425,6 +626,40 @@ const styles = StyleSheet.create({
   },
   catDot: { width: 6, height: 6, borderRadius: 3, marginRight: 8 },
   catText: { color: 'rgba(255,255,255,0.8)', fontSize: 13, fontWeight: '500' },
+  topTabsWrap: { marginTop: 6, marginBottom: 4 },
+  topTabsRow: { flexDirection: 'row', gap: 8, paddingHorizontal: 16, marginBottom: 14 },
+  topTabBtn: {
+    height: 34,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#0B0B10',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  topTabBtnActive: {
+    backgroundColor: '#263243',
+    borderColor: '#33435a',
+  },
+  topTabText: { color: 'rgba(255,255,255,0.7)', fontSize: 12, fontWeight: '700' },
+  topTabTextActive: { color: '#d8e3f2' },
+  recoSeedText: { color: 'rgba(255,255,255,0.5)', fontSize: 11, paddingHorizontal: 16, marginBottom: 8 },
+  recoSeedStrong: { color: 'rgba(255,255,255,0.78)' },
+  recoFilterRow: { paddingHorizontal: 16, gap: 8, marginBottom: 10 },
+  recoChip: {
+    height: 32,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#0B0B10',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  recoChipActive: { backgroundColor: '#263243', borderColor: '#33435a' },
+  recoChipText: { color: 'rgba(255,255,255,0.72)', fontSize: 12, fontWeight: '700' },
+  recoChipTextActive: { color: '#d8e3f2' },
 
   movieRows: { gap: 10 },
   sectionBlock: { marginBottom: 32 },

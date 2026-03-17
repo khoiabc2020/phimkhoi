@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { View, Text } from 'react-native';
 import { Image } from 'expo-image';
 import { Link } from 'expo-router';
-import { Movie, getImageUrl } from '@/services/api';
+import { Movie, getImageUrl, prefetchMovieDetail } from '@/services/api';
 import FocusableButton from './FocusableButton';
 
 // Default card size – MovieRow overrides these with computed values
@@ -29,7 +29,10 @@ const MovieCard = memo(({ movie, width: propsWidth, height: propsHeight }: Movie
             <FocusableButton
                 className="mr-3 transition-opacity"
                 style={{ width: dynamicWidth, borderRadius: 14, padding: 2 }}
-                focusStyle={{ borderWidth: 2, borderColor: '#fbbf24', transform: [{ scale: 1.05 }] }}
+                focusStyle={{ borderWidth: 2, borderColor: '#8FA7C5', transform: [{ scale: 1.05 }] }}
+                onPressIn={() => {
+                    prefetchMovieDetail(movie.slug);
+                }}
             >
                 <View
                     style={{
@@ -68,8 +71,8 @@ const MovieCard = memo(({ movie, width: propsWidth, height: propsHeight }: Movie
                     )}
 
                     {movie.quality && (
-                        <View style={{ position: 'absolute', top: 8, right: 8, backgroundColor: '#fbbf24', paddingHorizontal: 6, paddingVertical: 3, borderRadius: 6, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84, elevation: 5 }}>
-                            <Text style={{ fontSize: 9, fontWeight: 'bold', color: 'black' }}>{movie.quality}</Text>
+                        <View style={{ position: 'absolute', top: 8, right: 8, backgroundColor: '#263243', borderWidth: 1, borderColor: '#33455F', paddingHorizontal: 6, paddingVertical: 3, borderRadius: 6, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84, elevation: 5 }}>
+                            <Text style={{ fontSize: 9, fontWeight: 'bold', color: '#d8e3f2' }}>{movie.quality}</Text>
                         </View>
                     )}
                 </View>

@@ -27,12 +27,7 @@ interface HeroSectionProps {
     movies: Movie[];
 }
 
-// Precomputed stable config outside component to avoid recreation each render
-const PARALLAX_CONFIG = {
-    parallaxScrollingScale: 0.88,
-    parallaxScrollingOffset: 48,
-};
-const PAN_HANDLER_PROPS = { activeOffsetX: [-10, 10] as [number, number] };
+const HERO_HORIZONTAL_PADDING = 12;
 
 export default function HeroSection({ movies }: HeroSectionProps) {
     const [activeIndex, setActiveIndex] = useState(0);
@@ -77,12 +72,12 @@ export default function HeroSection({ movies }: HeroSectionProps) {
         const uris = top
             .flatMap((m) => [getBackdropUri(m), getPosterUri(m)])
             .filter(Boolean);
-        if ((Image as any).clearDiskCache) {
-            (Image as any).clearDiskCache();
-        }
-        if ((Image as any).clearMemoryCache) {
-            (Image as any).clearMemoryCache();
-        }
+        // Prefetch instead of clearing caches to avoid unnecessary image re-downloads.
+        uris.forEach((uri) => {
+            if ((Image as any).prefetch) {
+                (Image as any).prefetch(uri);
+            }
+        });
     }, [movies, getBackdropUri, getPosterUri]);
 
     // Load favorites — prefer user.favorites from API (already in memory) to avoid slow AsyncStorage loop
@@ -112,21 +107,33 @@ export default function HeroSection({ movies }: HeroSectionProps) {
 
     // Smooth cross-fade when active slide changes
     const handleSnapToItem = useCallback((index: number) => {
+        if (!movies[index]) return;
         setActiveIndex(index);
         const newUri = getBackdropUri(movies[index]);
-        // Fade out, swap URI, fade in
-        bgOpacity.value = withTiming(0, { duration: 200, easing: Easing.out(Easing.quad) }, () => {
-            'worklet';
-        });
-        setTimeout(() => {
-            setBackdropUris(([, prev]) => [prev, newUri]);
-            bgOpacity.value = withTiming(1, { duration: 350, easing: Easing.in(Easing.quad) });
-        }, 200);
+        // Swap URI first, then fade in the new layer to avoid black flash.
+        setBackdropUris(([, current]) => [current, newUri]);
+        bgOpacity.value = 0;
+        bgOpacity.value = withTiming(1, { duration: 280, easing: Easing.out(Easing.cubic) });
     }, [movies, bgOpacity]);
 
     const bgAnimStyle = useAnimatedStyle(() => ({
         opacity: bgOpacity.value,
     }));
+
+    // Prefetch active + neighbor slides to keep swipe smooth.
+    useEffect(() => {
+        if (!movies?.length) return;
+        const idxs = [activeIndex, (activeIndex + 1) % movies.length, (activeIndex - 1 + movies.length) % movies.length];
+        const uris = idxs.flatMap((i) => {
+            const m = movies[i];
+            return [getBackdropUri(m), getPosterUri(m)];
+        }).filter(Boolean);
+        uris.forEach((uri) => {
+            if ((Image as any).prefetch) {
+                (Image as any).prefetch(uri);
+            }
+        });
+    }, [activeIndex, movies, getBackdropUri, getPosterUri]);
 
     const toggleFav = useCallback(async (movie: Movie) => {
         const slug = movie.slug;
@@ -169,21 +176,38 @@ export default function HeroSection({ movies }: HeroSectionProps) {
     if (!movies?.length) return null;
 
     const [, activeBackdropUri] = backdropUris;
+    const renderHeroItem = useCallback(({ item, index }: { item: Movie; index: number }) => (
+        <HeroSlide
+            movie={item}
+            index={index}
+            isFav={favSlugs.has(item.slug)}
+            onToggleFav={toggleFav}
+        />
+    ), [favSlugs, toggleFav]);
 
     return (
         <View style={styles.wrapper}>
-            {/* Background — single Image that fades smoothly, no re-mount */}
+            {/* Background — dual layer cross-fade for smoother transitions */}
             <View style={StyleSheet.absoluteFill}>
                 <Image
-                    source={{ uri: activeBackdropUri }}
+                    source={{ uri: backdropUris[0] }}
                     style={StyleSheet.absoluteFill}
                     contentFit="cover"
-                    // Blur is expensive on Android; keep it subtle like Netflix
                     blurRadius={Platform.OS === 'ios' ? 8 : 0}
                     cachePolicy="memory-disk"
-                    transition={180}
+                    transition={120}
                 />
-                <Animated.View style={[StyleSheet.absoluteFill, bgAnimStyle, { backgroundColor: 'rgba(11,13,24,0.72)' }]} />
+                <Animated.View style={[StyleSheet.absoluteFill, bgAnimStyle]}>
+                    <Image
+                        source={{ uri: activeBackdropUri }}
+                        style={StyleSheet.absoluteFill}
+                        contentFit="cover"
+                        blurRadius={Platform.OS === 'ios' ? 8 : 0}
+                        cachePolicy="memory-disk"
+                        transition={120}
+                    />
+                </Animated.View>
+                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(11,13,24,0.72)' }]} />
                 <LinearGradient
                     colors={['transparent', '#0B0D18']}
                     style={[StyleSheet.absoluteFill, { top: '30%' }]}
@@ -198,22 +222,15 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                     height={CAROUSEL_HEIGHT}
                     data={movies}
                     loop={true}
+                    enabled={movies.length > 1}
                     autoPlay={movies.length > 1}
-                    autoPlayInterval={4500}
-                    scrollAnimationDuration={380}
-                    windowSize={5}
+                    autoPlayInterval={5200}
+                    scrollAnimationDuration={520}
+                    pagingEnabled={true}
+                    snapEnabled={true}
+                    windowSize={3}
                     onSnapToItem={handleSnapToItem}
-                    mode="parallax"
-                    modeConfig={PARALLAX_CONFIG}
-                    panGestureHandlerProps={PAN_HANDLER_PROPS}
-                    renderItem={({ item, index }) => (
-                        <HeroSlide
-                            movie={item}
-                            index={index}
-                            isFav={favSlugs.has(item.slug)}
-                            onToggleFav={() => toggleFav(item)}
-                        />
-                    )}
+                    renderItem={renderHeroItem}
                 />
             </View>
 
@@ -232,7 +249,7 @@ export default function HeroSection({ movies }: HeroSectionProps) {
 // HeroSlide is pure — memoized so it never re-renders unless its own props change
 const HeroSlide = React.memo(function HeroSlide({
     movie, index, isFav, onToggleFav,
-}: { movie: Movie; index: number; isFav: boolean; onToggleFav: () => void }) {
+}: { movie: Movie; index: number; isFav: boolean; onToggleFav: (movie: Movie) => void }) {
     const router = useRouter();
     const posterUri = (() => {
         const anyM = movie as any;
@@ -243,6 +260,16 @@ const HeroSlide = React.memo(function HeroSlide({
             return `https://image.tmdb.org/t/p/w342${p.startsWith('/') ? p : `/${p}`}`;
         }
         return getImageUrl(movie.poster_url || movie.thumb_url);
+    })();
+    const backdropUri = (() => {
+        const anyM = movie as any;
+        if (anyM.tmdb_backdrop) return anyM.tmdb_backdrop;
+        const tmdb = anyM.tmdbData;
+        if (tmdb?.backdrop_path) {
+            const p = String(tmdb.backdrop_path);
+            return `https://image.tmdb.org/t/p/w780${p.startsWith('/') ? p : `/${p}`}`;
+        }
+        return getImageUrl(movie.thumb_url || movie.poster_url);
     })();
     const rating = (() => {
         const anyM = movie as any;
@@ -259,12 +286,12 @@ const HeroSlide = React.memo(function HeroSlide({
                     onPress={() => router.push(`/movie/${movie.slug}` as any)}
                 >
                     <Image
-                        source={{ uri: posterUri }}
+                        source={{ uri: backdropUri || posterUri }}
                         style={StyleSheet.absoluteFill}
                         contentFit="cover"
                         priority={index === 0 ? 'high' : 'normal'}
                         cachePolicy="memory-disk"
-                        transition={180}
+                        transition={120}
                     />
 
                     {/* Gradient Nền */}
@@ -291,7 +318,7 @@ const HeroSlide = React.memo(function HeroSlide({
                         )}
                         {rating && (
                             <View style={styles.badgeRating}>
-                                <Ionicons name="star" size={12} color="#E6BF5C" />
+                                <Ionicons name="star" size={12} color="#8FA7C5" />
                                 <Text style={styles.badgeRatingText}>{rating}</Text>
                             </View>
                         )}
@@ -312,7 +339,7 @@ const HeroSlide = React.memo(function HeroSlide({
                         </View>
                     )}
 
-                    <Text style={[styles.title, isTablet && styles.titleTablet]} numberOfLines={2} adjustsFontSizeToFit>{movie.name}</Text>
+                    <Text style={[styles.title, isTablet && styles.titleTablet]} numberOfLines={2}>{movie.name}</Text>
                     <View style={[styles.metaRow, isTablet && styles.metaRowTablet]}>
                         {movie.year && <Text style={styles.metaText}>{movie.year}</Text>}
                         {movie.category?.slice(0, 3).map((c: any) => (
@@ -323,7 +350,7 @@ const HeroSlide = React.memo(function HeroSlide({
                     <View style={[styles.actionRow, isTablet && styles.actionRowTablet]} pointerEvents="box-none">
                         <TouchableOpacity
                             style={styles.colBtn}
-                            onPress={() => onToggleFav()}
+                            onPress={() => onToggleFav(movie)}
                             activeOpacity={0.8}
                         >
                             <Ionicons name={isFav ? 'checkmark' : 'add'} size={28} color="#FFFFFF" />
@@ -335,7 +362,7 @@ const HeroSlide = React.memo(function HeroSlide({
                             onPress={() => router.push(`/movie/${movie.slug}?autoPlay=true` as any)}
                             activeOpacity={0.8}
                         >
-                            <Ionicons name="play" size={24} color="#000000" />
+                            <Ionicons name="play" size={24} color="#d8e3f2" />
                             <Text style={styles.playBtnText}>Phát</Text>
                         </TouchableOpacity>
 
@@ -357,7 +384,7 @@ const HeroSlide = React.memo(function HeroSlide({
 const styles = StyleSheet.create({
     wrapper: {
         width: '100%',
-        backgroundColor: '#0B0D18',
+        backgroundColor: COLORS.bg0,
         paddingBottom: 16,
         overflow: 'hidden',
     },
@@ -365,29 +392,41 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        paddingHorizontal: HERO_HORIZONTAL_PADDING,
+        paddingBottom: 2,
     },
     posterWrapper: {
         width: '100%',
         height: '100%',
-        borderRadius: 0,
+        borderRadius: 30,
         overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.12)',
+        backgroundColor: '#11131A',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 12 },
+        shadowOpacity: 0.32,
+        shadowRadius: 22,
+        elevation: 14,
     },
     badgesRow: {
         position: 'absolute',
-        top: 110,
-        right: 14,
+        top: 16,
+        right: 12,
         flexDirection: 'row',
         gap: 6,
         zIndex: 2,
     },
     badgeQuality: {
-        backgroundColor: '#E6BF5C',
+        backgroundColor: '#263243',
+        borderWidth: 1,
+        borderColor: '#33455F',
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 6,
     },
     badgeQualityText: {
-        color: '#0B0D12',
+        color: '#d8e3f2',
         fontSize: 10,
         fontWeight: '800',
     },
@@ -403,7 +442,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.1)',
     },
     badgeRatingText: {
-        color: '#E6BF5C',
+        color: '#c7d7ea',
         fontSize: 11,
         fontWeight: '700',
     },
@@ -471,15 +510,17 @@ const styles = StyleSheet.create({
         flex: 1,
         maxWidth: 160,
         height: 44,
-        borderRadius: 4,
-        backgroundColor: '#FFFFFF',
+        borderRadius: 10,
+        backgroundColor: '#263243',
+        borderWidth: 1,
+        borderColor: '#33455F',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 6,
     },
     playBtnText: {
-        color: '#000000',
+        color: '#d8e3f2',
         fontWeight: 'bold',
         fontSize: 16,
     },
@@ -491,7 +532,9 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     top10Square: {
-        backgroundColor: '#E50914',
+        backgroundColor: '#263243',
+        borderWidth: 1,
+        borderColor: '#33455F',
         borderRadius: 4,
         paddingHorizontal: 4,
         paddingVertical: 2,
@@ -501,7 +544,7 @@ const styles = StyleSheet.create({
     top10SquareText: { color: '#FFFFFF', fontSize: 8, fontWeight: '900', letterSpacing: 1 },
     top10SquareNumber: { color: '#FFFFFF', fontSize: 12, fontWeight: '900', marginTop: -2 },
     top10Text: {
-        color: '#FFFFFF',
+        color: '#d8e3f2',
         fontWeight: 'bold',
         fontSize: 13,
         textShadowColor: 'rgba(0,0,0,0.8)',
@@ -516,14 +559,14 @@ const styles = StyleSheet.create({
         gap: 6,
     },
     dot: { height: 6, borderRadius: 3 },
-    dotActive: { width: 22, backgroundColor: '#E6BF5C' },
+    dotActive: { width: 22, backgroundColor: '#8FA7C5' },
     dotInactive: { width: 6, backgroundColor: 'rgba(255,255,255,0.25)' },
 
     // Tablet Overrides
     infoBlockTablet: {
-        width: '50%',
-        left: 40,
-        bottom: 40,
+        width: '56%',
+        left: 30,
+        bottom: 30,
         alignItems: 'flex-start',
     },
     titleTablet: {

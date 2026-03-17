@@ -1,11 +1,13 @@
 export const COLORS = {
   // Backgrounds
-  bg0: '#0B0D12', // Main background
-  bg1: '#0F121A', // Card background
+  bg0: '#050507', // Main background (web sync)
+  bg1: '#0B0D12', // Card background
 
   // Accents
-  accent: '#E6BF5C', // Soft Sand Gold
-  accentPressed: '#CCA43B',
+  accent: '#8FA7C5', // Modern blue-gray (web sync)
+  accentPressed: '#7E95B1',
+  accentSoft: '#263243',
+  accentBorder: '#33455F',
 
   // Text
   textPrimary: 'rgba(255,255,255,0.92)',

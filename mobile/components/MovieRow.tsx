@@ -47,7 +47,7 @@ const MovieRow = memo(({ title, movies, slug, subtitle, type = 'list' }: MovieRo
                     <Link href={`/${type}/${slug}` as any} asChild>
                         <Pressable style={styles.seeAllBtn}>
                             <Text style={styles.seeAllText}>Tất cả</Text>
-                            <Ionicons name="chevron-forward" size={13} color="#fbbf24" />
+                            <Ionicons name="chevron-forward" size={13} color="#8FA7C5" />
                         </Pressable>
                     </Link>
                 )}
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
         width: 3,
         height: 20,
         borderRadius: 2,
-        backgroundColor: '#fbbf24',
+        backgroundColor: '#8FA7C5',
     },
     title: {
         color: '#ffffff',
@@ -109,10 +109,12 @@ const styles = StyleSheet.create({
         paddingVertical: 5,
         paddingHorizontal: 8,
         borderRadius: 12,
-        backgroundColor: 'rgba(251,191,36,0.1)',
+        backgroundColor: 'rgba(143,167,197,0.14)',
+        borderWidth: 1,
+        borderColor: 'rgba(143,167,197,0.3)',
     },
     seeAllText: {
-        color: '#fbbf24',
+        color: '#c7d7ea',
         fontSize: 12,
         fontWeight: '600',
     },

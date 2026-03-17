@@ -1,4 +1,5 @@
 import { CONFIG } from '@/constants/config';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const API_URL = CONFIG.PHIM_API_URL;
 export const BACKEND_URL = CONFIG.BACKEND_URL;
@@ -90,6 +91,7 @@ const fetchWithTimeout = async (url: string, options: RequestInit = {}, timeoutM
 // ── In-memory cache (session-scoped, 5-minute TTL) ──────────────────────────
 const _cache = new Map<string, { data: any; ts: number }>();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const DETAIL_CACHE_PREFIX = 'movie_detail_cache_v1:';
 
 function cacheGet(key: string): any | null {
     const hit = _cache.get(key);
@@ -244,6 +246,24 @@ export const getMovieDetail = async (slug: string) => {
     } catch (error) {
         console.error(`Error fetching movie detail [${slug}]:`, error);
         return null;
+    }
+};
+
+// Warm detail cache before navigation to make movie screen open instantly.
+export const prefetchMovieDetail = async (slug: string) => {
+    if (!slug) return;
+    const cacheKey = `movie:${slug}`;
+    const hit = cacheGet(cacheKey);
+    if (hit?.movie) return;
+    try {
+        const detail = await getMovieDetail(slug);
+        if (!detail?.movie) return;
+        await AsyncStorage.setItem(
+            `${DETAIL_CACHE_PREFIX}${slug}`,
+            JSON.stringify({ ts: Date.now(), data: { movie: detail.movie, episodes: detail.episodes || [] } })
+        );
+    } catch {
+        // prefetch is best-effort, never block UI
     }
 };
 

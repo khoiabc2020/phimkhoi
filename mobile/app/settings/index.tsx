@@ -50,8 +50,8 @@ export default function SettingsScreen() {
                     <View className="bg-gray-900 rounded-xl overflow-hidden">
                         {user ? (
                             <View className="p-4 flex-row items-center border-b border-gray-800">
-                                <View className="w-12 h-12 bg-primary/20 rounded-full justify-center items-center mr-4">
-                                    <Text className="text-primary font-bold text-lg">
+                                <View className="w-12 h-12 rounded-full justify-center items-center mr-4" style={{ backgroundColor: 'rgba(143,167,197,0.16)', borderWidth: 1, borderColor: 'rgba(143,167,197,0.3)' }}>
+                                    <Text className="font-bold text-lg" style={{ color: '#c7d7ea' }}>
                                         {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                                     </Text>
                                 </View>
@@ -81,14 +81,14 @@ export default function SettingsScreen() {
                                 <Ionicons name="moon-outline" size={22} color="white" style={{ marginRight: 12 }} />
                                 <Text className="text-white font-medium">Chế độ tối</Text>
                             </View>
-                            <Switch value={true} trackColor={{ false: '#767577', true: '#fbbf24' }} thumbColor={'#f4f3f4'} />
+                            <Switch value={true} trackColor={{ false: '#767577', true: '#33455F' }} thumbColor={'#d8e3f2'} />
                         </View>
                         <View className="p-4 flex-row items-center justify-between">
                             <View className="flex-row items-center">
                                 <Ionicons name="notifications-outline" size={22} color="white" style={{ marginRight: 12 }} />
                                 <Text className="text-white font-medium">Thông báo</Text>
                             </View>
-                            <Switch value={true} trackColor={{ false: '#767577', true: '#fbbf24' }} thumbColor={'#f4f3f4'} />
+                            <Switch value={true} trackColor={{ false: '#767577', true: '#33455F' }} thumbColor={'#d8e3f2'} />
                         </View>
                         <Pressable
                             className="p-4 flex-row items-center justify-between active:bg-gray-800"

@@ -27,6 +27,10 @@ import ExpoPip from 'expo-pip';
 import { parseServerLabel } from '@/services/api';
 
 const { width, height } = Dimensions.get('window');
+const ACCENT = '#8FA7C5';
+const ACCENT_TEXT = '#c7d7ea';
+const ACCENT_SURFACE = '#263243';
+const ACCENT_BORDER = '#33455F';
 
 /** Icon PiP: khung lớn, khung nhỏ góc phải dưới, mũi tên thu nhỏ (giống ảnh bạn gửi) */
 function PipIcon({ size = 24, color = 'white' }: { size?: number; color?: string }) {
@@ -661,7 +665,7 @@ export default function NativePlayer({
                 {/* Loading/Buffering indicator - Only show when first loading metadata, NOT when buffering mid-stream */}
                 {!isIframe && (!('isLoaded' in status) || !status.isLoaded) && !error && (
                     <View style={styles.loadingOverlay} pointerEvents="none">
-                        <ActivityIndicator size="large" color="#fbbf24" />
+                        <ActivityIndicator size="large" color={ACCENT} />
                         <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, marginTop: 8, fontWeight: '500' }}>
                             Đang tải...
                         </Text>
@@ -682,10 +686,10 @@ export default function NativePlayer({
                                 <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>Hủy</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                                style={{ paddingHorizontal: 24, paddingVertical: 10, backgroundColor: '#E6BF5C', borderRadius: 8 }}
+                                style={{ paddingHorizontal: 24, paddingVertical: 10, backgroundColor: ACCENT_SURFACE, borderWidth: 1, borderColor: ACCENT_BORDER, borderRadius: 8 }}
                                 onPress={() => { setAutoNextCountdown(0); }}
                             >
-                                <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 16 }}>Chuyển ngay</Text>
+                                <Text style={{ color: '#d8e3f2', fontWeight: 'bold', fontSize: 16 }}>Chuyển ngay</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -694,7 +698,7 @@ export default function NativePlayer({
                 {/* Error overlay */}
                 {error && (
                     <View style={styles.errorOverlay}>
-                        <Ionicons name="warning-outline" size={48} color="#fbbf24" style={{ marginBottom: 12 }} />
+                        <Ionicons name="warning-outline" size={48} color={ACCENT} style={{ marginBottom: 12 }} />
                         <Text style={styles.errorTitle}>Không phát được video</Text>
                         <Text style={styles.errorMessage} numberOfLines={3}>
                             {error}
@@ -893,10 +897,10 @@ export default function NativePlayer({
                                         <Ionicons
                                             name={sleepSecondsLeft !== null ? "moon" : "moon-outline"}
                                             size={22}
-                                            color={sleepSecondsLeft !== null ? '#fbbf24' : 'white'}
+                                            color={sleepSecondsLeft !== null ? ACCENT : 'white'}
                                         />
                                         {sleepSecondsLeft !== null && (
-                                            <Text style={{ color: '#fbbf24', fontSize: 13, fontWeight: '700' }}>
+                                            <Text style={{ color: ACCENT_TEXT, fontSize: 13, fontWeight: '700' }}>
                                                 {formatSleep(sleepSecondsLeft)}
                                             </Text>
                                         )}
@@ -919,11 +923,11 @@ export default function NativePlayer({
                         <TouchableOpacity
                             style={[
                                 styles.lockBtn,
-                                locked ? { backgroundColor: '#fbbf24', borderColor: '#fbbf24' } : { backgroundColor: 'rgba(0,0,0,0.5)' }
+                                locked ? { backgroundColor: ACCENT_SURFACE, borderColor: ACCENT_BORDER } : { backgroundColor: 'rgba(0,0,0,0.5)' }
                             ]}
                             onPress={() => setLocked(!locked)}
                         >
-                            <Ionicons name={locked ? "lock-closed" : "lock-open-outline"} size={20} color={locked ? "black" : "white"} />
+                            <Ionicons name={locked ? "lock-closed" : "lock-open-outline"} size={20} color={locked ? "#d8e3f2" : "white"} />
                         </TouchableOpacity>
 
                         {/* Center Controls */}
@@ -973,9 +977,9 @@ export default function NativePlayer({
                                         value={sliderValue}
                                         onSlidingStart={handleSlidingStart}
                                         onSlidingComplete={handleSlidingComplete}
-                                        minimumTrackTintColor="#fbbf24"
+                                        minimumTrackTintColor={ACCENT}
                                         maximumTrackTintColor="rgba(255,255,255,0.2)"
-                                        thumbTintColor="#fbbf24"
+                                        thumbTintColor={ACCENT}
                                     />
                                     <Text style={styles.timeText}>{formatTime(status.isLoaded ? status.durationMillis : 0)}</Text>
                                 </View>
@@ -1164,13 +1168,13 @@ export default function NativePlayer({
                                                     flexDirection: 'row', alignItems: 'center', gap: 6,
                                                     paddingHorizontal: 14, paddingVertical: 7,
                                                     borderRadius: 20,
-                                                    backgroundColor: isActive ? 'rgba(244,200,74,0.15)' : 'rgba(255,255,255,0.06)',
+                                                    backgroundColor: isActive ? 'rgba(143,167,197,0.16)' : 'rgba(255,255,255,0.06)',
                                                     borderWidth: 1,
-                                                    borderColor: isActive ? '#E6BF5C' : 'rgba(255,255,255,0.1)',
+                                                    borderColor: isActive ? ACCENT : 'rgba(255,255,255,0.1)',
                                                 }}
                                             >
                                                 <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: isActive ? dotColor : 'rgba(255,255,255,0.25)' }} />
-                                                <Text style={{ color: isActive ? '#E6BF5C' : 'rgba(255,255,255,0.55)', fontSize: 13, fontWeight: isActive ? '700' : '500' }}>
+                                                <Text style={{ color: isActive ? ACCENT_TEXT : 'rgba(255,255,255,0.55)', fontSize: 13, fontWeight: isActive ? '700' : '500' }}>
                                                     {lang}
                                                 </Text>
                                             </TouchableOpacity>
@@ -1202,12 +1206,12 @@ export default function NativePlayer({
                                             }}
                                         >
                                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                                                <Ionicons name="server-outline" size={20} color={index === currentServerIndex ? '#fbbf24' : 'gray'} />
+                                                <Ionicons name="server-outline" size={20} color={index === currentServerIndex ? ACCENT : 'gray'} />
                                                 <Text style={[styles.serverRowText, index === currentServerIndex && styles.activeServerRowText]}>
                                                     {sDisplayName} • {sourceName}
                                                 </Text>
                                             </View>
-                                            {index === currentServerIndex && <Ionicons name="checkmark" size={20} color="#fbbf24" />}
+                                            {index === currentServerIndex && <Ionicons name="checkmark" size={20} color={ACCENT} />}
                                         </TouchableOpacity>
                                     );
                                 })}
@@ -1266,10 +1270,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 18,
         paddingVertical: 10,
         borderRadius: 20,
-        backgroundColor: '#fbbf24',
+        backgroundColor: ACCENT_SURFACE,
+        borderWidth: 1,
+        borderColor: ACCENT_BORDER,
     },
     errorButtonPrimaryText: {
-        color: '#111827',
+        color: '#d8e3f2',
         fontWeight: '600',
         fontSize: 14,
     },
@@ -1351,7 +1357,7 @@ const styles = StyleSheet.create({
     },
     brightnessFill: {
         width: '100%',
-        backgroundColor: '#fbbf24',
+        backgroundColor: ACCENT,
         borderRadius: 2.5,
     },
 
@@ -1406,7 +1412,7 @@ const styles = StyleSheet.create({
     },
     activeEpGridItem: {
         backgroundColor: 'rgba(245,196,81,0.10)',
-        borderColor: '#F5C451',
+        borderColor: ACCENT,
     },
     epGridText: {
         color: '#9CA3AF',
@@ -1415,7 +1421,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     activeEpGridText: {
-        color: '#F5C451',
+        color: ACCENT_TEXT,
         fontWeight: '600',
     },
 
@@ -1432,9 +1438,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    rangeChipActive: { backgroundColor: 'rgba(251,191,36,0.15)', borderColor: '#fbbf24' },
+    rangeChipActive: { backgroundColor: 'rgba(143,167,197,0.16)', borderColor: ACCENT },
     rangeChipText: { color: 'rgba(255,255,255,0.55)', fontSize: 13, fontWeight: '600' },
-    rangeChipTextActive: { color: '#fbbf24', fontWeight: '700' },
+    rangeChipTextActive: { color: ACCENT_TEXT, fontWeight: '700' },
 
     sheetOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
     sheetContent: { width: '100%', backgroundColor: '#1c1c1c', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, paddingBottom: 40 },
@@ -1443,5 +1449,5 @@ const styles = StyleSheet.create({
     serverRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)' },
     activeServerRow: {},
     serverRowText: { color: 'white', fontSize: 16 },
-    activeServerRowText: { color: '#fbbf24', fontWeight: 'bold' },
+    activeServerRowText: { color: ACCENT_TEXT, fontWeight: 'bold' },
 });

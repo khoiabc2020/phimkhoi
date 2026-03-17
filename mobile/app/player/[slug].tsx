@@ -112,6 +112,7 @@ export default function PlayerScreen() {
     }, []);
 
     useEffect(() => {
+        let mounted = true;
         const fetchVideo = async () => {
             if (!slug) return;
             setLoading(true);
@@ -120,6 +121,7 @@ export default function PlayerScreen() {
             const useLocal = localUriDecoded || localFromStore;
 
             if (useLocal) {
+                if (!mounted) return;
                 setVideoUrl(useLocal);
                 setIsNative(true);
                 setMovieTitle('');
@@ -132,6 +134,7 @@ export default function PlayerScreen() {
 
             const data = await getMovieDetail(slug as string);
             if (data && data.episodes) {
+                if (!mounted) return;
                 const m = data.movie;
                 setMovieTitle(m?.name || "");
                 // Store movie metadata for history saving
@@ -146,12 +149,15 @@ export default function PlayerScreen() {
             // Fetch initial resume time if logged in
             if (token && slug && ep && !useLocal) {
                 const hist = await getHistoryForEpisode(slug as string, ep as string, token);
+                if (!mounted) return;
                 setInitialTime(hist?.currentTime ? hist.currentTime * 1000 : 0);
             }
 
+            if (!mounted) return;
             setLoading(false);
         };
         fetchVideo();
+        return () => { mounted = false; };
     }, [slug, ep, selectedServer, localUriParam, applyEpisode, token]);
 
     const handleProgress = async (currentTime: number, duration: number) => {
@@ -187,7 +193,7 @@ export default function PlayerScreen() {
         return (
             <View className="flex-1 bg-black justify-center items-center">
                 <StatusBar hidden />
-                <ActivityIndicator size="large" color="#fbbf24" />
+                <ActivityIndicator size="large" color="#8FA7C5" />
             </View>
         );
     }
@@ -270,8 +276,8 @@ export default function PlayerScreen() {
                         renderError={() => (
                             <View className="flex-1 justify-center items-center bg-black">
                                 <Text className="text-white mb-4">Lỗi tải video. Vui lòng thử lại.</Text>
-                                <TouchableOpacity onPress={() => setVideoUrl(videoUrl + '?retry=1')} className="bg-[#fbbf24] px-4 py-2 rounded">
-                                    <Text className="font-bold">Tải lại</Text>
+                                <TouchableOpacity onPress={() => setVideoUrl(videoUrl + '?retry=1')} className="bg-[#263243] border border-[#33455F] px-4 py-2 rounded">
+                                    <Text className="font-bold text-[#d8e3f2]">Tải lại</Text>
                                 </TouchableOpacity>
                             </View>
                         )}

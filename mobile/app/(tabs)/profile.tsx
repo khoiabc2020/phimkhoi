@@ -60,8 +60,8 @@ function MenuRow({ icon, label, sublabel, badge, onPress, danger = false }: {
         {sublabel && <Text style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12, marginTop: 1 }}>{sublabel}</Text>}
       </View>
       {badge ? (
-        <View style={{ backgroundColor: '#E6BF5C', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 2 }}>
-          <Text style={{ color: '#000', fontSize: 11, fontWeight: '800' }}>{badge}</Text>
+        <View style={{ backgroundColor: '#263243', borderWidth: 1, borderColor: '#33455F', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 2 }}>
+          <Text style={{ color: '#d8e3f2', fontSize: 11, fontWeight: '800' }}>{badge}</Text>
         </View>
       ) : (
         <Ionicons name="chevron-forward" size={15} color="rgba(255,255,255,0.15)" />
@@ -187,7 +187,7 @@ export default function ProfileScreen() {
         {/* Background gradient */}
         <View style={{ position: 'absolute', inset: 0 }} pointerEvents="none">
           <LinearGradient colors={['#0d0a1f', '#05060a']} style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '55%' }} />
-          <View style={{ position: 'absolute', top: -60, right: -80, width: 240, height: 240, borderRadius: 120, backgroundColor: 'rgba(234,179,8,0.05)' }} />
+          <View style={{ position: 'absolute', top: -60, right: -80, width: 240, height: 240, borderRadius: 120, backgroundColor: 'rgba(143,167,197,0.08)' }} />
         </View>
         <SafeAreaView style={{ flex: 1 }}>
           <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
@@ -197,15 +197,15 @@ export default function ProfileScreen() {
             {/* Hero sign-in card */}
             <GlassCard style={{ padding: 24, marginBottom: 24, alignItems: 'center' }}>
               <LinearGradient
-                colors={['rgba(234,179,8,0.08)', 'transparent']}
+                colors={['rgba(143,167,197,0.14)', 'transparent']}
                 style={{ position: 'absolute', inset: 0, borderRadius: 20 }}
               />
               <View style={{
-                width: 72, height: 72, borderRadius: 20, backgroundColor: 'rgba(234,179,8,0.1)',
+                width: 72, height: 72, borderRadius: 20, backgroundColor: 'rgba(143,167,197,0.14)',
                 alignItems: 'center', justifyContent: 'center', marginBottom: 16,
-                borderWidth: 1, borderColor: 'rgba(234,179,8,0.2)'
+                borderWidth: 1, borderColor: 'rgba(143,167,197,0.3)'
               }}>
-                <Ionicons name="person-outline" size={32} color="#E6BF5C" />
+                <Ionicons name="person-outline" size={32} color="#8FA7C5" />
               </View>
               <Text style={{ color: 'white', fontSize: 18, fontWeight: '700', marginBottom: 8 }}>Chưa đăng nhập</Text>
               <Text style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13, textAlign: 'center', lineHeight: 20, marginBottom: 24 }}>
@@ -216,11 +216,11 @@ export default function ProfileScreen() {
                 style={{ width: '100%', borderRadius: 14, overflow: 'hidden', marginBottom: 10 }}
               >
                 <LinearGradient
-                  colors={['#f59e0b', '#E6BF5C']}
+                  colors={['#263243', '#32445b']}
                   start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                  style={{ paddingVertical: 14, alignItems: 'center' }}
+                  style={{ paddingVertical: 14, alignItems: 'center', borderWidth: 1, borderColor: '#33455F' }}
                 >
-                  <Text style={{ color: '#000', fontWeight: '800', fontSize: 15 }}>Đăng nhập</Text>
+                  <Text style={{ color: '#d8e3f2', fontWeight: '800', fontSize: 15 }}>Đăng nhập</Text>
                 </LinearGradient>
               </TouchableOpacity>
               <TouchableOpacity
@@ -276,7 +276,7 @@ export default function ProfileScreen() {
       {/* Background */}
       <View style={{ position: 'absolute', inset: 0 }} pointerEvents="none">
         <LinearGradient colors={['#0d0a1f', '#05060a']} style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '40%' }} />
-        <View style={{ position: 'absolute', top: -40, right: -60, width: 200, height: 200, borderRadius: 100, backgroundColor: 'rgba(234,179,8,0.05)' }} />
+        <View style={{ position: 'absolute', top: -40, right: -60, width: 200, height: 200, borderRadius: 100, backgroundColor: 'rgba(143,167,197,0.08)' }} />
       </View>
 
       <SafeAreaView style={{ flex: 1 }}>
@@ -292,24 +292,24 @@ export default function ProfileScreen() {
           {/* Profile Card — iOS 26 Hero */}
           <GlassCard style={{ padding: 20, marginBottom: 16 }}>
             <LinearGradient
-              colors={['rgba(234,179,8,0.07)', 'transparent']}
+              colors={['rgba(143,167,197,0.14)', 'transparent']}
               style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 80, borderRadius: 20 }}
             />
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
               {/* Avatar */}
               <View style={{
                 width: 68, height: 68, borderRadius: 34,
-                borderWidth: 2.5, borderColor: 'rgba(234,179,8,0.5)',
+                borderWidth: 2.5, borderColor: 'rgba(143,167,197,0.45)',
                 overflow: 'hidden',
               }}>
                 {user.image ? (
                   <Image source={{ uri: user.image }} style={{ width: '100%', height: '100%' }} />
                 ) : (
                   <LinearGradient
-                    colors={['rgba(234,179,8,0.25)', 'rgba(234,179,8,0.08)']}
+                    colors={['rgba(143,167,197,0.28)', 'rgba(143,167,197,0.1)']}
                     style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
                   >
-                    <Text style={{ color: '#E6BF5C', fontSize: 24, fontWeight: '800' }}>{initials}</Text>
+                    <Text style={{ color: '#c7d7ea', fontSize: 24, fontWeight: '800' }}>{initials}</Text>
                   </LinearGradient>
                 )}
               </View>
@@ -317,9 +317,9 @@ export default function ProfileScreen() {
                 <Text style={{ color: 'white', fontSize: 20, fontWeight: '800', marginBottom: 4, letterSpacing: -0.3 }}>{user.name}</Text>
                 <Text style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13 }} numberOfLines={1}>{user.email}</Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8 }}>
-                  <View style={{ backgroundColor: 'rgba(234,179,8,0.12)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(234,179,8,0.2)', flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                    <Ionicons name={user.role === 'admin' ? 'shield' : 'star'} size={11} color="#E6BF5C" />
-                    <Text style={{ color: '#E6BF5C', fontSize: 11, fontWeight: '700' }}>
+                  <View style={{ backgroundColor: 'rgba(143,167,197,0.14)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(143,167,197,0.32)', flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                    <Ionicons name={user.role === 'admin' ? 'shield' : 'star'} size={11} color="#8FA7C5" />
+                    <Text style={{ color: '#c7d7ea', fontSize: 11, fontWeight: '700' }}>
                       {user.role === 'admin' ? 'Quản trị' : 'Thành viên'}
                     </Text>
                   </View>
@@ -371,8 +371,8 @@ export default function ProfileScreen() {
                 backgroundColor: pressed ? 'rgba(255,255,255,0.04)' : 'transparent',
               })}
             >
-              <View style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: updateInfo ? 'rgba(234,179,8,0.15)' : 'rgba(255,255,255,0.07)', alignItems: 'center', justifyContent: 'center', marginRight: 13 }}>
-                <Ionicons name={updateInfo ? 'cloud-download-outline' : 'checkmark-circle-outline'} size={18} color={updateInfo ? '#E6BF5C' : 'rgba(255,255,255,0.6)'} />
+              <View style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: updateInfo ? 'rgba(143,167,197,0.18)' : 'rgba(255,255,255,0.07)', alignItems: 'center', justifyContent: 'center', marginRight: 13 }}>
+                <Ionicons name={updateInfo ? 'cloud-download-outline' : 'checkmark-circle-outline'} size={18} color={updateInfo ? '#8FA7C5' : 'rgba(255,255,255,0.6)'} />
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={{ color: 'white', fontSize: 15, fontWeight: '600' }}>
@@ -381,8 +381,8 @@ export default function ProfileScreen() {
                 <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, textAlign: 'center' }}>Phiên bản {APP_VERSION} (Build {APP_BUILD})</Text>
               </View>
               {updateInfo ? (
-                <TouchableOpacity onPress={() => handleDownloadAndInstall(updateInfo.download_url)} style={{ backgroundColor: '#E6BF5C', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}>
-                  <Text style={{ color: '#000', fontSize: 12, fontWeight: '800' }}>Cập nhật</Text>
+                <TouchableOpacity onPress={() => handleDownloadAndInstall(updateInfo.download_url)} style={{ backgroundColor: '#263243', borderRadius: 8, borderWidth: 1, borderColor: '#33455F', paddingHorizontal: 12, paddingVertical: 6 }}>
+                  <Text style={{ color: '#d8e3f2', fontSize: 12, fontWeight: '800' }}>Cập nhật</Text>
                 </TouchableOpacity>
               ) : (
                 <Ionicons name="refresh-outline" size={18} color={checking ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.4)'} />

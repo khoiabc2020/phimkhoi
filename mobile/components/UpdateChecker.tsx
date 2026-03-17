@@ -9,8 +9,8 @@ import { CONFIG } from '@/constants/config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Version hiện tại của ứng dụng — cập nhật mỗi lần build
-const CURRENT_VERSION = '1.0.6';
-const CURRENT_BUILD = 7;
+const CURRENT_VERSION = '1.0.7';
+const CURRENT_BUILD = 8;
 
 const SKIP_KEY = 'skipped_update_build';
 
@@ -89,7 +89,7 @@ export default function UpdateChecker({ silent = true }: Props) {
                 <View style={styles.card}>
                     {/* Header */}
                     <View style={styles.iconWrap}>
-                        <Ionicons name="rocket-outline" size={40} color="#E6BF5C" />
+                        <Ionicons name="rocket-outline" size={40} color="#8FA7C5" />
                     </View>
 
                     <Text style={styles.title}>Phiên bản mới!</Text>
@@ -105,7 +105,7 @@ export default function UpdateChecker({ silent = true }: Props) {
 
                     {/* Buttons */}
                     <Pressable style={styles.updateBtn} onPress={handleUpdate}>
-                        <Ionicons name="cloud-download-outline" size={18} color="#0B0D12" style={{ marginRight: 8 }} />
+                        <Ionicons name="cloud-download-outline" size={18} color="#d8e3f2" style={{ marginRight: 8 }} />
                         <Text style={styles.updateBtnText}>Tải về & Cài đặt</Text>
                     </Pressable>
 
@@ -129,12 +129,12 @@ const styles = StyleSheet.create({
     },
     iconWrap: {
         width: 72, height: 72, borderRadius: 36,
-        backgroundColor: 'rgba(244,200,74,0.12)',
+        backgroundColor: 'rgba(143,167,197,0.14)',
         alignItems: 'center', justifyContent: 'center',
         marginBottom: 16,
     },
     title: { color: 'white', fontSize: 22, fontWeight: '700', marginBottom: 4 },
-    versionText: { color: '#E6BF5C', fontSize: 15, fontWeight: '600', marginBottom: 16 },
+    versionText: { color: '#c7d7ea', fontSize: 15, fontWeight: '600', marginBottom: 16 },
     changelogBox: {
         width: '100%', backgroundColor: 'rgba(255,255,255,0.05)',
         borderRadius: 12, padding: 14, marginBottom: 20,
@@ -143,9 +143,9 @@ const styles = StyleSheet.create({
     changelogText: { color: 'rgba(255,255,255,0.8)', fontSize: 13, lineHeight: 20 },
     updateBtn: {
         width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-        backgroundColor: '#E6BF5C', borderRadius: 14, paddingVertical: 14, marginBottom: 10,
+        backgroundColor: '#263243', borderWidth: 1, borderColor: '#33455F', borderRadius: 14, paddingVertical: 14, marginBottom: 10,
     },
-    updateBtnText: { color: '#0B0D12', fontSize: 16, fontWeight: '700' },
+    updateBtnText: { color: '#d8e3f2', fontSize: 16, fontWeight: '700' },
     skipBtn: { paddingVertical: 10 },
     skipText: { color: 'rgba(255,255,255,0.4)', fontSize: 13 },
 });

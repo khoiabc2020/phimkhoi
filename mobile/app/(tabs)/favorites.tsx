@@ -10,6 +10,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Dimensions } from 'react-native';
 import { useAuth } from '@/context/auth';
 import { CONFIG } from '@/constants/config';
+import { COLORS } from '@/constants/theme';
 
 const { width } = Dimensions.get('window');
 const COLS = 3;
@@ -87,7 +88,7 @@ export default function FavoritesScreen() {
           </View>
           {!isEmpty && (
             <View style={styles.headerBadge}>
-              <Ionicons name="heart" size={18} color="#E6BF5C" />
+              <Ionicons name="heart" size={18} color="#8FA7C5" />
             </View>
           )}
         </View>
@@ -96,7 +97,7 @@ export default function FavoritesScreen() {
           /* ── Empty State ─────────────────────────── */
           <View style={styles.emptyWrap}>
             <View style={styles.emptyIcon}>
-              <Ionicons name="heart-outline" size={36} color="rgba(244,200,74,0.6)" />
+              <Ionicons name="heart-outline" size={36} color="rgba(143,167,197,0.75)" />
             </View>
             <Text style={styles.emptyTitle}>Chưa có phim yêu thích</Text>
             <Text style={styles.emptySub}>
@@ -104,7 +105,7 @@ export default function FavoritesScreen() {
             </Text>
             <Link href="/(tabs)/explore" asChild>
               <Pressable style={styles.exploreBtn}>
-                <Ionicons name="compass-outline" size={16} color="black" />
+                <Ionicons name="compass-outline" size={16} color="#d8e3f2" />
                 <Text style={styles.exploreBtnText}>Khám phá phim</Text>
               </Pressable>
             </Link>
@@ -119,7 +120,7 @@ export default function FavoritesScreen() {
               contentContainerStyle={{ paddingBottom: 120 }}
               estimatedItemSize={CARD_W * 1.45 + 16}
               refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#E6BF5C" />
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#8FA7C5" />
               }
               showsVerticalScrollIndicator={false}
               renderItem={({ item, index }) => {
@@ -172,7 +173,7 @@ export default function FavoritesScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#09090f' },
+  root: { flex: 1, backgroundColor: COLORS.bg0 },
   safe: { flex: 1 },
 
   header: {
@@ -187,8 +188,8 @@ const styles = StyleSheet.create({
   headerSub: { color: 'rgba(255,255,255,0.4)', fontSize: 12, marginTop: 2 },
   headerBadge: {
     width: 42, height: 42, borderRadius: 14,
-    backgroundColor: 'rgba(244, 200, 74, 0.1)',
-    borderWidth: 1, borderColor: 'rgba(244,200,74,0.2)',
+    backgroundColor: 'rgba(143,167,197,0.12)',
+    borderWidth: 1, borderColor: 'rgba(143,167,197,0.3)',
     alignItems: 'center', justifyContent: 'center',
   },
 
@@ -199,8 +200,8 @@ const styles = StyleSheet.create({
   },
   emptyIcon: {
     width: 88, height: 88, borderRadius: 28,
-    backgroundColor: 'rgba(244,200,74,0.08)',
-    borderWidth: 1, borderColor: 'rgba(244,200,74,0.15)',
+    backgroundColor: 'rgba(143,167,197,0.12)',
+    borderWidth: 1, borderColor: 'rgba(143,167,197,0.25)',
     alignItems: 'center', justifyContent: 'center',
     marginBottom: 4,
   },
@@ -214,11 +215,13 @@ const styles = StyleSheet.create({
   },
   exploreBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
-    backgroundColor: '#E6BF5C',
+    backgroundColor: '#263243',
+    borderWidth: 1,
+    borderColor: '#33455F',
     paddingHorizontal: 24, paddingVertical: 12,
     borderRadius: 24, marginTop: 8,
   },
-  exploreBtnText: { color: '#000', fontWeight: '700', fontSize: 14 },
+  exploreBtnText: { color: '#d8e3f2', fontWeight: '700', fontSize: 14 },
 
   // Grid
   grid: { paddingHorizontal: 16, paddingBottom: 120 },
