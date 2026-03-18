@@ -12,8 +12,8 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
     const { name } = await params;
     const decodedName = decodeURIComponent(name);
     return {
-        title: `${decodedName} - Phim tham gia & Tiểu sử | CINEFLIX`,
-        description: `Danh sách phim, tiểu sử và thông tin chi tiết của diễn viên / đạo diễn ${decodedName} mới nhất và đầy đủ nhất tại CINEFLIX.`
+        title: `${decodedName} - Phim tham gia & Tiểu sử | KHOIPHIM`,
+        description: `Danh sách phim, tiểu sử và thông tin chi tiết của diễn viên / đạo diễn ${decodedName} mới nhất và đầy đủ nhất tại KHOIPHIM.`
     };
 }
 

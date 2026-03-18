@@ -282,10 +282,10 @@ export default function HomeScreen() {
         <SafeAreaView edges={['top']} style={styles.headerContent}>
           <View style={styles.headerRow}>
             <View style={[styles.logoRow, { paddingLeft: 8 }]}>
-              <View style={{ transform: [{ scaleX: 0.88 }, { scaleY: 1.22 }] }}>
+              <View style={{ transform: [{ scaleX: 0.88 }, { scaleY: 1.18 }] }}>
                 <Text style={styles.logoText}>
-                  <Text style={styles.logoTextBase}>CINE</Text>
-                  <Text style={styles.logoTextHot}>FLIX</Text>
+                  <Text style={styles.logoTextBase}>KHOI</Text>
+                  <Text style={styles.logoTextHot}>PHIM</Text>
                 </Text>
               </View>
             </View>
@@ -517,7 +517,7 @@ const styles = StyleSheet.create({
   headerContent: { paddingBottom: 10 },
   headerRow: { height: 50, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20 },
   logoRow: { flexDirection: 'row', alignItems: 'center' },
-  logoText: { color: COLORS.textPrimary, fontSize: 32, fontWeight: '900', letterSpacing: 1.0, textTransform: 'uppercase' },
+  logoText: { color: COLORS.textPrimary, fontSize: 32, fontWeight: '800', letterSpacing: 0.8, textTransform: 'uppercase' },
   logoTextBase: { color: '#9CA3AF' },
   logoTextHot: { color: '#E50914' },
   headerActions: { flexDirection: 'row', gap: 12, alignItems: 'center' },

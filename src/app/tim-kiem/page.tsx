@@ -8,7 +8,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
     title: "Tìm kiếm phim",
-    description: "Tìm kiếm phim, diễn viên và nội dung tại CINEFLIX.",
+    description: "Tìm kiếm phim, diễn viên và nội dung tại KHOIPHIM.",
     robots: {
         index: false,
         follow: true,

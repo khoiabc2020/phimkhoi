@@ -25,7 +25,7 @@ export default function AdminSidebar() {
                     <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center font-bold text-black shadow-lg shadow-primary/50">
                         K
                     </div>
-                    <span className="font-bold text-xl text-white">CINEFLIX Admin</span>
+                    <span className="font-bold text-xl text-white">KHOIPHIM Admin</span>
                 </Link>
             </div>
 

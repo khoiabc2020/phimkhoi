@@ -6,6 +6,16 @@ import { Lock, User, Mail } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Đăng ký | KHOIPHIM",
+    description: "Đăng ký để bắt đầu sử dụng KHOIPHIM.",
+    robots: {
+        index: false,
+        follow: true,
+    },
+};
 
 function RegisterForm() {
     const [name, setName] = useState("");
@@ -49,13 +59,13 @@ function RegisterForm() {
     return (
         <div className="relative z-10 w-full max-w-[450px] mx-4 p-8 md:p-12 bg-black/70 border border-white/15 rounded-2xl shadow-2xl flex flex-col items-center backdrop-blur-xl">
             <h1 className="text-3xl font-bold text-white mb-2 text-center w-full">Tạo tài khoản</h1>
-            <p className="text-[#a3a3a3] text-[15px] mb-6 text-center w-full">Tham gia cộng đồng yêu phim ngay hôm nay.</p>
+            <p className="text-white/45 text-[15px] mb-6 text-center w-full">Tham gia cộng đồng yêu phim ngay hôm nay.</p>
 
             {/* Chỉ tạo tài khoản bằng email/mật khẩu (ẩn Google/Facebook) */}
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
                 {error && (
-                    <div className="px-4 py-3 bg-[#e87c03] rounded text-white text-sm">
+                    <div className="px-4 py-3 bg-[#E50914]/15 border border-[#E50914]/25 rounded text-[#ffd1d1] text-sm">
                         {error}
                     </div>
                 )}
@@ -112,14 +122,14 @@ function RegisterForm() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-[#eab308] hover:bg-[#d9a307] text-black font-bold h-12 rounded transition-colors flex items-center justify-center shadow-[0_2px_10px_#EAB30833] disabled:opacity-70 disabled:cursor-not-allowed mt-1"
+                    className="w-full bg-[#E50914] hover:bg-[#ff2a2a] text-white font-bold h-12 rounded transition-colors flex items-center justify-center shadow-[0_2px_10px_#E5091433] disabled:opacity-70 disabled:cursor-not-allowed mt-1"
                 >
                     {loading ? "Đang xử lý..." : "Đăng ký"}
                 </button>
 
-                <div className="text-[#8c8c8c] text-[15px] mt-8 text-center w-full pb-2">
+                <div className="text-white/45 text-[15px] mt-8 text-center w-full pb-2">
                     Đã có tài khoản?{" "}
-                    <Link href="/login" className="text-[#eab308] hover:underline font-bold ml-1">
+                    <Link href="/login" className="text-[#E50914] hover:underline font-bold ml-1">
                         Đăng nhập ngay
                     </Link>
                 </div>
@@ -133,8 +143,8 @@ export default function RegisterPage() {
         <main className="min-h-screen flex flex-col items-center justify-center pt-24 pb-8 bg-[#0a0a0a] relative overflow-hidden font-sans">
             <div className="absolute top-6 left-6 md:top-8 md:left-12 z-20">
                 <Link href="/" className="group shrink-0">
-                    <span className="inline-block origin-left text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-[0.03em] leading-none font-sans whitespace-nowrap [transform:scale(0.88,1.22)]">
-                        <span className="text-[#9CA3AF]">CINE</span><span className="text-[#E50914]">FLIX</span>
+                    <span className="inline-block origin-left text-3xl md:text-4xl lg:text-5xl font-semibold uppercase tracking-[0.03em] leading-none font-sans whitespace-nowrap [transform:scale(0.88,1.18)]">
+                        <span className="text-[#9CA3AF]">KHOI</span><span className="text-[#E50914]">PHIM</span>
                     </span>
                 </Link>
             </div>

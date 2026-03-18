@@ -10,8 +10,8 @@ export const revalidate = 300;
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params;
     return {
-        title: `Phim ${slug} - CINEFLIX`,
-        description: `Xem phim ${slug} mới nhất tại CINEFLIX.`,
+        title: `Phim ${slug} - KHOIPHIM`,
+        description: `Xem phim ${slug} mới nhất tại KHOIPHIM.`,
     };
 }
 

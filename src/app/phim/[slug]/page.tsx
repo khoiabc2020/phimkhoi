@@ -27,15 +27,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const { slug } = await params;
     const data = await getMovieDetail(slug);
     const movie: any = data?.movie;
-    if (!movie) return { title: "Không tìm thấy phim - CINEFLIX" };
+    if (!movie) return { title: "Không tìm thấy phim - KHOIPHIM" };
 
     // Giới hạn description để SEO tốt hơn
-    const desc = movie.content ? movie.content.replace(/<[^>]+>/g, '').substring(0, 160) + '...' : `Xem phim ${movie.name} chất lượng cao tại CINEFLIX.`;
+    const desc = movie.content ? movie.content.replace(/<[^>]+>/g, '').substring(0, 160) + '...' : `Xem phim ${movie.name} chất lượng cao tại KHOIPHIM.`;
     const poster = getImageUrl(movie.poster_url || movie.thumb_url || "");
     const url = `https://khoiphim.io.vn/phim/${slug}`;
 
     return {
-        title: `${movie.name || "Phim"} - Xem phim tại CINEFLIX`,
+        title: `${movie.name || "Phim"} - Xem phim tại KHOIPHIM`,
         description: desc,
         alternates: {
             canonical: url,
@@ -60,7 +60,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         },
         twitter: {
             card: "summary_large_image",
-            title: `${movie.name} | CINEFLIX`,
+            title: `${movie.name} | KHOIPHIM`,
             description: desc,
             images: [poster],
         },
@@ -323,7 +323,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                     className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/5 rounded-full"
                                     showLabel={true}
                                 />
-                                <ShareButton title={`Xem phim ${movie.name} trên CINEFLIX`} />
+                                <ShareButton title={`Xem phim ${movie.name} trên KHOIPHIM`} />
                             </>
                         )}
                     </div>

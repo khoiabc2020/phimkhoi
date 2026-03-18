@@ -211,8 +211,8 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
 
                         {/* Logo */}
                         <Link href="/" className="flex items-center group shrink-0 order-2 md:order-none">
-                            <span className="inline-block origin-left text-[22px] md:text-[30px] font-black uppercase tracking-[0.03em] leading-none font-sans whitespace-nowrap [transform:scale(0.88,1.22)]">
-                                <span className="text-[#9CA3AF]">CINE</span><span className="text-[#E50914]">FLIX</span>
+                            <span className="inline-block origin-left text-[22px] md:text-[30px] font-semibold uppercase tracking-[0.03em] leading-none font-sans whitespace-nowrap [transform:scale(0.88,1.18)]">
+                                <span className="text-[#9CA3AF]">KHOI</span><span className="text-[#E50914]">PHIM</span>
                             </span>
                         </Link>
                     </div>

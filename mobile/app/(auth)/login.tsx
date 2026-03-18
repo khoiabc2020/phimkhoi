@@ -182,9 +182,9 @@ export default function AuthScreen() {
 
                         {/* Brand */}
                         <View style={{ alignItems: 'center', marginBottom: 32 }}>
-                            <View style={{ transform: [{ scaleX: 0.88 }, { scaleY: 1.22 }] }}>
-                                <Text style={{ color: 'white', fontSize: 42, fontWeight: '900', letterSpacing: 1.0 }}>
-                                    <Text style={{ color: '#9CA3AF' }}>CINE</Text><Text style={{ color: '#E50914' }}>FLIX</Text>
+                            <View style={{ transform: [{ scaleX: 0.88 }, { scaleY: 1.18 }] }}>
+                                <Text style={{ color: 'white', fontSize: 42, fontWeight: '800', letterSpacing: 0.8 }}>
+                                    <Text style={{ color: '#9CA3AF' }}>KHOI</Text><Text style={{ color: '#E50914' }}>PHIM</Text>
                                 </Text>
                             </View>
                             <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, marginTop: 6 }}>

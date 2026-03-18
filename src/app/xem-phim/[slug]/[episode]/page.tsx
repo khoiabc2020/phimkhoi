@@ -32,7 +32,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
     const currentEpisode = episodes.find((ep: { slug: string }) => ep.slug === episode);
     if (!movie) return { title: "Không tìm thấy phim" };
     return {
-        title: `Xem phim ${movie.name} - Tập ${currentEpisode?.name || episode} | CINEFLIX`,
+        title: `Xem phim ${movie.name} - Tập ${currentEpisode?.name || episode} | KHOIPHIM`,
         description: `Xem phim ${movie.name} tập ${currentEpisode?.name || episode} vietsub.`,
         alternates: {
             canonical: `https://khoiphim.io.vn/phim/${slug}`,
