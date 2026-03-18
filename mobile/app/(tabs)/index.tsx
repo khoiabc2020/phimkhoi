@@ -1,5 +1,5 @@
 import {
-  ScrollView, View, Text, Pressable, Image,
+  ScrollView, View, Text, Pressable,
   RefreshControl, Platform, StyleSheet, Dimensions
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -282,15 +282,9 @@ export default function HomeScreen() {
         <SafeAreaView edges={['top']} style={styles.headerContent}>
           <View style={styles.headerRow}>
             <View style={[styles.logoRow, { paddingLeft: 8 }]}>
-              <View style={styles.logoImageWrap}>
-                <Image
-                  source={require('../../assets/images/logo.webp')}
-                  style={styles.logoImage}
-                />
-              </View>
               <Text style={styles.logoText}>
-                Movie
-                <Text style={styles.logoTextAccent}>Box</Text>
+                <Text style={styles.logoTextBase}>CINE</Text>
+                <Text style={styles.logoTextHot}>FLIX</Text>
               </Text>
             </View>
 
@@ -520,28 +514,10 @@ const styles = StyleSheet.create({
   headerWrapper: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 100 },
   headerContent: { paddingBottom: 10 },
   headerRow: { height: 50, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20 },
-  logoRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  logoImageWrap: {
-    width: 42,
-    height: 42,
-    borderRadius: 14,
-    overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  logoImage: {
-    width: 42,
-    height: 42,
-    resizeMode: 'cover',
-  },
-  logoText: { color: COLORS.textPrimary, fontSize: 20, fontWeight: '800', letterSpacing: -0.5 },
-  logoTextAccent: { color: COLORS.accent },
+  logoRow: { flexDirection: 'row', alignItems: 'center' },
+  logoText: { color: COLORS.textPrimary, fontSize: 32, fontWeight: '900', letterSpacing: 1.0, textTransform: 'uppercase' },
+  logoTextBase: { color: '#9CA3AF' },
+  logoTextHot: { color: '#E50914' },
   headerActions: { flexDirection: 'row', gap: 12, alignItems: 'center' },
   iconBtn: {
     width: 36, height: 36, borderRadius: 18,

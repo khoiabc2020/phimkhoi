@@ -132,22 +132,10 @@ export default function RegisterPage() {
     return (
         <main className="min-h-screen flex flex-col items-center justify-center pt-24 pb-8 bg-[#0a0a0a] relative overflow-hidden font-sans">
             <div className="absolute top-6 left-6 md:top-8 md:left-12 z-20">
-                <Link href="/" className="flex items-center gap-3 group shrink-0">
-                    <div className="relative w-10 h-10 md:w-12 md:h-12 flex items-center justify-center">
-                        <div className="absolute inset-0 bg-primary/10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                        <Image
-                            src="/logo.png"
-                            alt="CINEFLIX Logo"
-                            width={48}
-                            height={48}
-                            className="relative w-full h-full rounded-[14px] object-cover shadow-lg ring-1 ring-white/10 group-hover:scale-105 group-hover:ring-white/20 transition-all duration-300"
-                        />
-                    </div>
-                    <div className="flex flex-col justify-center">
-                        <span className="text-xl md:text-2xl lg:text-3xl font-bold text-white tracking-tight leading-none font-sans whitespace-nowrap">
-                            <span className="text-[#9CA3AF]">CINE</span><span className="text-[#E50914]">FLIX</span>
-                        </span>
-                    </div>
+                <Link href="/" className="group shrink-0">
+                    <span className="text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-[0.035em] leading-none font-sans whitespace-nowrap">
+                        <span className="text-[#9CA3AF]">CINE</span><span className="text-[#E50914]">FLIX</span>
+                    </span>
                 </Link>
             </div>
 

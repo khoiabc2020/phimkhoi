@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import {
@@ -80,15 +79,8 @@ export default function MobileMenu({
             >
                 {/* Header */}
                 <div className="flex items-center justify-between px-5 h-[72px] shrink-0 border-b border-white/[0.06] bg-[#09090d]/92">
-                    <Link href="/" onClick={onClose} className="flex items-center gap-2.5">
-                        <Image
-                            src="/logo.png"
-                            alt="CINEFLIX Logo"
-                            width={40}
-                            height={40}
-                            className="w-[40px] h-[40px] rounded-[11px] object-cover shadow-[0_0_10px_#8FA7C52A] ring-1 ring-white/8"
-                        />
-                        <span className="text-[18px] font-bold text-white tracking-tight"><span className="text-[#9CA3AF]">CINE</span><span className="text-[#E50914]">FLIX</span></span>
+                    <Link href="/" onClick={onClose} className="flex items-center">
+                        <span className="text-[28px] font-black uppercase tracking-[0.035em] leading-none"><span className="text-[#9CA3AF]">CINE</span><span className="text-[#E50914]">FLIX</span></span>
                     </Link>
                     <button
                         onClick={onClose}

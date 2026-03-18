@@ -1,6 +1,6 @@
 import {
     View, Text, TextInput, TouchableOpacity, ActivityIndicator,
-    Alert, KeyboardAvoidingView, Platform, ScrollView, Image, Pressable
+    Alert, KeyboardAvoidingView, Platform, ScrollView, Pressable
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
@@ -180,12 +180,9 @@ export default function AuthScreen() {
                             <Ionicons name="arrow-back" size={20} color="white" />
                         </TouchableOpacity>
 
-                        {/* Logo */}
+                        {/* Brand */}
                         <View style={{ alignItems: 'center', marginBottom: 32 }}>
-                            <View style={{ width: 80, height: 80, borderRadius: 22, overflow: 'hidden', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.15)', marginBottom: 16, shadowColor: '#8FA7C5', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.3, shadowRadius: 20 }}>
-                                <Image source={require('../../assets/images/logo.webp')} style={{ width: 80, height: 80 }} resizeMode="cover" />
-                            </View>
-                            <Text style={{ color: 'white', fontSize: 28, fontWeight: '800', letterSpacing: -0.5 }}>
+                            <Text style={{ color: 'white', fontSize: 42, fontWeight: '900', letterSpacing: 1.0 }}>
                                 <Text style={{ color: '#9CA3AF' }}>CINE</Text><Text style={{ color: '#E50914' }}>FLIX</Text>
                             </Text>
                             <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, marginTop: 6 }}>
