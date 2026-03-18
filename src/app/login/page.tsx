@@ -156,7 +156,7 @@ export default function LoginPage() {
         <main className="min-h-screen flex flex-col items-center justify-center pt-24 pb-8 bg-[#0a0a0a] relative overflow-hidden font-sans">
             <div className="absolute top-6 left-6 md:top-8 md:left-12 z-20">
                 <Link href="/" className="group shrink-0">
-                    <span className="text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-[0.035em] leading-none font-sans whitespace-nowrap">
+                    <span className="inline-block origin-left text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-[0.055em] leading-none font-sans whitespace-nowrap [transform:scaleX(1.18)]">
                         <span className="text-[#9CA3AF]">CINE</span><span className="text-[#E50914]">FLIX</span>
                     </span>
                 </Link>
