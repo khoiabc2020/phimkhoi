@@ -282,10 +282,12 @@ export default function HomeScreen() {
         <SafeAreaView edges={['top']} style={styles.headerContent}>
           <View style={styles.headerRow}>
             <View style={[styles.logoRow, { paddingLeft: 8 }]}>
-              <Text style={styles.logoText}>
-                <Text style={styles.logoTextBase}>CINE</Text>
-                <Text style={styles.logoTextHot}>FLIX</Text>
-              </Text>
+              <View style={{ transform: [{ scaleX: 0.88 }, { scaleY: 1.22 }] }}>
+                <Text style={styles.logoText}>
+                  <Text style={styles.logoTextBase}>CINE</Text>
+                  <Text style={styles.logoTextHot}>FLIX</Text>
+                </Text>
+              </View>
             </View>
 
             <View style={styles.headerActions}>

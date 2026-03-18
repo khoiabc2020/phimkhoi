@@ -80,7 +80,7 @@ export default function MobileMenu({
                 {/* Header */}
                 <div className="flex items-center justify-between px-5 h-[72px] shrink-0 border-b border-white/[0.06] bg-[#09090d]/92">
                     <Link href="/" onClick={onClose} className="flex items-center">
-                        <span className="inline-block origin-left text-[28px] font-black uppercase tracking-[0.055em] leading-none [transform:scaleX(1.18)]"><span className="text-[#9CA3AF]">CINE</span><span className="text-[#E50914]">FLIX</span></span>
+                        <span className="inline-block origin-left text-[28px] font-black uppercase tracking-[0.03em] leading-none [transform:scale(0.88,1.22)]"><span className="text-[#9CA3AF]">CINE</span><span className="text-[#E50914]">FLIX</span></span>
                     </Link>
                     <button
                         onClick={onClose}

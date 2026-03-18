@@ -182,9 +182,11 @@ export default function AuthScreen() {
 
                         {/* Brand */}
                         <View style={{ alignItems: 'center', marginBottom: 32 }}>
-                            <Text style={{ color: 'white', fontSize: 42, fontWeight: '900', letterSpacing: 1.0 }}>
-                                <Text style={{ color: '#9CA3AF' }}>CINE</Text><Text style={{ color: '#E50914' }}>FLIX</Text>
-                            </Text>
+                            <View style={{ transform: [{ scaleX: 0.88 }, { scaleY: 1.22 }] }}>
+                                <Text style={{ color: 'white', fontSize: 42, fontWeight: '900', letterSpacing: 1.0 }}>
+                                    <Text style={{ color: '#9CA3AF' }}>CINE</Text><Text style={{ color: '#E50914' }}>FLIX</Text>
+                                </Text>
+                            </View>
                             <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, marginTop: 6 }}>
                                 {tab === 'login' ? 'Chào mừng trở lại!' : 'Tạo tài khoản mới'}
                             </Text>
