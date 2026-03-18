@@ -186,7 +186,7 @@ export default function AuthScreen() {
                                 <Image source={require('../../assets/images/logo.webp')} style={{ width: 80, height: 80 }} resizeMode="cover" />
                             </View>
                             <Text style={{ color: 'white', fontSize: 28, fontWeight: '800', letterSpacing: -0.5 }}>
-                                Movie<Text style={{ color: '#8FA7C5' }}>Box</Text>
+                                <Text style={{ color: '#9CA3AF' }}>CINE</Text><Text style={{ color: '#E50914' }}>FLIX</Text>
                             </Text>
                             <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, marginTop: 6 }}>
                                 {tab === 'login' ? 'Chào mừng trở lại!' : 'Tạo tài khoản mới'}

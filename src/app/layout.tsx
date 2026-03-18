@@ -23,13 +23,13 @@ const beVietnamPro = Be_Vietnam_Pro({
 export const metadata: Metadata = {
   metadataBase: new URL("https://khoiphim.io.vn"),
   title: {
-    default: "MovieBox - Xem Phim Online Chất Lượng Cao",
-    template: "%s | MovieBox"
+    default: "CINEFLIX - Xem Phim Online Chất Lượng Cao",
+    template: "%s | CINEFLIX"
   },
   description: "Xem phim online chất lượng cao vietsub, lồng tiếng, thuyết minh. Phim mới cập nhật hàng ngày, hoàn toàn miễn phí.",
-  keywords: ["xem phim", "phim online", "phim vietsub", "phim hay", "phim mới", "MovieBox"],
-  authors: [{ name: "MovieBox" }],
-  creator: "MovieBox",
+  keywords: ["xem phim", "phim online", "phim vietsub", "phim hay", "phim mới", "CINEFLIX"],
+  authors: [{ name: "CINEFLIX" }],
+  creator: "CINEFLIX",
   alternates: {
     canonical: "/",
   },
@@ -45,24 +45,24 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "MovieBox - Xem Phim Online Chất Lượng Cao",
+    title: "CINEFLIX - Xem Phim Online Chất Lượng Cao",
     description: "Xem phim online chất lượng cao vietsub, lồng tiếng, thuyết minh. Phim mới cập nhật hàng ngày, hoàn toàn miễn phí.",
     type: "website",
     url: "https://khoiphim.io.vn",
     locale: "vi_VN",
-    siteName: "MovieBox",
+    siteName: "CINEFLIX",
     images: [
       {
         url: "/logo.png",
         width: 512,
         height: 512,
-        alt: "MovieBox",
+        alt: "CINEFLIX",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "MovieBox - Xem Phim Online Chất Lượng Cao",
+    title: "CINEFLIX - Xem Phim Online Chất Lượng Cao",
     description: "Xem phim online chất lượng cao vietsub, lồng tiếng, thuyết minh. Phim mới cập nhật hàng ngày, hoàn toàn miễn phí.",
     images: ["/logo.png"],
   },

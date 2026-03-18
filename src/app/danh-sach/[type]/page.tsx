@@ -53,14 +53,14 @@ export async function generateMetadata({ params }: { params: Promise<{ type: str
     const typeName = TYPE_NAMES[type] || "Danh Sách Phim";
     const canonical = `https://khoiphim.io.vn/danh-sach/${type}`;
     return {
-        title: `${typeName} - Khôi Phim`,
-        description: `Xem ${typeName} chất lượng cao tại Khôi Phim.`,
+        title: `${typeName} - CINEFLIX`,
+        description: `Xem ${typeName} chất lượng cao tại CINEFLIX.`,
         alternates: {
             canonical,
         },
         openGraph: {
-            title: `${typeName} | MovieBox`,
-            description: `Xem ${typeName} chất lượng cao tại Khôi Phim.`,
+            title: `${typeName} | CINEFLIX`,
+            description: `Xem ${typeName} chất lượng cao tại CINEFLIX.`,
             url: canonical,
             type: "website",
         },

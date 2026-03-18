@@ -1,6 +1,6 @@
 {
-    "name": "MovieBox - Xem Phim Online",
-    "short_name": "MovieBox",
+    "name": "CINEFLIX - Xem Phim Online",
+    "short_name": "CINEFLIX",
     "description": "Xem hàng ngàn bộ phim chất lượng cao, vietsub chuẩn, miễn phí - cập nhật hàng ngày.",
     "start_url": "/",
     "display": "standalone",

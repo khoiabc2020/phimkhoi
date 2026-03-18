@@ -137,7 +137,7 @@ export default function RegisterPage() {
                         <div className="absolute inset-0 bg-primary/10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                         <Image
                             src="/logo.png"
-                            alt="MovieBox Logo"
+                            alt="CINEFLIX Logo"
                             width={48}
                             height={48}
                             className="relative w-full h-full rounded-[14px] object-cover shadow-lg ring-1 ring-white/10 group-hover:scale-105 group-hover:ring-white/20 transition-all duration-300"
@@ -145,7 +145,7 @@ export default function RegisterPage() {
                     </div>
                     <div className="flex flex-col justify-center">
                         <span className="text-xl md:text-2xl lg:text-3xl font-bold text-white tracking-tight leading-none font-sans whitespace-nowrap">
-                            Movie<span className="text-primary">Box</span>
+                            <span className="text-[#9CA3AF]">CINE</span><span className="text-[#E50914]">FLIX</span>
                         </span>
                     </div>
                 </Link>

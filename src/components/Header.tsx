@@ -215,7 +215,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                 <div className="absolute inset-0 bg-primary/10 rounded-[10px] opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                                 <Image
                                     src="/logo.png"
-                                    alt="MovieBox Logo"
+                                    alt="CINEFLIX Logo"
                                     width={36}
                                     height={36}
                                     className="relative w-full h-full rounded-[10px] object-cover ring-1 ring-white/8 group-hover:ring-white/15 transition-all duration-200"
@@ -223,7 +223,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             </div>
                             <div className="flex flex-col justify-center">
                                 <span className="text-[14px] md:text-[18px] font-semibold text-white/95 tracking-tight leading-none font-sans whitespace-nowrap">
-                                    Movie<span className="text-primary">Box</span>
+                                    <span className="text-[#9CA3AF]">CINE</span><span className="text-[#E50914]">FLIX</span>
                                 </span>
                             </div>
                         </Link>

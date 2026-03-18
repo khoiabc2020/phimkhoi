@@ -256,7 +256,7 @@ export default function ProfileScreen() {
                   <Ionicons name="information-circle-outline" size={22} color="rgba(255,255,255,0.6)" />
                 </View>
                 <View>
-                  <Text style={{ color: 'white', fontSize: 14, fontWeight: '600' }}>MovieBox</Text>
+                  <Text style={{ color: 'white', fontSize: 14, fontWeight: '600' }}>CINEFLIX</Text>
                   <Text style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>v{APP_VERSION} · © 2026</Text>
                 </View>
               </View>
@@ -396,7 +396,7 @@ export default function ProfileScreen() {
           </GlassCard>
 
           <Text style={{ color: 'rgba(255,255,255,0.15)', fontSize: 11, textAlign: 'center', marginTop: 24 }}>
-            © 2026 MovieBox · Khôi Le
+            © 2026 CINEFLIX · Khôi Le
           </Text>
         </ScrollView>
       </SafeAreaView>

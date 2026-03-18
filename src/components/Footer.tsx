@@ -47,7 +47,7 @@ export default function Footer() {
                     <div className="col-span-2 md:col-span-1 flex flex-col gap-4">
                         <Link href="/" className="inline-flex items-center gap-1.5">
                             <span className="text-2xl font-black tracking-tight text-white">
-                                Movie<span className="text-[#8FA7C5]">Box</span>
+                                <span className="text-[#9CA3AF]">CINE</span><span className="text-[#E50914]">FLIX</span>
                             </span>
                         </Link>
                         <p className="text-[13px] text-gray-500 leading-relaxed max-w-[220px]">
@@ -106,7 +106,7 @@ export default function Footer() {
                             { href: "#", label: "Chính sách bảo mật" },
                             { href: "#", label: "Điều khoản sử dụng" },
                             { href: "#", label: "Liên hệ quảng cáo" },
-                            { href: "mailto:contact@moviebox.io.vn", label: "contact@moviebox.io.vn" },
+                            { href: "mailto:support@cineflix.io.vn", label: "support@cineflix.io.vn" },
                         ].map(({ href, label }) => (
                             <a key={label} href={href}
                                 className="text-[13px] text-gray-500 hover:text-white transition-colors">
@@ -122,7 +122,7 @@ export default function Footer() {
                 {/* Bottom */}
                 <div className="pt-5 border-t border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                     <div className="text-[12px] text-gray-700">
-                        <p>&copy; {year} <span className="text-white/60">MovieBox</span>. All rights reserved.</p>
+                        <p>&copy; {year} <span className="text-white/60">CINEFLIX</span>. All rights reserved.</p>
                         <p className="mt-0.5">Nội dung được tổng hợp từ các nguồn công khai. Chúng tôi không lưu trữ video trên máy chủ.</p>
                     </div>
                     <div className="flex gap-4 text-[12px] text-gray-700 shrink-0">

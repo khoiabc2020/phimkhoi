@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
         minWidth: 110,
     },
     primaryBtn: {
-        backgroundColor: '#eab308', // MovieBox yellow
+        backgroundColor: '#eab308', // legacy accent
         shadowColor: '#eab308',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,

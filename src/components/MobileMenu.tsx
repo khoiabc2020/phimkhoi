@@ -83,12 +83,12 @@ export default function MobileMenu({
                     <Link href="/" onClick={onClose} className="flex items-center gap-2.5">
                         <Image
                             src="/logo.png"
-                            alt="MovieBox Logo"
+                            alt="CINEFLIX Logo"
                             width={40}
                             height={40}
                             className="w-[40px] h-[40px] rounded-[11px] object-cover shadow-[0_0_10px_#8FA7C52A] ring-1 ring-white/8"
                         />
-                        <span className="text-[18px] font-bold text-white tracking-tight">Movie<span className="text-[#8FA7C5]">Box</span></span>
+                        <span className="text-[18px] font-bold text-white tracking-tight"><span className="text-[#9CA3AF]">CINE</span><span className="text-[#E50914]">FLIX</span></span>
                     </Link>
                     <button
                         onClick={onClose}
@@ -250,7 +250,7 @@ export default function MobileMenu({
                                     <Smartphone className="w-5 h-5 text-[#8FA7C5]" strokeWidth={1.5} />
                                 </div>
                                 <div>
-                                    <p className="text-white font-semibold text-[14px]">Ứng Dụng MovieBox</p>
+                                    <p className="text-white font-semibold text-[14px]">Ứng Dụng CINEFLIX</p>
                                     <p className="text-white/40 text-[12px]">Xem phim mọi lúc, mọi nơi</p>
                                 </div>
                             </div>
