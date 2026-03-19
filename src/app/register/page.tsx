@@ -6,16 +6,6 @@ import { Lock, User, Mail } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-    title: "Đăng ký | KHOIPHIM",
-    description: "Đăng ký để bắt đầu sử dụng KHOIPHIM.",
-    robots: {
-        index: false,
-        follow: true,
-    },
-};
 
 function RegisterForm() {
     const [name, setName] = useState("");

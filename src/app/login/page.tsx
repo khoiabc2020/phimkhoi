@@ -7,19 +7,9 @@ import Link from "next/link";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import Image from "next/image";
 import Script from "next/script";
-import type { Metadata } from "next";
 
 const hasGoogle = true; // controlled by env in NextAuth
 const hasFacebook = true;
-
-export const metadata: Metadata = {
-    title: "Đăng nhập | KHOIPHIM",
-    description: "Đăng nhập để tiếp tục sử dụng KHOIPHIM.",
-    robots: {
-        index: false,
-        follow: true,
-    },
-};
 
 function LoginForm() {
     const [username, setUsername] = useState("");
