@@ -58,8 +58,14 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
             const endpoints = isLikelyTv ? ['tv', 'movie'] : ['movie', 'tv'];
 
             for (const endpoint of endpoints) {
-                // Thêm &_v=1 để phá cache vì NextJS lưu cache fetch API quá lâu (1 tiếng)
-                let url = `${TMDB_API_URL}/search/${endpoint}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanQuery)}&language=vi-VN&_v=5`;
+                // Try with zh-TW locale first for Asian dramas, then vi-VN
+                // Chinese language helps TMDB return Chinese originals instead of English translations
+                const isAsianSearch = verification?.countrySlug &&
+                    ["trung-quoc", "han-quoc", "nhat-ban", "thai-lan"].includes(verification.countrySlug);
+                const locales = isAsianSearch ? ['zh-TW', 'vi-VN'] : ['vi-VN'];
+
+                for (const locale of locales) {
+                let url = `${TMDB_API_URL}/search/${endpoint}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanQuery)}&language=${locale}&_v=6`;
 
                 if (year) {
                     if (endpoint === 'movie') url += `&primary_release_year=${year}`;
@@ -147,6 +153,7 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
                         return { ...bestMatch, media_type: endpoint };
                     }
                 }
+                } // end locale loop
             }
         }
 

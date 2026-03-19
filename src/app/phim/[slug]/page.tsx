@@ -165,19 +165,14 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
 
     // --- Backdrop image selection ---
     // Priority: (1) TMDB backdrop (always landscape, always correct)
-    //           (2) Source landscape (detect which URL is actually landscape)
-    //           (3) Portrait fallback – rendered with object-contain so it fills sensibly
+    //           (2) Portrait fallback — rendered with object-contain
+    // 
+    // NOTE: We intentionally DO NOT use source landscape images from OPhim/KKPhim/NguonC as backdrop.
+    // OPhim's poster_url often contains completely unrelated stills (e.g. horses in a Western for a Chinese drama).
+    // Without being able to verify the image content, using source landscape causes more harm than good.
     const tmdbBackdrop = tmdbDetails?.backdrop_path ? getTMDBImage(tmdbDetails.backdrop_path, "original") : "";
 
-    // Find landscape from source — prefer whichever URL detectOrientation identifies as landscape
-    let sourceLandscapeUrl = "";
-    if (detectOrientation(movie?.poster_url) === "landscape") {
-        sourceLandscapeUrl = movie.poster_url;
-    } else if (detectOrientation(movie?.thumb_url) === "landscape") {
-        sourceLandscapeUrl = movie.thumb_url;
-    }
-
-    // Find portrait for metadata / SEO and as backdrop last-resort
+    // Verified portrait for hero and SEO
     let verifiedPortraitUrl = "";
     if (detectOrientation(movie?.thumb_url) === "portrait") {
         verifiedPortraitUrl = movie.thumb_url;
@@ -189,11 +184,9 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     }
 
     const posterUrl = getImageUrl(verifiedPortraitUrl);
-
-    // Final backdrop: TMDB > source landscape > portrait fallback
-    const backdropUrl = tmdbBackdrop || (sourceLandscapeUrl ? getImageUrl(sourceLandscapeUrl) : posterUrl);
-    // isPortraitFallback is true when we end up using a portrait image as the backdrop
-    const isPortraitFallback = !tmdbBackdrop && !sourceLandscapeUrl && !!posterUrl;
+    // Use TMDB backdrop or fallback to portrait (rendered with object-contain)
+    const backdropUrl = tmdbBackdrop || posterUrl;
+    const isPortraitFallback = !tmdbBackdrop && !!posterUrl;
     const rating = tmdbDetails?.vote_average ? tmdbDetails.vote_average.toFixed(1) : "9.7";
 
     const jsonLd = {
