@@ -163,27 +163,37 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
         });
     });
 
-    // 1. Determine the guaranteed portrait poster (to serve as our primary backdrop fallback)
-    // OPhim, KKPhim, NguonC often mix up the fields. detectOrientation guarantees we get the vertical poster.
+    // --- Backdrop image selection ---
+    // Priority: (1) TMDB backdrop (always landscape, always correct)
+    //           (2) Source landscape (detect which URL is actually landscape)
+    //           (3) Portrait fallback – rendered with object-contain so it fills sensibly
+    const tmdbBackdrop = tmdbDetails?.backdrop_path ? getTMDBImage(tmdbDetails.backdrop_path, "original") : "";
+
+    // Find landscape from source — prefer whichever URL detectOrientation identifies as landscape
+    let sourceLandscapeUrl = "";
+    if (detectOrientation(movie?.poster_url) === "landscape") {
+        sourceLandscapeUrl = movie.poster_url;
+    } else if (detectOrientation(movie?.thumb_url) === "landscape") {
+        sourceLandscapeUrl = movie.thumb_url;
+    }
+
+    // Find portrait for metadata / SEO and as backdrop last-resort
     let verifiedPortraitUrl = "";
     if (detectOrientation(movie?.thumb_url) === "portrait") {
         verifiedPortraitUrl = movie.thumb_url;
     } else if (detectOrientation(movie?.poster_url) === "portrait") {
         verifiedPortraitUrl = movie.poster_url;
-    // Fallbacks if detection fails but URLs exist
     } else {
-        // KKPhim and NguonC usually put the portrait poster in poster_url and landscape in thumb_url without string markers.
-        // OPhim puts portrait in thumb_url, but detectOrientation catches OPhim beforehand.
+        // KKPhim & NguonC: portrait usually in poster_url, landscape in thumb_url
         verifiedPortraitUrl = movie?.poster_url || movie?.thumb_url || "";
     }
 
     const posterUrl = getImageUrl(verifiedPortraitUrl);
-    const tmdbBackdrop = tmdbDetails?.backdrop_path ? getTMDBImage(tmdbDetails.backdrop_path, "original") : "";
-    
-    // We strictly use TMDB backdrop. If missing (e.g. TMDB matching failed), we fallback to the verified portrait poster
-    // because relying on API landscape posters (e.g. OPhim horses) results in wildly inaccurate images.
-    const backdropUrl = tmdbBackdrop || posterUrl;
-    const isPortraitFallback = !tmdbBackdrop && !!posterUrl;
+
+    // Final backdrop: TMDB > source landscape > portrait fallback
+    const backdropUrl = tmdbBackdrop || (sourceLandscapeUrl ? getImageUrl(sourceLandscapeUrl) : posterUrl);
+    // isPortraitFallback is true when we end up using a portrait image as the backdrop
+    const isPortraitFallback = !tmdbBackdrop && !sourceLandscapeUrl && !!posterUrl;
     const rating = tmdbDetails?.vote_average ? tmdbDetails.vote_average.toFixed(1) : "9.7";
 
     const jsonLd = {

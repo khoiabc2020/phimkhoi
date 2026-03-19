@@ -81,20 +81,20 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
     const [posterIndex, setPosterIndex] = useState(0);
     const activePosterSrc = posterCandidates[posterIndex] ? getImageUrl(posterCandidates[posterIndex]) : "/placeholder.svg";
 
-    // Backdrop/overlay (ảnh ngang): ưu tiên TMDB backdrop, sau đó là poster_url (ảnh ngang của OPhim).
+    // Backdrop/overlay (ảnh ngang): TMDB backdrop first, then whichever source URL is truly landscape.
+    // Never use a portrait URL in the overlay — it looks cropped and wrong.
     const tmdbBackdrop =
         (movie as any).tmdbData?.backdrop_path
             ? getTMDBImage((movie as any).tmdbData.backdrop_path)
             : null;
 
-    let sourceBackdrop = null;
+    let sourceBackdrop: string | null = null;
     if (movie.poster_url && detectOrientation(movie.poster_url) === "landscape") {
         sourceBackdrop = movie.poster_url;
     } else if (movie.thumb_url && detectOrientation(movie.thumb_url) === "landscape") {
         sourceBackdrop = movie.thumb_url;
-    } else {
-        sourceBackdrop = movie.poster_url || movie.thumb_url;
     }
+    // If neither resolved as landscape, sourceBackdrop stays null → overlay shows gradient.
 
     const displayBackdrop = tmdbBackdrop || (sourceBackdrop ? getImageUrl(sourceBackdrop) : null);
 
