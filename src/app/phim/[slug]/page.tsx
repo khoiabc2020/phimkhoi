@@ -172,7 +172,9 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
         verifiedPortraitUrl = movie.poster_url;
     // Fallbacks if detection fails but URLs exist
     } else {
-        verifiedPortraitUrl = movie?.thumb_url || movie?.poster_url || "";
+        // KKPhim and NguonC usually put the portrait poster in poster_url and landscape in thumb_url without string markers.
+        // OPhim puts portrait in thumb_url, but detectOrientation catches OPhim beforehand.
+        verifiedPortraitUrl = movie?.poster_url || movie?.thumb_url || "";
     }
 
     const posterUrl = getImageUrl(verifiedPortraitUrl);
