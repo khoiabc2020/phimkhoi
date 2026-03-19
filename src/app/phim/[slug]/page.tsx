@@ -239,15 +239,15 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 <div className="relative z-10 w-full max-w-[1920px] mx-auto flex flex-col md:flex-row items-end justify-between gap-8 md:gap-12">
                     {/* Left side: Movie Info */}
                     <div className="space-y-2 sm:space-y-4 max-w-[760px] flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                            <span className="bg-[#1ed760] text-black px-1.5 py-0.5 text-[11px] font-bold rounded shadow-[0_0_10px_rgba(30,215,96,0.5)]">
-                                {movie?.quality || "HD"}
-                            </span>
+                        <div className="flex items-center gap-2 mb-1">
                             {movie?.year && (
-                                <span className="text-[#1ed760] text-[14px] font-bold">
+                                <span className="px-2.5 py-0.5 rounded border border-white/15 bg-white/[0.06] text-white/80 text-[11px] font-semibold leading-none">
                                     {movie?.year}
                                 </span>
                             )}
+                            <span className="px-2.5 py-0.5 rounded border border-[#8FA7C5]/40 bg-[#8FA7C5]/10 text-[#8FA7C5] text-[11px] font-bold leading-none uppercase">
+                                {movie?.quality || "FHD"}
+                            </span>
                         </div>
                         <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white leading-[1.14] tracking-[-0.012em] pt-1 drop-shadow-2xl">{movie?.name}</h1>
                         <h2 className="hidden sm:block text-base md:text-2xl text-gray-300 font-medium tracking-wide drop-shadow-md">{movie?.origin_name}</h2>
@@ -259,12 +259,23 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             // Extract episode number, removing "Tập " strings to avoid duplication
                             const epNum = epCurrent.replace(/hoàn tất/gi, "").replace(/\(.*?\)/g, "").replace(/tập\s*/gi, "").trim() || "1";
                             return (
-                                <div className="flex items-center gap-2 font-medium text-[15px] mt-3 text-[#ffb020] drop-shadow-md">
-                                    <Clock className="w-4 h-4" />
+                                <div className="flex items-center gap-2 font-bold text-sm mt-2 drop-shadow-md">
                                     {isCompleted ? (
-                                        <span>Trọn bộ {total} tập</span>
+                                        <>
+                                            <span className="inline-flex items-center gap-1.5 bg-green-500/20 text-green-400 border border-green-500/30 px-2.5 py-0.5 rounded-full text-xs font-bold">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
+                                                Hoàn Tất
+                                            </span>
+                                            <span className="text-gray-400 text-xs font-medium">{total} Tập</span>
+                                        </>
                                     ) : (
-                                        <span>{epCurrent !== "Đang cập nhật" ? epCurrent : `Tập ${epNum} / ${total}`}</span>
+                                        <>
+                                            <span className="inline-flex items-center gap-1.5 bg-[#8FA7C5]/20 text-[#8FA7C5] border border-[#8FA7C5]/30 px-2.5 py-0.5 rounded-full text-xs font-bold">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-[#8FA7C5] animate-pulse inline-block" />
+                                                Đang chiếu
+                                            </span>
+                                            <span className="text-gray-300 text-xs font-medium">Tập {epNum} / {total}</span>
+                                        </>
                                     )}
                                 </div>
                             );
@@ -281,20 +292,20 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             <span className="text-gray-500">Diễn viên:</span> {movie?.actor?.join(", ") || tmdbDetails?.credits?.cast?.slice(0, 5).map((c: { name?: string }) => c.name).join(", ") || "Đang cập nhật"}
                         </div>
 
-                        {/* Action Buttons */}
-                        <div className="flex flex-wrap items-center gap-4 sm:gap-6 pt-2">
+                        {/* Action Buttons -- bigger touch targets on mobile */}
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-2 sm:pt-4">
                             {serverData.length > 0 && (
                                 <Link
                                     href={`/xem-phim/${movie?.slug}/${serverData[0].slug}`}
-                                    className="flex items-center justify-center gap-2 bg-[#1ed760] text-black px-6 sm:px-8 py-2.5 rounded hover:bg-[#1db954] hover:scale-105 transition-all duration-300 font-bold text-[14px] leading-tight shadow-[0_0_20px_rgba(30,215,96,0.3)]"
+                                    className="flex items-center justify-center gap-2 bg-[#8FA7C5] text-[#0a0a0a] px-6 sm:px-8 py-3 rounded-full font-black text-[15px] hover:bg-[#a8bdd8] hover:scale-105 transition-all duration-300 shadow-[0_4px_24px_rgba(143,167,197,0.4)] hover:shadow-[0_8px_32px_rgba(143,167,197,0.6)]"
                                 >
-                                    <Play className="w-5 h-5 fill-current shrink-0" />
-                                    CHIẾU PHÁT
+                                    <Play className="w-4 h-4 fill-current shrink-0" />
+                                    Xem Phim
                                 </Link>
                             )}
 
                             {movie && (
-                                <div className="flex items-center gap-1 sm:gap-3">
+                                <>
                                     <FavoriteButton
                                         movieData={{
                                             movieId: movie._id,
@@ -306,17 +317,17 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                             movieQuality: movie.quality || "HD",
                                             movieCategories: movie.category?.map((c: { name?: string }) => c.name) || [],
                                         }}
-                                        className="!bg-transparent hover:!bg-transparent !border-transparent !shadow-none text-white/70 hover:text-white px-2 py-2"
+                                        className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/5 rounded-full"
                                         showLabel={true}
                                     />
                                     <WatchlistButton
                                         slug={movie.slug}
                                         initialInWatchlist={inWatchlist}
-                                        className="!bg-transparent hover:!bg-transparent !border-transparent !shadow-none text-white/70 hover:text-white px-2 py-2"
+                                        className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/5 rounded-full"
                                         showLabel={true}
                                     />
-                                    <ShareButton title={`Xem phim ${movie.name} trên KHOIPHIM`} className="!bg-transparent hover:!bg-transparent !border-transparent !shadow-none text-white/70 hover:text-white px-2 py-2" />
-                                </div>
+                                    <ShareButton title={`Xem phim ${movie.name} trên KHOIPHIM`} />
+                                </>
                             )}
                         </div>
                     </div>
