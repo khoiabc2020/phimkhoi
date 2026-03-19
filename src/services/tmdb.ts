@@ -87,6 +87,19 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
                             ? (item.release_date ? parseInt(item.release_date.substring(0, 4)) : null)
                             : (item.first_air_date ? parseInt(item.first_air_date.substring(0, 4)) : null);
 
+                        // Country Check: Prevent Western movies from matching Asian dramas
+                        if (verification?.countrySlug) {
+                            const isAsianDrama = ["trung-quoc", "han-quoc", "nhat-ban", "thai-lan"].includes(verification.countrySlug);
+                            const itemCountries = item.origin_country || [];
+                            // If it's a known Asian drama, it must originate from CN, KR, JP, TH, TW, HK.
+                            if (isAsianDrama) {
+                                const hasAsianOrigin = itemCountries.some((c: string) => ["CN", "KR", "JP", "TH", "TW", "HK"].includes(c));
+                                if (itemCountries.length > 0 && !hasAsianOrigin) {
+                                    return false; // Reject false positive (e.g. US movie named "Pursuit of Jade")
+                                }
+                            }
+                        }
+
                         // Title Check:
                         let isMatch = false;
 
@@ -108,7 +121,7 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
                             )) {
                                 isMatch = true;
                             } else {
-                                return false;
+                                return false; // Fail year check
                             }
                         }
 
@@ -119,10 +132,9 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
                         if (localTitle && calculateSimilarity(cleanQuery, localTitle) >= 0.5) isMatch = true;
                         if (originalTitleSearch && calculateSimilarity(cleanQuery, originalTitleSearch) >= 0.5) isMatch = true;
 
-                        // 3. Fallback: If Chinese/Korean names fail to match TMDB's English names, we rely strictly on the similarity check above.
-                        // We DO NOT force a match just because the year matches, as that leads to hilarious false positives (like Western movies for Chinese dramas).
+                        // 3. Fallback: If Chinese/Korean names fail to match TMDB's English names
                         if (!isMatch && itemYear === year) {
-                            // Only force match if the query was EXACTLY the original name, meaning TMDB returned this as the #1 result for the original name
+                            // Only force match if the query was EXACTLY the original name, meaning TMDB returned this as the #1 result
                             if (q === verification?.originalName && filteredResults.indexOf(item) === 0) {
                                 isMatch = true;
                             }
