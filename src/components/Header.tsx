@@ -188,7 +188,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                 className={cn(
                     "fixed top-0 left-0 right-0 z-40 transition-colors duration-200 will-change-transform transform-gpu",
                     isScrolled
-                        ? "glass pointer-events-auto"
+                        ? "bg-[#0a0a0a]/98 shadow-md pointer-events-auto"
                         : "bg-gradient-to-b from-[#0a0a0a]/80 via-[#0a0a0a]/40 to-transparent pointer-events-none"
                 )}
             >

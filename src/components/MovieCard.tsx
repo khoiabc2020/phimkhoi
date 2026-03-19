@@ -112,14 +112,22 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
     const [posterIndex, setPosterIndex] = useState(0);
     const activePosterSrc = posterCandidates[posterIndex] ? getImageUrl(posterCandidates[posterIndex]) : "/placeholder.svg";
 
-    // Backdrop/overlay (ảnh ngang): ưu tiên TMDB backdrop, sau đó thumb (thường là ảnh ngang).
-    // Không fallback sang poster để tránh dùng ảnh dọc cho overlay.
+    // Backdrop/overlay (ảnh ngang): ưu tiên TMDB backdrop, sau đó là poster_url (ảnh ngang của OPhim).
     const tmdbBackdrop =
         (movie as any).tmdbData?.backdrop_path
             ? getTMDBImage((movie as any).tmdbData.backdrop_path)
             : null;
 
-    const displayBackdrop = tmdbBackdrop || (movie.thumb_url ? getImageUrl(movie.thumb_url) : null);
+    let sourceBackdrop = null;
+    if (movie.poster_url && detectOrientation(movie.poster_url) === "landscape") {
+        sourceBackdrop = movie.poster_url;
+    } else if (movie.thumb_url && detectOrientation(movie.thumb_url) === "landscape") {
+        sourceBackdrop = movie.thumb_url;
+    } else {
+        sourceBackdrop = movie.poster_url || movie.thumb_url;
+    }
+
+    const displayBackdrop = tmdbBackdrop || (sourceBackdrop ? getImageUrl(sourceBackdrop) : null);
 
     // Reset fallback state when card movie changes
     useEffect(() => {
@@ -188,7 +196,6 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
             <div
                 ref={cardRef}
                 className="relative block h-full w-full cursor-pointer z-10 group/static-card hover:z-20"
-                style={{ contain: "layout style paint" }}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
