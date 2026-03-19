@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Be_Vietnam_Pro } from "next/font/google";
+import { Geist, Geist_Mono, Be_Vietnam_Pro, Roboto_Condensed } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
 import Script from "next/script";
@@ -18,6 +18,12 @@ const beVietnamPro = Be_Vietnam_Pro({
   variable: "--font-display",
   subsets: ["latin", "vietnamese"],
   weight: ["700", "800", "900"],
+});
+
+const logoFont = Roboto_Condensed({
+  variable: "--font-logo",
+  subsets: ["latin", "vietnamese"],
+  weight: ["500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -106,7 +112,7 @@ export default async function RootLayout({
         <link rel="dns-prefetch" href="https://i.ytimg.com" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${beVietnamPro.variable} antialiased pb-20 lg:pb-0`}
+        className={`${geistSans.variable} ${geistMono.variable} ${beVietnamPro.variable} ${logoFont.variable} antialiased pb-20 lg:pb-0`}
       >
         <Providers>
           <Header categories={categories} countries={countries} />

@@ -46,7 +46,7 @@ export default function Footer() {
                     {/* Brand column */}
                     <div className="col-span-2 md:col-span-1 flex flex-col gap-4">
                         <Link href="/" className="inline-flex items-center gap-1.5">
-                            <span className="inline-block origin-left text-2xl font-semibold uppercase tracking-[0.03em] leading-none [transform:scale(0.88,1.18)]">
+                            <span className="inline-block font-logo text-2xl font-semibold uppercase tracking-[0.012em] leading-none whitespace-nowrap">
                                 <span className="text-[#9CA3AF]">KHOI</span><span className="text-[#E50914]">PHIM</span>
                             </span>
                         </Link>

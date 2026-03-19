@@ -133,7 +133,7 @@ export default function RegisterPage() {
         <main className="min-h-screen flex flex-col items-center justify-center pt-24 pb-8 bg-[#0a0a0a] relative overflow-hidden font-sans">
             <div className="absolute top-6 left-6 md:top-8 md:left-12 z-20">
                 <Link href="/" className="group shrink-0">
-                    <span className="inline-block origin-left text-3xl md:text-4xl lg:text-5xl font-semibold uppercase tracking-[0.03em] leading-none font-sans whitespace-nowrap [transform:scale(0.88,1.18)]">
+                    <span className="inline-block font-logo text-3xl md:text-4xl lg:text-5xl font-semibold uppercase tracking-[0.012em] leading-none whitespace-nowrap">
                         <span className="text-[#9CA3AF]">KHOI</span><span className="text-[#E50914]">PHIM</span>
                     </span>
                 </Link>

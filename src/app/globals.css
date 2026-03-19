@@ -193,6 +193,14 @@ h2 {
     font-feature-settings: "ss01" on, "ss02" on;
   }
 
+  .font-logo {
+    font-family: var(--font-logo);
+    font-feature-settings: "ss01" on, "ss02" on;
+    text-rendering: geometricPrecision;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   .glass {
     /* Cleaner header: darker, flatter, less glow */
     @apply bg-[#060608]/92 border-b border-white/[0.05] shadow-[0_4px_12px_0_#0000002e];
