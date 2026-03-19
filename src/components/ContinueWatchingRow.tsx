@@ -209,7 +209,7 @@ function ContinueWatchingRowInner() {
                                     {/* Progress Bar - chỉ 1 dải mỏng đáy ảnh */}
                                     <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20 z-20">
                                         <div
-                                            className="h-full bg-[#E50914] rounded-r-sm"
+                                            className="h-full bg-[#8FA7C5] rounded-r-sm"
                                             style={{ width: `${Math.max(2, Math.min(100, item.progress || 0))}%` }}
                                         />
                                     </div>

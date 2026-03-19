@@ -47,14 +47,14 @@ export default function Footer() {
                     <div className="col-span-2 md:col-span-1 flex flex-col gap-4">
                         <Link href="/" className="inline-flex items-center gap-1.5">
                             <span className="inline-block font-logo text-2xl font-semibold uppercase tracking-[0.012em] leading-none whitespace-nowrap">
-                                <span className="text-[#9CA3AF]">KHOI</span><span className="text-[#E50914]">PHIM</span>
+                                <span className="text-[#9CA3AF]">KHOI</span><span className="text-[#8FA7C5]">PHIM</span>
                             </span>
                         </Link>
                         <p className="text-[13px] text-gray-500 leading-relaxed max-w-[220px]">
                             Xem hàng ngàn bộ phim chất lượng cao, vietsub chuẩn, miễn phí — cập nhật hàng ngày.
                         </p>
                         <a href="https://khoiphim.io.vn/api/download/apk"
-                            className="inline-flex items-center gap-2 self-start px-3.5 py-1.5 rounded-full border border-[#E50914]/40 text-[#E50914] text-[12px] font-medium hover:bg-[#E50914]/10 transition-all duration-200 mt-1">
+                            className="inline-flex items-center gap-2 self-start px-3.5 py-1.5 rounded-full border border-[#8FA7C5]/40 text-[#8FA7C5] text-[12px] font-medium hover:bg-[#8FA7C5]/10 transition-all duration-200 mt-1">
                             <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3">
                                 <path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm0 18a8 8 0 110-16 8 8 0 010 16zm-1-5h2v2h-2zm0-8h2v6h-2z" />
                             </svg>
@@ -78,7 +78,7 @@ export default function Footer() {
 
                     {/* Discover */}
                     <div className="flex flex-col gap-3">
-                        <p className="text-[11px] font-bold uppercase tracking-widest text-[#E50914] mb-1">Khám phá</p>
+                        <p className="text-[11px] font-bold uppercase tracking-widest text-[#8FA7C5] mb-1">Khám phá</p>
                         {DISCOVER_LINKS.map(({ href, label }) => (
                             <Link key={href} href={href}
                                 className="text-[13px] text-gray-500 hover:text-white transition-colors">
@@ -89,7 +89,7 @@ export default function Footer() {
 
                     {/* Countries */}
                     <div className="flex flex-col gap-3">
-                        <p className="text-[11px] font-bold uppercase tracking-widest text-[#E50914] mb-1">Quốc gia</p>
+                        <p className="text-[11px] font-bold uppercase tracking-widest text-[#8FA7C5] mb-1">Quốc gia</p>
                         {COUNTRY_LINKS.map(({ href, label }) => (
                             <Link key={href} href={href}
                                 className="text-[13px] text-gray-500 hover:text-white transition-colors">
@@ -100,7 +100,7 @@ export default function Footer() {
 
                     {/* Support */}
                     <div className="flex flex-col gap-3">
-                        <p className="text-[11px] font-bold uppercase tracking-widest text-[#E50914] mb-1">Hỗ trợ</p>
+                        <p className="text-[11px] font-bold uppercase tracking-widest text-[#8FA7C5] mb-1">Hỗ trợ</p>
                             {[
                             { href: "#", label: "Câu hỏi thường gặp" },
                             { href: "#", label: "Chính sách bảo mật" },

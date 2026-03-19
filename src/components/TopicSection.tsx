@@ -5,7 +5,7 @@ import Link from "next/link";
 const topics = [
     { id: "marvel", name: "Marvel", color: "#ef4444", href: "/tim-kiem?q=Marvel" },
     { id: "4k", name: "4K Ultra HD", color: "#a855f7", href: "/danh-sach/tat-ca-the-loai?quality=4K" },
-    { id: "sitcom", name: "Sitcom", color: "#E50914", href: "/the-loai/hai-huoc" },
+    { id: "sitcom", name: "Sitcom", color: "#8FA7C5", href: "/the-loai/hai-huoc" },
     { id: "long-tieng", name: "Lồng Tiếng", color: "#6366f1", href: "/danh-sach/phim-long-tieng" },
     { id: "xuyen-khong", name: "Xuyên Không", color: "#f97316", href: "/the-loai/xuyen-khong" },
     { id: "co-trang", name: "Cổ Trang", color: "#dc2626", href: "/the-loai/co-trang" },
@@ -21,7 +21,7 @@ export default function TopicSection() {
     return (
         <section className="w-full max-w-[1920px] mx-auto px-4 md:px-12 pt-5 pb-3 md:pt-3">
             <div className="flex items-center gap-2 mb-3 px-1">
-                <span className="w-1 h-6 bg-[#E50914] rounded-sm inline-block" />
+                <span className="w-1 h-6 bg-[#8FA7C5] rounded-sm inline-block" />
                 <h2 className="text-[20px] md:text-[24px] font-bold text-white">Khám phá nhanh</h2>
             </div>
 

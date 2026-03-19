@@ -169,7 +169,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                 return (
                     <div>
                         <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                            <History className="w-6 h-6 text-[#E50914]" />
+                            <History className="w-6 h-6 text-[#8FA7C5]" />
                             Lịch Sử Xem
                         </h2>
 
@@ -235,7 +235,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                     <div>
                         <div className="flex items-center justify-between mb-8">
                             <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                                <ListVideo className="w-6 h-6 text-[#E50914]" />
+                                <ListVideo className="w-6 h-6 text-[#8FA7C5]" />
                                 Danh sách của bạn
                             </h2>
                             <button
@@ -249,7 +249,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                         {/* List Collections */}
                         {isLoadingPlaylists ? (
                             <div className="flex items-center justify-center py-20">
-                                <Loader2 className="w-8 h-8 text-[#E50914] animate-spin" />
+                                <Loader2 className="w-8 h-8 text-[#8FA7C5] animate-spin" />
                             </div>
                         ) : playlistsError ? (
                             <div className="text-center py-20 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10">

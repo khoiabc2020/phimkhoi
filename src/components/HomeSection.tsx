@@ -29,13 +29,13 @@ export default function HomeSection({
         >
             <div className="flex items-center justify-between gap-4 px-0.5">
                 <h2 id={headingId} className="text-[18px] md:text-[24px] font-bold text-white flex items-center gap-2.5 tracking-[-0.01em]">
-                    <span className="w-0.5 h-5 md:h-6 bg-[#E50914] shrink-0" aria-hidden />
+                    <span className="w-0.5 h-5 md:h-6 bg-[#8FA7C5] shrink-0" aria-hidden />
                     <span>{title}</span>
                 </h2>
                 {viewAllHref && (
                     <Link
                         href={viewAllHref}
-                        className="text-xs md:text-sm font-semibold text-[#E50914] hover:text-white flex items-center gap-0.5 shrink-0 transition-colors group/link"
+                        className="text-xs md:text-sm font-semibold text-[#8FA7C5] hover:text-white flex items-center gap-0.5 shrink-0 transition-colors group/link"
                     >
                         {viewAllLabel}
                         <ChevronRight className="w-4 h-4 transition-transform group-hover/link:translate-x-0.5" />

@@ -173,7 +173,7 @@ export default async function ActorPage({ params, searchParams }: { params: Prom
                         {/* Biography */}
                         <div className="mt-8 mb-10">
                             <div className="flex items-center gap-2 mb-4">
-                                <div className="w-1.5 h-5 bg-[#E50914] rounded-full" />
+                                <div className="w-1.5 h-5 bg-[#8FA7C5] rounded-full" />
                                 <h3 className="text-xl font-bold text-white">Tiểu sử</h3>
                             </div>
                             <p className="text-[#a1a1aa] leading-relaxed text-[15px] whitespace-pre-wrap">
@@ -184,7 +184,7 @@ export default async function ActorPage({ params, searchParams }: { params: Prom
                         {/* Filmography */}
                         <div>
                             <div className="flex items-center gap-2 mb-4">
-                                <div className="w-1.5 h-5 bg-[#E50914] rounded-full" />
+                                <div className="w-1.5 h-5 bg-[#8FA7C5] rounded-full" />
                                 <h3 className="text-xl font-bold text-white">
                                     Phim tham gia <span className="font-normal text-gray-500 text-lg">({pagination?.totalItems || 0})</span>
                                 </h3>
@@ -199,7 +199,7 @@ export default async function ActorPage({ params, searchParams }: { params: Prom
                                         : 'text-gray-500 border-transparent hover:text-white'
                                         }`}
                                 >
-                                    <Grid className={`w-4 h-4 ${view === 'movies' ? 'text-[#E50914]' : ''}`} />
+                                    <Grid className={`w-4 h-4 ${view === 'movies' ? 'text-[#8FA7C5]' : ''}`} />
                                     Phim
                                 </Link>
                                 <Link
@@ -209,7 +209,7 @@ export default async function ActorPage({ params, searchParams }: { params: Prom
                                         : 'text-gray-500 border-transparent hover:text-white'
                                         }`}
                                 >
-                                    <Clock className={`w-4 h-4 ${view === 'time' ? 'text-[#E50914]' : ''}`} />
+                                    <Clock className={`w-4 h-4 ${view === 'time' ? 'text-[#8FA7C5]' : ''}`} />
                                     Thời gian
                                 </Link>
                             </div>
@@ -254,7 +254,7 @@ export default async function ActorPage({ params, searchParams }: { params: Prom
                                                 <div className="text-2xl font-black text-emerald-400 leading-none">{year}</div>
                                             </div>
                                             <div className="relative border-l border-white/10 pl-4 sm:pl-6">
-                                                <div className="absolute left-0 top-2 w-2 h-2 -translate-x-1/2 rounded-full bg-[#E50914]" />
+                                                <div className="absolute left-0 top-2 w-2 h-2 -translate-x-1/2 rounded-full bg-[#8FA7C5]" />
                                                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                                                     {timelineByYear[year].map((movie: any) => (
                                                         <MovieCard key={`${year}-${movie._id || movie.slug || movie.name}`} movie={movie} />

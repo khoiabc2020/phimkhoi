@@ -33,7 +33,7 @@ export default async function CategoryPage({ params, searchParams }: { params: P
                         Thể loại
                     </p>
                     <h1 className="text-[20px] md:text-[26px] font-extrabold text-white capitalize flex items-center gap-2 tracking-tight">
-                        <span className="w-1 h-5 bg-[#E50914] rounded-full"></span>
+                        <span className="w-1 h-5 bg-[#8FA7C5] rounded-full"></span>
                         {slug.replace(/-/g, " ")}
                     </h1>
                 </div>

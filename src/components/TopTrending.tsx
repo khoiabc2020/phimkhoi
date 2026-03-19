@@ -23,7 +23,7 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-[20px] md:text-[24px] font-extrabold text-white capitalize flex items-center gap-2.5 tracking-tight">
-                    <span className="w-1 h-6 bg-[#E50914] rounded-full"></span>
+                    <span className="w-1 h-6 bg-[#8FA7C5] rounded-full"></span>
                     <span className="leading-tight">{title}</span>
                 </h2>
                 {slug && (
@@ -57,7 +57,7 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
                                     "font-black text-lg md:text-xl italic",
                                     index === 0 ? "text-[#c6d6ea]" :
                                         index === 1 ? "text-gray-200" :
-                                            index === 2 ? "text-[#E50914]" : "text-white"
+                                            index === 2 ? "text-[#8FA7C5]" : "text-white"
                                 )} style={{ fontFamily: 'var(--font-outfit)' }}>
                                     {index + 1}
                                 </span>

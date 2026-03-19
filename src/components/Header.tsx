@@ -212,7 +212,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         {/* Logo */}
                         <Link href="/" className="flex items-center group shrink-0 order-2 md:order-none">
                             <span className="inline-block font-logo text-[22px] md:text-[30px] font-semibold uppercase tracking-[0.012em] leading-none whitespace-nowrap">
-                                <span className="text-[#9CA3AF]">KHOI</span><span className="text-[#E50914]">PHIM</span>
+                                <span className="text-[#9CA3AF]">KHOI</span><span className="text-[#8FA7C5]">PHIM</span>
                             </span>
                         </Link>
                     </div>
@@ -526,7 +526,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                     </div>
                                 </div>
                             ) : (
-                                <Link href="/login" className="bg-[#E50914] hover:bg-[#a8bdd8] text-[#0a0a0a] px-5 py-2 rounded-full font-bold text-sm transition-transform duration-200 hover:scale-105 active:scale-95 ml-1 whitespace-nowrap">
+                                <Link href="/login" className="bg-[#8FA7C5] hover:bg-[#a8bdd8] text-[#0a0a0a] px-5 py-2 rounded-full font-bold text-sm transition-transform duration-200 hover:scale-105 active:scale-95 ml-1 whitespace-nowrap">
                                     Đăng nhập
                                 </Link>
                             )}

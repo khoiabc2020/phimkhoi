@@ -47,7 +47,7 @@ export default function FavoriteActorButton({ actorName, initialIsFavorite }: Fa
             onClick={toggleFavorite}
             disabled={isPending}
             className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm transition-colors border ${isFavorite
-                    ? "bg-[#e50914] hover:bg-[#b81d24] text-white border-transparent"
+                    ? "bg-[#8FA7C5] hover:bg-[#b81d24] text-white border-transparent"
                     : "bg-white/5 hover:bg-white/10 text-gray-300 border-white/10"
                 }`}
         >

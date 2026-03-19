@@ -164,11 +164,13 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     });
 
     // Prefer source poster (dọc). For backdrop hero, ưu tiên TMDB backdrop để tránh watermark từ nguồn phim.
-    const sourceImage = getImageUrl(movie?.poster_url || movie?.thumb_url);
+    // Prefer source poster (dọc). OPhim uses thumb_url cho ảnh dọc.
+    const sourceImage = getImageUrl(movie?.thumb_url || movie?.poster_url);
     const posterUrl = sourceImage;
     const tmdbBackdrop = tmdbDetails?.backdrop_path ? getTMDBImage(tmdbDetails.backdrop_path, "original") : "";
-    const sourceBackdrop = movie?.thumb_url ? getImageUrl(movie.thumb_url) : "";
-    const backdropUrl = tmdbBackdrop || sourceBackdrop || getImageUrl(movie?.poster_url || "");
+    // OPhim uses poster_url cho ảnh ngang.
+    const sourceBackdrop = movie?.poster_url ? getImageUrl(movie.poster_url) : "";
+    const backdropUrl = tmdbBackdrop || sourceBackdrop || getImageUrl(movie?.thumb_url || "");
     const rating = tmdbDetails?.vote_average ? tmdbDetails.vote_average.toFixed(1) : "9.7";
 
     const jsonLd = {
@@ -236,97 +238,116 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/36 via-transparent to-transparent" />
 
                 {/* Hero Info Content aligned left/bottom */}
-                <div className="relative z-10 w-full max-w-[1920px] mx-auto space-y-2 sm:space-y-4 max-w-[760px]">
-                    <div className="flex items-center gap-2 mb-1">
-                        {movie?.year && (
-                            <span className="px-2.5 py-0.5 rounded border border-white/15 bg-white/[0.06] text-white/80 text-[11px] font-semibold leading-none">
-                                {movie?.year}
+                <div className="relative z-10 w-full max-w-[1920px] mx-auto flex flex-col md:flex-row items-end justify-between gap-8 md:gap-12">
+                    {/* Left side: Movie Info */}
+                    <div className="space-y-2 sm:space-y-4 max-w-[760px] flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                            {movie?.year && (
+                                <span className="px-2.5 py-0.5 rounded border border-white/15 bg-white/[0.06] text-white/80 text-[11px] font-semibold leading-none">
+                                    {movie?.year}
+                                </span>
+                            )}
+                            <span className="px-2.5 py-0.5 rounded border border-[#8FA7C5]/40 bg-[#8FA7C5]/10 text-[#8FA7C5] text-[11px] font-bold leading-none uppercase">
+                                {movie?.quality || "FHD"}
                             </span>
-                        )}
-                        <span className="px-2.5 py-0.5 rounded border border-[#E50914]/40 bg-[#E50914]/10 text-[#E50914] text-[11px] font-bold leading-none uppercase">
-                            {movie?.quality || "FHD"}
-                        </span>
+                        </div>
+                        <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white leading-[1.14] tracking-[-0.012em] pt-1 drop-shadow-2xl">{movie?.name}</h1>
+                        <h2 className="hidden sm:block text-base md:text-2xl text-gray-300 font-medium tracking-wide drop-shadow-md">{movie?.origin_name}</h2>
+
+                        {(() => {
+                            const epCurrent = movie?.episode_current || "";
+                            const isCompleted = epCurrent.toLowerCase().includes("hoàn tất") || epCurrent.toLowerCase().includes("full");
+                            const total = movie?.episode_total || "?";
+                            // Extract episode number, removing "Tập " strings to avoid duplication
+                            const epNum = epCurrent.replace(/hoàn tất/gi, "").replace(/\(.*?\)/g, "").replace(/tập\s*/gi, "").trim() || "1";
+                            return (
+                                <div className="flex items-center gap-2 font-bold text-sm mt-2 drop-shadow-md">
+                                    {isCompleted ? (
+                                        <>
+                                            <span className="inline-flex items-center gap-1.5 bg-green-500/20 text-green-400 border border-green-500/30 px-2.5 py-0.5 rounded-full text-xs font-bold">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
+                                                Hoàn Tất
+                                            </span>
+                                            <span className="text-gray-400 text-xs font-medium">{total} Tập</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span className="inline-flex items-center gap-1.5 bg-[#8FA7C5]/20 text-[#8FA7C5] border border-[#8FA7C5]/30 px-2.5 py-0.5 rounded-full text-xs font-bold">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-[#8FA7C5] animate-pulse inline-block" />
+                                                Đang chiếu
+                                            </span>
+                                            <span className="text-gray-300 text-xs font-medium">Tập {epNum} / {total}</span>
+                                        </>
+                                    )}
+                                </div>
+                            );
+                        })()}
+
+                        <div className="text-xs sm:text-sm text-gray-300 flex flex-wrap items-center gap-2 sm:gap-4 py-1 sm:py-2 drop-shadow-md">
+                            {(movie?.director && movie.director.length > 0 && !movie.director.includes("Đang cập nhật")) || tmdbDetails?.credits?.crew?.find((c: { job?: string; name?: string }) => c.job === "Director") ? (
+                                <span><span className="text-gray-500">Đạo diễn:</span> {movie?.director?.join(", ") || tmdbDetails?.credits?.crew?.find((c: { job?: string; name?: string }) => c.job === "Director")?.name}</span>
+                            ) : null}
+                            <span className="w-1 h-1 bg-gray-600 rounded-full hidden sm:block" />
+                            <span><span className="text-gray-500">Thời lượng:</span> {movie?.time || "N/A"}</span>
+                        </div>
+                        <div className="text-xs sm:text-sm text-gray-300 mb-3 sm:mb-6 line-clamp-2 max-w-3xl drop-shadow-md">
+                            <span className="text-gray-500">Diễn viên:</span> {movie?.actor?.join(", ") || tmdbDetails?.credits?.cast?.slice(0, 5).map((c: { name?: string }) => c.name).join(", ") || "Đang cập nhật"}
+                        </div>
+
+                        {/* Action Buttons -- bigger touch targets on mobile */}
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-2 sm:pt-4">
+                            {serverData.length > 0 && (
+                                <Link
+                                    href={`/xem-phim/${movie?.slug}/${serverData[0].slug}`}
+                                    className="flex items-center justify-center gap-2 bg-[#8FA7C5] text-[#0a0a0a] px-6 sm:px-8 py-3 rounded-full font-black text-[15px] hover:bg-[#a8bdd8] hover:scale-105 transition-all duration-300 shadow-[0_4px_24px_rgba(143,167,197,0.4)] hover:shadow-[0_8px_32px_rgba(143,167,197,0.6)]"
+                                >
+                                    <Play className="w-4 h-4 fill-current shrink-0" />
+                                    Xem Phim
+                                </Link>
+                            )}
+
+                            {movie && (
+                                <>
+                                    <FavoriteButton
+                                        movieData={{
+                                            movieId: movie._id,
+                                            movieSlug: movie.slug,
+                                            movieName: movie.name,
+                                            movieOriginName: movie.origin_name || "",
+                                            moviePoster: posterUrl || "/fallback.png",
+                                            movieYear: Number(movie.year) || new Date().getFullYear(),
+                                            movieQuality: movie.quality || "HD",
+                                            movieCategories: movie.category?.map((c: { name?: string }) => c.name) || [],
+                                        }}
+                                        className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/5 rounded-full"
+                                        showLabel={true}
+                                    />
+                                    <WatchlistButton
+                                        slug={movie.slug}
+                                        initialInWatchlist={inWatchlist}
+                                        className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/5 rounded-full"
+                                        showLabel={true}
+                                    />
+                                    <ShareButton title={`Xem phim ${movie.name} trên KHOIPHIM`} />
+                                </>
+                            )}
+                        </div>
                     </div>
-                    <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white leading-[1.14] tracking-[-0.012em] pt-1 drop-shadow-2xl">{movie?.name}</h1>
-                    <h2 className="hidden sm:block text-base md:text-2xl text-gray-300 font-medium tracking-wide drop-shadow-md">{movie?.origin_name}</h2>
 
-                    {(() => {
-                        const epCurrent = movie?.episode_current || "";
-                        const isCompleted = epCurrent.toLowerCase().includes("hoàn tất") || epCurrent.toLowerCase().includes("full");
-                        const total = movie?.episode_total || "?";
-                        // Extract episode number, removing "Tập " strings to avoid duplication
-                        const epNum = epCurrent.replace(/hoàn tất/gi, "").replace(/\(.*?\)/g, "").replace(/tập\s*/gi, "").trim() || "1";
-                        return (
-                            <div className="flex items-center gap-2 font-bold text-sm mt-2 drop-shadow-md">
-                                {isCompleted ? (
-                                    <>
-                                        <span className="inline-flex items-center gap-1.5 bg-green-500/20 text-green-400 border border-green-500/30 px-2.5 py-0.5 rounded-full text-xs font-bold">
-                                            <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
-                                            Hoàn Tất
-                                        </span>
-                                        <span className="text-gray-400 text-xs font-medium">{total} Tập</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <span className="inline-flex items-center gap-1.5 bg-[#E50914]/20 text-[#E50914] border border-[#E50914]/30 px-2.5 py-0.5 rounded-full text-xs font-bold">
-                                            <span className="w-1.5 h-1.5 rounded-full bg-[#E50914] animate-pulse inline-block" />
-                                            Đang chiếu
-                                        </span>
-                                        <span className="text-gray-300 text-xs font-medium">Tập {epNum} / {total}</span>
-                                    </>
-                                )}
-                            </div>
-                        );
-                    })()}
-
-                    <div className="text-xs sm:text-sm text-gray-300 flex flex-wrap items-center gap-2 sm:gap-4 py-1 sm:py-2 drop-shadow-md">
-                        {(movie?.director && movie.director.length > 0 && !movie.director.includes("Đang cập nhật")) || tmdbDetails?.credits?.crew?.find((c: { job?: string; name?: string }) => c.job === "Director") ? (
-                            <span><span className="text-gray-500">Đạo diễn:</span> {movie?.director?.join(", ") || tmdbDetails?.credits?.crew?.find((c: { job?: string; name?: string }) => c.job === "Director")?.name}</span>
-                        ) : null}
-                        <span className="w-1 h-1 bg-gray-600 rounded-full hidden sm:block" />
-                        <span><span className="text-gray-500">Thời lượng:</span> {movie?.time || "N/A"}</span>
-                    </div>
-                    <div className="text-xs sm:text-sm text-gray-300 mb-3 sm:mb-6 line-clamp-2 max-w-3xl drop-shadow-md">
-                        <span className="text-gray-500">Diễn viên:</span> {movie?.actor?.join(", ") || tmdbDetails?.credits?.cast?.slice(0, 5).map((c: { name?: string }) => c.name).join(", ") || "Đang cập nhật"}
-                    </div>
-
-                    {/* Action Buttons -- bigger touch targets on mobile */}
-                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-2 sm:pt-4">
-                        {serverData.length > 0 && (
-                            <Link
-                                href={`/xem-phim/${movie?.slug}/${serverData[0].slug}`}
-                                className="flex items-center justify-center gap-2 bg-[#E50914] text-[#0a0a0a] px-6 sm:px-8 py-3 rounded-full font-black text-[15px] hover:bg-[#ff0f1e] hover:scale-105 transition-all duration-300 shadow-[0_4px_24px_rgba(229,9,20,0.4)] hover:shadow-[0_8px_32px_rgba(229,9,20,0.6)]"
-                            >
-                                <Play className="w-4 h-4 fill-current shrink-0" />
-                                Xem Phim
-                            </Link>
-                        )}
-
-                        {movie && (
-                            <>
-                                <FavoriteButton
-                                    movieData={{
-                                        movieId: movie._id,
-                                        movieSlug: movie.slug,
-                                        movieName: movie.name,
-                                        movieOriginName: movie.origin_name || "",
-                                        moviePoster: posterUrl || "/fallback.png",
-                                        movieYear: Number(movie.year) || new Date().getFullYear(),
-                                        movieQuality: movie.quality || "HD",
-                                        movieCategories: movie.category?.map((c: { name?: string }) => c.name) || [],
-                                    }}
-                                    className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/5 rounded-full"
-                                    showLabel={true}
-                                />
-                                <WatchlistButton
-                                    slug={movie.slug}
-                                    initialInWatchlist={inWatchlist}
-                                    className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/5 rounded-full"
-                                    showLabel={true}
-                                />
-                                <ShareButton title={`Xem phim ${movie.name} trên KHOIPHIM`} />
-                            </>
-                        )}
+                    {/* Right side: Portrait Poster for Desktop */}
+                    <div className="hidden lg:block shrink-0 w-[240px] xl:w-[280px]">
+                        <div className="relative aspect-[2/3] rounded-xl overflow-hidden ring-1 ring-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] group/poster">
+                            <Image
+                                src={posterUrl || "/placeholder.svg"}
+                                alt={movie?.name || ""}
+                                fill
+                                className="object-cover transition-transform duration-300 group-hover/poster:scale-[1.03]"
+                                sizes="(min-width: 1280px) 280px, 240px"
+                                priority
+                                placeholder="blur"
+                                blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -349,7 +370,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         />
                         {/* Comment Section below tabs */}
                         <div className="mt-8 sm:mt-12">
-                            <div className="flex items-center gap-2 mb-6 border-l-2 border-[#E50914] pl-3">
+                            <div className="flex items-center gap-2 mb-6 border-l-2 border-[#8FA7C5] pl-3">
                                 <h3 className="text-[15px] font-bold text-white uppercase tracking-widest">Bình luận</h3>
                             </div>
                             <CommentSection movieId={movie._id} movieSlug={movie.slug} />
@@ -361,7 +382,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         <div className="rounded-[10px] border border-white/[0.06] bg-[#07070b]/78 p-4 sm:p-5 space-y-6 sm:space-y-8 shadow-[0_10px_24px_#00000066]">
                         {/* Nội dung */}
                         <div>
-                            <div className="flex items-center gap-2 mb-3 sm:mb-4 border-l-2 border-[#E50914] pl-3">
+                            <div className="flex items-center gap-2 mb-3 sm:mb-4 border-l-2 border-[#8FA7C5] pl-3">
                                 <h3 className="text-[14px] sm:text-[15px] font-bold text-white uppercase tracking-widest">Nội dung</h3>
                             </div>
                             <div className="text-[13px] text-gray-400 leading-relaxed font-light text-justify line-clamp-6 sm:line-clamp-[12]" dangerouslySetInnerHTML={{ __html: movie?.content }} />
@@ -384,7 +405,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             <div className="text-[11px] font-medium text-gray-400 uppercase tracking-widest mb-3">Thể loại</div>
                             <div className="flex flex-wrap gap-2">
                                 {movie?.category?.map((c: { slug?: string; name?: string; id?: string }) => (
-                                    <Link key={c.id} href={`/the-loai/${c.slug}`} className="text-[11px] font-medium text-gray-300 bg-white/[0.08] border border-white/[0.14] py-1.5 px-3 rounded-full hover:text-white hover:border-[#E50914]/50 transition-colors uppercase tracking-wider">{c.name}</Link>
+                                    <Link key={c.id} href={`/the-loai/${c.slug}`} className="text-[11px] font-medium text-gray-300 bg-white/[0.08] border border-white/[0.14] py-1.5 px-3 rounded-full hover:text-white hover:border-[#8FA7C5]/50 transition-colors uppercase tracking-wider">{c.name}</Link>
                                 ))}
                             </div>
                         </div>

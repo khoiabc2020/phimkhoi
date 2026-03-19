@@ -134,7 +134,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
     return (
         <div className="bg-[#07070b]/82 p-4 md:p-6 rounded-[10px] border border-white/[0.06] shadow-[0_12px_28px_#00000066] scroll-mt-24">
             <div className="flex items-center gap-2 mb-6">
-                <MessageCircle className="w-6 h-6 text-[#E50914] fill-[#E50914]/20" />
+                <MessageCircle className="w-6 h-6 text-[#8FA7C5] fill-[#8FA7C5]/20" />
                 <h3 className="text-xl font-bold text-white tracking-wide">
                     Bình luận <span className="text-gray-400 text-sm font-normal">({total})</span>
                 </h3>
@@ -175,7 +175,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                             <button
                                 type="submit"
                                 disabled={submitting || !newComment.trim()}
-                                className="bg-[#E50914] hover:bg-[#a8bdd8] text-[#0a0a0a] px-5 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold text-sm"
+                                className="bg-[#8FA7C5] hover:bg-[#a8bdd8] text-[#0a0a0a] px-5 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold text-sm"
                             >
                                 {submitting ? <Loader2 className="w-4 h-4 animate-spin inline mr-1" /> : null}
                                 Gửi bình luận
@@ -185,14 +185,14 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                 </form>
             ) : (
                 <div className="bg-[#09090d] text-gray-200 p-4 rounded-[10px] mb-8 text-center border border-white/[0.06] text-sm">
-                    Vui lòng <a href="/login" className="text-[#E50914] hover:underline font-bold">đăng nhập</a> để bình luận.
+                    Vui lòng <a href="/login" className="text-[#8FA7C5] hover:underline font-bold">đăng nhập</a> để bình luận.
                 </div>
             )}
 
             {/* Comments List */}
             {loading ? (
                 <div className="flex justify-center py-4">
-                    <Loader2 className="w-6 h-6 text-[#E50914] animate-spin" />
+                    <Loader2 className="w-6 h-6 text-[#8FA7C5] animate-spin" />
                 </div>
             ) : (
                 <div className="space-y-8">
@@ -216,12 +216,12 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                                         </span>
                                         {/* Dynamic Episode Tag */}
                                         {comment.episodeName && (
-                                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#E50914]/20 text-[#E50914] font-medium tracking-wide">
+                                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#8FA7C5]/20 text-[#8FA7C5] font-medium tracking-wide">
                                                 {comment.episodeName.startsWith("Tập") ? comment.episodeName : `Tập ${comment.episodeName}`}
                                             </span>
                                         )}
                                     </div>
-                                    <div className="text-[11px] text-[#E50914] font-bold mt-0.5 tracking-wide">
+                                    <div className="text-[11px] text-[#8FA7C5] font-bold mt-0.5 tracking-wide">
                                         {comment.userRole || "Thành viên"}
                                     </div>
                                 </div>
@@ -233,7 +233,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                                         onClick={() => handleLike(comment._id)}
                                         disabled={!session}
                                         className={`flex items-center gap-1.5 text-[13px] font-medium transition-colors ${session && comment.likedBy.includes(session.user?.id as string)
-                                            ? "text-[#E50914]"
+                                            ? "text-[#8FA7C5]"
                                             : "text-gray-300 hover:text-white"
                                             } disabled:opacity-50`}
                                     >

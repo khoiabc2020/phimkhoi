@@ -45,10 +45,10 @@ export async function POST(req: Request) {
             subject: "Đặt lại mật khẩu - KHOIPHIM",
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-                    <h2 style="color: #E50914;">Đặt lại mật khẩu KHOIPHIM</h2>
+                    <h2 style="color: #8FA7C5;">Đặt lại mật khẩu KHOIPHIM</h2>
                     <p>Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản KHOIPHIM của mình.</p>
                     <p>Vui lòng nhấp vào nút bên dưới để tiếp tục:</p>
-                    <a href="${resetUrl}" style="background-color: #E50914; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; margin: 10px 0;">
+                    <a href="${resetUrl}" style="background-color: #8FA7C5; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; margin: 10px 0;">
                         Đặt lại mật khẩu
                     </a>
                     <p>Hoặc sao chép liên kết này vào trình duyệt của bạn:</p>

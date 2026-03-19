@@ -92,7 +92,7 @@ function LoginForm() {
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
                 {error && (
-                    <div className="px-4 py-3 bg-[#E50914]/15 border border-[#E50914]/25 rounded text-[#ffd1d1] text-sm">
+                    <div className="px-4 py-3 bg-[#8FA7C5]/15 border border-[#8FA7C5]/25 rounded text-[#ffd1d1] text-sm">
                         {error}
                     </div>
                 )}
@@ -129,20 +129,20 @@ function LoginForm() {
                 </div>
 
                 <div className="flex justify-end w-full cursor-pointer mb-2">
-                    <Link href="/forgot-password" className="text-white/55 text-[13px] hover:underline hover:text-[#E50914] transition-colors">Quên mật khẩu?</Link>
+                    <Link href="/forgot-password" className="text-white/55 text-[13px] hover:underline hover:text-[#8FA7C5] transition-colors">Quên mật khẩu?</Link>
                 </div>
 
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-[#E50914] hover:bg-[#ff2a2a] text-white font-bold h-12 rounded transition-colors flex items-center justify-center shadow-[0_2px_10px_#E5091433] disabled:opacity-70 disabled:cursor-not-allowed mt-1"
+                    className="w-full bg-[#8FA7C5] hover:bg-[#ff2a2a] text-white font-bold h-12 rounded transition-colors flex items-center justify-center shadow-[0_2px_10px_#8FA7C533] disabled:opacity-70 disabled:cursor-not-allowed mt-1"
                 >
                     {isLoading ? "Đang xử lý..." : "Đăng nhập"}
                 </button>
 
                 <div className="text-white/45 text-[15px] mt-8 text-center w-full pb-2">
                     Chưa có tài khoản?{" "}
-                    <Link href="/register" className="text-[#E50914] hover:underline font-bold ml-1">
+                    <Link href="/register" className="text-[#8FA7C5] hover:underline font-bold ml-1">
                         Đăng ký ngay
                     </Link>
                 </div>
@@ -157,7 +157,7 @@ export default function LoginPage() {
             <div className="absolute top-6 left-6 md:top-8 md:left-12 z-20">
                 <Link href="/" className="group shrink-0">
                     <span className="inline-block font-logo text-3xl md:text-4xl lg:text-5xl font-semibold uppercase tracking-[0.012em] leading-none whitespace-nowrap">
-                        <span className="text-[#9CA3AF]">KHOI</span><span className="text-[#E50914]">PHIM</span>
+                        <span className="text-[#9CA3AF]">KHOI</span><span className="text-[#8FA7C5]">PHIM</span>
                     </span>
                 </Link>
             </div>
