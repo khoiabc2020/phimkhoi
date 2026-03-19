@@ -67,7 +67,7 @@ export const HOT_KEYWORDS: HotKeywordItem[] = [
   { label: 'Chiến Tranh', slug: 'chien-tranh', type: 'category', color: '#78716c' },
   { label: 'Tâm Lý', slug: 'tam-ly', type: 'category', color: '#a855f7' },
   { label: 'Võ Thuật', slug: 'vo-thuat', type: 'category', color: '#dc2626' },
-  { label: 'Chiếu Rạp', slug: 'phim-chieu-rap', type: 'category', color: '#8FA7C5' },
+  { label: 'Chiếu Rạp', slug: 'phim-chieu-rap', type: 'category', color: '#E50914' },
   { label: 'Trung Quốc', slug: 'trung-quoc', type: 'country', color: '#ef4444' },
 ];
 

@@ -4,7 +4,7 @@ export const COLORS = {
   bg1: '#0B0D12', // Card background
 
   // Accents
-  accent: '#8FA7C5', // Modern blue-gray (web sync)
+  accent: '#E50914', // Modern blue-gray (web sync)
   accentPressed: '#7E95B1',
   accentSoft: '#263243',
   accentBorder: '#33455F',

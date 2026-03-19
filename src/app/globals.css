@@ -4,17 +4,17 @@
   --color-background: #0B0D12;
   --color-foreground: #ffffff;
 
-  --color-primary: #8FA7C5;
-  --color-primary-foreground: #050507;
+  --color-primary: #E50914;
+  --color-primary-foreground: #0a0a0a;
 
   --color-secondary: #1a1a1a;
   --color-secondary-foreground: #ffffff;
 
-  --color-accent: #8FA7C5;
-  --color-accent-foreground: #050507;
+  --color-accent: #E50914;
+  --color-accent-foreground: #0a0a0a;
 
-  --font-sans: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-  --font-mono: "SF Mono", "Fira Code", monospace;
+  --font-sans: var(--font-geist-sans), "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
   --font-display: "Be Vietnam Pro", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 
   /* Custom Animations */
@@ -92,11 +92,11 @@
 
     0%,
     100% {
-      box-shadow: 0 0 8px #8FA7C54D;
+      box-shadow: 0 0 8px #E509144D;
     }
 
     50% {
-      box-shadow: 0 0 20px #8FA7C599;
+      box-shadow: 0 0 20px #E5091499;
     }
   }
 
@@ -136,7 +136,7 @@
 }
 
 :root {
-  --background: #050507;
+  --background: #0a0a0a;
   --foreground: #ffffff;
 }
 
@@ -147,7 +147,7 @@ html {
 
 body {
   /* Đồng bộ với body::before — một tông duy nhất */
-  background-color: #050507;
+  background-color: #0a0a0a;
   color: var(--foreground);
   font-family: var(--font-sans);
   font-size: 16px;
@@ -165,7 +165,7 @@ body::before {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background: #050507;
+  background: #0a0a0a;
   /* Composite on GPU — no repaint on scroll */
   will-change: transform;
   transform: translateZ(0);
@@ -203,7 +203,7 @@ h2 {
 
   .glass {
     /* Cleaner header: darker, flatter, less glow */
-    @apply bg-[#060608]/92 border-b border-white/[0.05] shadow-[0_4px_12px_0_#0000002e];
+    @apply bg-[#0a0a0a]/60 backdrop-blur-lg border-b border-white/[0.05] shadow-[0_4px_12px_0_#0000002e];
   }
 
   .glass-panel {
@@ -253,12 +253,12 @@ h2 {
 
   /* Override Tailwind Default Yellow-500 to system accent */
   .text-yellow-500 {
-    color: #8fa7c5;
+    color: #E50914;
     opacity: 0.85 !important;
   }
 
   .bg-yellow-500 {
-    background-color: #8fa7c5;
+    background-color: #E50914;
     opacity: 0.8 !important;
   }
 

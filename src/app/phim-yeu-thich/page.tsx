@@ -45,7 +45,7 @@ export default async function FavoritesPage() {
     const favorites = favoritesResult.success && favoritesResult.data ? favoritesResult.data : [];
 
     return (
-        <div className="min-h-screen bg-[#050507] pt-24 md:pt-28 pb-12">
+        <div className="min-h-screen bg-[#0a0a0a] pt-24 md:pt-28 pb-12">
             <div className="w-full max-w-[1920px] mx-auto px-3 sm:px-4 md:px-12">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4 md:mb-8">

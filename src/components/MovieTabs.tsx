@@ -148,12 +148,12 @@ export default function MovieTabs({
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id as any)}
-                            className={`flex items-center gap-2 pb-3 text-[12px] sm:text-sm font-bold transition-all relative whitespace-nowrap ${isActive ? "text-[#8FA7C5]" : "text-gray-400 hover:text-white"
+                            className={`flex items-center gap-2 pb-3 text-[12px] sm:text-sm font-bold transition-all relative whitespace-nowrap ${isActive ? "text-[#E50914]" : "text-gray-400 hover:text-white"
                                 }`}
                         >
                             {tab.label}
                             {isActive && (
-                                <span className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-[#8FA7C5]" />
+                                <span className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-[#E50914]" />
                             )}
                         </button>
                     );
@@ -188,13 +188,13 @@ export default function MovieTabs({
                                                     }}
                                                     className={cn(
                                                         "flex items-center gap-1.5 sm:gap-2 pb-2 sm:pb-3 text-[12px] sm:text-[14px] font-bold transition-all relative whitespace-nowrap uppercase tracking-wider",
-                                                        isActive ? "text-[#8FA7C5]" : "text-gray-400 hover:text-gray-200"
+                                                        isActive ? "text-[#E50914]" : "text-gray-400 hover:text-gray-200"
                                                     )}
                                                 >
-                                                    <Icon className={cn("w-[14px] h-[14px] sm:w-[16px] sm:h-[16px]", isActive ? "text-[#8FA7C5]" : "text-gray-500")} />
+                                                    <Icon className={cn("w-[14px] h-[14px] sm:w-[16px] sm:h-[16px]", isActive ? "text-[#E50914]" : "text-gray-500")} />
                                                     {lang}
                                                     {isActive && (
-                                                        <span className="absolute bottom-[-1px] left-0 right-0 h-[3px] rounded-t-full bg-[#8FA7C5]" />
+                                                        <span className="absolute bottom-[-1px] left-0 right-0 h-[3px] rounded-t-full bg-[#E50914]" />
                                                     )}
                                                 </button>
                                             );
@@ -230,7 +230,7 @@ export default function MovieTabs({
                                                     className={cn(
                                                         "h-[32px] sm:h-[38px] px-3 sm:px-5 rounded-full text-[12px] sm:text-[13px] font-bold transition-all duration-300 border flex items-center gap-2 shadow-sm",
                                                         isActive
-                                                            ? "bg-[#8FA7C5] border-[#8FA7C5] text-[#050507] scale-105 transform"
+                                                            ? "bg-[#E50914] border-[#E50914] text-[#0a0a0a] scale-105 transform"
                                                             : "bg-white/[0.04] border-white/[0.10] text-gray-300 hover:text-white hover:border-white/[0.2] hover:bg-white/[0.08] active:scale-95"
                                                     )}
                                                 >
@@ -256,14 +256,14 @@ export default function MovieTabs({
                                 <div className="flex items-center justify-between gap-3">
                                     <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
                                         <div className="text-sm font-bold text-gray-200">
-                                            Danh sách tập <span className="text-[#8FA7C5]">({currentServerData.length})</span>
+                                            Danh sách tập <span className="text-[#E50914]">({currentServerData.length})</span>
                                         </div>
                                         {totalChunks > 1 && (
                                             <div className="relative">
                                                 <select
                                                     value={currentChunk}
                                                     onChange={(e) => setCurrentChunk(Number(e.target.value))}
-                                                    className="appearance-none bg-[#0B0B10] border border-white/[0.08] text-white text-sm font-medium py-2 px-4 pr-10 rounded-lg outline-none focus:border-[#8FA7C5]/40 transition-colors cursor-pointer"
+                                                    className="appearance-none bg-[#0B0B10] border border-white/[0.08] text-white text-sm font-medium py-2 px-4 pr-10 rounded-lg outline-none focus:border-[#E50914]/40 transition-colors cursor-pointer"
                                                 >
                                                     {Array.from({ length: totalChunks }).map((_, idx) => {
                                                         const start = idx * EPISODES_PER_CHUNK + 1;
@@ -360,7 +360,7 @@ export default function MovieTabs({
                                         })}
                                     </div>
                                 ) : (
-                                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-3 max-h-[360px] sm:max-h-[440px] overflow-y-auto custom-scrollbar pr-1 sm:pr-2 pb-1 [contain:layout_paint]">
+                                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2 sm:gap-3 max-h-[360px] sm:max-h-[440px] overflow-y-auto custom-scrollbar pr-1 sm:pr-2 pb-1 [contain:layout_paint]">
                                         {paginatedEpisodes.map((ep: { slug?: string; name?: string }) => {
                                             if (!ep?.slug) return null;
                                             const rawName = String(ep?.name || "");
@@ -434,7 +434,7 @@ export default function MovieTabs({
                                             className={cn(
                                                 "flex-shrink-0 relative w-32 sm:w-40 rounded-lg overflow-hidden border transition-all",
                                                 activeTrailerIdx === i
-                                                    ? "border-[#8FA7C5] ring-1 ring-[#8FA7C5]/40"
+                                                    ? "border-[#E50914] ring-1 ring-[#E50914]/40"
                                                     : "border-white/10 hover:border-white/25"
                                             )}
                                         >
@@ -445,7 +445,7 @@ export default function MovieTabs({
                                             />
                                             <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                                                 {activeTrailerIdx === i ? (
-                                                    <div className="w-6 h-6 rounded-full bg-[#8FA7C5] flex items-center justify-center">
+                                                    <div className="w-6 h-6 rounded-full bg-[#E50914] flex items-center justify-center">
                                                         <Play className="w-3 h-3 fill-black text-black" />
                                                     </div>
                                                 ) : (
@@ -458,7 +458,7 @@ export default function MovieTabs({
                                                 <p className="text-[10px] text-gray-400 truncate text-left">{v.name}</p>
                                                 <p className={cn(
                                                     "text-[10px] font-bold mt-0.5",
-                                                    v.type === "Trailer" ? "text-[#8FA7C5]" : "text-gray-500"
+                                                    v.type === "Trailer" ? "text-[#E50914]" : "text-gray-500"
                                                 )}>{v.type}</p>
                                             </div>
                                         </button>
@@ -478,7 +478,7 @@ export default function MovieTabs({
                                     href={`https://www.youtube.com/watch?v=${activeVideo.key}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex-shrink-0 text-xs text-[#8FA7C5] hover:text-white border border-[#8FA7C5]/30 hover:border-white/20 px-3 py-1.5 rounded-full transition-colors"
+                                    className="flex-shrink-0 text-xs text-[#E50914] hover:text-white border border-[#E50914]/30 hover:border-white/20 px-3 py-1.5 rounded-full transition-colors"
                                 >
                                     YouTube ↗
                                 </a>

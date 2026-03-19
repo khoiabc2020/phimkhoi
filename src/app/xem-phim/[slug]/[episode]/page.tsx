@@ -148,9 +148,9 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
     };
 
     return (
-        <div className="min-h-screen bg-[#050507] text-gray-300" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+        <div className="min-h-screen bg-[#0a0a0a] text-gray-300" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
             <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute inset-0 bg-gradient-radial from-[#101014]/22 via-[#050507] to-[#050507]" />
+                <div className="absolute inset-0 bg-gradient-radial from-[#101014]/22 via-[#0a0a0a] to-[#0a0a0a]" />
             </div>
 
             <div className="relative z-10 pt-10 md:pt-24 pb-16">
@@ -182,7 +182,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
                             <div className="relative z-30 rounded-[10px] border border-white/[0.06] overflow-hidden bg-[#07070b]/82 shadow-[0_10px_24px_#00000066] mx-3 sm:mx-0">
                                 <div className="px-5 sm:px-6 pt-4 pb-3 border-b border-white/[0.06] bg-[#09090d]">
                                     <h3 className="text-white font-bold text-[14px] sm:text-[15px] flex items-center gap-2 tracking-wide uppercase">
-                                        <Info className="w-4 h-4 text-[#8FA7C5]" /> Nội dung
+                                        <Info className="w-4 h-4 text-[#E50914]" /> Nội dung
                                     </h3>
                                 </div>
                                 <div className="p-5 sm:p-6">
@@ -244,7 +244,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
                                     <div className="p-5 flex flex-wrap gap-2">
                                         {movie.category.map((c: { id: React.Key | null | undefined; slug: string; name: string }) => (
                                             <Link key={c.id} href={`/the-loai/${c.slug}`}
-                                                className="text-xs px-3 py-1.5 rounded-full text-gray-200 border border-white/[0.10] hover:border-[#8FA7C5]/40 hover:text-[#8FA7C5] transition-colors"
+                                                className="text-xs px-3 py-1.5 rounded-full text-gray-200 border border-white/[0.10] hover:border-[#E50914]/40 hover:text-[#E50914] transition-colors"
                                                 style={{ background: "rgba(255,255,255,0.06)" }}>
                                                 {c.name}
                                             </Link>
@@ -257,7 +257,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
                             {movie.category?.[0]?.slug && (
                                 <div className="relative z-30 rounded-[10px] border border-white/[0.06] overflow-hidden bg-[#07070b]/82 shadow-[0_10px_24px_#00000066]">
                                     <div className="px-5 pt-5 pb-4 border-b border-white/[0.06] flex items-center gap-2 bg-[#09090d]">
-                                        <div className="w-1.5 h-4 rounded-full bg-[#8FA7C5]" />
+                                        <div className="w-1.5 h-4 rounded-full bg-[#E50914]" />
                                         <h3 className="text-white font-bold text-[15px] tracking-wide">Phim đề xuất</h3>
                                     </div>
                                     <div className="p-4">

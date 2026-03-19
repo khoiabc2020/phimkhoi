@@ -188,8 +188,8 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                 className={cn(
                     "fixed top-0 left-0 right-0 z-40 transition-colors duration-200 will-change-transform transform-gpu",
                     isScrolled
-                        ? "glass"
-                        : "bg-[#050507]/92 border-b border-white/[0.05] pointer-events-none lg:bg-gradient-to-b lg:from-black/80 lg:via-black/40 lg:to-transparent lg:border-b-0"
+                        ? "glass pointer-events-auto"
+                        : "bg-gradient-to-b from-[#0a0a0a]/80 via-[#0a0a0a]/40 to-transparent pointer-events-none"
                 )}
             >
                 <div className="max-w-[1920px] mx-auto px-3 sm:px-4 lg:px-8 h-[54px] lg:h-[60px] flex items-center justify-between gap-3 flex-nowrap pointer-events-auto">
@@ -526,7 +526,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                     </div>
                                 </div>
                             ) : (
-                                <Link href="/login" className="bg-[#8FA7C5] hover:bg-[#a8bdd8] text-[#050507] px-5 py-2 rounded-full font-bold text-sm transition-transform duration-200 hover:scale-105 active:scale-95 ml-1 whitespace-nowrap">
+                                <Link href="/login" className="bg-[#E50914] hover:bg-[#a8bdd8] text-[#0a0a0a] px-5 py-2 rounded-full font-bold text-sm transition-transform duration-200 hover:scale-105 active:scale-95 ml-1 whitespace-nowrap">
                                     Đăng nhập
                                 </Link>
                             )}

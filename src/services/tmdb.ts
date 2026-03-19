@@ -59,7 +59,7 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
 
             for (const endpoint of endpoints) {
                 // Thêm &_v=1 để phá cache vì NextJS lưu cache fetch API quá lâu (1 tiếng)
-                let url = `${TMDB_API_URL}/search/${endpoint}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanQuery)}&language=vi-VN&_v=4`;
+                let url = `${TMDB_API_URL}/search/${endpoint}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanQuery)}&language=vi-VN&_v=5`;
 
                 if (year) {
                     if (endpoint === 'movie') url += `&primary_release_year=${year}`;
@@ -112,7 +112,9 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
                         // We DO NOT force a match just because the year matches, as that leads to hilarious false positives (like Western movies for Chinese dramas).
                         if (!isMatch && itemYear === year) {
                             // Only force match if the query was EXACTLY the original name, meaning TMDB returned this as the #1 result for the original name
-                            if (q === verification?.originalName) isMatch = true;
+                            if (q === verification?.originalName && filteredResults.indexOf(item) === 0) {
+                                isMatch = true;
+                            }
                         }
 
                         return isMatch;

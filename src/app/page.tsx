@@ -15,7 +15,7 @@ export const revalidate = 3600;
 const ROW_LIMIT = 10;
 const getCachedHomeData = cache(getHomeData);
 
-const heroSkeleton = <div className="w-full h-[66vh] md:h-[88vh] bg-[#050507] animate-pulse" />;
+const heroSkeleton = <div className="w-full h-[66vh] md:h-[88vh] bg-[#0a0a0a] animate-pulse" />;
 const contentSkeleton = (
   <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 py-8 space-y-8">
     <div className="h-6 w-48 bg-white/10 rounded animate-pulse" />
@@ -221,12 +221,12 @@ async function HomeContentStream() {
 
 export default function Home() {
   return (
-    <main className="min-h-screen pb-16 bg-[#050507]">
+    <main className="min-h-screen pb-16 bg-[#0a0a0a]">
       <Suspense fallback={heroSkeleton}>
         <HeroStream />
       </Suspense>
 
-      <div className="relative z-20 -mt-6 md:-mt-10 lg:-mt-14 mb-4 pt-4 md:pt-6 bg-[#050507]">
+      <div className="relative z-20 -mt-6 md:-mt-10 lg:-mt-14 mb-4 pt-4 md:pt-6 bg-[#0a0a0a]">
         <TopicSection />
       </div>
 

@@ -10,7 +10,7 @@ import { CONFIG } from '@/constants/config';
 
 const API_URL = 'https://phimapi.com';
 const BASE_IMG = 'https://phimimg.com/';
-const ACCENT = '#8FA7C5';
+const ACCENT = '#E50914';
 const ACCENT_SOFT = 'rgba(143,167,197,0.14)';
 const ACCENT_BORDER = 'rgba(143,167,197,0.28)';
 

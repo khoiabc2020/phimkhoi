@@ -112,7 +112,7 @@ function Dots({ count, active, onGo }: { count: number; active: number; onGo: (i
                     aria-label={`Slide ${i + 1}`}
                     className={cn(
                         "rounded-full transition-all duration-400 ease-out",
-                        i === active ? "w-7 h-1.5 bg-[#8FA7C5]" : "w-1.5 h-1.5 bg-white/30 hover:bg-white/60"
+                        i === active ? "w-7 h-1.5 bg-[#E50914]" : "w-1.5 h-1.5 bg-white/30 hover:bg-white/60"
                     )}
                 />
             ))}
@@ -166,7 +166,7 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                             aria-hidden={!isActive}
                         >
                             {/* Backdrop */}
-                            <div className="relative w-full h-[260px] sm:h-[330px] overflow-hidden bg-[#050507]">
+                            <div className="relative w-full h-[260px] sm:h-[330px] overflow-hidden bg-[#0a0a0a]">
                                 <Image
                                     src={bg}
                                     alt=""
@@ -180,8 +180,8 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                                     decoding="async"
                                 />
                                 {/* Gradient overlay */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#050507] via-[#050507]/36 to-transparent" />
-                                <div className="absolute inset-0 bg-gradient-to-r from-[#050507]/56 via-transparent to-transparent" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/36 to-transparent" />
+                                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a]/56 via-transparent to-transparent" />
 
                                 {/* Quality + rating badges */}
                                 <div className="absolute top-3 right-3 flex flex-col items-end gap-1.5 z-20">
@@ -260,9 +260,9 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                 <div className="flex items-center gap-2 mt-3">
                     <Link
                         href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                        className="flex flex-1 items-center justify-center gap-1.5 h-10 rounded-full bg-[#263243] border border-[#33455F] text-[#d8e3f2] font-bold text-[14px] active:scale-[0.97] transition-transform"
+                        className="flex flex-1 items-center justify-center gap-1.5 h-10 rounded-full bg-[#E50914] text-[#0a0a0a] font-black text-[14px] active:scale-[0.97] hover:scale-105 transition-all shadow-[0_4px_20px_rgba(229,9,20,0.4)] hover:shadow-[0_6px_28px_rgba(229,9,20,0.6)]"
                     >
-                        <Play className="w-3.5 h-3.5 fill-[#d8e3f2] shrink-0" />
+                        <Play className="w-3.5 h-3.5 fill-[#0a0a0a] shrink-0" />
                         Xem Ngay
                     </Link>
                     <Link
@@ -294,7 +294,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
 
     return (
         <div
-            className="relative w-full h-[76vh] lg:h-[92vh] xl:h-[104vh] overflow-hidden bg-[#050507]"
+            className="relative w-full h-[76vh] lg:h-[92vh] xl:h-[104vh] overflow-hidden bg-[#0a0a0a]"
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}
         >
@@ -342,11 +342,11 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
             {/* ── Gradient overlays (always on top) ── */}
             <div className="absolute inset-0 z-[2] pointer-events-none">
                 {/* Left text readability */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#050507]/95 via-[#050507]/62 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a]/95 via-[#0a0a0a]/62 to-transparent" />
                 {/* Bottom blend into page */}
-                <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#050507] via-[#050507]/70 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/70 to-transparent" />
                 {/* Top subtle vignette */}
-                <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-[#050507]/42 to-transparent" />
+                <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-[#0a0a0a]/42 to-transparent" />
             </div>
 
             {/* ── Content ── */}
@@ -372,7 +372,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                             )}
                             {movie.tmdbData?.vote_average && (
                                 <span className="flex items-center gap-1 text-white/70 text-[11px]">
-                                    <span className="text-[#8FA7C5]">★</span>
+                                    <span className="text-[#E50914]">★</span>
                                     {movie.tmdbData.vote_average.toFixed(1)}
                                 </span>
                             )}
@@ -436,9 +436,9 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         >
                             <Link
                                 href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                className="flex items-center justify-center gap-2 h-12 px-7 rounded-full bg-[#263243] hover:bg-[#314156] border border-[#33455F] text-[#d8e3f2] font-bold text-[15px] transition-all duration-200 hover:scale-105 active:scale-95"
+                                className="flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-[#E50914] text-[#0a0a0a] font-black text-[15px] transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_4px_24px_rgba(229,9,20,0.4)] hover:shadow-[0_8px_32px_rgba(229,9,20,0.6)]"
                             >
-                                <Play className="w-4 h-4 fill-[#d8e3f2] shrink-0" />
+                                <Play className="w-4 h-4 fill-[#0a0a0a] shrink-0" />
                                 Xem Ngay
                             </Link>
                             <Link

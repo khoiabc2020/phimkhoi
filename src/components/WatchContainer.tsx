@@ -105,7 +105,7 @@ export default function WatchContainer({
                 className={cn(
                     "transition-all duration-300",
                     isTheaterMode
-                        ? "fixed top-[70px] md:top-[80px] left-0 right-0 bottom-0 z-[100] bg-[#050507] overflow-y-auto w-full px-4 md:px-10 lg:px-20 py-6 pb-32"
+                        ? "fixed top-[70px] md:top-[80px] left-0 right-0 bottom-0 z-[100] bg-[#0a0a0a] overflow-y-auto w-full px-4 md:px-10 lg:px-20 py-6 pb-32"
                         : "relative z-10 w-full"
                 )}
             >
@@ -181,7 +181,7 @@ export default function WatchContainer({
                             <h1 className="text-white font-extrabold text-[15px] sm:text-lg truncate leading-tight">
                                 {movie.name}
                             </h1>
-                            <p className="text-[#8FA7C5] text-xs sm:text-sm mt-0.5 truncate font-semibold">
+                            <p className="text-[#E50914] text-xs sm:text-sm mt-0.5 truncate font-semibold">
                                 {activeEpisode ? displayEpisodeName(activeEpisode.name) : ""}
                             </p>
                         </div>
@@ -213,15 +213,15 @@ export default function WatchContainer({
                             className={cn(
                                 "flex items-center justify-center transition-all w-8 h-8 sm:w-auto sm:px-3 sm:py-2 rounded-[10px] border touch-manipulation active:scale-95",
                                 autoNext
-                                    ? "bg-[#8FA7C5]/15 text-[#8FA7C5] border-[#8FA7C5]/30 hover:bg-[#8FA7C5]/25"
+                                    ? "bg-[#E50914]/15 text-[#E50914] border-[#E50914]/30 hover:bg-[#E50914]/25"
                                     : "bg-white/8 text-gray-200 border-white/15 hover:bg-white/12"
                             )}
                         >
-                            <SkipForward className={cn("w-3.5 h-3.5", autoNext ? "text-[#8FA7C5]" : "text-gray-300")} />
+                            <SkipForward className={cn("w-3.5 h-3.5", autoNext ? "text-[#E50914]" : "text-gray-300")} />
                             <span className="hidden sm:inline ml-1.5 text-xs font-bold">Tự chuyển</span>
                             <span className={cn(
                                 "hidden sm:inline ml-1.5 px-1 py-0.5 rounded text-[10px] font-bold",
-                                autoNext ? "bg-[#8FA7C5]/20" : "bg-white/10"
+                                autoNext ? "bg-[#E50914]/20" : "bg-white/10"
                             )}>
                                 {autoNext ? "BẬT" : "TẮT"}
                             </span>
@@ -232,7 +232,7 @@ export default function WatchContainer({
                             <Link
                                 href={nextEpisodeUrl}
                                 title="Tập sau"
-                                className="flex items-center justify-center text-xs font-bold text-[#050507] bg-[#8FA7C5] hover:bg-[#a8bdd8] transition-all w-8 h-8 sm:w-auto sm:px-3 sm:py-2 rounded-[10px] touch-manipulation active:scale-95 shadow-md shadow-[#8FA7C5]/20"
+                                className="flex items-center justify-center text-xs font-bold text-[#0a0a0a] bg-[#E50914] hover:bg-[#a8bdd8] transition-all w-8 h-8 sm:w-auto sm:px-3 sm:py-2 rounded-[10px] touch-manipulation active:scale-95 shadow-md shadow-[#E50914]/20"
                             >
                                 <span className="hidden sm:inline mr-1">Tập sau</span>
                                 <ChevronRight className="w-4 h-4" />

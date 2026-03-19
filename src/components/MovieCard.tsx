@@ -192,7 +192,7 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
-                <div className={`relative ${orientation === 'landscape' ? 'aspect-video' : 'aspect-[2/3]'} rounded-[10px] overflow-hidden bg-[#0b101a]`}>
+                <div className={`relative ${orientation === 'landscape' ? 'aspect-video' : 'aspect-[2/3]'} rounded-[10px] overflow-hidden bg-[#0b101a] ring-1 ring-white/5 group-hover/static-card:ring-2 group-hover/static-card:ring-[#E50914]/60 transition-all duration-300 shadow-lg`}>
                     <Link href={`/phim/${movie.slug}`} className="block h-full w-full absolute inset-0 z-0" prefetch={false}>
                         <Image
                             src={activePosterSrc || "/placeholder.svg"}
@@ -237,7 +237,7 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                     {/* Rating Badge bottom-right */}
                     {(movie as any).vote_average && (movie as any).vote_average > 0 && (
                         <div className="absolute bottom-2 right-2 z-10 pointer-events-none flex items-center gap-0.5 bg-black/70 backdrop-blur-sm rounded px-1.5 py-0.5">
-                            <Star className="w-2.5 h-2.5 fill-[#8FA7C5] text-[#8FA7C5]" />
+                            <Star className="w-2.5 h-2.5 fill-[#E50914] text-[#E50914]" />
                             <span className="text-[9px] font-bold text-white/90">{((movie as any).vote_average).toFixed(1)}</span>
                         </div>
                     )}
@@ -371,7 +371,7 @@ function OnflixHoverCard({
                             {/* Play button (Yellow) */}
                             <Link
                                 href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                className="flex-1 min-w-0 flex items-center justify-center gap-1.5 bg-[#8FA7C5] hover:bg-[#a8bdd8] text-[#050507] font-extrabold text-[13px] h-9 px-3 rounded-full transition-all hover:scale-105"
+                                className="flex-1 min-w-0 flex items-center justify-center gap-1.5 bg-[#E50914] hover:bg-[#ff0f1e] text-[#0a0a0a] font-extrabold text-[13px] h-9 px-3 rounded-full transition-all hover:scale-105 shadow-[0_2px_12px_rgba(229,9,20,0.5)]"
                             >
                                 <Play className="w-3.5 h-3.5 fill-current shrink-0" />
                                 <span className="truncate">Xem</span>

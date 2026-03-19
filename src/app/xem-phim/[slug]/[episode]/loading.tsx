@@ -1,6 +1,6 @@
 export default function WatchEpisodeLoading() {
     return (
-        <div className="min-h-screen bg-[#050507] pt-16 md:pt-24 pb-16">
+        <div className="min-h-screen bg-[#0a0a0a] pt-16 md:pt-24 pb-16">
             <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 lg:px-8">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8">
                     <div className="lg:col-span-9">

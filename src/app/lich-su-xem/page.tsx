@@ -48,7 +48,7 @@ export default async function WatchHistoryPage() {
     return (
         <div className="min-h-screen pt-24 md:pt-28 pb-12 relative overflow-hidden">
             {/* Background nhẹ đồng bộ với toàn site */}
-            <div className="fixed inset-0 pointer-events-none z-0 bg-[#050507]" />
+            <div className="fixed inset-0 pointer-events-none z-0 bg-[#0a0a0a]" />
 
             <div className="w-full max-w-[1920px] mx-auto px-3 sm:px-4 md:px-12 relative z-10">
                 {/* Header */}
@@ -58,7 +58,7 @@ export default async function WatchHistoryPage() {
                             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                         </Link>
                         <div>
-                            <div className="flex items-center gap-2 text-[#8FA7C5] text-xs font-bold uppercase tracking-widest mb-1">
+                            <div className="flex items-center gap-2 text-[#E50914] text-xs font-bold uppercase tracking-widest mb-1">
                                 <History className="w-3.5 h-3.5" />
                                 <span>Thư viện cá nhân</span>
                             </div>
@@ -71,7 +71,7 @@ export default async function WatchHistoryPage() {
                 {history.length === 0 ? (
                     <div className="py-20">
                         <EmptyState
-                            icon={<History className="w-16 h-16 text-[#8FA7C5]" />}
+                            icon={<History className="w-16 h-16 text-[#E50914]" />}
                             title="Lịch sử trống"
                             description="Bạn chưa xem phim nào gần đây. Hãy bắt đầu trải nghiệm ngay!"
                             action={{ label: "Khám phá phim hay", href: "/" }}
@@ -82,8 +82,8 @@ export default async function WatchHistoryPage() {
                         {/* Continue Watching Section */}
                         {continueWatching.length > 0 && (
                             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                <h2 className="text-[18px] md:text-xl font-bold text-white mb-5 flex items-center gap-2 border-l-4 border-[#8FA7C5] pl-3">
-                                    <Play className="w-4 h-4 md:w-5 md:h-5 text-[#8FA7C5] fill-current" />
+                                <h2 className="text-[18px] md:text-xl font-bold text-white mb-5 flex items-center gap-2 border-l-4 border-[#E50914] pl-3">
+                                    <Play className="w-4 h-4 md:w-5 md:h-5 text-[#E50914] fill-current" />
                                     Tiếp tục xem
                                 </h2>
                                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 [contain:layout_paint]">
@@ -93,7 +93,7 @@ export default async function WatchHistoryPage() {
                                             href={`/xem-phim/${item.movieSlug}/${item.episodeSlug}`}
                                             className="group relative block"
                                         >
-                                            <div className="relative aspect-[2/3] rounded-[10px] overflow-hidden bg-[#0B0B10] shadow-[0_10px_20px_#00000066] border border-white/[0.08] group-hover:border-[#8FA7C5]/30 transition-all">
+                                            <div className="relative aspect-[2/3] rounded-[10px] overflow-hidden bg-[#0B0B10] shadow-[0_10px_20px_#00000066] border border-white/[0.08] group-hover:border-[#E50914]/30 transition-all">
                                                 <Image
                                                     src={getImageUrl(item.moviePoster)}
                                                     alt={item.movieName}
@@ -104,7 +104,7 @@ export default async function WatchHistoryPage() {
 
                                                 {/* Play button on hover */}
                                                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 bg-black/20">
-                                                    <div className="w-12 h-12 rounded-full bg-[#8FA7C5] flex items-center justify-center shadow-[0_0_20px_#8FA7C580] scale-0 group-hover:scale-100 transition-transform duration-300">
+                                                    <div className="w-12 h-12 rounded-full bg-[#E50914] flex items-center justify-center shadow-[0_0_20px_#E5091480] scale-0 group-hover:scale-100 transition-transform duration-300">
                                                         <Play className="w-6 h-6 text-black fill-black ml-1" />
                                                     </div>
                                                 </div>
@@ -120,12 +120,12 @@ export default async function WatchHistoryPage() {
 
                                             {/* Text bên dưới ảnh - không che mặt nhân vật */}
                                             <div className="mt-2 px-0.5">
-                                                <h3 className="text-white font-semibold line-clamp-1 text-sm group-hover:text-[#8FA7C5] transition-colors">
+                                                <h3 className="text-white font-semibold line-clamp-1 text-sm group-hover:text-[#E50914] transition-colors">
                                                     {item.movieName}
                                                 </h3>
                                                 <div className="flex items-center justify-between mt-0.5">
                                                     <span className="text-white/50 text-xs">{item.episodeName}</span>
-                                                    <span className="text-[#8FA7C5]/70 text-[10px] font-medium">{item.progress}%</span>
+                                                    <span className="text-[#E50914]/70 text-[10px] font-medium">{item.progress}%</span>
                                                 </div>
                                             </div>
                                         </Link>

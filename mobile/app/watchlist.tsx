@@ -98,7 +98,7 @@ export default function WatchListScreen() {
             <View style={styles.centered}>
                 <Stack.Screen options={{ headerShown: false }} />
                 <StatusBar style="light" />
-                <ActivityIndicator size="large" color="#8FA7C5" />
+                <ActivityIndicator size="large" color="#E50914" />
             </View>
         );
     }
@@ -136,7 +136,7 @@ export default function WatchListScreen() {
                             <RefreshControl
                                 refreshing={refreshing}
                                 onRefresh={onRefresh}
-                                tintColor="#8FA7C5"
+                                tintColor="#E50914"
                             />
                         }
                         renderItem={({ item }) => {
@@ -180,7 +180,7 @@ export default function WatchListScreen() {
                                         {/* Row actions */}
                                         <View style={styles.actionRow}>
                                             <View style={styles.playBtn}>
-                                                <Ionicons name="play-circle" size={18} color="#8FA7C5" />
+                                                <Ionicons name="play-circle" size={18} color="#E50914" />
                                                 <Text style={styles.playBtnText}>Xem phim</Text>
                                             </View>
 

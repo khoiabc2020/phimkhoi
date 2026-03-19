@@ -29,7 +29,7 @@ const MovieCard = memo(({ movie, width: propsWidth, height: propsHeight }: Movie
             <FocusableButton
                 className="mr-3 transition-opacity"
                 style={{ width: dynamicWidth, borderRadius: 14, padding: 2 }}
-                focusStyle={{ borderWidth: 2, borderColor: '#8FA7C5', transform: [{ scale: 1.05 }] }}
+                focusStyle={{ borderWidth: 2, borderColor: '#E50914', transform: [{ scale: 1.05 }] }}
                 onPressIn={() => {
                     prefetchMovieDetail(movie.slug);
                 }}

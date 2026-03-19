@@ -27,7 +27,7 @@ import ExpoPip from 'expo-pip';
 import { parseServerLabel } from '@/services/api';
 
 const { width, height } = Dimensions.get('window');
-const ACCENT = '#8FA7C5';
+const ACCENT = '#E50914';
 const ACCENT_TEXT = '#c7d7ea';
 const ACCENT_SURFACE = '#263243';
 const ACCENT_BORDER = '#33455F';

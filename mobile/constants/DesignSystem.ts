@@ -16,7 +16,7 @@ export const Colors = {
 
     // Accent Colors
     accent: {
-        yellow: '#8FA7C5',     // Synced blue-gray accent
+        yellow: '#E50914',     // Synced blue-gray accent
         orange: '#7E95B1',
         red: '#FF453A',
         green: '#32D74B',

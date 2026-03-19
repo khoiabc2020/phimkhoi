@@ -15,7 +15,7 @@ const { width } = Dimensions.get('window');
 const COLUMN_COUNT = 3;
 const ITEM_SPACING = 10;
 const ITEM_WIDTH = (width - 32 - (ITEM_SPACING * (COLUMN_COUNT - 1))) / COLUMN_COUNT;
-const ACCENT = '#8FA7C5';
+const ACCENT = '#E50914';
 const ACCENT_SOFT = 'rgba(143,167,197,0.18)';
 
 const HotMovieItem = ({ item, index }: { item: Movie, index: number }) => {
@@ -429,11 +429,11 @@ export default function ExploreScreen() {
             <ScrollView showsVerticalScrollIndicator={false} className="mb-4">
               <Text className="text-white font-semibold mb-3 ml-2 text-lg">Thể Loại</Text>
               <View className="flex-row flex-wrap gap-2 px-2 pb-6">
-                <TouchableOpacity onPress={() => setSelectedCategory('all')} className={`px-4 py-2.5 border rounded-full ${selectedCategory === 'all' ? 'bg-[#8FA7C5] border-[#8FA7C5]' : 'bg-transparent border-white/20'}`}>
+                <TouchableOpacity onPress={() => setSelectedCategory('all')} className={`px-4 py-2.5 border rounded-full ${selectedCategory === 'all' ? 'bg-[#E50914] border-[#E50914]' : 'bg-transparent border-white/20'}`}>
                   <Text className={selectedCategory === 'all' ? 'text-black font-semibold' : 'text-gray-300'}>Tất cả</Text>
                 </TouchableOpacity>
                 {categories.map((c: any) => (
-                  <TouchableOpacity key={c.slug} onPress={() => setSelectedCategory(c.slug)} className={`px-4 py-2.5 border rounded-full ${selectedCategory === c.slug ? 'bg-[#8FA7C5] border-[#8FA7C5]' : 'bg-transparent border-white/20'}`}>
+                  <TouchableOpacity key={c.slug} onPress={() => setSelectedCategory(c.slug)} className={`px-4 py-2.5 border rounded-full ${selectedCategory === c.slug ? 'bg-[#E50914] border-[#E50914]' : 'bg-transparent border-white/20'}`}>
                     <Text className={selectedCategory === c.slug ? 'text-black font-semibold' : 'text-gray-300'}>{c.name}</Text>
                   </TouchableOpacity>
                 ))}
@@ -441,11 +441,11 @@ export default function ExploreScreen() {
 
               <Text className="text-white font-semibold mb-3 ml-2 text-lg">Quốc Gia</Text>
               <View className="flex-row flex-wrap gap-2 px-2 pb-6">
-                <TouchableOpacity onPress={() => setSelectedCountry('all')} className={`px-4 py-2.5 border rounded-full ${selectedCountry === 'all' ? 'bg-[#8FA7C5] border-[#8FA7C5]' : 'bg-transparent border-white/20'}`}>
+                <TouchableOpacity onPress={() => setSelectedCountry('all')} className={`px-4 py-2.5 border rounded-full ${selectedCountry === 'all' ? 'bg-[#E50914] border-[#E50914]' : 'bg-transparent border-white/20'}`}>
                   <Text className={selectedCountry === 'all' ? 'text-black font-semibold' : 'text-gray-300'}>Tất cả</Text>
                 </TouchableOpacity>
                 {countries.map((c: any) => (
-                  <TouchableOpacity key={c.slug} onPress={() => setSelectedCountry(c.slug)} className={`px-4 py-2.5 border rounded-full ${selectedCountry === c.slug ? 'bg-[#8FA7C5] border-[#8FA7C5]' : 'bg-transparent border-white/20'}`}>
+                  <TouchableOpacity key={c.slug} onPress={() => setSelectedCountry(c.slug)} className={`px-4 py-2.5 border rounded-full ${selectedCountry === c.slug ? 'bg-[#E50914] border-[#E50914]' : 'bg-transparent border-white/20'}`}>
                     <Text className={selectedCountry === c.slug ? 'text-black font-semibold' : 'text-gray-300'}>{c.name}</Text>
                   </TouchableOpacity>
                 ))}
@@ -453,11 +453,11 @@ export default function ExploreScreen() {
 
               <Text className="text-white font-semibold mb-3 ml-2 text-lg">Năm Phát Hành</Text>
               <View className="flex-row flex-wrap gap-2 px-2 pb-6">
-                <TouchableOpacity onPress={() => setSelectedYear('all')} className={`px-4 py-2.5 border rounded-full ${selectedYear === 'all' ? 'bg-[#8FA7C5] border-[#8FA7C5]' : 'bg-transparent border-white/20'}`}>
+                <TouchableOpacity onPress={() => setSelectedYear('all')} className={`px-4 py-2.5 border rounded-full ${selectedYear === 'all' ? 'bg-[#E50914] border-[#E50914]' : 'bg-transparent border-white/20'}`}>
                   <Text className={selectedYear === 'all' ? 'text-black font-semibold' : 'text-gray-300'}>Tất cả</Text>
                 </TouchableOpacity>
                 {years.map((y) => (
-                  <TouchableOpacity key={y} onPress={() => setSelectedYear(y.toString())} className={`px-4 py-2.5 border rounded-full ${selectedYear === y.toString() ? 'bg-[#8FA7C5] border-[#8FA7C5]' : 'bg-transparent border-white/20'}`}>
+                  <TouchableOpacity key={y} onPress={() => setSelectedYear(y.toString())} className={`px-4 py-2.5 border rounded-full ${selectedYear === y.toString() ? 'bg-[#E50914] border-[#E50914]' : 'bg-transparent border-white/20'}`}>
                     <Text className={selectedYear === y.toString() ? 'text-black font-semibold' : 'text-gray-300'}>{y}</Text>
                   </TouchableOpacity>
                 ))}
@@ -468,7 +468,7 @@ export default function ExploreScreen() {
               <TouchableOpacity onPress={() => { setSelectedCategory('all'); setSelectedCountry('all'); setSelectedYear('all'); }} className="flex-1 py-4 bg-white/5 rounded-2xl items-center border border-white/10">
                 <Text className="text-white font-bold text-base">Xóa Bô Lọc</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => setIsFilterVisible(false)} className="flex-[1.5] py-4 bg-[#8FA7C5] rounded-2xl items-center shadow-[0_4px_14px_rgba(143,167,197,0.39)]">
+              <TouchableOpacity onPress={() => setIsFilterVisible(false)} className="flex-[1.5] py-4 bg-[#E50914] rounded-2xl items-center shadow-[0_4px_14px_rgba(143,167,197,0.39)]">
                 <Text className="text-black font-bold text-base">Áp Dụng</Text>
               </TouchableOpacity>
             </View>

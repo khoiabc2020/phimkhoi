@@ -47,6 +47,6 @@ const styles = StyleSheet.create({
     container: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#000', padding: 20 },
     title: { color: 'white', fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
     error: { color: 'red', marginBottom: 20, textAlign: 'center' },
-    btn: { backgroundColor: '#8FA7C5', padding: 10, borderRadius: 5 },
+    btn: { backgroundColor: '#E50914', padding: 10, borderRadius: 5 },
     btnText: { fontWeight: 'bold' }
 });

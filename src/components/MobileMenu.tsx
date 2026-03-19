@@ -75,7 +75,7 @@ export default function MobileMenu({
                     "border-r border-white/[0.10] backdrop-blur-xl",
                     isOpen ? "translate-x-0" : "-translate-x-full"
                 )}
-                style={{ background: "linear-gradient(180deg, #09090d 0%, #050507 100%)" }}
+                style={{ background: "linear-gradient(180deg, #09090d 0%, #0a0a0a 100%)" }}
             >
                 {/* Header */}
                 <div className="flex items-center justify-between px-5 h-[72px] shrink-0 border-b border-white/[0.06] bg-[#09090d]/92">
@@ -98,7 +98,7 @@ export default function MobileMenu({
                     {session ? (
                         <div className="rounded-[12px] p-4 border border-white/[0.08] bg-[#0B0B10]">
                             <div className="flex items-center gap-3 mb-3">
-                                <div className="w-11 h-11 rounded-full overflow-hidden border border-[#8FA7C5]/26 shrink-0 ring-1 ring-[#8FA7C5]/14">
+                                <div className="w-11 h-11 rounded-full overflow-hidden border border-[#E50914]/26 shrink-0 ring-1 ring-[#E50914]/14">
                                     <img
                                         src={session.user?.image || `https://ui-avatars.com/api/?name=${session.user?.name}&background=1e2235&color=F4C84A&bold=true`}
                                         alt={session.user?.name || "User"}
@@ -108,8 +108,8 @@ export default function MobileMenu({
                                 <div className="min-w-0">
                                     <p className="font-bold text-white text-[15px] truncate">{session.user?.name}</p>
                                     <div className="flex items-center gap-1.5 mt-0.5">
-                                        <Star className="w-3 h-3 text-[#8FA7C5]" fill="#8FA7C5" />
-                                        <p className="text-[12px] text-[#8FA7C5]/80 font-medium">Thành viên</p>
+                                        <Star className="w-3 h-3 text-[#E50914]" fill="#E50914" />
+                                        <p className="text-[12px] text-[#E50914]/80 font-medium">Thành viên</p>
                                     </div>
                                 </div>
                             </div>
@@ -130,7 +130,7 @@ export default function MobileMenu({
                         <div className="rounded-[12px] p-4 border border-white/[0.08] text-center bg-[#0B0B10]">
                             <p className="text-white/45 mb-3 text-[13px] leading-relaxed">Đăng nhập để lưu phim yêu thích và lịch sử xem</p>
                             <Link href="/login" onClick={onClose}
-                            className="block w-full bg-[#8FA7C5] text-[#050507] font-bold py-2.5 rounded-[12px] text-[14px] hover:brightness-105 transition-all"
+                            className="block w-full bg-[#E50914] text-[#0a0a0a] font-bold py-2.5 rounded-[12px] text-[14px] hover:brightness-105 transition-all"
                             >
                                 Đăng Nhập / Đăng Ký
                             </Link>
@@ -153,10 +153,10 @@ export default function MobileMenu({
                                 onClick={onClose}
                                 className="flex items-center gap-3 px-3 py-2.5 rounded-[12px] text-[15px] font-semibold text-white/80 hover:text-white hover:bg-white/[0.05] transition-all group"
                             >
-                                <Icon className="w-[17px] h-[17px] text-white/35 group-hover:text-[#8FA7C5]/80 transition-colors" strokeWidth={1.5} />
+                                <Icon className="w-[17px] h-[17px] text-white/35 group-hover:text-[#E50914]/80 transition-colors" strokeWidth={1.5} />
                                 <span className="flex-1">{label}</span>
                                 {badge && (
-                                    <span className="text-[9px] font-black text-[#050507] bg-[#8FA7C5] px-1.5 py-0.5 rounded-md">{badge}</span>
+                                    <span className="text-[9px] font-black text-[#0a0a0a] bg-[#E50914] px-1.5 py-0.5 rounded-md">{badge}</span>
                                 )}
                             </Link>
                         ))}
@@ -168,7 +168,7 @@ export default function MobileMenu({
                                 className="w-full flex items-center justify-between px-3 py-2.5 rounded-[12px] text-[14px] font-medium text-white/70 hover:text-white hover:bg-white/[0.06] transition-all group"
                             >
                                 <span className="flex items-center gap-3">
-                                    <LayoutGrid className="w-[17px] h-[17px] text-white/30 group-hover:text-[#8FA7C5]/80 transition-colors" strokeWidth={1.5} />
+                                    <LayoutGrid className="w-[17px] h-[17px] text-white/30 group-hover:text-[#E50914]/80 transition-colors" strokeWidth={1.5} />
                                     Thể Loại
                                 </span>
                                 <ChevronDown
@@ -190,7 +190,7 @@ export default function MobileMenu({
                                         </Link>
                                     ))}
                                     <Link href="/the-loai" onClick={onClose}
-                                        className="text-[#8FA7C5]/80 text-[12px] hover:text-[#8FA7C5] px-3 py-2 rounded-[10px] text-center transition-colors col-span-3 font-medium"
+                                        className="text-[#E50914]/80 text-[12px] hover:text-[#E50914] px-3 py-2 rounded-[10px] text-center transition-colors col-span-3 font-medium"
                                     >
                                         Xem tất cả thể loại →
                                     </Link>
@@ -205,7 +205,7 @@ export default function MobileMenu({
                                 className="w-full flex items-center justify-between px-3 py-2.5 rounded-[12px] text-[14px] font-medium text-white/70 hover:text-white hover:bg-white/[0.06] transition-all group"
                             >
                                 <span className="flex items-center gap-3">
-                                    <Globe className="w-[17px] h-[17px] text-white/30 group-hover:text-[#8FA7C5]/80 transition-colors" strokeWidth={1.5} />
+                                    <Globe className="w-[17px] h-[17px] text-white/30 group-hover:text-[#E50914]/80 transition-colors" strokeWidth={1.5} />
                                     Quốc Gia
                                 </span>
                                 <ChevronDown
@@ -238,8 +238,8 @@ export default function MobileMenu({
                     <div className="rounded-[14px] overflow-hidden border border-white/[0.08] bg-[#0B0B10]">
                         <div className="p-4">
                             <div className="flex items-center gap-3 mb-3">
-                                <div className="w-10 h-10 rounded-[12px] bg-[#8FA7C5]/12 flex items-center justify-center border border-[#8FA7C5]/16">
-                                    <Smartphone className="w-5 h-5 text-[#8FA7C5]" strokeWidth={1.5} />
+                                <div className="w-10 h-10 rounded-[12px] bg-[#E50914]/12 flex items-center justify-center border border-[#E50914]/16">
+                                    <Smartphone className="w-5 h-5 text-[#E50914]" strokeWidth={1.5} />
                                 </div>
                                 <div>
                                     <p className="text-white font-semibold text-[14px]">Ứng Dụng KHOIPHIM</p>
@@ -249,7 +249,7 @@ export default function MobileMenu({
                             <a
                                 href={APK_DOWNLOAD_URL}
                                 download="PhimKhoi-Release.apk"
-                                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-[12px] text-[13px] font-bold text-[#050507] bg-[#8FA7C5] hover:brightness-105 transition-all shadow-[0_4px_12px_#8FA7C528]"
+                                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-[12px] text-[13px] font-bold text-[#0a0a0a] bg-[#E50914] hover:brightness-105 transition-all shadow-[0_4px_12px_#E5091428]"
                             >
                                 <Download className="w-4 h-4" strokeWidth={2.5} />
                                 Tải APK Android

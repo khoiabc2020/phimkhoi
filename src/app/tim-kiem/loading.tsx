@@ -8,7 +8,7 @@ export default function Loading() {
                     <div className="h-8 w-28 rounded-full bg-white/[0.06] animate-pulse" />
                 </div>
             </div>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-2 sm:gap-2.5 md:gap-3 [contain:layout_paint]">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2 sm:gap-2.5 md:gap-3 [contain:layout_paint]">
                 {Array.from({ length: 16 }).map((_, i) => (
                     <div key={i} className="aspect-[2/3] rounded-lg bg-white/[0.06] border border-white/[0.06] animate-pulse" />
                 ))}

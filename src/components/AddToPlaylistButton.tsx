@@ -116,7 +116,7 @@ export default function AddToPlaylistButton({ movieData, className, variant = "i
                         className
                     )}
                 >
-                    <ListVideo className="w-5 h-5 group-hover:text-[#8FA7C5] transition-colors" />
+                    <ListVideo className="w-5 h-5 group-hover:text-[#E50914] transition-colors" />
                 </button>
             ) : (
                 <button
@@ -149,7 +149,7 @@ export default function AddToPlaylistButton({ movieData, className, variant = "i
                         <div className="p-2 max-h-[300px] overflow-y-auto custom-scrollbar">
                             {isLoading ? (
                                 <div className="flex justify-center py-10">
-                                    <Loader2 className="w-6 h-6 text-[#8FA7C5] animate-spin" />
+                                    <Loader2 className="w-6 h-6 text-[#E50914] animate-spin" />
                                 </div>
                             ) : playlists.length === 0 ? (
                                 <div className="text-center py-8 px-4 text-white/50 text-sm">
@@ -167,7 +167,7 @@ export default function AddToPlaylistButton({ movieData, className, variant = "i
                                                 <div className={cn(
                                                     "w-5 h-5 rounded border flex items-center justify-center transition-colors shadow-sm",
                                                     isChecked
-                                                        ? "bg-[#8FA7C5] border-[#8FA7C5] text-[#050507]"
+                                                        ? "bg-[#E50914] border-[#E50914] text-[#0a0a0a]"
                                                         : "border-white/20 bg-black/50"
                                                 )}>
                                                     {isChecked && <Check className="w-3.5 h-3.5 stroke-[3]" />}
@@ -190,7 +190,7 @@ export default function AddToPlaylistButton({ movieData, className, variant = "i
                                     value={newPlaylistName}
                                     onChange={(e) => setNewPlaylistName(e.target.value)}
                                     placeholder="Tạo danh sách mới..."
-                                    className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#8FA7C5] focus:ring-1 focus:ring-[#8FA7C5] transition-all"
+                                    className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914] transition-all"
                                 />
                                 <button
                                     type="submit"

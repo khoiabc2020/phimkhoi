@@ -40,13 +40,13 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
                         {slug && (
                             <a
                                 href={slug.startsWith('/') ? slug : `/danh-sach/${slug}`}
-                                className="inline-flex items-center gap-2 text-sm font-bold text-[#8fa7c5] hover:text-white transition-all group/link mt-2"
+                                className="inline-flex items-center gap-2 text-sm font-bold text-[#E50914] hover:text-white transition-all group/link mt-2"
                             >
-                                <span className="border-b-2 border-[#8fa7c5] group-hover/link:border-white pb-0.5 transition-colors">Xem tất cả</span>
+                                <span className="border-b-2 border-[#E50914] group-hover/link:border-white pb-0.5 transition-colors">Xem tất cả</span>
                                 <ChevronRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
                             </a>
                         )}
-                        <div className="hidden md:block w-16 h-1.5 bg-[#8fa7c5] rounded-full mt-4" />
+                        <div className="hidden md:block w-16 h-1.5 bg-[#E50914] rounded-full mt-4" />
                     </div>
 
                     {/* Carousel Section */}
@@ -56,7 +56,7 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
                             onClick={() => scroll("left")}
                             className="absolute left-0 top-0 bottom-0 z-40 w-12 bg-gradient-to-r from-[#020617]/80 via-transparent to-transparent flex items-center justify-center opacity-0 group-hover/row:opacity-100 transition-all duration-300 -translate-x-full group-hover/row:translate-x-0"
                         >
-                            <ChevronLeft className="w-8 h-8 text-white hover:text-[#8fa7c5] transition-colors" />
+                            <ChevronLeft className="w-8 h-8 text-white hover:text-[#E50914] transition-colors" />
                         </button>
 
                         <div
@@ -76,7 +76,7 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
                             onClick={() => scroll("right")}
                             className="absolute right-0 top-0 bottom-0 z-40 w-12 bg-gradient-to-l from-[#020617]/80 via-transparent to-transparent flex items-center justify-center opacity-0 group-hover/row:opacity-100 transition-all duration-300 translate-x-full group-hover/row:translate-x-0"
                         >
-                            <ChevronRight className="w-8 h-8 text-white hover:text-[#8fa7c5] transition-colors" />
+                            <ChevronRight className="w-8 h-8 text-white hover:text-[#E50914] transition-colors" />
                         </button>
                     </div>
                 </div>
@@ -94,13 +94,13 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
                 <div className="space-y-2.5 rounded-[10px] bg-transparent overflow-hidden">
                     <div className="flex items-center justify-between px-3 sm:px-4 pt-2.5">
                         <h2 className="text-[16px] sm:text-[18px] md:text-[20px] font-bold text-white flex items-center gap-2 tracking-tight">
-                            <span className="w-1 h-4 sm:h-5 bg-[#8fa7c5] rounded-sm" />
+                            <span className="w-1 h-4 sm:h-5 bg-[#E50914] rounded-sm" />
                             <span>{title}</span>
                         </h2>
                         {slug && (
                             <a
                                 href={slug.startsWith('/') ? slug : `/danh-sach/${slug}`}
-                                className="text-xs sm:text-sm font-semibold text-[#8fa7c5] hover:text-white flex items-center gap-1 transition-colors group/link"
+                                className="text-xs sm:text-sm font-semibold text-[#E50914] hover:text-white flex items-center gap-1 transition-colors group/link"
                             >
                                 Xem tất cả
                                 <ChevronRight className="w-4 h-4 transition-transform group-hover/link:translate-x-1" />
@@ -111,7 +111,7 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
                     <div className="relative group/row pb-3">
                         <button
                             onClick={() => scroll("left")}
-                            className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-40 w-8 h-8 flex items-center justify-center rounded-[10px] bg-[#0b1220]/92 border border-white/14 text-white hover:bg-[#8FA7C5] hover:border-[#8FA7C5] hover:text-[#050507] opacity-0 group-hover/row:opacity-100 transition-all duration-150 pointer-events-none group-hover/row:pointer-events-auto"
+                            className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-40 w-8 h-8 flex items-center justify-center rounded-[10px] bg-[#0b1220]/92 border border-white/14 text-white hover:bg-[#E50914] hover:border-[#E50914] hover:text-[#0a0a0a] opacity-0 group-hover/row:opacity-100 transition-all duration-150 pointer-events-none group-hover/row:pointer-events-auto"
                         >
                             <ChevronLeft className="w-4 h-4" />
                         </button>
@@ -130,7 +130,7 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
 
                         <button
                             onClick={() => scroll("right")}
-                            className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-40 w-8 h-8 flex items-center justify-center rounded-[10px] bg-[#0b1220]/92 border border-white/14 text-white hover:bg-[#8FA7C5] hover:border-[#8FA7C5] hover:text-[#050507] opacity-0 group-hover/row:opacity-100 transition-all duration-150 pointer-events-none group-hover/row:pointer-events-auto"
+                            className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-40 w-8 h-8 flex items-center justify-center rounded-[10px] bg-[#0b1220]/92 border border-white/14 text-white hover:bg-[#E50914] hover:border-[#E50914] hover:text-[#0a0a0a] opacity-0 group-hover/row:opacity-100 transition-all duration-150 pointer-events-none group-hover/row:pointer-events-auto"
                         >
                             <ChevronRight className="w-4 h-4" />
                         </button>

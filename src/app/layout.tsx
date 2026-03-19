@@ -1,17 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Be_Vietnam_Pro, Roboto_Condensed } from "next/font/google";
+import { Inter, Geist_Mono, Be_Vietnam_Pro, Roboto_Condensed } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
 import Script from "next/script";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const interSans = Inter({
+  variable: "--font-geist-sans", // using same variable name to avoid breaking css, though we will change it in css
+  subsets: ["latin", "vietnamese"],
 });
 
 const beVietnamPro = Be_Vietnam_Pro({
@@ -112,7 +107,7 @@ export default async function RootLayout({
         <link rel="dns-prefetch" href="https://i.ytimg.com" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${beVietnamPro.variable} ${logoFont.variable} antialiased pb-20 lg:pb-0`}
+        className={`${interSans.variable} ${interSans.variable} ${beVietnamPro.variable} ${logoFont.variable} antialiased pb-20 lg:pb-0 font-sans`}
       >
         <Providers>
           <Header categories={categories} countries={countries} />

@@ -201,7 +201,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
             {/* Hero Section (Onflix-like: backdrop 16:9 on right, left side darker) */}
             <div className="relative w-full pt-20 sm:pt-28 md:pt-32 pb-8 px-4 md:px-8 xl:px-16 flex items-end min-h-[500px] sm:min-h-[560px] overflow-hidden">
                 {/* Base dark layer */}
-                <div className="absolute inset-0 bg-[#050507]" />
+                <div className="absolute inset-0 bg-[#0a0a0a]" />
 
                 {/* Backdrop layer: full canvas, anchored right to keep subject in right half */}
                 {backdropUrl && (
@@ -230,10 +230,10 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 )}
 
                 {/* Softer cinematic feather blend: tránh đường chia cứng trái/phải */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#050507] via-[#050507]/94 via-[43%] to-[#050507]/20" />
-                <div className="absolute inset-y-0 left-[34%] w-[38%] bg-gradient-to-r from-[#050507]/86 via-[#050507]/28 to-transparent blur-2xl" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#050507]/96 via-[#050507]/44 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-b from-[#050507]/36 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/94 via-[43%] to-[#0a0a0a]/20" />
+                <div className="absolute inset-y-0 left-[34%] w-[38%] bg-gradient-to-r from-[#0a0a0a]/86 via-[#0a0a0a]/28 to-transparent blur-2xl" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/96 via-[#0a0a0a]/44 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/36 via-transparent to-transparent" />
 
                 {/* Hero Info Content aligned left/bottom */}
                 <div className="relative z-10 w-full max-w-[1920px] mx-auto space-y-2 sm:space-y-4 max-w-[760px]">
@@ -243,7 +243,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                 {movie?.year}
                             </span>
                         )}
-                        <span className="px-2.5 py-0.5 rounded border border-[#8FA7C5]/40 bg-[#8FA7C5]/10 text-[#8FA7C5] text-[11px] font-bold leading-none uppercase">
+                        <span className="px-2.5 py-0.5 rounded border border-[#E50914]/40 bg-[#E50914]/10 text-[#E50914] text-[11px] font-bold leading-none uppercase">
                             {movie?.quality || "FHD"}
                         </span>
                     </div>
@@ -268,8 +268,8 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                     </>
                                 ) : (
                                     <>
-                                        <span className="inline-flex items-center gap-1.5 bg-[#8FA7C5]/20 text-[#8FA7C5] border border-[#8FA7C5]/30 px-2.5 py-0.5 rounded-full text-xs font-bold">
-                                            <span className="w-1.5 h-1.5 rounded-full bg-[#8FA7C5] animate-pulse inline-block" />
+                                        <span className="inline-flex items-center gap-1.5 bg-[#E50914]/20 text-[#E50914] border border-[#E50914]/30 px-2.5 py-0.5 rounded-full text-xs font-bold">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-[#E50914] animate-pulse inline-block" />
                                             Đang chiếu
                                         </span>
                                         <span className="text-gray-300 text-xs font-medium">Tập {epNum} / {total}</span>
@@ -295,9 +295,10 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         {serverData.length > 0 && (
                             <Link
                                 href={`/xem-phim/${movie?.slug}/${serverData[0].slug}`}
-                                className="flex items-center justify-center bg-[#8FA7C5] text-[#050507] px-5 sm:px-6 py-2.5 rounded-full font-bold text-sm hover:brightness-110 hover:scale-105 transition-all"
+                                className="flex items-center justify-center gap-2 bg-[#E50914] text-[#0a0a0a] px-6 sm:px-8 py-3 rounded-full font-black text-[15px] hover:bg-[#ff0f1e] hover:scale-105 transition-all duration-300 shadow-[0_4px_24px_rgba(229,9,20,0.4)] hover:shadow-[0_8px_32px_rgba(229,9,20,0.6)]"
                             >
-                                CHIẾU PHÁT
+                                <Play className="w-4 h-4 fill-current shrink-0" />
+                                Xem Phim
                             </Link>
                         )}
 
@@ -348,7 +349,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         />
                         {/* Comment Section below tabs */}
                         <div className="mt-8 sm:mt-12">
-                            <div className="flex items-center gap-2 mb-6 border-l-2 border-[#8FA7C5] pl-3">
+                            <div className="flex items-center gap-2 mb-6 border-l-2 border-[#E50914] pl-3">
                                 <h3 className="text-[15px] font-bold text-white uppercase tracking-widest">Bình luận</h3>
                             </div>
                             <CommentSection movieId={movie._id} movieSlug={movie.slug} />
@@ -360,7 +361,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         <div className="rounded-[10px] border border-white/[0.06] bg-[#07070b]/78 p-4 sm:p-5 space-y-6 sm:space-y-8 shadow-[0_10px_24px_#00000066]">
                         {/* Nội dung */}
                         <div>
-                            <div className="flex items-center gap-2 mb-3 sm:mb-4 border-l-2 border-[#8FA7C5] pl-3">
+                            <div className="flex items-center gap-2 mb-3 sm:mb-4 border-l-2 border-[#E50914] pl-3">
                                 <h3 className="text-[14px] sm:text-[15px] font-bold text-white uppercase tracking-widest">Nội dung</h3>
                             </div>
                             <div className="text-[13px] text-gray-400 leading-relaxed font-light text-justify line-clamp-6 sm:line-clamp-[12]" dangerouslySetInnerHTML={{ __html: movie?.content }} />
@@ -383,7 +384,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             <div className="text-[11px] font-medium text-gray-400 uppercase tracking-widest mb-3">Thể loại</div>
                             <div className="flex flex-wrap gap-2">
                                 {movie?.category?.map((c: { slug?: string; name?: string; id?: string }) => (
-                                    <Link key={c.id} href={`/the-loai/${c.slug}`} className="text-[11px] font-medium text-gray-300 bg-white/[0.08] border border-white/[0.14] py-1.5 px-3 rounded-full hover:text-white hover:border-[#8FA7C5]/50 transition-colors uppercase tracking-wider">{c.name}</Link>
+                                    <Link key={c.id} href={`/the-loai/${c.slug}`} className="text-[11px] font-medium text-gray-300 bg-white/[0.08] border border-white/[0.14] py-1.5 px-3 rounded-full hover:text-white hover:border-[#E50914]/50 transition-colors uppercase tracking-wider">{c.name}</Link>
                                 ))}
                             </div>
                         </div>

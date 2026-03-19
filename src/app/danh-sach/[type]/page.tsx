@@ -103,7 +103,7 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
                     </p>
                     <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
                         <h1 className="text-[20px] md:text-[26px] font-extrabold text-white tracking-tight flex items-center gap-2">
-                            <span className="w-1 h-5 bg-[#8FA7C5] rounded-full"></span>
+                            <span className="w-1 h-5 bg-[#E50914] rounded-full"></span>
                             {typeName}
                         </h1>
                         <p className="text-white/55 text-sm">
@@ -113,12 +113,12 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
                 </div>
 
                 {/* Filter Bar */}
-                <div className="relative z-10 md:sticky md:top-[56px] md:z-20 bg-[#050507]/92 backdrop-blur-md rounded-[10px] px-1 border border-white/[0.06]">
+                <div className="relative z-10 md:sticky md:top-[56px] md:z-20 bg-[#0a0a0a]/92 backdrop-blur-md rounded-[10px] px-1 border border-white/[0.06]">
                     <FilterBar />
                 </div>
 
                 {/* Grid: content-visibility giúp giảm CPU khi cuộn */}
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-2 sm:gap-2.5 md:gap-3 mt-6 [contain:layout_paint]">
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2 sm:gap-2.5 md:gap-3 mt-6 [contain:layout_paint]">
                     {items?.length > 0 ? (
                         items.map((movie: any) => (
                             <MovieCard key={movie._id} movie={movie} />

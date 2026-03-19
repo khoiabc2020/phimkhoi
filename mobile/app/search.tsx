@@ -40,7 +40,7 @@ const YEARS = Array.from({ length: 10 }, (_, i) => {
 });
 
 const POPULAR_QUERIES = ['Phim hành động 2024', 'Phim Hàn Quốc', 'Phim kinh dị', 'Phim hoạt hình', 'Phim tình cảm', 'Phim viễn tưởng'];
-const ACCENT = '#8FA7C5';
+const ACCENT = '#E50914';
 const ACCENT_SOFT = 'rgba(143,167,197,0.16)';
 const ACCENT_BORDER = 'rgba(143,167,197,0.36)';
 const SEARCH_CACHE_TTL = 2 * 60 * 1000;

@@ -330,7 +330,7 @@ const HeroSlide = React.memo(function HeroSlide({
                         )}
                         {rating && (
                             <View style={styles.badgeRating}>
-                                <Ionicons name="star" size={12} color="#8FA7C5" />
+                                <Ionicons name="star" size={12} color="#E50914" />
                                 <Text style={styles.badgeRatingText}>{rating}</Text>
                             </View>
                         )}
@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
         gap: 6,
     },
     dot: { height: 6, borderRadius: 3 },
-    dotActive: { width: 22, backgroundColor: '#8FA7C5' },
+    dotActive: { width: 22, backgroundColor: '#E50914' },
     dotInactive: { width: 6, backgroundColor: 'rgba(255,255,255,0.25)' },
 
     // Tablet Overrides

@@ -205,7 +205,7 @@ export default function ProfileScreen() {
                 alignItems: 'center', justifyContent: 'center', marginBottom: 16,
                 borderWidth: 1, borderColor: 'rgba(143,167,197,0.3)'
               }}>
-                <Ionicons name="person-outline" size={32} color="#8FA7C5" />
+                <Ionicons name="person-outline" size={32} color="#E50914" />
               </View>
               <Text style={{ color: 'white', fontSize: 18, fontWeight: '700', marginBottom: 8 }}>Chưa đăng nhập</Text>
               <Text style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13, textAlign: 'center', lineHeight: 20, marginBottom: 24 }}>
@@ -318,7 +318,7 @@ export default function ProfileScreen() {
                 <Text style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13 }} numberOfLines={1}>{user.email}</Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8 }}>
                   <View style={{ backgroundColor: 'rgba(143,167,197,0.14)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(143,167,197,0.32)', flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                    <Ionicons name={user.role === 'admin' ? 'shield' : 'star'} size={11} color="#8FA7C5" />
+                    <Ionicons name={user.role === 'admin' ? 'shield' : 'star'} size={11} color="#E50914" />
                     <Text style={{ color: '#c7d7ea', fontSize: 11, fontWeight: '700' }}>
                       {user.role === 'admin' ? 'Quản trị' : 'Thành viên'}
                     </Text>
@@ -372,7 +372,7 @@ export default function ProfileScreen() {
               })}
             >
               <View style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: updateInfo ? 'rgba(143,167,197,0.18)' : 'rgba(255,255,255,0.07)', alignItems: 'center', justifyContent: 'center', marginRight: 13 }}>
-                <Ionicons name={updateInfo ? 'cloud-download-outline' : 'checkmark-circle-outline'} size={18} color={updateInfo ? '#8FA7C5' : 'rgba(255,255,255,0.6)'} />
+                <Ionicons name={updateInfo ? 'cloud-download-outline' : 'checkmark-circle-outline'} size={18} color={updateInfo ? '#E50914' : 'rgba(255,255,255,0.6)'} />
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={{ color: 'white', fontSize: 15, fontWeight: '600' }}>

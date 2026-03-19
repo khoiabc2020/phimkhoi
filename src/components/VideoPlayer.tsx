@@ -130,14 +130,14 @@ export default function VideoPlayer({
                 countdownEl.style.zIndex = '999';
                 countdownEl.style.fontFamily = 'monospace';
                 countdownEl.style.fontSize = '14px';
-                countdownEl.innerHTML = `Tập tiếp theo sau <b>${countdown}s</b> <span style="margin-left:8px; cursor:pointer; color:#8FA7C5;" id="cancel-next">✖</span>`;
+                countdownEl.innerHTML = `Tập tiếp theo sau <b>${countdown}s</b> <span style="margin-left:8px; cursor:pointer; color:#E50914;" id="cancel-next">✖</span>`;
                 container.appendChild(countdownEl);
             }
 
             const interval = setInterval(() => {
                 countdown--;
                 if (countdownEl) {
-                    countdownEl.innerHTML = `Tập tiếp theo sau <b>${countdown}s</b> <span style="margin-left:8px; cursor:pointer; color:#8FA7C5;" id="cancel-next">✖</span>`;
+                    countdownEl.innerHTML = `Tập tiếp theo sau <b>${countdown}s</b> <span style="margin-left:8px; cursor:pointer; color:#E50914;" id="cancel-next">✖</span>`;
                     const cancelBtn = countdownEl.querySelector('#cancel-next');
                     if (cancelBtn) {
                         cancelBtn.addEventListener('click', () => {
@@ -192,7 +192,7 @@ export default function VideoPlayer({
                     subtitleOffset: true,
                     miniProgressBar: true,
                     screenshot: true,
-                    theme: "#8FA7C5",
+                    theme: "#E50914",
                     i18n: { "vi": VI_LOCALE },
                     lang: "vi",
                     moreVideoAttr: { crossOrigin: "anonymous" },
@@ -231,7 +231,7 @@ export default function VideoPlayer({
                             index: 10,
                             html: `<div style="display:flex; align-items:center; margin-right: 8px; cursor: pointer; opacity: 0.9;" id="auto-next-toggle">
                                 <span style="font-size: 13px; color: rgba(255,255,255,0.8); margin-right: 8px; font-weight: 500;">Chuyển tập</span>
-                                <div style="width: 32px; height: 18px; background: #8FA7C5; border-radius: 9px; position: relative; transition: background 0.2s;" id="auto-next-bg">
+                                <div style="width: 32px; height: 18px; background: #E50914; border-radius: 9px; position: relative; transition: background 0.2s;" id="auto-next-bg">
                                     <div style="width: 14px; height: 14px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 16px; transition: left 0.2s;" id="auto-next-dot"></div>
                                 </div>
                             </div>`,
@@ -240,14 +240,14 @@ export default function VideoPlayer({
                                 const bg = document.getElementById("auto-next-bg");
                                 const dot = document.getElementById("auto-next-dot");
                                 if (bg && dot) {
-                                    const isAuto = bg.style.background === "rgb(143, 167, 197)" || bg.style.background === "#8FA7C5" || bg.style.background === "#8fa7c5";
+                                    const isAuto = bg.style.background === "rgb(143, 167, 197)" || bg.style.background === "#E50914" || bg.style.background === "#E50914";
                                     if (isAuto) {
                                         bg.style.background = "rgba(255,255,255,0.3)";
                                         dot.style.left = "2px";
                                         localStorage.setItem("autoNextEpisode", "false");
                                         autoNextRef.current = false;
                                     } else {
-                                        bg.style.background = "#8FA7C5";
+                                        bg.style.background = "#E50914";
                                         dot.style.left = "16px";
                                         localStorage.setItem("autoNextEpisode", "true");
                                         autoNextRef.current = true;
@@ -260,7 +260,7 @@ export default function VideoPlayer({
                                 const dot = document.getElementById("auto-next-dot");
                                 if (bg && dot) {
                                     if (isAuto) {
-                                        bg.style.background = "#8FA7C5";
+                                        bg.style.background = "#E50914";
                                         dot.style.left = "16px";
                                     } else {
                                         bg.style.background = "rgba(255,255,255,0.3)";
@@ -483,7 +483,7 @@ export default function VideoPlayer({
                             boxShadow: '0 2px 14px rgba(0,0,0,0.5)',
                             fontFamily: 'inherit',
                         }}
-                        onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(143,167,197,0.95)'; (e.currentTarget as HTMLButtonElement).style.color = '#050507'; }}
+                        onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(143,167,197,0.95)'; (e.currentTarget as HTMLButtonElement).style.color = '#0a0a0a'; }}
                         onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,0,0,0.82)'; (e.currentTarget as HTMLButtonElement).style.color = 'white'; }}
                     >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zm2-8.14L11.03 12 8 14.14V9.86zM16 6h2v12h-2z" /></svg>
@@ -524,7 +524,7 @@ export default function VideoPlayer({
                     margin-bottom: 0px !important;
                 }
                 .art-ios-theme.art-video-player .art-progress-played {
-                    background: #8FA7C5 !important;
+                    background: #E50914 !important;
                 }
                 .art-ios-theme.art-video-player .art-progress-indicator {
                     background: white !important;

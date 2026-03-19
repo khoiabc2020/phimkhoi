@@ -89,7 +89,7 @@ export default function UpdateChecker({ silent = true }: Props) {
                 <View style={styles.card}>
                     {/* Header */}
                     <View style={styles.iconWrap}>
-                        <Ionicons name="rocket-outline" size={40} color="#8FA7C5" />
+                        <Ionicons name="rocket-outline" size={40} color="#E50914" />
                     </View>
 
                     <Text style={styles.title}>Phiên bản mới!</Text>

@@ -88,7 +88,7 @@ export default function FavoritesScreen() {
           </View>
           {!isEmpty && (
             <View style={styles.headerBadge}>
-              <Ionicons name="heart" size={18} color="#8FA7C5" />
+              <Ionicons name="heart" size={18} color="#E50914" />
             </View>
           )}
         </View>
@@ -120,7 +120,7 @@ export default function FavoritesScreen() {
               contentContainerStyle={{ paddingBottom: 120 }}
               estimatedItemSize={CARD_W * 1.45 + 16}
               refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#8FA7C5" />
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#E50914" />
               }
               showsVerticalScrollIndicator={false}
               renderItem={({ item, index }) => {

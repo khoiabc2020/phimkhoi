@@ -80,7 +80,7 @@ export default function MovieGrid({
                 ListFooterComponent={
                     loadingMore ? (
                         <View className="py-4 items-center">
-                            <ActivityIndicator size="small" color="#8FA7C5" />
+                            <ActivityIndicator size="small" color="#E50914" />
                         </View>
                     ) : null
                 }

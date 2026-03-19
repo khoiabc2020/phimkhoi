@@ -341,7 +341,7 @@ export default function AuthScreen() {
                                 }}
                             >
                                 <LinearGradient
-                                    colors={['#7E95B1', '#8FA7C5']}
+                                    colors={['#7E95B1', '#E50914']}
                                     start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
                                     style={{ position: 'absolute', inset: 0 }}
                                 />

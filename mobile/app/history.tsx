@@ -130,7 +130,7 @@ export default function HistoryScreen() {
                             <RefreshControl
                                 refreshing={refreshing}
                                 onRefresh={onRefresh}
-                                tintColor="#8FA7C5"
+                                tintColor="#E50914"
                             />
                         }
                         renderItem={({ item }) => {
@@ -184,7 +184,7 @@ export default function HistoryScreen() {
                                             {formatTime(item.timestamp || Date.now())}
                                         </Text>
                                         <View style={styles.continueBtn}>
-                                            <Ionicons name="play-circle" size={16} color="#8FA7C5" />
+                                            <Ionicons name="play-circle" size={16} color="#E50914" />
                                             <Text style={styles.continueBtnText}>Tiếp tục xem</Text>
                                         </View>
                                     </View>

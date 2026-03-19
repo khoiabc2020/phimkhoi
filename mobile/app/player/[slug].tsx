@@ -193,7 +193,7 @@ export default function PlayerScreen() {
         return (
             <View className="flex-1 bg-black justify-center items-center">
                 <StatusBar hidden />
-                <ActivityIndicator size="large" color="#8FA7C5" />
+                <ActivityIndicator size="large" color="#E50914" />
             </View>
         );
     }
