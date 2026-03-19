@@ -4,7 +4,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Play, PlayCircle, Share2, Star, Clock, Film } from "lucide-react";
 import FavoriteButton from "@/components/FavoriteButton";
-import { getImageUrl } from "@/lib/utils";
+import { getImageUrl, detectOrientation } from "@/lib/utils";
 import Image from "next/image";
 
 const CommentSection = dynamic(() => import("@/components/CommentSection"), {
@@ -163,13 +163,23 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
         });
     });
 
-    // Prefer source poster (dọc). For backdrop hero, ưu tiên TMDB backdrop để tránh watermark từ nguồn phim.
-    // Prefer source poster (dọc). OPhim uses thumb_url cho ảnh dọc.
-    const sourceImage = getImageUrl(movie?.thumb_url || movie?.poster_url);
-    const posterUrl = sourceImage;
+    // 1. Determine the guaranteed portrait poster (to serve as our primary backdrop fallback)
+    // OPhim, KKPhim, NguonC often mix up the fields. detectOrientation guarantees we get the vertical poster.
+    let verifiedPortraitUrl = "";
+    if (detectOrientation(movie?.thumb_url) === "portrait") {
+        verifiedPortraitUrl = movie.thumb_url;
+    } else if (detectOrientation(movie?.poster_url) === "portrait") {
+        verifiedPortraitUrl = movie.poster_url;
+    // Fallbacks if detection fails but URLs exist
+    } else {
+        verifiedPortraitUrl = movie?.thumb_url || movie?.poster_url || "";
+    }
+
+    const posterUrl = getImageUrl(verifiedPortraitUrl);
     const tmdbBackdrop = tmdbDetails?.backdrop_path ? getTMDBImage(tmdbDetails.backdrop_path, "original") : "";
-    // OPhim's poster_url is often an incorrect/unrelated landscape image (e.g., horses).
-    // Use TMDB if present, otherwise fallback to posterUrl (thumb_url - which is guaranteed correct).
+    
+    // We strictly use TMDB backdrop. If missing (e.g. TMDB matching failed), we fallback to the verified portrait poster
+    // because relying on API landscape posters (e.g. OPhim horses) results in wildly inaccurate images.
     const backdropUrl = tmdbBackdrop || posterUrl;
     const isPortraitFallback = !tmdbBackdrop && !!posterUrl;
     const rating = tmdbDetails?.vote_average ? tmdbDetails.vote_average.toFixed(1) : "9.7";

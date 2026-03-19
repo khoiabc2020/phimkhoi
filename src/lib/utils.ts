@@ -57,3 +57,33 @@ export function decodeHtml(html: string) {
         .replace(/&#039;/g, "'")
         .replace(/&apos;/g, "'");
 }
+
+export function detectOrientation(url?: string | null): "portrait" | "landscape" | "unknown" {
+    if (!url) return "unknown";
+    const u = url.toLowerCase();
+    
+    // OPhim uses *-thumb.jpg for portrait, *-poster.jpg for backdrop
+    if (u.includes("img.ophim.live") || u.includes("phimimg.com")) {
+        if (u.includes("-thumb.") || u.includes("/thumb-")) return "portrait";
+        if (u.includes("-poster.") || u.includes("/poster-")) return "landscape";
+    }
+
+    // KKPhim and NguonC generic checks
+    if (u.includes("backdrop") || u.includes("banner") || u.includes("landscape") || u.includes("horizontal")) {
+        return "landscape";
+    }
+    if (u.includes("portrait") || u.includes("vertical") || u.includes("/poster") || u.includes("poster.")) {
+        return "portrait";
+    }
+
+    // Dimension heuristic for fallback
+    const dim = u.match(/(\d{2,4})x(\d{2,4})/);
+    if (dim) {
+        const w = parseInt(dim[1], 10);
+        const h = parseInt(dim[2], 10);
+        if (Number.isFinite(w) && Number.isFinite(h) && w !== h) {
+            return h > w ? "portrait" : "landscape";
+        }
+    }
+    return "unknown";
+}

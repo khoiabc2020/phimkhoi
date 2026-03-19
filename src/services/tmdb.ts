@@ -87,9 +87,6 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
                             ? (item.release_date ? parseInt(item.release_date.substring(0, 4)) : null)
                             : (item.first_air_date ? parseInt(item.first_air_date.substring(0, 4)) : null);
 
-                        // Year Check: Allow +/- 1 year tolerance for release date discrepancies
-                        if (year && itemYear && Math.abs(itemYear - year) > 1) return false;
-
                         // Title Check:
                         let isMatch = false;
 
@@ -98,6 +95,20 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
                             const originalTitle = endpoint === 'movie' ? item.original_title : item.original_name;
                             if (originalTitle && calculateSimilarity(verification.originalName, originalTitle) >= 0.35) {
                                 isMatch = true;
+                            }
+                        }
+
+                        // Year Check: Allow +/- 3 year tolerance for release date discrepancies (Asian dramas are often delayed)
+                        // Only reject if we don't have a high-confidence exact name match
+                        if (!isMatch && year && itemYear && Math.abs(itemYear - year) > 3) {
+                            // Even if year is off by > 3, if original name matches EXACTLY, trust it.
+                            if (verification?.originalName && (
+                                item.original_title?.toLowerCase() === verification.originalName.toLowerCase() ||
+                                item.original_name?.toLowerCase() === verification.originalName.toLowerCase()
+                            )) {
+                                isMatch = true;
+                            } else {
+                                return false;
                             }
                         }
 
