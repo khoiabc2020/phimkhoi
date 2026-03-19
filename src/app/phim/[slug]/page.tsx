@@ -168,9 +168,10 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     const sourceImage = getImageUrl(movie?.thumb_url || movie?.poster_url);
     const posterUrl = sourceImage;
     const tmdbBackdrop = tmdbDetails?.backdrop_path ? getTMDBImage(tmdbDetails.backdrop_path, "original") : "";
-    // OPhim uses poster_url cho ảnh ngang.
-    const sourceBackdrop = movie?.poster_url ? getImageUrl(movie.poster_url) : "";
-    const backdropUrl = tmdbBackdrop || sourceBackdrop || getImageUrl(movie?.thumb_url || "");
+    // OPhim's poster_url is often an incorrect/unrelated landscape image (e.g., horses).
+    // Use TMDB if present, otherwise fallback to posterUrl (thumb_url - which is guaranteed correct).
+    const backdropUrl = tmdbBackdrop || posterUrl;
+    const isPortraitFallback = !tmdbBackdrop && !!posterUrl;
     const rating = tmdbDetails?.vote_average ? tmdbDetails.vote_average.toFixed(1) : "9.7";
 
     const jsonLd = {
@@ -208,25 +209,26 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 {/* Backdrop layer: full canvas, anchored right to keep subject in right half */}
                 {backdropUrl && (
                     <div className="absolute inset-0">
+                        {/* 1. Blurred background filling the empty space */}
                         <Image
                             src={backdropUrl}
                             alt={movie?.name || ""}
                             fill
                             priority
-                            className="object-cover object-[68%_22%] opacity-[0.32] scale-[1.06] blur-2xl"
+                            className="object-cover object-[68%_22%] opacity-[0.4] scale-110 blur-[45px]"
                             sizes="100vw"
-                            placeholder="blur"
-                            blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
+                            quality={60}
                         />
+                        {/* 2. Sharp focused image on the right */}
                         <Image
                             src={backdropUrl}
                             alt={movie?.name || ""}
                             fill
                             priority
-                            className="object-cover object-[62%_20%] sm:object-contain sm:object-right opacity-[0.95]"
+                            className={`opacity-100 ${isPortraitFallback ? 'object-cover sm:object-contain sm:object-right-top' : 'object-cover object-[62%_20%] sm:object-right'}`}
                             sizes="100vw"
-                            placeholder="blur"
-                            blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
+                            quality={100}
+                            unoptimized={true} // Bỏ qua Next.js optimization để lấy ảnh gốc rõ nét nhất
                         />
                     </div>
                 )}
