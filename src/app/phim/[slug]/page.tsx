@@ -326,7 +326,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                             movieSlug: movie.slug,
                                             movieName: movie.name,
                                             movieOriginName: movie.origin_name || "",
-                                            moviePoster: posterUrl || "/fallback.png",
+                                            moviePoster: sourcePosterUrl || sourceThumbUrl || tmdbBackdrop || "/fallback.png",
                                             movieYear: Number(movie.year) || new Date().getFullYear(),
                                             movieQuality: movie.quality || "HD",
                                             movieCategories: movie.category?.map((c: { name?: string }) => c.name) || [],
