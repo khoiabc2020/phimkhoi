@@ -90,25 +90,27 @@ export default async function CategoryPage({ params, searchParams }: { params: P
                 {/* Decorative background glow */}
                 <div className="absolute top-0 left-0 right-0 h-[400px] bg-gradient-to-b from-[#0e1621] via-transparent to-transparent pointer-events-none -z-10 blur-[120px]" />
 
-                <div className="mb-6 md:mb-10 max-w-4xl">
-                    <Link 
-                        href="/" 
-                        className="inline-flex items-center gap-1.5 text-white/40 hover:text-white text-[13px] font-medium transition-colors mb-4 group"
-                    >
-                        <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-                        Quay lại
-                    </Link>
-                    
-                    <div className="space-y-1">
-                        <span className="text-[#8FA7C5] text-xs font-bold uppercase tracking-[0.2em] opacity-80 pl-1">Thể loại</span>
-                        <h1 className="text-[36px] md:text-[56px] font-outfit font-extrabold text-white tracking-tighter leading-none italic uppercase">
-                            {categoryName}
-                        </h1>
+                <div className="mb-6 md:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div className="max-w-4xl">
+                        <Link 
+                            href="/" 
+                            className="inline-flex items-center gap-1.5 text-white/40 hover:text-white text-[13px] font-medium transition-colors mb-4 group"
+                        >
+                            <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+                            Quay lại
+                        </Link>
+                        
+                        <div className="space-y-1">
+                            <span className="text-[#8FA7C5] text-xs font-bold uppercase tracking-[0.2em] opacity-80 pl-1">Thể loại</span>
+                            <h1 className="text-[36px] md:text-[56px] font-outfit font-extrabold text-white tracking-tighter leading-none italic uppercase">
+                                {categoryName}
+                            </h1>
+                        </div>
                     </div>
-                </div>
 
-                <div className="relative z-10 sticky top-[64px] bg-[#0a0a0a]/80 backdrop-blur-md rounded-[12px] px-2 mb-6 border border-white/[0.05] shadow-xl shadow-black/20">
-                    <FilterBar categories={categories} countries={countries} />
+                    <div className="w-full md:w-auto bg-[#0a0a0a]/80 backdrop-blur-md rounded-[12px] p-1 border border-white/[0.05] shadow-xl">
+                        <FilterBar categories={categories} countries={countries} />
+                    </div>
                 </div>
 
                 <Suspense key={`${slug}-${currentPage}`} fallback={<GridSkeleton />}>
