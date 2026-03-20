@@ -236,7 +236,11 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                     <div className="pl-[102px]">
                         <h1
                             key={`m-title-${index}`}
-                            className="text-[17px] font-outfit font-extrabold text-white leading-[1.2] line-clamp-2 drop-shadow-[0_2px_14px_rgba(0,0,0,0.75)] animate-hero-in tracking-tight"
+                            className={cn(
+                                "font-outfit font-extrabold text-white leading-[1.2] drop-shadow-[0_2px_14px_rgba(0,0,0,0.75)] animate-hero-in tracking-tight",
+                                "text-balance line-clamp-2",
+                                movie.name.length > 30 ? "text-[14px]" : movie.name.length > 20 ? "text-[16px]" : "text-[18px]"
+                            )}
                         >
                             {decodeHtml(movie.name)}
                         </h1>
@@ -382,7 +386,19 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         {/* Title — key triggers re-animation on slide change */}
                         <h1
                             key={`title-${index}`}
-                            className="font-outfit text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-white leading-[1.15] tracking-tight line-clamp-2 pt-1 animate-hero-in drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
+                            className={cn(
+                                "font-outfit font-extrabold text-white leading-[1.15] tracking-tight pt-1 animate-hero-in drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]",
+                                // Use `text-balance` for a premium, symmetrical multi-line look
+                                "text-balance",
+                                // If name is long, clamp lines instead
+                                movie.name.length > 40 ? "line-clamp-3" : "line-clamp-2",
+                                // Dynamic font scaling based on string length
+                                movie.name.length > 35 
+                                    ? "text-3xl md:text-4xl lg:text-5xl xl:text-5xl" 
+                                    : movie.name.length > 20
+                                        ? "text-4xl md:text-5xl lg:text-[54px] xl:text-[62px]"
+                                        : "text-4xl md:text-5xl lg:text-6xl xl:text-7xl"
+                            )}
                             title={decodeHtml(movie.name)}
                         >
                             {decodeHtml(movie.name)}
