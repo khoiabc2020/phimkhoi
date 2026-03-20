@@ -263,8 +263,8 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             )}
                         </div>
 
-                        {/* Countries Dropdown */}
-                                  <button
+                        <div className="relative group/nav">
+                            <button
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     setOpenDropdown(openDropdown === "countries" ? null : "countries");
