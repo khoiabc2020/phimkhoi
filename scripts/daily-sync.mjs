@@ -158,69 +158,75 @@ async function syncTMDBTrending(timeWindow = 'day') {
     }
 
     const type = `tmdb-trending-${timeWindow}`;
-    log(`Syncing [${type}] (Hero Data source)...`);
+    log(`Syncing [${type}] (Hero Data source - Expanded Search)...`);
 
     try {
-        const url = `${TMDB_API_URL}/trending/all/${timeWindow}?api_key=${TMDB_API_KEY}&language=vi-VN`;
-        const data = await fetchJson(url);
-        
-        if (!data || !data.results) {
-            log(`  ✗ Error fetching TMDb Trending [${timeWindow}]`);
-            return;
-        }
-
-        // Fetch more to ensure we have enough after filtering
-        const trendingItems = data.results.slice(0, 40);
         const mappedMovies = [];
+        const maxPages = 3;
+        const targetCount = 10;
 
-        for (const item of trendingItems) {
-            if (mappedMovies.length >= 20) break;
+        for (let page = 1; page <= maxPages; page++) {
+            if (mappedMovies.length >= targetCount) break;
 
-            const title = item.title || item.name;
-            const originalTitle = item.original_title || item.original_name;
+            const url = `${TMDB_API_URL}/trending/all/${timeWindow}?api_key=${TMDB_API_KEY}&language=vi-VN&page=${page}`;
+            const data = await fetchJson(url);
             
-            // Search local DB for matching slug
-            const localMovie = await Movie.findOne({
-                $or: [
-                    { name: new RegExp(`^${title}$`, 'i') },
-                    { origin_name: new RegExp(`^${originalTitle}$`, 'i') },
-                    { slug: title.toLowerCase().replace(/[^a-z0-9]/g, '-') }
-                ]
-            }).lean();
-
-            // Skip if not found locally (we only want playable content in Hero)
-            if (!localMovie) continue;
-
-            // Skip if it is just a Trailer or Unreleased
-            const ep = (localMovie.episode_current || '').toLowerCase();
-            const status = (localMovie.status || '').toLowerCase();
-            if (ep.includes('trailer') || status.includes('trailer') || status.includes('sắp chiếu')) {
-                log(`  - Skipping trailer/unreleased: ${title}`);
-                continue;
+            if (!data || !data.results) {
+                log(`  ✗ Error fetching TMDb Trending [${timeWindow}] page ${page}`);
+                break;
             }
 
-            mappedMovies.push({
-                _id: String(item.id),
-                name: title,
-                slug: localMovie.slug,
-                poster_url: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : localMovie.poster_url,
-                thumb_url: item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : localMovie.thumb_url,
-                year: parseInt((item.release_date || item.first_air_date || '0000').substring(0, 4)) || localMovie.year,
-                tmdbData: {
-                    id: item.id,
-                    vote_average: item.vote_average,
-                    poster_path: item.poster_path,
-                    backdrop_path: item.backdrop_path,
-                    media_type: item.media_type
-                },
-                content: localMovie.content || item.overview,
-                episode_current: localMovie.episode_current,
-                quality: localMovie.quality || 'FHD',
-                category: localMovie.category,
-                country: localMovie.country,
-                time: localMovie.time,
-                origin_name: localMovie.origin_name || originalTitle
-            });
+            for (const item of data.results) {
+                if (mappedMovies.length >= 20) break; // Hard limit
+
+                const title = item.title || item.name;
+                const originalTitle = item.original_title || item.original_name;
+                
+                // Search local DB for matching slug
+                const localMovie = await Movie.findOne({
+                    $or: [
+                        { name: new RegExp(`^${title}$`, 'i') },
+                        { origin_name: new RegExp(`^${originalTitle}$`, 'i') },
+                        { slug: title.toLowerCase().replace(/[^a-z0-9]/g, '-') }
+                    ]
+                }).lean();
+
+                if (!localMovie) continue;
+
+                // Skip duplicates
+                if (mappedMovies.some(m => m.slug === localMovie.slug)) continue;
+
+                // Skip if it is just a Trailer or Unreleased
+                const ep = (localMovie.episode_current || '').toLowerCase();
+                const status = (localMovie.status || '').toLowerCase();
+                if (ep.includes('trailer') || status.includes('trailer') || status.includes('sắp chiếu')) {
+                    continue;
+                }
+
+                mappedMovies.push({
+                    _id: String(item.id),
+                    name: title,
+                    slug: localMovie.slug,
+                    // Use 'original' for maximum quality as requested
+                    poster_url: item.poster_path ? `https://image.tmdb.org/t/p/original${item.poster_path}` : localMovie.poster_url,
+                    thumb_url: item.backdrop_path ? `https://image.tmdb.org/t/p/original${item.backdrop_path}` : localMovie.thumb_url,
+                    year: parseInt((item.release_date || item.first_air_date || '0000').substring(0, 4)) || localMovie.year,
+                    tmdbData: {
+                        id: item.id,
+                        vote_average: item.vote_average,
+                        poster_path: item.poster_path,
+                        backdrop_path: item.backdrop_path,
+                        media_type: item.media_type
+                    },
+                    content: localMovie.content || item.overview,
+                    episode_current: localMovie.episode_current,
+                    quality: localMovie.quality || 'FHD',
+                    category: localMovie.category,
+                    country: localMovie.country,
+                    time: localMovie.time,
+                    origin_name: localMovie.origin_name || originalTitle
+                });
+            }
         }
 
         await TrendingCache.findOneAndUpdate(
@@ -229,7 +235,7 @@ async function syncTMDBTrending(timeWindow = 'day') {
             { upsert: true }
         );
 
-        log(`  ✓ Saved ${mappedMovies.length} items for [${type}]`);
+        log(`  ✓ Saved ${mappedMovies.length} items for [${type}] (High Quality)`);
     } catch (error) {
         log(`  ✗ TMDb Trending Error: ${error.message}`);
     }
