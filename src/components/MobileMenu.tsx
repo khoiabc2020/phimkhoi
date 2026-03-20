@@ -5,7 +5,7 @@ import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import {
     Film, Video, LayoutGrid, Download, History, Heart, LogOut, Globe,
-    X, ChevronDown, Home, Tv, Star, MonitorPlay, Smartphone, Clapperboard
+    X, ChevronDown, Home, Tv, Star, MonitorPlay, Smartphone, Clapperboard, LogIn
 } from "lucide-react";
 import { useState } from "react";
 
@@ -128,11 +128,12 @@ export default function MobileMenu({
                         </div>
                     ) : (
                         <div className="rounded-[12px] p-4 border border-white/[0.08] text-center bg-[#0B0B10]">
-                            <p className="text-white/45 mb-3 text-[13px] leading-relaxed">Đăng nhập để lưu phim yêu thích và lịch sử xem</p>
+                            <p className="text-white/45 mb-4 text-[13px] leading-relaxed">Đăng nhập để lưu phim yêu thích và lịch sử xem</p>
                             <Link href="/login" onClick={onClose}
-                            className="block w-full bg-[#8FA7C5] text-[#0a0a0a] font-bold py-2.5 rounded-[12px] text-[14px] hover:brightness-105 transition-all"
+                                className="flex items-center justify-center gap-2 w-full bg-[#263243] hover:bg-[#2d3d54] text-[#d8e3f2] font-bold py-2.5 rounded-full text-[14px] transition-all border border-white/5 active:scale-[0.98]"
                             >
-                                Đăng Nhập / Đăng Ký
+                                <LogIn className="w-4 h-4" />
+                                <span>Đăng nhập</span>
                             </Link>
                         </div>
                     )}

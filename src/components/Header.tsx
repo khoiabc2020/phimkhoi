@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Search, Bell, User, LogOut, Shield, Trash2, Clock, History, Heart, Settings, X, ChevronDown, Play, Film, Video, LayoutGrid, Download, Loader2, Bookmark } from "lucide-react";
+import { Search, Bell, User, LogOut, Shield, Trash2, Clock, History, Heart, Settings, X, ChevronDown, Play, Film, Video, LayoutGrid, Download, Loader2, Bookmark, LogIn } from "lucide-react";
 import { useState, useEffect, useRef, useTransition } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
@@ -526,8 +526,12 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                     </div>
                                 </div>
                             ) : (
-                                <Link href="/login" className="bg-[#8FA7C5] hover:bg-[#a8bdd8] text-[#0a0a0a] px-5 py-2 rounded-full font-bold text-sm transition-transform duration-200 hover:scale-105 active:scale-95 ml-1 whitespace-nowrap">
-                                    Đăng nhập
+                                <Link
+                                    href="/login"
+                                    className="flex items-center gap-2 bg-[#263243] hover:bg-[#2d3d54] text-[#d8e3f2] px-4 py-2 rounded-full font-bold text-sm transition-all duration-200 hover:scale-105 active:scale-95 ml-1 whitespace-nowrap border border-white/5"
+                                >
+                                    <LogIn className="w-4 h-4" />
+                                    <span>Đăng nhập</span>
                                 </Link>
                             )}
                         </div>
