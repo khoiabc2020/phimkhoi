@@ -36,12 +36,7 @@ export default function Sidebar() {
 
     return (
         <aside className="fixed left-0 top-0 bottom-0 z-50 hidden lg:flex max-lg:!hidden flex-col w-20 bg-transparent backdrop-blur-md border-r border-white/[0.03] transition-all duration-300 overflow-y-auto no-scrollbar">
-            {/* Logo Section */}
-            <div className="flex items-center justify-center h-20 shrink-0">
-                <Link href="/" className="flex items-center group">
-                    <span className="font-logo text-2xl font-bold text-[#8FA7C5]">K</span>
-                </Link>
-            </div>
+            <div className="h-4 shrink-0" />
 
             {/* Navigation Section */}
             <nav className="flex-1 flex flex-col gap-5 py-4">

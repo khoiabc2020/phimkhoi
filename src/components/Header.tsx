@@ -195,11 +195,11 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                 <div className="max-w-[1920px] mx-auto px-4 lg:px-8 h-[54px] lg:h-[64px] flex items-center justify-between gap-3 flex-nowrap pointer-events-auto">
 
                     {/* Left Section: Logo & Mobile Menu */}
-                    <div className="flex items-center gap-3 shrink-0">
+                    <div className="flex items-center gap-6 shrink-0">
                         {/* Mobile Menu Button */}
                         <button
                             onClick={() => setIsMobileMenuOpen(true)}
-                            className="lg:hidden w-9 h-9 -ml-1 rounded-[10px] bg-transparent hover:bg-white/[0.06] text-white/95 transition-all active:scale-95 flex items-center justify-center order-1 md:order-none"
+                            className="lg:hidden w-9 h-9 -ml-1 rounded-[10px] bg-transparent hover:bg-white/[0.06] text-white/95 transition-all active:scale-95 flex items-center justify-center"
                             aria-label="Mở menu"
                         >
                             <span className="relative flex h-4 w-5 flex-col items-start justify-center gap-1">
@@ -209,8 +209,8 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             </span>
                         </button>
 
-                        {/* Logo - Mobile only */}
-                        <Link href="/" className="flex lg:hidden items-center group shrink-0 order-2 md:order-none">
+                        {/* Full Logo - Visible on all sizes now */}
+                        <Link href="/" className="flex items-center group shrink-0">
                             <span className="inline-block font-logo text-[22px] md:text-[26px] font-semibold uppercase tracking-[0.012em] leading-none whitespace-nowrap">
                                 <span className="text-[#9CA3AF]">KHOI</span><span className="text-[#8FA7C5]">PHIM</span>
                             </span>
@@ -226,11 +226,76 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         />
                     )}
 
-                    {/* Desktop Nav - Hidden when Sidebar is present */}
+                    {/* Desktop Nav - Restored */}
                     <nav
                         ref={navRef}
-                        className="hidden"
+                        className="hidden lg:flex items-center gap-1 flex-1 ml-4"
                     >
+                        {/* Categories Dropdown */}
+                        <div className="relative group/nav">
+                            <button
+                                onClick={() => setOpenDropdown(openDropdown === "categories" ? null : "categories")}
+                                onMouseEnter={() => setOpenDropdown("categories")}
+                                className={cn(
+                                    "flex items-center gap-1.5 px-3 py-2 rounded-full text-[14px] font-bold transition-all transition-colors",
+                                    openDropdown === "categories" ? "text-white bg-white/10" : "text-white/60 hover:text-white"
+                                )}
+                            >
+                                Thể loại <ChevronDown className={cn("w-3.5 h-3.5 transition-transform duration-300", openDropdown === "categories" ? "rotate-180" : "")} />
+                            </button>
+                            {openDropdown === "categories" && (
+                                <div
+                                    onMouseLeave={() => setOpenDropdown(null)}
+                                    className="absolute top-full left-0 mt-1 w-[440px] bg-[#0d0f14]/98 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl grid grid-cols-3 gap-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+                                >
+                                    {displayCategories.map((cat) => (
+                                        <Link
+                                            key={cat.slug}
+                                            href={`/the-loai/${cat.slug}`}
+                                            onClick={() => setOpenDropdown(null)}
+                                            className="px-3 py-2 rounded-xl text-sm font-medium text-white/50 hover:text-white hover:bg-white/5 transition-all"
+                                        >
+                                            {cat.name}
+                                        </Link>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Countries Dropdown */}
+                        <div className="relative group/nav">
+                            <button
+                                onClick={() => setOpenDropdown(openDropdown === "countries" ? null : "countries")}
+                                onMouseEnter={() => setOpenDropdown("countries")}
+                                className={cn(
+                                    "flex items-center gap-1.5 px-3 py-2 rounded-full text-[14px] font-bold transition-all transition-colors",
+                                    openDropdown === "countries" ? "text-white bg-white/10" : "text-white/60 hover:text-white"
+                                )}
+                            >
+                                Quốc gia <ChevronDown className={cn("w-3.5 h-3.5 transition-transform duration-300", openDropdown === "countries" ? "rotate-180" : "")} />
+                            </button>
+                            {openDropdown === "countries" && (
+                                <div
+                                    onMouseLeave={() => setOpenDropdown(null)}
+                                    className="absolute top-full left-0 mt-1 w-[380px] bg-[#0d0f14]/98 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl grid grid-cols-2 gap-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+                                >
+                                    {displayCountries.map((c) => (
+                                        <Link
+                                            key={c.slug}
+                                            href={`/quoc-gia/${c.slug}`}
+                                            onClick={() => setOpenDropdown(null)}
+                                            className="px-3 py-2 rounded-xl text-sm font-medium text-white/50 hover:text-white hover:bg-white/5 transition-all"
+                                        >
+                                            {c.name}
+                                        </Link>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Static Links */}
+                        <Link href="/danh-sach/phim-le" className="px-3 py-2 rounded-full text-[14px] font-bold text-white/60 hover:text-white transition-colors">Phim Lẻ</Link>
+                        <Link href="/danh-sach/phim-bo" className="px-3 py-2 rounded-full text-[14px] font-bold text-white/60 hover:text-white transition-colors">Phim Bộ</Link>
                     </nav>
 
                     {/* Right: Search & Actions */}
