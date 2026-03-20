@@ -195,11 +195,11 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                 <div className="max-w-[1920px] mx-auto px-4 lg:px-8 h-[54px] lg:h-[64px] flex items-center justify-between gap-3 flex-nowrap pointer-events-auto">
 
                     {/* Left Section: Logo & Mobile Menu */}
-                    <div className="flex items-center gap-6 shrink-0">
-                        {/* Mobile Menu Button */}
+                    <div className="flex items-center gap-2 md:gap-4 shrink-0">
+                        {/* Mobile Menu Button - Hamburger */}
                         <button
                             onClick={() => setIsMobileMenuOpen(true)}
-                            className="lg:hidden w-9 h-9 -ml-1 rounded-[10px] bg-transparent hover:bg-white/[0.06] text-white/95 transition-all active:scale-95 flex items-center justify-center"
+                            className="lg:hidden w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-white/90 active:scale-95 transition-transform"
                             aria-label="Mở menu"
                         >
                             <span className="relative flex h-4 w-5 flex-col items-start justify-center gap-1">
@@ -209,9 +209,9 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             </span>
                         </button>
 
-                        {/* Full Logo - Visible on all sizes now */}
+                        {/* Full Logo - Balanced for all sizes */}
                         <Link href="/" className="flex items-center group shrink-0">
-                            <span className="inline-block font-logo text-[22px] md:text-[26px] font-semibold uppercase tracking-[0.012em] leading-none whitespace-nowrap">
+                            <span className="inline-block font-logo text-[20px] md:text-[24px] font-semibold uppercase tracking-[0.012em] leading-none whitespace-nowrap">
                                 <span className="text-[#9CA3AF]">KHOI</span><span className="text-[#8FA7C5]">PHIM</span>
                             </span>
                         </Link>
@@ -295,19 +295,15 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
 
                         {/* Static Links */}
                         <Link href="/danh-sach/phim-le" className="px-3 py-2 rounded-full text-[14px] font-bold text-white/60 hover:text-white transition-colors">Phim Lẻ</Link>
-                        <Link href="/danh-sach/phim-bo" className="px-3 py-2 rounded-full text-[14px] font-bold text-white/60 hover:text-white transition-colors">Phim Bộ</Link>
-                    </nav>
-
-                    {/* Right: Search & Actions */}
-                    <div className="flex items-center gap-3 shrink-0">
-
-                        <div className="flex items-center justify-end flex-1">
-                            {/* Unified expandable search bar for both Mobile and Desktop */}
+                        <Link href="/danh-sach/phim-bo" className="px-3 py-2 rounded-full text-[14px] font-bold text-white/60 hover:text-white trans                    {/* Right: Search & Actions */}
+                    <div className="flex items-center gap-2 md:gap-3 shrink-0">
+                        {/* Search Unified */}
+                        <div className="flex items-center justify-end">
                             <form
                                 onSubmit={handleSearch}
                                 className={cn(
                                     "flex relative items-center transition-all duration-500 ease-out h-10",
-                                    isSearchOpen ? "w-[calc(100vw-6rem)] md:w-[420px] lg:w-[520px] absolute right-4 lg:relative lg:right-0 z-40 rounded-full" : "w-10 relative"
+                                    isSearchOpen ? "w-[calc(100vw-3rem)] md:w-[420px] lg:w-[480px] absolute right-0 lg:relative z-[60] rounded-full" : "w-10"
                                 )}
                             >
                                 <button
@@ -317,13 +313,15 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                         if (!isSearchOpen) setIsSearchOpen(true);
                                     }}
                                     className={cn(
-                                        "absolute right-0 z-20 w-10 h-10 flex items-center justify-center rounded-full border transition-all duration-300",
+                                        "absolute right-0 z-20 w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300",
                                         isSearchOpen
-                                            ? "bg-transparent border-transparent pointer-events-none"
-                                            : "bg-[#0B0B10] hover:bg-[#111117] border-white/[0.10] hover:scale-105 active:scale-95"
+                                            ? "bg-transparent pointer-events-none"
+                                            : "hover:bg-white/10 active:scale-90"
                                     )}
                                 >
-                                    <Search className={cn("w-4 h-4 transition-colors", isSearchOpen ? "hidden" : "text-white/80")} />
+                                    <Search className={cn("w-[22px] h-[22px] transition-colors", isSearchOpen ? "hidden" : "text-white/80")} />
+                                </button>
+xt-white/80")} />
                                 </button>
                                 {/* Input wrapper to position popup correctly */}
                                 <div className={cn(
@@ -470,8 +468,8 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             </Link>
                         </div>
 
-                        {/* Auth — hidden on mobile (accessible via hamburger menu) */}
-                        <div className="hidden lg:block">
+                        {/* Auth / Account — Visible on mobile topbar now */}
+                        <div className={cn("transition-opacity duration-300", isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100")}>
                             {!mounted ? (
                                 <div className="w-24 h-10 bg-white/5 rounded-full animate-pulse" />
                             ) : session ? (

@@ -527,7 +527,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
     const heroMovies = movies.slice(0, 5);
 
     return (
-        <div className="relative w-full bg-transparent font-sans mt-[50px] md:mt-0" style={{ contain: "layout style paint" }}>
+        <div className="relative w-full bg-transparent font-sans" style={{ contain: "layout style paint" }}>
             {isDesktop ? (
                 <DesktopHero movies={heroMovies} />
             ) : (
