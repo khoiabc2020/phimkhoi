@@ -60,7 +60,7 @@ export default function Sidebar() {
                                 "relative flex items-center justify-center xl:justify-start gap-4 px-3 py-2.5 rounded-xl transition-all duration-200 group",
                                 isActive 
                                     ? "bg-[#8FA7C5]/8 text-[#8FA7C5]" 
-                                    : "text-white/40 hover:text-white hover:bg-white/5"
+                                    : "text-white/50 hover:text-white hover:bg-white/10"
                             )}
                         >
                             {/* Active Indicator Bar */}
