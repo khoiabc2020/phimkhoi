@@ -12,8 +12,7 @@ import { getMoviesList, getTrendMovies, getHomeData, HOME_SECTION_SLUGS } from "
 import { getTMDBDataForCard } from "@/app/actions/tmdb";
 
 export const revalidate = 3600;
-const ROW_LIMIT = 10;
-const getCachedHomeData = cache(getHomeData);
+const ROW_LIMIT = 12; // Tăng một chút để nhìn đầy đặn hơn trên màn hình ultra-wide
 
 const heroSkeleton = <div className="w-full h-[66vh] md:h-[88vh] bg-[#0a0a0a] animate-pulse" />;
 const contentSkeleton = (
@@ -129,101 +128,122 @@ async function AsyncHeroSection({ initialMovies }: { initialMovies: any[] }) {
   return <HeroSection movies={enhancedHeroData} />;
 }
 
-/** Hero stream: chỉ đợi getTrendMovies, không chờ getHomeData → FCP nhanh */
+/** Hàng phim tự tải dữ liệu (Self-fetching Row) để hỗ trợ Streaming */
+async function HomeRowSection({
+  title,
+  slug,
+  endpoint = 'danh-sach',
+  viewAllHref,
+  viewAllLabel = "Xem tất cả",
+  minHeight = 350
+}: {
+  title: string;
+  slug: string;
+  endpoint?: 'danh-sach' | 'the-loai' | 'quoc-gia';
+  viewAllHref?: string;
+  viewAllLabel?: string;
+  minHeight?: number;
+}) {
+  try {
+    const movies = await getMoviesList(slug, { limit: ROW_LIMIT, category: endpoint === 'the-loai' ? slug : undefined, country: endpoint === 'quoc-gia' ? slug : undefined })
+      .then(res => res.items || [])
+      .catch(() => []);
+
+    if (!movies.length) return null;
+
+    return (
+      <LazySection minHeight={minHeight}>
+        <MovieRow
+          title={title}
+          movies={movies}
+          slug={viewAllHref || slug}
+        />
+      </LazySection>
+    );
+  } catch (error) {
+    return null;
+  }
+}
+
+/** Hero stream: tải dữ liệu top trending độc lập */
 async function HeroStream() {
   const heroTrending = await getTrendMovies('all').catch((): any[] => []);
   let finalHeroData: any[] = (heroTrending || []).slice(0, 5);
-  if (finalHeroData.length < 4) {
-    const home = await getCachedHomeData();
-    const heroMixed: any[] = [];
-    const len = Math.max((home.phimBo || []).length, (home.phimLe || []).length);
-    for (let i = 0; i < len; i++) {
-      if (home.phimBo?.[i]) heroMixed.push(home.phimBo[i]);
-      if (home.phimLe?.[i]) heroMixed.push(home.phimLe[i]);
-    }
-    finalHeroData = heroMixed.slice(0, 5);
+  
+  // Nếu không có trending, tải backup nhẹ nhàng
+  if (finalHeroData.length < 3) {
+    const backup = await getMoviesList('phim-moi', { limit: 5 }).catch(() => ({ items: [] }));
+    finalHeroData = backup.items || [];
   }
+  
   return <AsyncHeroSection initialMovies={finalHeroData} />;
-}
-
-/** Nội dung trang chủ: đợi getHomeData (cache 20 phút) → stream khi xong */
-async function HomeContentStream() {
-  const homeData = await getCachedHomeData();
-
-  return (
-    <div className="w-full max-w-[1920px] mx-auto px-1.5 sm:px-3 md:px-5 lg:pl-20 relative z-20 pb-16">
-      <div className="mb-6">
-        <QuickNav />
-      </div>
-      <LazySection minHeight={280}>
-        <Suspense fallback={<div className="h-[260px] bg-white/5 rounded-lg animate-pulse" />}>
-          <AsyncTopTrendingHub />
-        </Suspense>
-      </LazySection>
-      <div className="space-y-12">
-        <LazySection minHeight={200}>
-            <ContinueWatchingRow />
-        </LazySection>
-
-        <LazySection minHeight={380}>
-          <HomeSection title="Phim Mới & Chiếu Rạp">
-            {homeData.phimChieuRap?.length ? (
-              <MovieRow title="Phim Chiếu Rạp Mới" movies={homeData.phimChieuRap.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.phimChieuRap} />
-            ) : null}
-            {homeData.phimMoi?.length ? (
-              <MovieRow title="Phim Mới Cập Nhật" movies={homeData.phimMoi.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.phimMoi} />
-            ) : null}
-          </HomeSection>
-        </LazySection>
-
-        <LazySection minHeight={380}>
-          <HomeSection title="Phim theo quốc gia" viewAllHref={HOME_SECTION_SLUGS.hanQuoc} viewAllLabel="Xem thêm">
-            {homeData.hanQuoc?.length ? (
-              <MovieRow title="Hàn Quốc" movies={homeData.hanQuoc.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.hanQuoc} />
-            ) : null}
-            {homeData.trungQuoc?.length ? (
-              <MovieRow title="Trung Quốc" movies={homeData.trungQuoc.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.trungQuoc} />
-            ) : null}
-          </HomeSection>
-        </LazySection>
-
-        <LazySection minHeight={360}>
-          <HomeSection title="Mới cập nhật" viewAllHref={HOME_SECTION_SLUGS.phimMoi}>
-            {homeData.phimSapChieu?.length ? (
-              <MovieRow title="Phim Sắp Chiếu" movies={homeData.phimSapChieu.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.phimSapChieu} />
-            ) : null}
-            {homeData.phimLe?.length ? (
-              <MovieRow title="Phim Lẻ Mới" movies={homeData.phimLe.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.phimLe} />
-            ) : null}
-            {homeData.phimBo?.length ? (
-              <MovieRow title="Phim Bộ Mới" movies={homeData.phimBo.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.phimBo} />
-            ) : null}
-          </HomeSection>
-        </LazySection>
-
-        <LazySection minHeight={380}>
-          <HomeSection title="Thế loại phổ biến" viewAllHref={HOME_SECTION_SLUGS.hanhDong} viewAllLabel="Xem thêm">
-            {homeData.hanhDong?.length ? (
-              <MovieRow title="Hành Động" movies={homeData.hanhDong.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.hanhDong} />
-            ) : null}
-            {homeData.tinhCam?.length ? (
-              <MovieRow title="Tình Cảm" movies={homeData.tinhCam.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.tinhCam} />
-            ) : null}
-            {homeData.hoatHinh?.length ? (
-              <MovieRow title="Hoạt Hình" movies={homeData.hoatHinh.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.hoatHinh} />
-            ) : null}
-          </HomeSection>
-        </LazySection>
-      </div>
-    </div>
-  );
-}
-
-export default function Home() {
+}export default function Home() {
   return (
     <main className="min-h-screen pb-16 bg-[#0a0a0a]">
+      {/* Hero Section - Tải đầu tiên */}
       <Suspense fallback={heroSkeleton}>
         <HeroStream />
+      </Suspense>
+
+      <div className="w-full max-w-[1920px] mx-auto px-1.5 sm:px-3 md:px-5 lg:pl-20 relative z-20 pb-16">
+        <div className="mb-6">
+          <QuickNav />
+        </div>
+
+        {/* Top Trending - Tải độc lập */}
+        <LazySection minHeight={280}>
+          <Suspense fallback={<div className="h-[260px] bg-white/5 rounded-lg animate-pulse mx-4" />}>
+            <AsyncTopTrendingHub />
+          </Suspense>
+        </LazySection>
+
+        <div className="space-y-4 md:space-y-8">
+          {/* Hàng phim tiếp diễn - Client Side nhẹ nhàng */}
+          <LazySection minHeight={200}>
+            <ContinueWatchingRow />
+          </LazySection>
+
+          {/* Group: Phim Mới */}
+          <Suspense fallback={<div className="h-[380px] w-full animate-pulse bg-white/5 rounded-xl" />}>
+            <HomeRowSection title="Phim Chiếu Rạp Mới" slug="phim-chieu-rap" viewAllHref="/danh-sach/phim-chieu-rap" />
+          </Suspense>
+
+          <Suspense fallback={<div className="h-[380px] w-full animate-pulse bg-white/5 rounded-xl" />}>
+            <HomeRowSection title="Phim Mới Cập Nhật" slug="phim-moi-cap-nhat" viewAllHref="/danh-sach/phim-moi" />
+          </Suspense>
+
+          {/* Group: Quốc gia */}
+          <Suspense fallback={<div className="h-[380px] w-full animate-pulse bg-white/5 rounded-xl" />}>
+            <HomeRowSection title="Phim Hàn Quốc" slug="han-quoc" endpoint="quoc-gia" viewAllHref="/quoc-gia/han-quoc" />
+          </Suspense>
+
+          <Suspense fallback={<div className="h-[380px] w-full animate-pulse bg-white/5 rounded-xl" />}>
+            <HomeRowSection title="Phim Trung Quốc" slug="trung-quoc" endpoint="quoc-gia" viewAllHref="/quoc-gia/trung-quoc" />
+          </Suspense>
+
+          {/* Group: Mới cập nhật khác */}
+          <Suspense fallback={<div className="h-[380px] w-full animate-pulse bg-white/5 rounded-xl" />}>
+            <HomeRowSection title="Phim Lẻ Mới" slug="phim-le" viewAllHref="/danh-sach/phim-le" />
+          </Suspense>
+
+          <Suspense fallback={<div className="h-[380px] w-full animate-pulse bg-white/5 rounded-xl" />}>
+            <HomeRowSection title="Phim Bộ Mới" slug="phim-bo" viewAllHref="/danh-sach/phim-bo" />
+          </Suspense>
+
+          {/* Group: Thể loại */}
+          <Suspense fallback={<div className="h-[380px] w-full animate-pulse bg-white/5 rounded-xl" />}>
+            <HomeRowSection title="Phim Hành Động" slug="hanh-dong" endpoint="the-loai" viewAllHref="/the-loai/hanh-dong" />
+          </Suspense>
+
+          <Suspense fallback={<div className="h-[380px] w-full animate-pulse bg-white/5 rounded-xl" />}>
+            <HomeRowSection title="Phim Hoạt Hình" slug="hoat-hinh" endpoint="the-loai" viewAllHref="/the-loai/hoat-hinh" />
+          </Suspense>
+        </div>
+      </div>
+    </main>
+  );
+}
+oStream />
       </Suspense>
 
 

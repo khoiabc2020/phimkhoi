@@ -36,60 +36,52 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
     const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Poster (ảnh dọc) – ưu tiên poster thật, tránh nhầm thumb/backdrop vào slot dọc
-    const tmdbPoster =
+    const tmdbPoster = React.useMemo(() => 
         (movie as any).tmdbData?.poster_path
             ? getTMDBImage((movie as any).tmdbData.poster_path, "w780")
+            : null
+    , [(movie as any).tmdbData?.poster_path]);
+
+    const portraitPosterSource = React.useMemo(() => {
+        const sourcePoster = movie.poster_url && detectOrientation(movie.poster_url) === "portrait"
+            ? movie.poster_url
             : null;
-
-    const sourcePoster = movie.poster_url && detectOrientation(movie.poster_url) === "portrait"
-        ? movie.poster_url
-        : null;
-    const thumbAsPoster = movie.thumb_url && detectOrientation(movie.thumb_url) === "portrait"
-        ? movie.thumb_url
-        : null;
-
-    const portraitPosterSource =
-        sourcePoster ||            // poster từ KKPhim/OPhim/NguonC (ảnh dọc hợp lệ)
-        thumbAsPoster ||           // fallback khi source trả nhầm field nhưng ảnh vẫn dọc
-        tmdbPoster ||              // poster TMDB (đảm bảo ảnh dọc)
-        "";
-    const noCropPortrait = orientation === "portrait";
-    const relaxedPosterSource = movie.poster_url || movie.thumb_url || tmdbPoster || "";
+        const thumbAsPoster = movie.thumb_url && detectOrientation(movie.thumb_url) === "portrait"
+            ? movie.thumb_url
+            : null;
+        const relaxedPosterSource = movie.poster_url || movie.thumb_url || tmdbPoster || "";
+        
+        return sourcePoster || thumbAsPoster || tmdbPoster || relaxedPosterSource;
+    }, [movie.poster_url, movie.thumb_url, tmdbPoster]);
 
     // Build robust fallback candidates to avoid blank placeholder cards.
-    // Priority:
-    // - portrait cards: strict portrait source -> relaxed source -> opposite field -> tmdb
-    // - landscape cards: thumb -> poster -> tmdb backdrop -> tmdb poster
-    const posterCandidates = Array.from(
-        new Set(
-            (orientation === "landscape"
-                ? [
-                    movie.thumb_url,
-                    movie.poster_url,
-                    (movie as any).tmdbData?.backdrop_path ? getTMDBImage((movie as any).tmdbData.backdrop_path, "w780") : null,
-                    tmdbPoster,
-                ]
-                : [
-                    portraitPosterSource,
-                    relaxedPosterSource,
-                    movie.thumb_url,
-                    movie.poster_url,
-                    tmdbPoster,
-                ]).filter(Boolean) as string[]
-        )
-    );
-    const [posterIndex, setPosterIndex] = useState(0);
+    const posterCandidates = React.useMemo(() => {
+        const list = orientation === "landscape"
+            ? [
+                movie.thumb_url,
+                movie.poster_url,
+                (movie as any).tmdbData?.backdrop_path ? getTMDBImage((movie as any).tmdbData.backdrop_path, "w780") : null,
+                tmdbPoster,
+            ]
+            : [
+                portraitPosterSource,
+                movie.thumb_url,
+                movie.poster_url,
+                tmdbPoster,
+            ];
+        return Array.from(new Set(list.filter(Boolean))) as string[];
+    }, [orientation, movie.thumb_url, movie.poster_url, portraitPosterSource, tmdbPoster, (movie as any).tmdbData?.backdrop_path]);
+
     const activePosterSrc = posterCandidates[posterIndex] ? getImageUrl(posterCandidates[posterIndex]) : "/placeholder.svg";
 
     // Backdrop/overlay (ảnh ngang): TMDB backdrop first, then whichever source URL is truly landscape.
-    // Never use a portrait URL in the overlay — it looks cropped and wrong.
-    const tmdbBackdrop = (movie as any).tmdbData?.backdrop_path ? getTMDBImage((movie as any).tmdbData.backdrop_path, "w500") : "";
-    const tmdbPosterFallback = (movie as any).tmdbData?.poster_path ? getTMDBImage((movie as any).tmdbData.poster_path, "w500") : "";
-    
-    // User request: Priority to source backdrop (thumb_url usually has the leads)
-    const sourceBackdrop = movie.thumb_url ? getImageUrl(movie.thumb_url) : (movie.poster_url ? getImageUrl(movie.poster_url) : "");
-
-    const displayBackdrop = sourceBackdrop || tmdbBackdrop || tmdbPosterFallback || null;
+    const displayBackdrop = React.useMemo(() => {
+        const tmdbBackdrop = (movie as any).tmdbData?.backdrop_path ? getTMDBImage((movie as any).tmdbData.backdrop_path, "w500") : "";
+        const tmdbPosterFallback = (movie as any).tmdbData?.poster_path ? getTMDBImage((movie as any).tmdbData.poster_path, "w500") : "";
+        const sourceBackdrop = movie.thumb_url ? getImageUrl(movie.thumb_url) : (movie.poster_url ? getImageUrl(movie.poster_url) : "");
+        return sourceBackdrop || tmdbBackdrop || tmdbPosterFallback || null;
+    }, [movie.thumb_url, movie.poster_url, (movie as any).tmdbData?.backdrop_path, (movie as any).tmdbData?.poster_path]);
+p || tmdbBackdrop || tmdbPosterFallback || null;
 
     // Reset fallback state when card movie changes
     useEffect(() => {
