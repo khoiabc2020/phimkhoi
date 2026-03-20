@@ -299,7 +299,9 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         {/* Static Links */}
                         <Link href="/danh-sach/phim-le" className="px-2.5 py-1.5 rounded-full text-[13.5px] font-bold text-white/60 hover:text-white transition-colors">Phim Lẻ</Link>
                         <Link href="/danh-sach/phim-bo" className="px-2.5 py-1.5 rounded-full text-[13.5px] font-bold text-white/60 hover:text-white transition-colors">Phim Bộ</Link>
-l text-[14px] font-bold text-white/60 hover:text-white trans                    {/* Right: Search & Actions */}
+                    </nav>
+
+                    {/* Right: Search & Actions */}
                     <div className="flex items-center gap-2 md:gap-3 shrink-0">
                         {/* Search Unified */}
                         <div className="flex items-center justify-end">
