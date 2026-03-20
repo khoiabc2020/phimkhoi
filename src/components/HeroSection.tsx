@@ -185,14 +185,12 @@ function MobileHero({ movies }: { movies: Movie[] }) {
 
                                 {/* Quality + rating badges */}
                                 <div className="absolute top-3 right-3 flex flex-col items-end gap-1.5 z-20">
+                                    <span className="bg-[#8FA7C5] text-[#0a0a0a] text-[9px] font-black px-2 py-0.5 rounded tracking-wider shadow-md">
+                                        TOP 10
+                                    </span>
                                     {m.quality && (
-                                        <span className="bg-[#263243] border border-[#33455F] text-[#d8e3f2] text-[9px] font-black px-2 py-0.5 rounded tracking-wider shadow-md">
+                                        <span className="bg-black/60 backdrop-blur-sm border border-white/10 text-white/90 text-[9px] font-bold px-2 py-0.5 rounded tracking-wider">
                                             {formatQualityLabel(m.quality) || m.quality}
-                                        </span>
-                                    )}
-                                    {m.tmdbData?.vote_average && (
-                                        <span className="bg-black/70 backdrop-blur-sm text-[#c7d7ea] text-[9px] font-bold px-2 py-0.5 rounded border border-white/10">
-                                            ★ {m.tmdbData.vote_average.toFixed(1)}
                                         </span>
                                     )}
                                 </div>
@@ -242,10 +240,11 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                         >
                             {decodeHtml(movie.name)}
                         </h1>
-                        <div className="flex items-center gap-2 mt-1 flex-wrap">
-                            {movie.year && <span className="text-[11px] text-white/75">{movie.year}</span>}
+                         <div className="flex items-center gap-2 mt-1 flex-wrap">
+                            {movie.year && <span className="text-[11px] font-bold text-white/90">{movie.year}</span>}
+                            {movie.country?.[0] && <span className="text-[11px] text-white/60">· {movie.country[0].name}</span>}
                             {movie.category?.slice(0, 2).map((c: any) => (
-                                <span key={c.id || c.name} className="text-[11px] text-white/65">· {c.name}</span>
+                                <span key={c.id || c.name} className="text-[11px] text-white/60">· {c.name}</span>
                             ))}
                         </div>
                     </div>
