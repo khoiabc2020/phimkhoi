@@ -297,11 +297,11 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
 
     return (
         <div
-            className="relative w-full h-[65vh] lg:h-[75vh] xl:h-[82vh] overflow-hidden bg-[#0a0a0a]"
+            className="relative w-full h-[65vh] lg:h-[75vh] xl:h-[85vh] overflow-hidden bg-[#0a0a0a]"
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}
         >
-            {/* ── Crossfade backdrop stack ── */}
+            {/* ── Crossfade backdrop stack (Cinematic Full Bleed) ── */}
             {movies.map((m: any, i) => {
                 const bg = getHeroImage(m, "backdrop", "desktop");
                 const isActive = i === index;
@@ -309,28 +309,20 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                     <div
                         key={`bg-${m._id || i}`}
                         className={cn(
-                            "absolute inset-0 transition-opacity duration-800 ease-in-out will-change-[opacity]",
-                            isActive ? "opacity-100 z-[1]" : "opacity-0 z-0"
+                            "absolute inset-0 transition-opacity duration-1000 ease-in-out will-change-[opacity]",
+                            isActive ? "opacity-100 z-[1]" : "opacity-0 z-0 pointer-events-none"
                         )}
                         aria-hidden={!isActive}
                     >
+                        {/* Single Sharp Layer for Cinematic Feel */}
                         <Image
                             src={bg}
                             alt=""
                             fill
-                            className="object-cover object-[66%_18%] opacity-[0.32] scale-[1.06] blur-2xl"
-                            priority={isActive && i < 2}
-                            loading={isActive ? "eager" : "lazy"}
-                            sizes="100vw"
-                            placeholder="blur"
-                            blurDataURL={blurData}
-                            decoding="async"
-                        />
-                        <Image
-                            src={bg}
-                            alt=""
-                            fill
-                            className="object-cover object-[66%_32%] opacity-[0.94]"
+                            className={cn(
+                                "object-cover object-[center_20%] opacity-100 transition-transform duration-[8000ms] ease-linear",
+                                isActive ? "scale-105" : "scale-100"
+                            )}
                             priority={isActive && i < 2}
                             loading={isActive ? "eager" : "lazy"}
                             sizes="100vw"
@@ -343,19 +335,18 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
             })}
 
             {/* ── Gradient overlays (always on top) ── */}
-            <div className="absolute inset-0 z-[2] pointer-events-none">
-                {/* Left text readability */}
-                <div className="absolute inset-y-0 left-0 w-[60%] bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
+            <div className="absolute inset-0 z-[2] pointer-events-none transition-opacity duration-500">
+                {/* Left text readability - Stronger for cinematic text */}
+                <div className="absolute inset-y-0 left-0 w-[80%] lg:w-[60%] bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/70 to-transparent" />
                 {/* Bottom blend into page */}
-                <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/70 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 h-48 lg:h-64 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/50 to-transparent" />
             </div>
 
             {/* ── Content ── */}
-            <div className="relative z-[3] h-full w-full max-w-[1920px] mx-auto lg:pl-20 px-6 md:px-10 lg:pl-12 lg:pr-6 flex items-end pb-12 md:pb-16 lg:pb-20">
-                <div className="grid grid-cols-12 gap-8 lg:gap-12 w-full items-end">
-
+            <div className="relative z-[3] h-full w-full max-w-[1920px] mx-auto lg:pl-20 px-6 md:px-10 lg:pl-12 lg:pr-6 flex items-end pb-12 md:pb-16 lg:pb-24 pointer-events-none">
+                <div className="w-full">
                     {/* Left: Text block */}
-                    <div className="col-span-12 md:col-span-8 lg:col-span-7 xl:col-span-6 space-y-4 lg:space-y-5">
+                    <div className="w-full md:w-[85%] lg:w-[70%] xl:w-[60%] space-y-4 lg:space-y-5 pointer-events-auto">
                         {/* Badges Row */}
                         <div className="flex flex-wrap items-center gap-2 lg:gap-3 transition-all duration-500 delay-100">
                             <span className="inline-flex items-center px-2 py-0.5 rounded bg-[#8FA7C5] text-[#0a0a0a] text-[10px] font-black uppercase tracking-tighter">
@@ -387,7 +378,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         <h1
                             key={`title-${index}`}
                             className={cn(
-                                "font-outfit font-extrabold text-white leading-[1.15] tracking-tight pt-1 animate-hero-in drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]",
+                                "font-outfit font-extrabold text-white leading-[1.10] tracking-tight pt-1 animate-hero-in drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]",
                                 // Use `text-balance` for a premium, symmetrical multi-line look
                                 "text-balance",
                                 // If name is long, clamp lines instead
@@ -397,7 +388,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                                     ? "text-3xl md:text-4xl lg:text-5xl xl:text-5xl" 
                                     : movie.name.length > 20
                                         ? "text-4xl md:text-5xl lg:text-[54px] xl:text-[62px]"
-                                        : "text-4xl md:text-5xl lg:text-6xl xl:text-7xl"
+                                        : "text-4xl md:text-6xl lg:text-7xl xl:text-[80px]"
                             )}
                             title={decodeHtml(movie.name)}
                         >
@@ -414,13 +405,8 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                                     {decodeHtml(movie.origin_name)}
                                 </span>
                             )}
-                            {movie.country?.[0] && (
-                                <span className="text-white/40 text-xs">
-                                    · {movie.country[0].name}
-                                </span>
-                            )}
                             {movie.time && (
-                                <span className="text-white/40 text-xs">
+                                <span className="text-white/40 text-[13px]">
                                     · {movie.time}
                                 </span>
                             )}
@@ -429,7 +415,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                                 <Link
                                     key={c.id || c.name}
                                     href={`/the-loai/${c.slug}`}
-                                    className="text-[11px] text-white/60 hover:text-white border border-white/10 hover:border-white/30 px-2.5 py-0.5 rounded-full transition-all duration-150 hover:bg-white/10"
+                                    className="text-[12px] text-white/60 hover:text-white border border-white/10 hover:border-white/30 px-3 py-1 rounded-full transition-all duration-150 hover:bg-white/10 backdrop-blur-sm"
                                 >
                                     {c.name}
                                 </Link>
@@ -440,7 +426,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         {movie.content && (
                             <p
                                 key={`desc-${index}`}
-                                className="text-white/60 text-sm leading-relaxed line-clamp-2 max-w-lg animate-hero-in animation-delay-150"
+                                className="text-white/70 text-[14px] lg:text-[15px] leading-relaxed line-clamp-2 max-w-xl xl:max-w-2xl animate-hero-in animation-delay-150 drop-shadow-md"
                             >
                                 {decodeHtml(stripHtml(movie.content))}
                             </p>
@@ -449,83 +435,77 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         {/* Buttons */}
                         <div
                             key={`btns-${index}`}
-                            className="flex flex-wrap items-center gap-3 animate-hero-in animation-delay-200"
+                            className="flex flex-wrap items-center gap-3 pt-2 animate-hero-in animation-delay-200"
                         >
                             <Link
                                 href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                className="flex items-center justify-center gap-2 h-14 px-10 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[16px] transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_8px_20px_-4px_rgba(143,167,197,0.4)]"
+                                className="flex items-center justify-center gap-2 h-14 px-10 rounded-full bg-white text-[#0a0a0a] font-black text-[16px] transition-all duration-300 hover:bg-white/90 hover:scale-105 active:scale-95 shadow-[0_8px_20px_-4px_rgba(255,255,255,0.3)]"
                             >
                                 <Play className="w-5 h-5 fill-[#0a0a0a] shrink-0" />
                                 Xem Ngay
                             </Link>
                             <Link
                                 href={`/phim/${movie.slug}`}
-                                className="flex items-center justify-center h-12 px-6 rounded-full bg-white/10 hover:bg-white/18 border border-white/15 text-white font-bold text-[15px] transition-all hover:scale-105 active:scale-95 backdrop-blur-sm"
+                                className="flex items-center justify-center gap-2 h-12 px-7 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-[15px] transition-all hover:scale-105 active:scale-95 backdrop-blur-md"
                             >
+                                <Info className="w-5 h-5" />
                                 <span className="hidden sm:inline">Chi Tiết</span>
                                 <span className="sm:hidden">Chi Tiết</span>
                             </Link>
-                            <div className="h-12 w-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/18 border border-white/15 transition-all hover:scale-110 cursor-pointer backdrop-blur-sm">
+                            <div className="h-12 w-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 border border-white/20 transition-all hover:scale-110 cursor-pointer backdrop-blur-md">
                                 <FavoriteButton movieData={getFavoriteData(movie)} size="md" />
                             </div>
                         </div>
-
-                        {/* Dots + nav */}
-                        <div className="flex items-center gap-4 pt-1">
-                            <Dots count={movies.length} active={index} onGo={go} />
-                            {movies.length > 1 && (
-                                <div className="flex items-center gap-2 ml-auto">
-                                    <button
-                                        onClick={prev}
-                                        className="w-9 h-9 rounded-full bg-white/10 hover:bg-[#263243] hover:text-[#d8e3f2] border border-white/10 flex items-center justify-center text-white/60 transition-all duration-200"
-                                        aria-label="Trước"
-                                    >
-                                        <ChevronLeft className="w-4 h-4" />
-                                    </button>
-                                    <button
-                                        onClick={next}
-                                        className="w-9 h-9 rounded-full bg-white/10 hover:bg-[#263243] hover:text-[#d8e3f2] border border-white/10 flex items-center justify-center text-white/60 transition-all duration-200"
-                                        aria-label="Tiếp"
-                                    >
-                                        <ChevronRight className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Right: Poster Stack (Preloaded) */}
-                    <div className="col-span-12 md:col-span-4 lg:col-span-4 xl:col-span-4 hidden md:flex justify-end items-end pr-0">
-                        <div className="relative w-[220px] lg:w-[320px] xl:w-[360px] aspect-[2/3] rounded-[10px] overflow-hidden ring-1 ring-white/10 shadow-[0_20px_42px_#00000088] group/poster transition-transform duration-200 ease-out animate-hero-in animation-delay-100 lg:translate-x-8 xl:translate-x-12 2xl:translate-x-20">
-                            {movies.map((m: any, i) => {
-                                const isActive = i === index;
-                                return (
-                                    <div
-                                        key={`poster-${m._id || i}`}
-                                        className={cn(
-                                            "absolute inset-0 transition-opacity duration-700 ease-in-out",
-                                            isActive ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
-                                        )}
-                                        aria-hidden={!isActive}
-                                    >
-                                        <Image
-                                            src={getHeroImage(m, "poster", "desktop")}
-                                            alt={decodeHtml(m.name)}
-                                            fill
-                                            className="object-cover group-hover/poster:scale-[1.03] transition-transform duration-200 ease-out"
-                                            priority={isActive && i < 2}
-                                            loading={isActive ? "eager" : "lazy"}
-                                            sizes="(min-width: 1280px) 310px, (min-width: 1024px) 260px, 200px"
-                                            placeholder="blur"
-                                            blurDataURL={blurData}
-                                            decoding="async"
-                                        />
-                                    </div>
-                                );
-                            })}
-                        </div>
                     </div>
                 </div>
+
+                {/* Right/Bottom Thumbnail Navigation (VieON Cinematic Style) */}
+                {movies.length > 1 && (
+                    <div className="absolute bottom-6 right-6 lg:bottom-10 lg:right-12 z-[4] flex items-center gap-3 pointer-events-auto">
+                        <div className="hidden lg:flex items-center gap-1.5 mr-2">
+                            <button
+                                onClick={prev}
+                                className="w-10 h-10 rounded-full bg-[#0a0a0a]/50 hover:bg-white hover:text-black border border-white/10 hover:border-white flex items-center justify-center text-white/70 transition-all duration-300 backdrop-blur-md"
+                                aria-label="Trước"
+                            >
+                                <ChevronLeft className="w-5 h-5" />
+                            </button>
+                            <button
+                                onClick={next}
+                                className="w-10 h-10 rounded-full bg-[#0a0a0a]/50 hover:bg-white hover:text-black border border-white/10 hover:border-white flex items-center justify-center text-white/70 transition-all duration-300 backdrop-blur-md"
+                                aria-label="Tiếp"
+                            >
+                                <ChevronRight className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {movies.map((m: any, idx) => {
+                            const isActive = idx === index;
+                            return (
+                                <div
+                                    key={`thumb-${m._id || idx}`}
+                                    onClick={() => go(idx)}
+                                    className={cn(
+                                        "relative w-[130px] lg:w-[160px] aspect-[16/9] rounded-lg overflow-hidden cursor-pointer flex-shrink-0 transition-all duration-500 box-border group",
+                                        isActive 
+                                            ? "ring-2 ring-white scale-100 opacity-100 shadow-[0_4px_20px_rgba(0,0,0,0.8)]" 
+                                            : "ring-1 ring-white/10 scale-[0.92] opacity-50 hover:opacity-80 hover:scale-95"
+                                    )}
+                                >
+                                    <Image
+                                        src={getHeroImage(m, "backdrop", "mobile")}
+                                        alt={decodeHtml(m.name)}
+                                        fill
+                                        className="object-cover group-hover:scale-105 transition-transform duration-700"
+                                        sizes="180px"
+                                        placeholder="blur"
+                                        blurDataURL={blurData}
+                                    />
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
         </div>
     );
