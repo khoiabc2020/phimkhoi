@@ -232,7 +232,7 @@ export default function WatchContainer({
                             <Link
                                 href={nextEpisodeUrl}
                                 title="Tập sau"
-                                className="flex items-center justify-center text-xs font-bold text-[#0a0a0a] bg-[#8FA7C5] hover:bg-[#a8bdd8] transition-all w-8 h-8 sm:w-auto sm:px-3 sm:py-2 rounded-[10px] touch-manipulation active:scale-95 shadow-md shadow-[#8FA7C5]/20"
+                                className="flex items-center justify-center text-xs font-bold text-[#0a0a0a] bg-[#8FA7C5] hover:bg-[#a8bdd8] transition-all w-8 h-8 sm:w-auto sm:px-3 sm:py-2 rounded-[10px] touch-manipulation active:scale-95"
                             >
                                 <span className="hidden sm:inline mr-1">Tập sau</span>
                                 <ChevronRight className="w-4 h-4" />

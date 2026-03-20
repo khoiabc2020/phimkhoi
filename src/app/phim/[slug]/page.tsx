@@ -311,7 +311,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             {serverData.length > 0 && (
                                 <Link
                                     href={`/xem-phim/${movie?.slug}/${serverData[0].slug}`}
-                                    className="flex items-center justify-center gap-2 bg-[#8FA7C5] text-[#0a0a0a] px-6 sm:px-8 py-3 rounded-full font-black text-[15px] hover:bg-[#a8bdd8] hover:scale-105 transition-all duration-300 shadow-[0_4px_24px_rgba(143,167,197,0.4)] hover:shadow-[0_8px_32px_rgba(143,167,197,0.6)]"
+                                    className="flex items-center justify-center gap-2 bg-[#8FA7C5] text-[#0a0a0a] px-6 sm:px-8 py-3 rounded-full font-black text-[15px] hover:bg-[#a8bdd8] hover:scale-105 transition-all duration-300"
                                 >
                                     <Play className="w-4 h-4 fill-current shrink-0" />
                                     Xem Phim

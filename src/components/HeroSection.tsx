@@ -260,7 +260,7 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                 <div className="flex items-center gap-2 mt-3">
                     <Link
                         href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                        className="flex flex-1 items-center justify-center gap-1.5 h-10 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[14px] active:scale-[0.97] hover:scale-105 transition-all shadow-[0_4px_20px_rgba(229,9,20,0.4)] hover:shadow-[0_6px_28px_rgba(229,9,20,0.6)]"
+                        className="flex flex-1 items-center justify-center gap-1.5 h-10 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[14px] active:scale-[0.97] hover:scale-105 transition-all"
                     >
                         <Play className="w-3.5 h-3.5 fill-[#0a0a0a] shrink-0" />
                         Xem Ngay
@@ -436,7 +436,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         >
                             <Link
                                 href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                className="flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[15px] transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_4px_24px_rgba(229,9,20,0.4)] hover:shadow-[0_8px_32px_rgba(229,9,20,0.6)]"
+                                className="flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[15px] transition-all duration-300 hover:scale-105 active:scale-95"
                             >
                                 <Play className="w-4 h-4 fill-[#0a0a0a] shrink-0" />
                                 Xem Ngay

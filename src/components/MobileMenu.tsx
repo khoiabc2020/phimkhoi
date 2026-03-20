@@ -249,7 +249,7 @@ export default function MobileMenu({
                             <a
                                 href={APK_DOWNLOAD_URL}
                                 download="PhimKhoi-Release.apk"
-                                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-[12px] text-[13px] font-bold text-[#0a0a0a] bg-[#8FA7C5] hover:brightness-105 transition-all shadow-[0_4px_12px_#8FA7C528]"
+                                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-[12px] text-[13px] font-bold text-[#0a0a0a] bg-[#8FA7C5] hover:brightness-105 transition-all"
                             >
                                 <Download className="w-4 h-4" strokeWidth={2.5} />
                                 Tải APK Android

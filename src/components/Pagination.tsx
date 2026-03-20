@@ -74,7 +74,7 @@ export default function Pagination({ currentPage, totalPages, baseUrl }: Paginat
                         className={cn(
                             "w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 relative overflow-hidden",
                             currentPage === page
-                                ? "bg-primary text-black shadow-[0_0_15px_rgba(234,179,8,0.5)] scale-110"
+                                ? "bg-primary text-black scale-110"
                                 : "text-gray-400 hover:text-white hover:bg-white/10"
                         )}
                     >

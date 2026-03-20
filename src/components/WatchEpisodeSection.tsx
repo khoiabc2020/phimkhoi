@@ -158,7 +158,7 @@ export default function WatchEpisodeSection({
                                     <Icon className={cn("w-[14px] h-[14px] sm:w-[16px] sm:h-[16px]", isActive ? "text-[#8FA7C5]" : "text-gray-400")} />
                                     {lang}
                                     {isActive && (
-                                        <span className="absolute bottom-[-1px] left-0 right-0 h-[3px] rounded-t-full bg-[#8FA7C5] shadow-[0_0_12px_#8FA7C599]" />
+                                        <span className="absolute bottom-[-1px] left-0 right-0 h-[3px] rounded-t-full bg-[#8FA7C5]" />
                                     )}
                                 </button>
                             );
@@ -192,7 +192,7 @@ export default function WatchEpisodeSection({
                                             className={cn(
                                                 "h-[32px] sm:h-[38px] px-3 sm:px-5 rounded-full text-[12px] sm:text-[13px] font-bold transition-all duration-300 border flex items-center justify-center gap-2 shadow-sm",
                                                 isServerActive
-                                                    ? "bg-[#8FA7C5] border-[#8FA7C5] text-[#0a0a0a] shadow-[0_4px_14px_#8FA7C540] scale-105 transform"
+                                                    ? "bg-[#8FA7C5] border-[#8FA7C5] text-[#0a0a0a] scale-105 transform"
                                                     : "bg-[#0B0B10] border-white/[0.10] text-gray-300 hover:text-white hover:border-white/[0.2] hover:bg-white/[0.06] active:scale-95"
                                             )}
                                         >
@@ -288,7 +288,7 @@ export default function WatchEpisodeSection({
                                         className={cn(
                                             "group rounded-[12px] overflow-hidden border transition-all duration-200 touch-manipulation bg-[#151924]",
                                             isActive
-                                                ? "border-[#8FA7C5]/70 ring-1 ring-[#8FA7C5]/45 shadow-[0_0_18px_#8FA7C533]"
+                                                ? "border-[#8FA7C5]/70 ring-1 ring-[#8FA7C5]/45"
                                                 : "border-white/[0.08] hover:border-white/[0.22] hover:-translate-y-[1px]"
                                         )}
                                     >
@@ -340,7 +340,7 @@ export default function WatchEpisodeSection({
                                         className={cn(
                                             "h-[38px] rounded-full flex items-center justify-center gap-1.5 text-[13px] font-semibold transition-all duration-200 border backdrop-blur-md touch-manipulation",
                                             isActive
-                                                ? "bg-[#8FA7C5]/[0.15] border-[#8FA7C5]/60 text-[#8FA7C5] shadow-[0_0_16px_#8FA7C51F]"
+                                                ? "bg-[#8FA7C5]/[0.15] border-[#8FA7C5]/60 text-[#8FA7C5]"
                                                 : "bg-[#0B0B10] border-white/[0.08] text-gray-300 hover:text-white hover:bg-white/[0.06] hover:border-white/[0.16] hover:-translate-y-[1px] active:scale-95"
                                         )}
                                     >
@@ -363,7 +363,7 @@ export default function WatchEpisodeSection({
                                     className={cn(
                                         "h-[40px] sm:h-[44px] rounded-[12px] flex items-center justify-center gap-1.5 text-[13px] sm:text-[14px] font-semibold transition-all duration-200 border backdrop-blur-md touch-manipulation",
                                         isActive
-                                            ? "bg-[#8FA7C5]/[0.15] border-[#8FA7C5]/60 text-[#8FA7C5] shadow-[0_0_16px_#8FA7C51F]"
+                                            ? "bg-[#8FA7C5]/[0.15] border-[#8FA7C5]/60 text-[#8FA7C5]"
                                             : "bg-[#0B0B10] border-white/[0.08] text-gray-300 hover:text-white hover:bg-white/[0.06] hover:border-white/[0.16] hover:-translate-y-[1px] active:scale-95"
                                     )}
                                 >

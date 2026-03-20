@@ -192,7 +192,7 @@ function ContinueWatchingRowInner() {
 
                                     {/* Play button on hover; on mobile always show subtle */}
                                     <div className="absolute inset-0 bg-black/20 md:bg-black/30 md:opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
-                                        <div className="w-10 h-10 rounded-full bg-[#d3deec] flex items-center justify-center shadow-[0_0_12px_#d3deec55] scale-90 md:scale-0 group-hover/card:scale-100 transition-transform duration-300 delay-75">
+                                        <div className="w-10 h-10 rounded-full bg-[#d3deec] flex items-center justify-center scale-90 md:scale-0 group-hover/card:scale-100 transition-transform duration-300 delay-75">
                                             <Play className="w-5 h-5 text-[#0d1119] fill-[#0d1119] ml-0.5" />
                                         </div>
                                     </div>

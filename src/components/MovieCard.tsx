@@ -340,7 +340,7 @@ function OnflixHoverCard({
                             {/* Play button (Yellow) */}
                             <Link
                                 href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                className="flex-1 min-w-0 flex items-center justify-center gap-1.5 bg-[#8FA7C5] hover:bg-[#a8bdd8] text-[#0a0a0a] font-extrabold text-[13px] h-9 px-3 rounded-full transition-all hover:scale-105 shadow-[0_2px_12px_rgba(229,9,20,0.5)]"
+                                className="flex-1 min-w-0 flex items-center justify-center gap-1.5 bg-[#8FA7C5] hover:bg-[#a8bdd8] text-[#0a0a0a] font-extrabold text-[13px] h-9 px-3 rounded-full transition-all hover:scale-105"
                             >
                                 <Play className="w-3.5 h-3.5 fill-current shrink-0" />
                                 <span className="truncate">Xem</span>
