@@ -90,7 +90,7 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
             className="py-2.5"
             style={{ contentVisibility: "auto", containIntrinsicSize: "420px" }}
         >
-            <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8">
+            <div className="w-full max-w-[1920px] mx-auto">
                 <div className="space-y-2.5 rounded-[10px] bg-transparent overflow-hidden">
                     <div className="flex items-center justify-between px-3 sm:px-4 pt-2.5">
                         <h2 className="text-[16px] sm:text-[18px] md:text-[20px] font-bold text-white flex items-center gap-2 tracking-tight">
@@ -121,7 +121,7 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
 
                         <div
                             ref={rowRef}
-                            className="flex gap-2.5 overflow-x-auto overflow-y-hidden px-2 sm:px-3 pb-2.5 pt-1 no-scrollbar snap-x scroll-smooth"
+                            className="flex gap-2.5 overflow-x-auto overflow-y-hidden px-1.5 sm:px-2.5 pb-2.5 pt-1 no-scrollbar snap-x scroll-smooth"
                             style={{ scrollbarWidth: "none", msOverflowStyle: "none", scrollBehavior: "smooth", contain: "layout paint" }}
                         >
                             {movies.map((movie) => (

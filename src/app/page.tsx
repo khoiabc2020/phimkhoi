@@ -151,7 +151,7 @@ async function HomeContentStream() {
   const homeData = await getCachedHomeData();
 
   return (
-    <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 relative z-20 pb-16">
+    <div className="w-full max-w-[1920px] mx-auto px-1.5 sm:px-3 md:px-5 lg:pl-20 relative z-20 pb-16">
       <div className="mb-6">
         <QuickNav />
       </div>

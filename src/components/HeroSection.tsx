@@ -166,7 +166,7 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                             aria-hidden={!isActive}
                         >
                             {/* Backdrop */}
-                            <div className="relative w-full h-[260px] sm:h-[330px] overflow-hidden bg-[#0a0a0a]">
+                            <div className="relative w-full h-[300px] sm:h-[380px] overflow-hidden bg-[#0a0a0a]">
                                 <Image
                                     src={bg}
                                     alt=""
@@ -200,7 +200,7 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                 })}
 
                 {/* Poster Stack always on top */}
-                <div className="absolute bottom-3 left-3 z-20 w-[68px] h-[96px] rounded-lg overflow-hidden shadow-2xl ring-1 ring-white/10">
+                <div className="absolute bottom-3 left-2.5 z-20 w-[90px] h-[126px] rounded-lg overflow-hidden shadow-2xl ring-1 ring-white/10">
                     {movies.map((m: any, i) => {
                         const isActive = i === index;
                         const po = getHeroImage(m, "poster", "mobile");
@@ -219,7 +219,7 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                                     alt=""
                                     fill
                                     className="object-cover"
-                                    sizes="72px"
+                                    sizes="90px"
                                     placeholder="blur"
                                     blurDataURL={blurData}
                                     loading={isActive ? "eager" : "lazy"}
@@ -232,8 +232,8 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                 </div>
 
                 {/* Overlay title/meta on hero image (Onflix-like mobile) */}
-                <div className="absolute inset-x-0 bottom-0 z-20 px-4 pb-4">
-                    <div className="pl-[80px]">
+                <div className="absolute inset-x-0 bottom-0 z-20 px-3 pb-4">
+                    <div className="pl-[102px]">
                         <h1
                             key={`m-title-${index}`}
                             className="text-[17px] font-black text-white leading-snug line-clamp-2 drop-shadow-[0_2px_14px_rgba(0,0,0,0.75)] animate-hero-in"
@@ -252,8 +252,8 @@ function MobileHero({ movies }: { movies: Movie[] }) {
             </div>
 
             {/* ── Content below ── */}
-            <div className="px-4 pt-2 pb-2">
-                <div className="pl-[80px] min-h-[8px]" />
+            <div className="px-3 pt-2 pb-2">
+                <div className="pl-[102px] min-h-[4px]" />
 
                 {/* Buttons */}
                 <div className="flex items-center gap-2 mt-3">
@@ -349,7 +349,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
             </div>
 
             {/* ── Content ── */}
-            <div className="relative z-[3] h-full container max-w-[1920px] mx-auto px-6 md:px-12 lg:px-20 xl:px-28 flex items-end pb-16 md:pb-20 lg:pb-24">
+            <div className="relative z-[3] h-full w-full max-w-[1920px] mx-auto px-6 md:px-10 lg:px-12 flex items-end pb-16 md:pb-20 lg:pb-24">
                 <div className="grid grid-cols-12 gap-8 lg:gap-12 w-full items-end">
 
                     {/* Left: Text block */}
@@ -481,8 +481,8 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                     </div>
 
                     {/* Right: Poster Stack (Preloaded) */}
-                    <div className="col-span-12 md:col-span-4 lg:col-span-5 xl:col-span-6 hidden md:flex justify-end items-end pr-0 lg:pr-8 xl:pr-12">
-                        <div className="relative w-[200px] lg:w-[260px] xl:w-[310px] aspect-[2/3] rounded-[10px] overflow-hidden ring-1 ring-white/10 shadow-[0_20px_42px_#00000088] group/poster transition-transform duration-200 ease-out animate-hero-in animation-delay-100">
+                    <div className="col-span-12 md:col-span-4 lg:col-span-4 xl:col-span-4 hidden md:flex justify-end items-end pr-0 lg:pr-4">
+                        <div className="relative w-[220px] lg:w-[320px] xl:w-[360px] aspect-[2/3] rounded-[10px] overflow-hidden ring-1 ring-white/10 shadow-[0_20px_42px_#00000088] group/poster transition-transform duration-200 ease-out animate-hero-in animation-delay-100">
                             {movies.map((m: any, i) => {
                                 const isActive = i === index;
                                 return (

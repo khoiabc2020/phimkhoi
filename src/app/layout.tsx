@@ -87,6 +87,7 @@ export default async function RootLayout({
     <html lang="vi" suppressHydrationWarning>
       <head>
         {/* PWA + Mobile */}
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
         <meta name="theme-color" content="#020617" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -113,7 +114,7 @@ export default async function RootLayout({
         <Providers>
           <div className="flex min-h-screen">
             <Sidebar />
-            <div className="flex-1 flex flex-col transition-all duration-300 lg:pl-20 pt-[54px] lg:pt-0">
+            <div className="flex-1 flex flex-col transition-all duration-300">
                 <Header categories={categories} countries={countries} />
               <main className="flex-1">
                 {children}
