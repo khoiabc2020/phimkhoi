@@ -8,7 +8,7 @@ import ContinueWatchingRow from "@/components/ContinueWatchingRow";
 
 import HomeSection from "@/components/HomeSection";
 import LazySection from "@/components/LazySection";
-import { getMoviesList, getTrendMovies, getHomeData, HOME_SECTION_SLUGS } from "@/services/api";
+import { getMoviesList, getTrendMovies } from "@/services/api";
 import { getTMDBDataForCard } from "@/app/actions/tmdb";
 
 export const revalidate = 3600;
@@ -134,7 +134,6 @@ async function HomeRowSection({
   slug,
   endpoint = 'danh-sach',
   viewAllHref,
-  viewAllLabel = "Xem tất cả",
   minHeight = 350
 }: {
   title: string;
@@ -145,9 +144,13 @@ async function HomeRowSection({
   minHeight?: number;
 }) {
   try {
-    const movies = await getMoviesList(slug, { limit: ROW_LIMIT, category: endpoint === 'the-loai' ? slug : undefined, country: endpoint === 'quoc-gia' ? slug : undefined })
-      .then(res => res.items || [])
-      .catch(() => []);
+    const res = await getMoviesList(slug, { 
+      limit: ROW_LIMIT, 
+      category: endpoint === 'the-loai' ? slug : undefined, 
+      country: endpoint === 'quoc-gia' ? slug : undefined 
+    });
+    
+    const movies = res?.items || [];
 
     if (!movies.length) return null;
 
@@ -167,17 +170,23 @@ async function HomeRowSection({
 
 /** Hero stream: tải dữ liệu top trending độc lập */
 async function HeroStream() {
-  const heroTrending = await getTrendMovies('all').catch((): any[] => []);
-  let finalHeroData: any[] = (heroTrending || []).slice(0, 5);
-  
-  // Nếu không có trending, tải backup nhẹ nhàng
-  if (finalHeroData.length < 3) {
-    const backup = await getMoviesList('phim-moi', { limit: 5 }).catch(() => ({ items: [] }));
-    finalHeroData = backup.items || [];
+  try {
+    const heroTrending = await getTrendMovies('all');
+    let finalHeroData: any[] = (heroTrending || []).slice(0, 5);
+    
+    // Nếu không có trending, tải backup nhẹ nhàng
+    if (finalHeroData.length < 3) {
+      const backup = await getMoviesList('phim-moi', { limit: 5 });
+      finalHeroData = backup?.items || [];
+    }
+    
+    return <AsyncHeroSection initialMovies={finalHeroData} />;
+  } catch (error) {
+    return null;
   }
-  
-  return <AsyncHeroSection initialMovies={finalHeroData} />;
-}export default function Home() {
+}
+
+export default function Home() {
   return (
     <main className="min-h-screen pb-16 bg-[#0a0a0a]">
       {/* Hero Section - Tải đầu tiên */}
