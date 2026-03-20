@@ -109,12 +109,15 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
                     </div>
 
                     <div className="relative group/row pb-3">
-                        <button
-                            onClick={() => scroll("left")}
-                            className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-40 w-8 h-8 flex items-center justify-center rounded-[10px] bg-[#0b1220]/92 border border-white/14 text-white hover:bg-[#8FA7C5] hover:border-[#8FA7C5] hover:text-[#0a0a0a] opacity-0 group-hover/row:opacity-100 transition-all duration-150 pointer-events-none group-hover/row:pointer-events-auto"
-                        >
-                            <ChevronLeft className="w-4 h-4" />
-                        </button>
+                        {/* Left Arrow - Vertical Safe Zone */}
+                        <div className="absolute left-0 top-0 bottom-0 z-40 w-12 flex items-center justify-center opacity-0 group-hover/row:opacity-100 transition-opacity duration-300 pointer-events-none group-hover/row:pointer-events-auto">
+                            <button
+                                onClick={() => scroll("left")}
+                                className="w-8 h-8 flex items-center justify-center rounded-[10px] bg-[#0b1220]/92 border border-white/14 text-white hover:bg-[#8FA7C5] hover:border-[#8FA7C5] hover:text-[#0a0a0a] transition-all duration-150 pointer-events-auto shadow-xl"
+                            >
+                                <ChevronLeft className="w-4 h-4" />
+                            </button>
+                        </div>
 
                         <div
                             ref={rowRef}
@@ -128,12 +131,15 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
                             ))}
                         </div>
 
-                        <button
-                            onClick={() => scroll("right")}
-                            className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-40 w-8 h-8 flex items-center justify-center rounded-[10px] bg-[#0b1220]/92 border border-white/14 text-white hover:bg-[#8FA7C5] hover:border-[#8FA7C5] hover:text-[#0a0a0a] opacity-0 group-hover/row:opacity-100 transition-all duration-150 pointer-events-none group-hover/row:pointer-events-auto"
-                        >
-                            <ChevronRight className="w-4 h-4" />
-                        </button>
+                        {/* Right Arrow - Vertical Safe Zone */}
+                        <div className="absolute right-0 top-0 bottom-0 z-40 w-12 flex items-center justify-center opacity-0 group-hover/row:opacity-100 transition-opacity duration-300 pointer-events-none group-hover/row:pointer-events-auto">
+                            <button
+                                onClick={() => scroll("right")}
+                                className="w-8 h-8 flex items-center justify-center rounded-[10px] bg-[#0b1220]/92 border border-white/14 text-white hover:bg-[#8FA7C5] hover:border-[#8FA7C5] hover:text-[#0a0a0a] transition-all duration-150 pointer-events-auto shadow-xl"
+                            >
+                                <ChevronRight className="w-4 h-4" />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
