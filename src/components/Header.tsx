@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Search, Bell, User, LogOut, Shield, Trash2, Clock, History, Heart, Settings, X, ChevronDown, Play, Film, Video, LayoutGrid, Download, Loader2, Bookmark, LogIn } from "lucide-react";
+import { Search, Bell, User, LogOut, Shield, Trash2, Clock, Settings, X, ChevronDown, Loader2, Bookmark, LogIn } from "lucide-react";
 import { useState, useEffect, useRef, useTransition } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
@@ -24,7 +24,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
     const [showHistory, setShowHistory] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
     const [isSearchNavigating, startSearchTransition] = useTransition();
-    const [searchResults, setSearchResults] = useState<any>(null);
+    const [searchResults, setSearchResults] = useState<{ movies: any[] } | null>(null);
     const [openDropdown, setOpenDropdown] = useState<"categories" | "countries" | null>(null);
     const router = useRouter();
     const pathname = usePathname();

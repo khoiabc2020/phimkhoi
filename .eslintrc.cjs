@@ -8,5 +8,10 @@ module.exports = {
     "**/node_modules/**",
     ".next/**",
   ],
+  settings: {
+    react: {
+      version: "detect",
+    },
+  },
 };
 

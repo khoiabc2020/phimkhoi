@@ -387,6 +387,28 @@ export const HOME_SECTION_SLUGS: Record<HomeCacheKey, string> = {
     tinhCam: "/the-loai/tinh-cam",
 };
 
+const FETCH_TIMEOUT_MS = 12000;
+
+/** Fetch with timeout and optional retry logic for external APIs */
+async function fetchWithRetry(url: string, options: RequestInit = {}, retries = 1): Promise<any> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    
+    try {
+        const response = await fetch(url, { ...options, signal: controller.signal });
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        return await response.json();
+    } catch (error: any) {
+        if (retries > 0 && error.name !== 'AbortError') {
+            console.warn(`Retrying fetch for ${url} (${retries} left)`);
+            return fetchWithRetry(url, options, retries - 1);
+        }
+        throw error;
+    } finally {
+        clearTimeout(timeoutId);
+    }
+}
+
 export const getHomeData = async () => {
     // Cache 20 phút trên VPS để giảm tải khi lượng xem lớn
     const CACHE_TTL_MS = 20 * 60 * 1000;
@@ -399,19 +421,10 @@ export const getHomeData = async () => {
             let nguoncUrl = `${NGUONC_API}/api/films/${endpoint}/${slug}?page=1`;
             if (slug === 'phim-moi-cap-nhat') nguoncUrl = `${NGUONC_API}/api/films/phim-moi-cap-nhat?page=1`;
 
-            const FETCH_TIMEOUT_MS = 12000; // 12s timeout để VPS không treo khi API ngoài chậm
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-
-            const doFetch = (url: string) =>
-                fetch(url, { signal: controller.signal, next: { revalidate: 3600 } })
-                    .then((res) => res.json())
-                    .finally(() => clearTimeout(timeoutId));
-
             const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
-                doFetch(`${API_URL}/v1/api/${endpoint}/${slug}?limit=12`),
-                doFetch(`${OPHIM_API}/v1/api/${endpoint}/${slug}?limit=12`),
-                doFetch(nguoncUrl),
+                fetchWithRetry(`${API_URL}/v1/api/${endpoint}/${slug}?limit=12`, { next: { revalidate: 3600 } }),
+                fetchWithRetry(`${OPHIM_API}/v1/api/${endpoint}/${slug}?limit=12`, { next: { revalidate: 3600 } }),
+                fetchWithRetry(nguoncUrl, { next: { revalidate: 3600 } }),
             ]);
 
             let items: Movie[] = [];

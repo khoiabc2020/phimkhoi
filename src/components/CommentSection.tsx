@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { Send, ThumbsUp, ThumbsDown, Reply, Flag, Trash2, Edit2, Star, Loader2, MessageCircle, Smile } from "lucide-react";
+import { Send, ThumbsUp, ThumbsDown, Reply, Trash2, Loader2, MessageCircle, Smile } from "lucide-react";
 import { addComment, getComments, likeComment, dislikeComment, deleteComment, reportComment } from "@/app/actions/comments";
 import Image from "next/image";
 import CommentMemePicker from "./CommentMemePicker";
@@ -56,7 +56,6 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
     const [comments, setComments] = useState<CommentData[]>([]);
     const [newComment, setNewComment] = useState("");
     const [rating, setRating] = useState(0);
-    const [hoverRating, setHoverRating] = useState(0);
     const [loading, setLoading] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [replyingTo, setReplyingTo] = useState<string | null>(null);
