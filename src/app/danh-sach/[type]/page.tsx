@@ -97,24 +97,26 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
     return (
         <main className="min-h-screen pb-20">
             <div className="pt-24 w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8">
-                <div className="mb-5 rounded-[10px] border border-white/[0.06] bg-[#07070b]/78 px-3 sm:px-4 py-3 sm:py-3.5 shadow-[0_8px_20px_#00000055]">
-                    <p className="text-[11px] uppercase tracking-[0.16em] text-white/40 mb-1">
-                        Danh sách / {typeName}
-                    </p>
-                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
-                        <h1 className="text-[20px] md:text-[26px] font-extrabold text-white tracking-tight flex items-center gap-2">
-                            <span className="w-1 h-5 bg-[#8FA7C5] rounded-full"></span>
-                            {typeName}
-                        </h1>
-                        <p className="text-white/55 text-sm">
-                            Trang {pagination?.currentPage} / {pagination?.totalPages}
-                        </p>
+                <div className="mb-6 rounded-[12px] border border-white/[0.06] bg-[#07070b]/78 p-4 md:p-5 shadow-xl transition-all">
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                        <div className="space-y-1">
+                            <p className="text-[#8FA7C5] text-[11px] font-bold uppercase tracking-[0.2em] opacity-80 pl-1">
+                                Danh sách / {typeName}
+                            </p>
+                            <h1 className="text-[32px] md:text-[44px] font-outfit font-extrabold text-white tracking-tighter leading-none italic uppercase">
+                                {typeName}
+                            </h1>
+                        </div>
+                        
+                        <div className="flex flex-col items-end gap-3 flex-1">
+                            <p className="text-white/40 text-xs font-medium bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
+                                Trang <span className="text-white font-bold">{pagination?.currentPage}</span> / <span className="text-white/60">{pagination?.totalPages}</span>
+                            </p>
+                            <div className="w-full md:w-auto">
+                                <FilterBar />
+                            </div>
+                        </div>
                     </div>
-                </div>
-
-                {/* Filter Bar */}
-                <div className="relative z-10 md:sticky md:top-[56px] md:z-20 bg-[#0a0a0a]/92 backdrop-blur-md rounded-[10px] px-1 border border-white/[0.06]">
-                    <FilterBar />
                 </div>
 
                 {/* Grid: content-visibility giúp giảm CPU khi cuộn */}
