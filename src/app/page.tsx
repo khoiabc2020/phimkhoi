@@ -5,7 +5,7 @@ import MovieRow from "@/components/MovieRow";
 import TopTrendingTabs from "@/components/TopTrendingTabs";
 import QuickNav from "@/components/QuickNav";
 import ContinueWatchingRow from "@/components/ContinueWatchingRow";
-import TopicSection from "@/components/TopicSection";
+
 import HomeSection from "@/components/HomeSection";
 import LazySection from "@/components/LazySection";
 import { getMoviesList, getTrendMovies, getHomeData, HOME_SECTION_SLUGS } from "@/services/api";
@@ -226,9 +226,7 @@ export default function Home() {
         <HeroStream />
       </Suspense>
 
-      <div className="relative z-20 -mt-6 md:-mt-10 lg:-mt-14 mb-4 pt-4 md:pt-6 bg-[#0a0a0a]">
-        <TopicSection />
-      </div>
+
 
       <Suspense fallback={contentSkeleton}>
         <HomeContentStream />
