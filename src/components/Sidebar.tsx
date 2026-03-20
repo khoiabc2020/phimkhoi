@@ -35,13 +35,13 @@ export default function Sidebar() {
     }
 
     return (
-        <aside className="fixed left-0 top-0 bottom-0 z-50 hidden lg:flex flex-col w-20 xl:w-64 bg-[#0a0a0a]/98 border-r border-white/5 shadow-2xl transition-all duration-300 overflow-y-auto no-scrollbar">
+        <aside className="fixed left-0 top-0 bottom-0 z-50 hidden lg:flex flex-col w-20 xl:w-56 bg-[#0a0a0a]/98 border-r border-white/5 shadow-2xl transition-all duration-300 overflow-y-auto no-scrollbar">
             {/* Logo Section */}
             <div className="flex items-center justify-center xl:justify-start px-2 xl:px-8 h-20 shrink-0">
                 <Link href="/" className="flex items-center gap-2 group">
-                    <span className="xl:hidden font-logo text-2xl font-bold text-[#22C55E]">K</span>
+                    <span className="xl:hidden font-logo text-2xl font-bold text-[#8FA7C5]">K</span>
                     <span className="hidden xl:inline font-logo text-2xl font-bold tracking-tight">
-                        <span className="text-white">KHOI</span><span className="text-[#22C55E]">PHIM</span>
+                        <span className="text-[#9CA3AF]">KHOI</span><span className="text-[#8FA7C5]">PHIM</span>
                     </span>
                 </Link>
             </div>
@@ -57,20 +57,20 @@ export default function Sidebar() {
                             key={item.href}
                             href={item.href}
                             className={cn(
-                                "relative flex items-center justify-center xl:justify-start gap-4 px-3 py-3.5 rounded-xl transition-all duration-200 group",
+                                "relative flex items-center justify-center xl:justify-start gap-4 px-3 py-3 rounded-xl transition-all duration-200 group",
                                 isActive 
-                                    ? "bg-[#22C55E]/10 text-[#22C55E]" 
+                                    ? "bg-[#8FA7C5]/10 text-[#8FA7C5]" 
                                     : "text-white/40 hover:text-white hover:bg-white/5"
                             )}
                         >
                             {/* Active Indicator Bar */}
                             {isActive && (
-                                <div className="absolute left-0 top-3 bottom-3 w-1 bg-[#22C55E] rounded-r-full shadow-[0_0_10px_#22C55E]" />
+                                <div className="absolute left-0 top-3 bottom-3 w-1 bg-[#8FA7C5] rounded-r-full shadow-[0_0_10px_#8FA7C5]" />
                             )}
 
                             <Icon className={cn(
                                 "w-6 h-6 shrink-0 transition-all duration-300",
-                                isActive ? "scale-110 drop-shadow-[0_0_8px_#22C55E99]" : "group-hover:scale-110 group-hover:text-white"
+                                isActive ? "scale-110 drop-shadow-[0_0_8px_#8FA7C599]" : "group-hover:scale-110 group-hover:text-white"
                             )} />
                             
                             <span className={cn(
@@ -92,8 +92,8 @@ export default function Sidebar() {
             {/* Footer / User Preview or Settings could go here */}
             <div className="p-4 border-t border-white/5 shrink-0">
                 <div className="xl:flex items-center gap-3 px-3 py-2 text-white/40 hover:text-white cursor-pointer transition-colors hidden truncate">
-                    <div className="w-8 h-8 rounded-full bg-[#22C55E]/20 flex items-center justify-center shrink-0">
-                        <span className="text-[#22C55E] text-xs font-bold">K</span>
+                    <div className="w-8 h-8 rounded-full bg-[#8FA7C5]/20 flex items-center justify-center shrink-0">
+                        <span className="text-[#8FA7C5] text-xs font-bold">K</span>
                     </div>
                     <span className="text-sm font-medium">Premium User</span>
                 </div>
