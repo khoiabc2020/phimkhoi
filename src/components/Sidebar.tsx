@@ -35,19 +35,16 @@ export default function Sidebar() {
     }
 
     return (
-        <aside className="fixed left-0 top-0 bottom-0 z-50 hidden lg:flex max-lg:!hidden flex-col w-16 xl:w-[200px] bg-transparent backdrop-blur-md border-r border-white/[0.03] transition-all duration-300 overflow-y-auto no-scrollbar">
+        <aside className="fixed left-0 top-0 bottom-0 z-50 hidden lg:flex max-lg:!hidden flex-col w-20 bg-transparent backdrop-blur-md border-r border-white/[0.03] transition-all duration-300 overflow-y-auto no-scrollbar">
             {/* Logo Section */}
-            <div className="flex items-center justify-center xl:justify-start px-2 xl:px-6 h-20 shrink-0">
-                <Link href="/" className="flex items-center gap-2 group">
-                    <span className="xl:hidden font-logo text-2xl font-bold text-[#8FA7C5]">K</span>
-                    <span className="hidden xl:inline font-logo text-xl font-bold tracking-tight">
-                        <span className="text-[#9CA3AF]">KHOI</span><span className="text-[#8FA7C5]">PHIM</span>
-                    </span>
+            <div className="flex items-center justify-center h-20 shrink-0">
+                <Link href="/" className="flex items-center group">
+                    <span className="font-logo text-2xl font-bold text-[#8FA7C5]">K</span>
                 </Link>
             </div>
 
             {/* Navigation Section */}
-            <nav className="flex-1 flex flex-col gap-2 p-3 xl:px-4">
+            <nav className="flex-1 flex flex-col gap-5 py-4">
                 {navItems.map((item) => {
                     const isActive = pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href));
                     const Icon = item.icon;
@@ -57,33 +54,28 @@ export default function Sidebar() {
                             key={item.href}
                             href={item.href}
                             className={cn(
-                                "relative flex items-center justify-center xl:justify-start gap-4 px-3 py-2.5 rounded-xl transition-all duration-200 group",
+                                "relative flex flex-col items-center justify-center gap-1.5 py-3 transition-all duration-200 group",
                                 isActive 
-                                    ? "bg-[#8FA7C5]/8 text-[#8FA7C5]" 
-                                    : "text-white/50 hover:text-white hover:bg-white/10"
+                                    ? "text-[#8FA7C5]" 
+                                    : "text-white/40 hover:text-white"
                             )}
                         >
-                            {/* Active Indicator Bar - Full Height */}
+                            {/* Active Indicator Bar - Left Edge */}
                             {isActive && (
-                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#8FA7C5] shadow-[2px_0_12px_#8FA7C5]" />
+                                <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#8FA7C5] shadow-[2px_0_12px_#8FA7C5]" />
                             )}
 
                             <Icon className={cn(
-                                "w-[22px] h-[22px] shrink-0 transition-all duration-300",
-                                isActive ? "scale-105 drop-shadow-[0_0_8px_#8FA7C566]" : "group-hover:scale-110 group-hover:text-white"
+                                "w-6 h-6 shrink-0 transition-all duration-300",
+                                isActive ? "scale-110 drop-shadow-[0_0_8px_#8FA7C588]" : "group-hover:scale-110 group-hover:text-white"
                             )} />
                             
                             <span className={cn(
-                                "hidden xl:inline text-[14px] font-medium transition-colors",
-                                isActive ? "font-bold" : ""
+                                "text-[10px] font-bold tracking-tight text-center transition-colors",
+                                isActive ? "opacity-100" : "opacity-60 group-hover:opacity-100"
                             )}>
                                 {item.name}
                             </span>
-
-                            {/* Tooltip for collapsed state */}
-                            <div className="absolute left-full ml-4 px-2 py-1 bg-white text-[#0a0a0a] text-xs font-bold rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all xl:hidden whitespace-nowrap z-[60]">
-                                {item.name}
-                            </div>
                         </Link>
                     );
                 })}
