@@ -213,8 +213,6 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             </span>
                         </Link>
                     </div>
-               </Link>
-                    </div>
 
                     {/* Overlay to close dropdowns when clicking outside nav */}
                     {openDropdown && (
