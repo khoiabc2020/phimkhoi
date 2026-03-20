@@ -142,7 +142,7 @@ function MobileHero({ movies }: { movies: Movie[] }) {
 
     return (
         <div
-            className="relative w-full select-none"
+            className="relative w-full select-none mt-[-54px]"
             onTouchStart={onTouchStart}
             onTouchEnd={onTouchEnd}
         >
@@ -520,19 +520,19 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
 // ─── Export ───────────────────────────────────────────────────────────────────
 
 export default function HeroSection({ movies }: { movies: Movie[] }) {
-    const isDesktop = useMediaQuery("(min-width: 768px)");
-
     if (!movies || movies.length === 0) return null;
-
     const heroMovies = movies.slice(0, 5);
 
     return (
         <div className="relative w-full bg-transparent font-sans" style={{ contain: "layout style paint" }}>
-            {isDesktop ? (
-                <DesktopHero movies={heroMovies} />
-            ) : (
+            {/* Mobile View */}
+            <div className="md:hidden">
                 <MobileHero movies={heroMovies} />
-            )}
+            </div>
+            {/* Desktop View */}
+            <div className="hidden md:block">
+                <DesktopHero movies={heroMovies} />
+            </div>
         </div>
     );
 }

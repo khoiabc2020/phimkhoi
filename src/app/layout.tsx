@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Geist_Mono, Be_Vietnam_Pro, Roboto_Condensed } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
@@ -20,6 +20,14 @@ const logoFont = Roboto_Condensed({
   subsets: ["latin", "vietnamese"],
   weight: ["500", "600", "700"],
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
+  themeColor: "#020617",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://khoiphim.io.vn"),
@@ -87,8 +95,6 @@ export default async function RootLayout({
     <html lang="vi" suppressHydrationWarning>
       <head>
         {/* PWA + Mobile */}
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
-        <meta name="theme-color" content="#020617" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -114,7 +120,7 @@ export default async function RootLayout({
         <Providers>
           <div className="flex min-h-screen">
             <Sidebar />
-            <div className="flex-1 flex flex-col transition-all duration-300">
+            <div className="flex-1 flex flex-col transition-all duration-300 pt-[54px] lg:pt-0">
                 <Header categories={categories} countries={countries} />
               <main className="flex-1">
                 {children}
