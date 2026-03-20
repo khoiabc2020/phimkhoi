@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
@@ -21,19 +22,63 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     };
 }
 
+/** Stream component for the movie grid */
+async function CategoryGridStream({ 
+    slug, 
+    page 
+}: { 
+    slug: string; 
+    page: number;
+}) {
+    const data = await getMoviesByCategory(slug, page);
+    const { items, pagination } = data;
+
+    if (!items || items.length === 0) {
+        return (
+            <div className="col-span-full text-center py-20 text-gray-400">
+                Không tìm thấy phim nào cho thể loại này.
+            </div>
+        );
+    }
+
+    return (
+        <>
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2 sm:gap-2.5 md:gap-3 mt-6 [contain:layout_paint]">
+                {items.map((movie: any, idx: number) => (
+                    <MovieCard 
+                        key={movie._id} 
+                        movie={movie} 
+                        priority={page === 1 && idx < 7}
+                        loading={page === 1 && idx < 14 ? "eager" : "lazy"}
+                    />
+                ))}
+            </div>
+
+            {pagination && (
+                <Pagination
+                    currentPage={pagination.currentPage}
+                    totalPages={pagination.totalPages}
+                />
+            )}
+        </>
+    );
+}
+
+const GridSkeleton = () => (
+    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2 sm:gap-2.5 md:gap-3 mt-6">
+        {Array.from({ length: 14 }).map((_, i) => (
+            <div key={i} className="aspect-[2/3] rounded-lg bg-white/5 animate-pulse" />
+        ))}
+    </div>
+);
+
 export default async function CategoryPage({ params, searchParams }: { params: Promise<{ slug: string }>, searchParams: Promise<{ page?: string }> }) {
     const { slug } = await params;
-    const { page } = await searchParams;
-    const currentPage = Number(page) || 1;
+    const sParams = await searchParams;
+    const currentPage = Number(sParams.page) || 1;
 
-    // Fetch movies and menu data in parallel
-    const [data, menuData] = await Promise.all([
-        getMoviesByCategory(slug, currentPage),
-        getMenuData()
-    ]);
-
-    const { items, pagination } = data;
-    const { categories, countries } = menuData;
+    // Fetch menu data immediately for the shell
+    const { categories, countries } = await getMenuData();
 
     // Resolve properly formatted name (with full diacritics)
     const category = categories.find(c => c.slug === slug);
@@ -60,29 +105,13 @@ export default async function CategoryPage({ params, searchParams }: { params: P
                     </h1>
                 </div>
 
-                <div className="relative z-10 sticky top-[56px] bg-[#0a0a0a]/80 backdrop-blur-md rounded-[12px] px-2 mb-6 border border-white/[0.05] shadow-xl shadow-black/20">
+                <div className="relative z-10 sticky top-[64px] bg-[#0a0a0a]/80 backdrop-blur-md rounded-[12px] px-2 mb-6 border border-white/[0.05] shadow-xl shadow-black/20">
                     <FilterBar categories={categories} countries={countries} />
                 </div>
 
-                {/* Optimized Grid for Mobile */}
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2 sm:gap-2.5 md:gap-3 mt-6 [contain:layout_paint]">
-                    {items?.length > 0 ? (
-                        items.map((movie: any) => (
-                            <MovieCard key={movie._id} movie={movie} />
-                        ))
-                    ) : (
-                        <div className="col-span-full text-center py-20 text-gray-400">
-                            Không tìm thấy phim nào cho thể loại này.
-                        </div>
-                    )}
-                </div>
-
-                {pagination && (
-                    <Pagination
-                        currentPage={pagination.currentPage}
-                        totalPages={pagination.totalPages}
-                    />
-                )}
+                <Suspense key={`${slug}-${currentPage}`} fallback={<GridSkeleton />}>
+                    <CategoryGridStream slug={slug} page={currentPage} />
+                </Suspense>
             </div>
         </main>
     );
