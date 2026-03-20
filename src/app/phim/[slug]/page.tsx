@@ -167,29 +167,33 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     // Rule: PRIORITY 1 = TMDB Backdrop (Best quality, correct scene)
     //       PRIORITY 2 = TMDB Poster (If backdrop missing, use poster)
     //       PRIORITY 3 = Source Portrait (If TMDB fails, use the leads' poster)
-    //       BLACKHOLE  = Source "-poster.jpg" (Often garbage/unrelated, avoid unless desperate)
+    //       STRICT AVOIDANCE = Source "-poster.jpg" or "-thumb.jpg" that look like landscapes from OPhim.
 
     const tmdbBackdrop = tmdbDetails?.backdrop_path ? getTMDBImage(tmdbDetails.backdrop_path, "original") : "";
     const tmdbPosterFallback = tmdbDetails?.poster_path ? getTMDBImage(tmdbDetails.poster_path, "original") : "";
 
-    // Verified portrait for hero and SEO (The Umbrella one)
-    let verifiedPortraitUrl = "";
-    if (detectOrientation(movie?.thumb_url) === "portrait") {
-        verifiedPortraitUrl = movie.thumb_url;
-    } else if (detectOrientation(movie?.poster_url) === "portrait") {
-        verifiedPortraitUrl = movie.poster_url;
+    // Find the REAL portrait (Usually the one showing the actors, not the generic scene)
+    let authenticatedPortrait = "";
+    const isAsianMovie = movie?.category?.some(c => ["Phim Bộ", "Phim Lẻ", "Trung Quốc", "Hàn Quốc"].includes(c.name));
+
+    if (movie?.thumb_url && detectOrientation(movie.thumb_url) === "portrait") {
+        authenticatedPortrait = movie.thumb_url;
+    } else if (movie?.poster_url && detectOrientation(movie.poster_url) === "portrait") {
+        authenticatedPortrait = movie.poster_url;
     } else {
-        // Find the one that is NOT the horse (-poster.jpg) if possible
-        if (movie?.thumb_url && !movie.thumb_url.includes("-poster.")) {
-            verifiedPortraitUrl = movie.thumb_url;
+        // Fallback: Pick the one that is NOT a "-poster.jpg" because we know that's the horse on OPhim for Asian dramas
+        if (isAsianMovie && movie?.thumb_url && movie.thumb_url.includes("-thumb.")) {
+            authenticatedPortrait = movie.thumb_url;
         } else {
-            verifiedPortraitUrl = movie?.poster_url || movie?.thumb_url || "";
+            authenticatedPortrait = movie?.thumb_url || movie?.poster_url || "";
         }
     }
 
-    const posterUrl = getImageUrl(verifiedPortraitUrl);
+    const posterUrl = getImageUrl(authenticatedPortrait);
     
-    // Final Backdrop Selection
+    // Final Backdrop Selection: NEVER USE THE HORSE (Source Landscape) UNLESS TMDB SAYS SO
+    // Note: If we have NO tmdbBackdrop, we prefer showing the portrait (posterUrl) 
+    // rather than the source "landscape" (which we know is often wrong).
     const backdropUrl = tmdbBackdrop || tmdbPosterFallback || posterUrl;
     const isPortraitFallback = !tmdbBackdrop && !!backdropUrl;
     const rating = tmdbDetails?.vote_average ? tmdbDetails.vote_average.toFixed(1) : "9.7";
