@@ -327,8 +327,6 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                 >
                                     <Search className={cn("w-[20px] h-[20px] transition-colors", isSearchOpen ? "hidden" : "text-white/90")} />
                                 </button>
-xt-white/80")} />
-                                </button>
                                 {/* Input wrapper to position popup correctly */}
                                 <div className={cn(
                                     "absolute right-0 top-0 transition-all duration-500",
