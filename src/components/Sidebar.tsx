@@ -35,7 +35,7 @@ export default function Sidebar() {
     }
 
     return (
-        <aside className="fixed left-0 top-0 bottom-0 z-50 hidden lg:flex flex-col w-16 xl:w-[200px] bg-transparent backdrop-blur-md border-r border-white/[0.03] transition-all duration-300 overflow-y-auto no-scrollbar">
+        <aside className="fixed left-0 top-0 bottom-0 z-50 hidden lg:flex max-lg:!hidden flex-col w-16 xl:w-[200px] bg-transparent backdrop-blur-md border-r border-white/[0.03] transition-all duration-300 overflow-y-auto no-scrollbar">
             {/* Logo Section */}
             <div className="flex items-center justify-center xl:justify-start px-2 xl:px-6 h-20 shrink-0">
                 <Link href="/" className="flex items-center gap-2 group">
