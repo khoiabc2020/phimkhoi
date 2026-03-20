@@ -134,7 +134,8 @@ async function HomeRowSection({
   slug,
   endpoint = 'danh-sach',
   viewAllHref,
-  minHeight = 350
+  minHeight = 350,
+  priorityFirst = false
 }: {
   title: string;
   slug: string;
@@ -142,6 +143,7 @@ async function HomeRowSection({
   viewAllHref?: string;
   viewAllLabel?: string;
   minHeight?: number;
+  priorityFirst?: boolean;
 }) {
   try {
     const res = await getMoviesList(slug, { 
@@ -160,6 +162,7 @@ async function HomeRowSection({
           title={title}
           movies={movies}
           slug={viewAllHref || slug}
+          priorityFirst={priorityFirst}
         />
       </LazySection>
     );
@@ -214,11 +217,11 @@ export default function Home() {
 
           {/* Group: Phim Mới */}
           <Suspense fallback={<div className="h-[380px] w-full animate-pulse bg-white/5 rounded-xl" />}>
-            <HomeRowSection title="Phim Chiếu Rạp Mới" slug="phim-chieu-rap" viewAllHref="/danh-sach/phim-chieu-rap" />
+            <HomeRowSection title="Phim Chiếu Rạp Mới" slug="phim-chieu-rap" viewAllHref="/danh-sach/phim-chieu-rap" priorityFirst={true} />
           </Suspense>
 
           <Suspense fallback={<div className="h-[380px] w-full animate-pulse bg-white/5 rounded-xl" />}>
-            <HomeRowSection title="Phim Mới Cập Nhật" slug="phim-moi-cap-nhat" viewAllHref="/danh-sach/phim-moi" />
+            <HomeRowSection title="Phim Mới Cập Nhật" slug="phim-moi-cap-nhat" viewAllHref="/danh-sach/phim-moi" priorityFirst={true} />
           </Suspense>
 
           {/* Group: Quốc gia */}

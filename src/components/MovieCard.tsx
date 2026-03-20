@@ -28,12 +28,24 @@ function formatQualityLabel(quality?: string) {
     return q.length > 6 ? q.slice(0, 6) : q;
 }
 
-function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientation?: 'portrait' | 'landscape' }) {
+function MovieCard({ 
+    movie, 
+    orientation = 'portrait',
+    priority = false,
+    loading = "lazy" 
+}: { 
+    movie: Movie, 
+    orientation?: 'portrait' | 'landscape',
+    priority?: boolean,
+    loading?: "lazy" | "eager"
+}) {
     const [isHovered, setIsHovered] = useState(false);
     const [position, setPosition] = useState<{ top: number; left: number; width: number; rectTop?: number; innerHeight?: number; rectHeight?: number }>({ top: 0, left: 0, width: 0 });
     const cardRef = useRef<HTMLDivElement>(null);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const [posterIndex, setPosterIndex] = useState(0);
 
     // Poster (ảnh dọc) – ưu tiên poster thật, tránh nhầm thumb/backdrop vào slot dọc
     const tmdbPoster = React.useMemo(() => 
@@ -81,7 +93,6 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
         const sourceBackdrop = movie.thumb_url ? getImageUrl(movie.thumb_url) : (movie.poster_url ? getImageUrl(movie.poster_url) : "");
         return sourceBackdrop || tmdbBackdrop || tmdbPosterFallback || null;
     }, [movie.thumb_url, movie.poster_url, (movie as any).tmdbData?.backdrop_path, (movie as any).tmdbData?.poster_path]);
-p || tmdbBackdrop || tmdbPosterFallback || null;
 
     // Reset fallback state when card movie changes
     useEffect(() => {
@@ -161,8 +172,8 @@ p || tmdbBackdrop || tmdbPosterFallback || null;
                             fill
                             className="transition-transform duration-200 ease-out group-hover/static-card:scale-[1.03] object-cover"
                             sizes={orientation === 'landscape' ? "(max-width: 768px) 68vw, 36vw" : "(max-width: 768px) 48vw, (max-width: 1280px) 220px, 250px"}
-                            loading="lazy"
-                            priority={false}
+                            loading={priority ? undefined : loading}
+                            priority={priority}
                             placeholder="blur"
                             blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
                             onError={(e) => {

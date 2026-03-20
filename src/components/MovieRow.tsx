@@ -10,9 +10,10 @@ interface MovieRowProps {
     movies: Movie[];
     slug?: string;
     variant?: 'default' | 'sidebar';
+    priorityFirst?: boolean;
 }
 
-function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowProps) {
+function MovieRowInner({ title, movies, slug, variant = 'default', priorityFirst = false }: MovieRowProps) {
     const rowRef = useRef<HTMLDivElement>(null);
 
     const scroll = (direction: "left" | "right") => {
@@ -64,9 +65,14 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
                             className="flex gap-4 overflow-x-auto overflow-y-hidden pb-4 pt-2 no-scrollbar snap-x scroll-smooth"
                             style={{ scrollbarWidth: "none", msOverflowStyle: "none", scrollBehavior: "smooth", contain: "layout paint" }}
                         >
-                            {movies.map((movie) => (
+                            {movies.map((movie, idx) => (
                                 <div key={movie._id} className="min-w-[200px] md:min-w-[280px] snap-start">
-                                    <MovieCard movie={movie} orientation="landscape" />
+                                    <MovieCard 
+                                        movie={movie} 
+                                        orientation="landscape" 
+                                        priority={priorityFirst && idx < 3}
+                                        loading={priorityFirst ? "eager" : "lazy"}
+                                    />
                                 </div>
                             ))}
                         </div>
@@ -124,9 +130,13 @@ function MovieRowInner({ title, movies, slug, variant = 'default' }: MovieRowPro
                             className="flex gap-2.5 overflow-x-auto overflow-y-hidden px-1.5 sm:px-2.5 pb-2.5 pt-1 no-scrollbar snap-x scroll-smooth"
                             style={{ scrollbarWidth: "none", msOverflowStyle: "none", scrollBehavior: "smooth", contain: "layout paint" }}
                         >
-                            {movies.map((movie) => (
+                            {movies.map((movie, idx) => (
                                 <div key={movie._id} className="min-w-[156px] sm:min-w-[176px] md:min-w-[196px] xl:min-w-[226px] snap-center">
-                                    <MovieCard movie={movie} />
+                                    <MovieCard 
+                                        movie={movie} 
+                                        priority={priorityFirst && idx < 4}
+                                        loading={priorityFirst ? "eager" : "lazy"}
+                                    />
                                 </div>
                             ))}
                         </div>
