@@ -186,13 +186,13 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
         <>
             <header
                 className={cn(
-                    "fixed top-0 left-0 right-0 z-40 transition-colors duration-200 will-change-transform transform-gpu lg:left-20",
+                    "fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-transparent",
                     isScrolled
-                        ? "bg-[#0a0a0a]/92 backdrop-blur-md shadow-md pointer-events-auto"
-                        : "bg-gradient-to-b from-[#0a0a0a]/80 via-[#0a0a0a]/20 to-transparent pointer-events-none"
+                        ? "bg-[#0a0a0a]/95 backdrop-blur-xl border-white/5 py-0 shadow-lg pointer-events-auto"
+                        : "bg-gradient-to-b from-[#0a0a0a]/80 via-[#0a0a0a]/20 to-transparent py-0 pointer-events-none"
                 )}
             >
-                <div className="max-w-[1920px] mx-auto px-4 lg:px-8 h-[54px] lg:h-[64px] flex items-center justify-between gap-3 flex-nowrap pointer-events-auto">
+                <div className="w-full h-[54px] lg:h-[64px] flex items-center justify-between gap-3 flex-nowrap pointer-events-auto px-1 lg:px-4">
                     {/* Mobile Section: Hamburger & Mobile Logo */}
                     <div className="flex lg:hidden items-center gap-2 shrink-0">
                         <button
@@ -224,9 +224,9 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                     )}
 
                     {/* Desktop Section: Brand + Links */}
-                    <div className="hidden lg:flex items-center gap-8 flex-1">
-                        <Link href="/" className="flex items-center shrink-0">
-                            <span className="font-display text-[22px] font-black uppercase tracking-tighter text-white hover:text-primary transition-colors">
+                    <div className="hidden lg:flex items-center gap-12 flex-1">
+                        <Link href="/" className="flex items-center shrink-0 -ml-1">
+                            <span className="font-display text-[24px] font-black uppercase tracking-tighter text-white hover:text-primary transition-colors">
                                 KHOIPHIM<span className="text-primary ml-0.5">.</span>
                             </span>
                         </Link>

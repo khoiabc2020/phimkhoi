@@ -35,7 +35,7 @@ export default function Sidebar() {
     }
 
     return (
-        <aside className="fixed left-0 top-0 bottom-0 z-50 hidden lg:flex flex-col w-20 bg-[#0d0f14]/80 backdrop-blur-md border-r border-white/[0.03] transition-all duration-300 overflow-y-auto no-scrollbar">
+        <aside className="fixed left-0 top-[54px] lg:top-[64px] bottom-0 z-40 hidden lg:flex flex-col w-20 bg-[#0d0f14]/80 backdrop-blur-md border-r border-white/[0.03] transition-all duration-300 overflow-y-auto no-scrollbar">
             <div className="h-4 shrink-0" />
 
             {/* Navigation Section */}

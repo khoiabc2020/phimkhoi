@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import Script from "next/script";
 
 const interSans = Inter({
-  variable: "--font-geist-sans", // using same variable name to avoid breaking css, though we will change it in css
+  variable: "--font-inter",
   subsets: ["latin", "vietnamese"],
 });
 
@@ -115,18 +115,18 @@ export default async function RootLayout({
         <link rel="dns-prefetch" href="https://i.ytimg.com" />
       </head>
       <body
-        className={`${interSans.variable} ${interSans.variable} ${beVietnamPro.variable} ${logoFont.variable} antialiased pb-20 lg:pb-0 font-sans h-full`}
+        className={`${interSans.variable} ${beVietnamPro.variable} ${logoFont.variable} antialiased pb-20 lg:pb-0 font-sans`}
       >
         <Providers>
-          <div className="flex min-h-screen w-full overflow-x-hidden">
-            <Sidebar />
-            <div className="flex-1 flex flex-col transition-all duration-300 pt-[54px] lg:pt-0 min-w-0 overflow-x-hidden">
-                <Header categories={categories} countries={countries} />
-              <main className="flex-1">
+          <div className="flex flex-col min-h-screen">
+            <Header categories={categories} countries={countries} />
+            <div className="flex flex-1 w-full overflow-x-hidden pt-[54px] lg:pt-[64px]">
+              <Sidebar />
+              <main className="flex-1 min-w-0">
                 {children}
               </main>
-              <Footer />
             </div>
+            <Footer />
           </div>
         </Providers>
       </body>
