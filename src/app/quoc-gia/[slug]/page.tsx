@@ -27,14 +27,21 @@ export default async function CountryPage({ params, searchParams }: { params: Pr
 
     return (
         <main className="min-h-screen pb-20">
-            <div className="pt-24 w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8">
-                <div className="mb-5 rounded-[10px] border border-white/[0.06] bg-[#07070b]/78 px-3 sm:px-4 py-3 sm:py-3.5 shadow-[0_8px_20px_#00000055]">
-                    <p className="text-[11px] uppercase tracking-[0.16em] text-white/40 mb-1">
-                        Quốc gia
-                    </p>
-                    <h1 className="text-[20px] md:text-[26px] font-extrabold text-white capitalize flex items-center gap-2 tracking-tight">
-                        <span className="w-1 h-5 bg-[#8FA7C5] rounded-full"></span>
-                        {slug.replace(/-/g, " ")}
+            <div className="pt-24 w-full max-w-[1920px] mx-auto px-4 sm:px-6 md:px-12 relative">
+                {/* Decorative background glow to match Image 4 */}
+                <div className="absolute top-0 left-0 right-0 h-[300px] bg-gradient-to-b from-primary/10 via-transparent to-transparent pointer-events-none -z-10 blur-[100px]" />
+
+                <div className="mb-8 md:mb-12">
+                    <Link 
+                        href="/" 
+                        className="flex items-center gap-1.5 text-white/50 hover:text-white text-[13px] font-medium transition-colors mb-3 group"
+                    >
+                        <ChevronDown className="w-4 h-4 rotate-90 group-hover:-translate-x-0.5 transition-transform" />
+                        Quay lại
+                    </Link>
+                    
+                    <h1 className="text-[28px] md:text-[42px] font-black text-white tracking-tight leading-tight">
+                        Quốc gia: <span className="text-white/90 capitalize">{slug.replace(/-/g, " ")}</span>
                     </h1>
                 </div>
 
