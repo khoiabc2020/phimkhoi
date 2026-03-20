@@ -65,7 +65,7 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
                 const locales = isAsianSearch ? ['zh-TW', 'vi-VN'] : ['vi-VN'];
 
                 for (const locale of locales) {
-                const url = `${TMDB_API_URL}/search/${endpoint}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(q)}&language=${locale}&_v=8`;
+                let url = `${TMDB_API_URL}/search/${endpoint}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(q)}&language=${locale}&_v=8`;
 
                 if (year) {
                     if (endpoint === 'movie') url += `&primary_release_year=${year}`;
