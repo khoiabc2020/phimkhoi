@@ -319,13 +319,13 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                         if (!isSearchOpen) setIsSearchOpen(true);
                                     }}
                                     className={cn(
-                                        "absolute right-0 z-20 w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300",
+                                        "absolute right-0 z-20 w-10 min-w-[40px] h-10 flex items-center justify-center rounded-full transition-all duration-300",
                                         isSearchOpen
                                             ? "bg-transparent pointer-events-none"
-                                            : "hover:bg-white/10 active:scale-90"
+                                            : "bg-white/5 hover:bg-white/10 active:scale-90 border border-white/5"
                                     )}
                                 >
-                                    <Search className={cn("w-[22px] h-[22px] transition-colors", isSearchOpen ? "hidden" : "text-white/80")} />
+                                    <Search className={cn("w-[20px] h-[20px] transition-colors", isSearchOpen ? "hidden" : "text-white/90")} />
                                 </button>
 xt-white/80")} />
                                 </button>
