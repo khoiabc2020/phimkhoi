@@ -186,7 +186,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
         <>
             <header
                 className={cn(
-                    "fixed top-0 left-0 right-0 z-40 transition-colors duration-200 will-change-transform transform-gpu lg:left-20 xl:left-48",
+                    "fixed top-0 left-0 right-0 z-40 transition-colors duration-200 will-change-transform transform-gpu lg:left-16 xl:left-[200px]",
                     isScrolled
                         ? "bg-[#0a0a0a]/92 backdrop-blur-md shadow-md pointer-events-auto"
                         : "bg-gradient-to-b from-[#0a0a0a]/80 via-[#0a0a0a]/20 to-transparent pointer-events-none"

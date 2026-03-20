@@ -113,7 +113,7 @@ export default async function RootLayout({
         <Providers>
           <div className="flex min-h-screen">
             <Sidebar />
-            <div className="flex-1 flex flex-col transition-all duration-300 lg:pl-20 xl:pl-48">
+            <div className="flex-1 flex flex-col transition-all duration-300 lg:pl-16 xl:pl-[200px]">
                 <Header categories={categories} countries={countries} />
               <main className="flex-1">
                 {children}

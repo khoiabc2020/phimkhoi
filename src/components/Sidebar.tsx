@@ -35,7 +35,7 @@ export default function Sidebar() {
     }
 
     return (
-        <aside className="fixed left-0 top-0 bottom-0 z-50 hidden lg:flex flex-col w-20 xl:w-48 bg-[#0a0a0a]/98 border-r border-white/5 shadow-2xl transition-all duration-300 overflow-y-auto no-scrollbar">
+        <aside className="fixed left-0 top-0 bottom-0 z-50 hidden lg:flex flex-col w-16 xl:w-[200px] bg-transparent backdrop-blur-md border-r border-white/[0.03] transition-all duration-300 overflow-y-auto no-scrollbar">
             {/* Logo Section */}
             <div className="flex items-center justify-center xl:justify-start px-2 xl:px-6 h-20 shrink-0">
                 <Link href="/" className="flex items-center gap-2 group">
@@ -63,9 +63,9 @@ export default function Sidebar() {
                                     : "text-white/50 hover:text-white hover:bg-white/10"
                             )}
                         >
-                            {/* Active Indicator Bar */}
+                            {/* Active Indicator Bar - Full Height */}
                             {isActive && (
-                                <div className="absolute left-0 top-2.5 bottom-2.5 w-1 bg-[#8FA7C5] rounded-r-full shadow-[0_0_10px_#8FA7C5]" />
+                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#8FA7C5] shadow-[2px_0_12px_#8FA7C5]" />
                             )}
 
                             <Icon className={cn(
