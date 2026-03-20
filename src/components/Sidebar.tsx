@@ -57,24 +57,24 @@ export default function Sidebar() {
                             key={item.href}
                             href={item.href}
                             className={cn(
-                                "relative flex items-center justify-center xl:justify-start gap-4 px-3 py-3 rounded-xl transition-all duration-200 group",
+                                "relative flex items-center justify-center xl:justify-start gap-4 px-3 py-2.5 rounded-xl transition-all duration-200 group",
                                 isActive 
-                                    ? "bg-[#8FA7C5]/10 text-[#8FA7C5]" 
+                                    ? "bg-[#8FA7C5]/8 text-[#8FA7C5]" 
                                     : "text-white/40 hover:text-white hover:bg-white/5"
                             )}
                         >
                             {/* Active Indicator Bar */}
                             {isActive && (
-                                <div className="absolute left-0 top-3 bottom-3 w-1 bg-[#8FA7C5] rounded-r-full shadow-[0_0_10px_#8FA7C5]" />
+                                <div className="absolute left-0 top-2.5 bottom-2.5 w-1 bg-[#8FA7C5] rounded-r-full shadow-[0_0_10px_#8FA7C5]" />
                             )}
 
                             <Icon className={cn(
-                                "w-6 h-6 shrink-0 transition-all duration-300",
-                                isActive ? "scale-110 drop-shadow-[0_0_8px_#8FA7C599]" : "group-hover:scale-110 group-hover:text-white"
+                                "w-[22px] h-[22px] shrink-0 transition-all duration-300",
+                                isActive ? "scale-105 drop-shadow-[0_0_8px_#8FA7C566]" : "group-hover:scale-110 group-hover:text-white"
                             )} />
                             
                             <span className={cn(
-                                "hidden xl:inline text-[15px] font-medium transition-colors",
+                                "hidden xl:inline text-[14px] font-medium transition-colors",
                                 isActive ? "font-bold" : ""
                             )}>
                                 {item.name}
