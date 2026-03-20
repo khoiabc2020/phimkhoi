@@ -642,11 +642,13 @@ function IframePlayer({ url, slug, episode, movieData, initialProgress, session,
         <div className="relative w-full h-full bg-black">
             <iframe
                 src={url}
-                className="w-full h-full"
+                className="w-full h-full block"
                 allowFullScreen
                 allow="autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                 title={`${slug} - ${episode}`}
                 frameBorder="0"
+                scrolling="no"
+                style={{ border: "none", overflow: "hidden" }}
             />
         </div>
     );
