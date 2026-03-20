@@ -3,6 +3,8 @@ import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
 import { getMoviesByCountry } from "@/services/api";
 import { Metadata } from "next";
+import Link from "next/link";
+import { ChevronDown } from "lucide-react";
 
 // Revalidate mỗi 5 phút
 export const revalidate = 300;
