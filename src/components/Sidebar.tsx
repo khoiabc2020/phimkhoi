@@ -35,12 +35,12 @@ export default function Sidebar() {
     }
 
     return (
-        <aside className="fixed left-0 top-0 bottom-0 z-50 hidden lg:flex flex-col w-20 xl:w-56 bg-[#0a0a0a]/98 border-r border-white/5 shadow-2xl transition-all duration-300 overflow-y-auto no-scrollbar">
+        <aside className="fixed left-0 top-0 bottom-0 z-50 hidden lg:flex flex-col w-20 xl:w-48 bg-[#0a0a0a]/98 border-r border-white/5 shadow-2xl transition-all duration-300 overflow-y-auto no-scrollbar">
             {/* Logo Section */}
-            <div className="flex items-center justify-center xl:justify-start px-2 xl:px-8 h-20 shrink-0">
+            <div className="flex items-center justify-center xl:justify-start px-2 xl:px-6 h-20 shrink-0">
                 <Link href="/" className="flex items-center gap-2 group">
                     <span className="xl:hidden font-logo text-2xl font-bold text-[#8FA7C5]">K</span>
-                    <span className="hidden xl:inline font-logo text-2xl font-bold tracking-tight">
+                    <span className="hidden xl:inline font-logo text-xl font-bold tracking-tight">
                         <span className="text-[#9CA3AF]">KHOI</span><span className="text-[#8FA7C5]">PHIM</span>
                     </span>
                 </Link>
