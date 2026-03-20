@@ -185,11 +185,16 @@ function MobileHero({ movies }: { movies: Movie[] }) {
 
                                 {/* Quality + rating badges */}
                                 <div className="absolute top-3 right-3 flex flex-col items-end gap-1.5 z-20">
-                                    <span className="bg-[#8FA7C5] text-[#0a0a0a] text-[9px] font-black px-2 py-0.5 rounded tracking-wider shadow-md">
-                                        TOP 10
-                                    </span>
+                                    <div className="flex items-center shadow-lg">
+                                        <span className="bg-[#E50914] text-white text-[9px] font-black px-1.5 py-0.5 rounded-l-[1px] tracking-tighter">
+                                            TOP 10
+                                        </span>
+                                        <span className="bg-white/10 backdrop-blur-md border border-white/20 text-white/90 text-[9px] font-bold px-1.5 py-0.5 rounded-r-[1px] tracking-tight">
+                                            Hôm nay
+                                        </span>
+                                    </div>
                                     {m.quality && (
-                                        <span className="bg-black/60 backdrop-blur-sm border border-white/10 text-white/90 text-[9px] font-bold px-2 py-0.5 rounded tracking-wider">
+                                        <span className="bg-black/40 backdrop-blur-sm border border-white/10 text-white/80 text-[9px] font-bold px-2 py-0.5 rounded tracking-wider shadow-md">
                                             {formatQualityLabel(m.quality) || m.quality}
                                         </span>
                                     )}
@@ -237,16 +242,16 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                         <h1
                             key={`m-title-${index}`}
                             className={cn(
-                                "font-outfit font-extrabold text-white leading-[1.2] drop-shadow-[0_2px_14px_rgba(0,0,0,0.75)] animate-hero-in tracking-tight",
+                                "font-outfit font-black text-white leading-[1.1] drop-shadow-[0_2px_14px_rgba(0,0,0,0.85)] animate-hero-in tracking-tight uppercase",
                                 "text-balance line-clamp-2",
                                 movie.name.length > 30 ? "text-[14px]" : movie.name.length > 20 ? "text-[16px]" : "text-[18px]"
                             )}
                         >
                             {decodeHtml(movie.name)}
                         </h1>
-                         <div className="flex items-center gap-2 mt-1 flex-wrap">
-                            {movie.year && <span className="text-[11px] font-bold text-white/90">{movie.year}</span>}
-                            {movie.country?.[0] && <span className="text-[11px] text-white/60">· {movie.country[0].name}</span>}
+                         <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                            {movie.year && <span className="text-[11px] font-black text-white/90">{movie.year}</span>}
+                            {movie.country?.[0] && <span className="text-[11px] text-white/50">| {movie.country[0].name}</span>}
                             {movie.category?.slice(0, 2).map((c: any) => (
                                 <span key={c.id || c.name} className="text-[11px] text-white/60">· {c.name}</span>
                             ))}
@@ -346,87 +351,79 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
             <div className="relative z-[3] h-full w-full max-w-[1920px] mx-auto lg:pl-20 px-6 md:px-10 lg:pl-12 lg:pr-6 flex items-end pb-12 md:pb-16 lg:pb-24 pointer-events-none">
                 <div className="w-full">
                     {/* Left: Text block */}
-                    <div className="w-full md:w-[85%] lg:w-[70%] xl:w-[60%] space-y-4 lg:space-y-5 pointer-events-auto">
-                        {/* Badges Row */}
-                        <div className="flex flex-wrap items-center gap-2 lg:gap-3 transition-all duration-500 delay-100">
-                            <span className="inline-flex items-center px-2 py-0.5 rounded bg-[#8FA7C5] text-[#0a0a0a] text-[10px] font-black uppercase tracking-tighter">
-                                TOP 10
-                            </span>
-                            {movie.year && (
-                                <span className="text-white/80 text-[12px] font-bold">
-                                    {movie.year}
+                    <div className="w-full md:w-[85%] lg:w-[80%] xl:w-[70%] space-y-4 lg:space-y-6 pointer-events-auto">
+                        {/* Badges Row (Onflix/VieON style) */}
+                        <div className="flex flex-wrap items-center gap-2.5 lg:gap-4 transition-all duration-500 delay-100">
+                            <div className="flex items-center">
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded-l-[2px] bg-[#E50914] text-white text-[10px] lg:text-[11px] font-black uppercase tracking-tighter shadow-lg">
+                                    TOP 10
                                 </span>
-                            )}
-                            {movie.country?.[0] && (
-                                <span className="text-white/40 text-[12px]">
-                                    | {movie.country[0].name}
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-r-[2px] bg-white/10 backdrop-blur-md border-y border-r border-white/20 text-white/90 text-[10px] lg:text-[11px] font-bold tracking-tight">
+                                    Hôm nay
                                 </span>
-                            )}
-                            {movie.episode_current && (
-                                <span className="text-white/40 text-[12px]">
-                                    | {movie.episode_current}
-                                </span>
-                            )}
+                            </div>
+                            
+                            <div className="flex items-center gap-3 text-white/90 font-bold text-[13px] lg:text-[14px] drop-shadow-md">
+                                {movie.year && <span>{movie.year}</span>}
+                                {movie.country?.[0] && <span className="opacity-50">|</span>}
+                                {movie.country?.[0] && <span>{movie.country[0].name}</span>}
+                                {movie.episode_current && <span className="opacity-50">|</span>}
+                                {movie.episode_current && <span>{movie.episode_current}</span>}
+                            </div>
+
                             {movie.quality && (
-                                <span className="px-2 py-0.5 rounded border border-white/10 bg-white/5 text-white/60 text-[10px] font-bold">
+                                <span className="px-1.5 py-0.5 rounded border border-white/20 bg-black/20 text-white/70 text-[10px] font-bold backdrop-blur-sm">
                                     {formatQualityLabel(movie.quality) || movie.quality}
                                 </span>
                             )}
                         </div>
 
-                        {/* Title — key triggers re-animation on slide change */}
+                        {/* Title — Optimized for all devices */}
                         <h1
                             key={`title-${index}`}
                             className={cn(
-                                "font-outfit font-extrabold text-white leading-[1.10] tracking-tight pt-1 animate-hero-in drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]",
-                                // Use `text-balance` for a premium, symmetrical multi-line look
+                                "font-outfit font-black text-white leading-[1.05] tracking-tight pt-1 animate-hero-in drop-shadow-[0_8px_24px_rgba(0,0,0,0.9)] uppercase",
                                 "text-balance",
-                                // If name is long, clamp lines instead
                                 movie.name.length > 40 ? "line-clamp-3" : "line-clamp-2",
-                                // Dynamic font scaling based on string length
+                                // Tablet (md) and iPad (lg) specific scaling
                                 movie.name.length > 35 
-                                    ? "text-3xl md:text-4xl lg:text-5xl xl:text-5xl" 
+                                    ? "text-3xl md:text-4xl lg:text-5xl xl:text-6xl" 
                                     : movie.name.length > 20
-                                        ? "text-4xl md:text-5xl lg:text-[54px] xl:text-[62px]"
-                                        : "text-4xl md:text-6xl lg:text-7xl xl:text-[80px]"
+                                        ? "text-4xl md:text-5xl lg:text-[54px] xl:text-[72px]"
+                                        : "text-4xl md:text-6xl lg:text-7xl xl:text-[88px]"
                             )}
                             title={decodeHtml(movie.name)}
                         >
                             {decodeHtml(movie.name)}
                         </h1>
 
-                        {/* Origin + Genre chips + Country + Episode */}
+                        {/* Origin + Genre chips + Meta */}
                         <div
                             key={`meta-${index}`}
-                            className="flex items-center gap-2 flex-wrap animate-hero-in animation-delay-100"
+                            className="flex items-center gap-3 flex-wrap animate-hero-in animation-delay-100"
                         >
                             {movie.origin_name && (
-                                <span className="text-[#c7d7ea] text-sm font-medium opacity-90 truncate max-w-[240px]">
+                                <span className="text-white/60 text-[15px] font-medium opacity-90 truncate max-w-[300px] border-r border-white/20 pr-3 mr-1">
                                     {decodeHtml(movie.origin_name)}
                                 </span>
                             )}
-                            {movie.time && (
-                                <span className="text-white/40 text-[13px]">
-                                    · {movie.time}
-                                </span>
-                            )}
-                            {/* Clickable genre chips */}
-                            {movie.category?.slice(0, 4).map((c: any) => (
+                            {/* Clickable genre chips - more clean, less borders */}
+                            {movie.category?.slice(0, 3).map((c: any) => (
                                 <Link
                                     key={c.id || c.name}
                                     href={`/the-loai/${c.slug}`}
-                                    className="text-[12px] text-white/60 hover:text-white border border-white/10 hover:border-white/30 px-3 py-1 rounded-full transition-all duration-150 hover:bg-white/10 backdrop-blur-sm"
+                                    className="text-[13px] text-white/80 hover:text-white transition-all duration-200"
                                 >
                                     {c.name}
                                 </Link>
                             ))}
                         </div>
 
-                        {/* Description */}
+                        {/* Description - matched to Onflix concise look */}
                         {movie.content && (
                             <p
                                 key={`desc-${index}`}
-                                className="text-white/70 text-[14px] lg:text-[15px] leading-relaxed line-clamp-2 max-w-xl xl:max-w-2xl animate-hero-in animation-delay-150 drop-shadow-md"
+                                className="text-white/80 text-[15px] lg:text-[16px] leading-relaxed line-clamp-2 md:line-clamp-3 max-w-xl xl:max-w-2xl animate-hero-in animation-delay-150 drop-shadow-md font-medium opacity-90"
                             >
                                 {decodeHtml(stripHtml(movie.content))}
                             </p>
@@ -435,24 +432,24 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         {/* Buttons */}
                         <div
                             key={`btns-${index}`}
-                            className="flex flex-wrap items-center gap-3 pt-2 animate-hero-in animation-delay-200"
+                            className="flex flex-wrap items-center gap-4 pt-4 lg:pt-6 animate-hero-in animation-delay-200 pointer-events-auto"
                         >
                             <Link
                                 href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                className="flex items-center justify-center gap-2 h-14 px-10 rounded-full bg-white text-[#0a0a0a] font-black text-[16px] transition-all duration-300 hover:bg-white/90 hover:scale-105 active:scale-95 shadow-[0_8px_20px_-4px_rgba(255,255,255,0.3)]"
+                                className="flex items-center justify-center gap-2 h-14 md:h-16 px-10 md:px-12 rounded-full bg-[#00FF57] text-black font-black text-[17px] transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_12px_24px_-8px_rgba(0,255,87,0.5)] group"
                             >
-                                <Play className="w-5 h-5 fill-[#0a0a0a] shrink-0" />
+                                <Play className="w-6 h-6 fill-black shrink-0 group-hover:scale-110 transition-transform" />
                                 Xem Ngay
                             </Link>
                             <Link
                                 href={`/phim/${movie.slug}`}
-                                className="flex items-center justify-center gap-2 h-12 px-7 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-[15px] transition-all hover:scale-105 active:scale-95 backdrop-blur-md"
+                                className="flex items-center justify-center gap-2 h-14 md:h-16 px-8 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-[16px] transition-all hover:scale-105 active:scale-95 backdrop-blur-md shadow-xl"
                             >
-                                <Info className="w-5 h-5" />
-                                <span className="hidden sm:inline">Chi Tiết</span>
-                                <span className="sm:hidden">Chi Tiết</span>
+                                <Info className="w-6 h-6" />
+                                <span className="hidden sm:inline">Thông Tin</span>
+                                <span className="sm:hidden">Thông Tin</span>
                             </Link>
-                            <div className="h-12 w-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 border border-white/20 transition-all hover:scale-110 cursor-pointer backdrop-blur-md">
+                            <div className="h-14 w-14 md:h-16 md:w-16 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 border border-white/20 transition-all hover:scale-110 cursor-pointer backdrop-blur-md shadow-xl group">
                                 <FavoriteButton movieData={getFavoriteData(movie)} size="md" />
                             </div>
                         </div>

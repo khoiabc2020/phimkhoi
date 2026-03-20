@@ -185,11 +185,12 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
     return (
         <>
             <header
+                suppressHydrationWarning
                 className={cn(
-                    "fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-transparent",
+                    "fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b border-transparent",
                     isScrolled
-                        ? "bg-[#0a0a0a]/95 backdrop-blur-xl border-white/5 py-0 shadow-lg pointer-events-auto"
-                        : "bg-gradient-to-b from-[#0a0a0a]/80 via-[#0a0a0a]/20 to-transparent py-0 pointer-events-none"
+                        ? "bg-[#0a0a0a]/90 backdrop-blur-2xl border-white/5 py-0 shadow-[0_8px_32px_rgba(0,0,0,0.4)] pointer-events-auto"
+                        : "bg-gradient-to-b from-[#0a0a0a]/90 via-[#0a0a0a]/40 to-transparent py-0 pointer-events-none"
                 )}
             >
                 <div className="w-full h-[54px] lg:h-[64px] flex items-center justify-between gap-3 flex-nowrap pointer-events-auto px-1 lg:px-4">

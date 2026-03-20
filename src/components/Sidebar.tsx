@@ -76,15 +76,8 @@ export default function Sidebar() {
                 })}
             </nav>
 
-            {/* Footer / User Preview or Settings could go here */}
-            <div className="p-4 border-t border-white/5 shrink-0">
-                <div className="xl:flex items-center gap-3 px-3 py-2 text-white/40 hover:text-white cursor-pointer transition-colors hidden truncate">
-                    <div className="w-8 h-8 rounded-full bg-[#8FA7C5]/20 flex items-center justify-center shrink-0">
-                        <span className="text-[#8FA7C5] text-xs font-bold">K</span>
-                    </div>
-                    <span className="text-sm font-medium">Premium User</span>
-                </div>
-            </div>
+            {/* Footer space */}
+            <div className="h-6 shrink-0" />
         </aside>
     );
 }
