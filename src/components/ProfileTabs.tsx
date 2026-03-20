@@ -134,7 +134,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
                                                 <div className="absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#263243] text-[#d8e3f2] mx-auto shadow-lg hover:scale-110 transition-transform">
+                                                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#263243] text-[#d8e3f2] mx-auto hover:scale-110 transition-transform">
                                                         <Play className="w-5 h-5 fill-current ml-0.5" />
                                                     </div>
                                                 </div>
@@ -204,7 +204,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                                             {/* Progress Bar */}
                                             <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20 z-20">
                                                 <div
-                                                    className="h-full bg-red-600 shadow-[0_0_10px_#DC2626B3]"
+                                                    className="h-full bg-red-600"
                                                     style={{ width: `${item.progress}%` }}
                                                 />
                                             </div>
@@ -240,7 +240,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                             </h2>
                             <button
                                 onClick={handleOpenCreateModal}
-                                className="flex items-center gap-1.5 px-4 py-2 bg-[#263243] hover:bg-[#2f3f54] text-[#d8e3f2] text-sm font-bold rounded-full transition-all shadow-[0_0_15px_#33455f66] active:scale-95"
+                                className="flex items-center gap-1.5 px-4 py-2 bg-[#263243] hover:bg-[#2f3f54] text-[#d8e3f2] text-sm font-bold rounded-full transition-all active:scale-95"
                             >
                                 <Plus className="w-4 h-4" /> Tạo danh sách
                             </button>
@@ -335,7 +335,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                             <div className="absolute top-0 right-0 p-32 bg-[#2b3a4d] rounded-full blur-[100px] opacity-20 -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
 
                             <div className="flex flex-col sm:flex-row items-start gap-6 sm:gap-8 relative z-10">
-                                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-[#33455f] bg-black shadow-[0_0_20px_#2a3b5050]">
+                                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-[#33455f] bg-black">
                                     {user?.image ? (
                                         <Image src={user.image} alt="Avatar" width={96} height={96} className="w-full h-full object-cover" />
                                     ) : (
@@ -386,7 +386,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
                     <nav className="flex-1 space-y-1">
                         <button
                             onClick={() => setActiveTab("account")}
-                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-bold text-sm ${activeTab === "account" ? "text-[#d8e3f2] bg-[#263243] border border-[#33455f] shadow-[0_0_15px_#33455f66]" : "text-white/60 hover:text-white hover:bg-white/10"}`}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-bold text-sm ${activeTab === "account" ? "text-[#d8e3f2] bg-[#263243] border border-[#33455f]" : "text-white/60 hover:text-white hover:bg-white/10"}`}
                         >
                             <User className="w-5 h-5" />
                             Quản lý tài khoản
@@ -394,7 +394,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
 
                         <button
                             onClick={() => setActiveTab("favorites")}
-                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-bold text-sm ${activeTab === "favorites" ? "text-[#d8e3f2] bg-[#263243] border border-[#33455f] shadow-[0_0_15px_#33455f66]" : "text-white/60 hover:text-white hover:bg-white/10"}`}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-bold text-sm ${activeTab === "favorites" ? "text-[#d8e3f2] bg-[#263243] border border-[#33455f]" : "text-white/60 hover:text-white hover:bg-white/10"}`}
                         >
                             <Heart className="w-5 h-5" />
                             Danh sách yêu thích
@@ -402,7 +402,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
 
                         <button
                             onClick={() => setActiveTab("history")}
-                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-bold text-sm ${activeTab === "history" ? "text-[#d8e3f2] bg-[#263243] border border-[#33455f] shadow-[0_0_15px_#33455f66]" : "text-white/60 hover:text-white hover:bg-white/10"}`}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-bold text-sm ${activeTab === "history" ? "text-[#d8e3f2] bg-[#263243] border border-[#33455f]" : "text-white/60 hover:text-white hover:bg-white/10"}`}
                         >
                             <History className="w-5 h-5" />
                             Lịch sử xem phim
@@ -410,7 +410,7 @@ export default function ProfileTabs({ user, favorites, history }: ProfileTabsPro
 
                         <button
                             onClick={() => setActiveTab("lists")}
-                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-bold text-sm ${activeTab === "lists" ? "text-[#d8e3f2] bg-[#263243] border border-[#33455f] shadow-[0_0_15px_#33455f66]" : "text-white/60 hover:text-white hover:bg-white/10"}`}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-bold text-sm ${activeTab === "lists" ? "text-[#d8e3f2] bg-[#263243] border border-[#33455f]" : "text-white/60 hover:text-white hover:bg-white/10"}`}
                         >
                             <Plus className="w-4 h-4" /> Danh sách
                         </button>
