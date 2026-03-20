@@ -27,6 +27,9 @@ echo "Building application..."
 # Increase Node heap, limit to 1536MB to prevent OOM on 2GB RAM VPS
 export NODE_OPTIONS="--max_old_space_size=1536"
 
+# Cleanup any stale locks
+rm -f .next/lock
+
 # Run build without deleting .next first. If it fails, exit immediately.
 if npm run build; then
     echo "Build successful! Preparing standalone..."
