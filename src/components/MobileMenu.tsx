@@ -75,10 +75,10 @@ export default function MobileMenu({
                     "border-r border-white/[0.10] backdrop-blur-xl",
                     isOpen ? "translate-x-0" : "-translate-x-full"
                 )}
-                style={{ background: "linear-gradient(180deg, #09090d 0%, #0a0a0a 100%)" }}
+                style={{ background: "linear-gradient(180deg, #1a1f2e 0%, #0d0f14 100%)" }}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between px-5 h-[72px] shrink-0 border-b border-white/[0.06] bg-[#09090d]/92">
+                <div className="flex items-center justify-between px-5 h-[72px] shrink-0 border-b border-white/[0.06] bg-[#1a1f2e]/92">
                     <Link href="/" onClick={onClose} className="flex items-center">
                         <span className="inline-block font-logo text-[28px] font-semibold uppercase tracking-[0.012em] leading-none whitespace-nowrap"><span className="text-[#9CA3AF]">KHOI</span><span className="text-[#8FA7C5]">PHIM</span></span>
                     </Link>
