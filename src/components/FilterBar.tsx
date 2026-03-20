@@ -4,7 +4,13 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useCallback, useTransition } from "react";
 import { ChevronDown } from "lucide-react";
 
-export default function FilterBar() {
+export default function FilterBar({ 
+    categories = [], 
+    countries = [] 
+}: { 
+    categories?: { name: string; slug: string }[]; 
+    countries?: { name: string; slug: string }[]; 
+}) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
@@ -31,50 +37,18 @@ export default function FilterBar() {
         });
     };
 
-    const categories = [
-        { name: "Thể loại", value: "all" },
-        { name: "Hành Động", value: "hanh-dong" },
-        { name: "Tình Cảm", value: "tinh-cam" },
-        { name: "Hài Hước", value: "hai-huoc" },
-        { name: "Cổ Trang", value: "co-trang" },
-        { name: "Tâm Lý", value: "tam-ly" },
-        { name: "Hình Sự", value: "hinh-su" },
-        { name: "Chiến Tranh", value: "chien-tranh" },
-        { name: "Thể Thao", value: "the-thao" },
-        { name: "Võ Thuật", value: "vo-thuat" },
-        { name: "Viễn Tưởng", value: "vien-tuong" },
-        { name: "Kinh Dị", value: "kinh-di" },
-        { name: "Tài Liệu", value: "tai-lieu" },
-        { name: "Bí Ẩn", value: "bi-an" },
-        { name: "Học Đường", value: "hoc-duong" },
-        { name: "Kinh Điển", value: "kinh-dien" },
-        { name: "Phim 18+", value: "phim-18" },
-    ];
-
-    const countries = [
-        { name: "Quốc gia", value: "all" },
-        { name: "Trung Quốc", value: "trung-quoc" },
-        { name: "Hàn Quốc", value: "han-quoc" },
-        { name: "Nhật Bản", value: "nhat-ban" },
-        { name: "Thái Lan", value: "thai-lan" },
-        { name: "Âu Mỹ", value: "au-my" },
-        { name: "Đài Loan", value: "dai-loan" },
-        { name: "Hồng Kông", value: "hong-kong" },
-        { name: "Ấn Độ", value: "an-do" },
-        { name: "Anh", value: "anh" },
-        { name: "Pháp", value: "phap" },
-        { name: "Canada", value: "canada" },
-        { name: "Việt Nam", value: "viet-nam" },
-    ];
-
     const currentYear = new Date().getFullYear();
     const years = [
         { name: "Năm", value: "all" },
-        ...Array.from({ length: 20 }, (_, i) => ({
+        ...Array.from({ length: 25 }, (_, i) => ({
             name: `${currentYear - i}`,
             value: `${currentYear - i}`,
         })),
     ];
+
+    // Ensure we have "All" option if provided list doesn't have it
+    const displayCategories = [{ name: "Thể loại", slug: "all" }, ...categories];
+    const displayCountries = [{ name: "Quốc gia", slug: "all" }, ...countries];
 
     return (
         <div>
@@ -83,18 +57,18 @@ export default function FilterBar() {
                 <div className="relative group">
                     <select
                         onChange={(e) => handleFilterChange("category", e.target.value)}
-                        className="appearance-none min-w-[126px] bg-[#0b0b10] border border-white/[0.08] text-white/90 py-2 px-3 pr-8 rounded-[10px] leading-tight focus:outline-none focus:border-[#33445c] cursor-pointer text-sm"
+                        className="appearance-none min-w-[120px] bg-white/[0.05] border border-white/[0.08] text-white/70 py-1.5 px-3 pr-8 rounded-[8px] leading-tight focus:outline-none focus:border-white/20 focus:text-white cursor-pointer text-[13px] font-medium transition-all"
                         value={searchParams.get("category") || "all"}
                         disabled={isPending}
                     >
-                        {categories.map((c) => (
-                            <option key={c.value} value={c.value}>
+                        {displayCategories.map((c) => (
+                            <option key={c.slug} value={c.slug} className="bg-[#0b0b10] text-white">
                                 {c.name}
                             </option>
                         ))}
                     </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/70">
-                        <ChevronDown className="w-4 h-4" />
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/40 group-focus-within:text-white">
+                        <ChevronDown className="w-3.5 h-3.5" />
                     </div>
                 </div>
 
@@ -102,18 +76,18 @@ export default function FilterBar() {
                 <div className="relative group">
                     <select
                         onChange={(e) => handleFilterChange("country", e.target.value)}
-                        className="appearance-none min-w-[126px] bg-[#0b0b10] border border-white/[0.08] text-white/90 py-2 px-3 pr-8 rounded-[10px] leading-tight focus:outline-none focus:border-[#33445c] cursor-pointer text-sm"
+                        className="appearance-none min-w-[120px] bg-white/[0.05] border border-white/[0.08] text-white/70 py-1.5 px-3 pr-8 rounded-[8px] leading-tight focus:outline-none focus:border-white/20 focus:text-white cursor-pointer text-[13px] font-medium transition-all"
                         value={searchParams.get("country") || "all"}
                         disabled={isPending}
                     >
-                        {countries.map((c) => (
-                            <option key={c.value} value={c.value}>
+                        {displayCountries.map((c) => (
+                            <option key={c.slug} value={c.slug} className="bg-[#0b0b10] text-white">
                                 {c.name}
                             </option>
                         ))}
                     </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/70">
-                        <ChevronDown className="w-4 h-4" />
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/40 group-focus-within:text-white">
+                        <ChevronDown className="w-3.5 h-3.5" />
                     </div>
                 </div>
 
@@ -121,18 +95,18 @@ export default function FilterBar() {
                 <div className="relative group">
                     <select
                         onChange={(e) => handleFilterChange("year", e.target.value)}
-                        className="appearance-none min-w-[110px] bg-[#0b0b10] border border-white/[0.08] text-white/90 py-2 px-3 pr-8 rounded-[10px] leading-tight focus:outline-none focus:border-[#33445c] cursor-pointer text-sm"
+                        className="appearance-none min-w-[110px] bg-white/[0.05] border border-white/[0.08] text-white/70 py-1.5 px-3 pr-8 rounded-[8px] leading-tight focus:outline-none focus:border-white/20 focus:text-white cursor-pointer text-[13px] font-medium transition-all"
                         value={searchParams.get("year") || "all"}
                         disabled={isPending}
                     >
                         {years.map((y) => (
-                            <option key={y.value} value={y.value}>
+                            <option key={y.value} value={y.value} className="bg-[#0b0b10] text-white">
                                 {y.name}
                             </option>
                         ))}
                     </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/70">
-                        <ChevronDown className="w-4 h-4" />
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/40 group-focus-within:text-white">
+                        <ChevronDown className="w-3.5 h-3.5" />
                     </div>
                 </div>
             </div>

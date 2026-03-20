@@ -1,19 +1,23 @@
 import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
-import { getMoviesByCategory } from "@/services/api";
+import { getMoviesByCategory, getMenuData } from "@/services/api";
 import { Metadata } from "next";
 import Link from "next/link";
-import { ChevronDown } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 
 // Revalidate mỗi 5 phút
 export const revalidate = 300;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params;
+    const { categories } = await getMenuData();
+    const category = categories.find(c => c.slug === slug);
+    const categoryName = category?.name || slug.replace(/-/g, " ");
+
     return {
-        title: `Phim ${slug} - KHOIPHIM`,
-        description: `Xem phim ${slug} mới nhất tại KHOIPHIM.`,
+        title: `Phim ${categoryName} - KHOIPHIM`,
+        description: `Xem phim ${categoryName} mới nhất tại KHOIPHIM.`,
     };
 }
 
@@ -22,33 +26,42 @@ export default async function CategoryPage({ params, searchParams }: { params: P
     const { page } = await searchParams;
     const currentPage = Number(page) || 1;
 
-    // Fetch movies by category
-    const data = await getMoviesByCategory(slug, currentPage);
+    // Fetch movies and menu data in parallel
+    const [data, menuData] = await Promise.all([
+        getMoviesByCategory(slug, currentPage),
+        getMenuData()
+    ]);
 
     const { items, pagination } = data;
+    const { categories, countries } = menuData;
+
+    // Resolve properly formatted name (with full diacritics)
+    const category = categories.find(c => c.slug === slug);
+    const categoryName = category?.name || (slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, " "));
 
     return (
         <main className="min-h-screen pb-20">
             <div className="pt-24 w-full max-w-[1920px] mx-auto px-4 sm:px-6 md:px-12 relative">
-                {/* Decorative background glow to match Image 4 */}
-                <div className="absolute top-0 left-0 right-0 h-[300px] bg-gradient-to-b from-primary/10 via-transparent to-transparent pointer-events-none -z-10 blur-[100px]" />
+                {/* Decorative background glow */}
+                <div className="absolute top-0 left-0 right-0 h-[400px] bg-gradient-to-b from-[#0e1621] via-transparent to-transparent pointer-events-none -z-10 blur-[120px]" />
 
-                <div className="mb-8 md:mb-12">
+                <div className="mb-6 md:mb-10 max-w-4xl">
                     <Link 
                         href="/" 
-                        className="flex items-center gap-1.5 text-white/50 hover:text-white text-[13px] font-medium transition-colors mb-3 group"
+                        className="inline-flex items-center gap-1.5 text-white/40 hover:text-white text-[13px] font-medium transition-colors mb-4 group"
                     >
-                        <ChevronDown className="w-4 h-4 rotate-90 group-hover:-translate-x-0.5 transition-transform" />
+                        <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
                         Quay lại
                     </Link>
                     
-                    <h1 className="text-[28px] md:text-[42px] font-black text-white tracking-tight leading-tight">
-                        Thể loại: <span className="text-white/90 capitalize">{slug.replace(/-/g, " ")}</span>
+                    <h1 className="text-[32px] md:text-[52px] font-outfit font-extrabold text-white tracking-tight leading-[1.1]">
+                        <span className="text-white/40 block text-lg md:text-xl font-medium tracking-normal mb-1">Thể loại</span>
+                        {categoryName}
                     </h1>
                 </div>
 
-                <div className="relative z-10 md:sticky md:top-[56px] md:z-20 bg-[#0a0a0a]/92 backdrop-blur-md rounded-[10px] px-1 border border-white/[0.06]">
-                    <FilterBar />
+                <div className="relative z-10 sticky top-[56px] bg-[#0a0a0a]/80 backdrop-blur-md rounded-[12px] px-2 mb-6 border border-white/[0.05] shadow-xl shadow-black/20">
+                    <FilterBar categories={categories} countries={countries} />
                 </div>
 
                 {/* Optimized Grid for Mobile */}
