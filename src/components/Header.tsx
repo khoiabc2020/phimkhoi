@@ -240,11 +240,11 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                         setOpenDropdown(openDropdown === "categories" ? null : "categories");
                                     }}
                                     className={cn(
-                                        "flex items-center gap-1 px-3 py-1.5 rounded-full text-[13px] font-black uppercase tracking-wide transition-all",
-                                        openDropdown === "categories" ? "text-white bg-white/10" : "text-white/60 hover:text-white"
+                                        "flex items-center gap-1 px-3 py-1.5 rounded-full text-[13px] font-medium capitalize tracking-tight transition-all",
+                                        openDropdown === "categories" ? "text-white bg-white/10" : "text-white/70 hover:text-white"
                                     )}
                                 >
-                                    Thể loại <ChevronDown className={cn("w-3 h-3 transition-transform duration-300", openDropdown === "categories" ? "rotate-180" : "")} />
+                                    Thể loại <ChevronDown className={cn("w-3.5 h-3.5 opacity-60 transition-transform duration-300", openDropdown === "categories" ? "rotate-180 opacity-100" : "")} />
                                 </button>
                                 {openDropdown === "categories" && (
                                     <div
@@ -271,11 +271,11 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                         setOpenDropdown(openDropdown === "countries" ? null : "countries");
                                     }}
                                     className={cn(
-                                        "flex items-center gap-1 px-3 py-1.5 rounded-full text-[13px] font-black uppercase tracking-wide transition-all",
-                                        openDropdown === "countries" ? "text-white bg-white/10" : "text-white/60 hover:text-white"
+                                        "flex items-center gap-1 px-3 py-1.5 rounded-full text-[13px] font-medium capitalize tracking-tight transition-all",
+                                        openDropdown === "countries" ? "text-white bg-white/10" : "text-white/70 hover:text-white"
                                     )}
                                 >
-                                    Quốc gia <ChevronDown className={cn("w-3 h-3 transition-transform duration-300", openDropdown === "countries" ? "rotate-180" : "")} />
+                                    Quốc gia <ChevronDown className={cn("w-3.5 h-3.5 opacity-60 transition-transform duration-300", openDropdown === "countries" ? "rotate-180 opacity-100" : "")} />
                                 </button>
                                 {openDropdown === "countries" && (
                                     <div
@@ -297,8 +297,8 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                 )}
                             </div>
 
-                            <Link href="/danh-sach/phim-le" className="px-3 py-1.5 rounded-full text-[13px] font-black uppercase tracking-wide text-white/60 hover:text-white transition-colors">Phim Lẻ</Link>
-                            <Link href="/danh-sach/phim-bo" className="px-3 py-1.5 rounded-full text-[13px] font-black uppercase tracking-wide text-white/60 hover:text-white transition-colors">Phim Bộ</Link>
+                            <Link href="/danh-sach/phim-le" className="px-3 py-1.5 rounded-full text-[13px] font-medium capitalize tracking-tight text-white/70 hover:text-white transition-colors">Phim Lẻ</Link>
+                            <Link href="/danh-sach/phim-bo" className="px-3 py-1.5 rounded-full text-[13px] font-medium capitalize tracking-tight text-white/70 hover:text-white transition-colors">Phim Bộ</Link>
                         </nav>
                     </div>
 
@@ -371,14 +371,14 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                             {searchQuery.length > 0 ? (
                                                 <div className="flex flex-col max-h-[400px] overflow-y-auto custom-scrollbar p-2">
                                                     <div className="px-3 pb-2 pt-1 border-b border-white/10 flex justify-between items-center mb-2">
-                                                        <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Kết quả tìm kiếm</span>
+                                                        <span className="text-[12px] font-medium text-white/40 capitalize tracking-tight">Kết quả tìm kiếm</span>
                                                         {isSearching && <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />}
                                                     </div>
 
                                                     {/* Movies */}
                                                     {searchResults?.movies && searchResults.movies.length > 0 && (
                                                         <div className="mb-1">
-                                                            <div className="px-3 py-1 text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">Kết quả</div>
+                                                            <div className="px-3 py-1 text-[11px] font-medium text-white/30 capitalize tracking-wider mb-1">Phim mới</div>
                                                             {searchResults.movies.map((movie: any) => (
                                                                 <Link
                                                                     href={`/phim/${movie.slug}`}
@@ -423,9 +423,9 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                     <div className="p-2">
                                                         <div className="flex items-center justify-between px-3 pb-2 pt-1 border-b border-white/10 mb-2">
                                                             <div className="flex items-center gap-2">
-                                                                <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Lịch sử</span>
+                                                                <span className="text-[12px] font-medium text-white/40 capitalize tracking-tight">Lịch sử</span>
                                                             </div>
-                                                            <button type="button" onClick={clearHistory} className="text-xs text-red-400 hover:text-red-300 transition-colors">Xóa</button>
+                                                            <button type="button" onClick={clearHistory} className="text-[11px] text-red-400/60 hover:text-red-400 transition-colors">Xóa hết</button>
                                                         </div>
                                                         <div className="flex flex-col gap-1 max-h-[300px] overflow-y-auto custom-scrollbar">
                                                             {movieSearchHistory.map((item, idx) => (

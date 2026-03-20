@@ -120,7 +120,7 @@ export default async function RootLayout({
         <Providers>
           <div className="flex flex-col min-h-screen">
             <Header categories={categories} countries={countries} />
-            <div className="flex flex-1 w-full overflow-x-hidden pt-[54px] lg:pt-[64px]">
+            <div className="flex flex-1 w-full overflow-x-hidden min-h-screen">
               <Sidebar />
               <main className="flex-1 min-w-0">
                 {children}

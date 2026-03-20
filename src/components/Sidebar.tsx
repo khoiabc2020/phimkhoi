@@ -66,8 +66,8 @@ export default function Sidebar() {
                             )} />
                             
                             <span className={cn(
-                                "text-[10px] font-bold tracking-tight text-center transition-colors",
-                                isActive ? "opacity-100" : "opacity-60 group-hover:opacity-100"
+                                "text-[10px] font-medium tracking-normal text-center transition-colors",
+                                isActive ? "opacity-100" : "opacity-40 group-hover:opacity-100"
                             )}>
                                 {item.name}
                             </span>

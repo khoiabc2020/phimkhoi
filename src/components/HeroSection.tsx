@@ -293,7 +293,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
 
     return (
         <div
-            className="relative w-full h-[76vh] lg:h-[92vh] xl:h-[104vh] overflow-hidden bg-[#0a0a0a]"
+            className="relative w-full h-[65vh] lg:h-[75vh] xl:h-[82vh] overflow-hidden bg-[#0a0a0a]"
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}
         >
@@ -326,7 +326,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                             src={bg}
                             alt=""
                             fill
-                            className="object-cover object-[66%_18%] opacity-[0.94]"
+                            className="object-cover object-[66%_32%] opacity-[0.94]"
                             priority={isActive && i < 2}
                             loading={isActive ? "eager" : "lazy"}
                             sizes="100vw"
@@ -341,15 +341,13 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
             {/* ── Gradient overlays (always on top) ── */}
             <div className="absolute inset-0 z-[2] pointer-events-none">
                 {/* Left text readability */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a]/95 via-[#0a0a0a]/62 to-transparent" />
+                <div className="absolute inset-y-0 left-0 w-[60%] bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
                 {/* Bottom blend into page */}
                 <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/70 to-transparent" />
-                {/* Top subtle vignette */}
-                <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-[#0a0a0a]/42 to-transparent" />
             </div>
 
             {/* ── Content ── */}
-            <div className="relative z-[3] h-full w-full max-w-[1920px] mx-auto px-6 md:px-10 lg:px-12 flex items-end pb-16 md:pb-20 lg:pb-24">
+            <div className="relative z-[3] h-full w-full max-w-[1920px] mx-auto lg:pl-20 px-6 md:px-10 lg:px-12 flex items-end pb-12 md:pb-16 lg:pb-20">
                 <div className="grid grid-cols-12 gap-8 lg:gap-12 w-full items-end">
 
                     {/* Left: Text block */}
