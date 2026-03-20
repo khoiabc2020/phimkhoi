@@ -307,8 +307,9 @@ const enrichMoviesWithTMDB = async (movies: Movie[], maxItems = 18): Promise<Mov
             return normalizeMovieImageRoles({
                 ...movie,
                 year: tmdbYear || movie.year || 0,
-                poster_url: movie.poster_url || tmdbPoster,
-                thumb_url: movie.thumb_url || tmdbBackdrop,
+                // Prioritize TMDB images if they exist
+                poster_url: tmdbPoster || movie.poster_url,
+                thumb_url: tmdbBackdrop || movie.thumb_url,
                 tmdbData: {
                     vote_average: (tmdb as any).vote_average,
                     poster_path: (tmdb as any).poster_path,

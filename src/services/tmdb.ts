@@ -65,7 +65,7 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
                 const locales = isAsianSearch ? ['zh-TW', 'vi-VN'] : ['vi-VN'];
 
                 for (const locale of locales) {
-                let url = `${TMDB_API_URL}/search/${endpoint}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanQuery)}&language=${locale}&_v=6`;
+                const url = `${TMDB_API_URL}/search/${endpoint}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(q)}&language=${locale}&_v=8`;
 
                 if (year) {
                     if (endpoint === 'movie') url += `&primary_release_year=${year}`;
@@ -117,13 +117,24 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
                             }
                         }
 
-                        // Year Check: Allow +/- 3 year tolerance for release date discrepancies (Asian dramas are often delayed)
-                        // Only reject if we don't have a high-confidence exact name match
+                        // 1b. Check local name from verification (New & Critical!)
+                        if (!isMatch && verification?.localName) {
+                            const localTitle = endpoint === 'movie' ? item.title : item.name;
+                            const originalTitleSearch = endpoint === 'movie' ? item.original_title : item.original_name;
+                            if (localTitle && calculateSimilarity(verification.localName, localTitle) >= 0.5) isMatch = true;
+                            if (!isMatch && originalTitleSearch && calculateSimilarity(verification.localName, originalTitleSearch) >= 0.5) isMatch = true;
+                        }
+
+                        // Year Check: Allow +/- 3 year tolerance
                         if (!isMatch && year && itemYear && Math.abs(itemYear - year) > 3) {
-                            // Even if year is off by > 3, if original name matches EXACTLY, trust it.
                             if (verification?.originalName && (
                                 item.original_title?.toLowerCase() === verification.originalName.toLowerCase() ||
                                 item.original_name?.toLowerCase() === verification.originalName.toLowerCase()
+                            )) {
+                                isMatch = true;
+                            } else if (verification?.localName && (
+                                item.title?.toLowerCase() === verification.localName.toLowerCase() ||
+                                item.name?.toLowerCase() === verification.localName.toLowerCase()
                             )) {
                                 isMatch = true;
                             } else {
@@ -131,17 +142,17 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
                             }
                         }
 
-                        // 2. Check query against local title and original title
+                        // 2. Check current query q against local title and original title
                         const localTitle = endpoint === 'movie' ? item.title : item.name;
                         const originalTitleSearch = endpoint === 'movie' ? item.original_title : item.original_name;
 
                         if (localTitle && calculateSimilarity(cleanQuery, localTitle) >= 0.5) isMatch = true;
-                        if (originalTitleSearch && calculateSimilarity(cleanQuery, originalTitleSearch) >= 0.5) isMatch = true;
+                        if (!isMatch && originalTitleSearch && calculateSimilarity(cleanQuery, originalTitleSearch) >= 0.5) isMatch = true;
 
                         // 3. Fallback: If Chinese/Korean names fail to match TMDB's English names
                         if (!isMatch && itemYear === year) {
-                            // Only force match if the query was EXACTLY the original name, meaning TMDB returned this as the #1 result
-                            if (q === verification?.originalName && filteredResults.indexOf(item) === 0) {
+                            // If q matches originalName or localName exactly, and it's the #1 result, trust it
+                            if ((q === verification?.originalName || q === verification?.localName) && filteredResults.indexOf(item) === 0) {
                                 isMatch = true;
                             }
                         }
@@ -206,11 +217,10 @@ export const getTMDBPersonDetails = async (personId: number) => {
     }
 };
 
-export const getTMDBDetails = async (tmdbId: number, type: 'movie' | 'tv' = 'movie') => {
+export const getTMDBDetails = async (id: number, type: 'movie' | 'tv' = 'movie') => {
     try {
         if (!TMDB_API_KEY) return null;
-
-        const url = `${TMDB_API_URL}/${type}/${tmdbId}?api_key=${TMDB_API_KEY}&language=vi-VN&append_to_response=credits,images,videos`;
+        const url = `${TMDB_API_URL}/${type}/${id}?api_key=${TMDB_API_KEY}&append_to_response=videos,credits,external_ids,images&_v=8`;
 
         const res = await fetch(url, { next: { revalidate: 3600 } });
         const data = await res.json();
@@ -222,10 +232,10 @@ export const getTMDBDetails = async (tmdbId: number, type: 'movie' | 'tv' = 'mov
     }
 };
 
-export const getTMDBSeasonDetails = async (tmdbId: number, seasonNumber: number) => {
+export const getTMDBSeasonDetails = async (tvId: number, seasonNumber: number) => {
     try {
         if (!TMDB_API_KEY) return null;
-        const url = `${TMDB_API_URL}/tv/${tmdbId}/season/${seasonNumber}?api_key=${TMDB_API_KEY}&language=vi-VN`;
+        const url = `${TMDB_API_URL}/tv/${tvId}/season/${seasonNumber}?api_key=${TMDB_API_KEY}&_v=8`;
         const res = await fetch(url, { next: { revalidate: 86400 } });
         if (!res.ok) return null;
         return await res.json();

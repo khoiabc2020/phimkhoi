@@ -83,21 +83,21 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
 
     // Backdrop/overlay (ảnh ngang): TMDB backdrop first, then whichever source URL is truly landscape.
     // Never use a portrait URL in the overlay — it looks cropped and wrong.
-    const tmdbBackdrop =
-        (movie as any).tmdbData?.backdrop_path
-            ? getTMDBImage((movie as any).tmdbData.backdrop_path)
-            : null;
-
-    let sourceBackdrop: string | null = null;
-    if (movie.poster_url && detectOrientation(movie.poster_url) === "landscape") {
-        sourceBackdrop = movie.poster_url;
-    } else if (movie.thumb_url && detectOrientation(movie.thumb_url) === "landscape") {
+    const tmdbBackdrop = (movie as any).tmdbData?.backdrop_path ? getTMDBImage((movie as any).tmdbData.backdrop_path, "w500") : "";
+    const tmdbPosterFallback = (movie as any).tmdbData?.poster_path ? getTMDBImage((movie as any).tmdbData.poster_path, "w500") : "";
+    
+    let sourceBackdrop = "";
+    if (movie.thumb_url && detectOrientation(movie.thumb_url) === "landscape") {
         sourceBackdrop = movie.thumb_url;
+    } else if (movie.poster_url && detectOrientation(movie.poster_url) === "landscape" && !movie.poster_url.includes("-poster.")) {
+        // Only use poster_url as landscape if it's not a known unreliable OPhim-style -poster.jpg
+        sourceBackdrop = movie.poster_url;
     } else {
-        sourceBackdrop = movie.poster_url || movie.thumb_url;
+        // Fallback: use thumb (usually the snowy portrait) instead of the horse poster
+        sourceBackdrop = movie.thumb_url || movie.poster_url;
     }
 
-    const displayBackdrop = tmdbBackdrop || (sourceBackdrop ? getImageUrl(sourceBackdrop) : null);
+    const displayBackdrop = tmdbBackdrop || tmdbPosterFallback || (sourceBackdrop ? getImageUrl(sourceBackdrop) : null);
 
     // Reset fallback state when card movie changes
     useEffect(() => {
