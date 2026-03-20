@@ -187,42 +187,46 @@ function MovieCard({
                         <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
                     </Link>
 
-                    {/* Top-Left: TMDB Rating Badge (Onflix Style) */}
+                    {/* Top-Left: IMDb Rating Badge (Onflix Style) */}
                     {(movie as any).tmdbData?.vote_average && (movie as any).tmdbData.vote_average > 0 && (
-                        <div className="absolute top-2 left-2 z-10 pointer-events-none">
-                            <div className="flex items-center gap-1 bg-[#F5C518] text-black px-1.5 py-0.5 rounded shadow-lg">
-                                <Star className="w-2.5 h-2.5 fill-black" />
-                                <span className="text-[10px] font-black">{((movie as any).tmdbData.vote_average).toFixed(1)}</span>
+                        <div className="absolute top-1.5 left-1.5 z-10 pointer-events-none">
+                            <div className="flex items-center gap-1 bg-[#F5C518] text-black px-1.5 py-0.5 rounded-[3px] shadow-lg border border-black/10">
+                                <span className="text-[10px] font-black tracking-tighter">IMDb</span>
+                                <span className="text-[10px] font-extrabold">{(movie as any).tmdbData.vote_average.toFixed(1)}</span>
                             </div>
                         </div>
                     )}
 
-                    {/* Top-Right: Episode/Quality Badge */}
-                    <div className="absolute top-2 right-2 z-10 pointer-events-none flex flex-col items-end gap-1">
-                        {movie.episode_current && (
-                            <span className="bg-[#8FA7C5] text-[#0a0a0a] text-[9px] font-black px-1.5 py-0.5 rounded shadow-md uppercase tracking-tighter">
-                                {movie.episode_current}
+                    {/* Top-Right: Premium Quality Badge */}
+                    <div className="absolute top-1.5 right-1.5 z-10 pointer-events-none flex flex-col items-end gap-1">
+                        {formatQualityLabel(movie.quality) && (
+                            <span className="bg-black/60 shadow-md border border-white/10 text-white/90 text-[9px] font-black px-1.5 py-0.5 rounded-[3px] backdrop-blur-sm tracking-tight">
+                                {formatQualityLabel(movie.quality)}
                             </span>
                         )}
-                        {formatQualityLabel(movie.quality) && (
-                            <span className="bg-black/60 shadow-md border border-white/10 text-white/90 text-[9px] font-bold px-1.5 py-0.5 rounded backdrop-blur-sm">
-                                {formatQualityLabel(movie.quality)}
+                    </div>
+
+                    {/* Bottom-Left: Subtitle / Language Badge (Onflix P.Đề style) */}
+                    <div className="absolute bottom-1.5 left-1.5 z-10 pointer-events-none">
+                        {(movie.episode_current || movie.lang) && (
+                            <span className="bg-black/50 border border-white/10 text-white/80 text-[8px] font-bold px-1 py-0.5 rounded-[2px] backdrop-blur-[2px] tracking-tighter uppercase mb-0.5 block w-fit">
+                                {movie.lang?.toLowerCase().includes('lồng tiếng') ? 'L.Tiếng' : 'P.Đề'}
                             </span>
                         )}
                     </div>
                 </div>
 
-                <div className="mt-2 space-y-0.5 px-0.5">
-                    <h3 className="text-white font-bold text-[13px] truncate group-hover/static-card:text-primary transition-colors leading-tight" title={decodeHtml(movie.name) || movie.slug || ""}>
+                <div className="mt-2.5 space-y-0.5 px-0.5">
+                    <h3 className="text-white/95 font-bold text-[13px] leading-tight truncate group-hover/static-card:text-[#8FA7C5] transition-colors" title={decodeHtml(movie.name) || movie.slug || ""}>
                         {decodeHtml(movie.name) || movie.slug || "—"}
                     </h3>
-                    <div className="flex items-center justify-between">
-                        {movie.origin_name && (
-                            <p className="text-white/40 text-[11px] truncate font-medium max-w-[80%]" title={decodeHtml(movie.origin_name)}>
-                                {decodeHtml(movie.origin_name)}
-                            </p>
+                    <div className="flex items-center justify-between gap-2 overflow-hidden">
+                        <p className="text-white/40 text-[10px] truncate font-medium flex-1" title={decodeHtml(movie.origin_name)}>
+                            {decodeHtml(movie.origin_name || "")}
+                        </p>
+                        {movie.year && Number(movie.year) > 0 && (
+                            <span className="text-white/30 text-[10px] font-medium shrink-0">{movie.year}</span>
                         )}
-                        <span className="text-white/30 text-[10px] font-medium">{movie.year && Number(movie.year) > 0 ? movie.year : ""}</span>
                     </div>
                 </div>
             </div>

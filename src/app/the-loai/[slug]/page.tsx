@@ -90,17 +90,17 @@ export default async function CategoryPage({ params, searchParams }: { params: P
                 {/* Decorative background glow */}
                 <div className="absolute top-0 left-0 right-0 h-[400px] bg-gradient-to-b from-[#0e1621] via-transparent to-transparent pointer-events-none -z-10 blur-[120px]" />
 
-                <div className="mb-6 md:mb-10 max-w-4xl">
+                <div className="mb-6 md:mb-8">
                     <Link 
                         href="/" 
                         className="inline-flex items-center gap-1.5 text-white/40 hover:text-white text-[13px] font-medium transition-colors mb-4 group"
                     >
-                        <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+                        <ChevronLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
                         Quay lại
                     </Link>
                     
-                    <h1 className="text-[32px] md:text-[52px] font-outfit font-extrabold text-white tracking-tight leading-[1.1]">
-                        <span className="text-white/40 block text-lg md:text-xl font-medium tracking-normal mb-1">Thể loại</span>
+                    <h1 className="text-[28px] md:text-[34px] font-outfit font-extrabold text-white tracking-tight leading-tight">
+                        <span className="text-white/60 font-medium mr-2">Thể loại:</span>
                         {categoryName}
                     </h1>
                 </div>
