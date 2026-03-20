@@ -73,6 +73,7 @@ export const metadata: Metadata = {
 import { Providers } from "@/components/Providers";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Sidebar from "@/components/Sidebar";
 import { getMenuData } from "@/services/api";
 
 export default async function RootLayout({
@@ -107,12 +108,19 @@ export default async function RootLayout({
         <link rel="dns-prefetch" href="https://i.ytimg.com" />
       </head>
       <body
-        className={`${interSans.variable} ${interSans.variable} ${beVietnamPro.variable} ${logoFont.variable} antialiased pb-20 lg:pb-0 font-sans`}
+        className={`${interSans.variable} ${interSans.variable} ${beVietnamPro.variable} ${logoFont.variable} antialiased pb-20 lg:pb-0 font-sans h-full`}
       >
         <Providers>
-          <Header categories={categories} countries={countries} />
-          {children}
-          <Footer />
+          <div className="flex min-h-screen">
+            <Sidebar />
+            <div className="flex-1 flex flex-col transition-all duration-300 lg:pl-20 xl:pl-64">
+              <Header categories={categories} countries={countries} />
+              <main className="flex-1">
+                {children}
+              </main>
+              <Footer />
+            </div>
+          </div>
         </Providers>
       </body>
     </html>
