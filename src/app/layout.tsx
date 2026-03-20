@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Geist_Mono, Be_Vietnam_Pro, Roboto_Condensed, Outfit } from "next/font/google";
+import { Inter, Geist_Mono, Be_Vietnam_Pro, Roboto_Condensed, Lexend } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
 import Script from "next/script";
@@ -21,7 +21,7 @@ const logoFont = Roboto_Condensed({
   weight: ["500", "600", "700"],
 });
 
-const outfitFont = Outfit({
+const outfitFont = Lexend({
   variable: "--font-outfit",
   subsets: ["latin", "vietnamese"],
   weight: ["400", "500", "600", "700", "800", "900"],
