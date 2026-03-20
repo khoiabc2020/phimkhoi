@@ -355,25 +355,29 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
 
                     {/* Left: Text block */}
                     <div className="col-span-12 md:col-span-8 lg:col-span-7 xl:col-span-6 space-y-4 lg:space-y-5">
-                        {/* Tags */}
-                        <div className="flex flex-wrap items-center gap-2">
-                            <span className="px-2.5 py-0.5 rounded bg-[#263243] border border-[#33455F] text-[#d8e3f2] text-[11px] font-black tracking-widest uppercase">
-                                Hot
+                        {/* Badges Row */}
+                        <div className="flex flex-wrap items-center gap-2 lg:gap-3 transition-all duration-500 delay-100">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded bg-[#8FA7C5] text-[#0a0a0a] text-[10px] font-black uppercase tracking-tighter">
+                                TOP 10
                             </span>
                             {movie.year && (
-                                <span className="px-2.5 py-0.5 rounded border border-white/15 bg-white/[0.06] text-white/80 text-[11px] font-semibold">
+                                <span className="text-white/80 text-[12px] font-bold">
                                     {movie.year}
                                 </span>
                             )}
-                            {movie.quality && (
-                                <span className="px-2.5 py-0.5 rounded border border-[#33455F] bg-[#263243]/80 text-[#d8e3f2] text-[11px] font-bold">
-                                    {formatQualityLabel(movie.quality) || movie.quality}
+                            {movie.country?.[0] && (
+                                <span className="text-white/40 text-[12px]">
+                                    | {movie.country[0].name}
                                 </span>
                             )}
-                            {movie.tmdbData?.vote_average && (
-                                <span className="flex items-center gap-1 text-white/70 text-[11px]">
-                                    <span className="text-[#8FA7C5]">★</span>
-                                    {movie.tmdbData.vote_average.toFixed(1)}
+                            {movie.episode_current && (
+                                <span className="text-white/40 text-[12px]">
+                                    | {movie.episode_current}
+                                </span>
+                            )}
+                            {movie.quality && (
+                                <span className="px-2 py-0.5 rounded border border-white/10 bg-white/5 text-white/60 text-[10px] font-bold">
+                                    {formatQualityLabel(movie.quality) || movie.quality}
                                 </span>
                             )}
                         </div>
@@ -381,7 +385,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         {/* Title — key triggers re-animation on slide change */}
                         <h1
                             key={`title-${index}`}
-                            className="font-display text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black text-white leading-[1.12] tracking-[-0.015em] line-clamp-2 pt-1 animate-hero-in"
+                            className="font-display text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-[1.1] tracking-[-0.03em] line-clamp-2 pt-1 animate-hero-in drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
                             title={decodeHtml(movie.name)}
                         >
                             {decodeHtml(movie.name)}
@@ -436,9 +440,9 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         >
                             <Link
                                 href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                className="flex items-center justify-center gap-2 h-12 px-8 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[15px] transition-all duration-300 hover:scale-105 active:scale-95"
+                                className="flex items-center justify-center gap-2 h-14 px-10 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[16px] transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_8px_20px_-4px_rgba(143,167,197,0.4)]"
                             >
-                                <Play className="w-4 h-4 fill-[#0a0a0a] shrink-0" />
+                                <Play className="w-5 h-5 fill-[#0a0a0a] shrink-0" />
                                 Xem Ngay
                             </Link>
                             <Link
