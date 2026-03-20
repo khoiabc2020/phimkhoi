@@ -35,10 +35,20 @@ const cleanQueryString = (query: string) => {
 };
 
 const calculateSimilarity = (str1: string, str2: string) => {
-    const s1 = str1.toLowerCase().replace(/[^a-z0-9]/g, '');
-    const s2 = str2.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (!str1 || !str2) return 0;
+    
+    // Normalize string: lowercase, remove accents, remove symbols
+    const normalize = (s: string) => 
+        s.toLowerCase()
+         .normalize("NFD")
+         .replace(/[\u0300-\u036f]/g, "") // remove accents
+         .replace(/[^a-z0-9]/g, "");    // remove non-alphanumeric
+
+    const s1 = normalize(str1);
+    const s2 = normalize(str2);
+    
     if (s1 === s2) return 1.0;
-    if (s1.includes(s2) || s2.includes(s1)) return 0.8;
+    if (s1.length > 0 && s2.length > 0 && (s1.includes(s2) || s2.includes(s1))) return 0.8;
     return 0;
 };
 
@@ -65,7 +75,7 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
                 const locales = isAsianSearch ? ['zh-TW', 'vi-VN'] : ['vi-VN'];
 
                 for (const locale of locales) {
-                let url = `${TMDB_API_URL}/search/${endpoint}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(q)}&language=${locale}&_v=8`;
+                let url = `${TMDB_API_URL}/search/${endpoint}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(q)}&language=${locale}&_v=9`;
 
                 if (year) {
                     if (endpoint === 'movie') url += `&primary_release_year=${year}`;
@@ -220,7 +230,7 @@ export const getTMDBPersonDetails = async (personId: number) => {
 export const getTMDBDetails = async (id: number, type: 'movie' | 'tv' = 'movie') => {
     try {
         if (!TMDB_API_KEY) return null;
-        const url = `${TMDB_API_URL}/${type}/${id}?api_key=${TMDB_API_KEY}&append_to_response=videos,credits,external_ids,images&_v=8`;
+        const url = `${TMDB_API_URL}/${type}/${id}?api_key=${TMDB_API_KEY}&append_to_response=videos,credits,external_ids,images&_v=9`;
 
         const res = await fetch(url, { next: { revalidate: 3600 } });
         const data = await res.json();
@@ -235,7 +245,7 @@ export const getTMDBDetails = async (id: number, type: 'movie' | 'tv' = 'movie')
 export const getTMDBSeasonDetails = async (tvId: number, seasonNumber: number) => {
     try {
         if (!TMDB_API_KEY) return null;
-        const url = `${TMDB_API_URL}/tv/${tvId}/season/${seasonNumber}?api_key=${TMDB_API_KEY}&_v=8`;
+        const url = `${TMDB_API_URL}/tv/${tvId}/season/${seasonNumber}?api_key=${TMDB_API_KEY}&_v=9`;
         const res = await fetch(url, { next: { revalidate: 86400 } });
         if (!res.ok) return null;
         return await res.json();
