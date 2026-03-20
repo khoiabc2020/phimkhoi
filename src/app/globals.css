@@ -17,6 +17,7 @@
   --font-mono: var(--font-geist-mono), monospace;
   --font-display: var(--font-display), "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   --font-logo: var(--font-logo), "Roboto Condensed", sans-serif;
+  --font-outfit: var(--font-outfit), "Inter", sans-serif;
 
   /* Custom Animations */
   --animate-float: float 6s ease-in-out infinite;

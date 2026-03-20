@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Geist_Mono, Be_Vietnam_Pro, Roboto_Condensed } from "next/font/google";
+import { Inter, Geist_Mono, Be_Vietnam_Pro, Roboto_Condensed, Outfit } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
 import Script from "next/script";
@@ -19,6 +19,12 @@ const logoFont = Roboto_Condensed({
   variable: "--font-logo",
   subsets: ["latin", "vietnamese"],
   weight: ["500", "600", "700"],
+});
+
+const outfitFont = Outfit({
+  variable: "--font-outfit",
+  subsets: ["latin", "vietnamese"],
+  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
 export const viewport: Viewport = {
@@ -115,7 +121,7 @@ export default async function RootLayout({
         <link rel="dns-prefetch" href="https://i.ytimg.com" />
       </head>
       <body
-        className={`${interSans.variable} ${beVietnamPro.variable} ${logoFont.variable} antialiased pb-20 lg:pb-0 font-sans`}
+        className={`${interSans.variable} ${beVietnamPro.variable} ${logoFont.variable} ${outfitFont.variable} antialiased pb-20 lg:pb-0 font-sans`}
       >
         <Providers>
           <div className="flex flex-col min-h-screen">

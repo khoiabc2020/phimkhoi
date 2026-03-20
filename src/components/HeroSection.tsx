@@ -236,7 +236,7 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                     <div className="pl-[102px]">
                         <h1
                             key={`m-title-${index}`}
-                            className="text-[17px] font-black text-white leading-snug line-clamp-2 drop-shadow-[0_2px_14px_rgba(0,0,0,0.75)] animate-hero-in"
+                            className="text-[17px] font-outfit font-extrabold text-white leading-[1.2] line-clamp-2 drop-shadow-[0_2px_14px_rgba(0,0,0,0.75)] animate-hero-in tracking-tight"
                         >
                             {decodeHtml(movie.name)}
                         </h1>
@@ -382,7 +382,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         {/* Title — key triggers re-animation on slide change */}
                         <h1
                             key={`title-${index}`}
-                            className="font-display text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-[1.1] tracking-[-0.03em] line-clamp-2 pt-1 animate-hero-in drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
+                            className="font-outfit text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-white leading-[1.15] tracking-tight line-clamp-2 pt-1 animate-hero-in drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
                             title={decodeHtml(movie.name)}
                         >
                             {decodeHtml(movie.name)}
