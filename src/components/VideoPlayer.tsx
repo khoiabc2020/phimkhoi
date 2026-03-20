@@ -188,20 +188,10 @@ export default function VideoPlayer({
                     pip: true,
                     mutex: true,
                     fullscreen: true,
-                                 theme: "#10b981", // Emerald green theme
+                    theme: "#8FA7C5",
                     i18n: { "vi": VI_LOCALE },
                     lang: "vi",
                     moreVideoAttr: { crossOrigin: "anonymous" },
-                    icons: {
-                        play: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>`,
-                        pause: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="10" y1="15" x2="10" y2="9"/><line x1="14" y1="15" x2="14" y2="9"/></svg>`,
-                        volume: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>`,
-                        volumeClose: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>`,
-                        fullscreen: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>`,
-                        exitFullscreen: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6m0 0v6m0-6l-7 7m17-7h-6m0 0v6m0-6l7 7M20 10h-6m0 0V4m0 6l7-7M4 10h6m0 0V4m0 6l-7-7"/></svg>`,
-                        setting: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
-                        pip: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"/><rect x="13" y="11" width="8" height="6" rx="1"/></svg>`,
-                    },
                     // Controls: skip -10, skip +10 (luôn giữ), auto-next + next-episode chỉ trên màn lớn
                     controls: [
                         // Skip back 10s
@@ -209,12 +199,9 @@ export default function VideoPlayer({
                             position: "left",
                             name: "skip-back",
                             index: 11,
-                            html: `<div style="display:flex; align-items:center; justify-content:center; width:36px; height:36px; margin: 0; transition: opacity 0.2s; cursor: pointer;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
-                                  <path d="M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10 10 10 0 0 1-10-10"/>
-                                  <path d="M2 12a10 10 0 0 1 10-10"/>
-                                  <polyline points="2 7 6 7 6 3"/>
-                                  <text x="12" y="16" font-size="9" font-weight="900" text-anchor="middle" fill="currentColor" stroke="none">10</text>
+                            html: `<div style="display:flex; align-items:center; justify-content:center; width:40px; height:40px; margin: 0; transition: opacity 0.2s; cursor: pointer;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                                <svg viewBox="0 0 24 24" fill="white" width="26" height="26">
+                                  <path d="M11.99 5V1l-5 5 5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6h-2c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8zm-1.1 11h-.85v-3.26l-1.01.31v-.69l1.77-.63h.09V16zm4.28-1.76c0 .32-.03.6-.1.82s-.17.42-.29.57-.28.26-.45.33-.37.1-.59.1-.41-.03-.59-.1-.33-.18-.46-.33-.23-.34-.3-.57-.11-.5-.11-.82v-.74c0-.32.03-.6.1-.82s.17-.42.29-.57.28-.26.45-.33.37-.1.59-.1.41.03.59.1.33.18.46.33.23.34.3.57.11.5.11.82v.74zm-.85-.86c0-.19-.01-.35-.04-.48s-.07-.23-.12-.31-.11-.14-.19-.17-.16-.04-.25-.04-.18.01-.25.04-.12.1-.18.17-.09.18-.12.31-.04.29-.04.48v.97c0 .19.01.35.04.48s.07.24.12.32.11.14.19.17.16.05.25.05.18-.01.25-.05.12-.1.18-.17.09-.18.12-.32.04-.29.04-.48v-.97z"/>
                                 </svg>
                             </div>`,
                             tooltip: "Tua lùi 10s",
@@ -225,12 +212,9 @@ export default function VideoPlayer({
                             position: "left",
                             name: "skip-forward",
                             index: 12,
-                            html: `<div style="display:flex; align-items:center; justify-content:center; width:36px; height:36px; margin: 0; transition: opacity 0.2s; cursor: pointer;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
-                                  <path d="M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10 10 10 0 0 1-10-10"/>
-                                  <path d="M22 12a10 10 0 0 0-10-10"/>
-                                  <polyline points="22 7 18 7 18 3"/>
-                                  <text x="12" y="16" font-size="9" font-weight="900" text-anchor="middle" fill="currentColor" stroke="none">10</text>
+                            html: `<div style="display:flex; align-items:center; justify-content:center; width:40px; height:40px; margin: 0; transition: opacity 0.2s; cursor: pointer;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                                <svg viewBox="0 0 24 24" fill="white" width="26" height="26">
+                                  <path d="M18 13c0 3.31-2.69 6-6 6s-6-2.69-6-6 2.69-6 6-6v4l5-5-5-5v4c-4.42 0-8 3.58-8 8s3.58 8 8 8 8-3.58 8-8h-2zm-5.66 3h-.85v-3.26l-1.01.31v-.69l1.77-.63h.09V16zm4.28-1.76c0 .32-.03.6-.1.82s-.17.42-.29.57-.28.26-.45.33-.37.1-.59.1-.41-.03-.59-.1-.33-.18-.46-.33-.23-.34-.3-.57-.11-.5-.11-.82v-.74c0-.32.03-.6.1-.82s.17-.42.29-.57.28-.26.45-.33.37-.1.59-.1.41.03.59.1.33.18.46.33.23.34.3.57.11.5.11.82v.74zm-.85-.86c0-.19-.01-.35-.04-.48s-.07-.23-.12-.31-.11-.14-.19-.17-.16-.04-.25-.04-.18.01-.25.04-.12.1-.18.17-.09.18-.12.31-.04.29-.04.48v.97c0 .19.01.35.04.48s.07.24.12.32.11.14.19.17.16.05.25.05.18-.01.25-.05.12-.1.18-.17.09-.18.12-.32.04-.29.04-.48v-.97z"/>
                                 </svg>
                             </div>`,
                             tooltip: "Tua tiếp 10s",
@@ -243,8 +227,8 @@ export default function VideoPlayer({
                             index: 10,
                             html: `<div style="display:flex; align-items:center; margin-right: 8px; cursor: pointer; opacity: 0.9;" id="auto-next-toggle">
                                 <span style="font-size: 13px; color: rgba(255,255,255,0.8); margin-right: 8px; font-weight: 500;">Chuyển tập</span>
-                                <div style="width: 32px; height: 18px; background: #10b981; border-radius: 9px; position: relative; transition: background 0.2s;" id="auto-next-bg">
-                                    <div style="width: 14px; height: 14px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 16px; transition: left 0.2s;" id="auto-next-dot"></div>
+                                <div style="width: 34px; height: 20px; background: #8FA7C5; border-radius: 10px; position: relative; transition: background 0.2s;" id="auto-next-bg">
+                                    <div style="width: 16px; height: 16px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 16px; transition: left 0.2s;" id="auto-next-dot"></div>
                                 </div>
                             </div>`,
                             tooltip: "Tự động chuyển tập",
@@ -252,14 +236,14 @@ export default function VideoPlayer({
                                 const bg = document.getElementById("auto-next-bg");
                                 const dot = document.getElementById("auto-next-dot");
                                 if (bg && dot) {
-                                    const isAuto = bg.style.background === "rgb(16, 185, 129)" || bg.style.background === "#10b981";
+                                    const isAuto = bg.style.background === "rgb(143, 167, 197)" || bg.style.background === "#8FA7C5";
                                     if (isAuto) {
                                         bg.style.background = "rgba(255,255,255,0.3)";
                                         dot.style.left = "2px";
                                         localStorage.setItem("autoNextEpisode", "false");
                                         autoNextRef.current = false;
                                     } else {
-                                        bg.style.background = "#10b981";
+                                        bg.style.background = "#8FA7C5";
                                         dot.style.left = "16px";
                                         localStorage.setItem("autoNextEpisode", "true");
                                         autoNextRef.current = true;
@@ -272,7 +256,7 @@ export default function VideoPlayer({
                                 const dot = document.getElementById("auto-next-dot");
                                 if (bg && dot) {
                                     if (isAuto) {
-                                        bg.style.background = "#10b981";
+                                        bg.style.background = "#8FA7C5";
                                         dot.style.left = "16px";
                                     } else {
                                         bg.style.background = "rgba(255,255,255,0.3)";
@@ -286,10 +270,10 @@ export default function VideoPlayer({
                             position: "right",
                             name: "next-episode",
                             index: 11,
-                            html: `<div style="display:flex; align-items:center; justify-content:center; width:36px; height:36px; margin: 0 4px; opacity: 0.8; transition: opacity 0.2s; cursor: pointer;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
-                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <polygon points="5 4 15 12 5 20 5 4" fill="currentColor"/>
-                                    <line x1="19" y1="5" x2="19" y2="19"/>
+                            html: `<div style="display:flex; align-items:center; justify-content:center; width:40px; height:40px; margin: 0 4px; opacity: 0.8; transition: opacity 0.2s; cursor: pointer;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="white" stroke="none">
+                                    <polygon points="5 4 15 12 5 20 5 4" />
+                                    <rect x="17" y="5" width="3" height="14" rx="1" />
                                 </svg>
                             </div>`,
                             tooltip: "Tập tiếp theo",
@@ -512,6 +496,15 @@ export default function VideoPlayer({
                 .art-ios-theme.art-video-player .art-controls-left .art-volume {
                     margin-left: 8px !important;
                 }
+                /* Tăng kích thước icon chung */
+                .art-ios-theme.art-video-player .art-icon {
+                    width: 32px !important;
+                    height: 32px !important;
+                }
+                .art-ios-theme.art-video-player .art-icon svg {
+                    width: 24px !important;
+                    height: 24px !important;
+                }
                 .art-ios-theme.art-video-player .art-volume-slider {
                     width: 70px !important;
                 }
@@ -530,18 +523,18 @@ export default function VideoPlayer({
                     background: white !important;
                     height: 4px !important;
                 }
-                /* Thin progress bar like iOS */
+                /* Progress bar size */
                 .art-ios-theme.art-video-player .art-progress {
-                    height: 4px !important;
-                    margin-bottom: 4px !important;
+                    height: 6px !important;
+                    margin-bottom: 2px !important;
                 }
                 .art-ios-theme.art-video-player .art-progress-played {
-                    background: #10b981 !important;
+                    background: #8FA7C5 !important;
                 }
                 .art-ios-theme.art-video-player .art-progress-indicator {
                     background: white !important;
-                    width: 14px !important;
-                    height: 14px !important;
+                    width: 16px !important;
+                    height: 16px !important;
                     box-shadow: 0 0 8px rgba(0,0,0,0.5) !important;
                 }
                 .art-ios-theme.art-video-player .art-progress-loaded {
@@ -549,7 +542,7 @@ export default function VideoPlayer({
                 }
                 /* Transparent bottom for a cleaner look */
                 .art-ios-theme.art-video-player .art-bottom {
-                    background: linear-gradient(to top, rgba(0,0,0,0.6), transparent) !important;
+                    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent) !important;
                 }
                 /* Bigger bottom controls on mobile for touch */
                 @media (max-width: 768px) {
@@ -557,19 +550,19 @@ export default function VideoPlayer({
                         padding: 6px 10px calc(14px + env(safe-area-inset-bottom, 0px)) 10px !important;
                     }
                     .art-ios-theme.art-video-player .art-progress {
-                        height: 5px !important;
+                        height: 7px !important;
                     }
                     .art-ios-theme.art-video-player .art-progress-indicator {
-                        width: 18px !important;
-                        height: 18px !important;
+                        width: 20px !important;
+                        height: 20px !important;
                     }
                     .art-ios-theme.art-video-player .art-icon {
-                        width: 38px !important;
-                        height: 38px !important;
+                        width: 42px !important;
+                        height: 42px !important;
                     }
                     .art-ios-theme.art-video-player .art-icon svg {
-                        width: 22px !important;
-                        height: 22px !important;
+                        width: 26px !important;
+                        height: 26px !important;
                     }
                     /* Hide less important controls on small screens */
                     .art-ios-theme.art-video-player .art-screenshot { display: none !important; }
@@ -595,8 +588,8 @@ export default function VideoPlayer({
                     /* Shrink skip buttons on very small screens */
                     .art-ios-theme.art-video-player .art-controls-left [name="skip-back"] > div,
                     .art-ios-theme.art-video-player .art-controls-left [name="skip-forward"] > div {
-                        width: 30px !important;
-                        height: 30px !important;
+                        width: 34px !important;
+                        height: 34px !important;
                     }
                     /* Reduce time display font size */
                     .art-ios-theme.art-video-player .art-time {
