@@ -191,7 +191,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
         "@type": type === 'tv' ? "TVSeries" : "Movie",
         "name": movie?.name,
         "alternativeHeadline": movie?.origin_name,
-        "image": posterUrl,
+        "image": sourcePosterUrl || sourceThumbUrl || tmdbBackdrop,
         "description": movie?.content?.replace(/<[^>]+>/g, ''),
         "dateCreated": movie?.year?.toString(),
         "director": {
