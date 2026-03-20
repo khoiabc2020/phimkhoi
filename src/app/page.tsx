@@ -181,13 +181,13 @@ async function HeroStream() {
       next: { revalidate: 3600 }
     });
     const data = await res.json();
-    let finalHeroData: any[] = (data.movies || []).slice(0, 5);
+    let finalHeroData: any[] = (data.movies || []).slice(0, 10);
     
     // Nếu không có trending từ TMDb, tải backup từ phim bộ mới
     if (finalHeroData.length < 3) {
       const backupRes = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/trending?type=phim-bo`);
       const backupData = await backupRes.json();
-      finalHeroData = (backupData.movies || []).slice(0, 5);
+      finalHeroData = (backupData.movies || []).slice(0, 10);
     }
     
     return <AsyncHeroSection initialMovies={finalHeroData} />;
@@ -205,7 +205,7 @@ export default function Home() {
         <HeroStream />
       </Suspense>
 
-      <div className="w-full max-w-[1920px] mx-auto px-1.5 sm:px-3 md:px-5 lg:pl-20 relative z-20 pb-16">
+      <div className="w-full max-w-[1920px] mx-auto px-1.5 sm:px-3 md:px-5 lg:pl-24 relative z-20 pb-16">
         <div className="mb-6">
           <QuickNav />
         </div>

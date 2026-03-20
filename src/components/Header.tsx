@@ -193,7 +193,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         : "bg-gradient-to-b from-[#0a0a0a]/90 via-[#0a0a0a]/40 to-transparent py-0 pointer-events-none"
                 )}
             >
-                <div className="w-full h-[54px] lg:h-[64px] flex items-center justify-between gap-3 flex-nowrap pointer-events-auto px-1 lg:px-4">
+                <div className="w-full h-[54px] lg:h-[64px] flex items-center justify-between gap-3 flex-nowrap pointer-events-auto px-4 lg:px-8">
                     {/* Mobile Section: Hamburger & Mobile Logo */}
                     <div className="flex lg:hidden items-center gap-2 shrink-0">
                         <button

@@ -96,14 +96,14 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
 
     return (
         <main className="min-h-screen pb-20">
-            <div className="pt-24 w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8">
+            <div className="pt-24 w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 lg:pl-24 lg:pr-12">
                 <div className="mb-6 rounded-[12px] border border-white/[0.06] bg-[#07070b]/78 p-4 md:p-5 shadow-xl transition-all">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                         <div className="space-y-1">
                             <p className="text-[#8FA7C5] text-[11px] font-bold uppercase tracking-[0.2em] opacity-80 pl-1">
                                 Danh sách / {typeName}
                             </p>
-                            <h1 className="text-[32px] md:text-[44px] font-outfit font-extrabold text-white tracking-tighter leading-none italic uppercase">
+                            <h1 className="text-[30px] md:text-[40px] font-outfit font-extrabold text-white tracking-tighter leading-tight italic uppercase drop-shadow-lg">
                                 {typeName}
                             </h1>
                         </div>

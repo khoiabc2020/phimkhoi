@@ -80,7 +80,9 @@ export default function MobileMenu({
                 {/* Header */}
                 <div className="flex items-center justify-between px-5 h-[72px] shrink-0 border-b border-white/[0.06] bg-[#1a1f2e]/92">
                     <Link href="/" onClick={onClose} className="flex items-center">
-                        <span className="inline-block font-logo text-[28px] font-semibold uppercase tracking-[0.012em] leading-none whitespace-nowrap"><span className="text-[#9CA3AF]">KHOI</span><span className="text-[#8FA7C5]">PHIM</span></span>
+                        <span className="font-display text-[24px] font-black uppercase tracking-tighter text-white">
+                            KHOIPHIM<span className="text-[#8FA7C5] ml-0.5">.</span>
+                        </span>
                     </Link>
                     <button
                         onClick={onClose}

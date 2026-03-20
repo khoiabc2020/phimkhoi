@@ -86,7 +86,7 @@ export default async function CountryPage({ params, searchParams }: { params: Pr
 
     return (
         <main className="min-h-screen pb-20">
-            <div className="pt-24 w-full max-w-[1920px] mx-auto px-4 sm:px-6 md:px-12 relative">
+            <div className="pt-24 w-full max-w-[1920px] mx-auto px-4 sm:px-6 md:px-12 lg:pl-24 lg:pr-12 relative">
                 {/* Decorative background glow */}
                 <div className="absolute top-0 left-0 right-0 h-[400px] bg-gradient-to-b from-[#0e1621] via-transparent to-transparent pointer-events-none -z-10 blur-[120px]" />
 
@@ -102,7 +102,7 @@ export default async function CountryPage({ params, searchParams }: { params: Pr
                         
                         <div className="space-y-1">
                             <span className="text-[#8FA7C5] text-xs font-bold uppercase tracking-[0.2em] opacity-80 pl-1">Quốc gia</span>
-                            <h1 className="text-[36px] md:text-[56px] font-outfit font-extrabold text-white tracking-tighter leading-none italic uppercase">
+                            <h1 className="text-[32px] md:text-[40px] lg:text-[48px] font-outfit font-extrabold text-white tracking-tighter leading-tight italic uppercase drop-shadow-lg">
                                 {countryName}
                             </h1>
                         </div>

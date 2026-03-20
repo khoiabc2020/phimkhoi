@@ -348,7 +348,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
             </div>
 
             {/* ── Content ── */}
-            <div className="relative z-[3] h-full w-full max-w-[1920px] mx-auto lg:pl-20 px-6 md:px-10 lg:pl-12 lg:pr-6 flex items-end pb-12 md:pb-16 lg:pb-24 pointer-events-none">
+            <div className="relative z-[3] h-full w-full max-w-[1920px] mx-auto px-6 md:px-10 lg:pl-24 lg:pr-12 flex items-end pb-12 md:pb-16 lg:pb-24 pointer-events-none">
                 <div className="w-full">
                     {/* Left: Text block */}
                     <div className="w-full md:w-[85%] lg:w-[80%] xl:w-[70%] space-y-4 lg:space-y-6 pointer-events-auto">
@@ -383,14 +383,13 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                             key={`title-${index}`}
                             className={cn(
                                 "font-outfit font-black text-white leading-[1.05] tracking-tight pt-1 animate-hero-in drop-shadow-[0_8px_24px_rgba(0,0,0,0.9)] uppercase",
-                                "text-balance",
-                                movie.name.length > 40 ? "line-clamp-3" : "line-clamp-2",
-                                // Tablet (md) and iPad (lg) specific scaling
+                                "text-balance line-clamp-2",
+                                // Scaled down for better balance
                                 movie.name.length > 35 
-                                    ? "text-3xl md:text-4xl lg:text-5xl xl:text-6xl" 
+                                    ? "text-2xl md:text-3xl lg:text-4xl xl:text-5xl" 
                                     : movie.name.length > 20
-                                        ? "text-4xl md:text-5xl lg:text-[54px] xl:text-[72px]"
-                                        : "text-4xl md:text-6xl lg:text-7xl xl:text-[88px]"
+                                        ? "text-3xl md:text-4xl lg:text-5xl xl:text-6xl"
+                                        : "text-4xl md:text-5xl lg:text-6xl xl:text-7xl"
                             )}
                             title={decodeHtml(movie.name)}
                         >
@@ -436,21 +435,21 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         >
                             <Link
                                 href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                className="flex items-center justify-center gap-2 h-14 md:h-16 px-10 md:px-12 rounded-full bg-[#00FF57] text-black font-black text-[17px] transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_12px_24px_-8px_rgba(0,255,87,0.5)] group"
+                                className="flex items-center justify-center gap-2 h-12 md:h-14 px-8 md:px-10 rounded-full bg-[#00FF57] text-black font-black text-[16px] transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_8px_20px_-6px_rgba(0,255,87,0.4)] group"
                             >
-                                <Play className="w-6 h-6 fill-black shrink-0 group-hover:scale-110 transition-transform" />
+                                <Play className="w-5 h-5 fill-black shrink-0 group-hover:scale-110 transition-transform" />
                                 Xem Ngay
                             </Link>
                             <Link
                                 href={`/phim/${movie.slug}`}
-                                className="flex items-center justify-center gap-2 h-14 md:h-16 px-8 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-[16px] transition-all hover:scale-105 active:scale-95 backdrop-blur-md shadow-xl"
+                                className="flex items-center justify-center gap-2 h-12 md:h-14 px-7 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-[15px] transition-all hover:scale-105 active:scale-95 backdrop-blur-md shadow-xl"
                             >
-                                <Info className="w-6 h-6" />
+                                <Info className="w-5 h-5" />
                                 <span className="hidden sm:inline">Thông Tin</span>
                                 <span className="sm:hidden">Thông Tin</span>
                             </Link>
-                            <div className="h-14 w-14 md:h-16 md:w-16 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 border border-white/20 transition-all hover:scale-110 cursor-pointer backdrop-blur-md shadow-xl group">
-                                <FavoriteButton movieData={getFavoriteData(movie)} size="md" />
+                            <div className="h-12 w-12 md:h-14 md:w-14 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 border border-white/20 transition-all hover:scale-110 cursor-pointer backdrop-blur-md shadow-xl group">
+                                <FavoriteButton movieData={getFavoriteData(movie)} size="sm" />
                             </div>
                         </div>
                     </div>
@@ -483,10 +482,10 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                                     key={`thumb-${m._id || idx}`}
                                     onClick={() => go(idx)}
                                     className={cn(
-                                        "relative w-[130px] lg:w-[160px] aspect-[16/9] rounded-lg overflow-hidden cursor-pointer flex-shrink-0 transition-all duration-500 box-border group",
+                                        "relative w-[110px] lg:w-[130px] aspect-[16/9] rounded-lg overflow-hidden cursor-pointer flex-shrink-0 transition-all duration-500 box-border group",
                                         isActive 
                                             ? "ring-2 ring-white scale-100 opacity-100 shadow-[0_4px_20px_rgba(0,0,0,0.8)]" 
-                                            : "ring-1 ring-white/10 scale-[0.92] opacity-50 hover:opacity-80 hover:scale-95"
+                                            : "ring-1 ring-white/10 scale-[0.92] opacity-40 hover:opacity-100 hover:scale-95"
                                     )}
                                 >
                                     <Image
@@ -512,7 +511,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
 
 export default function HeroSection({ movies }: { movies: Movie[] }) {
     if (!movies || movies.length === 0) return null;
-    const heroMovies = movies.slice(0, 5);
+    const heroMovies = movies.slice(0, 10);
 
     return (
         <div className="relative w-full bg-transparent font-sans" style={{ contain: "layout style paint" }}>
