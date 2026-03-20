@@ -61,6 +61,7 @@ export default function LazySection({
         <div
             ref={containerRef}
             style={visible ? undefined : { minHeight }}
+            className={visible ? "animate-slide-up" : ""}
         >
             {visible ? children : null}
         </div>

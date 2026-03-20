@@ -160,10 +160,13 @@ async function HomeContentStream() {
           <AsyncTopTrendingHub />
         </Suspense>
       </LazySection>
-      <div className="space-y-10 md:space-y-12">
-        <LazySection minHeight={360}>
-          <HomeSection title="Đề xuất cho bạn">
+      <div className="space-y-12">
+        <LazySection minHeight={200}>
             <ContinueWatchingRow />
+        </LazySection>
+
+        <LazySection minHeight={380}>
+          <HomeSection title="Phim Mới & Chiếu Rạp">
             {homeData.phimChieuRap?.length ? (
               <MovieRow title="Phim Chiếu Rạp Mới" movies={homeData.phimChieuRap.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.phimChieuRap} />
             ) : null}
@@ -173,7 +176,7 @@ async function HomeContentStream() {
           </HomeSection>
         </LazySection>
 
-        <LazySection minHeight={340}>
+        <LazySection minHeight={380}>
           <HomeSection title="Phim theo quốc gia" viewAllHref={HOME_SECTION_SLUGS.hanQuoc} viewAllLabel="Xem thêm">
             {homeData.hanQuoc?.length ? (
               <MovieRow title="Hàn Quốc" movies={homeData.hanQuoc.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.hanQuoc} />
@@ -198,8 +201,8 @@ async function HomeContentStream() {
           </HomeSection>
         </LazySection>
 
-        <LazySection minHeight={360}>
-          <HomeSection title="Thể loại" viewAllHref={HOME_SECTION_SLUGS.hanhDong} viewAllLabel="Xem thêm">
+        <LazySection minHeight={380}>
+          <HomeSection title="Thế loại phổ biến" viewAllHref={HOME_SECTION_SLUGS.hanhDong} viewAllLabel="Xem thêm">
             {homeData.hanhDong?.length ? (
               <MovieRow title="Hành Động" movies={homeData.hanhDong.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.hanhDong} />
             ) : null}
@@ -208,9 +211,6 @@ async function HomeContentStream() {
             ) : null}
             {homeData.hoatHinh?.length ? (
               <MovieRow title="Hoạt Hình" movies={homeData.hoatHinh.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.hoatHinh} />
-            ) : null}
-            {homeData.tvShows?.length ? (
-              <MovieRow title="TV Shows" movies={homeData.tvShows.slice(0, ROW_LIMIT)} slug={HOME_SECTION_SLUGS.tvShows} />
             ) : null}
           </HomeSection>
         </LazySection>
