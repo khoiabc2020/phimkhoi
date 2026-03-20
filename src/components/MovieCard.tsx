@@ -86,18 +86,10 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
     const tmdbBackdrop = (movie as any).tmdbData?.backdrop_path ? getTMDBImage((movie as any).tmdbData.backdrop_path, "w500") : "";
     const tmdbPosterFallback = (movie as any).tmdbData?.poster_path ? getTMDBImage((movie as any).tmdbData.poster_path, "w500") : "";
     
-    let sourceBackdrop = "";
-    if (movie.thumb_url && detectOrientation(movie.thumb_url) === "landscape") {
-        sourceBackdrop = movie.thumb_url;
-    } else if (movie.poster_url && detectOrientation(movie.poster_url) === "landscape" && !movie.poster_url.includes("-poster.")) {
-        // Only use poster_url as landscape if it's not a known unreliable OPhim-style -poster.jpg
-        sourceBackdrop = movie.poster_url;
-    } else {
-        // Fallback: use thumb (usually the snowy portrait) instead of the horse poster
-        sourceBackdrop = movie.thumb_url || movie.poster_url;
-    }
+    // User request: Priority to source backdrop (thumb_url usually has the leads)
+    const sourceBackdrop = movie.thumb_url ? getImageUrl(movie.thumb_url) : (movie.poster_url ? getImageUrl(movie.poster_url) : "");
 
-    const displayBackdrop = tmdbBackdrop || tmdbPosterFallback || (sourceBackdrop ? getImageUrl(sourceBackdrop) : null);
+    const displayBackdrop = sourceBackdrop || tmdbBackdrop || tmdbPosterFallback || null;
 
     // Reset fallback state when card movie changes
     useEffect(() => {

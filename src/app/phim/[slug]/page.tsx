@@ -164,37 +164,25 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     });
 
     // --- Backdrop image selection ---
-    // Rule: PRIORITY 1 = TMDB Backdrop (Best quality, correct scene)
-    //       PRIORITY 2 = TMDB Poster (If backdrop missing, use poster)
-    //       PRIORITY 3 = Source Portrait (If TMDB fails, use the leads' poster)
-    //       STRICT AVOIDANCE = Source "-poster.jpg" or "-thumb.jpg" that look like landscapes from OPhim.
+    // Rule: PRIORITY 1 = Source Thumb (The snowy couple in OPhim thumb_url)
+    //       PRIORITY 2 = TMDB Backdrop (High quality fallback)
+    //       PRIORITY 3 = TMDB Poster
+    //       PRIORITY 4 = Source Poster (The Horse - least desired)
 
     const tmdbBackdrop = tmdbDetails?.backdrop_path ? getTMDBImage(tmdbDetails.backdrop_path, "original") : "";
     const tmdbPosterFallback = tmdbDetails?.poster_path ? getTMDBImage(tmdbDetails.poster_path, "original") : "";
 
-    // Find the REAL portrait (Usually the one showing the actors, not the generic scene)
-    let authenticatedPortrait = "";
-    const isAsianMovie = movie?.category?.some((c: any) => ["Phim Bộ", "Phim Lẻ", "Trung Quốc", "Hàn Quốc"].includes(c.name));
-
-    if (movie?.thumb_url && detectOrientation(movie.thumb_url) === "portrait") {
-        authenticatedPortrait = movie.thumb_url;
-    } else if (movie?.poster_url && detectOrientation(movie.poster_url) === "portrait") {
-        authenticatedPortrait = movie.poster_url;
-    } else {
-        // Fallback: Pick the one that is NOT a "-poster.jpg" because we know that's the horse on OPhim for Asian dramas
-        if (isAsianMovie && movie?.thumb_url && movie.thumb_url.includes("-thumb.")) {
-            authenticatedPortrait = movie.thumb_url;
-        } else {
-            authenticatedPortrait = movie?.thumb_url || movie?.poster_url || "";
-        }
-    }
-
-    const posterUrl = getImageUrl(authenticatedPortrait);
+    // Verified source backdrop - User specifically requested "lấy ảnh backdrop của nguồn phim đi"
+    // For Asian dramas, the "thumb_url" usually contains the main actors (Snowy Couple).
+    const sourceThumbUrl = movie?.thumb_url ? getImageUrl(movie.thumb_url) : "";
+    const sourcePosterUrl = movie?.poster_url ? getImageUrl(movie.poster_url) : "";
     
-    // Final Backdrop Selection: NEVER USE THE HORSE (Source Landscape) UNLESS TMDB SAYS SO
-    // Note: If we have NO tmdbBackdrop, we prefer showing the portrait (posterUrl) 
-    // rather than the source "landscape" (which we know is often wrong).
-    const backdropUrl = tmdbBackdrop || tmdbPosterFallback || posterUrl;
+    // Final Backdrop Selection
+    // Priority: Source Thumb -> TMDB Backdrop -> TMDB Poster -> Source Poster
+    const backdropUrl = sourceThumbUrl || tmdbBackdrop || tmdbPosterFallback || sourcePosterUrl;
+    
+    // We treat it as a "portrait" style (to apply blur/object-contain) if it's from source 
+    // because source images are often smaller/differently aspected than pure backdrops.
     const isPortraitFallback = !tmdbBackdrop && !!backdropUrl;
     const rating = tmdbDetails?.vote_average ? tmdbDetails.vote_average.toFixed(1) : "9.7";
 
