@@ -610,12 +610,6 @@ export default function VideoPlayer({
                         display: none !important;
                     }
                 }
-            `}</style>e.art-video-player .art-setting,
-                    .art-ios-theme.art-video-player .art-playbackRate,
-                    .art-ios-theme.art-video-player .art-aspect-ratio {
-                        display: none !important;
-                    }
-                }
             `}</style>
         </>
     );
