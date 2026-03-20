@@ -75,7 +75,7 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
                 const locales = isAsianSearch ? ['zh-TW', 'vi-VN'] : ['vi-VN'];
 
                 for (const locale of locales) {
-                let url = `${TMDB_API_URL}/search/${endpoint}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(q)}&language=${locale}&_v=10`;
+                let url = `${TMDB_API_URL}/search/${endpoint}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(q)}&language=${locale}&_v=11`;
 
                 if (year) {
                     if (endpoint === 'movie') url += `&primary_release_year=${year}`;
@@ -230,7 +230,7 @@ export const getTMDBPersonDetails = async (personId: number) => {
 export const getTMDBDetails = async (id: number, type: 'movie' | 'tv' = 'movie') => {
     try {
         if (!TMDB_API_KEY) return null;
-        const url = `${TMDB_API_URL}/${type}/${id}?api_key=${TMDB_API_KEY}&append_to_response=videos,credits,external_ids,images&_v=10`;
+        const url = `${TMDB_API_URL}/${type}/${id}?api_key=${TMDB_API_KEY}&append_to_response=videos,credits,external_ids,images&_v=11`;
 
         const res = await fetch(url, { next: { revalidate: 3600 } });
         const data = await res.json();
@@ -245,7 +245,7 @@ export const getTMDBDetails = async (id: number, type: 'movie' | 'tv' = 'movie')
 export const getTMDBSeasonDetails = async (tvId: number, seasonNumber: number) => {
     try {
         if (!TMDB_API_KEY) return null;
-        const url = `${TMDB_API_URL}/tv/${tvId}/season/${seasonNumber}?api_key=${TMDB_API_KEY}&_v=10`;
+        const url = `${TMDB_API_URL}/tv/${tvId}/season/${seasonNumber}?api_key=${TMDB_API_KEY}&_v=11`;
         const res = await fetch(url, { next: { revalidate: 86400 } });
         if (!res.ok) return null;
         return await res.json();

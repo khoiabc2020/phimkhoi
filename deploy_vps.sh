@@ -43,9 +43,11 @@ if [ -f .env.local ]; then
     echo "Copied .env.local to standalone directory"
 fi
 
-# Restart PM2 process
-echo "Restarting PM2..."
-npx pm2 startOrReload ecosystem.config.cjs --update-env
+# Restart PM2 process (FORCE DELETE and START to ensure clean state and correct mode)
+echo "Restarting PM2 (Forced)..."
+# Try to delete, but don't fail if it's not there
+npx pm2 delete phimkhoi || true
+npx pm2 start ecosystem.config.cjs --update-env
 npx pm2 save
 
 echo "Deployment complete!"
