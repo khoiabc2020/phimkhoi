@@ -347,7 +347,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
             </div>
 
             {/* ── Content ── */}
-            <div className="relative z-[3] h-full w-full max-w-[1920px] mx-auto lg:pl-20 px-6 md:px-10 lg:px-12 flex items-end pb-12 md:pb-16 lg:pb-20">
+            <div className="relative z-[3] h-full w-full max-w-[1920px] mx-auto lg:pl-20 px-6 md:px-10 lg:pl-12 lg:pr-6 flex items-end pb-12 md:pb-16 lg:pb-20">
                 <div className="grid grid-cols-12 gap-8 lg:gap-12 w-full items-end">
 
                     {/* Left: Text block */}
@@ -479,8 +479,8 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                     </div>
 
                     {/* Right: Poster Stack (Preloaded) */}
-                    <div className="col-span-12 md:col-span-4 lg:col-span-4 xl:col-span-4 hidden md:flex justify-end items-end pr-0 lg:pr-4">
-                        <div className="relative w-[220px] lg:w-[320px] xl:w-[360px] aspect-[2/3] rounded-[10px] overflow-hidden ring-1 ring-white/10 shadow-[0_20px_42px_#00000088] group/poster transition-transform duration-200 ease-out animate-hero-in animation-delay-100">
+                    <div className="col-span-12 md:col-span-4 lg:col-span-4 xl:col-span-4 hidden md:flex justify-end items-end pr-0">
+                        <div className="relative w-[220px] lg:w-[320px] xl:w-[360px] aspect-[2/3] rounded-[10px] overflow-hidden ring-1 ring-white/10 shadow-[0_20px_42px_#00000088] group/poster transition-transform duration-200 ease-out animate-hero-in animation-delay-100 lg:translate-x-8 xl:translate-x-12 2xl:translate-x-20">
                             {movies.map((m: any, i) => {
                                 const isActive = i === index;
                                 return (
