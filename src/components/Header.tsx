@@ -186,7 +186,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
         <>
             <header
                 className={cn(
-                    "fixed top-0 right-0 z-40 transition-colors duration-200 will-change-transform transform-gpu lg:left-20 xl:left-64",
+                    "fixed top-0 right-0 z-40 transition-colors duration-200 will-change-transform transform-gpu lg:left-20 xl:left-56",
                     isScrolled
                         ? "bg-[#0a0a0a]/92 backdrop-blur-md shadow-md pointer-events-auto"
                         : "bg-gradient-to-b from-[#0a0a0a]/80 via-[#0a0a0a]/20 to-transparent pointer-events-none"
@@ -212,7 +212,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         {/* Logo - Mobile only */}
                         <Link href="/" className="flex lg:hidden items-center group shrink-0 order-2 md:order-none">
                             <span className="inline-block font-logo text-[22px] md:text-[26px] font-semibold uppercase tracking-[0.012em] leading-none whitespace-nowrap">
-                                <span className="text-white">KHOI</span><span className="text-[#22C55E]">PHIM</span>
+                                <span className="text-[#9CA3AF]">KHOI</span><span className="text-[#8FA7C5]">PHIM</span>
                             </span>
                         </Link>
                     </div>
