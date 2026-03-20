@@ -174,7 +174,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
 
     // Find the REAL portrait (Usually the one showing the actors, not the generic scene)
     let authenticatedPortrait = "";
-    const isAsianMovie = movie?.category?.some(c => ["Phim Bộ", "Phim Lẻ", "Trung Quốc", "Hàn Quốc"].includes(c.name));
+    const isAsianMovie = movie?.category?.some((c: any) => ["Phim Bộ", "Phim Lẻ", "Trung Quốc", "Hàn Quốc"].includes(c.name));
 
     if (movie?.thumb_url && detectOrientation(movie.thumb_url) === "portrait") {
         authenticatedPortrait = movie.thumb_url;
