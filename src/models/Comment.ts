@@ -18,6 +18,7 @@ export interface IComment extends Document {
     isApproved: boolean;
     isReported: boolean;
     reportReason?: string;
+    imageUrl?: string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -41,6 +42,7 @@ const CommentSchema: Schema<IComment> = new Schema(
         isApproved: { type: Boolean, default: true },
         isReported: { type: Boolean, default: false },
         reportReason: { type: String },
+        imageUrl: { type: String },
     },
     { timestamps: true }
 );

@@ -12,6 +12,7 @@ export async function addComment(data: {
     movieSlug: string;
     episodeName?: string;
     content: string;
+    imageUrl?: string;
     rating?: number;
     parentId?: string;
 }) {
@@ -36,6 +37,7 @@ export async function addComment(data: {
             movieSlug: data.movieSlug,
             episodeName: data.episodeName,
             content: data.content.trim(),
+            imageUrl: data.imageUrl,
             userRole: roleDisplay,
             rating: data.rating,
             parentId: data.parentId || undefined,

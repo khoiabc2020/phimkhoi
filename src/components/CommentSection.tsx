@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { Send, ThumbsUp, ThumbsDown, Reply, Flag, Trash2, Edit2, Star, Loader2, MessageCircle, Smile } from "lucide-react";
 import { addComment, getComments, likeComment, dislikeComment, deleteComment, reportComment } from "@/app/actions/comments";
 import Image from "next/image";
+import CommentMemePicker from "./CommentMemePicker";
 
 interface CommentData {
     _id: string;
@@ -20,6 +21,7 @@ interface CommentData {
     likedBy: string[];
     dislikedBy: string[];
     replyCount?: number;
+    imageUrl?: string;
     createdAt: string;
     updatedAt: string;
 }
@@ -59,6 +61,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
     const [submitting, setSubmitting] = useState(false);
     const [replyingTo, setReplyingTo] = useState<string | null>(null);
     const [total, setTotal] = useState(0);
+    const [showPicker, setShowPicker] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
     const fetchComments = async () => {
@@ -131,6 +134,48 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
         });
     };
 
+    const handleEmojiSelect = (emoji: string) => {
+        const textarea = textareaRef.current;
+        if (!textarea) {
+            setNewComment((prev) => prev + emoji);
+            return;
+        }
+
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const text = newComment;
+        const before = text.substring(0, start);
+        const after = text.substring(end);
+
+        setNewComment(before + emoji + after);
+        
+        // Restore focus and cursor position
+        requestAnimationFrame(() => {
+            textarea.focus();
+            const newPos = start + emoji.length;
+            textarea.setSelectionRange(newPos, newPos);
+        });
+    };
+
+    const handleMemeSelect = async (memeUrl: string) => {
+        if (!session) return;
+        setShowPicker(false);
+        setSubmitting(true);
+        
+        const result = await addComment({
+            movieId,
+            movieSlug,
+            episodeName,
+            content: "[Sticker]", // Placeholder content for image comments
+            imageUrl: memeUrl,
+        });
+
+        if (result.success) {
+            fetchComments();
+        }
+        setSubmitting(false);
+    };
+
     return (
         <div className="bg-[#07070b]/82 p-4 md:p-6 rounded-[10px] border border-white/[0.06] shadow-[0_12px_28px_#00000066] scroll-mt-24">
             <div className="flex items-center gap-2 mb-6">
@@ -163,8 +208,21 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                                     className="w-full bg-transparent border-none text-white focus:outline-none min-h-[60px] text-[15px] resize-none placeholder:text-gray-400"
                                     maxLength={1000}
                                 />
-                                <div className="absolute right-0 bottom-2 text-gray-400 hover:text-white cursor-pointer transition-colors">
-                                    <Smile className="w-5 h-5" />
+                                <div className="absolute right-0 bottom-2">
+                                    <button 
+                                        type="button"
+                                        onClick={() => setShowPicker(!showPicker)}
+                                        className="text-gray-400 hover:text-white cursor-pointer transition-colors p-1"
+                                    >
+                                        <Smile className="w-5 h-5" />
+                                    </button>
+                                    {showPicker && (
+                                        <CommentMemePicker 
+                                            onEmojiSelect={handleEmojiSelect}
+                                            onMemeSelect={handleMemeSelect}
+                                            onClose={() => setShowPicker(false)}
+                                        />
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -225,7 +283,18 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                                         {comment.userRole || "Thành viên"}
                                     </div>
                                 </div>
-                                <p className="text-gray-100 text-[15px] leading-relaxed mb-3 whitespace-pre-wrap">{comment.content}</p>
+                                
+                                {comment.imageUrl ? (
+                                    <div className="mb-3 max-w-[160px] md:max-w-[200px] rounded-lg overflow-hidden bg-white/5 p-1 border border-white/5">
+                                        <img 
+                                            src={comment.imageUrl} 
+                                            alt="Meme" 
+                                            className="w-full h-auto object-contain hover:scale-105 transition-transform cursor-pointer" 
+                                        />
+                                    </div>
+                                ) : (
+                                    <p className="text-gray-100 text-[15px] leading-relaxed mb-3 whitespace-pre-wrap">{comment.content}</p>
+                                )}
 
                                 {/* Actions */}
                                 <div className="flex items-center gap-5 touch-manipulation">
