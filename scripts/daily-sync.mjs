@@ -168,7 +168,7 @@ async function syncTMDBTrending(timeWindow = 'day') {
         for (let page = 1; page <= maxPages; page++) {
             if (mappedMovies.length >= targetCount) break;
 
-            const url = `${TMDB_API_URL}/trending/all/${timeWindow}?api_key=${TMDB_API_KEY}&language=vi-VN&page=${page}`;
+            const url = `${TMDB_API_URL}/trending/movie/${timeWindow}?api_key=${TMDB_API_KEY}&language=vi-VN&page=${page}`;
             const data = await fetchJson(url);
             
             if (!data || !data.results) {
