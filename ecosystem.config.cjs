@@ -7,11 +7,11 @@ module.exports = {
       name: "phimkhoi",
       script: ".next/standalone/server.js",
       exec_mode: "cluster",
-      instances: "max",
+      instances: 1, // Only 1 instance for 2GB RAM VPS to avoid OOM
       env: {
         NODE_ENV: "production",
         PORT: "3000",
-        NODE_OPTIONS: "--max_old_space_size=2048",
+        NODE_OPTIONS: "--max_old_space_size=1024", // Max 1GB heap
         NEXTAUTH_URL: process.env.NEXTAUTH_URL,
         NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
         MONGODB_URI: process.env.MONGODB_URI,
@@ -21,7 +21,7 @@ module.exports = {
         FACEBOOK_CLIENT_ID: process.env.FACEBOOK_CLIENT_ID,
         FACEBOOK_CLIENT_SECRET: process.env.FACEBOOK_CLIENT_SECRET,
       },
-      max_memory_restart: "512M",
+      max_memory_restart: "800M",
     },
   ],
 };
