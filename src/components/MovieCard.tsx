@@ -167,10 +167,7 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                             src={activePosterSrc || "/placeholder.svg"}
                             alt={decodeHtml(movie.name) || movie.slug || "Phim"}
                             fill
-                            className={cn(
-                                "transition-transform duration-200 ease-out group-hover/static-card:scale-[1.03]",
-                                noCropPortrait ? "object-contain bg-[#0a0f1a]" : "object-cover"
-                            )}
+                            className="transition-transform duration-200 ease-out group-hover/static-card:scale-[1.03] object-cover"
                             sizes={orientation === 'landscape' ? "(max-width: 768px) 68vw, 36vw" : "(max-width: 768px) 48vw, (max-width: 1280px) 220px, 250px"}
                             loading="lazy"
                             priority={false}
