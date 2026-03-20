@@ -174,17 +174,25 @@ async function HomeRowSection({
 /** Hero stream: tải dữ liệu top trending độc lập */
 async function HeroStream() {
   try {
-    const heroTrending = await getTrendMovies('all');
-    let finalHeroData: any[] = (heroTrending || []).slice(0, 5);
+    // Tải dữ liệu top trending từ TMDb đã được sync vào DB
+    // Use a fixed internal URL or a direct DB query would be better for SSR
+    // But since the current pattern uses helper functions, let's keep it consistent
+    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/trending?type=tmdb-trending-day`, {
+      next: { revalidate: 3600 }
+    });
+    const data = await res.json();
+    let finalHeroData: any[] = (data.movies || []).slice(0, 5);
     
-    // Nếu không có trending, tải backup nhẹ nhàng
+    // Nếu không có trending từ TMDb, tải backup từ phim bộ mới
     if (finalHeroData.length < 3) {
-      const backup = await getMoviesList('phim-moi', { limit: 5 });
-      finalHeroData = backup?.items || [];
+      const backupRes = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/trending?type=phim-bo`);
+      const backupData = await backupRes.json();
+      finalHeroData = (backupData.movies || []).slice(0, 5);
     }
     
     return <AsyncHeroSection initialMovies={finalHeroData} />;
   } catch (error) {
+    console.error("HeroStream Error:", error);
     return null;
   }
 }

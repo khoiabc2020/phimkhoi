@@ -7,16 +7,27 @@
 
 import mongoose from 'mongoose';
 import https from 'https';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.join(__dirname, '../.env.local') });
 
 const KKPHIM_API = 'https://phimapi.com';
 const OPHIM_API = 'https://ophim1.com';
+const TMDB_API_URL = 'https://api.themoviedb.org/3';
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/phimkhoi';
+const TMDB_API_KEY = process.env.TMDB_API_KEY;
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function fetchJson(url) {
     return new Promise((resolve, reject) => {
-        https.get(url, (res) => {
+        const options = {
+            headers: { 'User-Agent': 'Mozilla/5.0' }
+        };
+        https.get(url, options, (res) => {
             let data = '';
             res.on('data', chunk => data += chunk);
             res.on('end', () => {
@@ -140,6 +151,90 @@ async function syncTrendingWithViewCount() {
     }
 }
 
+async function syncTMDBTrending(timeWindow = 'day') {
+    if (!TMDB_API_KEY) {
+        log('✗ Skipping TMDb Trending: TMDB_API_KEY not found');
+        return;
+    }
+
+    const type = `tmdb-trending-${timeWindow}`;
+    log(`Syncing [${type}] (Hero Data source)...`);
+
+    try {
+        const url = `${TMDB_API_URL}/trending/all/${timeWindow}?api_key=${TMDB_API_KEY}&language=vi-VN`;
+        const data = await fetchJson(url);
+        
+        if (!data || !data.results) {
+            log(`  ✗ Error fetching TMDb Trending [${timeWindow}]`);
+            return;
+        }
+
+        // Fetch more to ensure we have enough after filtering
+        const trendingItems = data.results.slice(0, 40);
+        const mappedMovies = [];
+
+        for (const item of trendingItems) {
+            if (mappedMovies.length >= 20) break;
+
+            const title = item.title || item.name;
+            const originalTitle = item.original_title || item.original_name;
+            
+            // Search local DB for matching slug
+            const localMovie = await Movie.findOne({
+                $or: [
+                    { name: new RegExp(`^${title}$`, 'i') },
+                    { origin_name: new RegExp(`^${originalTitle}$`, 'i') },
+                    { slug: title.toLowerCase().replace(/[^a-z0-9]/g, '-') }
+                ]
+            }).lean();
+
+            // Skip if not found locally (we only want playable content in Hero)
+            if (!localMovie) continue;
+
+            // Skip if it is just a Trailer or Unreleased
+            const ep = (localMovie.episode_current || '').toLowerCase();
+            const status = (localMovie.status || '').toLowerCase();
+            if (ep.includes('trailer') || status.includes('trailer') || status.includes('sắp chiếu')) {
+                log(`  - Skipping trailer/unreleased: ${title}`);
+                continue;
+            }
+
+            mappedMovies.push({
+                _id: String(item.id),
+                name: title,
+                slug: localMovie.slug,
+                poster_url: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : localMovie.poster_url,
+                thumb_url: item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : localMovie.thumb_url,
+                year: parseInt((item.release_date || item.first_air_date || '0000').substring(0, 4)) || localMovie.year,
+                tmdbData: {
+                    id: item.id,
+                    vote_average: item.vote_average,
+                    poster_path: item.poster_path,
+                    backdrop_path: item.backdrop_path,
+                    media_type: item.media_type
+                },
+                content: localMovie.content || item.overview,
+                episode_current: localMovie.episode_current,
+                quality: localMovie.quality || 'FHD',
+                category: localMovie.category,
+                country: localMovie.country,
+                time: localMovie.time,
+                origin_name: localMovie.origin_name || originalTitle
+            });
+        }
+
+        await TrendingCache.findOneAndUpdate(
+            { type },
+            { type, movies: mappedMovies, updatedAt: new Date() },
+            { upsert: true }
+        );
+
+        log(`  ✓ Saved ${mappedMovies.length} items for [${type}]`);
+    } catch (error) {
+        log(`  ✗ TMDb Trending Error: ${error.message}`);
+    }
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
@@ -150,6 +245,8 @@ async function main() {
         log('✓ Connected to MongoDB');
 
         await syncTrendingWithViewCount();
+        await syncTMDBTrending('day');
+        await syncTMDBTrending('week');
 
         log('=== Sync Completed Successfully ===');
     } catch (e) {

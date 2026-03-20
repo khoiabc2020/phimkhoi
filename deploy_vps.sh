@@ -52,11 +52,22 @@ if npm run build; then
     npx pm2 reload ecosystem.config.cjs --update-env || npx pm2 start ecosystem.config.cjs --update-env
     npx pm2 save
     
+    # SYSTEM CLEANUP (New: keep VPS tidy as requested)
+    echo "Performing system cleanup..."
+    npx pm2 flush # Clear all logs
+    rm -rf .next/cache # Clear build cache to save disk space
+    find . -maxdepth 2 -name "*.bak" -type f -delete
+    find . -maxdepth 2 -name "*.tmp" -type f -delete
+    find . -maxdepth 2 -name "temp*" -type f -delete
+    
     echo "Deployment complete and successful!"
 else
     echo "=========================================="
     echo "   [ERROR] BUILD FAILED! ROLLING BACK...   "
     echo "=========================================="
     echo "The current version remains untouched and running."
+    
+    # Cleanup even on failure
+    rm -f .next/lock
     exit 1
 fi
