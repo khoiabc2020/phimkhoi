@@ -184,29 +184,29 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
                         <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
                     </Link>
 
-                    {/* Badges */}
-                    {movie.episode_current && (
+                    {/* Top-Left: TMDB Rating Badge (Onflix Style) */}
+                    {(movie as any).tmdbData?.vote_average && (movie as any).tmdbData.vote_average > 0 && (
                         <div className="absolute top-2 left-2 z-10 pointer-events-none">
-                            <span className="bg-primary/90 text-black text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm">
-                                {movie.episode_current}
-                            </span>
+                            <div className="flex items-center gap-1 bg-[#F5C518] text-black px-1.5 py-0.5 rounded shadow-lg">
+                                <Star className="w-2.5 h-2.5 fill-black" />
+                                <span className="text-[10px] font-black">{((movie as any).tmdbData.vote_average).toFixed(1)}</span>
+                            </div>
                         </div>
                     )}
 
-                    {formatQualityLabel(movie.quality) && (
-                        <div className="absolute top-2 right-2 z-10 pointer-events-none flex flex-col items-end gap-1">
-                            <span className="bg-black/75 shadow-md border border-white/10 text-white/90 text-[10px] font-bold px-1.5 py-0.5 rounded max-w-[56px] truncate">
+                    {/* Top-Right: Episode/Quality Badge */}
+                    <div className="absolute top-2 right-2 z-10 pointer-events-none flex flex-col items-end gap-1">
+                        {movie.episode_current && (
+                            <span className="bg-[#8FA7C5] text-[#0a0a0a] text-[9px] font-black px-1.5 py-0.5 rounded shadow-md uppercase tracking-tighter">
+                                {movie.episode_current}
+                            </span>
+                        )}
+                        {formatQualityLabel(movie.quality) && (
+                            <span className="bg-black/60 shadow-md border border-white/10 text-white/90 text-[9px] font-bold px-1.5 py-0.5 rounded backdrop-blur-sm">
                                 {formatQualityLabel(movie.quality)}
                             </span>
-                        </div>
-                    )}
-                    {/* Rating Badge bottom-right */}
-                    {(movie as any).vote_average && (movie as any).vote_average > 0 && (
-                        <div className="absolute bottom-2 right-2 z-10 pointer-events-none flex items-center gap-0.5 bg-black/70 backdrop-blur-sm rounded px-1.5 py-0.5">
-                            <Star className="w-2.5 h-2.5 fill-[#8FA7C5] text-[#8FA7C5]" />
-                            <span className="text-[9px] font-bold text-white/90">{((movie as any).vote_average).toFixed(1)}</span>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
 
                 <div className="mt-2 space-y-0.5 px-0.5">
