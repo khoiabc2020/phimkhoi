@@ -173,6 +173,8 @@ export default function VideoPlayer({
 
                 const isMobileNarrow = typeof window !== "undefined" && window.innerWidth <= 768;
 
+                let hasAutoSkipped = false;
+
                 art = new Artplayer({
                     container: artRef.current!,
                     url: streamUrl,
@@ -192,6 +194,18 @@ export default function VideoPlayer({
                     i18n: { "vi": VI_LOCALE },
                     lang: "vi",
                     moreVideoAttr: { crossOrigin: "anonymous" },
+                    settings: [
+                        {
+                            html: 'Bỏ qua QC Server (15:00)',
+                            tooltip: localStorage.getItem("autoSkipAds") === "false" ? "Tắt" : "Bật",
+                            switch: localStorage.getItem("autoSkipAds") !== "false",
+                            onSwitch: function (item: any) {
+                                item.tooltip = item.switch ? 'Tắt' : 'Bật';
+                                localStorage.setItem("autoSkipAds", String(!item.switch));
+                                return !item.switch;
+                            },
+                        }
+                    ],
                     // Controls: skip -10, skip +10 (luôn giữ), auto-next + next-episode chỉ trên màn lớn
                     controls: [
                         // Skip back 10s
@@ -329,11 +343,29 @@ export default function VideoPlayer({
                     }
                 });
 
-                // Realtime history save
+                // Realtime history save - Thêm Logic AUTO SKIP
                 art.on("timeupdate", () => {
-                    // Skip Ad: check first, regardless of paused state
                     const ct = Math.floor(art.currentTime);
-                    setShowSkipAd(ct >= AD_START && ct <= AD_END);
+                    
+                    if (ct >= AD_START && ct <= AD_END) {
+                        const isAutoSkipEnabled = localStorage.getItem("autoSkipAds") !== "false";
+                        if (isAutoSkipEnabled && !hasAutoSkipped) {
+                            art.currentTime = AD_END + 1;
+                            hasAutoSkipped = true;
+                            setShowSkipAd(false);
+                            if (art.notice) {
+                                art.notice.show = "Đã tự động bỏ qua quảng cáo Server";
+                            }
+                        } else if (!hasAutoSkipped) {
+                            setShowSkipAd(true);
+                        }
+                    } else {
+                        // Reset auto-skip if we scrubbed back before the ad or past it significantly
+                        if (ct < AD_START || ct > AD_END + 5) {
+                             hasAutoSkipped = false;
+                        }
+                        setShowSkipAd(false);
+                    }
 
                     if (!art.playing) return;
                     saveHistory(art.currentTime, art.duration);
