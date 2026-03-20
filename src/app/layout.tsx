@@ -118,9 +118,9 @@ export default async function RootLayout({
         className={`${interSans.variable} ${interSans.variable} ${beVietnamPro.variable} ${logoFont.variable} antialiased pb-20 lg:pb-0 font-sans h-full`}
       >
         <Providers>
-          <div className="flex min-h-screen">
+          <div className="flex min-h-screen w-full overflow-x-hidden">
             <Sidebar />
-            <div className="flex-1 flex flex-col transition-all duration-300 pt-[54px] lg:pt-0">
+            <div className="flex-1 flex flex-col transition-all duration-300 pt-[54px] lg:pt-0 min-w-0 overflow-x-hidden">
                 <Header categories={categories} countries={countries} />
               <main className="flex-1">
                 {children}
