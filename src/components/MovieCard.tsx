@@ -93,8 +93,9 @@ function MovieCard({ movie, orientation = 'portrait' }: { movie: Movie, orientat
         sourceBackdrop = movie.poster_url;
     } else if (movie.thumb_url && detectOrientation(movie.thumb_url) === "landscape") {
         sourceBackdrop = movie.thumb_url;
+    } else {
+        sourceBackdrop = movie.poster_url || movie.thumb_url;
     }
-    // If neither resolved as landscape, sourceBackdrop stays null → overlay shows gradient.
 
     const displayBackdrop = tmdbBackdrop || (sourceBackdrop ? getImageUrl(sourceBackdrop) : null);
 

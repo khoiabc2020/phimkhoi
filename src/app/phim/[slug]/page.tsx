@@ -90,7 +90,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
             movie?.origin_name || movie?.name,
             movie?.year ? parseInt(movie.year.toString().split("-")[0]) : undefined,
             type,
-            { originalName: movie?.origin_name, countrySlug: movie?.country?.[0]?.slug }
+            { originalName: movie?.origin_name, localName: movie?.name, countrySlug: movie?.country?.[0]?.slug }
         ),
         movie?.category?.[0]?.slug
             ? getMoviesList('phim-moi-cap-nhat', { category: movie.category[0].slug, limit: 12 })
@@ -100,7 +100,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
         getTMDBEpisodeImages(
             movie?.origin_name || movie?.name,
             movie?.year ? parseInt(movie.year.toString().split("-")[0]) : undefined,
-            { originalName: movie?.origin_name, countrySlug: movie?.country?.[0]?.slug }
+            { originalName: movie?.origin_name, localName: movie?.name, countrySlug: movie?.country?.[0]?.slug }
         ),
     ]);
 

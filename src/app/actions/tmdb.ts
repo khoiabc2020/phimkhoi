@@ -15,7 +15,7 @@ export async function getTMDBDataForCard(
     query: string,
     year?: number,
     type: 'movie' | 'tv' = 'movie',
-    verification?: { originalName?: string; countrySlug?: string }
+    verification?: { originalName?: string; localName?: string; countrySlug?: string }
 ) {
     try {
         const movie = await searchTMDBMovie(query, year, type, verification);
@@ -37,7 +37,7 @@ export async function getMovieTrailer(
     query: string,
     year?: number,
     type: 'movie' | 'tv' = 'movie',
-    verification?: { originalName?: string; countrySlug?: string }
+    verification?: { originalName?: string; localName?: string; countrySlug?: string }
 ) {
     try {
         const movie = await searchTMDBMovie(query, year, type, verification);
@@ -64,7 +64,7 @@ export async function getMovieCast(
     year?: number,
     type: 'movie' | 'tv' = 'movie',
     localizedActors?: string[],
-    verification?: { originalName?: string; countrySlug?: string }
+    verification?: { originalName?: string; localName?: string; countrySlug?: string }
 ) {
     try {
         const movie = await searchTMDBMovie(query, year, type, verification);
@@ -167,7 +167,7 @@ export async function getActorDetailsFromTMDB(actorName: string) {
 export async function getTMDBEpisodeImages(
     query: string,
     year?: number,
-    verification?: { originalName?: string; countrySlug?: string }
+    verification?: { originalName?: string; localName?: string; countrySlug?: string }
 ) {
     try {
         const toNumberOrUndefined = (value: unknown): number | undefined => {
@@ -204,7 +204,7 @@ export async function getTMDBEpisodeImages(
                     baseQuery,
                     undefined,
                     "tv",
-                    { originalName: stripSeasonSuffix(verification?.originalName || ""), countrySlug: verification?.countrySlug }
+                    { originalName: stripSeasonSuffix(verification?.originalName || ""), localName: stripSeasonSuffix(verification?.localName || ""), countrySlug: verification?.countrySlug }
                 );
             }
         }

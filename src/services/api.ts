@@ -296,7 +296,7 @@ const enrichMoviesWithTMDB = async (movies: Movie[], maxItems = 18): Promise<Mov
                 query,
                 toValidYear(movie.year),
                 inferTmdbType(movie),
-                { originalName: movie.origin_name, countrySlug: movie.country?.[0]?.slug }
+                { originalName: movie.origin_name, localName: movie.name, countrySlug: movie.country?.[0]?.slug }
             );
             if (!tmdb) return movie;
 

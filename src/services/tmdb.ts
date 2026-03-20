@@ -42,12 +42,12 @@ const calculateSimilarity = (str1: string, str2: string) => {
     return 0;
 };
 
-export const searchTMDBMovie = async (query: string, year?: number, type: 'movie' | 'tv' = 'movie', verification?: { originalName?: string; countrySlug?: string }) => {
+export const searchTMDBMovie = async (query: string, year?: number, type: 'movie' | 'tv' = 'movie', verification?: { originalName?: string; localName?: string; countrySlug?: string }) => {
     try {
         if (!TMDB_API_KEY) return null;
 
-        // Force originalName (English/Pinyin) as the primary search query, then fallback to Vietnamese name
-        const queries = [verification?.originalName, query].filter(Boolean) as string[];
+        // Force both originalName (English/Pinyin) and localName (Vietnamese) into the query queue.
+        const queries = [verification?.originalName, verification?.localName, query].filter(Boolean) as string[];
         // Deduplicate
         const uniqueQueries = [...new Set(queries)];
 
