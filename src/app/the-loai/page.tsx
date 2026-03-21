@@ -66,35 +66,51 @@ export default async function GenresIndexPage() {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                    {categories.map((cat) => {
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+                    {categories.map((cat, index) => {
                         const bgImage = CATEGORY_IMAGES[cat.slug] || "https://image.tmdb.org/t/p/w780/vIgyYkX8gd1KkSCAIfbS2mRzT7x.jpg"; // Default generic movie backdrop
                         
+                        // Mảng màu gradient đẹp cho icon # (giống Onflix)
+                        const accentColors = [
+                            "text-[#ff3b3b]", // Đỏ tươi
+                            "text-[#00e281]", // Xanh lá mạ
+                            "text-[#3b82f6]", // Xanh biển
+                            "text-[#facc15]", // Vàng
+                            "text-[#a855f7]", // Tím mộng mơ
+                            "text-[#06b6d4]", // Xanh lơ (Cyan)
+                            "text-[#f97316]", // Cam
+                            "text-[#ec4899]", // Hồng
+                        ];
+                        const accent = accentColors[index % accentColors.length];
+
                         return (
                             <Link
                                 key={cat.slug}
                                 href={`/the-loai/${cat.slug}`}
-                                className="relative overflow-hidden bg-black/40 border border-white/5 hover:border-[#8FA7C5]/60 rounded-lg aspect-[16/9] transition-all duration-300 group flex flex-col items-center justify-center text-center shadow-lg hover:shadow-[#8FA7C5]/10"
+                                className="relative overflow-hidden bg-[#14151a] rounded-[14px] lg:rounded-2xl aspect-[2/1] sm:aspect-[16/9] transition-all duration-300 group shadow-lg hover:shadow-2xl hover:-translate-y-1 block border border-white/5 hover:border-white/10"
                             >
-                                {/* Background Image with Safe Fallback */}
-                                <div 
-                                    className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 group-hover:opacity-60 transition-opacity duration-500 group-hover:scale-105"
-                                    style={{ 
-                                        backgroundImage: `url(${bgImage})`,
-                                        backgroundColor: '#1a202c', // Fallback color
-                                    }}
-                                    aria-hidden="true"
-                                />
-                                {/* Gradient Overlay for better text readability */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f16]/90 via-[#0a0f16]/40 to-transparent pointer-events-none" />
+                                {/* Nửa phải: Ảnh Background TMDB */}
+                                <div className="absolute top-0 bottom-0 right-0 w-[70%] sm:w-[75%]">
+                                    <div 
+                                        className="w-full h-full bg-cover bg-center transition-all duration-700 group-hover:scale-[1.03] opacity-60 mix-blend-luminosity group-hover:mix-blend-normal group-hover:opacity-100"
+                                        style={{ backgroundImage: `url(${bgImage})` }}
+                                        aria-hidden="true"
+                                    />
+                                    {/* Gradient Fade ngang (trái sang phải) để nối mượt ảnh với background solid */}
+                                    <div className="absolute inset-0 bg-gradient-to-r from-[#14151a] via-[#14151a]/70 to-transparent" />
+                                </div>
 
-                                <div className="relative z-10 flex flex-col items-center gap-1 p-3">
-                                    <span className="font-display text-[16px] md:text-xl font-semibold text-white group-hover:text-[#8FA7C5] transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] tracking-wide">
+                                {/* Gradient dọc kéo từ dưới lên để tôn chữ Title luôn dễ đọc */}
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#14151a]/95 via-[#14151a]/30 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
+
+                                {/* Nội dung chữ (Góc trái dưới) */}
+                                <div className="absolute inset-0 p-4 sm:p-5 flex flex-col justify-end pointer-events-none">
+                                    <div className="mb-2 sm:mb-2.5 w-6 h-6 sm:w-7 sm:h-7 rounded-[6px] bg-black/40 border border-white/10 flex items-center justify-center backdrop-blur-md shadow-sm group-hover:scale-110 group-hover:bg-white/5 transition-all duration-300">
+                                        <span className={`font-black text-sm sm:text-[15px] ${accent}`}>#</span>
+                                    </div>
+                                    <h3 className="text-white font-display font-bold text-lg sm:text-xl lg:text-2xl drop-shadow-md tracking-tight group-hover:text-white transition-colors capitalize">
                                         {cat.name}
-                                    </span>
-                                    <span className="text-[10px] md:text-[11px] text-white/60 uppercase tracking-[0.2em] font-medium group-hover:text-[#8FA7C5]/80 transition-colors">
-                                        Khám phá
-                                    </span>
+                                    </h3>
                                 </div>
                             </Link>
                         );
