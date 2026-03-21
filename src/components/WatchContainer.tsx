@@ -186,6 +186,7 @@ export default function WatchContainer({
                                     autoNext={autoNext}
                                     nextEpisodeUrl={nextEpisodeUrl}
                                     isTheaterMode={isTheaterMode}
+                                    serverName={activeServerName}
                                 />
                             ) : (
                                 <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-white gap-3">

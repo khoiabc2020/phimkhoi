@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #0d0f14;
+  --color-background: #000000;
   --color-foreground: #ffffff;
 
   --color-primary: #8FA7C5;
@@ -138,7 +138,7 @@
 }
 
 :root {
-  --background: #0d0f14;
+  --background: #000000;
   --foreground: #ffffff;
 }
 
@@ -149,7 +149,7 @@ html {
 
 body {
   /* Đồng bộ với body::before — một tông duy nhất */
-  background-color: #0d0f14;
+  background-color: #000000;
   color: var(--foreground);
   font-family: var(--font-sans);
   font-size: 16px;
@@ -167,7 +167,7 @@ body::before {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background: radial-gradient(circle at 50% -20%, #1a1f2e 0%, #0d0f14 100%);
+  background: #000000;
   /* Composite on GPU — no repaint on scroll */
   will-change: transform;
   transform: translateZ(0);
@@ -205,7 +205,7 @@ h2 {
 
   .glass {
     /* Cleaner header: darker, flatter, less glow */
-    @apply bg-[#0d0f14]/80 backdrop-blur-xl border-b border-white/[0.08] shadow-[0_4px_20px_0_#0000004d];
+    @apply bg-black/80 backdrop-blur-xl border-b border-white/[0.08] shadow-[0_4px_20px_0_#0000004d];
   }
 
   .glass-panel {

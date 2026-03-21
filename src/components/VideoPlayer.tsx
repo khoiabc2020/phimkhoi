@@ -26,6 +26,7 @@ interface VideoPlayerProps {
     onEnded?: () => void;
     /** Khi bật chế độ rạp phim, container đổi kích thước — cần resize player */
     isTheaterMode?: boolean;
+    serverName?: string;
 }
 
 // Vietnamese i18n for ArtPlayer
@@ -80,6 +81,7 @@ export default function VideoPlayer({
     nextEpisodeUrl,
     onEnded,
     isTheaterMode = false,
+    serverName = "",
 }: VideoPlayerProps) {
     const artRef = useRef<HTMLDivElement>(null);
     const artInstance = useRef<any>(null);
@@ -194,7 +196,7 @@ export default function VideoPlayer({
                     i18n: { "vi": VI_LOCALE },
                     lang: "vi",
                     moreVideoAttr: { crossOrigin: "anonymous" },
-                    settings: [
+                    settings: serverName.toLowerCase().includes("kkphim") ? [
                         {
                             html: 'Bỏ qua QC Server (15:00)',
                             tooltip: localStorage.getItem("autoSkipAds") === "false" ? "Tắt" : "Bật",
@@ -205,7 +207,7 @@ export default function VideoPlayer({
                                 return !item.switch;
                             },
                         }
-                    ],
+                    ] : [],
                     // Controls: skip -10, skip +10 (luôn giữ), auto-next + next-episode chỉ trên màn lớn
                     controls: [
                         // Skip back 10s
@@ -347,7 +349,7 @@ export default function VideoPlayer({
                 art.on("timeupdate", () => {
                     const ct = Math.floor(art.currentTime);
                     
-                    if (ct >= AD_START && ct <= AD_END) {
+                    if (serverName.toLowerCase().includes("kkphim") && ct >= AD_START && ct <= AD_END) {
                         const isAutoSkipEnabled = localStorage.getItem("autoSkipAds") !== "false";
                         if (isAutoSkipEnabled && !hasAutoSkipped) {
                             art.seek = AD_END + 1;
