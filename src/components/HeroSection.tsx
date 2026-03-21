@@ -299,6 +299,16 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
     const [paused, setPaused] = useState(false);
     const { index, go, next, prev } = useAutoplay(movies.length, 6000, paused);
     const movie = movies[index] as any;
+    const navRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (navRef.current) {
+            const activeEl = navRef.current.children[index] as HTMLElement;
+            if (activeEl && typeof activeEl.scrollIntoView === 'function') {
+                activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }
+    }, [index]);
 
     return (
         <div
@@ -457,49 +467,57 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
 
                 {/* Right/Bottom Thumbnail Navigation (VieON Cinematic Style) */}
                 {movies.length > 1 && (
-                    <div className="absolute bottom-6 right-6 lg:bottom-10 lg:right-12 z-[4] flex items-center gap-3 pointer-events-auto">
-                        <div className="hidden lg:flex items-center gap-1.5 mr-2">
+                    <div className="absolute bottom-4 right-4 md:bottom-8 md:right-8 lg:bottom-10 lg:right-12 z-[4] flex items-center gap-3 pointer-events-auto max-w-[calc(100vw-32px)] lg:max-w-[60vw] xl:max-w-[50vw]">
+                        {/* Prev/Next buttons */}
+                        <div className="hidden lg:flex items-center gap-1.5 shrink-0 bg-[#0a0a0a]/40 p-1.5 rounded-full backdrop-blur-md border border-white/10 shadow-lg">
                             <button
                                 onClick={prev}
-                                className="w-10 h-10 rounded-full bg-[#0a0a0a]/50 hover:bg-white hover:text-black border border-white/10 hover:border-white flex items-center justify-center text-white/70 transition-all duration-300 backdrop-blur-md"
+                                className="w-8 h-8 rounded-full hover:bg-white hover:text-black border border-white/5 flex items-center justify-center text-white/70 transition-all duration-300"
                                 aria-label="Trước"
                             >
-                                <ChevronLeft className="w-5 h-5" />
+                                <ChevronLeft className="w-4 h-4" />
                             </button>
                             <button
                                 onClick={next}
-                                className="w-10 h-10 rounded-full bg-[#0a0a0a]/50 hover:bg-white hover:text-black border border-white/10 hover:border-white flex items-center justify-center text-white/70 transition-all duration-300 backdrop-blur-md"
+                                className="w-8 h-8 rounded-full hover:bg-white hover:text-black border border-white/5 flex items-center justify-center text-white/70 transition-all duration-300"
                                 aria-label="Tiếp"
                             >
-                                <ChevronRight className="w-5 h-5" />
+                                <ChevronRight className="w-4 h-4" />
                             </button>
                         </div>
 
-                        {movies.map((m: any, idx) => {
-                            const isActive = idx === index;
-                            return (
-                                <div
-                                    key={`thumb-${m._id || idx}`}
-                                    onClick={() => go(idx)}
-                                    className={cn(
-                                        "relative w-[110px] lg:w-[130px] aspect-[16/9] rounded-lg overflow-hidden cursor-pointer flex-shrink-0 transition-all duration-500 box-border group",
-                                        isActive 
-                                            ? "ring-2 ring-white scale-100 opacity-100 shadow-[0_4px_20px_rgba(0,0,0,0.8)]" 
-                                            : "ring-1 ring-white/10 scale-[0.92] opacity-40 hover:opacity-100 hover:scale-95"
-                                    )}
-                                >
-                                    <Image
-                                        src={getHeroImage(m, "backdrop", "mobile")}
-                                        alt={decodeHtml(m.name)}
-                                        fill
-                                        className="object-cover group-hover:scale-105 transition-transform duration-700"
-                                        sizes="180px"
-                                        placeholder="blur"
-                                        blurDataURL={blurData}
-                                    />
-                                </div>
-                            );
-                        })}
+                        {/* Scrollable Container */}
+                        <div 
+                            ref={navRef}
+                            className="flex items-center gap-2 md:gap-2.5 overflow-x-auto no-scrollbar py-2 px-1 scroll-smooth snap-x snap-mandatory min-w-0 w-full"
+                            style={{ maskImage: 'linear-gradient(to right, transparent, black 2%, black 98%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 2%, black 98%, transparent)' }}
+                        >
+                            {movies.map((m: any, idx) => {
+                                const isActive = idx === index;
+                                return (
+                                    <div
+                                        key={`thumb-${m._id || idx}`}
+                                        onClick={() => go(idx)}
+                                        className={cn(
+                                            "relative w-[85px] md:w-[100px] lg:w-[115px] xl:w-[125px] aspect-[16/9] rounded-lg overflow-hidden cursor-pointer flex-shrink-0 transition-all duration-300 box-border group snap-center",
+                                            isActive 
+                                                ? "ring-[1.5px] ring-white scale-100 opacity-100 shadow-[0_4px_20px_rgba(0,0,0,0.8)] z-10" 
+                                                : "ring-1 ring-white/10 scale-95 opacity-50 hover:opacity-100 hover:scale-[0.98] z-0"
+                                        )}
+                                    >
+                                        <Image
+                                            src={getHeroImage(m, "backdrop", "mobile")}
+                                            alt={decodeHtml(m.name)}
+                                            fill
+                                            className="object-cover group-hover:scale-105 transition-transform duration-700"
+                                            sizes="160px"
+                                            placeholder="blur"
+                                            blurDataURL={blurData}
+                                        />
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
                 )}
             </div>
