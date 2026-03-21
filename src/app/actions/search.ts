@@ -3,14 +3,14 @@
 import { searchMovies } from "@/services/api";
 import { searchTMDBPerson, getTMDBImage } from "@/services/tmdb";
 
-export async function getRealtimeSearch(query: string) {
+export async function getRealtimeSearch(query: string, enrichTMDB: boolean = false) {
     if (!query || query.trim().length === 0) {
         return { movies: [], actors: [] };
     }
 
     try {
         const [movies, actors] = await Promise.all([
-            searchMovies(query),
+            searchMovies(query, { enrichTMDB, limit: 8 }),
             searchTMDBPerson(query),
         ]);
 

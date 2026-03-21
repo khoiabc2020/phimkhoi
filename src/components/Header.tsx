@@ -9,6 +9,8 @@ import { useSession, signOut } from "next-auth/react";
 import { cn, getImageUrl } from "@/lib/utils";
 import MobileMenu from "./MobileMenu";
 import { getRealtimeSearch } from "@/app/actions/search";
+import { getTrendMovies } from "@/services/api";
+import SearchSkeleton from "./SearchSkeleton";
 
 interface HeaderProps {
     categories?: { name: string; slug: string }[];
@@ -25,6 +27,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
     const [isSearching, setIsSearching] = useState(false);
     const [isSearchNavigating, startSearchTransition] = useTransition();
     const [searchResults, setSearchResults] = useState<{ movies: any[], actors: any[] } | null>(null);
+    const [trendingMovies, setTrendingMovies] = useState<any[]>([]);
     const [openDropdown, setOpenDropdown] = useState<"categories" | "countries" | null>(null);
     const router = useRouter();
     const pathname = usePathname();
@@ -121,6 +124,13 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
         if (savedMovies) {
             try { setMovieSearchHistory(JSON.parse(savedMovies)); } catch { }
         }
+
+        // Fetch trending for search empty state
+        const fetchTrending = async () => {
+            const trend = await getTrendMovies('all', 'day');
+            setTrendingMovies(trend.slice(0, 6));
+        };
+        fetchTrending();
     }, []);
 
     useEffect(() => {
@@ -368,7 +378,9 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                     )}
                                     {/* Realtime Search & History Dropdown - Premium Upgrade */}
                                     {isSearchOpen && (showHistory || searchQuery.length >= 0) && (
-                                        <div className="absolute top-full left-0 right-0 mt-3 bg-[#0c0c14]/98 border border-white/[0.08] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] z-50 overflow-hidden animate-in fade-in slide-in-from-top-3 duration-300 backdrop-blur-xl max-w-[100vw]">
+                                        <div
+                                            className="absolute top-full left-0 right-0 mt-3 bg-[#0c0c14]/98 border border-white/[0.08] rounded-xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.8)] z-50 overflow-hidden animate-in fade-in slide-in-from-top-3 duration-300 backdrop-blur-lg max-w-[100vw]"
+                                        >
                                             <div className="flex flex-col md:flex-row max-h-[85vh] md:max-h-[600px] overflow-hidden">
                                                 
                                                 {/* Left Column: Results or History */}
@@ -381,47 +393,53 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                             </div>
                                                             
                                                             <div className="space-y-2">
-                                                                {searchResults?.movies?.map((movie: any) => (
-                                                                    <Link
-                                                                        href={`/phim/${movie.slug}`}
-                                                                        key={movie._id || movie.slug}
-                                                                        onClick={() => {
-                                                                            saveHistoryItem("movies", movie.name);
-                                                                            setIsSearchOpen(false);
-                                                                            setSearchQuery("");
-                                                                        }}
-                                                                        className="flex items-center gap-4 p-2.5 hover:bg-white/[0.06] rounded-xl transition-all group relative overflow-hidden"
-                                                                    >
-                                                                        <div className="w-12 h-16 rounded-lg overflow-hidden bg-white/5 shrink-0 border border-white/10 group-hover:border-primary/40 transition-colors relative">
-                                                                            <Image 
-                                                                                src={getImageUrl(movie.poster_url || movie.thumb_url)} 
-                                                                                alt={movie.name} 
-                                                                                fill 
-                                                                                className="object-cover group-hover:scale-110 transition-transform duration-500" 
-                                                                                unoptimized 
-                                                                            />
-                                                                        </div>
-                                                                        <div className="flex-1 min-w-0">
-                                                                            <div className="text-sm font-bold text-white group-hover:text-primary transition-colors truncate mb-0.5">{movie.name}</div>
-                                                                            <div className="text-[11px] text-white/40 truncate flex items-center gap-2">
-                                                                                <span className="font-medium">{movie.year || 'N/A'}</span>
-                                                                                <span className="w-1 h-1 rounded-full bg-white/10" />
-                                                                                <span className="text-primary/70">{movie.quality || 'FHD'}</span>
-                                                                                {movie.tmdbData?.vote_average > 0 && (
-                                                                                    <>
+                                                                {isSearching ? (
+                                                                    <SearchSkeleton />
+                                                                ) : (
+                                                                    <>
+                                                                        {searchResults?.movies?.map((movie: any) => (
+                                                                            <Link
+                                                                                href={`/phim/${movie.slug}`}
+                                                                                key={movie._id || movie.slug}
+                                                                                onClick={() => {
+                                                                                    saveHistoryItem("movies", movie.name);
+                                                                                    setIsSearchOpen(false);
+                                                                                    setSearchQuery("");
+                                                                                }}
+                                                                                className="flex items-center gap-4 p-2.5 hover:bg-white/[0.06] rounded-xl transition-all group relative overflow-hidden"
+                                                                            >
+                                                                                <div className="w-12 h-16 rounded-lg overflow-hidden bg-white/5 shrink-0 border border-white/10 group-hover:border-primary/40 transition-colors relative">
+                                                                                    <Image 
+                                                                                        src={getImageUrl(movie.poster_url || movie.thumb_url)} 
+                                                                                        alt={movie.name} 
+                                                                                        fill 
+                                                                                        className="object-cover group-hover:scale-110 transition-transform duration-500" 
+                                                                                        unoptimized 
+                                                                                    />
+                                                                                </div>
+                                                                                <div className="flex-1 min-w-0">
+                                                                                    <div className="text-sm font-bold text-white group-hover:text-primary transition-colors truncate mb-0.5">{movie.name}</div>
+                                                                                    <div className="text-[11px] text-white/40 truncate flex items-center gap-2">
+                                                                                        <span className="font-medium">{movie.year || 'N/A'}</span>
                                                                                         <span className="w-1 h-1 rounded-full bg-white/10" />
-                                                                                        <span className="text-yellow-500 font-bold">★ {movie.tmdbData.vote_average.toFixed(1)}</span>
-                                                                                    </>
-                                                                                )}
+                                                                                        <span className="text-primary/70">{movie.quality || 'FHD'}</span>
+                                                                                        {movie.tmdbData?.vote_average > 0 && (
+                                                                                            <>
+                                                                                                <span className="w-1 h-1 rounded-full bg-white/10" />
+                                                                                                <span className="text-yellow-500 font-bold">★ {movie.tmdbData.vote_average.toFixed(1)}</span>
+                                                                                            </>
+                                                                                        )}
+                                                                                    </div>
+                                                                                </div>
+                                                                            </Link>
+                                                                        ))}
+                                                                        
+                                                                        {searchResults && searchResults.movies.length === 0 && (
+                                                                            <div className="py-12 text-center">
+                                                                                <p className="text-white/30 text-sm">Không tìm thấy phim phù hợp</p>
                                                                             </div>
-                                                                        </div>
-                                                                    </Link>
-                                                                ))}
-                                                                
-                                                                {!isSearching && searchResults && searchResults.movies.length === 0 && (
-                                                                    <div className="py-12 text-center">
-                                                                        <p className="text-white/30 text-sm">Không tìm thấy phim phù hợp</p>
-                                                                    </div>
+                                                                        )}
+                                                                    </>
                                                                 )}
                                                             </div>
                                                         </>
@@ -526,9 +544,33 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                             </div>
                                                         </div>
                                                     ) : (
-                                                        <div className="flex flex-col h-full justify-center items-center text-center opacity-40">
-                                                            <Search className="w-12 h-12 mb-4" />
-                                                            <p className="text-xs">Bắt đầu nhập để<br />khám phá vũ trụ phim</p>
+                                                        <div className="space-y-6">
+                                                            <div className="mb-4">
+                                                                <span className="text-[11px] font-bold text-white/30 uppercase tracking-[0.1em]">Phim đang hot</span>
+                                                            </div>
+                                                            <div className="grid grid-cols-2 gap-3">
+                                                                {trendingMovies.length > 0 ? trendingMovies.map((movie: any) => (
+                                                                    <Link
+                                                                        key={movie._id}
+                                                                        href={`/phim/${movie.slug}`}
+                                                                        onClick={() => setIsSearchOpen(false)}
+                                                                        className="group relative aspect-[2/3] rounded-lg overflow-hidden border border-white/5 hover:border-primary/40 transition-all"
+                                                                    >
+                                                                        <Image 
+                                                                            src={getImageUrl(movie.poster_url || movie.thumb_url)}
+                                                                            alt={movie.name}
+                                                                            fill
+                                                                            className="object-cover group-hover:scale-110 transition-transform duration-500"
+                                                                            unoptimized
+                                                                        />
+                                                                        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
+                                                                            <span className="text-[10px] font-bold text-white line-clamp-1">{movie.name}</span>
+                                                                        </div>
+                                                                    </Link>
+                                                                )) : (
+                                                                    [1, 2, 3, 4].map(i => <div key={i} className="aspect-[2/3] rounded-lg bg-white/5 animate-pulse" />)
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     )}
                                                 </div>
