@@ -469,7 +469,9 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                         </div>
                                                     )}
                                                 </div>
-                                            </div>
+                                            {searchQuery.length > 0 && (
+                                                <button
+                                                    onClick={handleSearch}
                                                     className="w-full bg-primary py-3 text-black font-extrabold text-[13px] uppercase tracking-wider hover:bg-yellow-400 transition-colors flex items-center justify-center gap-2"
                                                 >
                                                     Xem tất cả kết quả cho "{searchQuery}"
