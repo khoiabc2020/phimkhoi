@@ -111,9 +111,9 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
             type,
             { originalName: movie?.origin_name, localName: movie?.name, countrySlug: movie?.country?.[0]?.slug }
         ),
-        movie?.category?.[0]?.slug
+        (movie?.category && movie.category.length > 0 && movie.category[0].slug)
             ? getMoviesList('phim-moi-cap-nhat', { category: movie.category[0].slug, limit: 12 })
-            : Promise.resolve(null),
+            : Promise.resolve({ items: [] }),
         getTMDBEpisodeImages(
             movie?.origin_name || movie?.name,
             movie?.year ? parseInt(movie.year.toString().split("-")[0]) : undefined,
@@ -344,14 +344,14 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                 <>
                                     <FavoriteButton
                                         movieData={{
-                                            movieId: movie._id,
-                                            movieSlug: movie.slug,
-                                            movieName: movie.name,
-                                            movieOriginName: movie.origin_name || "",
+                                            movieId: String(movie._id || movie.id || ""),
+                                            movieSlug: String(movie.slug || ""),
+                                            movieName: String(movie.name || ""),
+                                            movieOriginName: String(movie.origin_name || ""),
                                             moviePoster: sourcePosterUrl || sourceThumbUrl || tmdbBackdrop || "/fallback.png",
                                             movieYear: Number(movie.year) || new Date().getFullYear(),
-                                            movieQuality: movie.quality || "HD",
-                                            movieCategories: movie.category?.map((c: { name?: string }) => c.name) || [],
+                                            movieQuality: String(movie.quality || "HD"),
+                                            movieCategories: Array.isArray(movie.category) ? movie.category.map((c: any) => String(c.name || "")) : [],
                                         }}
                                         className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/5 rounded-full"
                                         showLabel={true}
@@ -406,7 +406,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             <div className="flex items-center gap-2 mb-6 border-l-2 border-[#8FA7C5] pl-3">
                                 <h3 className="text-[15px] font-bold text-white uppercase tracking-widest">Bình luận</h3>
                             </div>
-                            <CommentSection movieId={movie._id} movieSlug={movie.slug} />
+                            <CommentSection movieId={String(movie._id || movie.id || "")} movieSlug={String(movie.slug || "")} />
                         </div>
                     </div>
 
