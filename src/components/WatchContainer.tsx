@@ -7,7 +7,8 @@ import VideoPlayer from "@/components/VideoPlayer";
 import WatchEngagementBar from "@/components/WatchEngagementBar";
 import WatchEpisodeSection from "@/components/WatchEpisodeSection";
 import { Movie } from "@/services/api";
-import { Monitor, ChevronLeft, ChevronRight, SkipForward } from "lucide-react";
+import { Monitor, ChevronLeft, ChevronRight, SkipForward, Loader2 } from "lucide-react";
+import { getWatchHistoryForEpisode } from "@/app/actions/watchHistory";
 
 interface Episode {
     slug: string;
@@ -28,7 +29,6 @@ interface WatchContainerProps {
     servers: Server[];
     episodeThumbnails?: Record<string, string>;
     episodeMetadata?: Record<string, { title?: string; overview?: string; airDate?: string; runtime?: number; voteAverage?: number }>;
-    initialProgress: number;
     movieData: any;
     initialServerName: string;
 }
@@ -40,7 +40,6 @@ export default function WatchContainer({
     servers,
     episodeThumbnails,
     episodeMetadata,
-    initialProgress,
     movieData,
     initialServerName,
 }: WatchContainerProps) {
@@ -50,6 +49,8 @@ export default function WatchContainer({
     const [activeServerName, setActiveServerName] = useState(
         initialServerName || servers?.[0]?.server_name || ""
     );
+    const [progress, setProgress] = useState(0);
+    const [progressLoaded, setProgressLoaded] = useState(false);
 
     const activeServer = servers?.find((s) => s.server_name === activeServerName) || servers?.[0];
     const currentServerEpisodes = activeServer?.server_data || initialEpisodes || [];
@@ -85,6 +86,30 @@ export default function WatchContainer({
             return () => { document.body.style.overflow = ""; };
         }
     }, [isTheaterMode]);
+
+    // Fetch initial progress on client side to avoid dynamic server rendering
+    useEffect(() => {
+        let isMounted = true;
+        setProgressLoaded(false);
+        setProgress(0);
+
+        if (movie._id && currentEpisodeSlug) {
+            getWatchHistoryForEpisode(movie._id, currentEpisodeSlug)
+                .then((res) => {
+                    if (isMounted && res.success && res.data) {
+                        setProgress(res.data.progress || 0);
+                    }
+                })
+                .catch(() => {})
+                .finally(() => {
+                    if (isMounted) setProgressLoaded(true);
+                });
+        } else {
+            setProgressLoaded(true);
+        }
+
+        return () => { isMounted = false; };
+    }, [movie._id, currentEpisodeSlug]);
 
     return (
         <div className={cn("relative isolate transition-all duration-500", isLightOff ? "z-[60]" : "")}>
@@ -145,14 +170,19 @@ export default function WatchContainer({
                             isTheaterMode ? "aspect-video md:aspect-[21/9]" : "aspect-video"
                         )}>
 
-                            {activeEpisode ? (
+                            {!progressLoaded ? (
+                                <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-white gap-3">
+                                    <Loader2 className="w-8 h-8 animate-spin text-[#8FA7C5]" />
+                                    <p className="text-gray-400 text-sm animate-pulse">Đang tải trình phát...</p>
+                                </div>
+                            ) : activeEpisode ? (
                                 <VideoPlayer
                                     url={activeEpisode.link_embed}
                                     m3u8={effectiveM3u8}
                                     slug={movie.slug}
                                     episode={displayEpisodeName(activeEpisode.name)}
                                     movieData={movieData}
-                                    initialProgress={initialProgress}
+                                    initialProgress={progress}
                                     autoNext={autoNext}
                                     nextEpisodeUrl={nextEpisodeUrl}
                                     isTheaterMode={isTheaterMode}

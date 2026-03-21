@@ -14,8 +14,6 @@ const CommentSection = dynamic(() => import("@/components/CommentSection"), {
 import MovieTabs from "@/components/MovieTabs";
 import MovieCast from "@/components/MovieCast";
 import { searchTMDBMovie, getTMDBDetails, getTMDBImage } from "@/services/tmdb";
-import { isFavorite } from "@/app/actions/favorites";
-import { isInWatchlist } from "@/app/actions/watchlist";
 import WatchlistButton from "@/components/WatchlistButton";
 import ShareButton from "@/components/ShareButton";
 import { getTMDBEpisodeImages, TMDBEpisodeMeta } from "@/app/actions/tmdb";
@@ -84,8 +82,8 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
         type = 'tv';
     }
 
-    // ==> TỐI ƯU: Fetch song song tất cả dữ liệu phụ (TMDB + Related + isFavorite + isInWatchlist)
-    const [tmdbSearch, relatedMoviesRaw, isFavResult, isWatchlistResult, tmdbEpisodeImagesRes] = await Promise.allSettled([
+    // ==> TỐI ƯU: Fetch song song tất cả dữ liệu phụ (TMDB + Related)
+    const [tmdbSearch, relatedMoviesRaw, tmdbEpisodeImagesRes] = await Promise.allSettled([
         searchTMDBMovie(
             movie?.origin_name || movie?.name,
             movie?.year ? parseInt(movie.year.toString().split("-")[0]) : undefined,
@@ -95,8 +93,6 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
         movie?.category?.[0]?.slug
             ? getMoviesList('phim-moi-cap-nhat', { category: movie.category[0].slug, limit: 12 })
             : Promise.resolve(null),
-        isFavorite(movie?._id),
-        isInWatchlist(movie?.slug),
         getTMDBEpisodeImages(
             movie?.origin_name || movie?.name,
             movie?.year ? parseInt(movie.year.toString().split("-")[0]) : undefined,
@@ -109,8 +105,6 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     const relatedMovies = relatedMoviesRaw.status === 'fulfilled' && relatedMoviesRaw.value?.items
         ? relatedMoviesRaw.value.items.filter((m: { slug?: string }) => m.slug !== movie?.slug).slice(0, 8)
         : [];
-    const { isFavorite: isFav } = isFavResult.status === 'fulfilled' ? isFavResult.value : { isFavorite: false };
-    const inWatchlist = isWatchlistResult.status === 'fulfilled' ? isWatchlistResult.value.isInWatchlist : false;
     const episodeImageMap: Record<string, TMDBEpisodeMeta> = tmdbEpisodeImagesRes.status === "fulfilled" ? (tmdbEpisodeImagesRes.value || {}) : {};
 
     const extractEpisodeNumber = (value: string) => {
@@ -336,7 +330,6 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                     />
                                     <WatchlistButton
                                         slug={movie.slug}
-                                        initialInWatchlist={inWatchlist}
                                         className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/5 rounded-full"
                                         showLabel={true}
                                     />

@@ -9,27 +9,28 @@ import CommentSection from "@/components/CommentSection";
 import WatchEngagementBar from "@/components/WatchEngagementBar";
 import WatchContainer from "@/components/WatchContainer";
 import { Info } from "lucide-react";
-import { getWatchHistoryForEpisode } from "@/app/actions/watchHistory";
 import { getMovieCast, getTMDBDataForCard, getTMDBEpisodeImages, TMDBEpisodeMeta } from "@/app/actions/tmdb";
 import RelatedMovies from "@/components/RelatedMovies";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+
+export const revalidate = 300;
 
 interface PageProps {
     params: Promise<{ slug: string; episode: string }>;
-    searchParams?: Promise<{ server?: string }>;
 }
 
-export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { slug, episode } = await params;
-    const { server } = (await (searchParams || Promise.resolve({}))) as { server?: string };
     const data = await getMovieDetail(slug);
     const movie = data?.movie as any;
     const servers = data?.episodes || [];
-    const serverIndex = server ? Number(server) || 0 : 0;
-    const usedIndex = servers[serverIndex] ? serverIndex : 0;
-    const episodes = servers[usedIndex]?.server_data || [];
-    const currentEpisode = episodes.find((ep: { slug: string }) => ep.slug === episode);
+    let currentEpisode = null;
+    for (const srv of servers) {
+        const found = srv.server_data?.find((ep: { slug: string }) => ep.slug === episode);
+        if (found) {
+            currentEpisode = found;
+            break;
+        }
+    }
     if (!movie) return { title: "Không tìm thấy phim" };
     return {
         title: `Xem phim ${movie.name} - Tập ${currentEpisode?.name || episode} | KHOIPHIM`,
@@ -45,32 +46,36 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
     };
 }
 
-export default async function WatchPage({ params, searchParams }: PageProps) {
+export default async function WatchPage({ params }: PageProps) {
     const { slug, episode } = await params;
-    const { server } = (await (searchParams || Promise.resolve({}))) as { server?: string };
     const data = await getMovieDetail(slug);
     if (!data?.movie) return notFound();
 
     const movie = data.movie as Movie;
     const servers = data.episodes || [];
-    const serverIndex = server ? Number(server) || 0 : 0;
-    const usedIndex = servers[serverIndex] ? serverIndex : 0;
-    const episodes = servers[usedIndex]?.server_data || [];
-    const currentEpisode = episodes.find((ep: { slug: string }) => ep.slug === episode);
+    let currentEpisode: any = null;
+    let usedServerName = "";
+    let usedEpisodes: any[] = [];
+    for (const srv of servers) {
+        const found = srv.server_data?.find((ep: { slug: string }) => ep.slug === episode);
+        if (found) {
+            currentEpisode = found;
+            usedServerName = srv.server_name;
+            usedEpisodes = srv.server_data || [];
+            break;
+        }
+    }
 
-    let session = null;
     let cast: Record<string, unknown>[] = [];
     let episodeThumbnails: Record<string, string> = {};
     let episodeMetadata: Record<string, TMDBEpisodeMeta> = {};
 
     try {
-        const [sessionRes, castRes, tmdbRes, tmdbEpisodeImages] = await Promise.all([
-            getServerSession(authOptions).catch((): any => null),
+        const [castRes, tmdbRes, tmdbEpisodeImages] = await Promise.all([
             getMovieCast(movie.origin_name || movie.name, movie.year, movie.type === "series" ? "tv" : "movie").catch((): any[] => []),
             getTMDBDataForCard(movie.origin_name || movie.name, movie.year, movie.type === "series" ? "tv" : "movie").catch((): any => null),
             getTMDBEpisodeImages(movie.origin_name || movie.name, movie.year, { originalName: movie.origin_name, countrySlug: movie.country?.[0]?.slug }).catch((): any => ({})),
         ]);
-        session = sessionRes;
         cast = castRes || [];
         if (tmdbRes?.vote_average) (movie as any).vote_average = tmdbRes.vote_average;
         const episodeImageMap: Record<string, TMDBEpisodeMeta> = tmdbEpisodeImages || {};
@@ -126,14 +131,6 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
         });
     } catch { }
 
-    let initialProgress = 0;
-    if (session?.user?.id) {
-        const historyResult = await getWatchHistoryForEpisode(movie._id, episode);
-        if (historyResult.success && historyResult.data) {
-            initialProgress = historyResult.data.progress || 0;
-        }
-    }
-
     const displayEpisodeName = (name: string) => name?.startsWith("Tập") ? name : `Tập ${name}`;
 
     const movieData = {
@@ -168,13 +165,12 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
                             <WatchContainer
                                 movie={movie}
                                 currentEpisode={currentEpisode}
-                                episodes={episodes}
+                                episodes={usedEpisodes.length > 0 ? usedEpisodes : servers[0]?.server_data || []}
                                 servers={servers}
                                 episodeThumbnails={episodeThumbnails}
                                 episodeMetadata={episodeMetadata}
-                                initialProgress={initialProgress}
                                 movieData={movieData}
-                                initialServerName={servers[usedIndex]?.server_name || servers[0]?.server_name || ""}
+                                initialServerName={usedServerName || servers[0]?.server_name || ""}
                             />
 
 
