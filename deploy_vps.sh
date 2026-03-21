@@ -19,13 +19,17 @@ else
 fi
 
 # Install dependencies
-echo "Installing dependencies..."
-npm install
+echo "Installing dependencies (clean install)..."
+# Use npm ci for faster, more reliable installs on CI/Server
+npm ci || npm install
 
 # Build Next.js app
-echo "Building application..."
-# Increase Node heap, limit to 1536MB to prevent OOM on 2GB RAM VPS
-export NODE_OPTIONS="--max_old_space_size=1536"
+echo "Building application with strict memory limits..."
+# Reduce to 1152MB to leave more room for the OS and current running app on 2GB VPS
+export NODE_OPTIONS="--max_old_space_size=1152"
+
+# Flush IO and wait 2s to stabilize before heavy build
+sync && sleep 2
 
 # Cleanup any stale locks and troublesome cache directories that cause ENOTEMPTY
 rm -f .next/lock
