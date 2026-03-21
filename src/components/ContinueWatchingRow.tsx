@@ -187,12 +187,12 @@ function ContinueWatchingRowInner() {
 
                                 {/* Text bên dưới ảnh */}
                                 <div className="mt-2.5 px-0.5">
-                                    <h3 className="text-white font-semibold text-[13px] md:text-sm line-clamp-1 group-hover/card:text-[#d3deec] transition-colors leading-tight" title={item.movieName}>
+                                    <h3 className="text-white font-semibold text-[14.5px] line-clamp-1 group-hover/card:text-[#8FA7C5] transition-colors leading-tight" title={item.movieName}>
                                         {item.movieName}
                                     </h3>
                                     <div className="flex items-center justify-between mt-1 mb-1.5">
                                         <span className="text-white/40 text-[11px] truncate mr-2 font-medium">{item.episodeName || "Tiếp tục xem"}</span>
-                                        <span className="text-white/50 text-[10px] font-bold shrink-0">{item.progress}%</span>
+                                        <span className="text-white/50 text-[11px] font-bold shrink-0">{item.progress}%</span>
                                     </div>
                                 </div>
                             </Link>

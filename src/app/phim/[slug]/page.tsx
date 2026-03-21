@@ -234,7 +234,14 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             className={`opacity-100 ${isPortraitFallback ? 'object-cover sm:object-contain sm:object-right-top' : 'object-cover object-[62%_20%] sm:object-right'}`}
                             sizes="100vw"
                             quality={100}
-                            unoptimized={true} // Bỏ qua Next.js optimization để lấy ảnh gốc rõ nét nhất
+                            unoptimized={true} 
+                            onError={(e) => {
+                                // Fallback if proxy fails
+                                const target = e.target as HTMLImageElement;
+                                if (backdropUrl.includes('/api/img-proxy') && movie?.thumb_url) {
+                                    target.src = movie.thumb_url;
+                                }
+                            }}
                         />
                     </div>
                 )}
@@ -343,12 +350,26 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
             </div>
 
             {/* Bottom Content: responsive — stacked on mobile, 2-col on desktop */}
-            <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:pl-24 lg:pr-12 mt-6 sm:mt-10 lg:mt-12 relative z-10">
-                {/* On mobile/tablet: RIGHT column (tabs) first, then sidebar info below */}
-                <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+            <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:pl-24 lg:pr-12 mt-6 sm:mt-8 lg:mt-12 relative z-10">
+                
+                {/* Mobile prioritized Section: Description */}
+                <div className="lg:hidden mb-8">
+                    <div className="bg-[#07070b]/40 backdrop-blur-md rounded-2xl p-5 border border-white/5">
+                        <div className="flex items-center gap-2 mb-4 border-l-2 border-[#8FA7C5] pl-3">
+                            <h3 className="text-[15px] font-bold text-white uppercase tracking-widest">Nội dung</h3>
+                        </div>
+                        <div 
+                            className="text-[14px] text-gray-300 leading-relaxed font-light text-justify" 
+                            dangerouslySetInnerHTML={{ __html: movie?.content }} 
+                        />
+                    </div>
+                </div>
 
-                    {/* RIGHT COLUMN (shown first on mobile) */}
-                    <div className="w-full lg:col-span-8 xl:col-span-9 order-1 lg:order-2">
+                {/* On mobile/tablet: RIGHT column (tabs) first, then sidebar info below */}
+                <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 items-start">
+
+                    {/* RIGHT COLUMN (Tabs & Content) */}
+                    <div className="w-full lg:col-span-8 xl:col-span-9">
                         <MovieTabs
                             movie={movie}
                             relatedMovies={relatedMovies}
@@ -370,8 +391,8 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                     {/* LEFT SIDEBAR (shown after tabs on mobile, beside on desktop) */}
                     <div className="w-full lg:col-span-4 xl:col-span-3 order-2 lg:order-1 space-y-6 sm:space-y-8 lg:pr-4">
                         <div className="rounded-[10px] border border-white/[0.06] bg-[#07070b]/78 p-4 sm:p-5 space-y-6 sm:space-y-8 shadow-[0_10px_24px_#00000066]">
-                        {/* Nội dung */}
-                        <div>
+                        {/* Nội dung (Desktop only) */}
+                        <div className="hidden lg:block">
                             <div className="flex items-center gap-2 mb-3 sm:mb-4 border-l-2 border-[#8FA7C5] pl-3">
                                 <h3 className="text-[14px] sm:text-[15px] font-bold text-white uppercase tracking-widest">Nội dung</h3>
                             </div>
@@ -384,8 +405,8 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             <div className="text-[13px] font-bold text-white">{movie?.director?.join(", ") || "Đang cập nhật"}</div>
                         </div>
 
-                        {/* Diễn viên */}
-                        <div>
+                        {/* Diễn viên (Desktop only Sidebar or always removed to Tabs) */}
+                        <div className="hidden lg:block">
                             <div className="text-[11px] font-medium text-gray-400 uppercase tracking-widest mb-3">Diễn viên</div>
                             <MovieCast movie={movie} slug={movie.slug} isCompact={true} />
                         </div>

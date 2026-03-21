@@ -256,7 +256,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                 key={cat.slug}
                                                 href={`/the-loai/${cat.slug}`}
                                                 onClick={() => setOpenDropdown(null)}
-                                                className="px-3 py-2 rounded-xl text-[13px] font-bold text-white/50 hover:text-white hover:bg-white/5 transition-all"
+                                                className="px-3 py-2 rounded-xl text-[13px] font-semibold text-white/50 hover:text-white hover:bg-white/5 transition-all"
                                             >
                                                 {cat.name}
                                             </Link>
@@ -288,7 +288,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                     key={c.slug}
                                                     href={`/quoc-gia/${c.slug}`}
                                                     onClick={() => setOpenDropdown(null)}
-                                                    className="px-3 py-2 rounded-xl text-[13px] font-bold text-white/50 hover:text-white hover:bg-white/5 transition-all"
+                                                    className="px-3 py-2 rounded-xl text-[13px] font-semibold text-white/50 hover:text-white hover:bg-white/5 transition-all"
                                                 >
                                                     {c.name}
                                                 </Link>
@@ -395,7 +395,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                                         <Image src={getImageUrl(movie.poster_url || movie.thumb_url)} alt={movie.name} width={40} height={56} className="w-full h-full object-cover" unoptimized />
                                                                     </div>
                                                                     <div className="flex-1 min-w-0 flex flex-col justify-center">
-                                                                        <div className="text-sm font-bold text-white group-hover:text-primary transition-colors truncate">{movie.name}</div>
+                                                                        <div className="text-sm font-semibold text-white group-hover:text-primary transition-colors truncate">{movie.name}</div>
                                                                         <div className="text-xs text-gray-400 truncate">{movie.origin_name} {movie.year ? `(${movie.year})` : ''}</div>
                                                                     </div>
                                                                 </Link>
@@ -510,7 +510,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             ) : (
                                 <Link
                                     href="/login"
-                                    className="flex items-center gap-2 bg-[#263243] hover:bg-[#2d3d54] text-[#d8e3f2] px-4 py-2 rounded-full font-bold text-sm transition-all duration-200 hover:scale-105 active:scale-95 ml-1 whitespace-nowrap border border-white/5"
+                                    className="flex items-center gap-2 bg-[#263243] hover:bg-[#2d3d54] text-[#d8e3f2] px-4 py-2 rounded-full font-semibold text-sm transition-all duration-200 hover:scale-105 active:scale-95 ml-1 whitespace-nowrap border border-white/5"
                                 >
                                     <LogIn className="w-4 h-4" />
                                     <span>Đăng nhập</span>

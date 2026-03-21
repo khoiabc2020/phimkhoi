@@ -52,7 +52,7 @@ const calculateSimilarity = (str1: string, str2: string) => {
     return 0;
 };
 
-export const searchTMDBMovie = async (query: string, year?: number, type: 'movie' | 'tv' = 'movie', verification?: { originalName?: string; localName?: string; countrySlug?: string }) => {
+export const searchTMDBMovie = async (query: string, year?: number, type: 'movie' | 'tv' = 'movie', verification?: { originalName?: string; localName?: string; countrySlug?: string }): Promise<any> => {
     try {
         if (!TMDB_API_KEY) return null;
 
@@ -79,8 +79,10 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
 
                 if (year) {
                     if (endpoint === 'movie') url += `&primary_release_year=${year}`;
-                    // Do NOT add first_air_date_year for tv because it's too strict — some Chinese dramas air over 2 years
-                    // Instead, we filter by year in the result
+                    // Special case: if movie is very new/future, also try the year before
+                    if (endpoint === 'movie' && year > 2024) {
+                        // We will let the second pass or fallback handle it
+                    }
                 }
 
                 const res = await fetch(url, { next: { revalidate: 300 } });
@@ -135,8 +137,8 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
                             if (!isMatch && originalTitleSearch && calculateSimilarity(verification.localName, originalTitleSearch) >= 0.5) isMatch = true;
                         }
 
-                        // Year Check: Allow +/- 3 year tolerance
-                        if (!isMatch && year && itemYear && Math.abs(itemYear - year) > 3) {
+                        // Year Check: Allow +/- 5 year tolerance for very new or future movies
+                        if (!isMatch && year && itemYear && Math.abs(itemYear - year) > 5) {
                             if (verification?.originalName && (
                                 item.original_title?.toLowerCase() === verification.originalName.toLowerCase() ||
                                 item.original_name?.toLowerCase() === verification.originalName.toLowerCase()
@@ -176,6 +178,11 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
                 }
                 } // end locale loop
             }
+        }
+
+        // SECONDARY FALLBACK: Broader search without year if first pass failed
+        if (year) {
+            return searchTMDBMovie(query, undefined, type, verification);
         }
 
         return null;

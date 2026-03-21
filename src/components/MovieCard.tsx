@@ -223,15 +223,15 @@ function MovieCard({
                 </div>
 
                 <div className="mt-2.5 space-y-0.5 px-0.5">
-                    <h3 className="text-white/95 font-bold text-[13px] leading-tight truncate group-hover/static-card:text-[#8FA7C5] transition-colors" title={decodeHtml(movie.name) || movie.slug || ""}>
+                    <h3 className="text-white/95 font-semibold text-[14.5px] leading-tight truncate group-hover/static-card:text-[#8FA7C5] transition-colors" title={decodeHtml(movie.name) || movie.slug || ""}>
                         {decodeHtml(movie.name) || movie.slug || "—"}
                     </h3>
                     <div className="flex items-center justify-between gap-2 overflow-hidden">
-                        <p className="text-white/40 text-[10px] truncate font-medium flex-1" title={decodeHtml(movie.origin_name)}>
+                        <p className="text-white/40 text-[11px] truncate font-medium flex-1" title={decodeHtml(movie.origin_name)}>
                             {decodeHtml(movie.origin_name || "")}
                         </p>
                         {Number(movie.year) > 0 ? (
-                            <span className="text-white/30 text-[10px] font-medium shrink-0">{movie.year}</span>
+                            <span className="text-white/30 text-[11px] font-medium shrink-0">{movie.year}</span>
                         ) : null}
                     </div>
                 </div>

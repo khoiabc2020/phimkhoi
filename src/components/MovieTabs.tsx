@@ -6,6 +6,7 @@ import { Video, LayoutGrid, ChevronDown, Database, Subtitles, Mic, Volume2, Play
 import { Movie } from "@/services/api";
 import MovieCard from "./MovieCard";
 import { cn, getImageUrl } from "@/lib/utils";
+import MovieCast from "./MovieCast";
 
 interface Server {
     server_name: string;
@@ -34,7 +35,7 @@ export default function MovieTabs({
     episodeMetadata = {},
 }: MovieTabsProps) {
     const defaultTab = (episodes && episodes.length > 0) ? "episodes" : "related";
-    const [activeTab, setActiveTab] = useState<"episodes" | "trailer" | "related">(defaultTab);
+    const [activeTab, setActiveTab] = useState<"episodes" | "trailer" | "related" | "cast">(defaultTab);
     const [activeServer, setActiveServer] = useState(0);
     const [currentChunk, setCurrentChunk] = useState(0);
     const [activeLangTab, setActiveLangTab] = useState<string>("");
@@ -125,6 +126,7 @@ export default function MovieTabs({
 
     const tabs = [
         { id: "episodes", label: "DANH SÁCH TẬP" },
+        { id: "cast", label: "DIỄN VIÊN" },
         { id: "related", label: "ĐỀ XUẤT" },
         { id: "trailer", label: "TRAILER" },
     ];
@@ -499,6 +501,16 @@ export default function MovieTabs({
                         ) : (
                             <div className="text-center py-8 text-gray-400 text-sm">Chưa có phim đề xuất.</div>
                         )}
+                    </div>
+                )}
+
+                {/* CAST TAB */}
+                {activeTab === "cast" && (
+                    <div className="bg-[#07070b]/78 border border-white/[0.05] rounded-[10px] p-5 shadow-[0_10px_26px_#00000055]">
+                        <div className="mb-4 flex items-center gap-2 border-l-2 border-[#8FA7C5] pl-3">
+                            <h3 className="text-[15px] font-bold text-white uppercase tracking-widest">Diễn viên chính</h3>
+                        </div>
+                        <MovieCast movie={movie} slug={slug} isCompact={false} />
                     </div>
                 )}
             </div>
