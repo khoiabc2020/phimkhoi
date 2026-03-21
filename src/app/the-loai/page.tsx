@@ -1,0 +1,56 @@
+import { getMenuData } from "@/services/api";
+import Link from "next/link";
+import { ChevronLeft, LayoutGrid } from "lucide-react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Tất cả Thể loại phim - KHOIPHIM",
+    description: "Khám phá tất cả các thể loại phim tại KHOIPHIM: Hành động, Tình cảm, Kinh dị, Hoạt hình và nhiều hơn nữa.",
+};
+
+export default async function GenresIndexPage() {
+    const { categories } = await getMenuData();
+
+    return (
+        <main className="min-h-screen pb-20">
+            <div className="pt-24 w-full max-w-[1400px] mx-auto px-4 sm:px-6 md:px-12 lg:pl-24 lg:pr-12 relative">
+                <div className="mb-10">
+                    <Link 
+                        href="/" 
+                        className="inline-flex items-center gap-1.5 text-white/40 hover:text-white text-[13px] font-medium transition-colors mb-4 group"
+                    >
+                        <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+                        Quay lại trang chủ
+                    </Link>
+                    
+                    <div className="flex items-center gap-3 mb-2">
+                        <LayoutGrid className="w-6 h-6 text-[#8FA7C5]" />
+                        <h1 className="text-3xl md:text-4xl font-outfit font-extrabold text-white tracking-tighter uppercase italic">
+                            Tất cả Thể loại
+                        </h1>
+                    </div>
+                    <p className="text-gray-400 text-sm max-w-2xl">
+                        Tìm kiếm phim theo thể loại yêu thích của bạn. Chúng tôi cập nhật hàng ngàn bộ phim mới mỗi ngày.
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    {categories.map((cat) => (
+                        <Link
+                            key={cat.slug}
+                            href={`/the-loai/${cat.slug}`}
+                            className="bg-white/5 border border-white/10 hover:border-[#8FA7C5]/50 hover:bg-white/10 p-5 rounded-2xl transition-all group flex flex-col items-center justify-center text-center gap-3"
+                        >
+                            <span className="text-lg font-bold text-white group-hover:text-[#8FA7C5] transition-colors">
+                                {cat.name}
+                            </span>
+                            <span className="text-[10px] text-white/30 uppercase tracking-widest font-black">
+                                Xem phim →
+                            </span>
+                        </Link>
+                    ))}
+                </div>
+            </div>
+        </main>
+    );
+}
