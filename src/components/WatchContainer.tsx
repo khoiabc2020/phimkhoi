@@ -276,42 +276,42 @@ export default function WatchContainer({
                         )}
                     </div>
                 </div>
-            </div>
 
-            {/* Engagement Bar */}
-            <div className="mt-3 sm:mt-4 relative z-10 px-3 sm:px-0">
-                <WatchEngagementBar
-                    movie={movie}
-                    isTheaterMode={isTheaterMode}
-                    toggleTheater={() => setIsTheaterMode(!isTheaterMode)}
-                    isLightOff={isLightOff}
-                    toggleLight={() => setIsLightOff(!isLightOff)}
-                    autoNext={autoNext}
-                    onAutoNextToggle={() => setAutoNext(!autoNext)}
-                    currentEpisodeName={activeEpisode ? displayEpisodeName(activeEpisode.name) : undefined}
-                />
-            </div>
-
-            {/* Episodes Section */}
-            {servers && servers.length > 0 && (
-                <div
-                    className={cn(
-                        "relative mx-auto w-full",
-                        isTheaterMode ? "max-w-[1500px]" : "w-full lg:max-w-none"
-                    )}
-                >
-                    <WatchEpisodeSection
-                        movieSlug={movie.slug}
-                        movieName={movie.name}
-                        servers={servers}
-                        episodeThumbnails={episodeThumbnails}
-                        episodeMetadata={episodeMetadata}
-                        currentEpisodeSlug={currentEpisodeSlug}
-                        activeServerName={activeServerName}
-                        onServerChange={setActiveServerName}
+                {/* Engagement Bar */}
+                <div className="mt-3 sm:mt-4 relative z-10 px-3 sm:px-0">
+                    <WatchEngagementBar
+                        movie={movie}
+                        isTheaterMode={isTheaterMode}
+                        toggleTheater={() => setIsTheaterMode(!isTheaterMode)}
+                        isLightOff={isLightOff}
+                        toggleLight={() => setIsLightOff(!isLightOff)}
+                        autoNext={autoNext}
+                        onAutoNextToggle={() => setAutoNext(!autoNext)}
+                        currentEpisodeName={activeEpisode ? displayEpisodeName(activeEpisode.name) : undefined}
                     />
                 </div>
-            )}
+
+                {/* Episodes Section */}
+                {servers && servers.length > 0 && (
+                    <div
+                        className={cn(
+                            "relative mx-auto w-full",
+                            isTheaterMode ? "max-w-[1500px]" : "w-full lg:max-w-none"
+                        )}
+                    >
+                        <WatchEpisodeSection
+                            movieSlug={movie.slug}
+                            movieName={movie.name}
+                            servers={servers}
+                            episodeThumbnails={episodeThumbnails}
+                            episodeMetadata={episodeMetadata}
+                            currentEpisodeSlug={currentEpisodeSlug}
+                            activeServerName={activeServerName}
+                            onServerChange={setActiveServerName}
+                        />
+                    </div>
+                )}
+            </div>
 
         </div>
     );
