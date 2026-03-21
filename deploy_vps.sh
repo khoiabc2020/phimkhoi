@@ -72,6 +72,11 @@ if npm run build; then
          -H "Content-Type: application/json" \
          --data '{"purge_everything":true}'
     
+    # SYNC DATA (New: Ensure cache is warm after deployment)
+    echo "Warming up trending cache..."
+    # Run with limited memory to avoid hanging
+    NODE_OPTIONS="--max_old_space_size=512" node scripts/daily-sync.mjs || echo "Sync skipped or failed"
+
     echo "Deployment complete and successful!"
 else
     echo "=========================================="
