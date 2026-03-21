@@ -27,8 +27,9 @@ echo "Building application..."
 # Increase Node heap, limit to 1536MB to prevent OOM on 2GB RAM VPS
 export NODE_OPTIONS="--max_old_space_size=1536"
 
-# Cleanup any stale locks
+# Cleanup any stale locks and troublesome cache directories that cause ENOTEMPTY
 rm -f .next/lock
+rm -rf .next/standalone/.next/cache
 
 # Run build without deleting .next first. If it fails, exit immediately.
 if npm run build; then
