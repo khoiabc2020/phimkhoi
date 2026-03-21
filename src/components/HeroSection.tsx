@@ -501,20 +501,20 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                 {movies.length > 1 && (
                     <div className="absolute bottom-4 right-4 md:bottom-8 md:right-8 lg:bottom-10 lg:right-12 z-[4] flex items-center gap-3 pointer-events-auto max-w-[calc(100vw-32px)] lg:max-w-[60vw] xl:max-w-[50vw]">
                         {/* Prev/Next buttons */}
-                        <div className="hidden lg:flex items-center gap-1.5 shrink-0 bg-[#0a0a0a]/40 p-1.5 rounded-full backdrop-blur-md border border-white/10 shadow-lg">
+                        <div className="hidden lg:flex items-center gap-1.5 shrink-0">
                             <button
                                 onClick={prev}
-                                className="w-8 h-8 rounded-full hover:bg-white hover:text-black border border-white/5 flex items-center justify-center text-white/70 transition-all duration-300"
+                                className="w-8 h-8 flex items-center justify-center text-white hover:text-white transition-transform hover:scale-110 drop-shadow-xl"
                                 aria-label="Trước"
                             >
-                                <ChevronLeft className="w-4 h-4" />
+                                <ChevronLeft className="w-8 h-8 md:w-10 md:h-10" />
                             </button>
                             <button
                                 onClick={next}
-                                className="w-8 h-8 rounded-full hover:bg-white hover:text-black border border-white/5 flex items-center justify-center text-white/70 transition-all duration-300"
+                                className="w-8 h-8 flex items-center justify-center text-white hover:text-white transition-transform hover:scale-110 drop-shadow-xl"
                                 aria-label="Tiếp"
                             >
-                                <ChevronRight className="w-4 h-4" />
+                                <ChevronRight className="w-8 h-8 md:w-10 md:h-10" />
                             </button>
                         </div>
 
