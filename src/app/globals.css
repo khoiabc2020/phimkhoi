@@ -156,9 +156,24 @@ body {
   line-height: 1.5;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   /* Promote to GPU compositing layer */
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: none;
+}
+
+/* System-wide Typography Refinement: thinner weights */
+h1, h2, h3, h4, h5, h6, .font-bold {
+  font-weight: 600 !important; /* Semi-bold instead of standard thick bold */
+}
+.font-black {
+  font-weight: 700 !important; /* Bold instead of extra-thick black */
+}
+.font-medium {
+  font-weight: 500;
+}
+input, button, p, span, a {
+  letter-spacing: -0.01em;
 }
 
 
