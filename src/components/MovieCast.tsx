@@ -79,8 +79,9 @@ export default async function MovieCast({ movie, slug, isCompact = false }: { mo
     if (!movie) return null;
 
     // Use source actor list (always correct — from Ophim/KKPhim)
-    const actorNames: string[] = (movie.actor || [])
-        .filter((a: string) => a && !a.toLowerCase().includes("đang cập nhật") && !a.toLowerCase().includes("updating"))
+    const safeActors = Array.isArray(movie.actor) ? movie.actor : (typeof movie.actor === 'string' ? movie.actor.split(',').map((s: string) => s.trim()) : []);
+    const actorNames: string[] = safeActors
+        .filter((a: string) => a && typeof a === 'string' && !a.toLowerCase().includes("đang cập nhật") && !a.toLowerCase().includes("updating"))
         .slice(0, isCompact ? 8 : 15);
 
     if (actorNames.length === 0) return null;

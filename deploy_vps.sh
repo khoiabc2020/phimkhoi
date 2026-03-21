@@ -61,6 +61,13 @@ if npm run build; then
     find . -maxdepth 2 -name "*.tmp" -type f -delete
     find . -maxdepth 2 -name "temp*" -type f -delete
     
+    # CLOUDFLARE CACHE PURGE
+    echo "Purging Cloudflare Cache to prevent RSC Bleeding..."
+    curl -X POST "https://api.cloudflare.com/client/v4/zones/1164dbc3e64ce7eb80bceefaf277e500/purge_cache" \
+         -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+         -H "Content-Type: application/json" \
+         --data '{"purge_everything":true}'
+    
     echo "Deployment complete and successful!"
 else
     echo "=========================================="

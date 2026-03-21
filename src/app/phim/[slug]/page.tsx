@@ -76,6 +76,27 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     const { movie, episodes } = data as any;
     const serverData = episodes?.[0]?.server_data || [];
 
+    // --- DATA NORMALIZATION TO PREVENT SERVER COMPONENT RENDER CRASHES ---
+    // External APIs occasionally return strings instead of arrays for actors/directors,
+    // which causes array methods (.join, .filter) to throw SSR exceptions.
+    if (movie) {
+        if (typeof movie.actor === 'string') {
+            movie.actor = movie.actor.split(',').map((s: string) => s.trim()).filter(Boolean);
+        } else if (!Array.isArray(movie.actor)) {
+            movie.actor = [];
+        }
+        
+        if (typeof movie.director === 'string') {
+            movie.director = movie.director.split(',').map((s: string) => s.trim()).filter(Boolean);
+        } else if (!Array.isArray(movie.director)) {
+            movie.director = [];
+        }
+        
+        if (!Array.isArray(movie.category)) movie.category = [];
+        if (!Array.isArray(movie.country)) movie.country = [];
+        if (typeof movie.content !== 'string') movie.content = String(movie.content || "");
+    }
+
     // Xác định loại phim cho TMDB
     let type: 'movie' | 'tv' = 'movie';
     if (movie?.type === 'phim-bo' || movie?.type === 'tv-shows' || movie?.type === 'hoat-hinh') {
@@ -178,7 +199,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     // We treat it as a "portrait" style (to apply blur/object-contain) if it's from source 
     // because source images are often smaller/differently aspected than pure backdrops.
     const isPortraitFallback = !tmdbBackdrop && !!backdropUrl;
-    const rating = tmdbDetails?.vote_average ? tmdbDetails.vote_average.toFixed(1) : "9.7";
+    const rating = tmdbDetails?.vote_average ? Number(tmdbDetails.vote_average).toFixed(1) : "9.7";
 
     const jsonLd = {
         "@context": "https://schema.org",

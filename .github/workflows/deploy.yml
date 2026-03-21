@@ -20,3 +20,7 @@ jobs:
             npm install
             npm run build
             pm2 restart phimkhoi
+            curl -X POST "https://api.cloudflare.com/client/v4/zones/1164dbc3e64ce7eb80bceefaf277e500/purge_cache" \
+                 -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+                 -H "Content-Type: application/json" \
+                 --data '{"purge_everything":true}'
