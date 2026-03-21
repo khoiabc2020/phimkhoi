@@ -31,13 +31,9 @@ export NODE_OPTIONS="--max_old_space_size=1152"
 # Flush IO and wait 2s to stabilize before heavy build
 sync && sleep 2
 
-# Cleanup any stale locks and troublesome cache directories that cause ENOTEMPTY
-# STOP app before build to release file locks on .next/standalone
-echo "Stopping PM2 to release file locks..."
-npx pm2 stop phimkhoi || echo "App not running"
-
-echo "Clearing stale build artifacts..."
-rm -rf .next
+# Cleanup any stale locks that cause ENOTEMPTY
+# NOTE: We NO LONGER stop PM2 here to achieve ZERO DOWNTIME. 
+# We build while the app is running.
 rm -f .next/lock
 
 # Run build. If it fails, exit immediately.
@@ -57,9 +53,9 @@ if npm run build; then
         echo "Copied .env.local to standalone directory"
     fi
 
-    # Restart PM2 process to prevent RSC format bleeding
-    echo "Restarting PM2..."
-    npx pm2 restart ecosystem.config.cjs --update-env || npx pm2 start ecosystem.config.cjs --update-env
+    # Reload PM2 process for Zero Downtime
+    echo "Reloading PM2 (Zero Downtime)..."
+    npx pm2 reload ecosystem.config.cjs --update-env || npx pm2 restart ecosystem.config.cjs --update-env
     npx pm2 save
     
     # SYSTEM CLEANUP (New: keep VPS tidy as requested)

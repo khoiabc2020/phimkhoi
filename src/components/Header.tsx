@@ -304,7 +304,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                     </div>
 
                     {/* Right: Search & Actions */}
-                    <div className="flex items-center gap-2 md:gap-3 shrink-0">
+                    <div className="flex items-center gap-3 lg:gap-6 shrink-0">
                         {/* Search Unified */}
                         <div className="flex items-center justify-end">
                             <form
@@ -329,7 +329,6 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                 >
                                     <Search className={cn("w-[20px] h-[20px] transition-colors", isSearchOpen ? "hidden" : "text-white/90")} />
                                 </button>
-                                {/* Input wrapper to position popup correctly */}
                                 <div className={cn(
                                     "absolute right-0 top-0 transition-all duration-500",
                                     isSearchOpen ? "w-full opacity-100 visible h-auto z-40" : "w-10 opacity-0 invisible h-10"
@@ -343,7 +342,6 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                         placeholder="Tìm kiếm..."
                                         className="w-full h-10 bg-[#0B0B10] border border-white/[0.10] rounded-full pl-4 pr-10 text-sm text-white outline-none focus:border-primary/40 transition-all duration-300 shadow-[0_12px_36px_rgba(0,0,0,0.45)] backdrop-blur-md"
                                     />
-
                                     {isSearchOpen && (
                                         <button
                                             type={searchQuery ? "submit" : "button"}
@@ -356,16 +354,9 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                             }}
                                             className="absolute right-0 top-0 w-10 h-10 flex items-center justify-center z-30 text-white/50 hover:text-white transition-colors"
                                         >
-                                            {isSearchNavigating ? (
-                                                <Loader2 className="w-4 h-4 animate-spin" />
-                                            ) : searchQuery ? (
-                                                <Search className="w-4 h-4" />
-                                            ) : (
-                                                <X className="w-4 h-4" />
-                                            )}
+                                            {isSearchNavigating ? <Loader2 className="w-4 h-4 animate-spin" /> : searchQuery ? <Search className="w-4 h-4" /> : <X className="w-4 h-4" />}
                                         </button>
                                     )}
-
                                     {/* Realtime Search & History Dropdown */}
                                     {isSearchOpen && (showHistory || searchQuery.length > 0) && (
                                         <div className="absolute top-full left-0 right-0 mt-2 bg-[#07070b]/96 border border-white/[0.08] rounded-[10px] shadow-[0_12px_28px_#00000075] z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
@@ -462,63 +453,65 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             )}
                         </div>
 
-                        {/* Desktop Actions — Notifications button */}
-                        <div className="hidden lg:flex items-center gap-3">
-                            <Link
-                                href="/thong-bao"
-                                className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/[0.06] hover:bg-white/[0.10] border border-white/[0.09] transition-all active:scale-95 group text-sm font-medium text-white/70 hover:text-white"
-                                title="Thông báo hệ thống"
-                            >
-                                <Bell className="w-4 h-4 text-white/60 group-hover:text-primary transition-colors" />
-                                <span>Thông báo</span>
-                                {/* Notification Ping Indicator */}
-                                <span className="absolute top-1 right-2 flex w-2 h-2">
+                        {/* Minimalist Notification & Profile Group (Image 2 style) */}
+                        <div className={cn("flex items-center gap-4 lg:gap-6 transition-opacity duration-300", isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100")}>
+                            {/* Notification Bell Icon */}
+                            <Link href="/thong-bao" className="relative p-2 rounded-full hover:bg-white/5 transition-all active:scale-90 group" title="Thông báo">
+                                <Bell className="w-[22px] h-[22px] text-white/70 group-hover:text-white transition-colors" />
+                                <span className="absolute top-1.5 right-1.5 flex w-2.5 h-2.5">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 border-2 border-[#0a0a0a]"></span>
                                 </span>
                             </Link>
-                        </div>
 
-                        {/* Auth / Account — Visible on mobile topbar now */}
-                        <div className={cn("transition-opacity duration-300", isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100")}>
+                            {/* User Profile Horizontal Layout */}
                             {!mounted ? (
-                                <div className="w-24 h-10 bg-white/5 rounded-full animate-pulse" />
+                                <div className="w-10 h-10 rounded-full bg-white/5 animate-pulse" />
                             ) : session ? (
-                                <div className="relative group ml-1">
-                                    <button className="w-10 h-10 rounded-lg overflow-hidden border-2 border-white/10 hover:border-primary/50 transition-all p-0.5">
-                                        <div className="w-full h-full rounded-md bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center text-sm font-bold text-white shadow-inner">
-                                            {session.user?.name?.[0]?.toUpperCase() || "U"}
+                                <div className="relative group">
+                                    <button className="flex items-center gap-3 py-1.5 px-2 rounded-full hover:bg-white/5 transition-all">
+                                        <div className="w-9 h-9 rounded-full overflow-hidden border border-white/10 p-0.5 bg-black/40">
+                                            {session.user?.image ? (
+                                                <Image src={session.user.image} alt="" width={36} height={36} className="w-full h-full object-cover rounded-full" />
+                                            ) : (
+                                                <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center text-xs font-bold text-white uppercase">
+                                                    {session.user?.name?.[0]}
+                                                </div>
+                                            )}
                                         </div>
+                                        <span className="hidden md:block text-sm font-semibold text-white/90 truncate max-w-[120px]">{session.user?.name}</span>
+                                        <ChevronDown className="hidden md:block w-4 h-4 text-white/40 group-hover:text-white transition-all group-hover:rotate-180" />
                                     </button>
+
                                     {/* Dropdown Menu */}
-                                    <div className="absolute right-0 top-full mt-3 w-60 bg-[#0B0D12] border border-white/10 rounded-lg p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right shadow-2xl ring-1 ring-black/50">
-                                        <div className="px-4 py-3 border-b border-white/10 mb-2">
-                                            <p className="text-sm font-bold text-white truncate">{session.user?.name}</p>
-                                            <p className="text-xs text-white/50 truncate">{session.user?.email}</p>
+                                    <div className="absolute right-0 top-full mt-2 w-56 bg-[#0a0a0c]/95 backdrop-blur-2xl border border-white/10 rounded-2xl p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right shadow-2xl z-50">
+                                        <div className="px-4 py-3 border-b border-white/[0.06] mb-1">
+                                            <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-0.5">Tài khoản</p>
+                                            <p className="text-sm font-semibold text-white truncate">{session.user?.name}</p>
                                         </div>
-                                        <Link href="/thong-tin-tai-khoan" className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
-                                            <User className="w-4 h-4" /> Tài khoản
+                                        <Link href="/thong-tin-tai-khoan" className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+                                            <User className="w-4 h-4 opacity-70" /> <span>Hồ sơ cá nhân</span>
                                         </Link>
                                         {(session.user as any)?.role === "admin" && (
-                                            <Link href="/admin" className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
-                                                <Settings className="w-4 h-4" /> Quản trị
+                                            <Link href="/admin" className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+                                                <Shield className="w-4 h-4 opacity-70" /> <span>Quản trị viên</span>
                                             </Link>
                                         )}
+                                        <div className="h-px bg-white/[0.06] my-1" />
                                         <button
-                                            onClick={() => signOut()}
-                                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors mt-1"
+                                            onClick={() => signOut({ callbackUrl: "/login" })}
+                                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-400/80 hover:text-red-400 hover:bg-red-500/5 rounded-xl transition-all"
                                         >
-                                            <LogOut className="w-4 h-4" /> Đăng xuất
+                                            <LogOut className="w-4 h-4 opacity-70" /> <span>Đăng xuất</span>
                                         </button>
                                     </div>
                                 </div>
                             ) : (
                                 <Link
                                     href="/login"
-                                    className="flex items-center gap-2 bg-[#263243] hover:bg-[#2d3d54] text-[#d8e3f2] px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-200 hover:scale-105 active:scale-95 ml-1 whitespace-nowrap border border-white/5"
+                                    className="px-5 py-2 rounded-full bg-white text-black text-sm font-bold hover:bg-gray-200 transition-all active:scale-95"
                                 >
-                                    <LogIn className="w-4 h-4" />
-                                    <span>Đăng nhập</span>
+                                    Đăng nhập
                                 </Link>
                             )}
                         </div>

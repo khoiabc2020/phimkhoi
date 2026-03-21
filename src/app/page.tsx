@@ -14,10 +14,11 @@ import connectDB from "@/lib/db";
 import CustomHero from "@/models/CustomHero";
 import TrendingCache from "@/models/TrendingCache";
 
-export const revalidate = 3600;
-const ROW_LIMIT = 12; // Tăng một chút để nhìn đầy đặn hơn trên màn hình ultra-wide
-
-const heroSkeleton = <div className="w-full h-[66vh] md:h-[88vh] bg-[#0a0a0a] animate-pulse" />;
+const heroSkeleton = (
+  <div className="relative w-full h-[60vh] md:h-[58vh] lg:h-[70vh] xl:h-[82vh] bg-[#0a0a0a] animate-pulse">
+    <div className="absolute bottom-0 left-0 right-0 h-40 md:h-56 lg:h-72 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
+  </div>
+);
 const contentSkeleton = (
   <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 lg:pl-24 lg:pr-12 py-8 space-y-8">
     <div className="h-6 w-48 bg-white/10 rounded animate-pulse" />

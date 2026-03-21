@@ -334,7 +334,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
 
     return (
         <div
-            className="relative w-full h-[65vh] lg:h-[75vh] xl:h-[85vh] overflow-hidden bg-[#0a0a0a]"
+            className="relative w-full h-[60vh] md:h-[58vh] lg:h-[70vh] xl:h-[82vh] overflow-hidden bg-[#0a0a0a]"
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}
         >
@@ -398,11 +398,11 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                 <div className="absolute inset-y-0 left-0 w-[80%] lg:w-[60%] bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
                 <div className="absolute inset-0 bg-[#0a0a0a]/20" />
                 {/* Bottom blend into page */}
-                <div className="absolute bottom-0 left-0 right-0 h-32 lg:h-48 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 h-40 md:h-56 lg:h-72 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
             </div>
 
             {/* ── Content ── */}
-            <div className="relative z-[3] h-full w-full max-w-[1920px] mx-auto px-6 md:pl-28 md:pr-10 lg:pl-32 lg:pr-12 xl:pl-[140px] flex items-end pb-24 md:pb-28 lg:pb-32 pointer-events-none">
+            <div className="relative z-[3] h-full w-full max-w-[1920px] mx-auto px-6 md:pl-28 md:pr-10 lg:pl-32 lg:pr-12 xl:pl-[140px] flex items-end pb-12 md:pb-16 lg:pb-24 pointer-events-none">
                 <div className="w-full flex justify-between items-end">
                     {/* Left: Text block */}
                     <div className="w-full md:w-[75%] lg:w-[65%] xl:w-[60%] space-y-3 lg:space-y-4 pointer-events-auto pr-0 lg:pr-[300px] xl:pr-[400px]">
@@ -426,8 +426,8 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                     "font-display font-black text-white leading-tight tracking-tight pt-1 animate-hero-in drop-shadow-[0_8px_24px_rgba(0,0,0,0.9)] pb-2",
                                     "text-balance line-clamp-2 md:line-clamp-3",
                                     movie.name.length > 25 
-                                        ? "text-3xl md:text-4xl lg:text-[40px] xl:text-[46px]" 
-                                        : "text-4xl md:text-[42px] lg:text-[48px] xl:text-[54px]"
+                                        ? "text-2xl md:text-3xl lg:text-[40px] xl:text-[46px]" 
+                                        : "text-3xl md:text-[38px] lg:text-[48px] xl:text-[54px]"
                                 )}
                                 title={decodeHtml(movie.name)}
                             >
