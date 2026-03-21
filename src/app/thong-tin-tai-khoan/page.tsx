@@ -23,7 +23,7 @@ export default async function ProfilePage() {
 
     return (
         <main className="min-h-screen pt-24 pb-20">
-            <div className="w-full max-w-[1920px] mx-auto px-4 relative z-10">
+            <div className="w-full max-w-[1920px] mx-auto px-4 lg:pl-24 lg:pr-12 relative z-10">
                 <ProfileTabs
                     user={session.user}
                     favorites={favorites || []}

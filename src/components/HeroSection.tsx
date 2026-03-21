@@ -244,7 +244,7 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                             className={cn(
                                 "font-display font-black text-white leading-[1.15] drop-shadow-[0_2px_14px_rgba(0,0,0,0.85)] animate-hero-in tracking-tight uppercase pb-1",
                                 "text-balance line-clamp-2",
-                                movie.name.length > 30 ? "text-[14px]" : movie.name.length > 20 ? "text-[16px]" : "text-[18px]"
+                                movie.name.length > 30 ? "text-[16px] md:text-[20px]" : movie.name.length > 20 ? "text-[18px] md:text-[24px]" : "text-[22px] md:text-[28px]"
                             )}
                         >
                             {decodeHtml(movie.name)}

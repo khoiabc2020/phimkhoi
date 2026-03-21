@@ -214,7 +214,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
             {/* Hero Section (Onflix-like: backdrop 16:9 on right, left side darker) */}
-            <div className="relative w-full pt-20 sm:pt-28 md:pt-32 pb-8 px-4 md:px-8 xl:px-16 flex items-end min-h-[500px] sm:min-h-[560px] overflow-hidden">
+            <div className="relative w-full pt-20 sm:pt-28 md:pt-32 pb-8 px-4 md:px-8 lg:pl-24 lg:pr-12 flex items-end min-h-[500px] sm:min-h-[560px] overflow-hidden">
                 {/* Base dark layer */}
                 <div className="absolute inset-0 bg-[#0a0a0a]" />
 
@@ -263,7 +263,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                 {movie?.quality || "FHD"}
                             </span>
                         </div>
-                        <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white leading-[1.14] tracking-[-0.012em] pt-1 drop-shadow-2xl">{movie?.name}</h1>
+                        <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-[40px] font-black text-white leading-[1.15] tracking-tight pt-1 drop-shadow-2xl text-balance">{movie?.name}</h1>
                         <h2 className="hidden sm:block text-base md:text-2xl text-gray-300 font-medium tracking-wide drop-shadow-md">{movie?.origin_name}</h2>
 
                         {(() => {
@@ -350,7 +350,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
             </div>
 
             {/* Bottom Content: responsive — stacked on mobile, 2-col on desktop */}
-            <div className="max-w-[1920px] mx-auto px-4 md:px-8 xl:px-16 mt-6 sm:mt-10 lg:mt-12 relative z-10">
+            <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:pl-24 lg:pr-12 mt-6 sm:mt-10 lg:mt-12 relative z-10">
                 {/* On mobile/tablet: RIGHT column (tabs) first, then sidebar info below */}
                 <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-8 items-start">
 

@@ -101,7 +101,7 @@ export default async function WatchlistPage() {
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 md:px-12 pb-16">
+            <div className="max-w-7xl mx-auto px-4 md:px-12 lg:pl-24 lg:pr-12 pb-16">
                 {validMovies.length === 0 ? (
                     <div className="mt-8">
                         <EmptyState

@@ -16,7 +16,7 @@ const ROW_LIMIT = 12; // Tăng một chút để nhìn đầy đặn hơn trên 
 
 const heroSkeleton = <div className="w-full h-[66vh] md:h-[88vh] bg-[#0a0a0a] animate-pulse" />;
 const contentSkeleton = (
-  <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 py-8 space-y-8">
+  <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 lg:pl-24 lg:pr-12 py-8 space-y-8">
     <div className="h-6 w-48 bg-white/10 rounded animate-pulse" />
     <div className="flex gap-4 overflow-hidden">
       {[1, 2, 3, 4, 5].map((i) => (
@@ -205,7 +205,7 @@ export default function Home() {
         <HeroStream />
       </Suspense>
 
-      <div className="w-full max-w-[1920px] mx-auto px-1.5 sm:px-3 md:px-5 lg:pl-24 relative z-20 pb-16">
+      <div className="w-full max-w-[1920px] mx-auto px-1.5 sm:px-3 md:px-5 lg:pl-24 lg:pr-12 relative z-20 pb-16">
         <div className="mb-6">
           <QuickNav />
         </div>

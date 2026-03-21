@@ -95,7 +95,7 @@ export default function ThuvienPage() {
                 <div className="absolute inset-0 bg-gradient-to-b from-[#1a1f35]/30 via-transparent to-transparent" />
             </div>
 
-            <div className="relative z-10 max-w-[1400px] mx-auto px-4 md:px-8 lg:px-12 py-10">
+            <div className="relative z-10 max-w-[1400px] mx-auto px-4 md:px-8 lg:pl-24 lg:pr-12 py-10">
 
                 {/* Header row */}
                 <div className="mb-8">
