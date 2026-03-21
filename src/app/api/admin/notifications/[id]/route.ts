@@ -4,8 +4,9 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import dbConnect from "@/lib/db";
 import { Notification } from "@/models/Notification";
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const { id } = await params;
         const session = await getServerSession(authOptions);
         if (!session || (session.user as any).role !== "admin") {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -13,7 +14,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
 
         await dbConnect();
         
-        const deletedNotification = await Notification.findByIdAndDelete(params.id);
+        const deletedNotification = await Notification.findByIdAndDelete(id);
         
         if (!deletedNotification) {
             return NextResponse.json({ error: "Notification not found" }, { status: 404 });
