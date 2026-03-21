@@ -211,9 +211,15 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         </button>
 
                         <Link href="/" className="flex items-center group">
-                            <span className="font-display text-[19px] font-black uppercase tracking-tighter text-white">
-                                KHOIPHIM<span className="text-primary ml-0.5">.</span>
-                            </span>
+                            <div className="relative w-[130px] h-8 transition-transform active:scale-95">
+                                <Image
+                                    src="/logo.png"
+                                    alt="KHOIPHIM"
+                                    fill
+                                    className="object-contain object-left"
+                                    priority
+                                />
+                            </div>
                         </Link>
                     </div>
 
@@ -227,11 +233,17 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                     )}
 
                     {/* Desktop Section: Brand + Links */}
-                    <div className="hidden lg:flex items-center gap-12 flex-1">
+                    <div className="hidden lg:flex items-center gap-4 xl:gap-10 flex-1">
                         <Link href="/" className="flex items-center shrink-0 -ml-1">
-                            <span className="font-display text-[24px] font-black uppercase tracking-tighter text-white hover:text-primary transition-colors">
-                                KHOIPHIM<span className="text-primary ml-0.5">.</span>
-                            </span>
+                            <div className="relative w-[160px] lg:w-[190px] xl:w-[220px] h-10 lg:h-12 transition-transform hover:scale-[1.02] active:scale-95">
+                                <Image
+                                    src="/logo.png"
+                                    alt="KHOIPHIM"
+                                    fill
+                                    className="object-contain object-left hover:brightness-110 transition-all"
+                                    priority
+                                />
+                            </div>
                         </Link>
 
                         <nav ref={navRef} className="flex items-center gap-1">
@@ -303,19 +315,19 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             {/* Lọc Phim - New Premium Link */}
                             <Link
                                 href="/loc-phim"
-                                className="flex items-center gap-1 px-3 py-1.5 rounded-full text-[13px] font-bold text-primary hover:bg-primary/10 transition-all border border-primary/20"
+                                className="flex items-center gap-1 px-3 py-1.5 rounded-full text-[12px] xl:text-[13px] font-bold text-primary hover:bg-primary/10 transition-all border border-primary/20 shrink-0"
                             >
                                 <Filter className="w-3.5 h-3.5" />
                                 Lọc phim
                             </Link>
 
-                            <Link href="/danh-sach/phim-moi-cap-nhat" className="px-3 py-1.5 rounded-full text-[13px] font-medium text-white/70 hover:text-white transition-all">Phim mới</Link>
-                            <Link href="/danh-sach/phim-bo" className="px-3 py-1.5 rounded-full text-[13px] font-medium capitalize tracking-tight text-white/70 hover:text-white transition-colors">Phim Bộ</Link>
+                            <Link href="/danh-sach/phim-moi-cap-nhat" className="hidden xl:block px-3 py-1.5 rounded-full text-[13px] font-medium text-white/70 hover:text-white transition-all whitespace-nowrap">Phim mới</Link>
+                            <Link href="/danh-sach/phim-bo" className="hidden 2xl:block px-3 py-1.5 rounded-full text-[13px] font-medium capitalize tracking-tight text-white/70 hover:text-white transition-colors whitespace-nowrap">Phim Bộ</Link>
                         </nav>
                     </div>
 
                     {/* Right: Search & Actions */}
-                    <div className="flex items-center gap-3 lg:gap-6 shrink-0">
+                    <div className="flex items-center gap-2 lg:gap-3 xl:gap-6 shrink-0">
                         {/* Search Unified */}
                         <div className="flex items-center justify-end">
                             <form
@@ -520,8 +532,8 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                 </div>
                                             )}
                                         </div>
-                                        <span className="hidden md:block text-sm font-semibold text-white/90 truncate max-w-[120px]">{session.user?.name}</span>
-                                        <ChevronDown className="hidden md:block w-4 h-4 text-white/40 group-hover:text-white transition-all group-hover:rotate-180" />
+                                        <span className="hidden xl:block text-sm font-semibold text-white/90 truncate max-w-[120px]">{session.user?.name}</span>
+                                        <ChevronDown className="hidden xl:block w-4 h-4 text-white/40 group-hover:text-white transition-all group-hover:rotate-180" />
                                     </button>
 
                                     {/* Dropdown Menu */}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 const DISCOVER_LINKS = [
     { href: "/danh-sach/phim-moi-cap-nhat", label: "Phim mới cập nhật" },
@@ -46,9 +47,14 @@ export default function Footer() {
                     {/* Brand column */}
                     <div className="col-span-2 md:col-span-1 flex flex-col gap-4">
                         <Link href="/" className="inline-flex items-center">
-                            <span className="font-display text-[22px] font-black uppercase tracking-tighter text-white">
-                                KHOIPHIM<span className="text-[#8FA7C5] ml-0.5">.</span>
-                            </span>
+                            <div className="relative w-[150px] h-8">
+                                <Image
+                                    src="/logo.png"
+                                    alt="KHOIPHIM"
+                                    fill
+                                    className="object-contain object-left"
+                                />
+                            </div>
                         </Link>
                         <p className="text-[13px] text-gray-500 leading-relaxed max-w-[220px]">
                             Xem hàng ngàn bộ phim chất lượng cao, vietsub chuẩn, miễn phí — cập nhật hàng ngày.
