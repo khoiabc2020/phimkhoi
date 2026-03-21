@@ -739,17 +739,28 @@ const normalizeOphimItem = (item: any, pathImage: string): Movie => {
 
 export const getMoviesList = async (type: string, params: { page?: number; year?: number; category?: string; country?: string; limit?: number; quality?: string } = {}) => {
     try {
-        const { page = 1, year, category, country, limit = 24, quality } = params;
+        const { page = 1, year, category, country, limit = 42, quality } = params;
         let query = `?page=${page}&limit=${limit}`;
         if (year) query += `&year=${year}`;
         if (category) query += `&category=${category}`;
         if (country) query += `&country=${country}`;
 
-        // Fetch from BOTH sources in parallel
+        // Route "the-loai" categories correctly since they are mapped under danh-sach in the UI
+        const isTheLoaiEndpoint = [
+            'phim-chieu-rap', 'phim-hanh-dong', 'phim-tinh-cam', 'phim-hai-huoc', 
+            'phim-co-trang', 'phim-tam-ly', 'phim-hinh-su', 'phim-chien-tranh', 
+            'phim-vien-tuong', 'phim-kinh-di', 'phim-tai-lieu', 'phim-bi-an', 
+            'phim-hoc-duong', 'phim-khoa-hoc', 'phim-than-thoai', 'phim-vo-thuat', 
+            'phim-gia-dinh', 'phim-18'
+        ].includes(type);
+        const kkEndpoint = isTheLoaiEndpoint ? 'the-loai' : 'danh-sach';
+        const nguoncEndpoint = isTheLoaiEndpoint ? 'the-loai/' : 'danh-sach/';
+
+        // Fetch from sources in parallel
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
-            fetchWithFastTimeout(`${API_URL}/v1/api/danh-sach/${type}${query}`, 3000, { next: { revalidate: 3600 } }),
-            fetchWithFastTimeout(`${OPHIM_API}/v1/api/danh-sach/${type}${query}`, 2500, { next: { revalidate: 3600 } }),
-            fetchWithFastTimeout(`${NGUONC_API}/api/films/${type === 'phim-moi-cap-nhat' ? '' : 'danh-sach/'}${type}?page=${page}`, 2000, { next: { revalidate: 3600 } })
+            fetchWithFastTimeout(`${API_URL}/v1/api/${kkEndpoint}/${type}${query}`, 3000, { next: { revalidate: 3600 } }),
+            fetchWithFastTimeout(`${OPHIM_API}/v1/api/${kkEndpoint}/${type}${query}`, 2500, { next: { revalidate: 3600 } }),
+            fetchWithFastTimeout(`${NGUONC_API}/api/films/${type === 'phim-moi-cap-nhat' ? '' : nguoncEndpoint}${type}?page=${page}`, 2000, { next: { revalidate: 3600 } })
         ]);
 
         let items: Movie[] = [];
@@ -833,7 +844,7 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
     }
 };
 
-export const getMoviesByCategory = async (slug: string, page: number = 1, limit: number = 24) => {
+export const getMoviesByCategory = async (slug: string, page: number = 1, limit: number = 42) => {
     try {
         // Hybrid fetch for categories too
         // Hybrid fetch for categories too
@@ -904,7 +915,7 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
     }
 };
 
-export const getMoviesByCountry = async (slug: string, page: number = 1, limit: number = 24) => {
+export const getMoviesByCountry = async (slug: string, page: number = 1, limit: number = 42) => {
     try {
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
             fetch(`${API_URL}/v1/api/quoc-gia/${slug}?page=${page}&limit=${limit}`, { next: { revalidate: 3600 } }).then(r => r.json()),
