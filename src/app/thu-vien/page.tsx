@@ -90,9 +90,9 @@ export default function ThuvienPage() {
             className="min-h-screen bg-[#080b12] text-white pt-[52px]"
             style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
         >
-            {/* Hero gradient */}
+            {/* Hero gradient - Premium Dark Blue Fade */}
             <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute inset-0 bg-gradient-to-b from-[#1a1f35]/30 via-transparent to-transparent" />
+                <div className="absolute top-0 left-0 right-0 h-[60vh] bg-gradient-to-b from-[#112440] via-[#080b12]/90 to-transparent" />
             </div>
 
             <div className="relative z-10 max-w-[1400px] mx-auto px-4 md:px-8 lg:pl-24 lg:pr-12 py-10">
