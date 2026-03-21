@@ -219,7 +219,7 @@ export default function VideoPlayer({
                                 </svg>
                             </div>`,
                             tooltip: "Tua lùi 10s",
-                            click: () => { if (art) art.currentTime = Math.max(0, art.currentTime - 10); },
+                            click: () => { if (art) art.seek = Math.max(0, art.currentTime - 10); },
                         },
                         // Skip forward 10s
                         {
@@ -232,7 +232,7 @@ export default function VideoPlayer({
                                 </svg>
                             </div>`,
                             tooltip: "Tua tiếp 10s",
-                            click: () => { if (art) art.currentTime = Math.min(art.duration, art.currentTime + 10); },
+                            click: () => { if (art) art.seek = Math.min(art.duration, art.currentTime + 10); },
                         },
                         // Auto Next Episode Toggle (ẩn trên màn mobile dọc)
                         ...(!isMobileNarrow ? [{
@@ -350,7 +350,7 @@ export default function VideoPlayer({
                     if (ct >= AD_START && ct <= AD_END) {
                         const isAutoSkipEnabled = localStorage.getItem("autoSkipAds") !== "false";
                         if (isAutoSkipEnabled && !hasAutoSkipped) {
-                            art.currentTime = AD_END + 1;
+                            art.seek = AD_END + 1;
                             hasAutoSkipped = true;
                             setShowSkipAd(false);
                             if (art.notice) {
@@ -419,8 +419,8 @@ export default function VideoPlayer({
                 // Keyboard shortcuts
                 const handleKeydown = (e: KeyboardEvent) => {
                     if (!art || document.activeElement?.tagName === "INPUT") return;
-                    if (e.key === "ArrowLeft") { art.currentTime = Math.max(0, art.currentTime - 10); e.preventDefault(); }
-                    if (e.key === "ArrowRight") { art.currentTime = Math.min(art.duration, art.currentTime + 10); e.preventDefault(); }
+                    if (e.key === "ArrowLeft") { art.seek = Math.max(0, art.currentTime - 10); e.preventDefault(); }
+                    if (e.key === "ArrowRight") { art.seek = Math.min(art.duration, art.currentTime + 10); e.preventDefault(); }
                 };
                 document.addEventListener("keydown", handleKeydown);
                 (artInstance.current as any).handleKeydown = handleKeydown;
@@ -488,7 +488,7 @@ export default function VideoPlayer({
                 {showSkipAd && (
                     <button
                         onClick={() => {
-                            if (artInstance.current) artInstance.current.currentTime = AD_END + 1;
+                            if (artInstance.current) artInstance.current.seek = AD_END + 1;
                             setShowSkipAd(false);
                         }}
                         style={{
