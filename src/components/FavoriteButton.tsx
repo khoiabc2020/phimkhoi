@@ -49,7 +49,6 @@ export default function FavoriteButton({ movieData, size = "md", className = "",
 
         startTransition(async () => {
             await toggleFavorite(movieData);
-            router.refresh();
 
             if (!isFav) {
                 showToast({

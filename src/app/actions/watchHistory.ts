@@ -48,7 +48,6 @@ export async function addWatchHistory(movieData: {
             }
         );
 
-        revalidatePath("/lich-su-xem");
         return { success: true, data: watchHistory ?? undefined };
     } catch (error) {
         console.error("Add watch history error:", error);
