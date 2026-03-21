@@ -479,7 +479,8 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                 </button>
                                             )}
                                         </div>
-                                    )}
+                                    </div>
+                                )}
                                 </div>
                             </form>
 
