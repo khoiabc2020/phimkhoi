@@ -32,10 +32,15 @@ export NODE_OPTIONS="--max_old_space_size=1152"
 sync && sleep 2
 
 # Cleanup any stale locks and troublesome cache directories that cause ENOTEMPTY
-rm -f .next/lock
-rm -rf .next/standalone/.next/cache
+# STOP app before build to release file locks on .next/standalone
+echo "Stopping PM2 to release file locks..."
+npx pm2 stop phimkhoi || echo "App not running"
 
-# Run build without deleting .next first. If it fails, exit immediately.
+echo "Clearing stale build artifacts..."
+rm -rf .next
+rm -f .next/lock
+
+# Run build. If it fails, exit immediately.
 if npm run build; then
     echo "Build successful! Preparing standalone..."
     
@@ -82,7 +87,8 @@ else
     echo "=========================================="
     echo "   [ERROR] BUILD FAILED! ROLLING BACK...   "
     echo "=========================================="
-    echo "The current version remains untouched and running."
+    echo "Starting existing application back up..."
+    npx pm2 start ecosystem.config.cjs --update-env || npx pm2 restart phimkhoi --update-env
     
     # Cleanup even on failure
     rm -f .next/lock
