@@ -1,17 +1,22 @@
 import { getTMDBPersonDetails, getTMDBPersonCredits, getTMDBImage, searchTMDBPerson } from "@/services/tmdb";
-import { searchMovies } from "@/services/api";
+import { getMoviesByActor } from "@/services/api";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, Star, Calendar, MapPin, Info } from "lucide-react";
+import { ChevronLeft, Star, Calendar, MapPin, Info, Grid, Clock, Share2, Globe } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import MovieCard from "@/components/MovieCard";
+import FavoriteActorButton from "@/components/FavoriteActorButton";
+import { checkFavoriteActor } from "@/app/actions/actorFavorites";
 
 interface PersonPageProps {
     params: { slug: string };
+    searchParams?: { view?: string };
 }
 
-export default async function PersonPage({ params }: PersonPageProps) {
+export default async function PersonPage({ params, searchParams }: PersonPageProps) {
     const { slug } = params;
+    const view = searchParams?.view === 'local' ? 'local' : 'global';
     const name = slug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 
     // 1. Search for the person to get ID
@@ -29,18 +34,23 @@ export default async function PersonPage({ params }: PersonPageProps) {
         );
     }
 
-    // 2. Get details & credits
-    const [details, credits] = await Promise.all([
+    // 2. Get details, credits, local movies, and favorite status
+    const [details, credits, localData, favResult] = await Promise.all([
         getTMDBPersonDetails(person.id),
-        getTMDBPersonCredits(person.id)
+        getTMDBPersonCredits(person.id),
+        getMoviesByActor(details ? details.name : name, 1, 100),
+        checkFavoriteActor(details ? details.name : name)
     ]);
 
     if (!details) return null;
 
     // 3. Filter and sort credits
-    const filmography = (credits?.cast || [])
+    const globalFilmography = (credits?.cast || [])
         .filter((m: any) => m.poster_path || m.backdrop_path)
-        .slice(0, 30); // Show top 30
+        .slice(0, 50);
+
+    const localFilmography = localData?.items || [];
+    const isFavorite = favResult?.isFavorite;
 
     return (
         <main className="min-h-screen bg-[#080b12] text-white overflow-hidden" 
@@ -66,6 +76,13 @@ export default async function PersonPage({ params }: PersonPageProps) {
                                 priority
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                        </div>
+                        
+                        <div className="mt-8 flex items-center justify-center gap-4">
+                            <FavoriteActorButton actorName={details.name} initialIsFavorite={isFavorite} />
+                            <button className="flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm bg-white/5 hover:bg-white/10 text-gray-300 transition-all border border-white/10 active:scale-95 shadow-lg">
+                                <Share2 className="w-4 h-4" /> <span>Chia sẻ</span>
+                            </button>
                         </div>
                     </div>
 
@@ -125,45 +142,78 @@ export default async function PersonPage({ params }: PersonPageProps) {
 
             {/* Filmography Section */}
             <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-12 relative z-10">
-                <div className="flex items-center gap-3 mb-8">
-                    <div className="w-1.5 h-6 bg-primary rounded-full shadow-[0_0_15px_rgba(143,167,197,0.5)]" />
-                    <h2 className="text-2xl font-bold text-white tracking-tight">Sự nghiệp ({filmography.length}+ phim)</h2>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 border-b border-white/[0.06] pb-6">
+                    <div className="flex items-center gap-3">
+                        <div className="w-1.5 h-6 bg-primary rounded-full shadow-[0_0_15px_rgba(143,167,197,0.5)]" />
+                        <h2 className="text-2xl font-bold text-white tracking-tight">Sự nghiệp</h2>
+                    </div>
+                    
+                    <div className="flex items-center gap-1 p-1 bg-white/[0.03] border border-white/[0.06] rounded-full">
+                        <Link 
+                            href={`/dien-vien/${slug}`}
+                            className={`flex items-center gap-2 px-6 py-2 rounded-full text-[13px] font-bold transition-all ${view === 'global' ? 'bg-primary text-black shadow-lg shadow-primary/20' : 'text-white/40 hover:text-white'}`}
+                        >
+                            <Globe className="w-4 h-4" /> Kho phim quốc tế
+                        </Link>
+                        <Link 
+                            href={`/dien-vien/${slug}?view=local`}
+                            className={`flex items-center gap-2 px-6 py-2 rounded-full text-[13px] font-bold transition-all ${view === 'local' ? 'bg-primary text-black shadow-lg shadow-primary/20' : 'text-white/40 hover:text-white'}`}
+                        >
+                            <Grid className="w-4 h-4" /> Phim tại KHOIPHIM
+                        </Link>
+                    </div>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-                    {filmography.map((movie: any) => (
-                        <Link 
-                            href={`/phim/${movie.title?.toLowerCase().replace(/[^a-z0-9]/g, '-') || movie.name?.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
-                            key={movie.id} 
-                            className="group"
-                        >
-                            <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-white/5 border border-white/5 group-hover:border-primary/40 transition-all duration-300 shadow-lg">
-                                <Image 
-                                    src={getTMDBImage(movie.poster_path, "w500") || "/placeholder-poster.jpg"} 
-                                    alt={movie.title || movie.name} 
-                                    fill 
-                                    className="object-cover group-hover:scale-110 transition-transform duration-500"
-                                    unoptimized
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-                                    <div className="flex items-center gap-1.5 text-yellow-400 text-xs font-bold mb-1">
-                                        <Star className="w-3 h-3 fill-yellow-400" />
-                                        {movie.vote_average?.toFixed(1)}
+                {view === 'global' ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+                        {globalFilmography.map((movie: any) => (
+                            <Link 
+                                href={`/phim/${movie.title?.toLowerCase().replace(/[^a-z0-9]/g, '-') || movie.name?.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
+                                key={movie.id} 
+                                className="group"
+                            >
+                                <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-white/5 border border-white/5 group-hover:border-primary/40 transition-all duration-300 shadow-lg">
+                                    <Image 
+                                        src={getTMDBImage(movie.poster_path, "w500") || "/placeholder-poster.jpg"} 
+                                        alt={movie.title || movie.name} 
+                                        fill 
+                                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                                        unoptimized
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                                        <div className="flex items-center gap-1.5 text-yellow-400 text-xs font-bold mb-1">
+                                            <Star className="w-3 h-3 fill-yellow-400" />
+                                            {movie.vote_average?.toFixed(1)}
+                                        </div>
+                                        <p className="text-[10px] text-white/60 font-medium">Bắt đầu xem</p>
                                     </div>
-                                    <p className="text-[10px] text-white/60 font-medium">Bắt đầu xem</p>
                                 </div>
-                            </div>
-                            <div className="mt-3">
-                                <h3 className="text-sm font-bold text-white/90 group-hover:text-primary transition-colors line-clamp-1">
-                                    {movie.title || movie.name}
-                                </h3>
-                                <p className="text-xs text-white/40 font-medium mt-1">
-                                    {movie.release_date || movie.first_air_date ? (movie.release_date || movie.first_air_date).substring(0, 4) : "-"}
-                                </p>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
+                                <div className="mt-3">
+                                    <h3 className="text-sm font-bold text-white/90 group-hover:text-primary transition-colors line-clamp-1">
+                                        {movie.title || movie.name}
+                                    </h3>
+                                    <p className="text-xs text-white/40 font-medium mt-1">
+                                        {movie.release_date || movie.first_air_date ? (movie.release_date || movie.first_air_date).substring(0, 4) : "-"}
+                                    </p>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                ) : localFilmography.length === 0 ? (
+                    <div className="bg-white/[0.02] border border-white/[0.05] rounded-[32px] p-20 text-center flex flex-col items-center justify-center">
+                        <div className="w-20 h-20 bg-white/[0.03] rounded-full flex items-center justify-center mb-6">
+                            <Info className="w-10 h-10 text-white/20" />
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-2">Chưa có phim trên hệ thống</h3>
+                        <p className="text-white/40 text-sm max-w-sm">Hiện tại chưa tìm thấy phim nào của {details.name} đang có sẵn tại KHOIPHIM. Hãy thử quay lại sau nhé!</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+                        {localFilmography.map((movie: any) => (
+                            <MovieCard key={movie._id} movie={movie} />
+                        ))}
+                    </div>
+                )}
             </div>
 
             <Footer />
