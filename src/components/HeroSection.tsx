@@ -242,7 +242,7 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                         <h1
                             key={`m-title-${index}`}
                             className={cn(
-                                "font-outfit font-black text-white leading-[1.1] drop-shadow-[0_2px_14px_rgba(0,0,0,0.85)] animate-hero-in tracking-tight uppercase",
+                                "font-display font-black text-white leading-[1.15] drop-shadow-[0_2px_14px_rgba(0,0,0,0.85)] animate-hero-in tracking-tight uppercase pb-1",
                                 "text-balance line-clamp-2",
                                 movie.name.length > 30 ? "text-[14px]" : movie.name.length > 20 ? "text-[16px]" : "text-[18px]"
                             )}
@@ -392,14 +392,14 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         <h1
                             key={`title-${index}`}
                             className={cn(
-                                "font-outfit font-black text-white leading-[1.05] tracking-tight pt-1 animate-hero-in drop-shadow-[0_8px_24px_rgba(0,0,0,0.9)] uppercase",
+                                "font-display font-black text-white leading-[1.15] tracking-tight pt-1 animate-hero-in drop-shadow-[0_8px_24px_rgba(0,0,0,0.9)] uppercase pb-2",
                                 "text-balance line-clamp-2",
-                                // Scaled down for better balance
+                                // Scaled down for better balance and reading
                                 movie.name.length > 35 
-                                    ? "text-2xl md:text-3xl lg:text-4xl xl:text-5xl" 
+                                    ? "text-2xl md:text-3xl lg:text-4xl" 
                                     : movie.name.length > 20
-                                        ? "text-3xl md:text-4xl lg:text-5xl xl:text-6xl"
-                                        : "text-4xl md:text-5xl lg:text-6xl xl:text-7xl"
+                                        ? "text-3xl md:text-4xl lg:text-[42px] xl:text-5xl"
+                                        : "text-4xl md:text-5xl lg:text-[52px] xl:text-6xl"
                             )}
                             title={decodeHtml(movie.name)}
                         >
