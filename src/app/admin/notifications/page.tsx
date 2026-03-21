@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { Bell, Plus, Trash2, Loader2, Info, AlertTriangle, CheckCircle } from "lucide-react";
-import toast from "react-hot-toast";
 
 type Notification = {
     _id: string;
@@ -38,7 +37,7 @@ export default function AdminNotificationsPage() {
             const data = await res.json();
             setNotifications(data);
         } catch (error) {
-            toast.error("Lỗi khi tải danh sách thông báo");
+            alert("Lỗi khi tải danh sách thông báo");
         } finally {
             setIsLoading(false);
         }
@@ -56,12 +55,12 @@ export default function AdminNotificationsPage() {
 
             if (!res.ok) throw new Error("Thêm thất bại");
             
-            toast.success("Đã gửi thông báo thành công!");
+            alert("Đã gửi thông báo thành công!");
             setFormData({ title: "", message: "", link: "", type: "info" });
             setShowForm(false);
             fetchNotifications();
         } catch (error) {
-            toast.error("Lỗi khi thêm thông báo");
+            alert("Lỗi khi thêm thông báo");
         } finally {
             setIsSubmitting(false);
         }
@@ -74,10 +73,10 @@ export default function AdminNotificationsPage() {
             const res = await fetch(`/api/admin/notifications/${id}`, { method: "DELETE" });
             if (!res.ok) throw new Error("Xóa thất bại");
             
-            toast.success("Đã xóa thông báo");
+            alert("Đã xóa thông báo");
             setNotifications(prev => prev.filter(n => n._id !== id));
         } catch (error) {
-            toast.error("Lỗi khi xóa thông báo");
+            alert("Lỗi khi xóa thông báo");
         }
     };
 
