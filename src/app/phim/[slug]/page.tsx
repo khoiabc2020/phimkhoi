@@ -184,8 +184,8 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     //       PRIORITY 3 = TMDB Poster
     //       PRIORITY 4 = Source Poster (The Horse - least desired)
 
-    const tmdbBackdrop = tmdbDetails?.backdrop_path ? getTMDBImage(tmdbDetails.backdrop_path, "original") : "";
-    const tmdbPosterFallback = tmdbDetails?.poster_path ? getTMDBImage(tmdbDetails.poster_path, "original") : "";
+    const tmdbBackdrop = tmdbDetails?.backdrop_path ? getTMDBImage(tmdbDetails.backdrop_path, "w1280") : "";
+    const tmdbPosterFallback = tmdbDetails?.poster_path ? getTMDBImage(tmdbDetails.poster_path, "w780") : "";
 
     // Verified source backdrop - User specifically requested "lấy ảnh backdrop của nguồn phim đi"
     // For Asian dramas, the "thumb_url" usually contains the main actors (Snowy Couple).
@@ -338,12 +338,12 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             <span className="text-gray-500">Diễn viên:</span> {movie?.actor?.join(", ") || tmdbDetails?.credits?.cast?.slice(0, 5).map((c: { name?: string }) => c.name).join(", ") || "Đang cập nhật"}
                         </div>
 
-                        {/* Action Buttons -- bigger touch targets on mobile, centered */}
-                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 sm:gap-4 pt-4 pb-2 w-full">
+                        {/* Action Buttons -- bigger touch targets on mobile, 2x2 grid */}
+                        <div className="grid grid-cols-2 md:flex md:flex-wrap items-center justify-center md:justify-start gap-3 sm:gap-4 pt-4 pb-2 w-full max-w-[500px] md:max-w-none">
                             {serverData.length > 0 && (
                                 <Link
                                     href={`/xem-phim/${movie?.slug}/${serverData[0].slug}`}
-                                    className="flex items-center justify-center gap-2 bg-[#8FA7C5] text-[#0a0a0a] px-8 sm:px-10 py-3.5 rounded-full font-black text-[15px] hover:bg-[#a8bdd8] hover:scale-105 transition-all duration-300 shadow-[0_4px_20px_rgba(143,167,197,0.3)]"
+                                    className="flex items-center justify-center gap-2 bg-[#8FA7C5] text-[#0a0a0a] px-5 sm:px-10 py-3.5 rounded-full font-black text-[14px] sm:text-[15px] hover:bg-[#a8bdd8] hover:scale-105 transition-all duration-300 shadow-[0_4px_20px_rgba(143,167,197,0.3)] w-full md:w-auto"
                                 >
                                     <Play className="w-5 h-5 fill-current shrink-0" />
                                     Xem Phim
@@ -363,15 +363,15 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                             movieQuality: String(movie.quality || "HD"),
                                             movieCategories: Array.isArray(movie.category) ? movie.category.map((c: any) => String(c.name || "")) : [],
                                         }}
-                                        className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/10 py-3.5 px-6 rounded-full font-medium shadow-sm transition-all"
+                                        className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/10 py-3.5 px-5 sm:px-6 rounded-full font-medium shadow-sm transition-all w-full md:w-auto"
                                         showLabel={true}
                                     />
                                     <WatchlistButton
                                         slug={movie.slug}
-                                        className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/10 py-3.5 px-6 rounded-full font-medium shadow-sm transition-all hidden sm:flex"
+                                        className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/10 py-3.5 px-5 sm:px-6 rounded-full font-medium shadow-sm transition-all w-full md:w-auto"
                                         showLabel={true}
                                     />
-                                    <ShareButton title={`Xem phim ${movie.name} trên KHOIPHIM`} className="py-3.5 px-6 rounded-full !bg-white/5 hover:!bg-white/10 border-white/10 font-medium" />
+                                    <ShareButton title={`Xem phim ${movie.name} trên KHOIPHIM`} className="py-3.5 px-5 sm:px-6 rounded-full !bg-white/5 hover:!bg-white/10 border-white/10 font-medium w-full md:w-auto" />
                                 </>
                             )}
                         </div>
