@@ -47,7 +47,7 @@ export default function Footer() {
                     {/* Brand column */}
                     <div className="col-span-2 md:col-span-1 flex flex-col gap-4">
                         <Link href="/" className="inline-flex items-center">
-                            <div className="relative w-[150px] h-8">
+                            <div className="relative w-[200px] h-12">
                                 <Image
                                     src="/logo.png?v=2"
                                     alt="KHOIPHIM"

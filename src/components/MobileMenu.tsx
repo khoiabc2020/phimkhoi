@@ -82,7 +82,7 @@ export default function MobileMenu({
                 {/* Header */}
                 <div className="flex items-center justify-between px-5 h-[72px] shrink-0 border-b border-white/[0.06] bg-[#1a1f2e]/92">
                     <Link href="/" onClick={onClose} className="flex items-center">
-                        <div className="relative w-[140px] h-8 transition-transform active:scale-95">
+                        <div className="relative w-[180px] h-12 transition-transform active:scale-95">
                             <Image
                                 src="/logo.png?v=2"
                                 alt="KHOIPHIM"

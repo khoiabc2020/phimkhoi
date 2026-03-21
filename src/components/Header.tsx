@@ -211,7 +211,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         </button>
 
                         <Link href="/" className="flex items-center group">
-                            <div className="relative w-[130px] h-8 transition-transform active:scale-95">
+                            <div className="relative w-[150px] h-10 transition-transform active:scale-95">
                                 <Image
                                     src="/logo.png?v=2"
                                     alt="KHOIPHIM"
@@ -235,7 +235,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                     {/* Desktop Section: Brand + Links */}
                     <div className="hidden lg:flex items-center gap-4 xl:gap-10 flex-1">
                         <Link href="/" className="flex items-center shrink-0 -ml-1">
-                            <div className="relative w-[160px] lg:w-[190px] xl:w-[220px] h-10 lg:h-12 transition-transform hover:scale-[1.02] active:scale-95">
+                            <div className="relative w-[180px] lg:w-[240px] xl:w-[300px] h-12 lg:h-16 transition-transform hover:scale-[1.02] active:scale-95">
                                 <Image
                                     src="/logo.png?v=2"
                                     alt="KHOIPHIM"
