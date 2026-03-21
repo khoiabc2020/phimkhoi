@@ -378,6 +378,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             tmdbDetails={tmdbDetails}
                             episodeThumbnails={episodeThumbnails}
                             episodeMetadata={episodeMetadata}
+                            castComponent={<MovieCast movie={movie} slug={slug} isCompact={false} />}
                         />
                         {/* Comment Section below tabs */}
                         <div className="mt-8 sm:mt-12">

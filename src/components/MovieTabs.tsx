@@ -21,6 +21,7 @@ interface MovieTabsProps {
     tmdbDetails?: any;
     episodeThumbnails?: Record<string, string>;
     episodeMetadata?: Record<string, { title?: string; overview?: string; airDate?: string; runtime?: number; voteAverage?: number }>;
+    castComponent?: React.ReactNode;
 }
 
 const EPISODES_PER_CHUNK = 50;
@@ -33,6 +34,7 @@ export default function MovieTabs({
     tmdbDetails,
     episodeThumbnails = {},
     episodeMetadata = {},
+    castComponent,
 }: MovieTabsProps) {
     const defaultTab = (episodes && episodes.length > 0) ? "episodes" : "related";
     const [activeTab, setActiveTab] = useState<"episodes" | "trailer" | "related" | "cast">(defaultTab);
@@ -510,7 +512,7 @@ export default function MovieTabs({
                         <div className="mb-4 flex items-center gap-2 border-l-2 border-[#8FA7C5] pl-3">
                             <h3 className="text-[15px] font-bold text-white uppercase tracking-widest">Diễn viên chính</h3>
                         </div>
-                        <MovieCast movie={movie} slug={slug} isCompact={false} />
+                        {castComponent}
                     </div>
                 )}
             </div>
