@@ -256,13 +256,6 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             sizes="100vw"
                             quality={100}
                             unoptimized={true} 
-                            onError={(e) => {
-                                // Fallback if proxy fails
-                                const target = e.target as HTMLImageElement;
-                                if (backdropUrl.includes('/api/img-proxy') && movie?.thumb_url) {
-                                    target.src = movie.thumb_url;
-                                }
-                            }}
                         />
                     </div>
                 )}
