@@ -6,7 +6,7 @@ import { Play, Info, ChevronLeft, ChevronRight } from "lucide-react";
 import { Movie } from "@/services/api";
 import { getImageUrl, decodeHtml, cn } from "@/lib/utils";
 import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from "react";
-import FavoriteButton from "./FavoriteButton";
+import WatchlistButton from "./WatchlistButton";
 
 // ─── Utils ────────────────────────────────────────────────────────────────────
 
@@ -265,23 +265,20 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                 <div className="pl-[102px] min-h-[4px]" />
 
                 {/* Buttons */}
-                <div className="flex items-center gap-2 mt-3">
+                <div className="flex items-center gap-2 mt-3 w-full pr-[102px]">
                     <Link
                         href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                        className="flex flex-1 items-center justify-center gap-1.5 h-10 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[14px] active:scale-[0.97] hover:scale-105 transition-all"
+                        className="flex flex-1 items-center justify-center gap-1.5 h-10 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[13px] active:scale-[0.97] hover:scale-105 transition-all shadow-[0_4px_12px_rgba(143,167,197,0.3)]"
                     >
                         <Play className="w-3.5 h-3.5 fill-[#0a0a0a] shrink-0" />
                         Xem Ngay
                     </Link>
-                    <Link
-                        href={`/phim/${movie.slug}`}
-                        className="flex items-center justify-center px-4 h-10 rounded-full bg-white/8 border border-white/12 text-white font-medium text-[13px] active:scale-[0.97] transition-transform shrink-0"
-                    >
-                        Chi Tiết
-                    </Link>
-                    <div className="w-10 h-10 flex items-center justify-center rounded-full bg-white/8 border border-white/12 active:scale-[0.97] transition-transform shrink-0">
-                        <FavoriteButton movieData={getFavoriteData(movie)} size="sm" />
-                    </div>
+                    <WatchlistButton
+                        movieSlug={movie.slug}
+                        className="flex-1 px-0 h-10 rounded-full bg-white/8 border border-white/12 text-white font-medium text-[13px] active:scale-[0.97] transition-transform shrink-0 whitespace-nowrap"
+                        showLabel={true}
+                        label="Danh sách"
+                    />
                 </div>
 
                 {/* Dots */}
@@ -361,10 +358,10 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
             </div>
 
             {/* ── Content ── */}
-            <div className="relative z-[3] h-full w-full max-w-[1920px] mx-auto px-6 md:px-10 lg:pl-24 lg:pr-12 flex items-center lg:items-end pb-12 md:pb-16 lg:pb-32 pointer-events-none">
-                <div className="w-full flex justify-between items-center lg:items-end">
+            <div className="relative z-[3] h-full w-full max-w-[1920px] mx-auto px-6 md:px-10 lg:pl-24 lg:pr-12 flex items-end pb-24 md:pb-28 lg:pb-32 pointer-events-none">
+                <div className="w-full flex justify-between items-end">
                     {/* Left: Text block */}
-                    <div className="w-full lg:w-[50%] xl:w-[45%] space-y-4 lg:space-y-6 pointer-events-auto">
+                    <div className="w-full md:w-[70%] lg:w-[60%] xl:w-[55%] space-y-3 lg:space-y-5 pointer-events-auto">
                         
                         {/* Title — Optimized for Onflix aesthetic */}
                         <h1
@@ -373,8 +370,8 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                                 "font-display font-black text-white leading-[1.1] tracking-tight pt-1 animate-hero-in drop-shadow-[0_8px_24px_rgba(0,0,0,0.9)] uppercase pb-2",
                                 "text-balance line-clamp-3",
                                 movie.name.length > 35 
-                                    ? "text-4xl md:text-5xl lg:text-5xl" 
-                                    : "text-5xl md:text-6xl lg:text-[64px] xl:text-[72px]"
+                                    ? "text-3xl md:text-4xl lg:text-5xl" 
+                                    : "text-4xl md:text-5xl lg:text-6xl xl:text-[68px]"
                             )}
                             title={decodeHtml(movie.name)}
                         >
@@ -383,7 +380,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
 
                         {/* Tags Row */}
                         <div className="flex flex-wrap items-center gap-3 lg:gap-4 transition-all duration-500 animate-hero-in animation-delay-100">
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-[2px] bg-[#00d26a] text-white text-[11px] lg:text-[12px] font-black uppercase tracking-wider shadow-[0_2px_10px_rgba(0,210,106,0.3)]">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-[2px] bg-[#E50914] text-white text-[11px] lg:text-[12px] font-black uppercase tracking-wider shadow-[0_2px_10px_rgba(229,9,20,0.4)]">
                                 TOP 10
                             </span>
                             
@@ -418,7 +415,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         {movie.content && (
                             <p
                                 key={`desc-${index}`}
-                                className="text-white/80 text-[15px] lg:text-[16px] leading-[1.6] line-clamp-3 max-w-xl animate-hero-in animation-delay-200 drop-shadow-md font-medium"
+                                className="text-white/80 text-[14px] lg:text-[15px] xl:text-[16px] leading-[1.6] line-clamp-2 md:line-clamp-3 lg:line-clamp-2 xl:line-clamp-3 max-w-2xl animate-hero-in animation-delay-200 drop-shadow-md font-medium"
                             >
                                 {decodeHtml(stripHtml(movie.content))}
                             </p>
@@ -431,37 +428,18 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         >
                             <Link
                                 href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                className="flex items-center justify-center gap-2 h-12 md:h-14 px-8 md:px-10 rounded-full bg-[#00d26a] text-white font-black text-[16px] uppercase tracking-wide transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_8px_20px_-6px_rgba(0,210,106,0.6)] group"
+                                className="flex items-center justify-center gap-2 h-12 md:h-14 px-8 md:px-10 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[15px] lg:text-[16px] uppercase tracking-wide transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_8px_20px_-6px_rgba(143,167,197,0.5)] group"
                             >
-                                <Play className="w-5 h-5 fill-white shrink-0 group-hover:scale-110 transition-transform" />
+                                <Play className="w-5 h-5 fill-[#0a0a0a] shrink-0 group-hover:scale-110 transition-transform" />
                                 Xem Ngay
                             </Link>
-                            <Link
-                                href={`/phim/${movie.slug}`}
-                                className="flex items-center justify-center gap-2 h-12 md:h-14 px-7 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-[15px] transition-all hover:scale-105 active:scale-95 backdrop-blur-md shadow-xl"
-                            >
-                                <Info className="w-5 h-5" />
-                                <span className="hidden sm:inline">Thông Tin</span>
-                            </Link>
-                            <div className="h-12 w-12 md:h-14 md:w-14 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 border border-white/20 transition-all hover:scale-110 cursor-pointer backdrop-blur-md shadow-xl group">
-                                <FavoriteButton movieData={getFavoriteData(movie)} size="sm" />
-                            </div>
+                            <WatchlistButton
+                                movieSlug={movie.slug}
+                                className="flex items-center justify-center gap-2 h-12 md:h-14 px-7 md:px-8 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-[14px] lg:text-[15px] transition-all hover:scale-105 active:scale-95 backdrop-blur-md shadow-xl"
+                                showLabel={true}
+                                label="Thêm vào danh sách"
+                            />
                         </div>
-                    </div>
-
-                    {/* Right: Floating Poster Image (Stylized Onflix Aesthetic) */}
-                    <div className="hidden lg:block absolute right-[4%] xl:right-[8%] bottom-1/2 translate-y-[55%] w-[300px] xl:w-[380px] aspect-[2/3] rounded-2xl overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.9)] ring-1 ring-white/20 transform rotate-2 hover:rotate-0 transition-all duration-700 hover:scale-105 group pointer-events-auto z-10 animate-hero-in">
-                        <Image
-                            key={`poster-${index}`}
-                            src={posterImg}
-                            alt=""
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-700"
-                            sizes="400px"
-                            priority
-                            unoptimized={true}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
                     </div>
                 </div>
 
