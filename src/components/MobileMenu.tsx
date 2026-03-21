@@ -132,7 +132,7 @@ export default function MobileMenu({
                         <div className="rounded-[12px] p-4 border border-white/[0.08] text-center bg-[#0B0B10]">
                             <p className="text-white/45 mb-4 text-[13px] leading-relaxed">Đăng nhập để lưu phim yêu thích và lịch sử xem</p>
                             <Link href="/login" onClick={onClose}
-                                className="flex items-center justify-center gap-2 w-full bg-[#263243] hover:bg-[#2d3d54] text-[#d8e3f2] font-bold py-2.5 rounded-full text-[14px] transition-all border border-white/5 active:scale-[0.98]"
+                                className="flex items-center justify-center gap-2 w-full bg-[#263243] hover:bg-[#2d3d54] text-[#d8e3f2] font-bold py-2.5 rounded-lg text-[14px] transition-all border border-white/5 active:scale-[0.98]"
                             >
                                 <LogIn className="w-4 h-4" />
                                 <span>Đăng nhập</span>

@@ -1087,7 +1087,9 @@ export const getMenuData = async () => {
         const cleanName = (name: string) => name.replace(/&#039;/g, "'").replace(/&amp;/g, "&");
 
         return {
-            categories: (Array.isArray(kkCategories) ? kkCategories : []).map(c => ({ ...c, name: cleanName(c.name) })),
+            categories: (Array.isArray(kkCategories) ? kkCategories : [])
+                .filter(c => c.slug !== 'phim-18')
+                .map(c => ({ ...c, name: cleanName(c.name) })),
             countries: mergedCountries.map(c => ({ ...c, name: cleanName(c.name) }))
         };
     } catch (error) {

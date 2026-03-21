@@ -39,7 +39,7 @@ export default async function CountriesIndexPage() {
                         <Link
                             key={c.slug}
                             href={`/quoc-gia/${c.slug}`}
-                            className="bg-white/5 border border-white/10 hover:border-[#8FA7C5]/50 hover:bg-white/10 p-5 rounded-2xl transition-all group flex flex-col items-center justify-center text-center gap-3"
+                            className="bg-white/5 border border-white/10 hover:border-[#8FA7C5]/50 hover:bg-white/10 p-5 rounded-lg transition-all group flex flex-col items-center justify-center text-center gap-3"
                         >
                             <span className="text-lg font-bold text-white group-hover:text-[#8FA7C5] transition-colors">
                                 {c.name}

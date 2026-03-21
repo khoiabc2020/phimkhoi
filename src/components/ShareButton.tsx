@@ -39,7 +39,7 @@ export default function ShareButton({ title, text, className, iconOnlyOnMobile =
     return (
         <button
             onClick={handleShare}
-            className={`flex items-center gap-2 px-4 py-2 min-h-[40px] rounded-full bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white font-medium text-sm transition-all border border-white/5 group ${className || ""}`}
+            className={`flex items-center gap-2 px-4 py-2 min-h-[40px] rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white font-medium text-sm transition-all border border-white/5 group ${className || ""}`}
             title="Chia sẻ phim này"
         >
             <Share2 className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors shrink-0" />

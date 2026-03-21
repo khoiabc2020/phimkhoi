@@ -264,22 +264,39 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/95 via-[45%] to-transparent" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
 
-                {/* Hero Info Content aligned left/bottom */}
-                <div className="relative z-10 w-full max-w-[1920px] mx-auto flex flex-col md:flex-row items-end justify-between gap-8 md:gap-12">
+                {/* Hero Info Content aligned left/bottom on desktop, center on mobile */}
+                <div className="relative z-10 w-full max-w-[1920px] mx-auto flex flex-col md:flex-row items-center md:items-end justify-center md:justify-between gap-6 md:gap-12 text-center md:text-left">
+                    
+                    {/* Poster on Mobile (Centered, overlapping the backdrop slightly) */}
+                    <div className="w-[140px] sm:w-[180px] md:hidden shrink-0 rounded-lg overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.8)] border border-white/15 relative aspect-[2/3] z-20 mt-[-60px] sm:mt-[-80px]">
+                        <Image 
+                            src={sourcePosterUrl || sourceThumbUrl || tmdbPosterFallback || "/fallback.png"} 
+                            alt={movie?.name || "Poster"} 
+                            fill 
+                            className="object-cover" 
+                            sizes="180px"
+                            priority
+                        />
+                    </div>
+
                     {/* Left side: Movie Info */}
-                    <div className="space-y-2 sm:space-y-4 max-w-[760px] flex-1">
-                        <div className="flex items-center gap-2 mb-1">
+                    <div className="space-y-3 sm:space-y-4 max-w-[760px] flex-1 flex flex-col items-center md:items-start w-full">
+                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-1">
                             {movie?.year && (
-                                <span className="px-2.5 py-0.5 rounded border border-white/15 bg-white/[0.06] text-white/80 text-[11px] font-semibold leading-none">
+                                <span className="px-2.5 py-1 rounded-md border border-white/15 bg-white/[0.06] text-white/80 text-[11px] font-semibold leading-none drop-shadow-md">
                                     {movie?.year}
                                 </span>
                             )}
-                            <span className="px-2.5 py-0.5 rounded border border-[#8FA7C5]/40 bg-[#8FA7C5]/10 text-[#8FA7C5] text-[11px] font-bold leading-none uppercase">
+                            <span className="px-2.5 py-1 rounded-md border border-[#8FA7C5]/40 bg-[#8FA7C5]/10 text-[#8FA7C5] text-[11px] font-bold leading-none uppercase drop-shadow-md">
                                 {movie?.quality || "FHD"}
                             </span>
                         </div>
-                        <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-[40px] font-black text-white leading-tight tracking-tight pt-1 drop-shadow-2xl text-balance capitalize">{movie?.name?.toLowerCase()}</h1>
-                        <h2 className="hidden sm:block text-base md:text-2xl text-gray-300 font-medium tracking-wide drop-shadow-md capitalize">{movie?.origin_name?.toLowerCase()}</h2>
+                        <h1 className="font-display text-3xl sm:text-4xl lg:text-[44px] font-black text-white leading-tight tracking-tight pt-1 drop-shadow-2xl capitalize w-full">
+                            {movie?.name?.toLowerCase()}
+                        </h1>
+                        <h2 className="hidden sm:block text-base md:text-xl text-gray-300 font-medium tracking-wide drop-shadow-md capitalize opacity-80">
+                            {movie?.origin_name?.toLowerCase()}
+                        </h2>
 
                         {(() => {
                             const epCurrent = movie?.episode_current || "";
@@ -288,47 +305,47 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             // Extract episode number, removing "Tập " strings to avoid duplication
                             const epNum = epCurrent.replace(/hoàn tất/gi, "").replace(/\(.*?\)/g, "").replace(/tập\s*/gi, "").trim() || "1";
                             return (
-                                <div className="flex items-center gap-2 font-bold text-sm mt-2 drop-shadow-md">
+                                <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 font-bold text-sm mt-3 drop-shadow-md">
                                     {isCompleted ? (
                                         <>
-                                            <span className="inline-flex items-center gap-1.5 bg-green-500/20 text-green-400 border border-green-500/30 px-2.5 py-0.5 rounded-full text-xs font-bold">
+                                            <span className="inline-flex items-center gap-1.5 bg-green-500/15 text-green-400 border border-green-500/30 px-3 py-1 rounded-md text-xs font-bold">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
                                                 Hoàn Tất
                                             </span>
-                                            <span className="text-gray-400 text-xs font-medium">{total} Tập</span>
+                                            <span className="text-gray-300 text-xs font-medium bg-white/5 border border-white/10 px-3 py-1 rounded-md">{total} Tập</span>
                                         </>
                                     ) : (
                                         <>
-                                            <span className="inline-flex items-center gap-1.5 bg-[#8FA7C5]/20 text-[#8FA7C5] border border-[#8FA7C5]/30 px-2.5 py-0.5 rounded-full text-xs font-bold">
+                                            <span className="inline-flex items-center gap-1.5 bg-[#8FA7C5]/15 text-[#8FA7C5] border border-[#8FA7C5]/30 px-3 py-1 rounded-md text-xs font-bold">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-[#8FA7C5] animate-pulse inline-block" />
                                                 Đang chiếu
                                             </span>
-                                            <span className="text-gray-300 text-xs font-medium">Tập {epNum} / {total}</span>
+                                            <span className="text-gray-300 text-xs font-medium bg-white/5 border border-white/10 px-3 py-1 rounded-md">Tập {epNum} / {total}</span>
                                         </>
                                     )}
                                 </div>
                             );
                         })()}
 
-                        <div className="text-xs sm:text-sm text-gray-300 flex flex-wrap items-center gap-2 sm:gap-4 py-1 sm:py-2 drop-shadow-md">
+                        <div className="text-xs sm:text-sm text-gray-300 flex flex-wrap items-center justify-center md:justify-start gap-2 sm:gap-4 py-2 drop-shadow-md">
                             {(movie?.director && movie.director.length > 0 && !movie.director.includes("Đang cập nhật")) || tmdbDetails?.credits?.crew?.find((c: { job?: string; name?: string }) => c.job === "Director") ? (
                                 <span><span className="text-gray-500">Đạo diễn:</span> {movie?.director?.join(", ") || tmdbDetails?.credits?.crew?.find((c: { job?: string; name?: string }) => c.job === "Director")?.name}</span>
                             ) : null}
                             <span className="w-1 h-1 bg-gray-600 rounded-full hidden sm:block" />
                             <span><span className="text-gray-500">Thời lượng:</span> {movie?.time || "N/A"}</span>
                         </div>
-                        <div className="text-xs sm:text-sm text-gray-300 mb-3 sm:mb-6 line-clamp-2 max-w-3xl drop-shadow-md">
+                        <div className="text-xs sm:text-sm text-gray-300 mb-4 sm:mb-6 line-clamp-2 max-w-3xl drop-shadow-md text-center md:text-left">
                             <span className="text-gray-500">Diễn viên:</span> {movie?.actor?.join(", ") || tmdbDetails?.credits?.cast?.slice(0, 5).map((c: { name?: string }) => c.name).join(", ") || "Đang cập nhật"}
                         </div>
 
-                        {/* Action Buttons -- bigger touch targets on mobile */}
-                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-2 sm:pt-4">
+                        {/* Action Buttons -- bigger touch targets on mobile, centered */}
+                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 sm:gap-4 pt-4 pb-2 w-full">
                             {serverData.length > 0 && (
                                 <Link
                                     href={`/xem-phim/${movie?.slug}/${serverData[0].slug}`}
-                                    className="flex items-center justify-center gap-2 bg-[#8FA7C5] text-[#0a0a0a] px-6 sm:px-8 py-3 rounded-full font-black text-[15px] hover:bg-[#a8bdd8] hover:scale-105 transition-all duration-300"
+                                    className="flex items-center justify-center gap-2 bg-[#8FA7C5] text-[#0a0a0a] px-8 sm:px-10 py-3.5 rounded-lg font-black text-[15px] hover:bg-[#a8bdd8] hover:scale-105 transition-all duration-300 shadow-[0_4px_20px_rgba(143,167,197,0.3)]"
                                 >
-                                    <Play className="w-4 h-4 fill-current shrink-0" />
+                                    <Play className="w-5 h-5 fill-current shrink-0" />
                                     Xem Phim
                                 </Link>
                             )}
@@ -346,15 +363,15 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                             movieQuality: String(movie.quality || "HD"),
                                             movieCategories: Array.isArray(movie.category) ? movie.category.map((c: any) => String(c.name || "")) : [],
                                         }}
-                                        className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/5 rounded-full"
+                                        className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/10 py-3.5 px-6 rounded-lg font-medium shadow-sm transition-all"
                                         showLabel={true}
                                     />
                                     <WatchlistButton
                                         slug={movie.slug}
-                                        className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/5 rounded-full"
+                                        className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/10 py-3.5 px-6 rounded-lg font-medium shadow-sm transition-all hidden sm:flex"
                                         showLabel={true}
                                     />
-                                    <ShareButton title={`Xem phim ${movie.name} trên KHOIPHIM`} />
+                                    <ShareButton title={`Xem phim ${movie.name} trên KHOIPHIM`} className="py-3.5 px-6 rounded-lg !bg-white/5 hover:!bg-white/10 border-white/10 font-medium" />
                                 </>
                             )}
                         </div>
@@ -367,10 +384,10 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
             <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:pl-24 lg:pr-12 mt-6 sm:mt-8 lg:mt-12 relative z-10">
                 
                 {/* Mobile prioritized Section: Description */}
-                <div className="lg:hidden mb-8">
-                    <div className="bg-[#07070b]/40 backdrop-blur-md rounded-2xl p-5 border border-white/5">
-                        <div className="flex items-center gap-2 mb-4 border-l-2 border-[#8FA7C5] pl-3">
-                            <h3 className="text-[15px] font-bold text-white uppercase tracking-widest">Nội dung</h3>
+                <div className="lg:hidden mb-10 pt-4">
+                    <div className="bg-[#07070b]/60 backdrop-blur-xl rounded-lg p-5 sm:p-6 border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
+                        <div className="flex items-center gap-2 mb-4 border-l-4 border-[#8FA7C5] pl-3">
+                            <h3 className="text-[16px] font-black text-white tracking-widest uppercase">Nội dung</h3>
                         </div>
                         <div 
                             className="text-[14px] text-gray-300 leading-relaxed font-light text-justify" 
@@ -429,9 +446,9 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         {/* Thể loại */}
                         <div>
                             <div className="text-[11px] font-medium text-gray-400 uppercase tracking-widest mb-3">Thể loại</div>
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-wrap gap-2 text-left">
                                 {movie?.category?.map((c: { slug?: string; name?: string; id?: string }) => (
-                                    <Link key={c.id} href={`/the-loai/${c.slug}`} className="text-[11px] font-medium text-gray-300 bg-white/[0.08] border border-white/[0.14] py-1.5 px-3 rounded-full hover:text-white hover:border-[#8FA7C5]/50 transition-colors uppercase tracking-wider">{c.name}</Link>
+                                    <Link key={c.id} href={`/the-loai/${c.slug}`} className="text-[11.5px] font-bold text-gray-300 bg-white/[0.05] border border-white/[0.1] py-1.5 px-3 rounded-md hover:text-white hover:border-[#8FA7C5]/50 hover:bg-white/[0.08] transition-all uppercase tracking-wider">{c.name}</Link>
                                 ))}
                             </div>
                         </div>
