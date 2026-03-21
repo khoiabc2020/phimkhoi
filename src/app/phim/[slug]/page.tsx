@@ -257,8 +257,8 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                 {movie?.quality || "FHD"}
                             </span>
                         </div>
-                        <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-[40px] font-black text-white leading-[1.15] tracking-tight pt-1 drop-shadow-2xl text-balance">{movie?.name}</h1>
-                        <h2 className="hidden sm:block text-base md:text-2xl text-gray-300 font-medium tracking-wide drop-shadow-md">{movie?.origin_name}</h2>
+                        <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-[40px] font-black text-white leading-tight tracking-tight pt-1 drop-shadow-2xl text-balance capitalize">{movie?.name?.toLowerCase()}</h1>
+                        <h2 className="hidden sm:block text-base md:text-2xl text-gray-300 font-medium tracking-wide drop-shadow-md capitalize">{movie?.origin_name?.toLowerCase()}</h2>
 
                         {(() => {
                             const epCurrent = movie?.episode_current || "";

@@ -112,7 +112,7 @@ export default function WatchContainer({
     }, [movie._id, currentEpisodeSlug]);
 
     return (
-        <div className={cn("relative isolate transition-all duration-500", isLightOff ? "z-[60]" : "")}>
+        <div className={cn("relative w-full", isTheaterMode ? "z-[50]" : (isLightOff ? "z-[60]" : "z-10"))}>
 
             {/* Light Off Overlay */}
             {isLightOff && (

@@ -389,7 +389,21 @@ export const HOME_SECTION_SLUGS: Record<HomeCacheKey, string> = {
 
 const FETCH_TIMEOUT_MS = 12000;
 
-/** Fetch with timeout and optional retry logic for external APIs */
+/** Fetch with tight timeout used for server components to guarantee fast loads */
+export const fetchWithFastTimeout = async (url: string, timeoutMs: number = 3000, options: RequestInit = {}) => {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+        const response = await fetch(url, { ...options, signal: controller.signal });
+        clearTimeout(id);
+        return await response.json();
+    } catch (err) {
+        clearTimeout(id);
+        throw err;
+    }
+};
+
+/** Fetch with timeout and optional retry logic for external APIs (used by client caching) */
 async function fetchWithRetry(url: string, options: RequestInit = {}, retries = 1): Promise<any> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
@@ -496,9 +510,9 @@ export const getHomeData = async () => {
 export const getMovieDetail = async (slug: string) => {
     try {
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
-            fetch(`${API_URL}/phim/${slug}`, { next: { revalidate: 180 } }).then(r => r.json()),
-            fetch(`https://ophim1.com/phim/${slug}`, { next: { revalidate: 180 } }).then(r => r.json()),
-            fetch(`${NGUONC_API}/api/film/${slug}`, { next: { revalidate: 180 } }).then(r => r.json())
+            fetchWithFastTimeout(`${API_URL}/phim/${slug}`, 3000, { next: { revalidate: 180 } }),
+            fetchWithFastTimeout(`https://ophim1.com/phim/${slug}`, 2500, { next: { revalidate: 180 } }),
+            fetchWithFastTimeout(`${NGUONC_API}/api/film/${slug}`, 2000, { next: { revalidate: 180 } })
         ]);
 
         let combinedData: Record<string, unknown> | null = null;
@@ -619,9 +633,9 @@ export const searchMovies = async (keyword: string, options: { enrichTMDB?: bool
 
         const encoded = encodeURIComponent(q);
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
-            fetch(`${API_URL}/v1/api/tim-kiem?keyword=${encoded}&limit=${limit}`).then(r => r.json()),
-            fetch(`${OPHIM_API}/v1/api/tim-kiem?keyword=${encoded}&limit=${limit}`).then(r => r.json()),
-            fetch(`${NGUONC_API}/api/films/search?keyword=${encoded}`).then(r => r.json())
+            fetchWithFastTimeout(`${API_URL}/v1/api/tim-kiem?keyword=${encoded}&limit=${limit}`, 3000),
+            fetchWithFastTimeout(`${OPHIM_API}/v1/api/tim-kiem?keyword=${encoded}&limit=${limit}`, 2500),
+            fetchWithFastTimeout(`${NGUONC_API}/api/films/search?keyword=${encoded}`, 2000)
         ]);
 
         let results: Movie[] = [];
@@ -733,9 +747,9 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
 
         // Fetch from BOTH sources in parallel
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
-            fetch(`${API_URL}/v1/api/danh-sach/${type}${query}`, { next: { revalidate: 3600 } }).then(r => r.json()),
-            fetch(`${OPHIM_API}/v1/api/danh-sach/${type}${query}`, { next: { revalidate: 3600 } }).then(r => r.json()),
-            fetch(`${NGUONC_API}/api/films/${type === 'phim-moi-cap-nhat' ? '' : 'danh-sach/'}${type}?page=${page}`, { next: { revalidate: 3600 } }).then(r => r.json())
+            fetchWithFastTimeout(`${API_URL}/v1/api/danh-sach/${type}${query}`, 3000, { next: { revalidate: 3600 } }),
+            fetchWithFastTimeout(`${OPHIM_API}/v1/api/danh-sach/${type}${query}`, 2500, { next: { revalidate: 3600 } }),
+            fetchWithFastTimeout(`${NGUONC_API}/api/films/${type === 'phim-moi-cap-nhat' ? '' : 'danh-sach/'}${type}?page=${page}`, 2000, { next: { revalidate: 3600 } })
         ]);
 
         let items: Movie[] = [];

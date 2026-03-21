@@ -165,7 +165,7 @@ function MovieCard({
                 onMouseLeave={handleMouseLeave}
             >
                 <div className={`relative ${orientation === 'landscape' ? 'aspect-video' : 'aspect-[2/3]'} rounded-[10px] overflow-hidden bg-[#0b101a] ring-1 ring-white/5 group-hover/static-card:ring-2 group-hover/static-card:ring-[#8FA7C5]/60 transition-all duration-300 shadow-lg`}>
-                    <Link href={`/phim/${movie.slug}`} className="block h-full w-full absolute inset-0 z-0" prefetch={false}>
+                    <Link href={`/phim/${movie.slug}`} className="block h-full w-full absolute inset-0 z-0">
                         <Image
                             src={activePosterSrc || "/placeholder.svg"}
                             alt={decodeHtml(movie.name) || movie.slug || "Phim"}

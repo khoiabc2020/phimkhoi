@@ -261,7 +261,7 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                             <h1
                                 key={`m-title-${index}`}
                                 className={cn(
-                                    "font-display font-black text-white leading-[1.15] drop-shadow-[0_2px_14px_rgba(0,0,0,0.85)] animate-hero-in tracking-tight uppercase pb-1",
+                                    "font-display font-black text-white leading-tight drop-shadow-[0_2px_14px_rgba(0,0,0,0.85)] animate-hero-in tracking-tight pb-1",
                                     "text-balance line-clamp-2",
                                     movie.name.length > 30 ? "text-[16px] md:text-[20px]" : movie.name.length > 20 ? "text-[18px] md:text-[24px]" : "text-[22px] md:text-[28px]"
                                 )}
@@ -288,10 +288,10 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                 <div className="flex items-center gap-2 mt-3 w-full pr-[102px]">
                     <Link
                         href={`/phim/${movie.slug}`}
-                        className="flex-1 flex items-center justify-center gap-1.5 h-10 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[13px] active:scale-[0.97] hover:scale-105 transition-all shadow-[0_4px_12px_rgba(143,167,197,0.3)]"
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#8FA7C5] hover:bg-[#a8bdd8] hover:-translate-y-0.5 text-[#0a0a0a] px-6 py-2.5 rounded-full font-bold text-[14px] transition-all duration-300"
                     >
-                        <Play className="w-3.5 h-3.5 fill-[#0a0a0a] shrink-0" />
-                        Xem Ngay
+                        <Play className="w-5 h-5 fill-current" />
+                        <span>Xem Ngay</span>
                     </Link>
                     <WatchlistButton
                         slug={movie.slug}
@@ -421,11 +421,11 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                             <h1
                                 key={`title-${index}`}
                                 className={cn(
-                                    "font-display font-black text-white leading-[1.1] tracking-tight pt-1 animate-hero-in drop-shadow-[0_8px_24px_rgba(0,0,0,0.9)] uppercase pb-2",
+                                    "font-display font-black text-white leading-tight tracking-tight pt-1 animate-hero-in drop-shadow-[0_8px_24px_rgba(0,0,0,0.9)] pb-2",
                                     "text-balance line-clamp-2 md:line-clamp-3",
                                     movie.name.length > 25 
-                                        ? "text-3xl md:text-4xl lg:text-5xl xl:text-[52px]" 
-                                        : "text-4xl md:text-5xl lg:text-6xl xl:text-[60px]"
+                                        ? "text-3xl md:text-4xl lg:text-[40px] xl:text-[46px]" 
+                                        : "text-4xl md:text-[42px] lg:text-[48px] xl:text-[54px]"
                                 )}
                                 title={decodeHtml(movie.name)}
                             >
@@ -483,7 +483,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         >
                             <Link
                                 href={`/phim/${movie.slug}`}
-                                className="flex items-center justify-center gap-2 h-12 md:h-14 px-8 md:px-10 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[15px] lg:text-[16px] uppercase tracking-wide transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_8px_20px_-6px_rgba(143,167,197,0.5)] group"
+                                className="flex items-center justify-center gap-2 h-12 md:h-14 px-8 md:px-10 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[15px] lg:text-[16px] uppercase tracking-wide transition-all duration-300 hover:scale-105 active:scale-95 group"
                             >
                                 <Play className="w-5 h-5 fill-[#0a0a0a] shrink-0 group-hover:scale-110 transition-transform" />
                                 Xem Ngay

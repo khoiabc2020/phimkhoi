@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Check, Loader2 } from "lucide-react";
+import { BookmarkPlus, BookmarkCheck, Loader2 } from "lucide-react";
 import { useWatchlist } from "@/context/WatchlistContext";
 
 interface WatchlistButtonProps {
@@ -36,13 +36,13 @@ export default function WatchlistButton({ slug, className = "", showLabel = fals
     return (
         <button
             onClick={handleToggle}
-            className={`flex items-center justify-center ${showLabel ? "px-4 py-2 min-h-[40px] rounded-full gap-2" : "w-10 h-10 rounded-full"} bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md transition-all group ${className}`}
+            className={`flex items-center justify-center ${showLabel ? "px-4 py-2 min-h-[40px] rounded-full gap-2" : "w-10 h-10 rounded-full"} bg-[#e5e5e5]/90 hover:bg-white backdrop-blur-md transition-all shadow-md group ${className}`}
             title={inWatchlist ? "Xóa khỏi danh sách" : "Thêm vào danh sách"}
         >
             {inWatchlist ? (
-                <Check className="w-5 h-5 text-green-500 shrink-0" />
+                <BookmarkCheck className="w-5 h-5 text-green-600 shrink-0" />
             ) : (
-                <Plus className={`w-5 h-5 text-gray-400 group-hover:text-white transition-colors shrink-0`} />
+                <BookmarkPlus className="w-5 h-5 text-current transition-colors shrink-0" />
             )}
             {showLabel && (
                 <span className="text-sm font-medium text-white whitespace-nowrap">
