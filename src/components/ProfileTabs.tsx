@@ -172,7 +172,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                                 {favorites.map((movie) => (
                                     <div key={movie._id} className="group transition-all">
                                         <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-[#0a0a0c] border border-white/[0.05]">
-                                            <FavoriteButton movieData={movie} size="xs" />
+                                            <FavoriteButton movieData={movie} size="sm" />
                                             <Link href={`/phim/${movie.movieSlug}`}>
                                                 <Image src={getImageUrl(movie.moviePoster)} alt={movie.movieName} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                                             </Link>
