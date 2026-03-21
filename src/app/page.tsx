@@ -10,6 +10,8 @@ import HomeSection from "@/components/HomeSection";
 import LazySection from "@/components/LazySection";
 import { getMoviesList, getTrendMovies } from "@/services/api";
 import { getTMDBDataForCard } from "@/app/actions/tmdb";
+import connectDB from "@/lib/db";
+import CustomHero from "@/models/CustomHero";
 
 export const revalidate = 3600;
 const ROW_LIMIT = 12; // Tăng một chút để nhìn đầy đặn hơn trên màn hình ultra-wide
@@ -108,6 +110,9 @@ async function AsyncTopTrendingHub() {
 async function AsyncHeroSection({ initialMovies }: { initialMovies: any[] }) {
   const enhancedHeroData = await Promise.all(
     initialMovies.map(async (movie, idx) => {
+      // If it's a Custom Hero from DB, pass it right through as it already has layers
+      if (movie.isCustomHero) return movie;
+
       // Chỉ enrich TMDB cho các slide đầu để giảm thời gian render trang chủ
       if (idx > 2) return { ...movie, tmdbData: null };
       const year = movie.year ? parseInt(movie.year.toString().split("-")[0]) : undefined;
@@ -171,19 +176,33 @@ async function HomeRowSection({
   }
 }
 
-/** Hero stream: tải dữ liệu top trending độc lập */
+/** Hero stream: tải dữ liệu top trending độc lập hoặc Custom Hero */
 async function HeroStream() {
   try {
-    // Tải dữ liệu top trending từ TMDb đã được sync vào DB
-    // Use a fixed internal URL or a direct DB query would be better for SSR
-    // But since the current pattern uses helper functions, let's keep it consistent
+    // 1. Tải Custom Hero từ Database
+    await connectDB();
+    const customHeroes = await CustomHero.find({ isActive: true }).sort({ order: 1 }).lean();
+    if (customHeroes && customHeroes.length > 0) {
+      const mappedHeroes = customHeroes.map((ch: any) => ({
+        _id: ch._id.toString(),
+        name: ch.name,
+        slug: ch.slug,
+        origin_name: "", // Not needed for Custom
+        layer_bg: ch.layer_bg,
+        layer_character: ch.layer_character,
+        layer_logo: ch.layer_logo,
+        isCustomHero: true
+      }));
+      return <AsyncHeroSection initialMovies={mappedHeroes} />;
+    }
+
+    // 2. Không có Custom Hero -> Fallback tải dữ liệu top trending từ TMDb
     const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/trending?type=tmdb-trending-day`, {
       next: { revalidate: 3600 }
     });
     const data = await res.json();
     let finalHeroData: any[] = (data.movies || []).slice(0, 10);
     
-    // Nếu không có trending từ TMDb, tải backup từ phim bộ mới
     if (finalHeroData.length < 3) {
       const backupRes = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/trending?type=phim-bo`);
       const backupData = await backupRes.json();

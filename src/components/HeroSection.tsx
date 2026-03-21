@@ -61,7 +61,14 @@ function tmdbImage(path: string, size: string) {
     return `https://image.tmdb.org/t/p/${size}${p}`;
 }
 
-function getHeroImage(movie: any, type: "poster" | "backdrop", variant: "mobile" | "desktop") {
+function getHeroImage(movie: any, type: "poster" | "backdrop" | "character" | "logo", variant: "mobile" | "desktop") {
+    if (movie.isCustomHero) {
+        if (type === "backdrop") return movie.layer_bg;
+        if (type === "character") return movie.layer_character;
+        if (type === "logo") return movie.layer_logo;
+        if (type === "poster") return movie.layer_character || movie.layer_bg;
+    }
+
     const tmdb = movie?.tmdbData;
     if (tmdb) {
         if (type === "poster" && tmdb.poster_path)
@@ -239,16 +246,29 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                 {/* Overlay title/meta on hero image (Onflix-like mobile) */}
                 <div className="absolute inset-x-0 bottom-0 z-20 px-3 pb-4">
                     <div className="pl-[102px]">
-                        <h1
-                            key={`m-title-${index}`}
-                            className={cn(
-                                "font-display font-black text-white leading-[1.15] drop-shadow-[0_2px_14px_rgba(0,0,0,0.85)] animate-hero-in tracking-tight uppercase pb-1",
-                                "text-balance line-clamp-2",
-                                movie.name.length > 30 ? "text-[16px] md:text-[20px]" : movie.name.length > 20 ? "text-[18px] md:text-[24px]" : "text-[22px] md:text-[28px]"
-                            )}
-                        >
-                            {decodeHtml(movie.name)}
-                        </h1>
+                        {movie.isCustomHero && movie.layer_logo ? (
+                            <div key={`m-title-logo-${index}`} className="relative w-[180px] sm:w-[220px] h-[55px] sm:h-[70px] mb-1.5 animate-hero-in">
+                                <Image
+                                    src={movie.layer_logo}
+                                    alt={decodeHtml(movie.name)}
+                                    fill
+                                    className="object-contain object-left-bottom drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]"
+                                    unoptimized
+                                    priority
+                                />
+                            </div>
+                        ) : (
+                            <h1
+                                key={`m-title-${index}`}
+                                className={cn(
+                                    "font-display font-black text-white leading-[1.15] drop-shadow-[0_2px_14px_rgba(0,0,0,0.85)] animate-hero-in tracking-tight uppercase pb-1",
+                                    "text-balance line-clamp-2",
+                                    movie.name.length > 30 ? "text-[16px] md:text-[20px]" : movie.name.length > 20 ? "text-[18px] md:text-[24px]" : "text-[22px] md:text-[28px]"
+                                )}
+                            >
+                                {decodeHtml(movie.name)}
+                            </h1>
+                        )}
                          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                             {movie.year && <span className="text-[11px] font-black text-white/90">{movie.year}</span>}
                             {movie.country?.[0] && <span className="text-[11px] text-white/50">| {movie.country[0].name}</span>}
@@ -268,16 +288,15 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                 <div className="flex items-center gap-2 mt-3 w-full pr-[102px]">
                     <Link
                         href={`/phim/${movie.slug}`}
-                        className="flex flex-1 items-center justify-center gap-1.5 h-10 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[13px] active:scale-[0.97] hover:scale-105 transition-all shadow-[0_4px_12px_rgba(143,167,197,0.3)]"
+                        className="flex-1 flex items-center justify-center gap-1.5 h-10 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[13px] active:scale-[0.97] hover:scale-105 transition-all shadow-[0_4px_12px_rgba(143,167,197,0.3)]"
                     >
                         <Play className="w-3.5 h-3.5 fill-[#0a0a0a] shrink-0" />
                         Xem Ngay
                     </Link>
                     <WatchlistButton
                         slug={movie.slug}
-                        className="flex-1 px-0 h-10 rounded-full bg-white/8 border border-white/12 text-white font-medium text-[13px] active:scale-[0.97] transition-transform shrink-0 whitespace-nowrap"
-                        showLabel={true}
-                        label="Danh sách"
+                        className="w-10 h-10 rounded-full bg-white/8 border border-white/12 text-white active:scale-[0.97] transition-transform shrink-0"
+                        showLabel={false}
                     />
                 </div>
 
@@ -318,6 +337,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
             {/* ── Crossfade backdrop stack (Cinematic Full Bleed) ── */}
             {movies.map((m: any, i) => {
                 const bg = getHeroImage(m, "backdrop", "desktop");
+                const character = m.isCustomHero ? getHeroImage(m, "character", "desktop") : null;
                 const isActive = i === index;
                 return (
                     <div
@@ -328,7 +348,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                         )}
                         aria-hidden={!isActive}
                     >
-                        {/* Single Sharp Layer for Cinematic Feel */}
+                        {/* Single Sharp Layer for Cinematic Feel (Background) */}
                         <Image
                             src={bg}
                             alt=""
@@ -340,10 +360,30 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                             priority={isActive && i < 2}
                             loading={isActive ? "eager" : "lazy"}
                             sizes="100vw"
-                            placeholder="blur"
-                            blurDataURL={blurData}
+                            // CustomHero images are arbitrary URLs, so avoid local blur placeholder if it's external
+                            placeholder={m.isCustomHero ? "empty" : "blur"}
+                            blurDataURL={m.isCustomHero ? undefined : blurData}
+                            unoptimized={m.isCustomHero}
                             decoding="async"
                         />
+                        
+                        {/* Multi-layer Parallax: Character Overlay (If CustomHero) */}
+                        {character && (
+                            <div className="absolute inset-0 z-[1] pointer-events-none">
+                                <Image
+                                    src={character}
+                                    alt=""
+                                    fill
+                                    className={cn(
+                                        "object-cover object-[center_bottom] transition-transform duration-[8000ms] ease-out",
+                                        isActive ? "scale-105 translate-x-4" : "scale-100 translate-x-0"
+                                    )}
+                                    priority={isActive && i < 2}
+                                    sizes="100vw"
+                                    unoptimized
+                                />
+                            </div>
+                        )}
                     </div>
                 );
             })}
@@ -361,22 +401,35 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
             <div className="relative z-[3] h-full w-full max-w-[1920px] mx-auto px-6 md:px-10 lg:pl-24 lg:pr-12 flex items-end pb-24 md:pb-28 lg:pb-32 pointer-events-none">
                 <div className="w-full flex justify-between items-end">
                     {/* Left: Text block */}
-                    <div className="w-full md:w-[70%] lg:w-[60%] xl:w-[55%] space-y-3 lg:space-y-5 pointer-events-auto">
+                    <div className="w-full md:w-[75%] lg:w-[65%] xl:w-[60%] space-y-3 lg:space-y-4 pointer-events-auto pr-0 lg:pr-[300px] xl:pr-[400px]">
                         
                         {/* Title — Optimized for Onflix aesthetic */}
-                        <h1
-                            key={`title-${index}`}
-                            className={cn(
-                                "font-display font-black text-white leading-[1.1] tracking-tight pt-1 animate-hero-in drop-shadow-[0_8px_24px_rgba(0,0,0,0.9)] uppercase pb-2",
-                                "text-balance line-clamp-3",
-                                movie.name.length > 35 
-                                    ? "text-3xl md:text-4xl lg:text-5xl" 
-                                    : "text-4xl md:text-5xl lg:text-6xl xl:text-[68px]"
-                            )}
-                            title={decodeHtml(movie.name)}
-                        >
-                            {decodeHtml(movie.name)}
-                        </h1>
+                        {movie.isCustomHero && movie.layer_logo ? (
+                            <div key={`title-logo-${index}`} className="relative w-full max-w-[400px] md:max-w-[500px] lg:max-w-[600px] h-[100px] md:h-[130px] lg:h-[160px] mb-4 animate-hero-in">
+                                <Image
+                                    src={movie.layer_logo}
+                                    alt={decodeHtml(movie.name)}
+                                    fill
+                                    className="object-contain object-left-bottom drop-shadow-[0_8px_16px_rgba(0,0,0,0.8)]"
+                                    unoptimized
+                                    priority
+                                />
+                            </div>
+                        ) : (
+                            <h1
+                                key={`title-${index}`}
+                                className={cn(
+                                    "font-display font-black text-white leading-[1.1] tracking-tight pt-1 animate-hero-in drop-shadow-[0_8px_24px_rgba(0,0,0,0.9)] uppercase pb-2",
+                                    "text-balance line-clamp-2 md:line-clamp-3",
+                                    movie.name.length > 35 
+                                        ? "text-3xl md:text-4xl lg:text-5xl" 
+                                        : "text-4xl md:text-5xl lg:text-6xl xl:text-[68px]"
+                                )}
+                                title={decodeHtml(movie.name)}
+                            >
+                                {decodeHtml(movie.name)}
+                            </h1>
+                        )}
 
                         {/* Tags Row */}
                         <div className="flex flex-wrap items-center gap-3 lg:gap-4 transition-all duration-500 animate-hero-in animation-delay-100">
@@ -435,9 +488,8 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                             </Link>
                             <WatchlistButton
                                 slug={movie.slug}
-                                className="flex items-center justify-center gap-2 h-12 md:h-14 px-7 md:px-8 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-[14px] lg:text-[15px] transition-all hover:scale-105 active:scale-95 backdrop-blur-md shadow-xl"
-                                showLabel={true}
-                                label="Thêm vào danh sách"
+                                className="h-12 w-12 md:h-14 md:w-14 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all hover:scale-110 active:scale-95 backdrop-blur-md shadow-xl flex items-center justify-center group"
+                                showLabel={false}
                             />
                         </div>
                     </div>

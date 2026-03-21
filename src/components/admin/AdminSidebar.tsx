@@ -9,7 +9,7 @@ import { signOut } from "next-auth/react";
 const sidebarItems = [
     { label: "Tổng quan", href: "/admin", icon: LayoutDashboard },
     { label: "Thành viên", href: "/admin/users", icon: Users },
-    // { label: "Phim (Coming soon)", href: "/admin/movies", icon: Film },
+    { label: "Custom Hero", href: "/admin/hero", icon: Film },
     { label: "Bình luận", href: "/admin/comments", icon: MessageSquare },
     { label: "Cài đặt", href: "/admin/settings", icon: Settings },
 ];

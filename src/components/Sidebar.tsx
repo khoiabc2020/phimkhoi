@@ -17,8 +17,8 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
     { name: "Trang chủ", href: "/", icon: Home },
-    { name: "Phim Hàn", href: "/quoc-gia/han-quoc", icon: Tv },
-    { name: "Phim Trung", href: "/quoc-gia/trung-quoc", icon: Video },
+    { name: "Phim Hàn", href: "/phim-han", icon: Tv },
+    { name: "Phim Trung", href: "/phim-trung", icon: Video },
     { name: "Duyệt Tìm", href: "/tim-kiem", icon: LayoutGrid },
     { name: "Chủ đề", href: "/the-loai", icon: Hash },
     { name: "Thước phim", href: "/danh-sach/phim-le", icon: PlayCircle }, // Temporary mapping
