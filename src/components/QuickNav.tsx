@@ -56,13 +56,13 @@ export default function QuickNav() {
                     Bạn đang quan tâm gì?
                 </h2>
 
-                <div className="flex gap-2.5 overflow-x-auto no-scrollbar py-1 px-0.5 -mx-0.5 snap-x">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:flex gap-3 md:gap-4 py-1">
                     {NAV_ITEMS.map((item, index) => (
                         <Link
                             key={index}
                             href={item.href}
                             aria-label={`Xem ${item.label}`}
-                            className="quick-nav-card flex-[0_0_138px] sm:flex-[0_0_170px] md:flex-[0_0_190px] lg:flex-[1] aspect-[1.8/1] relative rounded-[10px] overflow-hidden snap-start transition-all duration-300 hover:scale-[1.02] shadow-sm hover:shadow-md"
+                            className="quick-nav-card relative flex-1 aspect-[1.8/1] rounded-[12px] overflow-hidden transition-all duration-300 hover:scale-[1.02] shadow-sm hover:shadow-xl group"
                             style={{ background: `linear-gradient(135deg, ${item.from}, ${item.to})` }}
                         >
                             {/* Bottom content */}

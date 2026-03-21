@@ -402,7 +402,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
             </div>
 
             {/* ── Content ── */}
-            <div className="relative z-[3] h-full w-full max-w-[1920px] mx-auto px-6 md:pl-28 md:pr-10 lg:pl-32 lg:pr-12 xl:pl-[140px] flex items-end pb-12 md:pb-16 lg:pb-24 pointer-events-none">
+            <div className="relative z-[3] h-full w-full max-w-[1920px] mx-auto px-6 md:px-10 lg:pl-32 lg:pr-12 xl:pl-[140px] flex items-end pb-12 md:pb-16 lg:pb-24 pointer-events-none">
                 <div className="w-full flex justify-between items-end">
                     {/* Left: Text block */}
                     <div className="w-full md:w-[75%] lg:w-[65%] xl:w-[60%] space-y-3 lg:space-y-4 pointer-events-auto pr-0 lg:pr-[300px] xl:pr-[400px]">
@@ -427,7 +427,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                     "text-balance line-clamp-2 md:line-clamp-3",
                                     movie.name.length > 25 
                                         ? "text-2xl md:text-3xl lg:text-[40px] xl:text-[46px]" 
-                                        : "text-3xl md:text-[38px] lg:text-[48px] xl:text-[54px]"
+                                        : "text-3xl md:text-[32px] lg:text-[48px] xl:text-[54px]"
                                 )}
                                 title={decodeHtml(movie.name)}
                             >
@@ -501,7 +501,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
 
                 {/* Right/Bottom Thumbnail Navigation (VieON Cinematic Style) */}
                 {movies.length > 1 && (
-                    <div className="absolute bottom-4 right-4 md:bottom-8 md:right-8 lg:bottom-10 lg:right-12 z-[4] flex items-center gap-3 pointer-events-auto max-w-[calc(100vw-32px)] lg:max-w-[60vw] xl:max-w-[50vw]">
+                    <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 lg:bottom-10 lg:right-12 z-[4] flex items-center gap-3 pointer-events-auto max-w-[calc(100vw-32px)] md:max-w-[40vw] lg:max-w-[60vw]">
                         {/* Prev/Next buttons */}
                         <div className="hidden lg:flex items-center gap-1.5 shrink-0">
                             <button
