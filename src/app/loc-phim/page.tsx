@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Link from "next/link";
 import { Filter, SlidersHorizontal, ChevronRight, LayoutGrid, List } from "lucide-react";
+import FilterToolbar from "@/components/FilterToolbar";
 
 interface FilterPageProps {
     searchParams: {
@@ -92,10 +93,13 @@ function LoadingSkeleton() {
 }
 
 export default function AdvancedFilterPage({ searchParams }: FilterPageProps) {
-    const { category, country, year, type, page } = searchParams;
+    const { page } = searchParams;
 
     const buildUrl = (updates: Record<string, string | null>) => {
-        const params = new URLSearchParams(Object.entries(searchParams).filter(([_, v]) => v) as [string, string][]);
+        const params = new URLSearchParams();
+        Object.entries(searchParams).forEach(([k, v]) => {
+            if (v) params.set(k, v);
+        });
         Object.entries(updates).forEach(([k, v]) => {
             if (v === null || v === "") params.delete(k);
             else params.set(k, v);
@@ -125,71 +129,13 @@ export default function AdvancedFilterPage({ searchParams }: FilterPageProps) {
                 </div>
 
                 {/* Filter Toolbar */}
-                <div className="sticky top-20 z-30 bg-[#080b12]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-4 md:p-6 mb-10 shadow-2xl">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                        
-                        {/* Type Select */}
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.1em] pl-1">Định dạng</label>
-                            <select 
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary/50 transition-colors appearance-none cursor-pointer"
-                                value={type || "phim-moi-cap-nhat"}
-                                onChange={(e) => window.location.href = buildUrl({ type: e.target.value, page: "1" })}
-                            >
-                                {TYPES.map(t => <option key={t.slug} value={t.slug} className="bg-[#080b12]">{t.name}</option>)}
-                            </select>
-                        </div>
-
-                        {/* Category Select */}
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.1em] pl-1">Thể loại</label>
-                            <select 
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary/50 transition-colors appearance-none cursor-pointer"
-                                value={category || ""}
-                                onChange={(e) => window.location.href = buildUrl({ category: e.target.value || null, page: "1" })}
-                            >
-                                <option value="" className="bg-[#080b12]">Tất cả thể loại</option>
-                                {CATEGORIES.map(c => <option key={c.slug} value={c.slug} className="bg-[#080b12]">{c.name}</option>)}
-                            </select>
-                        </div>
-
-                        {/* Country Select */}
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.1em] pl-1">Quốc gia</label>
-                            <select 
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary/50 transition-colors appearance-none cursor-pointer"
-                                value={country || ""}
-                                onChange={(e) => window.location.href = buildUrl({ country: e.target.value || null, page: "1" })}
-                            >
-                                <option value="" className="bg-[#080b12]">Tất cả quốc gia</option>
-                                {COUNTRIES.map(c => <option key={c.slug} value={c.slug} className="bg-[#080b12]">{c.name}</option>)}
-                            </select>
-                        </div>
-
-                        {/* Year Select */}
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.1em] pl-1">Năm phát hành</label>
-                            <select 
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary/50 transition-colors appearance-none cursor-pointer"
-                                value={year || ""}
-                                onChange={(e) => window.location.href = buildUrl({ year: e.target.value || null, page: "1" })}
-                            >
-                                <option value="" className="bg-[#080b12]">Tất cả năm</option>
-                                {YEARS.map(y => <option key={y} value={y} className="bg-[#080b12]">{y}</option>)}
-                            </select>
-                        </div>
-
-                        {/* Reset Button */}
-                        <div className="flex items-end">
-                            <Link 
-                                href="/loc-phim"
-                                className="w-full bg-white/10 hover:bg-white/20 border border-white/5 rounded-xl px-4 py-3 text-sm font-bold text-center transition-all active:scale-95"
-                            >
-                                Đặt lại bộ lọc
-                            </Link>
-                        </div>
-                    </div>
-                </div>
+                <FilterToolbar 
+                    searchParams={searchParams}
+                    categories={CATEGORIES}
+                    countries={COUNTRIES}
+                    years={YEARS}
+                    types={TYPES}
+                />
 
                 {/* Results Grid */}
                 <Suspense key={JSON.stringify(searchParams)} fallback={<LoadingSkeleton />}>
