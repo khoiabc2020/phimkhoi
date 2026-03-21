@@ -20,9 +20,9 @@ interface MovieSlide {
 const CHINA_MOVIES_DATA: MovieSlide[] = [
     {
         title: "Trục Ngọc",
-        bg: "https://sf-static.onflixcdn.pics/images/pic/1773223502_url.webp",
-        actor: "https://sf-static.onflixcdn.pics/images/pic/1773223490_url.webp",
-        logo: "https://sf-static.onflixcdn.pics/images/pic/1772791902_url.webp",
+        bg: "/images/china-hero/truc-ngoc-bg.webp",
+        actor: "/images/china-hero/truc-ngoc-actor.webp",
+        logo: "/images/china-hero/truc-ngoc-logo.webp",
         description: "Câu chuyện hành trình tìm lại bản thân và những âm mưu quyền lực chốn cung đình...",
         tags: ["Cổ Trang", "Tình Cảm", "Kịch Tính"],
         year: "2024",
@@ -30,9 +30,9 @@ const CHINA_MOVIES_DATA: MovieSlide[] = [
     },
     {
         title: "Xin Chào 1983",
-        bg: "https://sf-static.onflixcdn.pics/images/pic/1773858166_url.webp",
-        actor: "https://sf-static.onflixcdn.pics/images/pic/1773858200_url.webp",
-        logo: "https://sf-static.onflixcdn.pics/images/pic/1773748957_url.webp",
+        bg: "/images/china-hero/xin-chao-bg.webp",
+        actor: "/images/china-hero/xin-chao-actor.webp",
+        logo: "/images/china-hero/xin-chao-logo.webp",
         description: "Hồi ức về những năm tháng thanh xuân rực rỡ và những tình bạn không bao giờ phai...",
         tags: ["Thanh Xuân", "Học Đường", "Gia Đình"],
         year: "2024",
@@ -40,9 +40,9 @@ const CHINA_MOVIES_DATA: MovieSlide[] = [
     },
     {
         title: "Bụi Hoa Hồng",
-        bg: "https://sf-static.onflixcdn.pics/images/pic/1772315778_bg-bui-hoa-hong.webp",
-        actor: "https://sf-static.onflixcdn.pics/images/pic/1772316152_bui-hoa-hong-onflix.webp",
-        logo: "https://sf-static.onflixcdn.pics/images/pic/1772315871_url.webp",
+        bg: "/images/china-hero/bui-hoa-hong-bg.webp",
+        actor: "/images/china-hero/bui-hoa-hong-actor.webp",
+        logo: "/images/china-hero/bui-hoa-hong-logo.webp",
         description: "Mối tình đầy trắc trở giữa khói lửa chiến tranh và những hy sinh cao cả...",
         tags: ["Dân Quốc", "Chiến Tranh", "Ngược Tâm"],
         year: "2024",
@@ -50,13 +50,23 @@ const CHINA_MOVIES_DATA: MovieSlide[] = [
     },
     {
         title: "Giang Hồ Dạ Vũ Thập Niên Đăng",
-        bg: "https://sf-static.onflixcdn.pics/images/pic/1771757424_bg.webp",
-        actor: "https://sf-static.onflixcdn.pics/images/pic/1771757442_ONFLIX_main.webp",
-        logo: "https://sf-static.onflixcdn.pics/images/pic/1771757365_ghdvtnd_onflix.png",
+        bg: "/images/china-hero/giang-ho-bg.webp",
+        actor: "/images/china-hero/giang-ho-actor.webp",
+        logo: "/images/china-hero/giang-ho-logo.png",
         description: "Thế giới võ hiệp đầy kịch tính với những bí kíp thất truyền và ân oán giang hồ...",
         tags: ["Võ Hiệp", "Hành Động", "Kiếm Hiệp"],
         year: "2024",
         episodes: "Tập 12"
+    },
+    {
+        title: "Còn Ra Thể Thống Gì Nữa?",
+        bg: "/images/china-hero/the-thong-bg.webp",
+        actor: "/images/china-hero/the-thong-actor.webp",
+        logo: "/images/china-hero/the-thong-logo.webp",
+        description: "Câu chuyện hài hước và đầy bất ngờ về những quy tắc kỳ lạ trong hoàng cung...",
+        tags: ["Hài Hước", "Cổ Trang", "Lãng Mạn"],
+        year: "2024",
+        episodes: "Tập 14"
     }
 ];
 
