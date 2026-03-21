@@ -281,7 +281,7 @@ export const getTMDBSeasonDetails = async (tvId: number, seasonNumber: number) =
 };
 
 // ... existing code ...
-export const getTMDBImage = (path: string, size: "w342" | "w500" | "w780" | "w1280" | "original" = "w500") => {
+export const getTMDBImage = (path: string, size: "w342" | "w500" | "w780" | "w1280" | "h632" | "original" = "w500") => {
     if (!path) return "";
     return `https://image.tmdb.org/t/p/${size}${path}`;
 };
