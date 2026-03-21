@@ -166,22 +166,11 @@ function MovieCard({
             >
                 <div className={`relative ${orientation === 'landscape' ? 'aspect-video' : 'aspect-[2/3]'} rounded-[10px] overflow-hidden bg-[#0b101a] ring-1 ring-white/5 group-hover/static-card:ring-2 group-hover/static-card:ring-[#8FA7C5]/60 transition-all duration-300 shadow-lg`}>
                     <Link href={`/phim/${movie.slug}`} className="block h-full w-full absolute inset-0 z-0">
-                        {/* Background Blurred Image (prevents ugly empty space if aspect ratio mismatch) */}
-                        <Image
-                            src={activePosterSrc || "/placeholder.svg"}
-                            alt={""}
-                            fill
-                            className="object-cover scale-110 blur-xl opacity-50 transition-transform duration-200 ease-out group-hover/static-card:scale-125 select-none pointer-events-none"
-                            sizes={orientation === 'landscape' ? "(max-width: 768px) 68vw, 500px" : "(max-width: 768px) 48vw, (max-width: 1280px) 33vw, 400px"}
-                            quality={30} // Low quality is fine for blur
-                            priority={priority}
-                        />
-                        {/* Foreground clear image (uncropped) */}
                         <Image
                             src={activePosterSrc || "/placeholder.svg"}
                             alt={decodeHtml(movie.name) || movie.slug || "Phim"}
                             fill
-                            className="transition-transform duration-200 ease-out group-hover/static-card:scale-[1.03] object-contain drop-shadow-2xl z-10"
+                            className="transition-transform duration-200 ease-out group-hover/static-card:scale-[1.05] object-cover z-10"
                             sizes={orientation === 'landscape' ? "(max-width: 768px) 68vw, 500px" : "(max-width: 768px) 48vw, (max-width: 1280px) 33vw, 400px"}
                             quality={85}
                             loading={priority ? undefined : loading}
