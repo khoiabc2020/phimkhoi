@@ -274,7 +274,7 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                         Xem Ngay
                     </Link>
                     <WatchlistButton
-                        movieSlug={movie.slug}
+                        slug={movie.slug}
                         className="flex-1 px-0 h-10 rounded-full bg-white/8 border border-white/12 text-white font-medium text-[13px] active:scale-[0.97] transition-transform shrink-0 whitespace-nowrap"
                         showLabel={true}
                         label="Danh sách"
@@ -434,7 +434,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                                 Xem Ngay
                             </Link>
                             <WatchlistButton
-                                movieSlug={movie.slug}
+                                slug={movie.slug}
                                 className="flex items-center justify-center gap-2 h-12 md:h-14 px-7 md:px-8 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-[14px] lg:text-[15px] transition-all hover:scale-105 active:scale-95 backdrop-blur-md shadow-xl"
                                 showLabel={true}
                                 label="Thêm vào danh sách"
