@@ -120,6 +120,7 @@ export default function HeroSection({ movies }: HeroSectionProps) {
         });
         if (!changed) return;
         // Swap URI first, then fade in the new layer to avoid black flash.
+        // eslint-disable-next-line react-hooks/immutability
         bgOpacity.value = 0;
         bgOpacity.value = withTiming(1, { duration: 280, easing: Easing.out(Easing.cubic) });
     }, [movies, bgOpacity, getBackdropUri]);
@@ -181,9 +182,6 @@ export default function HeroSection({ movies }: HeroSectionProps) {
         }
     }, [favSlugs, user, token, syncFavorites]);
 
-    if (!movies?.length) return null;
-
-    const [, activeBackdropUri] = backdropUris;
     const renderHeroItem = useCallback(({ item, index }: { item: Movie; index: number }) => (
         <HeroSlide
             movie={item}
@@ -192,6 +190,10 @@ export default function HeroSection({ movies }: HeroSectionProps) {
             onToggleFav={toggleFav}
         />
     ), [favSlugs, toggleFav]);
+
+    if (!movies?.length) return null;
+
+    const [, activeBackdropUri] = backdropUris;
 
     return (
         <View style={styles.wrapper}>

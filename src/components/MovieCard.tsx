@@ -47,12 +47,17 @@ function MovieCard({
 
     const [posterIndex, setPosterIndex] = useState(0);
 
+    // Safe access for tmdbData
+    const tmdbData = (movie as any).tmdbData;
+    const tmdbPosterPath = tmdbData?.poster_path;
+    const tmdbBackdropPath = tmdbData?.backdrop_path;
+
     // Poster (ảnh dọc) – ưu tiên poster thật, tránh nhầm thumb/backdrop vào slot dọc
     const tmdbPoster = React.useMemo(() => 
-        (movie as any).tmdbData?.poster_path
-            ? getTMDBImage((movie as any).tmdbData.poster_path, "w780")
+        tmdbPosterPath
+            ? getTMDBImage(tmdbPosterPath, "w780")
             : null
-    , [(movie as any).tmdbData?.poster_path]);
+    , [tmdbPosterPath]);
 
     const portraitPosterSource = React.useMemo(() => {
         const sourcePoster = movie.poster_url && detectOrientation(movie.poster_url) === "portrait"
@@ -72,7 +77,7 @@ function MovieCard({
             ? [
                 movie.thumb_url,
                 movie.poster_url,
-                (movie as any).tmdbData?.backdrop_path ? getTMDBImage((movie as any).tmdbData.backdrop_path, "w780") : null,
+                tmdbBackdropPath ? getTMDBImage(tmdbBackdropPath, "w780") : null,
                 tmdbPoster,
             ]
             : [
@@ -82,17 +87,17 @@ function MovieCard({
                 tmdbPoster,
             ];
         return Array.from(new Set(list.filter(Boolean))) as string[];
-    }, [orientation, movie.thumb_url, movie.poster_url, portraitPosterSource, tmdbPoster, (movie as any).tmdbData?.backdrop_path]);
+    }, [orientation, movie.thumb_url, movie.poster_url, portraitPosterSource, tmdbPoster, tmdbBackdropPath]);
 
     const activePosterSrc = posterCandidates[posterIndex] ? getImageUrl(posterCandidates[posterIndex]) : "/placeholder.svg";
 
     // Backdrop/overlay (ảnh ngang): TMDB backdrop first, then whichever source URL is truly landscape.
     const displayBackdrop = React.useMemo(() => {
-        const tmdbBackdrop = (movie as any).tmdbData?.backdrop_path ? getTMDBImage((movie as any).tmdbData.backdrop_path, "w500") : "";
-        const tmdbPosterFallback = (movie as any).tmdbData?.poster_path ? getTMDBImage((movie as any).tmdbData.poster_path, "w500") : "";
+        const tmdbBackdrop = tmdbBackdropPath ? getTMDBImage(tmdbBackdropPath, "w500") : "";
+        const tmdbPosterFallback = tmdbPosterPath ? getTMDBImage(tmdbPosterPath, "w500") : "";
         const sourceBackdrop = movie.thumb_url ? getImageUrl(movie.thumb_url) : (movie.poster_url ? getImageUrl(movie.poster_url) : "");
         return sourceBackdrop || tmdbBackdrop || tmdbPosterFallback || null;
-    }, [movie.thumb_url, movie.poster_url, (movie as any).tmdbData?.backdrop_path, (movie as any).tmdbData?.poster_path]);
+    }, [movie.thumb_url, movie.poster_url, tmdbBackdropPath, tmdbPosterPath]);
 
     // Reset fallback state when card movie changes
     useEffect(() => {

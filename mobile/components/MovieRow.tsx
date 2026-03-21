@@ -23,12 +23,12 @@ interface MovieRowProps {
 }
 
 const MovieRow = memo(({ title, movies, slug, subtitle, type = 'list' }: MovieRowProps) => {
-    if (!movies || movies.length === 0) return null;
-
     const renderItem: ListRenderItem<Movie> = React.useCallback(
         ({ item }) => <MovieCard movie={item} width={CARD_WIDTH} height={CARD_HEIGHT} />,
         []
     );
+
+    if (!movies || movies.length === 0) return null;
 
     return (
         <View style={styles.container}>

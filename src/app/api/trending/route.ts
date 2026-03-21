@@ -1,16 +1,6 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
-import mongoose from 'mongoose';
-
-// Read from TrendingCache collection populated by the daily-sync.mjs script
-const trendingSchema = new mongoose.Schema({
-    type: String,
-    movies: Array,
-    updatedAt: Date
-}, { strict: false });
-
-const TrendingCache = mongoose.models.TrendingCache ||
-    mongoose.model('TrendingCache', trendingSchema, 'trendingcache');
+import TrendingCache from '@/models/TrendingCache';
 
 export async function GET(req: Request) {
     try {

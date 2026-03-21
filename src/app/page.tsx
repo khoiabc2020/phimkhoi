@@ -12,6 +12,7 @@ import { getMoviesList, getTrendMovies } from "@/services/api";
 import { getTMDBDataForCard } from "@/app/actions/tmdb";
 import connectDB from "@/lib/db";
 import CustomHero from "@/models/CustomHero";
+import TrendingCache from "@/models/TrendingCache";
 
 export const revalidate = 3600;
 const ROW_LIMIT = 12; // Tăng một chút để nhìn đầy đặn hơn trên màn hình ultra-wide
@@ -150,6 +151,7 @@ async function HomeRowSection({
   minHeight?: number;
   priorityFirst?: boolean;
 }) {
+  let movies: any[] = [];
   try {
     const res = await getMoviesList(slug, { 
       limit: ROW_LIMIT, 
@@ -157,33 +159,36 @@ async function HomeRowSection({
       country: endpoint === 'quoc-gia' ? slug : undefined 
     });
     
-    const movies = res?.items || [];
-
-    if (!movies.length) return null;
-
-    return (
-      <LazySection minHeight={minHeight}>
-        <MovieRow
-          title={title}
-          movies={movies}
-          slug={viewAllHref || slug}
-          priorityFirst={priorityFirst}
-        />
-      </LazySection>
-    );
+    movies = res?.items || [];
   } catch (error) {
-    return null;
+    // Return null handled below
   }
+
+  if (!movies.length) return null;
+
+  return (
+    <LazySection minHeight={minHeight}>
+      <MovieRow
+        title={title}
+        movies={movies}
+        slug={viewAllHref || slug}
+        priorityFirst={priorityFirst}
+      />
+    </LazySection>
+  );
 }
 
 /** Hero stream: tải dữ liệu top trending độc lập hoặc Custom Hero */
 async function HeroStream() {
+  let finalHeroData: any[] = [];
+  
   try {
     // 1. Tải Custom Hero từ Database
     await connectDB();
     const customHeroes = await CustomHero.find({ isActive: true }).sort({ order: 1 }).lean();
+    
     if (customHeroes && customHeroes.length > 0) {
-      const mappedHeroes = customHeroes.map((ch: any) => ({
+      finalHeroData = customHeroes.map((ch: any) => ({
         _id: ch._id.toString(),
         name: ch.name,
         slug: ch.slug,
@@ -193,27 +198,23 @@ async function HeroStream() {
         layer_logo: ch.layer_logo,
         isCustomHero: true
       }));
-      return <AsyncHeroSection initialMovies={mappedHeroes} />;
+    } else {
+      // 2. Không có Custom Hero -> Fallback tải dữ liệu top trending từ Database trực tiếp
+      const cache = await TrendingCache.findOne({ type: 'tmdb-trending-day' }).lean() as any;
+      finalHeroData = (cache?.movies || []).slice(0, 10);
+      
+      if (finalHeroData.length < 3) {
+        const backupCache = await TrendingCache.findOne({ type: 'phim-bo' }).lean() as any;
+        finalHeroData = (backupCache?.movies || []).slice(0, 10);
+      }
     }
-
-    // 2. Không có Custom Hero -> Fallback tải dữ liệu top trending từ TMDb
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/trending?type=tmdb-trending-day`, {
-      next: { revalidate: 3600 }
-    });
-    const data = await res.json();
-    let finalHeroData: any[] = (data.movies || []).slice(0, 10);
-    
-    if (finalHeroData.length < 3) {
-      const backupRes = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/trending?type=phim-bo`);
-      const backupData = await backupRes.json();
-      finalHeroData = (backupData.movies || []).slice(0, 10);
-    }
-    
-    return <AsyncHeroSection initialMovies={finalHeroData} />;
   } catch (error) {
     console.error("HeroStream Error:", error);
-    return null;
   }
+
+  if (finalHeroData.length === 0) return null;
+  
+  return <AsyncHeroSection initialMovies={finalHeroData} />;
 }
 
 export default function Home() {
