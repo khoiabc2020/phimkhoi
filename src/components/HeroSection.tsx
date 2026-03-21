@@ -267,7 +267,7 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                 {/* Buttons */}
                 <div className="flex items-center gap-2 mt-3 w-full pr-[102px]">
                     <Link
-                        href={`/xem-phim/${movie.slug}?autoPlay=true`}
+                        href={`/phim/${movie.slug}`}
                         className="flex flex-1 items-center justify-center gap-1.5 h-10 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[13px] active:scale-[0.97] hover:scale-105 transition-all shadow-[0_4px_12px_rgba(143,167,197,0.3)]"
                     >
                         <Play className="w-3.5 h-3.5 fill-[#0a0a0a] shrink-0" />
@@ -427,7 +427,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                             className="flex flex-wrap items-center gap-4 pt-4 lg:pt-6 animate-hero-in animation-delay-300 pointer-events-auto"
                         >
                             <Link
-                                href={`/xem-phim/${movie.slug}?autoPlay=true`}
+                                href={`/phim/${movie.slug}`}
                                 className="flex items-center justify-center gap-2 h-12 md:h-14 px-8 md:px-10 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[15px] lg:text-[16px] uppercase tracking-wide transition-all duration-300 hover:scale-105 active:scale-95 shadow-[0_8px_20px_-6px_rgba(143,167,197,0.5)] group"
                             >
                                 <Play className="w-5 h-5 fill-[#0a0a0a] shrink-0 group-hover:scale-110 transition-transform" />
