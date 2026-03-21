@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Search, Bell, User, LogOut, Shield, Trash2, Clock, Settings, X, ChevronDown, Loader2, Bookmark, LogIn } from "lucide-react";
+import { Search, Bell, User, LogOut, Shield, Trash2, Clock, Settings, X, ChevronDown, Loader2, Bookmark, LogIn, Filter } from "lucide-react";
 import { useState, useEffect, useRef, useTransition } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
