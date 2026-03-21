@@ -191,8 +191,8 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                 className={cn(
                     "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
                     isScrolled
-                        ? "bg-[#0a0a0a]/95 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.4)] pointer-events-auto"
-                        : "bg-gradient-to-b from-[#0a0a0a]/90 via-[#0a0a0a]/40 to-transparent pointer-events-none"
+                        ? "h-[64px] lg:h-[84px] bg-[#0a0a0a]/95 backdrop-blur-md shadow-lg border-b border-white/5"
+                        : "h-[84px] lg:h-[110px] bg-gradient-to-b from-black/80 to-transparent"
                 )}
             >
                 <div className="w-full h-[54px] lg:h-[64px] flex items-center justify-between gap-3 flex-nowrap pointer-events-auto px-4 lg:px-8">
@@ -211,7 +211,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         </button>
 
                         <Link href="/" className="flex items-center group">
-                            <div className="relative w-[150px] h-10 transition-transform active:scale-95">
+                            <div className="relative w-[220px] h-14 transition-transform active:scale-95">
                                 <Image
                                     src="/logo.png?v=2"
                                     alt="KHOIPHIM"
@@ -235,7 +235,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                     {/* Desktop Section: Brand + Links */}
                     <div className="hidden lg:flex items-center gap-4 xl:gap-10 flex-1">
                         <Link href="/" className="flex items-center shrink-0 -ml-1">
-                            <div className="relative w-[180px] lg:w-[240px] xl:w-[300px] h-12 lg:h-16 transition-transform hover:scale-[1.02] active:scale-95">
+                            <div className="relative w-[280px] lg:w-[400px] xl:w-[500px] h-18 lg:h-28 transition-transform hover:scale-[1.02] active:scale-95">
                                 <Image
                                     src="/logo.png?v=2"
                                     alt="KHOIPHIM"
