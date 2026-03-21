@@ -321,9 +321,11 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
 
     useEffect(() => {
         if (navRef.current) {
-            const activeEl = navRef.current.children[index] as HTMLElement;
-            if (activeEl && typeof activeEl.scrollIntoView === 'function') {
-                activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            const container = navRef.current;
+            const activeEl = container.children[index] as HTMLElement;
+            if (activeEl) {
+                const scrollLeft = activeEl.offsetLeft - (container.offsetWidth / 2) + (activeEl.offsetWidth / 2);
+                container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
             }
         }
     }, [index]);
@@ -354,8 +356,8 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                             alt=""
                             fill
                             className={cn(
-                                "object-cover object-[center_20%] opacity-100 transition-transform duration-[8000ms] ease-linear",
-                                isActive ? "scale-105" : "scale-100"
+                                "object-cover object-[center_20%] opacity-100",
+                                isActive ? "opacity-100" : "opacity-0"
                             )}
                             priority={isActive && i < 2}
                             loading={isActive ? "eager" : "lazy"}
@@ -375,8 +377,8 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                                     alt=""
                                     fill
                                     className={cn(
-                                        "object-cover object-[center_bottom] transition-transform duration-[8000ms] ease-out",
-                                        isActive ? "scale-105 translate-x-4" : "scale-100 translate-x-0"
+                                        "object-cover object-[center_bottom]",
+                                        isActive ? "opacity-100" : "opacity-0"
                                     )}
                                     priority={isActive && i < 2}
                                     sizes="100vw"
@@ -398,7 +400,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
             </div>
 
             {/* ── Content ── */}
-            <div className="relative z-[3] h-full w-full max-w-[1920px] mx-auto px-6 md:px-10 lg:pl-24 lg:pr-12 flex items-end pb-24 md:pb-28 lg:pb-32 pointer-events-none">
+            <div className="relative z-[3] h-full w-full max-w-[1920px] mx-auto px-6 md:pl-28 md:pr-10 lg:pl-32 lg:pr-12 xl:pl-[140px] flex items-end pb-24 md:pb-28 lg:pb-32 pointer-events-none">
                 <div className="w-full flex justify-between items-end">
                     {/* Left: Text block */}
                     <div className="w-full md:w-[75%] lg:w-[65%] xl:w-[60%] space-y-3 lg:space-y-4 pointer-events-auto pr-0 lg:pr-[300px] xl:pr-[400px]">
@@ -421,9 +423,9 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                                 className={cn(
                                     "font-display font-black text-white leading-[1.1] tracking-tight pt-1 animate-hero-in drop-shadow-[0_8px_24px_rgba(0,0,0,0.9)] uppercase pb-2",
                                     "text-balance line-clamp-2 md:line-clamp-3",
-                                    movie.name.length > 35 
-                                        ? "text-3xl md:text-4xl lg:text-5xl" 
-                                        : "text-4xl md:text-5xl lg:text-6xl xl:text-[68px]"
+                                    movie.name.length > 25 
+                                        ? "text-3xl md:text-4xl lg:text-5xl xl:text-[52px]" 
+                                        : "text-4xl md:text-5xl lg:text-6xl xl:text-[60px]"
                                 )}
                                 title={decodeHtml(movie.name)}
                             >
