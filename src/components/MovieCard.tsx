@@ -180,15 +180,16 @@ function MovieCard({
                             quality={85}
                             loading={priority ? undefined : loading}
                             priority={priority}
+                            unoptimized={true}
                             placeholder="blur"
                             blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
                             onError={(e) => {
                                 if (posterIndex < posterCandidates.length - 1) {
-                                    setPosterIndex((prev) => prev + 1);
-                                    return;
-                                }
-                                (e.target as HTMLImageElement).src = "/placeholder.svg";
-                            }}
+                                                                        setPosterIndex((prev) => prev + 1);
+                                                                        return;
+                                                                    }
+                                                                    (e.target as HTMLImageElement).src = "/placeholder.svg";
+                                                                }}
                         />
                         <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
                     </Link>
@@ -220,7 +221,7 @@ function MovieCard({
                     {/* Bottom-Left: Subtitle / Language Badge (Onflix P.Đề style) */}
                     <div className="absolute bottom-1.5 left-1.5 z-10 pointer-events-none">
                         {(movie.episode_current || movie.lang) && (
-                            <span className="bg-black/50 border border-white/10 text-white/80 text-[8px] font-bold px-1 py-0.5 rounded-[2px] backdrop-blur-[2px] tracking-tighter uppercase mb-0.5 block w-fit">
+                            <span className="bg-black/50 border border-white/10 text-white/80 text-[10px] sm:text-[11px] font-medium px-1.5 py-0.5 rounded-[2px] backdrop-blur-[2px] tracking-normal uppercase mb-0.5 block w-fit">
                                 {movie.lang?.toLowerCase().includes('lồng tiếng') ? 'L.Tiếng' : 'P.Đề'}
                             </span>
                         )}

@@ -462,15 +462,20 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             )}
                         </div>
 
-                        {/* Desktop Actions — single Library button */}
+                        {/* Desktop Actions — Notifications button */}
                         <div className="hidden lg:flex items-center gap-3">
                             <Link
-                                href="/thu-vien"
-                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.10] border border-white/[0.09] transition-all active:scale-95 group text-sm font-medium text-white/70 hover:text-white"
-                                title="Thư viện của bạn"
+                                href="/thong-bao"
+                                className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/[0.06] hover:bg-white/[0.10] border border-white/[0.09] transition-all active:scale-95 group text-sm font-medium text-white/70 hover:text-white"
+                                title="Thông báo hệ thống"
                             >
-                                <Bookmark className="w-4 h-4 text-white/60 group-hover:text-primary transition-colors" />
-                                <span>Thư viện</span>
+                                <Bell className="w-4 h-4 text-white/60 group-hover:text-primary transition-colors" />
+                                <span>Thông báo</span>
+                                {/* Notification Ping Indicator */}
+                                <span className="absolute top-1 right-2 flex w-2 h-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                                </span>
                             </Link>
                         </div>
 
@@ -480,8 +485,8 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                 <div className="w-24 h-10 bg-white/5 rounded-full animate-pulse" />
                             ) : session ? (
                                 <div className="relative group ml-1">
-                                    <button className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/10 hover:border-primary/50 transition-all p-0.5">
-                                        <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center text-sm font-bold text-white shadow-inner">
+                                    <button className="w-10 h-10 rounded-lg overflow-hidden border-2 border-white/10 hover:border-primary/50 transition-all p-0.5">
+                                        <div className="w-full h-full rounded-md bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center text-sm font-bold text-white shadow-inner">
                                             {session.user?.name?.[0]?.toUpperCase() || "U"}
                                         </div>
                                     </button>
@@ -510,7 +515,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             ) : (
                                 <Link
                                     href="/login"
-                                    className="flex items-center gap-2 bg-[#263243] hover:bg-[#2d3d54] text-[#d8e3f2] px-4 py-2 rounded-full font-semibold text-sm transition-all duration-200 hover:scale-105 active:scale-95 ml-1 whitespace-nowrap border border-white/5"
+                                    className="flex items-center gap-2 bg-[#263243] hover:bg-[#2d3d54] text-[#d8e3f2] px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-200 hover:scale-105 active:scale-95 ml-1 whitespace-nowrap border border-white/5"
                                 >
                                     <LogIn className="w-4 h-4" />
                                     <span>Đăng nhập</span>

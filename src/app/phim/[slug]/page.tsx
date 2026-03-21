@@ -265,10 +265,10 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
 
                 {/* Hero Info Content aligned left/bottom on desktop, center on mobile */}
-                <div className="relative z-10 w-full max-w-[1920px] mx-auto flex flex-col md:flex-row items-center md:items-end justify-center md:justify-between gap-6 md:gap-12 text-center md:text-left">
+                <div className="relative z-10 w-full max-w-[1920px] mx-auto flex flex-col md:flex-row items-center md:items-end justify-center md:justify-between gap-6 md:gap-12 text-center md:text-left mt-0 sm:mt-4">
                     
-                    {/* Poster on Mobile (Centered, overlapping the backdrop slightly) */}
-                    <div className="w-[140px] sm:w-[180px] md:hidden shrink-0 rounded-lg overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.8)] border border-white/15 relative aspect-[2/3] z-20 mt-[-60px] sm:mt-[-80px]">
+                    {/* Poster on Mobile (Centered, no negative margin to avoid topbar) */}
+                    <div className="w-[140px] sm:w-[180px] md:hidden shrink-0 rounded-xl overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.8)] border border-white/15 relative aspect-[2/3] z-20">
                         <Image 
                             src={sourcePosterUrl || sourceThumbUrl || tmdbPosterFallback || "/fallback.png"} 
                             alt={movie?.name || "Poster"} 
@@ -308,19 +308,19 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 font-bold text-sm mt-3 drop-shadow-md">
                                     {isCompleted ? (
                                         <>
-                                            <span className="inline-flex items-center gap-1.5 bg-green-500/15 text-green-400 border border-green-500/30 px-3 py-1 rounded-md text-xs font-bold">
+                                            <span className="inline-flex items-center gap-1.5 bg-green-500/15 text-green-400 border border-green-500/30 px-3 py-1 rounded-full text-xs font-bold">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
                                                 Hoàn Tất
                                             </span>
-                                            <span className="text-gray-300 text-xs font-medium bg-white/5 border border-white/10 px-3 py-1 rounded-md">{total} Tập</span>
+                                            <span className="text-gray-300 text-xs font-medium bg-white/5 border border-white/10 px-3 py-1 rounded-full">{total} Tập</span>
                                         </>
                                     ) : (
                                         <>
-                                            <span className="inline-flex items-center gap-1.5 bg-[#8FA7C5]/15 text-[#8FA7C5] border border-[#8FA7C5]/30 px-3 py-1 rounded-md text-xs font-bold">
+                                            <span className="inline-flex items-center gap-1.5 bg-[#8FA7C5]/15 text-[#8FA7C5] border border-[#8FA7C5]/30 px-3 py-1 rounded-full text-xs font-bold">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-[#8FA7C5] animate-pulse inline-block" />
                                                 Đang chiếu
                                             </span>
-                                            <span className="text-gray-300 text-xs font-medium bg-white/5 border border-white/10 px-3 py-1 rounded-md">Tập {epNum} / {total}</span>
+                                            <span className="text-gray-300 text-xs font-medium bg-white/5 border border-white/10 px-3 py-1 rounded-full">Tập {epNum} / {total}</span>
                                         </>
                                     )}
                                 </div>
@@ -343,7 +343,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             {serverData.length > 0 && (
                                 <Link
                                     href={`/xem-phim/${movie?.slug}/${serverData[0].slug}`}
-                                    className="flex items-center justify-center gap-2 bg-[#8FA7C5] text-[#0a0a0a] px-8 sm:px-10 py-3.5 rounded-lg font-black text-[15px] hover:bg-[#a8bdd8] hover:scale-105 transition-all duration-300 shadow-[0_4px_20px_rgba(143,167,197,0.3)]"
+                                    className="flex items-center justify-center gap-2 bg-[#8FA7C5] text-[#0a0a0a] px-8 sm:px-10 py-3.5 rounded-full font-black text-[15px] hover:bg-[#a8bdd8] hover:scale-105 transition-all duration-300 shadow-[0_4px_20px_rgba(143,167,197,0.3)]"
                                 >
                                     <Play className="w-5 h-5 fill-current shrink-0" />
                                     Xem Phim
@@ -363,15 +363,15 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                             movieQuality: String(movie.quality || "HD"),
                                             movieCategories: Array.isArray(movie.category) ? movie.category.map((c: any) => String(c.name || "")) : [],
                                         }}
-                                        className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/10 py-3.5 px-6 rounded-lg font-medium shadow-sm transition-all"
+                                        className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/10 py-3.5 px-6 rounded-full font-medium shadow-sm transition-all"
                                         showLabel={true}
                                     />
                                     <WatchlistButton
                                         slug={movie.slug}
-                                        className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/10 py-3.5 px-6 rounded-lg font-medium shadow-sm transition-all hidden sm:flex"
+                                        className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/10 py-3.5 px-6 rounded-full font-medium shadow-sm transition-all hidden sm:flex"
                                         showLabel={true}
                                     />
-                                    <ShareButton title={`Xem phim ${movie.name} trên KHOIPHIM`} className="py-3.5 px-6 rounded-lg !bg-white/5 hover:!bg-white/10 border-white/10 font-medium" />
+                                    <ShareButton title={`Xem phim ${movie.name} trên KHOIPHIM`} className="py-3.5 px-6 rounded-full !bg-white/5 hover:!bg-white/10 border-white/10 font-medium" />
                                 </>
                             )}
                         </div>

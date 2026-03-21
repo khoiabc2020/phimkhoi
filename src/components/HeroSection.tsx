@@ -149,7 +149,7 @@ function MobileHero({ movies }: { movies: Movie[] }) {
 
     return (
         <div
-            className="relative w-full select-none mt-[-54px]"
+            className="relative w-full select-none pt-2"
             onTouchStart={onTouchStart}
             onTouchEnd={onTouchEnd}
         >
@@ -184,6 +184,7 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                                     sizes="100vw"
                                     placeholder="blur"
                                     blurDataURL={blurData}
+                                    unoptimized={true}
                                     decoding="async"
                                 />
                                 {/* Gradient overlay */}
@@ -235,6 +236,7 @@ function MobileHero({ movies }: { movies: Movie[] }) {
                                     placeholder="blur"
                                     blurDataURL={blurData}
                                     loading={isActive ? "eager" : "lazy"}
+                                    unoptimized={true}
                                     decoding="async"
                                     priority={isActive && i < 2}
                                 />
@@ -365,7 +367,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                             // CustomHero images are arbitrary URLs, so avoid local blur placeholder if it's external
                             placeholder={m.isCustomHero ? "empty" : "blur"}
                             blurDataURL={m.isCustomHero ? undefined : blurData}
-                            unoptimized={m.isCustomHero}
+                            unoptimized={true}
                             decoding="async"
                         />
                         
@@ -545,6 +547,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
                                             sizes="160px"
                                             placeholder="blur"
                                             blurDataURL={blurData}
+                                            unoptimized={true}
                                         />
                                     </div>
                                 );

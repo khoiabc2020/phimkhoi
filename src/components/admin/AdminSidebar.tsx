@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, MessageSquare, Settings, Film, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, MessageSquare, Settings, Film, LogOut, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
 
@@ -11,6 +11,7 @@ const sidebarItems = [
     { label: "Thành viên", href: "/admin/users", icon: Users },
     { label: "Custom Hero", href: "/admin/hero", icon: Film },
     { label: "Bình luận", href: "/admin/comments", icon: MessageSquare },
+    { label: "Thông báo", href: "/admin/notifications", icon: Bell },
     { label: "Cài đặt", href: "/admin/settings", icon: Settings },
 ];
 
