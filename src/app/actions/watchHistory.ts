@@ -12,6 +12,7 @@ export async function addWatchHistory(movieData: {
     movieName: string;
     movieOriginName: string;
     moviePoster: string;
+    movieThumb?: string;
     episodeSlug: string;
     episodeName: string;
     duration: number;

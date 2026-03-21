@@ -138,7 +138,12 @@ export default async function WatchPage({ params }: PageProps) {
         movieSlug: movie.slug,
         movieName: movie.name,
         movieOriginName: movie.origin_name || "",
-        moviePoster: movie.poster_url || movie.thumb_url,
+        moviePoster: tmdbRes?.poster_path 
+            ? `https://image.tmdb.org/t/p/w500${tmdbRes.poster_path}` 
+            : (movie.poster_url || movie.thumb_url),
+        movieThumb: tmdbRes?.backdrop_path 
+            ? `https://image.tmdb.org/t/p/w780${tmdbRes.backdrop_path}` 
+            : (movie.thumb_url || movie.poster_url),
         episodeSlug: episode,
         episodeName: displayEpisodeName(currentEpisode?.name || episode),
         duration: movie.time ? parseInt(movie.time) || 90 : 90,

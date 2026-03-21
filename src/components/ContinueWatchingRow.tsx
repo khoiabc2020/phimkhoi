@@ -167,16 +167,27 @@ export default function ContinueWatchingRow() {
                             >
                                 {/* Card Image (Portrait 2:3) */}
                                 <div className="relative aspect-[2/3] rounded-[10px] overflow-hidden bg-white/5 border border-white/5 shadow-2xl transition-all duration-300 md:group-hover/card:-translate-y-1 md:group-hover/card:shadow-[0_8px_30px_rgba(0,0,0,0.6)]">
+                                    {/* Background Blurred Image */}
+                                    <Image
+                                        src={getImageUrl(item.moviePoster)}
+                                        alt={""}
+                                        fill
+                                        sizes="(max-width: 768px) 140px, (max-width: 1024px) 160px, 180px"
+                                        className="object-cover scale-110 blur-xl opacity-50 select-none pointer-events-none"
+                                        quality={30}
+                                    />
+                                    {/* Foreground clear image (uncropped) */}
                                     <Image
                                         src={getImageUrl(item.moviePoster)}
                                         alt={item.movieName}
                                         fill
                                         sizes="(max-width: 768px) 140px, (max-width: 1024px) 160px, 180px"
-                                        className="object-cover"
+                                        className="object-contain drop-shadow-2xl z-10"
+                                        quality={85}
                                     />
                                     
                                     {/* Vignette effect for text contrast later if needed, mostly transparent */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 transition-opacity duration-300 md:group-hover/card:opacity-100" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 transition-opacity duration-300 md:group-hover/card:opacity-100 z-20" />
                                 </div>
 
                                 {/* White Square 'X' Delete Button */}

@@ -7,6 +7,7 @@ export interface IWatchHistory extends Document {
     movieName: string;
     movieOriginName: string; // English name
     moviePoster: string;
+    movieThumb?: string;
     episodeSlug: string;
     episodeName: string;
     progress: number; // 0-100
@@ -43,6 +44,10 @@ const WatchHistorySchema = new Schema<IWatchHistory>(
         moviePoster: {
             type: String,
             required: true,
+        },
+        movieThumb: {
+            type: String,
+            default: "",
         },
         episodeSlug: {
             type: String,
