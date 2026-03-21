@@ -47,14 +47,9 @@ export default function Footer() {
                     {/* Brand column */}
                     <div className="col-span-2 md:col-span-1 flex flex-col gap-4">
                         <Link href="/" className="inline-flex items-center">
-                            <div className="relative w-[300px] h-20">
-                                <Image
-                                    src="/logo.png?v=2"
-                                    alt="KHOIPHIM"
-                                    fill
-                                    className="object-contain object-left"
-                                />
-                            </div>
+                            <span className="font-display text-[22px] font-black uppercase tracking-tighter text-white">
+                                KHOIPHIM<span className="text-[#8FA7C5] ml-0.5">.</span>
+                            </span>
                         </Link>
                         <p className="text-[13px] text-gray-500 leading-relaxed max-w-[220px]">
                             Xem hàng ngàn bộ phim chất lượng cao, vietsub chuẩn, miễn phí — cập nhật hàng ngày.

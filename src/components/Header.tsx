@@ -191,8 +191,8 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                 className={cn(
                     "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
                     isScrolled
-                        ? "h-[64px] lg:h-[84px] bg-[#0a0a0a]/95 backdrop-blur-md shadow-lg border-b border-white/5"
-                        : "h-[84px] lg:h-[110px] bg-gradient-to-b from-black/80 to-transparent"
+                        ? "h-[54px] lg:h-[64px] bg-[#0a0a0a]/95 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
+                        : "h-[64px] lg:h-[84px] bg-gradient-to-b from-black/80 to-transparent"
                 )}
             >
                 <div className="w-full h-[54px] lg:h-[64px] flex items-center justify-between gap-3 flex-nowrap pointer-events-auto px-4 lg:px-8">
@@ -211,15 +211,9 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         </button>
 
                         <Link href="/" className="flex items-center group">
-                            <div className="relative w-[220px] h-14 transition-transform active:scale-95">
-                                <Image
-                                    src="/logo.png?v=2"
-                                    alt="KHOIPHIM"
-                                    fill
-                                    className="object-contain object-left"
-                                    priority
-                                />
-                            </div>
+                            <span className="font-display text-[19px] font-black uppercase tracking-tighter text-white">
+                                KHOIPHIM<span className="text-primary ml-0.5">.</span>
+                            </span>
                         </Link>
                     </div>
 
@@ -234,16 +228,10 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
 
                     {/* Desktop Section: Brand + Links */}
                     <div className="hidden lg:flex items-center gap-4 xl:gap-10 flex-1">
-                        <Link href="/" className="flex items-center shrink-0 -ml-1">
-                            <div className="relative w-[280px] lg:w-[400px] xl:w-[500px] h-18 lg:h-28 transition-transform hover:scale-[1.02] active:scale-95">
-                                <Image
-                                    src="/logo.png?v=2"
-                                    alt="KHOIPHIM"
-                                    fill
-                                    className="object-contain object-left hover:brightness-110 transition-all"
-                                    priority
-                                />
-                            </div>
+                        <Link href="/" className="flex items-center shrink-0 -ml-1 group">
+                            <span className="font-display text-[20px] xl:text-[24px] font-black uppercase tracking-tighter text-white group-hover:text-primary transition-colors">
+                                KHOIPHIM<span className="text-primary ml-0.5">.</span>
+                            </span>
                         </Link>
 
                         <nav ref={navRef} className="flex items-center gap-1">

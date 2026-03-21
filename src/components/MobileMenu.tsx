@@ -82,15 +82,9 @@ export default function MobileMenu({
                 {/* Header */}
                 <div className="flex items-center justify-between px-5 h-[72px] shrink-0 border-b border-white/[0.06] bg-[#1a1f2e]/92">
                     <Link href="/" onClick={onClose} className="flex items-center">
-                        <div className="relative w-[240px] h-16 transition-transform active:scale-95">
-                            <Image
-                                src="/logo.png?v=2"
-                                alt="KHOIPHIM"
-                                fill
-                                className="object-contain object-left"
-                                priority
-                            />
-                        </div>
+                        <span className="font-display text-[24px] font-black uppercase tracking-tighter text-white">
+                            KHOIPHIM<span className="text-[#8FA7C5] ml-0.5">.</span>
+                        </span>
                     </Link>
                     <button
                         onClick={onClose}
