@@ -171,7 +171,8 @@ function MovieCard({
                             alt={decodeHtml(movie.name) || movie.slug || "Phim"}
                             fill
                             className="transition-transform duration-200 ease-out group-hover/static-card:scale-[1.03] object-cover"
-                            sizes={orientation === 'landscape' ? "(max-width: 768px) 68vw, 36vw" : "(max-width: 768px) 48vw, (max-width: 1280px) 220px, 250px"}
+                            sizes={orientation === 'landscape' ? "(max-width: 768px) 68vw, 500px" : "(max-width: 768px) 48vw, (max-width: 1280px) 33vw, 400px"}
+                            quality={85}
                             loading={priority ? undefined : loading}
                             priority={priority}
                             placeholder="blur"

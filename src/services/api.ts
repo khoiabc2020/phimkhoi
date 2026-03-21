@@ -739,7 +739,7 @@ const normalizeOphimItem = (item: any, pathImage: string): Movie => {
 
 export const getMoviesList = async (type: string, params: { page?: number; year?: number; category?: string; country?: string; limit?: number; quality?: string } = {}) => {
     try {
-        const { page = 1, year, category, country, limit = 42, quality } = params;
+        const { page = 1, year, category, country, limit = 28, quality } = params;
         let query = `?page=${page}&limit=${limit}`;
         if (year) query += `&year=${year}`;
         if (category) query += `&category=${category}`;
@@ -844,7 +844,7 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
     }
 };
 
-export const getMoviesByCategory = async (slug: string, page: number = 1, limit: number = 42) => {
+export const getMoviesByCategory = async (slug: string, page: number = 1, limit: number = 28) => {
     try {
         // Hybrid fetch for categories too
         // Hybrid fetch for categories too
@@ -915,7 +915,7 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
     }
 };
 
-export const getMoviesByCountry = async (slug: string, page: number = 1, limit: number = 42) => {
+export const getMoviesByCountry = async (slug: string, page: number = 1, limit: number = 28) => {
     try {
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
             fetch(`${API_URL}/v1/api/quoc-gia/${slug}?page=${page}&limit=${limit}`, { next: { revalidate: 3600 } }).then(r => r.json()),
