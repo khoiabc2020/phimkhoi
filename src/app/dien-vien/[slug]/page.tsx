@@ -34,17 +34,19 @@ export default async function PersonPage({ params, searchParams }: PersonPagePro
         );
     }
 
-    // 2. Get details, credits, local movies, and favorite status
-    const [details, credits, localData, favResult] = await Promise.all([
-        getTMDBPersonDetails(person.id),
-        getTMDBPersonCredits(person.id),
-        getMoviesByActor(details ? details.name : name, 1, 100),
-        checkFavoriteActor(details ? details.name : name)
-    ]);
+    // 2. Fetch TMDB details first to get the official name
+    const details = await getTMDBPersonDetails(person.id);
 
     if (!details) return null;
 
-    // 3. Filter and sort credits
+    // 3. Fetch credits, local movies, and favorite status in parallel
+    const [credits, localData, favResult] = await Promise.all([
+        getTMDBPersonCredits(person.id),
+        getMoviesByActor(details.name, 1, 50),
+        checkFavoriteActor(details.name)
+    ]);
+
+    // 4. Filter and sort credits
     const globalFilmography = (credits?.cast || [])
         .filter((m: any) => m.poster_path || m.backdrop_path)
         .slice(0, 50);
