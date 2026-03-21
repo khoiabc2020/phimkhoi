@@ -74,7 +74,7 @@ function getHeroImage(movie: any, type: "poster" | "backdrop" | "character" | "l
         if (type === "poster" && tmdb.poster_path)
             return getImageUrl(tmdbImage(tmdb.poster_path, variant === "desktop" ? "w500" : "w342"), true);
         if (type === "backdrop" && tmdb.backdrop_path)
-            return getImageUrl(tmdbImage(tmdb.backdrop_path, variant === "desktop" ? "original" : "w1280"), true);
+            return getImageUrl(tmdbImage(tmdb.backdrop_path, variant === "desktop" ? "original" : "w780"), true);
     }
     // Backdrop must stay landscape-only, do not fallback to poster here.
     const api = type === "backdrop" ? movie.thumb_url : movie.poster_url || movie.thumb_url;
@@ -202,7 +202,7 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                                         </span>
                                     </div>
                                     {m.quality && (
-                                        <span className="bg-black/40 backdrop-blur-sm border border-white/10 text-white/80 text-[9px] font-bold px-2 py-0.5 rounded tracking-wider shadow-md">
+                                        <span className="bg-black/40 border border-white/10 text-white/80 text-[9px] font-bold px-2 py-0.5 rounded tracking-wider shadow-md">
                                             {formatQualityLabel(m.quality) || m.quality}
                                         </span>
                                     )}

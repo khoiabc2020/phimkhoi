@@ -208,7 +208,7 @@ function MovieCard({
                     {/* Top-Right: Premium Quality Badge & Episode */}
                     <div className="absolute top-1.5 right-1.5 z-10 pointer-events-none flex flex-col items-end gap-1">
                         {formatQualityLabel(movie.quality) && (
-                            <span className="bg-black/60 shadow-md border border-white/10 text-white/90 text-[9px] font-black px-1.5 py-0.5 rounded-[3px] backdrop-blur-sm tracking-tight">
+                            <span className="bg-black/70 shadow-md border border-white/10 text-white/90 text-[9px] font-black px-1.5 py-0.5 rounded-[3px] tracking-tight">
                                 {formatQualityLabel(movie.quality)}
                             </span>
                         )}
@@ -222,7 +222,7 @@ function MovieCard({
                     {/* Bottom-Left: Subtitle / Language Badge (Onflix P.Đề style) */}
                     <div className="absolute bottom-1.5 left-1.5 z-10 pointer-events-none">
                         {(movie.episode_current || movie.lang) && (
-                            <span className="bg-black/50 border border-white/10 text-white/80 text-[10px] sm:text-[11px] font-medium px-1.5 py-0.5 rounded-[2px] backdrop-blur-[2px] tracking-normal uppercase mb-0.5 block w-fit">
+                            <span className="bg-black/70 border border-white/10 text-white/80 text-[10px] sm:text-[11px] font-medium px-1.5 py-0.5 rounded-[2px] tracking-normal uppercase mb-0.5 block w-fit">
                                 {movie.lang?.toLowerCase().includes('lồng tiếng') ? 'L.Tiếng' : 'P.Đề'}
                             </span>
                         )}

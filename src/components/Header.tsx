@@ -191,7 +191,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                 className={cn(
                     "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
                     isScrolled
-                        ? "bg-[#0a0a0a]/90 backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] pointer-events-auto"
+                        ? "bg-[#0a0a0a]/95 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.4)] pointer-events-auto"
                         : "bg-gradient-to-b from-[#0a0a0a]/90 via-[#0a0a0a]/40 to-transparent pointer-events-none"
                 )}
             >

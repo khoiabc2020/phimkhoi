@@ -170,7 +170,7 @@ function ContinueWatchingRowInner() {
                                     {/* Nút X xóa */}
                                     <button
                                         onClick={(e) => handleRemove(e, item._id)}
-                                        className="absolute top-1.5 right-1.5 md:top-2 md:right-2 w-8 h-8 md:w-6 md:h-6 rounded-full bg-black/70 hover:bg-red-600 backdrop-blur-md flex items-center justify-center text-white/90 hover:text-white transition-colors opacity-100 md:opacity-0 md:group-hover/card:opacity-100 z-30 touch-manipulation"
+                                        className="absolute top-1.5 right-1.5 md:top-2 md:right-2 w-8 h-8 md:w-6 md:h-6 rounded-full bg-black/80 hover:bg-red-600 flex items-center justify-center text-white/90 hover:text-white transition-colors opacity-100 md:opacity-0 md:group-hover/card:opacity-100 z-30 touch-manipulation"
                                         title="Xóa khỏi lịch sử"
                                     >
                                         <X className="w-4 h-4 md:w-3 md:h-3" />
