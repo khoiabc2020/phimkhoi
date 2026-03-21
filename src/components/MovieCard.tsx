@@ -241,9 +241,9 @@ function MovieCard({
                         <p className="text-white/40 text-[10px] truncate font-medium flex-1" title={decodeHtml(movie.origin_name)}>
                             {decodeHtml(movie.origin_name || "")}
                         </p>
-                        {movie.year && Number(movie.year) > 0 && (
+                        {Number(movie.year) > 0 ? (
                             <span className="text-white/30 text-[10px] font-medium shrink-0">{movie.year}</span>
-                        )}
+                        ) : null}
                     </div>
                 </div>
             </div>

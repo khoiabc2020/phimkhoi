@@ -69,14 +69,16 @@ export default async function WatchPage({ params }: PageProps) {
     let cast: Record<string, unknown>[] = [];
     let episodeThumbnails: Record<string, string> = {};
     let episodeMetadata: Record<string, TMDBEpisodeMeta> = {};
+    let tmdbRes: any = null;
 
     try {
-        const [castRes, tmdbRes, tmdbEpisodeImages] = await Promise.all([
+        const [castData, tmdbData, tmdbEpisodeImages] = await Promise.all([
             getMovieCast(movie.origin_name || movie.name, movie.year, movie.type === "series" ? "tv" : "movie").catch((): any[] => []),
             getTMDBDataForCard(movie.origin_name || movie.name, movie.year, movie.type === "series" ? "tv" : "movie").catch((): any => null),
             getTMDBEpisodeImages(movie.origin_name || movie.name, movie.year, { originalName: movie.origin_name, countrySlug: movie.country?.[0]?.slug }).catch((): any => ({})),
         ]);
-        cast = castRes || [];
+        cast = castData || [];
+        tmdbRes = tmdbData;
         if (tmdbRes?.vote_average) (movie as any).vote_average = tmdbRes.vote_average;
         const episodeImageMap: Record<string, TMDBEpisodeMeta> = tmdbEpisodeImages || {};
 

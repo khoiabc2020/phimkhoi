@@ -834,8 +834,10 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
             );
         }
 
+        const enrichedItems = await enrichMoviesWithTMDB(uniqueItems, 16);
+
         return {
-            items: uniqueItems,
+            items: enrichedItems,
             pagination: kkPagination // Use KK pagination as primary source of truth for simplicity in this hybrid mode
         };
     } catch (error) {
@@ -905,8 +907,11 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
             }
         }
 
+        const uniqueItems = Array.from(bySlug.values()).map(normalizeMovieImageRoles);
+        const enrichedItems = await enrichMoviesWithTMDB(uniqueItems, 16);
+
         return {
-            items: Array.from(bySlug.values()).map(normalizeMovieImageRoles),
+            items: enrichedItems,
             pagination: kkPagination
         };
     } catch (error) {
@@ -975,9 +980,10 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
             }
         }
         const uniqueItems = Array.from(bySlug.values()).map(normalizeMovieImageRoles);
+        const enrichedItems = await enrichMoviesWithTMDB(uniqueItems, 16);
 
         return {
-            items: uniqueItems,
+            items: enrichedItems,
             pagination: kkPagination
         };
     } catch (error) {
