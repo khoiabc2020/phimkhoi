@@ -3,7 +3,7 @@
 import { useRef, useState, useEffect, useMemo, memo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Play, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { removeWatchHistory } from "@/app/actions/watchHistory";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -14,10 +14,25 @@ const getImageUrl = (url: string) => {
     return `https://phimimg.com/${url}`;
 };
 
-function ContinueWatchingRowInner() {
+const formatTimeAndDuration = (currentSec: number, totalSec: number, episode: string) => {
+    const toStr = (sec: number) => {
+        if (!sec || isNaN(sec)) return "0m";
+        const h = Math.floor(sec / 3600);
+        const m = Math.floor((sec % 3600) / 60);
+        if (h > 0) return `${h}h ${m}m`;
+        return `${m}m`;
+    };
+
+    const epStr = episode ? `${episode} • ` : "";
+    if (currentSec > 0 && totalSec > 0) {
+        return `${epStr}${toStr(currentSec)} / ${toStr(totalSec)}`;
+    }
+    return episode || "Tiếp tục xem";
+};
+
+export default function ContinueWatchingRow() {
     const { data: session } = useSession();
     const [movies, setMovies] = useState<any[]>([]);
-    const [viewMode, setViewMode] = useState<"recent" | "nearlyDone">("recent");
     const [loading, setLoading] = useState(true);
     const rowRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
@@ -88,23 +103,23 @@ function ContinueWatchingRowInner() {
         }
     };
 
-    const displayMovies = useMemo(() => {
-        if (viewMode === "nearlyDone") {
-            return [...movies].sort((a, b) => (b.progress || 0) - (a.progress || 0));
-        }
-        return movies;
-    }, [movies, viewMode]);
-
     if (loading) {
         return (
-            <div className="space-y-4 py-4">
-                <div className="flex items-center justify-between gap-3">
+            <div className="space-y-6 py-4">
+                <div className="flex items-center gap-3">
                     <div className="h-6 w-48 bg-white/10 rounded animate-pulse" />
-                    <div className="h-4 w-16 bg-white/10 rounded animate-pulse" />
                 </div>
-                <div className="flex gap-3 overflow-x-hidden pb-4">
-                    {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="flex-[0_0_160px] sm:flex-[0_0_200px] md:flex-[0_0_240px] aspect-video rounded-md bg-white/10 animate-pulse" />
+                <div className="flex gap-4 overflow-x-hidden pb-4 pt-2">
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                        <div key={i} className="flex-[0_0_140px] md:flex-[0_0_160px] lg:flex-[0_0_180px] space-y-3 pt-2">
+                            <div className="aspect-[2/3] rounded-lg bg-white/10 animate-pulse" />
+                            <div className="h-1.5 w-4/5 mx-auto bg-white/10 rounded animate-pulse" />
+                            <div className="space-y-2 flex flex-col items-center">
+                                <div className="h-2 w-3/4 bg-white/10 rounded animate-pulse" />
+                                <div className="h-3 w-5/6 bg-white/10 rounded animate-pulse" />
+                                <div className="h-2 w-1/2 bg-white/10 rounded animate-pulse" />
+                            </div>
+                        </div>
                     ))}
                 </div>
             </div>
@@ -115,136 +130,104 @@ function ContinueWatchingRowInner() {
 
     return (
         <div className="space-y-4 group relative py-4">
-            <div className="space-y-2.5">
-                <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
-                        <h2 className="text-xl md:text-2xl font-[800] text-white leading-tight flex items-center gap-2 min-w-0">
-                            <span className="truncate">Xem tiếp của bạn</span>
-                            <ChevronRight className="w-4 h-4 text-white/45 shrink-0" />
-                        </h2>
-                        <span className="text-[11px] md:text-xs px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/[0.08] text-white/65 shrink-0">
-                            {movies.length} phim
-                        </span>
+            <div className="space-y-2">
+                <Link
+                    href="/lich-su-xem"
+                    className="flex items-center gap-2 min-w-0 group/title w-max"
+                >
+                    <h2 className="text-[17px] md:text-[20px] font-bold text-white leading-tight flex items-center min-w-0 transition-colors hover:text-[#e0e0e0]">
+                        Xem tiếp của bạn
+                    </h2>
+                    <div className="w-5 h-5 rounded-full border border-white/20 flex items-center justify-center transition-all opacity-80 group-hover/title:bg-white/10 group-hover/title:border-white/40">
+                        <ChevronRight className="w-3 h-3 text-white" />
                     </div>
-                    <Link
-                        href="/lich-su-xem"
-                        className="text-[13px] font-semibold text-[#9aa7bb] hover:text-[#c5d0e2] whitespace-nowrap flex items-center gap-1 shrink-0"
-                    >
-                        Lịch sử
-                        <ChevronRight className="w-3.5 h-3.5" />
-                    </Link>
-                </div>
-
-                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5">
-                    <button
-                        type="button"
-                        onClick={() => setViewMode("recent")}
-                        className={`h-8 px-3 rounded-[10px] text-[12px] font-semibold border transition-colors whitespace-nowrap ${viewMode === "recent"
-                            ? "bg-[#263243] border-[#33435a] text-[#d8e3f2]"
-                            : "bg-[#0B0B10] border-white/[0.08] text-white/70 hover:text-white hover:border-white/[0.14]"
-                            }`}
-                    >
-                        Mới xem
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => setViewMode("nearlyDone")}
-                        className={`h-8 px-3 rounded-[10px] text-[12px] font-semibold border transition-colors whitespace-nowrap ${viewMode === "nearlyDone"
-                            ? "bg-[#263243] border-[#33435a] text-[#d8e3f2]"
-                            : "bg-[#0B0B10] border-white/[0.08] text-white/70 hover:text-white hover:border-white/[0.14]"
-                            }`}
-                    >
-                        Sắp xong
-                    </button>
-                </div>
+                </Link>
             </div>
 
             <div className="relative group/row">
-                {/* Left Arrow - visible on touch (mobile) for easier scroll */}
+                {/* Left Arrow */}
                 <button
                     onClick={() => scroll("left")}
-                    className="absolute left-0 top-0 bottom-0 z-40 bg-gradient-to-r from-[#020617]/80 to-transparent w-10 md:w-12 flex items-center justify-start pl-1 md:pl-2 opacity-60 md:opacity-0 md:group-hover/row:opacity-100 transition-all duration-300 pointer-events-auto md:pointer-events-none md:group-hover/row:pointer-events-auto"
+                    className="absolute left-0 top-0 bottom-12 z-40 bg-gradient-to-r from-[#0a0a0a]/90 via-[#0a0a0a]/60 to-transparent w-12 md:w-16 flex items-center justify-start pl-1 md:pl-2 opacity-60 md:opacity-0 md:group-hover/row:opacity-100 transition-all duration-300 pointer-events-auto md:pointer-events-none md:group-hover/row:pointer-events-auto -ml-4 lg:-ml-8"
                 >
-                    <ChevronLeft className="w-7 h-7 md:w-8 md:h-8 text-white hover:text-[#c7d4e7] transition-colors drop-shadow-lg" />
+                    <ChevronLeft className="w-8 h-8 md:w-10 md:h-10 text-white hover:text-white transition-transform hover:scale-110 drop-shadow-xl" />
                 </button>
 
                 {/* Scroll Container */}
                 <div
                     ref={rowRef}
-                    className="flex gap-3 md:gap-4 overflow-x-auto pb-4 pt-2 no-scrollbar snap-x px-1"
+                    className="flex gap-4 md:gap-5 overflow-x-auto pb-4 pt-4 no-scrollbar snap-x px-1"
                     style={{ scrollbarWidth: "none", msOverflowStyle: "none", scrollBehavior: "smooth", contain: "layout paint" }}
                 >
-                    {displayMovies.map((item) => (
-                        <div key={item._id} className="relative group/card flex-[0_0_160px] sm:flex-[0_0_200px] md:flex-[0_0_240px] snap-start">
+                    {movies.map((item) => (
+                        <div key={item._id} className="relative group/card flex-[0_0_140px] md:flex-[0_0_160px] lg:flex-[0_0_180px] snap-start">
                             <Link
                                 href={`/xem-phim/${item.movieSlug}/${item.episodeSlug}`}
-                                className="block w-full"
+                                className="block w-full outline-none"
                             >
-                                {/* Card Image - ảnh đầy đủ không bị che */}
-                                <div className="relative aspect-video rounded-md overflow-hidden bg-white/5 border border-white/10 group-hover/card:border-[#b4c4da]/45 transition-all duration-300">
+                                {/* Card Image (Portrait 2:3) */}
+                                <div className="relative aspect-[2/3] rounded-[10px] overflow-hidden bg-white/5 border border-white/5 shadow-2xl transition-all duration-300 md:group-hover/card:-translate-y-1 md:group-hover/card:shadow-[0_8px_30px_rgba(0,0,0,0.6)]">
                                     <Image
                                         src={getImageUrl(item.moviePoster)}
                                         alt={item.movieName}
                                         fill
-                                        className="object-cover group-hover/card:scale-105 transition-transform duration-300"
+                                        sizes="(max-width: 768px) 140px, (max-width: 1024px) 160px, 180px"
+                                        className="object-cover"
                                     />
+                                    
+                                    {/* Vignette effect for text contrast later if needed, mostly transparent */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 transition-opacity duration-300 md:group-hover/card:opacity-100" />
+                                </div>
 
-                                    {/* Play button on hover; on mobile always show subtle */}
-                                    <div className="absolute inset-0 bg-black/20 md:bg-black/30 md:opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
-                                        <div className="w-10 h-10 rounded-full bg-[#d3deec] flex items-center justify-center scale-90 md:scale-0 group-hover/card:scale-100 transition-transform duration-300 delay-75">
-                                            <Play className="w-5 h-5 text-[#0d1119] fill-[#0d1119] ml-0.5" />
-                                        </div>
-                                    </div>
+                                {/* White Square 'X' Delete Button */}
+                                <button
+                                    onClick={(e) => handleRemove(e, item._id)}
+                                    className="absolute top-1 right-1 md:top-2 md:right-2 w-6 h-6 rounded bg-white/95 hover:bg-white backdrop-blur-md flex items-center justify-center text-[#111] hover:text-red-500 shadow-md transition-all opacity-100 md:opacity-0 md:group-hover/card:opacity-100 z-30 touch-manipulation hover:scale-110"
+                                    title="Xóa khỏi lịch sử"
+                                >
+                                    <X className="w-[14px] h-[14px] stroke-[2.5]" />
+                                </button>
 
-                                    {/* Nút X xóa — luôn hiện trên mobile để chạm được, desktop hover */}
-                                    <button
-                                        onClick={(e) => handleRemove(e, item._id)}
-                                        className="absolute top-1.5 right-1.5 md:top-2 md:right-2 w-8 h-8 md:w-6 md:h-6 rounded-full bg-black/70 hover:bg-red-600 backdrop-blur-md flex items-center justify-center text-white/90 hover:text-white transition-colors opacity-100 md:opacity-0 md:group-hover/card:opacity-100 z-30 touch-manipulation"
-                                        title="Xóa khỏi lịch sử"
-                                    >
-                                        <X className="w-4 h-4 md:w-3 md:h-3" />
-                                    </button>
-
-                                    {/* Progress Bar - chỉ 1 dải mỏng đáy ảnh */}
-                                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20 z-20">
+                                {/* External Progress Bar */}
+                                <div className="mt-3.5 flex justify-center w-full px-2">
+                                    <div className="w-full h-[3px] bg-white/15 rounded-full overflow-hidden">
                                         <div
-                                            className="h-full bg-[#8FA7C5] rounded-r-sm"
+                                            className="h-full bg-[#f1f1f1] rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-all duration-500"
                                             style={{ width: `${Math.max(2, Math.min(100, item.progress || 0))}%` }}
                                         />
                                     </div>
                                 </div>
 
-                                {/* Text bên dưới ảnh - không che mặt nhân vật */}
-                                <div className="mt-2 px-0.5">
-                                    <h3 className="text-white font-semibold text-sm line-clamp-1 group-hover/card:text-[#d3deec] transition-colors">
+                                {/* Text Block - Center Aligned */}
+                                <div className="mt-2.5 px-0.5 text-center flex flex-col items-center">
+                                    {/* Time Info */}
+                                    <span className="text-[#a0a0a0] text-[10.5px] font-medium tracking-wide">
+                                        {formatTimeAndDuration(item.currentTime, item.duration, item.episodeName)}
+                                    </span>
+                                    
+                                    {/* Main Title */}
+                                    <h3 className="text-white font-bold text-[13px] md:text-[14px] line-clamp-1 mt-1 px-1 tracking-tight">
                                         {item.movieName}
                                     </h3>
-                                    <div className="flex items-center justify-between mt-0.5">
-                                        <span className="text-white/50 text-xs truncate mr-1">{item.episodeName || "Tiếp tục xem"}</span>
-                                        <span className="text-[#c6d1e1]/85 text-[10px] font-medium shrink-0">{item.progress}%</span>
-                                    </div>
-                                    <div className="mt-1.5">
-                                        <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-[#242f3f]/65 border border-[#33445c] text-[#d3deec] text-[10px] font-semibold">
-                                            <Play className="w-3 h-3 fill-current" />
-                                            Xem ngay
-                                        </span>
-                                    </div>
+                                    
+                                    {/* Subtitle / English Title */}
+                                    <span className="text-[#707070] text-[11px] font-medium line-clamp-1 mt-0.5">
+                                        {item.movieOriginName || ""}
+                                    </span>
                                 </div>
                             </Link>
                         </div>
                     ))}
                 </div>
 
-                {/* Right Arrow - visible on touch (mobile) */}
+                {/* Right Arrow */}
                 <button
                     onClick={() => scroll("right")}
-                    className="absolute right-0 top-0 bottom-0 z-40 bg-gradient-to-l from-[#020617]/80 to-transparent w-10 md:w-12 flex items-center justify-end pr-1 md:pr-2 opacity-60 md:opacity-0 md:group-hover/row:opacity-100 transition-all duration-300 pointer-events-auto md:pointer-events-none md:group-hover/row:pointer-events-auto"
+                    className="absolute right-0 top-0 bottom-12 z-40 bg-gradient-to-l from-[#0a0a0a]/90 via-[#0a0a0a]/60 to-transparent w-12 md:w-16 flex items-center justify-end pr-1 md:pr-2 opacity-60 md:opacity-0 md:group-hover/row:opacity-100 transition-all duration-300 pointer-events-auto md:pointer-events-none md:group-hover/row:pointer-events-auto -mr-4 lg:-mr-12"
                 >
-                    <ChevronRight className="w-7 h-7 md:w-8 md:h-8 text-white hover:text-[#c7d4e7] transition-colors" />
+                    <ChevronRight className="w-8 h-8 md:w-10 md:h-10 text-white hover:text-white transition-transform hover:scale-110 drop-shadow-xl" />
                 </button>
             </div>
         </div>
     );
 }
-
-export default memo(ContinueWatchingRowInner);
