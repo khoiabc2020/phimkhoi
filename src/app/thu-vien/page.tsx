@@ -135,7 +135,7 @@ export default function ThuvienPage() {
                 {/* Content */}
                 {loading ? (
                     <div className="flex items-center justify-center py-24">
-                        <Loader2 className="w-8 h-8 text-yellow-400 animate-spin" />
+                        <Loader2 className="w-8 h-8 text-primary animate-spin" />
                     </div>
                 ) : currentItems.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-24 gap-4">
@@ -151,7 +151,7 @@ export default function ThuvienPage() {
                         </p>
                         <Link
                             href="/"
-                            className="px-4 py-2 rounded-full bg-yellow-400/10 text-yellow-400 text-sm font-medium hover:bg-yellow-400/20 transition-colors border border-yellow-400/20"
+                            className="px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors border border-primary/20"
                         >
                             Khám phá phim
                         </Link>
@@ -169,7 +169,7 @@ export default function ThuvienPage() {
                                     }
                                     className="block"
                                 >
-                                    <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-white/5 shadow-lg ring-1 ring-white/[0.06] group-hover:ring-yellow-400/30 transition-all duration-300">
+                                    <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-white/5 shadow-lg ring-1 ring-white/[0.06] group-hover:ring-primary/30 transition-all duration-300">
                                         <Image
                                             src={getImageUrl(movie.poster || "")}
                                             alt={movie.name}
@@ -187,7 +187,7 @@ export default function ThuvienPage() {
                                         {activeTab === "lich-su" && movie.progress && (
                                             <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10">
                                                 <div
-                                                    className="h-full bg-yellow-400 transition-all"
+                                                    className="h-full bg-primary transition-all"
                                                     style={{ width: `${Math.min(movie.progress, 100)}%` }}
                                                 />
                                             </div>
@@ -195,7 +195,7 @@ export default function ThuvienPage() {
                                         {/* Quality badge */}
                                         {movie.quality && (
                                             <div className="absolute top-1.5 left-1.5">
-                                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-yellow-400 text-black">
+                                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-primary text-[#0d1119]">
                                                     {movie.quality}
                                                 </span>
                                             </div>

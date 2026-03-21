@@ -90,8 +90,8 @@ async function syncMovieList(type, limit = 48) {
     log(`Syncing [${type}] limit=${limit}...`);
 
     const [kkData, ophimData] = await Promise.all([
-        fetchJson(`${KKPHIM_API}/v1/api/danh-sach/${type}?limit=${limit}&sort_field=view`),
-        fetchJson(`${OPHIM_API}/v1/api/danh-sach/${type}?limit=${limit}&sort_field=view`)
+        fetchJson(`${KKPHIM_API}/v1/api/danh-sach/${type}?limit=${limit}&sort_field=modified.time`),
+        fetchJson(`${OPHIM_API}/v1/api/danh-sach/${type}?limit=${limit}&sort_field=modified.time`)
     ]);
 
     const kkItems = getItems(kkData);
@@ -106,8 +106,12 @@ async function syncMovieList(type, limit = 48) {
         return true;
     });
 
-    // Sort by view count descending
-    unique.sort((a, b) => (b.view || 0) - (a.view || 0));
+    // Sort by modified time descending (newest first)
+    unique.sort((a, b) => {
+        const timeA = new Date(a.modified?.time || 0).getTime();
+        const timeB = new Date(b.modified?.time || 0).getTime();
+        return timeB - timeA;
+    });
 
     log(`  → Found ${unique.length} unique movies for [${type}]`);
 

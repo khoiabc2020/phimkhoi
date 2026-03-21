@@ -42,7 +42,7 @@ export default function NotificationsPage() {
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1000px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none -z-10 opacity-50" />
 
             <div className="w-full max-w-[1000px] mx-auto px-4 sm:px-6">
-                <div className="mb-8 md:mb-12 text-center md:text-left pt-6">
+                <div className="mb-8 md:mb-10 text-center md:text-left pt-6">
                     <h1 className="text-3xl md:text-4xl font-black text-white mb-3 tracking-tight flex items-center justify-center md:justify-start gap-4">
                         <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
                             <Bell className="w-6 h-6 text-primary" />
@@ -52,6 +52,48 @@ export default function NotificationsPage() {
                     <p className="text-gray-400 text-sm md:text-base">
                         Cập nhật các tin tức, bảo trì hoặc thông báo quan trọng nhất từ ban quản trị KHOIPHIM
                     </p>
+                </div>
+
+                {/* VPS / System Status Card */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <div className="bg-[#0B0B10]/60 backdrop-blur-md border border-white/[0.08] rounded-2xl p-5 flex items-center justify-between group hover:border-primary/30 transition-all">
+                        <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center border border-green-500/20">
+                                <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse" />
+                            </div>
+                            <div>
+                                <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-0.5">Trạng thái VPS</p>
+                                <p className="text-sm font-bold text-white">Đang hoạt động</p>
+                            </div>
+                        </div>
+                        <span className="text-[10px] font-bold text-green-500/80 bg-green-500/10 px-2 py-0.5 rounded border border-green-500/20">ONLINE</span>
+                    </div>
+
+                    <div className="bg-[#0B0B10]/60 backdrop-blur-md border border-white/[0.08] rounded-2xl p-5 flex items-center justify-between group hover:border-primary/30 transition-all">
+                        <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                                <CheckCircle className="w-5 h-5 text-blue-500" />
+                            </div>
+                            <div>
+                                <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-0.5">Cơ sở dữ liệu</p>
+                                <p className="text-sm font-bold text-white">Kết nối tốt</p>
+                            </div>
+                        </div>
+                        <span className="text-[10px] font-bold text-blue-500/80 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">CONNECTED</span>
+                    </div>
+
+                    <div className="bg-[#0B0B10]/60 backdrop-blur-md border border-white/[0.08] rounded-2xl p-5 flex items-center justify-between group hover:border-primary/30 transition-all">
+                        <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
+                                <Clock className="w-5 h-5 text-primary" />
+                            </div>
+                            <div>
+                                <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-0.5">Lần cuối đồng bộ</p>
+                                <p className="text-sm font-bold text-white">Vừa xong</p>
+                            </div>
+                        </div>
+                        <span className="text-[10px] font-bold text-primary/80 bg-primary/10 px-2 py-0.5 rounded border border-primary/20">SYNCED</span>
+                    </div>
                 </div>
 
                 <div className="bg-[#0B0B10]/80 backdrop-blur-md border border-white/[0.08] rounded-2xl md:p-8 p-4 shadow-2xl">

@@ -234,6 +234,24 @@ export const getTMDBPersonDetails = async (personId: number) => {
     }
 };
 
+export const getTMDBPersonCredits = async (personId: number) => {
+    try {
+        if (!TMDB_API_KEY) return null;
+        const url = `${TMDB_API_URL}/person/${personId}/combined_credits?api_key=${TMDB_API_KEY}&language=vi-VN`;
+        const res = await fetch(url, { next: { revalidate: 86400 } });
+        if (!res.ok) return null;
+        const data = await res.json();
+        // Sort by popularity or release date
+        if (data.cast) {
+            data.cast.sort((a: any, b: any) => (b.popularity || 0) - (a.popularity || 0));
+        }
+        return data;
+    } catch (error) {
+        console.error("TMDB Person Credits Error:", error);
+        return null;
+    }
+};
+
 export const getTMDBDetails = async (id: number, type: 'movie' | 'tv' = 'movie') => {
     try {
         if (!TMDB_API_KEY) return null;

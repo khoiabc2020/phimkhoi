@@ -96,7 +96,7 @@ export default async function MovieCast({ movie, slug, isCompact = false }: { mo
             <div className="flex flex-wrap gap-4 pt-1">
                 {cast.map((actor) => (
                     <Link
-                        href={`/dien-vien/${encodeURIComponent(actor.name)}`}
+                        href={`/dien-vien/${actor.name.toLowerCase().replace(/ /g, '-')}`}
                         key={actor.name}
                         className="flex flex-col items-center gap-2 w-[4.5rem] group"
                         title={actor.name}
@@ -126,7 +126,7 @@ export default async function MovieCast({ movie, slug, isCompact = false }: { mo
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {cast.map((actor) => (
                     <Link
-                        href={`/dien-vien/${encodeURIComponent(actor.name)}`}
+                        href={`/dien-vien/${actor.name.toLowerCase().replace(/ /g, '-')}`}
                         key={actor.name}
                         className="relative flex items-center gap-3 bg-white/5 rounded-lg p-3 group hover:bg-white/10 transition-colors border border-white/5 hover:border-[#8FA7C5]/60"
                     >

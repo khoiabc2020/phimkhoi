@@ -24,7 +24,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
     const [showHistory, setShowHistory] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
     const [isSearchNavigating, startSearchTransition] = useTransition();
-    const [searchResults, setSearchResults] = useState<{ movies: any[] } | null>(null);
+    const [searchResults, setSearchResults] = useState<{ movies: any[], actors: any[] } | null>(null);
     const [openDropdown, setOpenDropdown] = useState<"categories" | "countries" | null>(null);
     const router = useRouter();
     const pathname = usePathname();
@@ -295,10 +295,19 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                             ))}
                                         </div>
                                     </div>
-                                )}
-                            </div>
+                                </div>
+                            )}
 
-                            <Link href="/danh-sach/phim-le" className="px-3 py-1.5 rounded-full text-[13px] font-medium capitalize tracking-tight text-white/70 hover:text-white transition-colors">Phim Lẻ</Link>
+                            {/* Lọc Phim - New Premium Link */}
+                            <Link
+                                href="/loc-phim"
+                                className="flex items-center gap-1 px-3 py-1.5 rounded-full text-[13px] font-bold text-primary hover:bg-primary/10 transition-all border border-primary/20"
+                            >
+                                <Filter className="w-3.5 h-3.5" />
+                                Lọc phim
+                            </Link>
+
+                            <Link href="/danh-sach/phim-moi-cap-nhat" className="px-3 py-1.5 rounded-full text-[13px] font-medium text-white/70 hover:text-white transition-all">Phim mới</Link>
                             <Link href="/danh-sach/phim-bo" className="px-3 py-1.5 rounded-full text-[13px] font-medium capitalize tracking-tight text-white/70 hover:text-white transition-colors">Phim Bộ</Link>
                         </nav>
                     </div>
@@ -357,86 +366,183 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                             {isSearchNavigating ? <Loader2 className="w-4 h-4 animate-spin" /> : searchQuery ? <Search className="w-4 h-4" /> : <X className="w-4 h-4" />}
                                         </button>
                                     )}
-                                    {/* Realtime Search & History Dropdown */}
-                                    {isSearchOpen && (showHistory || searchQuery.length > 0) && (
-                                        <div className="absolute top-full left-0 right-0 mt-2 bg-[#07070b]/96 border border-white/[0.08] rounded-[10px] shadow-[0_12px_28px_#00000075] z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
-                                            {searchQuery.length > 0 ? (
-                                                <div className="flex flex-col max-h-[400px] overflow-y-auto custom-scrollbar p-2">
-                                                    <div className="px-3 pb-2 pt-1 border-b border-white/10 flex justify-between items-center mb-2">
-                                                        <span className="text-[12px] font-medium text-white/40 capitalize tracking-tight">Kết quả tìm kiếm</span>
-                                                        {isSearching && <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />}
-                                                    </div>
-
-                                                    {/* Movies */}
-                                                    {searchResults?.movies && searchResults.movies.length > 0 && (
-                                                        <div className="mb-1">
-                                                            <div className="px-3 py-1 text-[11px] font-medium text-white/30 capitalize tracking-wider mb-1">Phim mới</div>
-                                                            {searchResults.movies.map((movie: any) => (
-                                                                <Link
-                                                                    href={`/phim/${movie.slug}`}
-                                                                    key={movie._id || movie.slug}
-                                                                    onClick={() => {
-                                                                        saveHistoryItem("movies", movie.name);
-                                                                        setIsSearchOpen(false);
-                                                                        setSearchQuery("");
-                                                                    }}
-                                                                    className="flex items-center gap-3 px-3 py-2 hover:bg-white/10 rounded-lg transition-colors group"
-                                                                >
-                                                                    <div className="w-10 h-14 rounded-md overflow-hidden bg-gray-800 shrink-0 border border-white/10 group-hover:border-primary/50 transition-colors">
-                                                                        <Image src={getImageUrl(movie.poster_url || movie.thumb_url)} alt={movie.name} width={40} height={56} className="w-full h-full object-cover" unoptimized />
-                                                                    </div>
-                                                                    <div className="flex-1 min-w-0 flex flex-col justify-center">
-                                                                        <div className="text-sm font-semibold text-white group-hover:text-primary transition-colors truncate">{movie.name}</div>
-                                                                        <div className="text-xs text-gray-400 truncate">{movie.origin_name} {movie.year ? `(${movie.year})` : ''}</div>
-                                                                    </div>
-                                                                </Link>
-                                                            ))}
-                                                        </div>
-                                                    )}
-
-                                                    {/* No results or still searching */}
-                                                    {!isSearching && searchResults && searchResults.movies.length === 0 && (
-                                                        <div className="px-4 py-6 text-center text-sm text-gray-400">
-                                                            Không tìm thấy kết quả phù hợp cho "{searchQuery}"
-                                                        </div>
-                                                    )}
-
-                                                    {/* Xem tat ca btn */}
-                                                    <button
-                                                        type="button"
-                                                        onClick={(e) => { e.preventDefault(); handleSearch(); }}
-                                                        className="mt-2 text-sm text-primary hover:text-white text-center py-2 border-t border-white/5 font-medium transition-colors w-full"
-                                                    >
-                                                        Xem tất cả kết quả cho "{searchQuery}"
-                                                    </button>
-                                                </div>
-                                            ) : (
-                                                movieSearchHistory.length > 0 && (
-                                                    <div className="p-2">
-                                                        <div className="flex items-center justify-between px-3 pb-2 pt-1 border-b border-white/10 mb-2">
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-[12px] font-medium text-white/40 capitalize tracking-tight">Lịch sử</span>
+                                    {/* Realtime Search & History Dropdown - Premium Upgrade */}
+                                    {isSearchOpen && (showHistory || searchQuery.length >= 0) && (
+                                        <div className="absolute top-full left-0 right-0 mt-3 bg-[#0c0c14]/98 border border-white/[0.08] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] z-50 overflow-hidden animate-in fade-in slide-in-from-top-3 duration-300 backdrop-blur-xl max-w-[100vw]">
+                                            <div className="flex flex-col md:flex-row max-h-[85vh] md:max-h-[600px] overflow-hidden">
+                                                
+                                                {/* Left Column: Results or History */}
+                                                <div className="flex-1 overflow-y-auto no-scrollbar border-r border-white/5 p-3 md:p-4">
+                                                    {searchQuery.length > 0 ? (
+                                                        <>
+                                                            <div className="flex items-center justify-between px-2 mb-4">
+                                                                <span className="text-[11px] font-bold text-white/30 uppercase tracking-[0.1em]">Kết quả phim ({searchResults?.movies?.length || 0})</span>
+                                                                {isSearching && <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />}
                                                             </div>
-                                                            <button type="button" onClick={clearHistory} className="text-[11px] text-red-400/60 hover:text-red-400 transition-colors">Xóa hết</button>
+                                                            
+                                                            <div className="space-y-2">
+                                                                {searchResults?.movies?.map((movie: any) => (
+                                                                    <Link
+                                                                        href={`/phim/${movie.slug}`}
+                                                                        key={movie._id || movie.slug}
+                                                                        onClick={() => {
+                                                                            saveHistoryItem("movies", movie.name);
+                                                                            setIsSearchOpen(false);
+                                                                            setSearchQuery("");
+                                                                        }}
+                                                                        className="flex items-center gap-4 p-2.5 hover:bg-white/[0.06] rounded-xl transition-all group relative overflow-hidden"
+                                                                    >
+                                                                        <div className="w-12 h-16 rounded-lg overflow-hidden bg-white/5 shrink-0 border border-white/10 group-hover:border-primary/40 transition-colors relative">
+                                                                            <Image 
+                                                                                src={getImageUrl(movie.poster_url || movie.thumb_url)} 
+                                                                                alt={movie.name} 
+                                                                                fill 
+                                                                                className="object-cover group-hover:scale-110 transition-transform duration-500" 
+                                                                                unoptimized 
+                                                                            />
+                                                                        </div>
+                                                                        <div className="flex-1 min-w-0">
+                                                                            <div className="text-sm font-bold text-white group-hover:text-primary transition-colors truncate mb-0.5">{movie.name}</div>
+                                                                            <div className="text-[11px] text-white/40 truncate flex items-center gap-2">
+                                                                                <span className="font-medium">{movie.year || 'N/A'}</span>
+                                                                                <span className="w-1 h-1 rounded-full bg-white/10" />
+                                                                                <span className="text-primary/70">{movie.quality || 'FHD'}</span>
+                                                                                {movie.tmdbData?.vote_average > 0 && (
+                                                                                    <>
+                                                                                        <span className="w-1 h-1 rounded-full bg-white/10" />
+                                                                                        <span className="text-yellow-500 font-bold">★ {movie.tmdbData.vote_average.toFixed(1)}</span>
+                                                                                    </>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                    </Link>
+                                                                ))}
+                                                                
+                                                                {!isSearching && searchResults && searchResults.movies.length === 0 && (
+                                                                    <div className="py-12 text-center">
+                                                                        <p className="text-white/30 text-sm">Không tìm thấy phim phù hợp</p>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        /* History and Hot Keyword when empty */
+                                                        <div className="space-y-6 py-2">
+                                                            {movieSearchHistory.length > 0 && (
+                                                                <div>
+                                                                    <div className="flex items-center justify-between px-2 mb-3">
+                                                                        <span className="text-[11px] font-bold text-white/30 uppercase tracking-[0.1em]">Tìm kiếm gần đây</span>
+                                                                        <button onClick={clearHistory} className="text-[10px] text-white/20 hover:text-red-400 transition-colors uppercase font-bold">Xóa</button>
+                                                                    </div>
+                                                                    <div className="flex flex-wrap gap-2 px-1">
+                                                                        {movieSearchHistory.slice(0, 6).map((item, idx) => (
+                                                                            <button
+                                                                                key={idx}
+                                                                                onClick={() => { setSearchQuery(item); handleSearch(item); }}
+                                                                                className="px-3 py-1.5 rounded-full bg-white/5 border border-white/5 text-xs text-white/60 hover:text-white hover:border-primary/30 hover:bg-primary/10 transition-all flex items-center gap-2"
+                                                                            >
+                                                                                <Clock className="w-3 h-3 text-white/20" />
+                                                                                {item}
+                                                                            </button>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                            
+                                                            <div>
+                                                                <div className="px-2 mb-3">
+                                                                    <span className="text-[11px] font-bold text-white/30 uppercase tracking-[0.1em]">Từ khóa hot</span>
+                                                                </div>
+                                                                <div className="grid grid-cols-2 gap-2 px-1">
+                                                                    {['Phim hành động', 'Phim bộ mới', 'Phim chiếu rạp', 'Anime hay', 'Phim Hàn Quốc', 'Marvel'].map((tag) => (
+                                                                        <button
+                                                                            key={tag}
+                                                                            onClick={() => { setSearchQuery(tag); handleSearch(tag); }}
+                                                                            className="flex items-center gap-3 p-2.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] transition-all text-left group"
+                                                                        >
+                                                                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                                                                                <Search className="w-4 h-4" />
+                                                                            </div>
+                                                                            <span className="text-xs font-semibold text-white/70 group-hover:text-white transition-colors">{tag}</span>
+                                                                        </button>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <div className="flex flex-col gap-1 max-h-[300px] overflow-y-auto custom-scrollbar">
-                                                            {movieSearchHistory.map((item, idx) => (
-                                                                <button
-                                                                    key={idx}
-                                                                    type="button"
-                                                                    onClick={() => {
-                                                                        setSearchQuery(item);
-                                                                        handleSearch(item);
-                                                                    }}
-                                                                    className="flex items-center gap-3 px-3 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors text-left"
-                                                                >
-                                                                    <Clock className="w-3.5 h-3.5 text-white/40 shrink-0" />
-                                                                    <span className="truncate">{item}</span>
-                                                                </button>
-                                                            ))}
+                                                    )}
+                                                </div>
+
+                                                {/* Right Column: Actors & Categories (Desktop only) */}
+                                                <div className="hidden md:flex w-[260px] bg-white/[0.02] flex-col p-4">
+                                                    {searchQuery.length > 0 ? (
+                                                        <div className="space-y-6">
+                                                            {/* Actors */}
+                                                            {searchResults?.actors && searchResults.actors.length > 0 && (
+                                                                <div>
+                                                                    <div className="mb-4">
+                                                                        <span className="text-[11px] font-bold text-white/30 uppercase tracking-[0.1em]">Diễn viên</span>
+                                                                    </div>
+                                                                    <div className="space-y-3">
+                                                                        {searchResults.actors.map((actor: any) => (
+                                                                            <Link
+                                                                                key={actor.id}
+                                                                                href={`/dien-vien/${actor.name.toLowerCase().replace(/ /g, '-')}`}
+                                                                                className="flex items-center gap-3 group"
+                                                                                onClick={() => setIsSearchOpen(false)}
+                                                                            >
+                                                                                <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-800 border border-white/10 group-hover:border-primary/50 transition-all">
+                                                                                    {actor.profile_url ? (
+                                                                                        <img src={actor.profile_url} alt={actor.name} className="w-full h-full object-cover" />
+                                                                                    ) : (
+                                                                                        <div className="w-full h-full flex items-center justify-center text-[10px] text-white/40 uppercase font-bold">
+                                                                                            {actor.name[0]}
+                                                                                        </div>
+                                                                                    )}
+                                                                                </div>
+                                                                                <span className="text-xs font-bold text-white/80 group-hover:text-primary transition-colors">{actor.name}</span>
+                                                                            </Link>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                            
+                                                            {/* Popular Genres as context */}
+                                                            <div>
+                                                                <div className="mb-3">
+                                                                    <span className="text-[11px] font-bold text-white/30 uppercase tracking-[0.1em]">Gợi ý thể loại</span>
+                                                                </div>
+                                                                <div className="flex flex-wrap gap-2">
+                                                                    {displayCategories.slice(0, 6).map(cat => (
+                                                                        <Link 
+                                                                            key={cat.slug} 
+                                                                            href={`/the-loai/${cat.slug}`}
+                                                                            className="text-[10px] font-bold px-2 py-1 rounded bg-white/5 text-white/50 hover:bg-primary hover:text-black transition-all"
+                                                                            onClick={() => setIsSearchOpen(false)}
+                                                                        >
+                                                                            #{cat.name}
+                                                                        </Link>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                )
+                                                    ) : (
+                                                        <div className="flex flex-col h-full justify-center items-center text-center opacity-40">
+                                                            <Search className="w-12 h-12 mb-4" />
+                                                            <p className="text-xs">Bắt đầu nhập để<br />khám phá vũ trụ phim</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            
+                                            {/* Bottom bar */}
+                                            {searchQuery.length > 0 && (
+                                                <button
+                                                    onClick={handleSearch}
+                                                    className="w-full bg-primary py-3 text-black font-extrabold text-[13px] uppercase tracking-wider hover:bg-yellow-400 transition-colors flex items-center justify-center gap-2"
+                                                >
+                                                    Xem tất cả kết quả cho "{searchQuery}"
+                                                    <Search className="w-4 h-4" />
+                                                </button>
                                             )}
                                         </div>
                                     )}
@@ -454,27 +560,27 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         </div>
 
                         {/* Minimalist Notification & Profile Group (Image 2 style) */}
-                        <div className={cn("flex items-center gap-4 lg:gap-6 transition-opacity duration-300", isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100")}>
+                        <div className={cn("flex items-center gap-3 lg:gap-6 transition-opacity duration-300", isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100")}>
                             {/* Notification Bell Icon */}
-                            <Link href="/thong-bao" className="relative p-2 rounded-full hover:bg-white/5 transition-all active:scale-90 group" title="Thông báo">
-                                <Bell className="w-[22px] h-[22px] text-white/70 group-hover:text-white transition-colors" />
-                                <span className="absolute top-1.5 right-1.5 flex w-2.5 h-2.5">
+                            <Link href="/thong-bao" className="relative p-1.5 sm:p-2 rounded-full hover:bg-white/5 transition-all active:scale-90 group shrink-0" title="Thông báo">
+                                <Bell className="w-[19px] h-[19px] sm:w-[22px] sm:h-[22px] text-white/70 group-hover:text-white transition-colors" />
+                                <span className="absolute top-1 sm:top-1.5 right-1 sm:right-1.5 flex w-2 sm:w-2.5 h-2 sm:h-2.5">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 border-2 border-[#0a0a0a]"></span>
+                                    <span className="relative inline-flex rounded-full h-2 sm:h-2.5 w-2 sm:w-2.5 bg-red-500 border-2 border-[#0a0a0a]"></span>
                                 </span>
                             </Link>
 
                             {/* User Profile Horizontal Layout */}
                             {!mounted ? (
-                                <div className="w-10 h-10 rounded-full bg-white/5 animate-pulse" />
+                                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/5 animate-pulse" />
                             ) : session ? (
                                 <div className="relative group">
-                                    <button className="flex items-center gap-3 py-1.5 px-2 rounded-full hover:bg-white/5 transition-all">
-                                        <div className="w-9 h-9 rounded-full overflow-hidden border border-white/10 p-0.5 bg-black/40">
+                                    <button className="flex items-center gap-2 sm:gap-3 py-1 sm:py-1.5 px-2 rounded-full hover:bg-white/5 transition-all">
+                                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden border border-white/10 p-0.5 bg-black/40">
                                             {session.user?.image ? (
                                                 <Image src={session.user.image} alt="" width={36} height={36} className="w-full h-full object-cover rounded-full" />
                                             ) : (
-                                                <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center text-xs font-bold text-white uppercase">
+                                                <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center text-[10px] sm:text-xs font-bold text-white uppercase">
                                                     {session.user?.name?.[0]}
                                                 </div>
                                             )}
@@ -509,7 +615,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                             ) : (
                                 <Link
                                     href="/login"
-                                    className="px-5 py-2 rounded-full bg-white text-black text-sm font-bold hover:bg-gray-200 transition-all active:scale-95"
+                                    className="px-2.5 sm:px-5 py-1.5 sm:py-2 rounded-full bg-white text-black text-[11px] sm:text-sm font-black hover:bg-gray-200 transition-all active:scale-95 whitespace-nowrap flex items-center justify-center shrink-0"
                                 >
                                     Đăng nhập
                                 </Link>

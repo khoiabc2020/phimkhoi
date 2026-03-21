@@ -175,9 +175,9 @@ function MovieCard({
                             src={activePosterSrc || "/placeholder.svg"}
                             alt={decodeHtml(movie.name) || movie.slug || "Phim"}
                             fill
-                            className="transition-transform duration-200 ease-out group-hover/static-card:scale-[1.05] object-cover z-10"
-                            sizes={orientation === 'landscape' ? "(max-width: 768px) 68vw, 500px" : "(max-width: 768px) 48vw, (max-width: 1280px) 33vw, 400px"}
-                            quality={85}
+                            className="transition-transform duration-200 ease-out group-hover/static-card:scale-[1.05] object-cover z-10 will-change-transform"
+                            sizes={orientation === 'landscape' ? "(max-width: 768px) 50vw, 400px" : "(max-width: 768px) 33vw, (max-width: 1280px) 20vw, 300px"}
+                            quality={80}
                             loading={priority ? undefined : loading}
                             priority={priority}
                             unoptimized={true}

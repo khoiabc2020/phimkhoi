@@ -165,7 +165,7 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                         <div
                             key={m._id || i}
                             className={cn(
-                                "absolute inset-0 transition-opacity duration-700 ease-in-out",
+                                "absolute inset-0 transition-opacity duration-700 ease-in-out will-change-opacity",
                                 i === 0 ? "relative" : "absolute inset-0",
                                 isActive ? "opacity-100 z-10" : "opacity-0 z-0"
                             )}
@@ -347,7 +347,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                     <div
                         key={`bg-${m._id || i}`}
                         className={cn(
-                            "absolute inset-0 transition-opacity duration-1000 ease-in-out will-change-[opacity]",
+                            "absolute inset-0 transition-opacity duration-1000 ease-in-out will-change-[opacity,transform]",
                             isActive ? "opacity-100 z-[1]" : "opacity-0 z-0 pointer-events-none"
                         )}
                         aria-hidden={!isActive}

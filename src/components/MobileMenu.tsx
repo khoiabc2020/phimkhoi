@@ -5,7 +5,7 @@ import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import {
     Film, Video, LayoutGrid, Download, History, Heart, LogOut, Globe,
-    X, ChevronDown, Home, Tv, Star, MonitorPlay, Smartphone, Clapperboard, LogIn
+    X, ChevronDown, Home, Tv, Star, MonitorPlay, Smartphone, Clapperboard, LogIn, SlidersHorizontal
 } from "lucide-react";
 import { useState } from "react";
 
@@ -54,6 +54,7 @@ export default function MobileMenu({
 
     const navLinks = [
         { href: "/", label: "Trang Chủ", icon: Home },
+        { href: "/loc-phim", label: "Lọc Phim Nâng Cao", icon: SlidersHorizontal, badge: "NEW" },
         { href: "/danh-sach/phim-le", label: "Phim Lẻ", icon: Film },
         { href: "/danh-sach/phim-bo", label: "Phim Bộ", icon: Video },
         { href: "/danh-sach/tv-shows", label: "TV Shows", icon: Tv },

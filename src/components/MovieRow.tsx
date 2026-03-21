@@ -93,7 +93,7 @@ function MovieRowInner({ title, movies, slug, variant = 'default', priorityFirst
     // Default Layout
     return (
         <section
-            className="py-2.5"
+            className="py-2.5 movie-row-section"
             style={{ contentVisibility: "auto", containIntrinsicSize: "420px" }}
         >
             <div className="w-full max-w-[1920px] mx-auto">
