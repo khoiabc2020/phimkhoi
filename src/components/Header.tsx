@@ -296,6 +296,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                         </div>
                                     </div>
                                 )}
+                            </div>
 
                             {/* Lọc Phim - New Premium Link */}
                             <Link
