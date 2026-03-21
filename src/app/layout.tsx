@@ -81,6 +81,11 @@ export const metadata: Metadata = {
     description: "Xem phim online chất lượng cao vietsub, lồng tiếng, thuyết minh. Phim mới cập nhật hàng ngày, hoàn toàn miễn phí.",
     images: ["/logo.png"],
   },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/logo.png",
+  },
   manifest: "/manifest.json",
 };
 

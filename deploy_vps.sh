@@ -48,15 +48,15 @@ if npm run build; then
         echo "Copied .env.local to standalone directory"
     fi
 
-    # Restart PM2 process gracefully (Reload instead of delete+start)
-    echo "Reloading PM2 (Zero-downtime attempt)..."
-    npx pm2 reload ecosystem.config.cjs --update-env || npx pm2 start ecosystem.config.cjs --update-env
+    # Restart PM2 process to prevent RSC format bleeding
+    echo "Restarting PM2..."
+    npx pm2 restart ecosystem.config.cjs --update-env || npx pm2 start ecosystem.config.cjs --update-env
     npx pm2 save
     
     # SYSTEM CLEANUP (New: keep VPS tidy as requested)
     echo "Performing system cleanup..."
     npx pm2 flush # Clear all logs
-    rm -rf .next/cache # Clear build cache to save disk space
+    # Note: DO NOT delete .next/cache after build as Next.js 14/15 requires it for fetch-cache!
     find . -maxdepth 2 -name "*.bak" -type f -delete
     find . -maxdepth 2 -name "*.tmp" -type f -delete
     find . -maxdepth 2 -name "temp*" -type f -delete
