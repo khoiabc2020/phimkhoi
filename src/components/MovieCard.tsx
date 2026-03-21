@@ -197,11 +197,16 @@ function MovieCard({
                         </div>
                     )}
 
-                    {/* Top-Right: Premium Quality Badge */}
+                    {/* Top-Right: Premium Quality Badge & Episode */}
                     <div className="absolute top-1.5 right-1.5 z-10 pointer-events-none flex flex-col items-end gap-1">
                         {formatQualityLabel(movie.quality) && (
                             <span className="bg-black/60 shadow-md border border-white/10 text-white/90 text-[9px] font-black px-1.5 py-0.5 rounded-[3px] backdrop-blur-sm tracking-tight">
                                 {formatQualityLabel(movie.quality)}
+                            </span>
+                        )}
+                        {movie.episode_current && (
+                            <span className="bg-[#8FA7C5]/95 shadow-md border border-black/10 text-[#0a0a0a] text-[9px] font-extrabold px-1.5 py-0.5 rounded-[3px] tracking-tight whitespace-nowrap max-w-[85px] overflow-hidden text-ellipsis text-right">
+                                {movie.episode_current}
                             </span>
                         )}
                     </div>
