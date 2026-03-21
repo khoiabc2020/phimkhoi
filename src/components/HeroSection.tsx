@@ -129,8 +129,8 @@ function Dots({ count, active, onGo }: { count: number; active: number; onGo: (i
 
 // ─── MOBILE HERO ──────────────────────────────────────────────────────────────
 
-function MobileHero({ movies }: { movies: Movie[] }) {
-    const { index, go, next, prev } = useAutoplay(movies.length, 5500, false);
+function MobileHero({ movies, active = true }: { movies: Movie[], active?: boolean }) {
+    const { index, go, next, prev } = useAutoplay(movies.length, 5500, !active);
     const movie = movies[index] as any;
 
     const backdropImg = getHeroImage(movie, "backdrop", "mobile");
@@ -313,9 +313,9 @@ function MobileHero({ movies }: { movies: Movie[] }) {
 
 // ─── DESKTOP HERO ─────────────────────────────────────────────────────────────
 
-function DesktopHero({ movies }: { movies: Movie[] }) {
+function DesktopHero({ movies, active = true }: { movies: Movie[], active?: boolean }) {
     const [paused, setPaused] = useState(false);
-    const { index, go, next, prev } = useAutoplay(movies.length, 6000, paused);
+    const { index, go, next, prev } = useAutoplay(movies.length, 6000, paused || !active);
     const movie = movies[index] as any;
     const navRef = useRef<HTMLDivElement>(null);
 
@@ -563,6 +563,7 @@ function DesktopHero({ movies }: { movies: Movie[] }) {
 // ─── Export ───────────────────────────────────────────────────────────────────
 
 export default function HeroSection({ movies }: { movies: Movie[] }) {
+    const isDesktop = useMediaQuery("(min-width: 768px)");
     if (!movies || movies.length === 0) return null;
     const heroMovies = movies.slice(0, 10);
 
@@ -570,11 +571,11 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
         <div className="relative w-full bg-transparent font-sans" style={{ contain: "layout style paint" }}>
             {/* Mobile View */}
             <div className="md:hidden">
-                <MobileHero movies={heroMovies} />
+                <MobileHero movies={heroMovies} active={!isDesktop} />
             </div>
             {/* Desktop View */}
             <div className="hidden md:block">
-                <DesktopHero movies={heroMovies} />
+                <DesktopHero movies={heroMovies} active={isDesktop} />
             </div>
         </div>
     );

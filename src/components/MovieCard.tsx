@@ -181,6 +181,7 @@ function MovieCard({
                             loading={priority ? undefined : loading}
                             priority={priority}
                             unoptimized={true}
+                            decoding="async"
                             placeholder="blur"
                             blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
                             onError={(e) => {

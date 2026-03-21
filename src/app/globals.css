@@ -161,18 +161,6 @@ body {
   overscroll-behavior-y: none;
 }
 
-/* Nền đồng nhất #020617 — bỏ glow xanh/tím gây chia cắt màu */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background: #000000;
-  /* Composite on GPU — no repaint on scroll */
-  will-change: transform;
-  transform: translateZ(0);
-  pointer-events: none;
-}
 
 /* Fluid Typography - Apple Style (Removed to allow component-level control) */
 /* h1 {

@@ -9,19 +9,20 @@ interface LazySectionProps {
      */
     minHeight?: number;
     /**
-     * Khoảng cách "đệm" để load trước khi scroll tới (ví dụ: "200px").
+     * Khoảng cách "đệm" để load trước khi scroll tới.
+     * Tăng lên 1500px để render sớm hơn, tránh giật lag khi đang cuộn trang.
      */
     rootMargin?: string;
 }
 
 /**
- * LazySection: chỉ mount children khi gần vào viewport (IntersectionObserver).
- * Giúp giảm DOM & JS render ban đầu, cuộn mượt hơn trên máy yếu.
+ * LazySection: chỉ mount children khi viewport chạm tới (IntersectionObserver).
+ * Giúp giảm DOM & JS render ban đầu.
  */
 export default function LazySection({
     children,
     minHeight = 320,
-    rootMargin = "200px",
+    rootMargin = "1500px",
 }: LazySectionProps) {
     const [visible, setVisible] = useState(false);
     const containerRef = useRef<HTMLDivElement | null>(null);
@@ -46,7 +47,7 @@ export default function LazySection({
             {
                 root: null,
                 rootMargin,
-                threshold: 0.01,
+                threshold: 0,
             }
         );
 
@@ -60,7 +61,7 @@ export default function LazySection({
     return (
         <div
             ref={containerRef}
-            style={visible ? undefined : { minHeight }}
+            style={visible ? undefined : { minHeight, contain: "layout size" }}
             className={visible ? "animate-slide-up" : ""}
         >
             {visible ? children : null}
