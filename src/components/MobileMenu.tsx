@@ -84,7 +84,7 @@ export default function MobileMenu({
                     <Link href="/" onClick={onClose} className="flex items-center">
                         <div className="relative w-[140px] h-8 transition-transform active:scale-95">
                             <Image
-                                src="/logo.png"
+                                src="/logo.png?v=2"
                                 alt="KHOIPHIM"
                                 fill
                                 className="object-contain object-left"

@@ -49,7 +49,7 @@ export default function Footer() {
                         <Link href="/" className="inline-flex items-center">
                             <div className="relative w-[150px] h-8">
                                 <Image
-                                    src="/logo.png"
+                                    src="/logo.png?v=2"
                                     alt="KHOIPHIM"
                                     fill
                                     className="object-contain object-left"

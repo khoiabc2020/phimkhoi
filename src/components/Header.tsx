@@ -213,7 +213,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         <Link href="/" className="flex items-center group">
                             <div className="relative w-[130px] h-8 transition-transform active:scale-95">
                                 <Image
-                                    src="/logo.png"
+                                    src="/logo.png?v=2"
                                     alt="KHOIPHIM"
                                     fill
                                     className="object-contain object-left"
@@ -237,7 +237,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         <Link href="/" className="flex items-center shrink-0 -ml-1">
                             <div className="relative w-[160px] lg:w-[190px] xl:w-[220px] h-10 lg:h-12 transition-transform hover:scale-[1.02] active:scale-95">
                                 <Image
-                                    src="/logo.png"
+                                    src="/logo.png?v=2"
                                     alt="KHOIPHIM"
                                     fill
                                     className="object-contain object-left hover:brightness-110 transition-all"
