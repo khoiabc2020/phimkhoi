@@ -166,7 +166,7 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                     <div className="absolute inset-0">
                         <Image
                             src={getHeroImage(movie, "backdrop", "mobile").startsWith('http')
-                                ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(movie, "backdrop", "mobile"))}&w=1080&q=75`
+                                ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(movie, "backdrop", "mobile"))}&w=800&q=75`
                                 : getHeroImage(movie, "backdrop", "mobile")
                             }
                             alt=""
@@ -179,7 +179,7 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                     </div>
 
                     {/* Content Block */}
-                    <div className="absolute inset-x-0 bottom-0 z-[10] px-6 pb-12 flex flex-col items-center gap-2 text-center">
+                    <div className="absolute inset-x-0 bottom-0 z-[10] px-6 pb-16 flex flex-col items-center gap-2 text-center">
                         <motion.div
                             initial={{ y: 20, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
