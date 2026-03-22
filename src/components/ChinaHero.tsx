@@ -16,53 +16,53 @@ interface MovieSlideAssets {
 
 const ASSETS_MAP: Record<string, MovieSlideAssets> = {
     "bach-nguyet-phan-tinh": {
-        bg: "/images/china-hero/bach-nguyet-bg.webp?v=1.6",
-        logo: "/images/china-hero/bach-nguyet-logo.webp?v=1.6",
+        bg: "/images/china-hero/bach-nguyet-bg.webp",
+        logo: "/images/china-hero/bach-nguyet-logo.webp",
         actor: "/images/china-hero/bach-nguyet-actor.webp"
     },
     "bui-hoa-hong": {
-        bg: "/images/china-hero/bui-hoa-hong-bg.webp?v=1.6",
-        logo: "/images/china-hero/bui-hoa-hong-logo.webp?v=1.6",
+        bg: "/images/china-hero/bui-hoa-hong-bg.webp",
+        logo: "/images/china-hero/bui-hoa-hong-logo.webp",
         actor: "/images/china-hero/bui-hoa-hong-actor.webp"
     },
     "dai-mong-quy-ly": {
-        bg: "/images/china-hero/dai-mong-bg.webp?v=1.6",
-        logo: "/images/china-hero/dai-mong-logo.webp?v=1.6",
+        bg: "/images/china-hero/dai-mong-bg.webp",
+        logo: "/images/china-hero/dai-mong-logo.webp",
         actor: "/images/china-hero/dai-mong-actor.webp"
     },
     "giang-ho-da-vu-thap-nien-dang": {
-        bg: "/images/china-hero/giang-ho-bg.webp?v=1.6",
-        logo: "/images/china-hero/giang-ho-logo.png?v=1.6",
+        bg: "/images/china-hero/giang-ho-bg.webp",
+        logo: "/images/china-hero/giang-ho-logo.png",
         actor: "/images/china-hero/giang-ho-actor.webp"
     },
     "mac-nhan-tang-kieu": {
-        bg: "/images/china-hero/mac-nhan-bg.webp?v=1.6",
-        logo: "/images/china-hero/mac-nhan-logo.webp?v=1.6",
+        bg: "/images/china-hero/mac-nhan-bg.webp",
+        logo: "/images/china-hero/mac-nhan-logo.webp",
         actor: "/images/china-hero/mac-nhan-actor.webp"
     },
     "ngoc-minh-tra-cot": {
-        bg: "/images/china-hero/ngoc-minh-bg.webp?v=1.6",
-        logo: "/images/china-hero/ngoc-minh-logo.webp?v=1.6",
+        bg: "/images/china-hero/ngoc-minh-bg.webp",
+        logo: "/images/china-hero/ngoc-minh-logo.webp",
         actor: "/images/china-hero/ngoc-minh-actor.webp"
     },
     "con-ra-the-thong-gi-nua": {
-        bg: "/images/china-hero/the-thong-bg.webp?v=1.6",
-        logo: "/images/china-hero/the-thong-logo.webp?v=1.6",
+        bg: "/images/china-hero/the-thong-bg.webp",
+        logo: "/images/china-hero/the-thong-logo.webp",
         actor: "/images/china-hero/the-thong-actor.webp"
     },
     "truc-ngoc": {
-        bg: "/images/china-hero/truc-ngoc-bg.webp?v=1.6",
-        logo: "/images/china-hero/truc-ngoc-logo.webp?v=1.6",
+        bg: "/images/china-hero/truc-ngoc-bg.webp",
+        logo: "/images/china-hero/truc-ngoc-logo.webp",
         actor: "/images/china-hero/truc-ngoc-actor.webp"
     },
     "xin-chao-1983": {
-        bg: "/images/china-hero/xin-chao-bg.webp?v=1.6",
-        logo: "/images/china-hero/xin-chao-logo.webp?v=1.6",
+        bg: "/images/china-hero/xin-chao-bg.webp",
+        logo: "/images/china-hero/xin-chao-logo.webp",
         actor: "/images/china-hero/xin-chao-actor.webp"
     },
     "duong-cung-ky-an-thanh-vu-phong-minh": {
-        bg: "/images/china-hero/tang-cung-bg.png?v=1.6",
-        logo: "/images/china-hero/tang-cung-logo.png?v=1.6",
+        bg: "/images/china-hero/tang-cung-bg.png",
+        logo: "/images/china-hero/tang-cung-logo.png",
         actor: "/images/china-hero/tang-cung-actor.png"
     }
 };
@@ -156,6 +156,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                             className="object-cover brightness-[0.5] contrast-[1.1]"
                             priority
                             quality={90}
+                            unoptimized={currentMovie.bg.startsWith('/')}
                         />
                         {/* IQIYI/Netflix Style Masks */}
                         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/20 to-transparent z-10" />
@@ -179,6 +180,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                                     fill
                                     className="object-contain object-right-bottom scale-[0.8] md:scale-100 origin-right-bottom"
                                     priority
+                                    unoptimized
                                 />
                             </motion.div>
                         )}
@@ -202,6 +204,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                                         fill
                                         className="object-contain object-left drop-shadow-[0_10px_25px_rgba(0,0,0,0.9)]"
                                         priority
+                                        unoptimized
                                     />
                                 ) : (
                                     <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white drop-shadow-xl font-display uppercase italic tracking-tighter line-clamp-2">
