@@ -27,16 +27,16 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const FEATURED_ACTORS = [
-    { name: "Tiêu Chiến", role: "Ngọc Cốt Dao", image: "https://image.tmdb.org/t/p/w300_and_h450_face/468n73j2sSJIbfZvsIZvDpvUaS8.jpg" },
-    { name: "Vương Nhất Bác", role: "Trần Tình Lệnh", image: "https://image.tmdb.org/t/p/w300_and_h450_face/5akr656RvJX8hl1pa1qZckfiQeF.jpg" },
-    { name: "Địch Lệ Nhiệt Ba", role: "Trường Ca Hành", image: "https://image.tmdb.org/t/p/w300_and_h450_face/5LPr0Bov63jS5s6Dk5W6F8G2Y1.jpg" },
-    { name: "Triệu Lộ Tư", role: "Thần Ẩn", image: "https://image.tmdb.org/t/p/w300_and_h450_face/96Y63pUf2bE486V02r2K5c0kFf3.jpg" },
-    { name: "Cung Tuấn", role: "An Lạc Truyện", image: "https://image.tmdb.org/t/p/w300_and_h450_face/6LPr0Bov63jS5s6Dk5W6F8G2Y1.jpg" },
-    { name: "Ngu Thư Hân", role: "Thương Lan Quyết", image: "https://image.tmdb.org/t/p/w300_and_h450_face/468n73j2sSJIbfZvsIZvDpvUaS8.jpg" },
-    { name: "Dương Tử", role: "Trường Tương Tư", image: "https://image.tmdb.org/t/p/w300_and_h450_face/j8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
-    { name: "Hứa Khải", role: "Lạc Du Nguyên", image: "https://image.tmdb.org/t/p/w300_and_h450_face/i8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
-    { name: "Cúc Tịnh Y", role: "Hoa Nhung", image: "https://image.tmdb.org/t/p/w300_and_h450_face/g8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
-    { name: "Trần Tinh Húc", role: "Tinh Lạc Ngưng Thành Đường", image: "https://image.tmdb.org/t/p/w300_and_h450_face/f8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
+    { name: "Tiêu Chiến", role: "Ngọc Cốt Dao", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/468n73j2sSJIbfZvsIZvDpvUaS8.jpg" },
+    { name: "Vương Nhất Bác", role: "Trần Tình Lệnh", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/5akr656RvJX8hl1pa1qZckfiQeF.jpg" },
+    { name: "Địch Lệ Nhiệt Ba", role: "Trường Ca Hành", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/bLa0rBHdZ4Su1l5Xh0cY4mTB70Z.jpg" },
+    { name: "Triệu Lộ Tư", role: "Thần Ẩn", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/y82wmaDqTdXqvtasb4kxAIuT44U.jpg" },
+    { name: "Cung Tuấn", role: "An Lạc Truyện", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/rtjBdEF61NySmDDnoDgAtuclAJJ.jpg" },
+    { name: "Ngu Thư Hân", role: "Thương Lan Quyết", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/xQ2Bur9AEy0IX3qHMvLbr7tmTyD.jpg" },
+    { name: "Dương Tử", role: "Trường Tương Tư", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/20Nc1xnRFC5XGsb896ZxVNUOzFU.jpg" },
+    { name: "Hứa Khải", role: "Lạc Du Nguyên", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/f8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
+    { name: "Cúc Tịnh Y", role: "Hoa Nhung", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/g8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
+    { name: "Trần Tinh Húc", role: "Tinh Lạc Ngưng Thành Đường", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/f8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
 ];
 
 async function PhimTrungHome() {

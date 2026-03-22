@@ -24,12 +24,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const FEATURED_ACTORS = [
-    { name: "Kim Ji-won", role: "Nữ Hoàng Nước Mắt", image: "https://image.tmdb.org/t/p/w300_and_h450_face/lX7W1j9kg4jV6XNn5XEE3rKsd3x.jpg" },
-    { name: "Ji Chang-wook", role: "Hậu Duệ Mặt Trời", image: "https://image.tmdb.org/t/p/w300_and_h450_face/sBmHrO5Tn27Ot5hy0yAKniROmNb.jpg" },
-    { name: "Song Hye-kyo", role: "Vinh Quang Trong Hận Thù", image: "https://image.tmdb.org/t/p/w300_and_h450_face/3qUaQG8W0lP9S6p2f3B0h9R6N5.jpg" },
-    { name: "Park Seo-joon", role: "Tầng Lớp Itaewon", image: "https://image.tmdb.org/t/p/w300_and_h450_face/96Y63pUf2bE486V02r2K5c0kFf3.jpg" },
-    { name: "Han So-hee", role: "Dẫu Biết", image: "https://image.tmdb.org/t/p/w300_and_h450_face/6LPr0Bov63jS5s6Dk5W6F8G2Y1.jpg" },
-    { name: "Lee Min-ho", role: "Quân Vương Bất Diệt", image: "https://image.tmdb.org/t/p/w300_and_h450_face/6LPr0Bov63jS5s6Dk5W6F8G2Y1.jpg" },
+    { name: "Kim Ji-won", role: "Nữ Hoàng Nước Mắt", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/lX7W1j9kg4jV6XNn5XEE3rKsd3x.jpg" },
+    { name: "Ji Chang-wook", role: "Chào mừng tới Samdal-ri", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/sBmHrO5Tn27Ot5hy0yAKniROmNb.jpg" },
+    { name: "Song Hye-kyo", role: "Vinh Quang Trong Hận Thù", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/3qUaQG8W0lP9S6p2f3B0h9R6N5.jpg" },
+    { name: "Park Seo-joon", role: "Tầng Lớp Itaewon", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/k1ALgZkOApYt7PIUBkUitmknXQC.jpg" },
+    { name: "Han So-hee", role: "Dẫu Biết", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/8IvEOnqMjqJWcci3z44haH38Ee8.jpg" },
+    { name: "Lee Min-ho", role: "Quân Vương Bất Diệt", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/iqopuz6cKuRZRUPZQrj7lFZcWWb.jpg" },
 ];
 
 async function PhimHanHome() {
