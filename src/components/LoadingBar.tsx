@@ -10,34 +10,37 @@ export default function LoadingBar() {
     const [progress, setProgress] = useState(0);
 
     useEffect(() => {
-        const handleStart = () => {
+        let timer: NodeJS.Timeout;
+        const startLoading = () => {
             setLoading(true);
-            setProgress(10);
-        };
-        const handleComplete = () => {
-            setProgress(100);
+            setProgress(0);
+            
+            // Artificial progress steps
+            timer = setInterval(() => {
+                setProgress(prev => {
+                    if (prev >= 95) {
+                        clearInterval(timer);
+                        return 95;
+                    }
+                    const diff = Math.random() * 10;
+                    return prev + diff;
+                });
+            }, 100);
+
+            // Complete after a short delay (simulating load)
             setTimeout(() => {
-                setLoading(false);
-                setProgress(0);
-            }, 300);
+                setProgress(100);
+                setTimeout(() => {
+                    setLoading(false);
+                    setProgress(0);
+                }, 400);
+            }, 500);
         };
 
-        handleStart();
-        // Since Next.js doesn't have native route change events in App Router for Link clicks easily, 
-        // we trigger this effect on pathname/searchParams change.
-        // For a more "Onflix" feel, we simulate a fast progress.
-        const timer = setInterval(() => {
-            setProgress(prev => {
-                if (prev >= 90) {
-                    clearInterval(timer);
-                    return 90;
-                }
-                return prev + 10;
-            });
-        }, 100);
-
-        handleComplete();
-        return () => clearInterval(timer);
+        startLoading();
+        return () => {
+            if (timer) clearInterval(timer);
+        };
     }, [pathname, searchParams]);
 
     if (!loading) return null;
