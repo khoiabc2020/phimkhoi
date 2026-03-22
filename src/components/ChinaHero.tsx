@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Play, Info, Star, Calendar, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, Info, Star, Calendar, Clock, Bookmark } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
