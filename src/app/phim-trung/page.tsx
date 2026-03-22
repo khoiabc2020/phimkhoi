@@ -3,12 +3,13 @@ import ChinaHero from "@/components/ChinaHero";
 import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
-import { getMoviesByCategory, getMenuData, getMoviesByCountry, Movie } from "@/services/api";
+import { getMoviesByCategory, getMenuData, getMoviesByCountry, Movie, getMovieDetail } from "@/services/api";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import MovieRow from "@/components/MovieRow";
 import ActorRow from "@/components/ActorRow";
+import { cn } from "@/lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
     const { countries } = await getMenuData();
@@ -93,6 +94,30 @@ async function CountryGridStream({ slug, page }: { slug: string; page: number })
     );
 }
 
+async function ChinaHeroWithData() {
+    const HERO_SLUGS = [
+        "bach-nguyet-phan-tinh",
+        "bui-hoa-hong",
+        "dai-mong-quy-ly",
+        "giang-ho-da-vu-thap-nien-dang",
+        "mac-nhan-tang-kieu",
+        "ngoc-minh-tra-cot",
+        "con-ra-the-thong-gi-nua",
+        "truc-ngoc",
+        "xin-chao-1983",
+        "duong-cung-ky-an-thanh-vu-phong-minh"
+    ];
+
+    const movieDetails = await Promise.all(
+        HERO_SLUGS.map(async (slug) => {
+            const data = await getMovieDetail(slug);
+            return data?.movie || null;
+        })
+    );
+
+    return <ChinaHero initialMovies={movieDetails.filter(Boolean)} />;
+}
+
 export default async function PhimTrungPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
     const sParams = await searchParams;
     const currentPage = Number(sParams.page) || 1;
@@ -105,9 +130,17 @@ export default async function PhimTrungPage({ searchParams }: { searchParams: Pr
     return (
         <main className="min-h-screen pb-20 bg-[#000000]">
             {/* Immersive Hero Section - Flush to Top */}
-            {currentPage === 1 && <ChinaHero />}
+            {currentPage === 1 && (
+                <Suspense fallback={<div className="h-[750px] bg-black animate-pulse" />}>
+                    <ChinaHeroWithData />
+                </Suspense>
+            )}
 
-            <div className={currentPage === 1 ? "relative z-10" : "pt-24 relative z-10"}>
+            <div className={cn(
+                "relative z-10",
+                currentPage === 1 ? "" : "pt-24",
+                "lg:pl-20" // Clear sidebar space
+            )}>
                 {/* Decorative background glow */}
                 <div className="absolute top-0 left-0 right-0 h-[400px] bg-gradient-to-b from-[#0e1621] via-transparent to-transparent pointer-events-none -z-10 blur-[120px]" />
 
@@ -150,3 +183,4 @@ export default async function PhimTrungPage({ searchParams }: { searchParams: Pr
         </main>
     );
 }
+```
