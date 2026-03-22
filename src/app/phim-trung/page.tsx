@@ -137,7 +137,7 @@ export default async function PhimTrungPage({ searchParams }: { searchParams: Pr
             )}
 
             <div className={cn(
-                "relative z-10",
+                "relative z-50",
                 currentPage === 1 ? "" : "pt-24",
                 "lg:pl-20" // Clear sidebar space
             )}>

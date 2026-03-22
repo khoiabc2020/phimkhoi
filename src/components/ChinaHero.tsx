@@ -24,18 +24,19 @@ const ASSETS_MAP: Record<string, MovieSlideAssets> = {
         bg: "/images/china-hero/bui-hoa-hong-bg.webp?v=1.6",
         actor: "/images/china-hero/bui-hoa-hong-actor.webp?v=1.6",
         logo: "/images/china-hero/bui-hoa-hong-logo.webp?v=1.6",
-        actorScale: 1.1,
+        actorScale: 1.05,
     },
     "dai-mong-quy-ly": {
         bg: "/images/china-hero/dai-mong-bg.webp?v=1.6",
         actor: "/images/china-hero/dai-mong-actor.webp?v=1.6",
         logo: "/images/china-hero/dai-mong-logo.webp?v=1.6",
+        actorScale: 0.95,
     },
     "giang-ho-da-vu-thap-nien-dang": {
         bg: "/images/china-hero/giang-ho-bg.webp?v=1.6",
         actor: "/images/china-hero/giang-ho-actor.webp?v=1.6",
         logo: "/images/china-hero/giang-ho-logo.png?v=1.6",
-        actorScale: 1.25,
+        actorScale: 1.15,
     },
     "mac-nhan-tang-kieu": {
         bg: "/images/china-hero/mac-nhan-bg.webp?v=1.6",
