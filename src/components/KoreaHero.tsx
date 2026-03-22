@@ -12,38 +12,44 @@ interface MovieSlideAssets {
     actor: string;
     logo: string;
     actorScale?: number;
+    actorTranslateY?: string;
 }
 
 const ASSETS_MAP: Record<string, MovieSlideAssets> = {
     "nghe-thuat-lua-doi-cua-sarah": {
-        bg: "/images/korea-hero/nghe-thuat-lua-doi-cua-sarah-bg.webp?v=1.6",
-        actor: "/images/korea-hero/nghe-thuat-lua-doi-cua-sarah-actor.webp?v=1.6",
-        logo: "/images/korea-hero/nghe-thuat-lua-doi-cua-sarah-logo.webp?v=1.6",
-        actorScale: 0.95
+        bg: "/images/korea-hero/nghe-thuat-lua-doi-cua-sarah-bg.webp?v=1.7",
+        actor: "/images/korea-hero/nghe-thuat-lua-doi-cua-sarah-actor.webp?v=1.7",
+        logo: "/images/korea-hero/nghe-thuat-lua-doi-cua-sarah-logo.webp?v=1.7",
+        actorScale: 0.82,     // Thu bé lại 1 chút
+        actorTranslateY: "-5%" // Đẩy lên cao hơn 1 chút
     },
     "khi-cuoc-doi-cho-ban-qua-quyt": {
-        bg: "/images/korea-hero/khi-cuoc-doi-cho-ban-qua-quyt-bg.webp?v=1.6",
-        actor: "/images/korea-hero/khi-cuoc-doi-cho-ban-qua-quyt-actor.png?v=1.6",
-        logo: "/images/korea-hero/khi-cuoc-doi-cho-ban-qua-quyt-logo.png?v=1.6",
-        actorScale: 1.05
+        bg: "/images/korea-hero/khi-cuoc-doi-cho-ban-qua-quyt-bg.webp?v=1.7",
+        actor: "/images/korea-hero/khi-cuoc-doi-cho-ban-qua-quyt-actor.png?v=1.7",
+        logo: "/images/korea-hero/khi-cuoc-doi-cho-ban-qua-quyt-logo.png?v=1.7",
+        actorScale: 1.05,
+        actorTranslateY: "-10%" // Đẩy lên cao nhất để che phần chân lỗi (user đã cắt)
     },
     "tieng-yeu-nay-anh-dich-duoc-khong": {
-        bg: "/images/korea-hero/tieng-yeu-nay-anh-dich-duoc-khong-bg.png?v=1.6",
-        actor: "/images/korea-hero/tieng-yeu-nay-anh-dich-duoc-khong-actor.png?v=1.6",
-        logo: "/images/korea-hero/tieng-yeu-nay-anh-dich-duoc-khong-logo.webp?v=1.6",
-        actorScale: 1.15
+        bg: "/images/korea-hero/tieng-yeu-nay-anh-dich-duoc-khong-bg.png?v=1.7",
+        actor: "/images/korea-hero/tieng-yeu-nay-anh-dich-duoc-khong-actor.png?v=1.7",
+        logo: "/images/korea-hero/tieng-yeu-nay-anh-dich-duoc-khong-logo.webp?v=1.7",
+        actorScale: 1.25,     // To hơn chút
+        actorTranslateY: "-15%" // Đẩy lên cao hẳn trên background cho đẹp
     },
     "ban-trai-theo-yeu-cau": {
-        bg: "/images/korea-hero/ban-trai-theo-yeu-cau-bg.webp?v=1.6",
-        actor: "/images/korea-hero/ban-trai-theo-yeu-cau-actor.webp?v=1.6",
-        logo: "/images/korea-hero/ban-trai-theo-yeu-cau-logo.webp?v=1.6",
-        actorScale: 1.1
+        bg: "/images/korea-hero/ban-trai-theo-yeu-cau-bg.webp?v=1.7",
+        actor: "/images/korea-hero/ban-trai-theo-yeu-cau-actor.webp?v=1.7",
+        logo: "/images/korea-hero/ban-trai-theo-yeu-cau-logo.webp?v=1.7",
+        actorScale: 1.35,     // To hơn chút (yêu cầu phim 4)
+        actorTranslateY: "-8%"  // Đẩy lên
     },
     "trao-em-ca-vu-tru": {
-        bg: "/images/korea-hero/trao-em-ca-vu-tru-bg.webp?v=1.6",
-        actor: "/images/korea-hero/trao-em-ca-vu-tru-actor.webp?v=1.6",
-        logo: "/images/korea-hero/trao-em-ca-vu-tru-logo.png?v=1.6",
-        actorScale: 1.0
+        bg: "/images/korea-hero/trao-em-ca-vu-tru-bg.webp?v=1.7",
+        actor: "/images/korea-hero/trao-em-ca-vu-tru-actor.webp?v=1.7",
+        logo: "/images/korea-hero/trao-em-ca-vu-tru-logo.png?v=1.7",
+        actorScale: 1.15,     // To hơn chút (yêu cầu phim 5)
+        actorTranslateY: "-12%" // Đẩy lên (yêu cầu phim 5)
     }
 };
 
@@ -63,7 +69,8 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                 bg: movie.thumb_url || movie.poster_url,
                 actor: "",
                 logo: "",
-                actorScale: 0.85
+                actorScale: 0.85,
+                actorTranslateY: "0%"
             };
             
             return {
@@ -156,6 +163,10 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                                     alt="Characters"
                                     fill
                                     className="object-contain object-right-bottom drop-shadow-[0_25px_50px_rgba(0,0,0,0.9)]"
+                                    style={{ 
+                                        transform: `scale(${currentMovie.actorScale || 0.85}) translateY(${currentMovie.actorTranslateY || "0%"})`,
+                                        transformOrigin: "bottom right" 
+                                    }}
                                     priority
                                     quality={95}
                                 />
