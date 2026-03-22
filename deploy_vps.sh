@@ -7,9 +7,10 @@ REPO_URL="https://github.com/khoiabc2020/phimkhoi.git"
 
 echo "Deploying PhimKhoi (CLEAN BUILD) to VPS..."
 
-# 1. STOP APP TO FREE RAM
+# 1. STOP APP TO FREE RAM & PREPARE CACHE
 echo "Stopping PM2 to free RAM for build..."
 npx pm2 stop phimkhoi || true
+mkdir -p /home/bitnami/phimkhoi-img-cache
 
 # 2. UPDATE SOURCE
 if [ -d "$APP_DIR" ]; then
@@ -31,8 +32,8 @@ rm -rf .next node_modules 2>/dev/null || true
 echo "Installing dependencies..."
 npm install --legacy-peer-deps
 
-echo "Building application (Limit: 1280MB)..."
-export NODE_OPTIONS="--max_old_space_size=1280"
+echo "Building application (Limit: 1536MB)..."
+export NODE_OPTIONS="--max_old_space_size=1536"
 npm run build
 
 if [ $? -eq 0 ]; then

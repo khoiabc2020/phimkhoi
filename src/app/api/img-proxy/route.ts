@@ -4,7 +4,10 @@ import path from 'path';
 import crypto from 'crypto';
 
 // Persistent Disk Cache Configuration
-const CACHE_DIR = path.join(process.cwd(), '.next', 'cache', 'proxy-images');
+// Persistent Disk Cache Configuration - Use absolute path on VPS for stability
+const CACHE_DIR = process.env.NODE_ENV === 'production' 
+    ? '/home/bitnami/phimkhoi-img-cache' 
+    : path.join(process.cwd(), '.next', 'cache', 'proxy-images');
 
 async function ensureCacheDir() {
     try {
