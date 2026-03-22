@@ -129,6 +129,8 @@ export default async function PhimTrungPage({ searchParams }: { searchParams: Pr
                             </div>
                         </div>
 
+                        <Suspense key={`${slug}-${currentPage}`} fallback={<div className="px-12 grid grid-cols-7 gap-4">{Array.from({length: 14}).map((_, i) => <div key={i} className="aspect-[2/3] bg-white/5 animate-pulse rounded-lg"/>)}</div>}>
+                            <CountryGridStream slug={slug} page={currentPage} />
                         </Suspense>
                     </div>
                 )}
