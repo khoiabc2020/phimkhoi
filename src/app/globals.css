@@ -148,7 +148,6 @@ html {
 }
 
 body {
-  /* Đồng bộ với body::before — một tông duy nhất */
   background-color: #000000;
   color: var(--foreground);
   font-family: var(--font-sans);
@@ -157,17 +156,22 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Promote to GPU compositing layer */
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: none;
   overflow-x: hidden;
+  /* Reduced paint overhead */
+  text-rendering: optimizeLegibility;
 }
 
-/* Performance: Content Visibility for heavy rows */
+/* Performance: Content Visibility & Layout Stability */
 .movie-row-section {
   content-visibility: auto;
-  contain-intrinsic-size: 1px 400px;
+  contain: layout paint;
 }
+/* Specific intrinsic sizes for common rows to prevent jumps */
+.movie-row-standard { contain-intrinsic-size: 1px 320px; }
+.movie-row-landscape { contain-intrinsic-size: 1px 240px; }
+.movie-row-hero { contain-intrinsic-size: 1px 600px; }
 
 /* System-wide Typography Refinement: thinner weights */
 h1, h2, h3, h4, h5, h6, .font-bold {

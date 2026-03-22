@@ -1,27 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
+import fs from 'fs/promises';
+import path from 'path';
+import crypto from 'crypto';
 
-// In-memory image URL → data cache (server-side, 4h TTL)
-// Giúp VPS cache ảnh và serve nhanh hơn CDN nước ngoài
-const cache = new Map<string, { blob: Blob; contentType: string; cachedAt: number }>();
-const CACHE_TTL = 4 * 60 * 60 * 1000; // 4h
-const MAX_CACHE_SIZE = 300;
+// Persistent Disk Cache Configuration
+const CACHE_DIR = path.join(process.cwd(), '.next', 'cache', 'proxy-images');
 
-function cleanCache() {
-    if (cache.size <= MAX_CACHE_SIZE) return;
-    const now = Date.now();
-    for (const [key, val] of cache.entries()) {
-        if (now - val.cachedAt > CACHE_TTL) cache.delete(key);
-    }
-    if (cache.size > MAX_CACHE_SIZE) {
-        const oldest = [...cache.keys()].slice(0, 100);
-        oldest.forEach(k => cache.delete(k));
+async function ensureCacheDir() {
+    try {
+        await fs.access(CACHE_DIR);
+    } catch {
+        await fs.mkdir(CACHE_DIR, { recursive: true });
     }
 }
+
+// Memory fallback to avoid hitting disk too often for the same session
+const memoryCache = new Map<string, { contentType: string; buffer: Buffer }>();
 
 const ALLOWED_DOMAINS = [
     'phimimg.com', 'ophim17.cc', 'ophim1.com', 'kkphim.vip',
     'img.phimapi.com', 'image.tmdb.org', 'phim.nguonc.com',
-    'cdn.kkphim.vip', 'i.imgur.com',
+    'cdn.kkphim.vip', 'i.imgur.com', 'static.phimapi.com'
 ];
 
 export async function GET(req: NextRequest) {
@@ -36,19 +35,46 @@ export async function GET(req: NextRequest) {
         return NextResponse.redirect(url, 302);
     }
 
-    // Serve từ cache nếu còn mới
-    const cached = cache.get(url);
-    if (cached && Date.now() - cached.cachedAt < CACHE_TTL) {
-        const text = await cached.blob.arrayBuffer();
-        return new Response(text, {
+    // 1. Generate unique hash for the URL
+    const hash = crypto.createHash('md5').update(url).digest('hex');
+    const ext = path.extname(new URL(url).pathname) || '.jpg';
+    const cachePath = path.join(CACHE_DIR, `${hash}${ext}`);
+
+    // 2. Check Memory Cache First (Fastest)
+    if (memoryCache.has(url)) {
+        const { contentType, buffer } = memoryCache.get(url)!;
+        return new Response(buffer, {
             headers: {
-                'Content-Type': cached.contentType,
-                'Cache-Control': 'public, max-age=14400, stale-while-revalidate=86400',
-                'X-Cache': 'HIT',
+                'Content-Type': contentType,
+                'Cache-Control': 'public, max-age=31536000, immutable',
+                'X-Cache-Status': 'MEMORY-HIT',
             },
         });
     }
 
+    // 3. Check Disk Cache
+    try {
+        await ensureCacheDir();
+        const stats = await fs.stat(cachePath);
+        // Only use disk cache if it's less than 7 days old
+        if (Date.now() - stats.mtimeMs < 7 * 24 * 60 * 60 * 1000) {
+            const buffer = await fs.readFile(cachePath);
+            const contentType = buffer[0] === 0xff && buffer[1] === 0xd8 ? 'image/jpeg' : 'image/webp';
+            
+            memoryCache.set(url, { contentType, buffer });
+            return new Response(buffer, {
+                headers: {
+                    'Content-Type': contentType,
+                    'Cache-Control': 'public, max-age=31536000, immutable',
+                    'X-Cache-Status': 'DISK-HIT',
+                },
+            });
+        }
+    } catch {
+        // Not in disk cache, proceed to fetch
+    }
+
+    // 4. Fetch from Upstream
     try {
         const upstream = await fetch(url, {
             headers: {
@@ -56,25 +82,28 @@ export async function GET(req: NextRequest) {
                 'Referer': 'https://phimapi.com/',
                 'Accept': 'image/webp,image/avif,image/*,*/*',
             },
-            signal: AbortSignal.timeout(7000),
+            signal: AbortSignal.timeout(10000),
         });
 
-        if (!upstream.ok) {
-            return NextResponse.redirect(url, 302);
-        }
+        if (!upstream.ok) return NextResponse.redirect(url, 302);
 
         const contentType = upstream.headers.get('content-type') || 'image/jpeg';
-        const blob = await upstream.blob();
-        const arrayBuffer = await blob.arrayBuffer();
+        const arrayBuffer = await upstream.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
 
-        cleanCache();
-        cache.set(url, { blob, contentType, cachedAt: Date.now() });
+        // 5. Save to Disk & Memory for future requests
+        try {
+            await fs.writeFile(cachePath, buffer);
+            memoryCache.set(url, { contentType, buffer });
+        } catch (e) {
+            console.error("Failed to write image cache:", e);
+        }
 
-        return new Response(arrayBuffer, {
+        return new Response(buffer, {
             headers: {
                 'Content-Type': contentType,
-                'Cache-Control': 'public, max-age=14400, stale-while-revalidate=86400',
-                'X-Cache': 'MISS',
+                'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400',
+                'X-Cache-Status': 'MISS',
             },
         });
     } catch {

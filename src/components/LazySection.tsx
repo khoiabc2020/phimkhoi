@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 interface LazySectionProps {
     children: ReactNode;
@@ -13,6 +14,7 @@ interface LazySectionProps {
      * Tăng lên 1500px để render sớm hơn, tránh giật lag khi đang cuộn trang.
      */
     rootMargin?: string;
+    className?: string;
 }
 
 /**
@@ -23,6 +25,7 @@ export default function LazySection({
     children,
     minHeight = 320,
     rootMargin = "1500px",
+    className = "",
 }: LazySectionProps) {
     const [visible, setVisible] = useState(false);
     const containerRef = useRef<HTMLDivElement | null>(null);
@@ -31,11 +34,7 @@ export default function LazySection({
         if (visible) return;
         const el = containerRef.current;
         if (!el) return;
-        if (typeof window === "undefined" || typeof IntersectionObserver === "undefined") {
-            setVisible(true);
-            return;
-        }
-
+        
         const observer = new IntersectionObserver(
             (entries) => {
                 const entry = entries[0];
@@ -52,17 +51,18 @@ export default function LazySection({
         );
 
         observer.observe(el);
-
-        return () => {
-            observer.disconnect();
-        };
+        return () => observer.disconnect();
     }, [rootMargin, visible]);
 
     return (
         <div
             ref={containerRef}
-            style={visible ? undefined : { minHeight, contain: "layout size" }}
-            className={visible ? "animate-slide-up" : ""}
+            style={visible ? undefined : { minHeight }}
+            className={cn(
+                "movie-row-section transform-gpu",
+                visible ? "animate-fade-in" : "pb-8 invisible-until-intersect",
+                className
+            )}
         >
             {visible ? children : null}
         </div>

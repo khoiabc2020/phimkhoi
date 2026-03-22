@@ -22,10 +22,26 @@ function ContinueWatchingRowInner() {
     const rowRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
 
+    const CACHE_KEY = "phimkhoi_continue_watching";
+
     useEffect(() => {
         if (!session) {
             setLoading(false);
             return;
+        }
+
+        // 1. Hydrate from LocalStorage for "Instant" feel
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+            try {
+                const parsed = JSON.parse(cached);
+                if (Array.isArray(parsed)) {
+                    setMovies(parsed);
+                    setLoading(false); // Immediate display if we have cache
+                }
+            } catch (e) {
+                console.error("Failed to parse history cache");
+            }
         }
 
         let cancelled = false;
@@ -38,6 +54,8 @@ function ContinueWatchingRowInner() {
                 const data = await res.json();
                 if (!cancelled && data?.success && Array.isArray(data.data)) {
                     setMovies(data.data);
+                    // 2. Sync back to LocalStorage
+                    localStorage.setItem(CACHE_KEY, JSON.stringify(data.data));
                 }
             } catch (error) {
                 console.error("Failed to fetch continue watching:", error);
@@ -47,8 +65,8 @@ function ContinueWatchingRowInner() {
         };
 
         fetchData();
-        // Poll để đồng bộ realtime (web nhận update từ app sau vài giây)
-        interval = setInterval(fetchData, 10000);
+        // Poll for realtime sync (web receives app updates after a few seconds)
+        interval = setInterval(fetchData, 15000);
 
         const onVis = () => {
             if (document.visibilityState === "visible") fetchData();

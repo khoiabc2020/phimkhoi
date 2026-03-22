@@ -2,6 +2,7 @@
 
 import { BookmarkPlus, BookmarkCheck, Loader2 } from "lucide-react";
 import { useWatchlist } from "@/context/WatchlistContext";
+import { useToast } from "@/context/ToastContext";
 
 interface WatchlistButtonProps {
     slug: string;
@@ -12,6 +13,7 @@ interface WatchlistButtonProps {
 
 export default function WatchlistButton({ slug, className = "", showLabel = false, label = "Xem sau" }: WatchlistButtonProps) {
     const { isInWatchlist, addToWatchlist, removeFromWatchlist, isLoaded } = useWatchlist();
+    const { showToast } = useToast();
     const inWatchlist = isInWatchlist(slug);
 
     const handleToggle = async (e: React.MouseEvent) => {
@@ -19,9 +21,19 @@ export default function WatchlistButton({ slug, className = "", showLabel = fals
         e.stopPropagation();
 
         if (inWatchlist) {
-            removeFromWatchlist(slug);
+            await removeFromWatchlist(slug);
+            showToast({
+                type: "success",
+                title: "Đã xóa khỏi Xem Sau",
+                description: "Danh sách của bạn đã được cập nhật.",
+            });
         } else {
-            addToWatchlist(slug);
+            await addToWatchlist(slug);
+            showToast({
+                type: "watchlist",
+                title: label || "Phim đã được lưu",
+                description: "Đã thêm vào Danh Sách Xem Sau",
+            });
         }
     };
 

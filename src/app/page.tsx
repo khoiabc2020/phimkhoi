@@ -171,7 +171,7 @@ async function HomeRowSection({
   if (!movies.length) return null;
 
   return (
-    <LazySection minHeight={minHeight}>
+    <LazySection minHeight={minHeight} className="movie-row-standard">
       <MovieRow
         title={title}
         movies={movies}
@@ -235,15 +235,15 @@ export default function Home() {
         </div>
 
         {/* Top Trending - Tải độc lập */}
-        <LazySection minHeight={280}>
-          <Suspense fallback={<div className="h-[260px] bg-white/5 rounded-lg animate-pulse mx-4" />}>
+        <LazySection minHeight={280} className="movie-row-landscape">
+          <Suspense fallback={<div className="h-[280px] bg-white/5 rounded-lg animate-pulse mx-4" />}>
             <AsyncTopTrendingHub />
           </Suspense>
         </LazySection>
 
         <div className="space-y-4 md:space-y-8">
           {/* Hàng phim tiếp diễn - Client Side nhẹ nhàng */}
-          <LazySection minHeight={200}>
+          <LazySection minHeight={200} className="movie-row-landscape">
             <ContinueWatchingRow />
           </LazySection>
 

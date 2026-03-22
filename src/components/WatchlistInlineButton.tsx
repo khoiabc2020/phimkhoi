@@ -45,30 +45,20 @@ export default function WatchlistInlineButton({
 
         startTransition(async () => {
             if (inWatchlist) {
-                removeLocal(slug);
-                const result = await removeFromWatchlist(slug);
-                if (!result.success) {
-                    addLocal(slug); // rollback
-                } else {
-                    showToast({
-                        type: "success",
-                        title: "Đã xóa khỏi Xem Sau",
-                        description: movieName,
-                    });
-                }
+                await removeLocal(slug);
+                showToast({
+                    type: "success",
+                    title: "Đã xóa khỏi Xem Sau",
+                    description: movieName,
+                });
             } else {
-                addLocal(slug);
-                const result = await addToWatchlist(slug);
-                if (!result.success) {
-                    removeLocal(slug); // rollback
-                } else {
-                    showToast({
-                        type: "watchlist",
-                        title: movieName || "Phim đã được lưu",
-                        description: "Đã thêm vào Danh Sách Xem Sau",
-                        poster: moviePoster,
-                    });
-                }
+                await addLocal(slug);
+                showToast({
+                    type: "watchlist",
+                    title: movieName || "Phim đã được lưu",
+                    description: "Đã thêm vào Danh Sách Xem Sau",
+                    poster: moviePoster,
+                });
             }
         });
     };

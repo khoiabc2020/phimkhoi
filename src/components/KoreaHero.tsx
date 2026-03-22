@@ -112,24 +112,27 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
 
     if (slides.length === 0) return null;
 
-    const currentMovie = slides[current];
+    const slideEase = [0.22, 1, 0.36, 1];
 
     return (
-        <section className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] xl:h-[800px] overflow-hidden bg-black">
-            <AnimatePresence mode="popLayout">
+        <section 
+            className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] xl:h-[800px] overflow-hidden bg-black"
+            style={{ contain: "layout style paint" }}
+        >
+            <AnimatePresence mode="popLayout" initial={false}>
                 <motion.div
                     key={current}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 1.2, ease: "easeInOut" }}
+                    transition={{ duration: 0.8, ease: "easeInOut" }}
                     className="absolute inset-0"
                 >
                     {/* Layer 1: Background Parallax */}
                     <motion.div 
-                        initial={{ scale: 1.05 }}
+                        initial={{ scale: 1.03 }}
                         animate={{ scale: 1 }}
-                        transition={{ duration: 10, ease: "linear" }}
+                        transition={{ duration: 8, ease: "linear" }}
                         className="absolute inset-0 z-0"
                     >
                         <Image 
@@ -153,9 +156,9 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                     {currentMovie.actor && (
                         <div className="absolute inset-0 z-20 pointer-events-none flex items-end justify-end overflow-hidden">
                             <motion.div
-                                initial={{ x: 60, opacity: 0, scale: (currentMovie.actorScale || 0.85) + 0.1 }}
+                                initial={{ x: 40, opacity: 0, scale: (currentMovie.actorScale || 0.85) + 0.05 }}
                                 animate={{ x: 0, opacity: 0.9, scale: currentMovie.actorScale || 0.85 }}
-                                transition={{ delay: 0.2, duration: 1.5, ease: "easeOut" }}
+                                transition={{ delay: 0.1, duration: 1.2, ease: slideEase }}
                                 className="relative w-[70%] h-[80%] md:w-[60%] md:h-[90%] lg:w-[45%] lg:h-[100%] mr-[5%] md:mr-[8%] lg:mr-[12%]"
                             >
                                 <Image 
@@ -182,7 +185,7 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                             <motion.div
                                 initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
-                                transition={{ delay: 0.3, duration: 0.8 }}
+                                transition={{ delay: 0.2, duration: 0.8, ease: slideEase }}
                                 className="relative w-full max-w-[200px] sm:max-w-[280px] md:max-w-[420px] lg:max-w-[480px] aspect-[4/1.5]"
                             >
                                 {currentMovie.logo ? (

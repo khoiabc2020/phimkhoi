@@ -165,11 +165,11 @@ function MovieCard({
         <>
             <div
                 ref={cardRef}
-                className="relative block h-full w-full cursor-pointer z-10 group/static-card hover:z-20"
+                className="relative block h-full w-full cursor-pointer z-10 group/static-card hover:z-20 transform-gpu"
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
-                <div className={`relative ${orientation === 'landscape' ? 'aspect-video' : 'aspect-[2/3]'} rounded-[10px] overflow-hidden bg-[#0b101a] ring-1 ring-white/5 group-hover/static-card:ring-2 group-hover/static-card:ring-[#8FA7C5]/60 transition-all duration-300 shadow-lg`}>
+                <div className={`relative ${orientation === 'landscape' ? 'aspect-video' : 'aspect-[2/3]'} rounded-[10px] overflow-hidden bg-[#0b101a] ring-1 ring-white/5 group-hover/static-card:ring-2 group-hover/static-card:ring-[#8FA7C5]/60 transition-all duration-300 shadow-lg will-change-transform`}>
                     <Link href={`/phim/${movie.slug}`} className="block h-full w-full absolute inset-0 z-0">
                         <Image
                             src={activePosterSrc || "/placeholder.svg"}
@@ -310,9 +310,9 @@ function OnflixHoverCard({
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
         >
-            <div className="relative animate-in fade-in zoom-in-95 duration-150 ease-out origin-top">
+            <div className="relative animate-in fade-in zoom-in-95 duration-150 ease-out origin-top transition-transform">
                 {/* Card */}
-                <div className="relative overflow-hidden rounded-[10px] border border-white/[0.08] bg-[#0c1018]/95 shadow-[0_12px_30px_#00000080]">
+                <div className="relative overflow-hidden rounded-[10px] border border-white/[0.08] bg-[#0c1018]/98 shadow-[0_12px_30px_#000000a0]">
 
                     {/* Overlay media — taller and less cropped so faces are easier to see */}
                     <div className="relative aspect-[16/8.6] w-full overflow-hidden bg-[#1a1a1a]">

@@ -47,17 +47,57 @@ export function WatchlistProvider({ children }: { children: ReactNode }) {
 
     const isInWatchlist = useCallback((slug: string) => watchlistSlugs.has(slug), [watchlistSlugs]);
 
-    const addToWatchlist = useCallback((slug: string) => {
+    const addToWatchlist = useCallback(async (slug: string) => {
+        if (!session?.user) return;
+        
+        // Optimistic update
         setWatchlistSlugs((prev) => new Set([...prev, slug]));
-    }, []);
 
-    const removeFromWatchlist = useCallback((slug: string) => {
+        try {
+            const res = await fetch("/api/user/watchlist", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ slug, action: "add" }),
+            });
+            if (!res.ok) throw new Error("Failed to add to watchlist");
+            const data = await res.json();
+            if (data.slugs) setWatchlistSlugs(new Set(data.slugs));
+        } catch (error) {
+            console.error("addToWatchlist error:", error);
+            // Rollback on error
+            setWatchlistSlugs((prev) => {
+                const next = new Set(prev);
+                next.delete(slug);
+                return next;
+            });
+        }
+    }, [session?.user]);
+
+    const removeFromWatchlist = useCallback(async (slug: string) => {
+        if (!session?.user) return;
+
+        // Optimistic update
         setWatchlistSlugs((prev) => {
             const next = new Set(prev);
             next.delete(slug);
             return next;
         });
-    }, []);
+
+        try {
+            const res = await fetch("/api/user/watchlist", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ slug, action: "remove" }),
+            });
+            if (!res.ok) throw new Error("Failed to remove from watchlist");
+            const data = await res.json();
+            if (data.slugs) setWatchlistSlugs(new Set(data.slugs));
+        } catch (error) {
+            console.error("removeFromWatchlist error:", error);
+            // Rollback on error
+            setWatchlistSlugs((prev) => new Set([...prev, slug]));
+        }
+    }, [session?.user]);
 
     return (
         <WatchlistContext.Provider value={{ watchlistSlugs, isInWatchlist, addToWatchlist, removeFromWatchlist, isLoaded }}>

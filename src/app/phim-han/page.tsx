@@ -9,6 +9,7 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import MovieRow from "@/components/MovieRow";
 import ActorRow from "@/components/ActorRow";
+import LazySection from "@/components/LazySection";
 import { cn } from "@/lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -45,32 +46,42 @@ async function PhimHanHome() {
 
     return (
         <div className="space-y-12 md:space-y-16 pb-12">
-            <div style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}>
+            <LazySection minHeight={380} className="movie-row-standard">
                 <MovieRow title="Phim Đang Chiếu" movies={latest.items} slug="/quoc-gia/han-quoc" priorityFirst />
-            </div>
+            </LazySection>
             
-            <div style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}>
+            <LazySection minHeight={380} className="movie-row-standard">
                 <MovieRow title="Phim Tình Cảm" movies={filterKorea(romance.items)} slug="/the-loai/tinh-cam" />
-            </div>
+            </LazySection>
             
-            <div style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}>
+            <LazySection minHeight={380} className="movie-row-standard">
                 <MovieRow title="Phim Hành Động" movies={filterKorea(action.items)} slug="/the-loai/hanh-dong" />
-            </div>
+            </LazySection>
 
-            <div style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}>
+            <LazySection minHeight={380} className="movie-row-standard">
                 <MovieRow title="Phim Cổ Trang" movies={filterKorea(historical.items)} slug="/the-loai/co-trang" />
-            </div>
+            </LazySection>
 
-            <div style={{ contentVisibility: 'auto', containIntrinsicSize: '0 200px' }}>
+            <LazySection minHeight={200} className="movie-row-landscape">
                 <ActorRow title="Diễn viên nổi bật" actors={FEATURED_ACTORS} />
-            </div>
+            </LazySection>
 
-            <div style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}>
+            <LazySection minHeight={380} className="movie-row-standard">
                 <MovieRow title="Phim Hoạt Hình" movies={filterKorea(animation.items)} slug="/the-loai/hoat-hinh" />
-            </div>
+            </LazySection>
             
-            <div style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}>
+            <LazySection minHeight={380} className="movie-row-standard">
                 <MovieRow title="Phim Hình Sự" movies={filterKorea(crime.items)} slug="/the-loai/hinh-su" />
+            </LazySection>
+
+            {/* View All Button */}
+            <div className="flex justify-center pt-8">
+                <Link 
+                    href="/phim-han?page=1"
+                    className="px-8 py-3 bg-white/10 hover:bg-white/20 border border-white/10 rounded-full text-white font-bold transition-all hover:scale-105 active:scale-95"
+                >
+                    Xem tất cả phim
+                </Link>
             </div>
         </div>
     );
@@ -132,7 +143,7 @@ export default async function PhimHanPage({ searchParams }: { searchParams: Prom
         <main className="min-h-screen pb-20 bg-[#000000]">
             {/* Immersive Hero Section - Flush to Top */}
             {currentPage === 1 && (
-                <Suspense fallback={<div className="h-[750px] bg-black animate-pulse" />}>
+                <Suspense fallback={<div className="h-[500px] md:h-[600px] lg:h-[700px] xl:h-[800px] bg-black/50 animate-pulse" />}>
                     <KoreaHeroWithData />
                 </Suspense>
             )}

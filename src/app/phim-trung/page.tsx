@@ -9,6 +9,7 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import MovieRow from "@/components/MovieRow";
 import ActorRow from "@/components/ActorRow";
+import LazySection from "@/components/LazySection";
 import { cn } from "@/lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -39,11 +40,13 @@ const FEATURED_ACTORS = [
 
 async function PhimTrungHome() {
     // Fetch multiple categories for China
-    const [latest, romance, action, historical] = await Promise.all([
+    const [latest, romance, action, historical, animation, crime] = await Promise.all([
         getMoviesByCountry("trung-quoc", 1, 14),
         getMoviesByCategory("tinh-cam", 1, 20),
         getMoviesByCategory("hanh-dong", 1, 20),
         getMoviesByCategory("co-trang", 1, 20),
+        getMoviesByCategory("hoat-hinh", 1, 20),
+        getMoviesByCategory("hinh-su", 1, 20),
     ]);
 
     // Filter by country if needed (PhimAPI usually groups by category globally)
@@ -51,24 +54,42 @@ async function PhimTrungHome() {
 
     return (
         <div className="space-y-12 md:space-y-16 pb-12">
-            <div style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}>
+            <LazySection minHeight={380} className="movie-row-standard">
                 <MovieRow title="Phim Đang Chiếu" movies={latest.items} slug="/quoc-gia/trung-quoc" priorityFirst />
-            </div>
+            </LazySection>
             
-            <div style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}>
+            <LazySection minHeight={380} className="movie-row-standard">
                 <MovieRow title="Phim Tình Cảm" movies={filterChina(romance.items)} slug="/the-loai/tinh-cam" />
-            </div>
-            
-            <div style={{ contentVisibility: 'auto', containIntrinsicSize: '0 200px' }}>
-                <ActorRow title="Diễn viên nổi bật" actors={FEATURED_ACTORS} />
-            </div>
+            </LazySection>
 
-            <div style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}>
+            <LazySection minHeight={380} className="movie-row-standard">
                 <MovieRow title="Phim Hành Động" movies={filterChina(action.items)} slug="/the-loai/hanh-dong" />
-            </div>
+            </LazySection>
             
-            <div style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}>
+            <LazySection minHeight={200} className="movie-row-landscape">
+                <ActorRow title="Diễn viên nổi bật" actors={FEATURED_ACTORS} />
+            </LazySection>
+
+            <LazySection minHeight={380} className="movie-row-standard">
                 <MovieRow title="Phim Cổ Trang" movies={filterChina(historical.items)} slug="/the-loai/co-trang" />
+            </LazySection>
+
+            <LazySection minHeight={380} className="movie-row-standard">
+                <MovieRow title="Phim Hoạt Hình" movies={filterChina(animation.items)} slug="/the-loai/hoat-hinh" />
+            </LazySection>
+            
+            <LazySection minHeight={380} className="movie-row-standard">
+                <MovieRow title="Phim Hình Sự" movies={filterChina(crime.items)} slug="/the-loai/hinh-su" />
+            </LazySection>
+
+            {/* View All Button */}
+            <div className="flex justify-center pt-8">
+                <Link 
+                    href="/phim-trung?page=1"
+                    className="px-8 py-3 bg-white/10 hover:bg-white/20 border border-white/10 rounded-full text-white font-bold transition-all hover:scale-105 active:scale-95"
+                >
+                    Xem tất cả phim
+                </Link>
             </div>
         </div>
     );
@@ -136,7 +157,7 @@ export default async function PhimTrungPage({ searchParams }: { searchParams: Pr
         <main className="min-h-screen pb-20 bg-[#000000]">
             {/* Immersive Hero Section - Flush to Top */}
             {currentPage === 1 && (
-                <Suspense fallback={<div className="h-[750px] bg-black animate-pulse" />}>
+                <Suspense fallback={<div className="h-[500px] md:h-[600px] lg:h-[700px] xl:h-[800px] bg-black/50 animate-pulse" />}>
                     <ChinaHeroWithData />
                 </Suspense>
             )}
