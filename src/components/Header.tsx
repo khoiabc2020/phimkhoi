@@ -8,7 +8,7 @@ import { Search, Bell, User, LogOut, ChevronDown, Filter, Shield, Loader2, X } f
 import { getImageUrl, cn } from "@/lib/utils";
 import { signOut, useSession } from "next-auth/react";
 import MobileMenu from "./MobileMenu";
-import { getMoviesByKeyword } from "@/app/actions/search";
+import { getRealtimeSearch } from "@/app/actions/search";
 import SearchSkeleton from "./SearchSkeleton";
 
 interface HeaderProps {
@@ -64,7 +64,7 @@ export default function Header({ categories, countries }: HeaderProps) {
             if (searchQuery.trim().length >= 2) {
                 setIsSearching(true);
                 try {
-                    const results = await getMoviesByKeyword(searchQuery);
+                    const results = await getRealtimeSearch(searchQuery);
                     setSearchResults(results);
                 } catch (error) {
                     console.error("Search error:", error);

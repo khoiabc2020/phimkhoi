@@ -1,5 +1,7 @@
 "use client";
 
+import React, { useState, useRef, useEffect, useMemo, useCallback, memo } from "react";
+
 import FavoriteButton from "@/components/FavoriteButton";
 import WatchlistInlineButton from "@/components/WatchlistInlineButton";
 import Link from "next/link";
@@ -57,13 +59,13 @@ function MovieCard({
     const tmdbBackdropPath = tmdbData?.backdrop_path;
 
     // Poster (ảnh dọc) – ưu tiên poster thật, tránh nhầm thumb/backdrop vào slot dọc
-    const tmdbPoster = React.useMemo(() => 
+    const tmdbPoster = useMemo(() => 
         tmdbPosterPath
             ? getTMDBImage(tmdbPosterPath, "w780")
             : null
     , [tmdbPosterPath]);
 
-    const portraitPosterSource = React.useMemo(() => {
+    const portraitPosterSource = useMemo(() => {
         const sourcePoster = movie.poster_url && detectOrientation(movie.poster_url) === "portrait"
             ? movie.poster_url
             : null;
@@ -76,7 +78,7 @@ function MovieCard({
     }, [movie.poster_url, movie.thumb_url, tmdbPoster]);
 
     // Build robust fallback candidates to avoid blank placeholder cards.
-    const posterCandidates = React.useMemo(() => {
+    const posterCandidates = useMemo(() => {
         const list = orientation === "landscape"
             ? [
                 movie.thumb_url,
@@ -96,7 +98,7 @@ function MovieCard({
     const activePosterSrc = posterCandidates[posterIndex] ? getImageUrl(posterCandidates[posterIndex]) : "/placeholder.svg";
 
     // Backdrop/overlay (ảnh ngang): TMDB backdrop first, then whichever source URL is truly landscape.
-    const displayBackdrop = React.useMemo(() => {
+    const displayBackdrop = useMemo(() => {
         const tmdbBackdrop = tmdbBackdropPath ? getTMDBImage(tmdbBackdropPath, "w500") : "";
         const tmdbPosterFallback = tmdbPosterPath ? getTMDBImage(tmdbPosterPath, "w500") : "";
         const sourceBackdrop = movie.thumb_url ? getImageUrl(movie.thumb_url) : (movie.poster_url ? getImageUrl(movie.poster_url) : "");
@@ -428,4 +430,4 @@ function OnflixHoverCard({
     );
 }
 
-export default React.memo(MovieCard);
+export default memo(MovieCard);

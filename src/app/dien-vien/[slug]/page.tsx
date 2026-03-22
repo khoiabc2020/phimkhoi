@@ -3,20 +3,20 @@ import { getMoviesByActor } from "@/services/api";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, Star, Calendar, MapPin, Info, Grid, Clock, Share2, Globe } from "lucide-react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import { checkFavoriteActor } from "@/app/actions/actorFavorites";
 import MovieCard from "@/components/MovieCard";
 import FavoriteActorButton from "@/components/FavoriteActorButton";
-import { checkFavoriteActor } from "@/app/actions/actorFavorites";
+import Footer from "@/components/Footer";
 
 interface PersonPageProps {
-    params: { slug: string };
-    searchParams?: { view?: string };
+    params: Promise<{ slug: string }>;
+    searchParams?: Promise<{ view?: string }>;
 }
 
 export default async function PersonPage({ params, searchParams }: PersonPageProps) {
-    const { slug } = params;
-    const view = searchParams?.view === 'local' ? 'local' : 'global';
+    const { slug } = await params;
+    const sParams = await searchParams;
+    const view = sParams?.view === 'local' ? 'local' : 'global';
     const name = slug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 
     // 1. Search for the person to get ID
@@ -59,7 +59,6 @@ export default async function PersonPage({ params, searchParams }: PersonPagePro
     return (
         <main className="min-h-screen bg-[#080b12] text-white overflow-hidden" 
               style={{ fontFamily: "'Inter', sans-serif" }}>
-            <Header />
 
             {/* Hero Section */}
             <div className="relative pt-32 pb-12 px-4 md:px-8 max-w-[1400px] mx-auto z-10">

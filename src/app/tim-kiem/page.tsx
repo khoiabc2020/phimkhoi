@@ -141,7 +141,7 @@ async function SearchResultsStream({
                     </div>
                     <div className="flex gap-4 overflow-x-auto pb-3 scrollbar-none">
                         {visibleActors.map((actor: any) => (
-                            <Link key={actor.id} href={`/dien-vien/${encodeURIComponent(actor.name)}`} className="flex-shrink-0 flex flex-col items-center gap-2 group">
+                            <Link key={actor.id} href={`/dien-vien/${actor.name.toLowerCase().replace(/ /g, '-')}`} className="flex-shrink-0 flex flex-col items-center gap-2 group">
                                 <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-[#8FA7C5] transition-colors bg-white/5">
                                     {actor.profile_path ? (
                                         <img src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`} alt={actor.name} className="w-full h-full object-cover" />

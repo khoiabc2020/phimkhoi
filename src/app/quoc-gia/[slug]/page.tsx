@@ -6,6 +6,7 @@ import { getMoviesByCountry, getMenuData } from "@/services/api";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 // Revalidate mỗi 5 phút
 export const revalidate = 300;

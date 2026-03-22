@@ -131,7 +131,9 @@ export default async function RootLayout({
         className={`${interSans.variable} ${beVietnamPro.variable} ${logoFont.variable} ${outfitFont.variable} antialiased pb-20 lg:pb-0 font-sans`}
       >
         <Providers>
-          <LoadingBar />
+          <Suspense fallback={null}>
+            <LoadingBar />
+          </Suspense>
           <div className="flex flex-col min-h-screen">
             <Suspense fallback={<div className="h-16 bg-black/50" />}>
               <Header categories={categories} countries={countries} />
