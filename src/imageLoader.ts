@@ -1,4 +1,4 @@
-export default function cloudflareImageLoader({
+export default function internalImageLoader({
     src,
     width,
     quality,
@@ -7,35 +7,27 @@ export default function cloudflareImageLoader({
     width: number;
     quality?: number;
 }) {
-    const q = quality || 80;
-    const safeWidth = Math.max(64, Math.min(1920, width || 640));
+    // If it's already a relative path or a local asset, keep it
+    if (src.startsWith("/") && !src.startsWith("/api/img-proxy")) {
+        return src;
+    }
 
-    const toWsrv = (absoluteUrl: string) =>
-        `https://wsrv.nl/?url=${encodeURIComponent(absoluteUrl)}&w=${safeWidth}&q=${q}&output=webp`;
-
-    // Nếu ảnh đi qua proxy nội bộ, bóc URL gốc ra để wsrv resize đúng kích thước.
+    // Extract the original URL if it's already wrapped in our proxy
+    let absoluteUrl = src;
     if (src.startsWith("/api/img-proxy?url=")) {
         try {
-            const query = src.split("?")[1] || "";
-            const params = new URLSearchParams(query);
-            const raw = params.get("url");
-            if (raw) {
-                const decoded = decodeURIComponent(raw);
-                if (decoded.startsWith("http://") || decoded.startsWith("https://")) {
-                    return toWsrv(decoded);
-                }
-            }
-        } catch {
-            // fallback to default handling below
-        }
+            const params = new URLSearchParams(src.split("?")[1]);
+            absoluteUrl = params.get("url") || src;
+        } catch { }
     }
 
-    // Đối với các ảnh có URL tuyệt đối (external images)
-    if (src.startsWith("http://") || src.startsWith("https://")) {
-        // Sử dụng wsrv.nl CDN (chạy trên hạ tầng Cloudflare) để tự động resize và nén WebP
-        return toWsrv(src);
+    // Only proxy external absolute URLs
+    if (absoluteUrl.startsWith("http")) {
+        const q = quality || 75;
+        // Map width to standard breakpoints to improve cache hit rate
+        const w = width <= 400 ? 400 : width <= 800 ? 800 : width <= 1200 ? 1200 : 1600;
+        return `/api/img-proxy?url=${encodeURIComponent(absoluteUrl)}&w=${w}&q=${q}`;
     }
 
-    // Đối với ảnh cục bộ trong /public
     return src;
 }

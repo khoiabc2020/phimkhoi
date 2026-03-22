@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
+import sharp from 'sharp';
 
 // Persistent Disk Cache Configuration
 // Persistent Disk Cache Configuration - Use absolute path on VPS for stability
@@ -27,7 +28,10 @@ const ALLOWED_DOMAINS = [
 ];
 
 export async function GET(req: NextRequest) {
-    const url = req.nextUrl.searchParams.get('url');
+    const searchParams = req.nextUrl.searchParams;
+    const url = searchParams.get('url');
+    const width = parseInt(searchParams.get('w') || '0');
+    const quality = parseInt(searchParams.get('q') || '75');
 
     if (!url || !url.startsWith('http')) {
         return NextResponse.json({ error: 'Invalid URL' }, { status: 400 });
@@ -38,14 +42,16 @@ export async function GET(req: NextRequest) {
         return NextResponse.redirect(url, 302);
     }
 
-    // 1. Generate unique hash for the URL
-    const hash = crypto.createHash('md5').update(url).digest('hex');
-    const ext = path.extname(new URL(url).pathname) || '.jpg';
+    // 1. Generate unique hash for the URL + Params to cache resized versions separately
+    const hash = crypto.createHash('md5').update(`${url}-${width}-${quality}`).digest('hex');
+    const ext = '.webp'; // Always use webp as output for optimized storage
     const cachePath = path.join(CACHE_DIR, `${hash}${ext}`);
 
     // 2. Check Memory Cache First (Fastest)
-    if (memoryCache.has(url)) {
-        const { contentType, buffer } = memoryCache.get(url)!;
+    // 2. Check Memory Cache First (Fastest)
+    const memKey = `${url}-${width}-${quality}`;
+    if (memoryCache.has(memKey)) {
+        const { contentType, buffer } = memoryCache.get(memKey)!;
         return new Response(new Uint8Array(buffer), {
             headers: {
                 'Content-Type': contentType,
@@ -62,9 +68,9 @@ export async function GET(req: NextRequest) {
         // Only use disk cache if it's less than 7 days old
         if (Date.now() - stats.mtimeMs < 7 * 24 * 60 * 60 * 1000) {
             const buffer = await fs.readFile(cachePath);
-            const contentType = buffer[0] === 0xff && buffer[1] === 0xd8 ? 'image/jpeg' : 'image/webp';
+            const contentType = 'image/webp';
             
-            memoryCache.set(url, { contentType, buffer });
+            memoryCache.set(`${url}-${width}-${quality}`, { contentType, buffer });
             return new Response(new Uint8Array(buffer), {
                 headers: {
                     'Content-Type': contentType,
@@ -90,14 +96,25 @@ export async function GET(req: NextRequest) {
 
         if (!upstream.ok) return NextResponse.redirect(url, 302);
 
-        const contentType = upstream.headers.get('content-type') || 'image/jpeg';
+        const contentType = 'image/webp';
         const arrayBuffer = await upstream.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
+        let buffer = Buffer.from(arrayBuffer);
 
-        // 5. Save to Disk & Memory for future requests
+        // 5. PROCESS IMAGE WITH SHARP
+        try {
+            let pipeline = sharp(buffer);
+            if (width > 0) {
+                pipeline = pipeline.resize({ width, withoutEnlargement: true });
+            }
+            buffer = await pipeline.webp({ quality }).toBuffer();
+        } catch (e) {
+            console.error("Sharp processing failed, using original:", e);
+        }
+
+        // 6. Save to Disk & Memory for future requests
         try {
             await fs.writeFile(cachePath, buffer);
-            memoryCache.set(url, { contentType, buffer });
+            memoryCache.set(`${url}-${width}-${quality}`, { contentType, buffer });
         } catch (e) {
             console.error("Failed to write image cache:", e);
         }

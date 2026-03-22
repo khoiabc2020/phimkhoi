@@ -21,29 +21,29 @@ const ASSETS_MAP: Record<string, MovieSlideAssets> = {
         bg: "/images/korea-hero/nghe-thuat-lua-doi-cua-sarah-bg.webp?v=1.7",
         actor: "/images/korea-hero/nghe-thuat-lua-doi-cua-sarah-actor.webp?v=1.7",
         logo: "/images/korea-hero/nghe-thuat-lua-doi-cua-sarah-logo.webp?v=1.7",
-        actorScale: 0.82,     // Thu bé lại 1 chút
-        actorTranslateY: "-5%" // Đẩy lên cao hơn 1 chút
+        actorScale: 1.15,     // Tăng từ 0.82 lên để cân bằng
+        actorTranslateY: "-7%"
     },
     "khi-cuoc-doi-cho-ban-qua-quyt": {
         bg: "/images/korea-hero/khi-cuoc-doi-cho-ban-qua-quyt-bg.webp?v=1.7",
         actor: "/images/korea-hero/khi-cuoc-doi-cho-ban-qua-quyt-actor.png?v=1.7",
         logo: "/images/korea-hero/khi-cuoc-doi-cho-ban-qua-quyt-logo.png?v=1.7",
         actorScale: 1.05,
-        actorTranslateY: "-10%" // Đẩy lên cao nhất để che phần chân lỗi (user đã cắt)
+        actorTranslateY: "-10%"
     },
     "tieng-yeu-nay-anh-dich-duoc-khong": {
         bg: "/images/korea-hero/tieng-yeu-nay-anh-dich-duoc-khong-bg.png?v=1.7",
         actor: "/images/korea-hero/tieng-yeu-nay-anh-dich-duoc-khong-actor.png?v=1.7",
         logo: "/images/korea-hero/tieng-yeu-nay-anh-dich-duoc-khong-logo.webp?v=1.7",
-        actorScale: 1.25,     // To hơn chút
-        actorTranslateY: "-15%" // Đẩy lên cao hẳn trên background cho đẹp
+        actorScale: 1.15,     // Giảm từ 1.25 xuống để cân bằng
+        actorTranslateY: "-12%"
     },
     "ban-trai-theo-yeu-cau": {
         bg: "/images/korea-hero/ban-trai-theo-yeu-cau-bg.webp?v=1.7",
         actor: "/images/korea-hero/ban-trai-theo-yeu-cau-actor.webp?v=1.7",
         logo: "/images/korea-hero/ban-trai-theo-yeu-cau-logo.webp?v=1.7",
-        actorScale: 1.35,     // To hơn chút (yêu cầu phim 4)
-        actorTranslateY: "-8%"  // Đẩy lên
+        actorScale: 1.2,      // Giảm từ 1.35 xuống
+        actorTranslateY: "-8%"
     },
     "trao-em-ca-vu-tru": {
         bg: "/images/korea-hero/trao-em-ca-vu-tru-bg.webp?v=1.7",
