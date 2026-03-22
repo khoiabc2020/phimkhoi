@@ -229,9 +229,9 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                     )}
 
                     {/* Desktop Section: Brand + Links */}
-                    <div className="hidden lg:flex items-center gap-4 xl:gap-10 flex-1">
+                    <div className="hidden lg:flex items-center gap-4 xl:gap-8 flex-1">
                         <Link href="/" className="flex items-center shrink-0 -ml-1 group">
-                            <span className="font-display text-[20px] xl:text-[24px] font-black uppercase tracking-tighter text-white group-hover:text-primary transition-colors">
+                            <span className="font-display text-[20px] xl:text-[23px] font-black uppercase tracking-tighter text-white group-hover:text-primary transition-colors">
                                 KHOIPHIM<span className="text-primary ml-0.5">.</span>
                             </span>
                         </Link>
@@ -313,6 +313,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
 
                             <Link href="/danh-sach/phim-moi-cap-nhat" className="hidden xl:block px-3 py-1.5 rounded-full text-[13px] font-medium text-white/70 hover:text-white transition-all whitespace-nowrap">Phim mới</Link>
                             <Link href="/danh-sach/phim-bo" className="hidden 2xl:block px-3 py-1.5 rounded-full text-[13px] font-medium capitalize tracking-tight text-white/70 hover:text-white transition-colors whitespace-nowrap">Phim Bộ</Link>
+                            <Link href="/danh-sach/phim-le" className="hidden 2xl:block px-3 py-1.5 rounded-full text-[13px] font-medium capitalize tracking-tight text-white/70 hover:text-white transition-colors whitespace-nowrap">Phim Lẻ</Link>
                         </nav>
                     </div>
 

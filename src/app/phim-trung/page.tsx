@@ -44,13 +44,13 @@ async function PhimTrungHome() {
     // Fetch multiple categories for China
     const [latest, romance, action, historical, animation, crime, comedy, thriller] = await Promise.all([
         getMoviesByCountry("trung-quoc", 1, 14),
-        getMoviesByCategory("tinh-cam", 1, 60),
-        getMoviesByCategory("hanh-dong", 1, 60),
-        getMoviesByCategory("co-trang", 1, 60),
-        getMoviesByCategory("hoat-hinh", 1, 60),
-        getMoviesByCategory("hinh-su", 1, 60),
-        getMoviesByCategory("hai-huoc", 1, 60),
-        getMoviesByCategory("kinh-di", 1, 60),
+        getMoviesByCategory("tinh-cam", 1, 100),
+        getMoviesByCategory("hanh-dong", 1, 100),
+        getMoviesByCategory("co-trang", 1, 100),
+        getMoviesByCategory("hoat-hinh", 1, 100),
+        getMoviesByCategory("hinh-su", 1, 100),
+        getMoviesByCategory("hai-huoc", 1, 100),
+        getMoviesByCategory("kinh-di", 1, 100),
     ]);
 
     // Filter by country if needed (PhimAPI usually groups by category globally)
