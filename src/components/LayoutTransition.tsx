@@ -7,7 +7,7 @@ export default function LayoutTransition({ children }: { children: React.ReactNo
     const pathname = usePathname();
 
     return (
-        <AnimatePresence>
+        <AnimatePresence mode="wait" initial={false}>
             <motion.div
                 key={pathname}
                 initial={{ opacity: 0, y: 10 }}

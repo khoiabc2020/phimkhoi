@@ -19,6 +19,10 @@ if [ -d "$APP_DIR" ]; then
     git fetch --all
     git reset --hard origin/main
     git clean -fd
+    if [ "$CLEAN_CACHE" = "true" ]; then
+        echo "Cleaning persistent image cache..."
+        rm -rf /home/bitnami/phimkhoi-img-cache/*
+    fi
 else
     echo "Cloning repository..."
     git clone "$REPO_URL" "$APP_DIR"
