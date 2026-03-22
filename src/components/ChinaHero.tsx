@@ -299,8 +299,3 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
         </section>
     );
 }
-                </button>
-            </div>
-        </section>
-    );
-}
