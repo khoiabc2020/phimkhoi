@@ -7,9 +7,8 @@ import Image from "next/image";
 import { Play, Info, Star, ChevronDown } from "lucide-react";
 import { getImageUrl, decodeHtml, cn, detectOrientation } from "@/lib/utils";
 import { Movie } from "@/services/api";
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import { createPortal } from "react-dom";
 import { getTMDBImage } from "@/services/tmdb";
+import { motion, AnimatePresence } from "framer-motion";
 
 // Tiny LQIP blur placeholder shared across all movie cards
 const BLUR_PLACEHOLDER = "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA==";
@@ -250,19 +249,20 @@ function MovieCard({
                 </div>
             </div>
 
-            {
-                isHovered && typeof window !== "undefined" && createPortal(
-                    <OnflixHoverCard
-                        movie={movie}
-                        position={position}
-                        displayBackdrop={displayBackdrop}
-                        orientation={orientation}
-                        onMouseEnter={handlePortalMouseEnter}
-                        onMouseLeave={handlePortalMouseLeave}
-                    />,
-                    document.body
-                )
-            }
+            <AnimatePresence>
+                {isHovered && !isTouchDevice && (
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] w-[320px] pointer-events-auto">
+                        <OnflixHoverCard
+                            movie={movie}
+                            position={position}
+                            displayBackdrop={displayBackdrop}
+                            orientation={orientation}
+                            onMouseEnter={handlePortalMouseEnter}
+                            onMouseLeave={handlePortalMouseLeave}
+                        />
+                    </div>
+                )}
+            </AnimatePresence>
         </>
     );
 }
@@ -287,36 +287,20 @@ function OnflixHoverCard({
     // Disable trailer iframe in hover card for faster UI response and less jank.
 
     const CARD_WIDTH = 320;
-    const offsetLeft = (CARD_WIDTH - position.width) / 2;
 
-    // Smart positioning: don't go off-screen horizontally
-    let left = position.left - offsetLeft;
-    if (left < 10) left = 10;
-    if (left + CARD_WIDTH > window.innerWidth - 10) left = window.innerWidth - CARD_WIDTH - 10;
-
-    // Smart positioning: don't go off-screen vertically
-    const ESTIMATED_CARD_HEIGHT = 380;
-    let top = position.top - 10;
-
-    // Nếu sát mép dưới màn hình thì bật ngược lên trên
-    if (position.rectTop && position.innerHeight && position.rectHeight) {
-        if (position.rectTop + ESTIMATED_CARD_HEIGHT > position.innerHeight) {
-            top = position.top - ESTIMATED_CARD_HEIGHT + position.rectHeight + 10;
-        }
-    }
+    // Use pure relative positioning for the hover card
+    const containerClasses = cn(
+        "relative animate-in fade-in zoom-in-95 duration-150 ease-out origin-center transition-transform",
+        orientation === "landscape" ? "-mt-8" : "-mt-12"
+    );
 
     return (
         <div
-            className="absolute z-[9999] pointer-events-auto"
-            style={{
-                top,
-                left,
-                width: CARD_WIDTH,
-            }}
+            className="w-full h-full"
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
         >
-            <div className="relative animate-in fade-in zoom-in-95 duration-150 ease-out origin-top transition-transform">
+            <div className={containerClasses}>
                 {/* Card */}
                 <div className="relative overflow-hidden rounded-[10px] border border-white/[0.08] bg-[#0c1018]/98 shadow-[0_12px_30px_#000000a0]">
 
