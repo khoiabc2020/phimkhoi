@@ -9,9 +9,10 @@ echo "Deploying PhimKhoi to VPS..."
 
 # Check if directory exists
 if [ -d "$APP_DIR" ]; then
-    # Deep clean hero assets
-    echo "Cleaning up old hero assets..."
+    # Deep clean hero assets and restore tracked ones
+    echo "Refreshing hero assets..."
     rm -rf public/images/china-hero/* 2>/dev/null || true
+    git checkout public/images/china-hero/
 
     # Update web
     echo "Updating web..."
