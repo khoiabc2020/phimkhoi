@@ -78,6 +78,14 @@ async function PhimTrungHome() {
             </LazySection>
 
             <LazySection minHeight={380} className="movie-row-standard">
+                <MovieRow title="Phim Hài Hước" movies={filterChina(comedy.items)} slug="/the-loai/hai-huoc" />
+            </LazySection>
+
+            <LazySection minHeight={380} className="movie-row-standard">
+                <MovieRow title="Phim Kinh Dị" movies={filterChina(thriller.items)} slug="/the-loai/kinh-di" />
+            </LazySection>
+
+            <LazySection minHeight={380} className="movie-row-standard">
                 <MovieRow title="Phim Hoạt Hình" movies={filterChina(animation.items)} slug="/the-loai/hoat-hinh" />
             </LazySection>
             
