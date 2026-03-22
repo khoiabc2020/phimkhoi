@@ -145,7 +145,7 @@ export default async function PhimTrungPage({ searchParams }: { searchParams: Pr
                 <div className="absolute top-0 left-0 right-0 h-[400px] bg-gradient-to-b from-[#0e1621] via-transparent to-transparent pointer-events-none -z-10 blur-[120px]" />
 
                 {currentPage === 1 ? (
-                    <div className="-mt-12 md:-mt-20 lg:-mt-28 relative z-30 w-full">
+                    <div className="-mt-4 md:-mt-8 lg:-mt-12 relative z-50 w-full">
                         <Suspense fallback={<div className="h-96 flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" /></div>}>
                             <PhimTrungHome />
                         </Suspense>
