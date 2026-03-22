@@ -197,32 +197,32 @@ function MovieCard({
 
                     {/* Top-Left: IMDb Rating Badge (Onflix Style) */}
                     {(movie as any).tmdbData?.vote_average && (movie as any).tmdbData.vote_average > 0 && (
-                        <div className="absolute top-1.5 left-1.5 z-10 pointer-events-none">
-                            <div className="flex items-center gap-1 bg-[#F5C518] text-black px-1.5 py-0.5 rounded-[3px] shadow-lg border border-black/10">
-                                <span className="text-[10px] font-black tracking-tighter">IMDb</span>
-                                <span className="text-[10px] font-extrabold">{(movie as any).tmdbData.vote_average.toFixed(1)}</span>
+                        <div className="absolute top-2 left-2 z-10 pointer-events-none transform group-hover/static-card:scale-110 transition-transform">
+                            <div className="flex items-center gap-1 bg-[#FFD700] text-black px-1.5 py-0.5 rounded-[4px] shadow-[0_4px_12px_rgba(255,215,0,0.4)] border border-black/10">
+                                <Star className="w-2.5 h-2.5 fill-black" />
+                                <span className="text-[10px] font-black tracking-tight">{(movie as any).tmdbData.vote_average.toFixed(1)}</span>
                             </div>
                         </div>
                     )}
 
                     {/* Top-Right: Premium Quality Badge & Episode */}
-                    <div className="absolute top-1.5 right-1.5 z-10 pointer-events-none flex flex-col items-end gap-1">
+                    <div className="absolute top-2 right-2 z-10 pointer-events-none flex flex-col items-end gap-1.5">
                         {formatQualityLabel(movie.quality) && (
-                            <span className="bg-black/70 shadow-md border border-white/10 text-white/90 text-[9px] font-black px-1.5 py-0.5 rounded-[3px] tracking-tight">
+                            <span className="bg-[#00A859] shadow-[0_2px_8px_rgba(0,168,89,0.4)] border border-white/10 text-white text-[9px] font-black px-1.5 py-0.5 rounded-[4px] tracking-tight uppercase">
                                 {formatQualityLabel(movie.quality)}
                             </span>
                         )}
                         {movie.episode_current && (
-                            <span className="bg-[#8FA7C5]/95 shadow-md border border-black/10 text-[#0a0a0a] text-[9px] font-extrabold px-1.5 py-0.5 rounded-[3px] tracking-tight whitespace-nowrap max-w-[85px] overflow-hidden text-ellipsis text-right">
+                            <span className="bg-white/90 backdrop-blur-md shadow-lg border border-black/10 text-[#0a0a0a] text-[9px] font-black px-1.5 py-0.5 rounded-[4px] tracking-tight whitespace-nowrap max-w-[90px] overflow-hidden text-ellipsis text-right uppercase">
                                 {movie.episode_current}
                             </span>
                         )}
                     </div>
 
                     {/* Bottom-Left: Subtitle / Language Badge (Onflix P.Đề style) */}
-                    <div className="absolute bottom-1.5 left-1.5 z-10 pointer-events-none">
+                    <div className="absolute bottom-2 left-2 z-10 pointer-events-none">
                         {(movie.episode_current || movie.lang) && (
-                            <span className="bg-black/70 border border-white/10 text-white/80 text-[10px] sm:text-[11px] font-medium px-1.5 py-0.5 rounded-[2px] tracking-normal uppercase mb-0.5 block w-fit">
+                            <span className="bg-[#E50914] shadow-[0_4px_12px_rgba(229,9,20,0.3)] border border-white/10 text-white text-[10px] font-black px-2 py-0.5 rounded-[4px] tracking-tight uppercase mb-0.5 block w-fit">
                                 {movie.lang?.toLowerCase().includes('lồng tiếng') ? 'L.Tiếng' : 'P.Đề'}
                             </span>
                         )}

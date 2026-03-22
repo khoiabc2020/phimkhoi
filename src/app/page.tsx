@@ -10,6 +10,7 @@ import HomeSection from "@/components/HomeSection";
 import LazySection from "@/components/LazySection";
 import { getMoviesList, getTrendMovies } from "@/services/api";
 import { getTMDBDataForCard } from "@/app/actions/tmdb";
+import { cn } from "@/lib/utils";
 import connectDB from "@/lib/db";
 import CustomHero from "@/models/CustomHero";
 import TrendingCache from "@/models/TrendingCache";
@@ -230,6 +231,9 @@ export default function Home() {
       </Suspense>
 
       <div className="w-full max-w-[1920px] mx-auto px-1.5 sm:px-3 md:px-5 lg:pl-24 lg:pr-12 relative z-20 pb-16">
+        {/* Decorative background glow - Deep Indigo for Premium feel */}
+        <div className="absolute top-0 left-0 right-0 h-[800px] bg-indigo-500/10 via-transparent to-transparent pointer-events-none -z-10 blur-[150px]" />
+        
         <div className="mb-6">
           <QuickNav />
         </div>
