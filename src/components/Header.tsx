@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Search, Bell, User, LogOut, Shield, Trash2, Clock, Settings, X, ChevronDown, Loader2, Bookmark, LogIn, Filter } from "lucide-react";
 import { useState, useEffect, useRef, useTransition } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { cn, getImageUrl } from "@/lib/utils";
 import MobileMenu from "./MobileMenu";
@@ -30,6 +30,9 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
     const [openDropdown, setOpenDropdown] = useState<"categories" | "countries" | null>(null);
     const router = useRouter();
     const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const currentPage = searchParams.get("page");
+    const isFirstPage = !currentPage || currentPage === "1";
     const { data: session } = useSession();
     const searchInputRef = useRef<HTMLInputElement>(null);
     const navRef = useRef<HTMLDivElement | null>(null);
@@ -189,10 +192,12 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
             <header
                 suppressHydrationWarning
                 className={cn(
-                    "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
+                    "fixed top-0 left-0 right-0 z-50 transition-all duration-700",
                     isScrolled
                         ? "h-[54px] lg:h-[64px] bg-[#0a0a0a]/95 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
-                        : "h-[64px] lg:h-[84px] bg-gradient-to-b from-black/80 to-transparent"
+                        : (pathname === "/" || (pathname === "/phim-trung" && isFirstPage))
+                            ? "h-[64px] lg:h-[90px] bg-transparent shadow-none"
+                            : "h-[64px] lg:h-[84px] bg-gradient-to-b from-black/80 to-transparent"
                 )}
             >
                 <div className="w-full h-[54px] lg:h-[64px] flex items-center justify-between gap-3 flex-nowrap pointer-events-auto px-4 lg:px-8">

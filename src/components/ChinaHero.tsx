@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Play, Info } from "lucide-react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 interface MovieSlide {
@@ -15,6 +16,7 @@ interface MovieSlide {
     tags: string[];
     year: string;
     episodes: string;
+    slug: string;
 }
 
 const CHINA_MOVIES_DATA: MovieSlide[] = [
@@ -23,50 +25,110 @@ const CHINA_MOVIES_DATA: MovieSlide[] = [
         bg: "/images/china-hero/truc-ngoc-bg.webp",
         actor: "/images/china-hero/truc-ngoc-actor.webp",
         logo: "/images/china-hero/truc-ngoc-logo.webp",
-        description: "Câu chuyện hành trình tìm lại bản thân và những âm mưu quyền lực chốn cung đình...",
+        description: "Hành trình tìm lại công lý và tình yêu chốn cung đình đầy sóng gió của nàng thiếu nữ tài năng...",
         tags: ["Cổ Trang", "Tình Cảm", "Kịch Tính"],
         year: "2024",
-        episodes: "Tập 32"
+        episodes: "Tập 32/40",
+        slug: "truc-ngoc"
     },
     {
         title: "Xin Chào 1983",
         bg: "/images/china-hero/xin-chao-bg.webp",
         actor: "/images/china-hero/xin-chao-actor.webp",
         logo: "/images/china-hero/xin-chao-logo.webp",
-        description: "Hồi ức về những năm tháng thanh xuân rực rỡ và những tình bạn không bao giờ phai...",
+        description: "Bản tình ca về tuổi thanh xuân rực rỡ và những ký ức không bao giờ phai tại con ngõ nhỏ đầy tình thân...",
         tags: ["Thanh Xuân", "Học Đường", "Gia Đình"],
         year: "2024",
-        episodes: "Tập 40"
+        episodes: "Tập 40/40",
+        slug: "xin-chao-1983"
     },
     {
         title: "Bụi Hoa Hồng",
         bg: "/images/china-hero/bui-hoa-hong-bg.webp",
         actor: "/images/china-hero/bui-hoa-hong-actor.webp",
         logo: "/images/china-hero/bui-hoa-hong-logo.webp",
-        description: "Mối tình đầy trắc trở giữa khói lửa chiến tranh và những hy sinh cao cả...",
+        description: "Mối duyên trắc trở giữa thời loạn và sự hy sinh cao cả của những con người quả cảm...",
         tags: ["Dân Quốc", "Chiến Tranh", "Ngược Tâm"],
         year: "2024",
-        episodes: "Full 24/24"
+        episodes: "Full 24/24",
+        slug: "bui-hoa-hong"
     },
     {
         title: "Giang Hồ Dạ Vũ Thập Niên Đăng",
         bg: "/images/china-hero/giang-ho-bg.webp",
         actor: "/images/china-hero/giang-ho-actor.webp",
         logo: "/images/china-hero/giang-ho-logo.png",
-        description: "Thế giới võ hiệp đầy kịch tính với những bí kíp thất truyền và ân oán giang hồ...",
+        description: "Vụ án mạng bí ẩn dẫn lối hiệp khách vào hành trình giang hồ đầy phong ba bão táp...",
         tags: ["Võ Hiệp", "Hành Động", "Kiếm Hiệp"],
         year: "2024",
-        episodes: "Tập 12"
+        episodes: "Tập 12/24",
+        slug: "giang-ho-da-vu-thap-nien-dang"
     },
     {
         title: "Còn Ra Thể Thống Gì Nữa?",
         bg: "/images/china-hero/the-thong-bg.webp",
         actor: "/images/china-hero/the-thong-actor.webp",
         logo: "/images/china-hero/the-thong-logo.webp",
-        description: "Câu chuyện hài hước và đầy bất ngờ về những quy tắc kỳ lạ trong hoàng cung...",
+        description: "Cuộc chiến cung đấu đầy hài hước và mưu mẹo giữa nữ chính thông minh và thế lực hắc ám...",
         tags: ["Hài Hước", "Cổ Trang", "Lãng Mạn"],
         year: "2024",
-        episodes: "Tập 14"
+        episodes: "Tập 14/24",
+        slug: "con-ra-the-thong-gi-nua"
+    },
+    {
+        title: "Đại Mộng Quy Ly",
+        bg: "/images/china-hero/dai-mong-bg.webp",
+        actor: "/images/china-hero/dai-mong-actor.webp",
+        logo: "/images/china-hero/dai-mong-logo.webp",
+        description: "Truyền thuyết về đại yêu tà và hành trình tìm lại sự yên bình cho muôn dân chốn thần tiên...",
+        tags: ["Tiên Hiệp", "Huyền Ảo", "Mạo Hiểm"],
+        year: "2024",
+        episodes: "Tập 34/34",
+        slug: "dai-mong-quy-ly"
+    },
+    {
+        title: "Bạch Nguyệt Phạn Tinh",
+        bg: "/images/china-hero/bach-nguyet-bg.webp",
+        actor: "/images/china-hero/bach-nguyet-actor.webp",
+        logo: "/images/china-hero/bach-nguyet-logo.webp",
+        description: "Duyên kiếp tiền định giữa tướng quân của Thần giới và thiếu nữ phàm trần đầy kiên cường...",
+        tags: ["Huyền Huyễn", "Lãng Mạn", "Tiên Diễn"],
+        year: "2024",
+        episodes: "Tập 36/40",
+        slug: "bach-nguyet-phan-tinh"
+    },
+    {
+        title: "Thanh Vụ Phong Minh",
+        bg: "/images/china-hero/tang-cung-bg.webp",
+        actor: "/images/china-hero/tang-cung-actor.png",
+        logo: "/images/china-hero/tang-cung-logo.png",
+        description: "Loạt vụ án bí ẩn chốn hậu cung nhà Đường dần được phá giải bởi cặp đôi quái kiệt...",
+        tags: ["Trinh Thám", "Cổ Trang", "Kịch Tính"],
+        year: "2024",
+        episodes: "Tập 24/30",
+        slug: "duong-cung-ky-an-thanh-vu-phong-minh"
+    },
+    {
+        title: "Mặc Nhẫn Tàng Kiều",
+        bg: "/images/china-hero/mac-nhan-bg.webp",
+        actor: "/images/china-hero/mac-nhan-actor.webp",
+        logo: "/images/china-hero/mac-nhan-logo.webp",
+        description: "Hợp đồng hôn nhân đầy bất ngờ của thiếu gia lạnh lùng và cô gái nghèo vượt khó...",
+        tags: ["Hiện Đại", "Ngôn Tình", "Tổng Tài"],
+        year: "2024",
+        episodes: "Full 24/24",
+        slug: "mac-nhan-tang-kieu"
+    },
+    {
+        title: "Ngọc Minh Trà Cốt",
+        bg: "/images/china-hero/ngoc-minh-bg.webp",
+        actor: "/images/china-hero/ngoc-minh-actor.webp",
+        logo: "/images/china-hero/ngoc-minh-logo.webp",
+        description: "Âm mưu đoạt bảo trà truyền thế của những thế lực giang hồ hắc ám...",
+        tags: ["Cổ Trang", "Võ Hiệp", "Quân Sự"],
+        year: "2024",
+        episodes: "Tập 20/24",
+        slug: "ngoc-minh-tra-cot"
     }
 ];
 
@@ -93,7 +155,7 @@ export default function ChinaHero() {
     };
 
     return (
-        <section className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] xl:h-[800px] overflow-hidden bg-black mt-[64px] lg:mt-[84px]">
+        <section className="relative w-full h-[500px] md:h-[600px] lg:h-[750px] xl:h-[880px] overflow-hidden bg-black">
             <AnimatePresence mode="wait">
                 <motion.div
                     key={current}
@@ -114,8 +176,9 @@ export default function ChinaHero() {
                             src={CHINA_MOVIES_DATA[current].bg}
                             alt={CHINA_MOVIES_DATA[current].title}
                             fill
-                            className="object-cover brightness-50"
-                            priority
+                            className="object-cover brightness-[0.55]"
+                            priority={current < 2}
+                            quality={90}
                         />
                         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent z-10" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10" />
@@ -133,8 +196,9 @@ export default function ChinaHero() {
                                 src={CHINA_MOVIES_DATA[current].actor}
                                 alt="Characters"
                                 fill
-                                className="object-contain object-right-bottom drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
-                                priority
+                                className="object-contain object-right-bottom drop-shadow-[0_20px_60px_rgba(0,0,0,0.9)]"
+                                priority={current < 2}
+                                quality={95}
                             />
                         </motion.div>
                     </div>
@@ -153,8 +217,8 @@ export default function ChinaHero() {
                                     src={CHINA_MOVIES_DATA[current].logo}
                                     alt="Logo"
                                     fill
-                                    className="object-contain object-left drop-shadow-[0_5px_15px_rgba(0,0,0,0.5)]"
-                                    priority
+                                    className="object-contain object-left drop-shadow-[0_8px_20px_rgba(0,0,0,0.6)]"
+                                    priority={current < 2}
                                 />
                             </motion.div>
 
@@ -184,14 +248,20 @@ export default function ChinaHero() {
                                 </p>
 
                                 <div className="flex items-center gap-3 pt-4">
-                                    <button className="flex items-center gap-2 px-6 md:px-8 py-2.5 md:py-3.5 bg-primary text-white rounded-full font-bold text-[14px] md:text-[15px] hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/20 group">
+                                    <Link 
+                                        href={`/phim/${CHINA_MOVIES_DATA[current].slug}`}
+                                        className="flex items-center gap-2 px-6 md:px-8 py-2.5 md:py-3.5 bg-primary text-white rounded-full font-bold text-[14px] md:text-[15px] hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/20 group"
+                                    >
                                         <Play className="w-5 h-5 fill-current" />
                                         Xem ngay
-                                    </button>
-                                    <button className="flex items-center gap-2 px-6 md:px-8 py-2.5 md:py-3.5 bg-white/10 backdrop-blur-md text-white border border-white/20 rounded-full font-bold text-[14px] md:text-[15px] hover:bg-white/20 transition-all shadow-xl">
+                                    </Link>
+                                    <Link 
+                                        href={`/phim/${CHINA_MOVIES_DATA[current].slug}`}
+                                        className="flex items-center gap-2 px-6 md:px-8 py-2.5 md:py-3.5 bg-white/10 backdrop-blur-md text-white border border-white/20 rounded-full font-bold text-[14px] md:text-[15px] hover:bg-white/20 transition-all shadow-xl"
+                                    >
                                         <Info className="w-5 h-5" />
                                         Thông tin
-                                    </button>
+                                    </Link>
                                 </div>
                             </motion.div>
                         </div>
