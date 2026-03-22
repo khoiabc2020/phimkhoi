@@ -18,6 +18,7 @@ if [ -d "$APP_DIR" ]; then
     cd "$APP_DIR"
     git fetch --all
     git reset --hard origin/main
+    git clean -fd
 else
     echo "Cloning repository..."
     git clone "$REPO_URL" "$APP_DIR"
