@@ -37,13 +37,13 @@ async function PhimHanHome() {
     // Fetch multiple categories for Korea
     const [latest, action, romance, comedy, thriller, historical, animation, crime] = await Promise.all([
         getMoviesByCountry("han-quoc", 1, 14),
-        getMoviesByCategory("hanh-dong", 1, 60),
-        getMoviesByCategory("tinh-cam", 1, 60),
-        getMoviesByCategory("hai-huoc", 1, 60),
-        getMoviesByCategory("kinh-di", 1, 60),
-        getMoviesByCategory("co-trang", 1, 60),
-        getMoviesByCategory("hoat-hinh", 1, 60),
-        getMoviesByCategory("hinh-su", 1, 60),
+        getMoviesByCategory("hanh-dong", 1, 100),
+        getMoviesByCategory("tinh-cam", 1, 100),
+        getMoviesByCategory("hai-huoc", 1, 100),
+        getMoviesByCategory("kinh-di", 1, 100),
+        getMoviesByCategory("co-trang", 1, 100),
+        getMoviesByCategory("hoat-hinh", 1, 100),
+        getMoviesByCategory("hinh-su", 1, 100),
     ]);
 
     const filterKorea = (movies: Movie[]) => movies.filter(m => m.country?.some(c => c.slug === "han-quoc"));
