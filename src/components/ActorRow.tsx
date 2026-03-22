@@ -61,11 +61,10 @@ const ActorRow = ({ title, actors }: ActorRowProps) => {
                             >
                                 <div className="relative w-20 h-20 md:w-28 md:h-28 rounded-full overflow-hidden border-2 border-white/10 group-hover/actor:border-primary transition-all duration-300 shadow-xl group-hover/actor:scale-105 group-hover/actor:shadow-primary/20">
                                     <Image
-                                        src={actor.image}
+                                        src={`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(actor.image)}&w=300&q=70`}
                                         alt={actor.name}
                                         fill
                                         className="object-cover"
-                                        unoptimized
                                     />
                                 </div>
                                 <span className="text-sm md:text-base font-semibold text-white/70 group-hover/actor:text-primary transition-colors text-center truncate w-full">

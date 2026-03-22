@@ -15,24 +15,24 @@ interface MovieSlideAssets {
 
 const ASSETS_MAP: Record<string, MovieSlideAssets> = {
     "nghe-thuat-lua-doi-cua-sarah": {
-        bg: "/images/korea-hero/nghe-thuat-lua-doi-cua-sarah-bg.webp?v=1.7",
-        logo: "/images/korea-hero/nghe-thuat-lua-doi-cua-sarah-logo.webp?v=1.7",
+        bg: "/images/korea-hero/nghe-thuat-lua-doi-cua-sarah-bg.webp?v=2.0",
+        logo: "/images/korea-hero/nghe-thuat-lua-doi-cua-sarah-logo.webp?v=2.0",
     },
     "khi-cuoc-doi-cho-ban-qua-quyt": {
-        bg: "/images/korea-hero/khi-cuoc-doi-cho-ban-qua-quyt-bg.webp?v=1.7",
-        logo: "/images/korea-hero/khi-cuoc-doi-cho-ban-qua-quyt-logo.png?v=1.7",
+        bg: "/images/korea-hero/khi-cuoc-doi-cho-ban-qua-quyt-bg.webp?v=2.0",
+        logo: "/images/korea-hero/khi-cuoc-doi-cho-ban-qua-quyt-logo.png?v=2.0",
     },
     "tieng-yeu-nay-anh-dich-duoc-khong": {
-        bg: "/images/korea-hero/tieng-yeu-nay-anh-dich-duoc-khong-bg.webp?v=1.8",
-        logo: "/images/korea-hero/tieng-yeu-nay-anh-dich-duoc-khong-logo.webp?v=1.8",
+        bg: "/images/korea-hero/tieng-yeu-nay-anh-dich-duoc-khong-bg.webp?v=2.1",
+        logo: "/images/korea-hero/tieng-yeu-nay-anh-dich-duoc-khong-logo.webp?v=2.1",
     },
     "ban-trai-theo-yeu-cau": {
-        bg: "/images/korea-hero/ban-trai-theo-yeu-cau-bg.webp?v=1.7",
-        logo: "/images/korea-hero/ban-trai-theo-yeu-cau-logo.webp?v=1.7",
+        bg: "/images/korea-hero/ban-trai-theo-yeu-cau-bg.webp?v=2.0",
+        logo: "/images/korea-hero/ban-trai-theo-yeu-cau-logo.webp?v=2.0",
     },
     "trao-em-ca-vu-tru": {
-        bg: "/images/korea-hero/trao-em-ca-vu-tru-bg.webp?v=1.7",
-        logo: "/images/korea-hero/trao-em-ca-vu-tru-logo.png?v=1.7",
+        bg: "/images/korea-hero/trao-em-ca-vu-tru-bg.webp?v=2.0",
+        logo: "/images/korea-hero/trao-em-ca-vu-tru-logo.png?v=2.0",
     }
 };
 

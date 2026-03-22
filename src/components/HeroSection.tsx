@@ -481,7 +481,10 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                 )}
                             >
                                 <Image
-                                    src={`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(m, "backdrop", "mobile"))}&w=300&q=60`}
+                                    src={getHeroImage(m, "backdrop", "mobile").startsWith('http') 
+                                        ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(m, "backdrop", "mobile"))}&w=300&q=60`
+                                        : getHeroImage(m, "backdrop", "mobile")
+                                    }
                                     alt={decodeHtml(m.name)}
                                     fill
                                     className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
