@@ -44,6 +44,11 @@ function MovieCard({
     const cardRef = useRef<HTMLDivElement>(null);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const [isTouchDevice, setIsTouchDevice] = useState(false);
+
+    useEffect(() => {
+        setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    }, []);
 
     const [posterIndex, setPosterIndex] = useState(0);
 
@@ -105,6 +110,7 @@ function MovieCard({
     }, [movie.slug, orientation]);
 
     const handleMouseEnter = () => {
+        if (isTouchDevice) return;
         if (leaveTimeoutRef.current) {
             clearTimeout(leaveTimeoutRef.current);
             leaveTimeoutRef.current = null;
