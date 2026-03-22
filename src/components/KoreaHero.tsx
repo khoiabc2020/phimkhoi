@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Play, Info, Star, Calendar, Bookmark } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import WatchlistButton from "./WatchlistButton";
 
 interface MovieSlideAssets {
     bg: string;
