@@ -18,6 +18,7 @@ export async function GET() {
 
         await dbConnect();
         const user = await User.findById(session.user.id).select("watchlist").lean();
+        const slugs = (user as any)?.watchlist || [];
         return NextResponse.json({ slugs });
     } catch (error) {
         console.error("GET /api/user/watchlist error:", error);
