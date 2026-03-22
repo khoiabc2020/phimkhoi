@@ -56,8 +56,9 @@ export default function MobileMenu({
     const navLinks = [
         { href: "/", label: "Trang Chủ", icon: Home },
         { href: "/loc-phim", label: "Lọc Phim Nâng Cao", icon: SlidersHorizontal, badge: "NEW" },
+        { href: "/phim-han", label: "Phim Hàn Quốc", icon: Tv },
+        { href: "/phim-trung", label: "Phim Trung Quốc", icon: Video },
         { href: "/danh-sach/phim-le", label: "Phim Lẻ", icon: Film },
-        { href: "/danh-sach/phim-bo", label: "Phim Bộ", icon: Video },
         { href: "/danh-sach/tv-shows", label: "TV Shows", icon: Tv },
         { href: "/danh-sach/hoat-hinh", label: "Hoạt Hình", icon: Clapperboard },
         { href: "/danh-sach/phim-chieu-rap", label: "Chiếu Rạp", id: "cinema", icon: MonitorPlay, badge: "HOT" },
