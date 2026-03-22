@@ -34,11 +34,15 @@ const FEATURED_ACTORS = [
 
 async function PhimHanHome() {
     // Fetch multiple categories for Korea
-    const [action, romance, comedy, thriller] = await Promise.all([
+    const [latest, action, romance, comedy, thriller, historical, animation, crime] = await Promise.all([
+        getMoviesByCountry("han-quoc", 1, 14),
         getMoviesByCategory("hanh-dong", 1, 60),
         getMoviesByCategory("tinh-cam", 1, 60),
         getMoviesByCategory("hai-huoc", 1, 60),
         getMoviesByCategory("kinh-di", 1, 60),
+        getMoviesByCategory("co-trang", 1, 60),
+        getMoviesByCategory("hoat-hinh", 1, 60),
+        getMoviesByCategory("hinh-su", 1, 60),
     ]);
 
     const filterKorea = (movies: Movie[]) => movies.filter(m => m.country?.some(c => c.slug === "han-quoc"));
@@ -46,7 +50,7 @@ async function PhimHanHome() {
     return (
         <div className="space-y-12 md:space-y-16 pb-12">
             <LazySection minHeight={380} className="movie-row-standard">
-                <MovieRow title="Phim Đang Chiếu" movies={latest.items} slug="/quoc-gia/han-quoc" priorityFirst />
+                <MovieRow title="Phim Mới Cập Nhật" movies={latest.items} slug="/quoc-gia/han-quoc" priorityFirst />
             </LazySection>
             
             <LazySection minHeight={380} className="movie-row-standard">
@@ -63,6 +67,14 @@ async function PhimHanHome() {
 
             <LazySection minHeight={200} className="movie-row-landscape">
                 <ActorRow title="Diễn viên nổi bật" actors={FEATURED_ACTORS} />
+            </LazySection>
+
+            <LazySection minHeight={380} className="movie-row-standard">
+                <MovieRow title="Phim Hài Hước" movies={filterKorea(comedy.items)} slug="/the-loai/hai-huoc" />
+            </LazySection>
+
+            <LazySection minHeight={380} className="movie-row-standard">
+                <MovieRow title="Phim Kinh Dị" movies={filterKorea(thriller.items)} slug="/the-loai/kinh-di" />
             </LazySection>
 
             <LazySection minHeight={380} className="movie-row-standard">

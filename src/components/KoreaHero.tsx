@@ -23,8 +23,8 @@ const ASSETS_MAP: Record<string, MovieSlideAssets> = {
         logo: "/images/korea-hero/khi-cuoc-doi-cho-ban-qua-quyt-logo.png?v=1.7",
     },
     "tieng-yeu-nay-anh-dich-duoc-khong": {
-        bg: "/images/korea-hero/tieng-yeu-nay-anh-dich-duoc-khong-bg.png?v=1.7",
-        logo: "/images/korea-hero/tieng-yeu-nay-anh-dich-duoc-khong-logo.webp?v=1.7",
+        bg: "/images/korea-hero/tieng-yeu-nay-anh-dich-duoc-khong-bg.webp?v=1.8",
+        logo: "/images/korea-hero/tieng-yeu-nay-anh-dich-duoc-khong-logo.webp?v=1.8",
     },
     "ban-trai-theo-yeu-cau": {
         bg: "/images/korea-hero/ban-trai-theo-yeu-cau-bg.webp?v=1.7",
