@@ -517,7 +517,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
             </div>
 
             {/* Side Navigation Buttons - Desktop Onflix Style */}
-            <div className="absolute inset-y-0 left-0 lg:left-20 right-0 z-[25] pointer-events-none flex items-center justify-between px-2 md:px-4 lg:px-8">
+            <div className="absolute inset-y-0 left-0 right-0 z-[35] pointer-events-none flex items-center justify-between px-4 sm:px-6 md:px-10 lg:px-12 xl:px-16">
                 <button 
                     onClick={prev}
                     className="w-10 h-10 md:w-11 md:h-11 lg:w-14 lg:h-14 rounded-full bg-black/20 hover:bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/40 hover:text-white transition-all group pointer-events-auto hover:scale-110 active:scale-95 shadow-2xl"
