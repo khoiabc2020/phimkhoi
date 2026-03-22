@@ -21,7 +21,6 @@ const navItems = [
     { name: "Phim Trung", href: "/phim-trung", icon: Video },
     { name: "Duyệt Tìm", href: "/tim-kiem", icon: LayoutGrid },
     { name: "Chủ đề", href: "/the-loai", icon: Hash },
-    { name: "Thước phim", href: "/danh-sach/phim-le", icon: PlayCircle }, // Temporary mapping
     { name: "Thư viện", href: "/thu-vien", icon: Library },
     { name: "Lịch sử", href: "/lich-su-xem", icon: History },
 ];

@@ -165,7 +165,10 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                     {/* Background Backdrop (Full Screen) */}
                     <div className="absolute inset-0">
                         <Image
-                            src={`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(movie, "backdrop", "mobile"))}&w=1080&q=75`}
+                            src={getHeroImage(movie, "backdrop", "mobile").startsWith('http')
+                                ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(movie, "backdrop", "mobile"))}&w=1080&q=75`
+                                : getHeroImage(movie, "backdrop", "mobile")
+                            }
                             alt=""
                             fill
                             className="object-cover"
@@ -185,11 +188,14 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                             {movie.isCustomHero && movie.layer_logo ? (
                                 <div className="relative w-[180px] h-[54px] mb-2 mx-auto">
                                     <Image
-                                        src={movie.layer_logo}
+                                        src={movie.layer_logo.startsWith('http')
+                                            ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(movie.layer_logo)}&w=400&q=80`
+                                            : movie.layer_logo
+                                        }
                                         alt={decodeHtml(movie.name)}
                                         fill
                                         className="object-contain"
-                                        unoptimized
+                                        unoptimized={!movie.layer_logo.startsWith('http')}
                                     />
                                 </div>
                             ) : (
@@ -303,7 +309,10 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                         className="absolute inset-0 z-0 optimize-gpu will-change-transform"
                     >
                         <Image
-                            src={`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(movie, "backdrop", "desktop"))}&w=1920&q=80`}
+                            src={getHeroImage(movie, "backdrop", "desktop").startsWith('http')
+                                ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(movie, "backdrop", "desktop"))}&w=1920&q=80`
+                                : getHeroImage(movie, "backdrop", "desktop")
+                            }
                             alt=""
                             fill
                             className="object-cover object-[center_20%]"
@@ -325,7 +334,10 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                 className="relative w-full h-full"
                             >
                                 <Image
-                                    src={`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(movie.layer_character)}&w=1200&q=85`}
+                                    src={movie.layer_character.startsWith('http')
+                                        ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(movie.layer_character)}&w=1200&q=85`
+                                        : movie.layer_character
+                                    }
                                     alt=""
                                     fill
                                     className="object-cover object-[center_bottom]"
@@ -357,11 +369,14 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                     {movie.isCustomHero && movie.layer_logo ? (
                                         <div className="relative w-full max-w-[400px] md:max-w-[500px] lg:max-w-[600px] h-[100px] md:h-[130px] lg:h-[160px] mb-4">
                                             <Image
-                                                src={movie.layer_logo}
+                                                src={movie.layer_logo.startsWith('http')
+                                                    ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(movie.layer_logo)}&w=800&q=85`
+                                                    : movie.layer_logo
+                                                }
                                                 alt={decodeHtml(movie.name)}
                                                 fill
                                                 className="object-contain object-left-bottom drop-shadow-[0_8px_16px_rgba(0,0,0,0.8)]"
-                                                unoptimized
+                                                unoptimized={!movie.layer_logo.startsWith('http')}
                                                 priority
                                             />
                                         </div>
@@ -460,8 +475,8 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                 </motion.div>
             </AnimatePresence>
 
-            {/* Thumbnail Nav Overlay */}
-            <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 lg:bottom-10 lg:right-12 z-[20] flex items-center gap-3 max-w-[calc(100vw-32px)] md:max-w-[40vw] lg:max-w-[60vw]">
+            {/* Thumbnail Nav Overlay - Centered to avoid overlap */}
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[30] w-full max-w-[90vw] md:max-w-3xl lg:max-w-5xl">
                 <div 
                     ref={navRef}
                     className="flex items-center gap-2 md:gap-3 overflow-x-auto no-scrollbar py-3 px-2 scroll-smooth snap-x snap-mandatory min-w-0 w-full"
