@@ -131,22 +131,8 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
         }
     }, [isSearchOpen]);
 
-    // Đóng dropdown khi click ra ngoài (hữu ích cho iPad / touch)
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-            if (!navRef.current) return;
-            const target = event.target as Node | null;
-            if (target && !navRef.current.contains(target)) {
-                setOpenDropdown(null);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        document.addEventListener("touchstart", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-            document.removeEventListener("touchstart", handleClickOutside);
-        };
-    }, []);
+    // Đóng dropdown khi click ra ngoài (Sử dụng overlay thay vì document listener theo yêu cầu 'không dùng DOM')
+    const closeDropdown = () => setOpenDropdown(null);
 
     // Hide Header on specific routes
     if (pathname === "/login" || pathname === "/register" || pathname?.startsWith("/admin")) {
