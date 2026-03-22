@@ -11,6 +11,7 @@ interface MovieSlideAssets {
     bg: string;
     actor: string;
     logo: string;
+    actorScale?: number;
 }
 
 const ASSETS_MAP: Record<string, MovieSlideAssets> = {
@@ -23,6 +24,7 @@ const ASSETS_MAP: Record<string, MovieSlideAssets> = {
         bg: "/images/china-hero/bui-hoa-hong-bg.webp?v=1.6",
         actor: "/images/china-hero/bui-hoa-hong-actor.webp?v=1.6",
         logo: "/images/china-hero/bui-hoa-hong-logo.webp?v=1.6",
+        actorScale: 1.1,
     },
     "dai-mong-quy-ly": {
         bg: "/images/china-hero/dai-mong-bg.webp?v=1.6",
@@ -33,6 +35,7 @@ const ASSETS_MAP: Record<string, MovieSlideAssets> = {
         bg: "/images/china-hero/giang-ho-bg.webp?v=1.6",
         actor: "/images/china-hero/giang-ho-actor.webp?v=1.6",
         logo: "/images/china-hero/giang-ho-logo.png?v=1.6",
+        actorScale: 1.25,
     },
     "mac-nhan-tang-kieu": {
         bg: "/images/china-hero/mac-nhan-bg.webp?v=1.6",
@@ -82,7 +85,8 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
             const assets = ASSETS_MAP[movie.slug] || {
                 bg: movie.thumb_url || movie.poster_url,
                 actor: "",
-                logo: ""
+                logo: "",
+                actorScale: 0.85
             };
             
             return {
@@ -162,8 +166,8 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                     {currentMovie.actor && (
                         <div className="absolute inset-0 z-20 pointer-events-none flex items-end justify-end overflow-hidden">
                             <motion.div
-                                initial={{ x: 60, opacity: 0, scale: 0.95 }}
-                                animate={{ x: 0, opacity: 0.9, scale: 0.85 }}
+                                initial={{ x: 60, opacity: 0, scale: (currentMovie.actorScale || 0.85) + 0.1 }}
+                                animate={{ x: 0, opacity: 0.9, scale: currentMovie.actorScale || 0.85 }}
                                 transition={{ delay: 0.2, duration: 1.5, ease: "easeOut" }}
                                 className="relative w-[70%] h-[80%] md:w-[60%] md:h-[90%] lg:w-[45%] lg:h-[100%] mr-[5%] md:mr-[8%] lg:mr-[12%]"
                             >
