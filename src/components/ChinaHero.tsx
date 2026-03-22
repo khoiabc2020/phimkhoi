@@ -11,48 +11,59 @@ import WatchlistButton from "./WatchlistButton";
 interface MovieSlideAssets {
     bg: string;
     logo: string;
+    actor?: string;
 }
 
 const ASSETS_MAP: Record<string, MovieSlideAssets> = {
     "bach-nguyet-phan-tinh": {
         bg: "/images/china-hero/bach-nguyet-bg.webp?v=1.6",
         logo: "/images/china-hero/bach-nguyet-logo.webp?v=1.6",
+        actor: "/images/china-hero/bach-nguyet-actor.webp"
     },
     "bui-hoa-hong": {
         bg: "/images/china-hero/bui-hoa-hong-bg.webp?v=1.6",
         logo: "/images/china-hero/bui-hoa-hong-logo.webp?v=1.6",
+        actor: "/images/china-hero/bui-hoa-hong-actor.webp"
     },
     "dai-mong-quy-ly": {
         bg: "/images/china-hero/dai-mong-bg.webp?v=1.6",
         logo: "/images/china-hero/dai-mong-logo.webp?v=1.6",
+        actor: "/images/china-hero/dai-mong-actor.webp"
     },
     "giang-ho-da-vu-thap-nien-dang": {
         bg: "/images/china-hero/giang-ho-bg.webp?v=1.6",
         logo: "/images/china-hero/giang-ho-logo.png?v=1.6",
+        actor: "/images/china-hero/giang-ho-actor.webp"
     },
     "mac-nhan-tang-kieu": {
         bg: "/images/china-hero/mac-nhan-bg.webp?v=1.6",
         logo: "/images/china-hero/mac-nhan-logo.webp?v=1.6",
+        actor: "/images/china-hero/mac-nhan-actor.webp"
     },
     "ngoc-minh-tra-cot": {
         bg: "/images/china-hero/ngoc-minh-bg.webp?v=1.6",
         logo: "/images/china-hero/ngoc-minh-logo.webp?v=1.6",
+        actor: "/images/china-hero/ngoc-minh-actor.webp"
     },
     "con-ra-the-thong-gi-nua": {
         bg: "/images/china-hero/the-thong-bg.webp?v=1.6",
         logo: "/images/china-hero/the-thong-logo.webp?v=1.6",
+        actor: "/images/china-hero/the-thong-actor.webp"
     },
     "truc-ngoc": {
         bg: "/images/china-hero/truc-ngoc-bg.webp?v=1.6",
         logo: "/images/china-hero/truc-ngoc-logo.webp?v=1.6",
+        actor: "/images/china-hero/truc-ngoc-actor.webp"
     },
     "xin-chao-1983": {
         bg: "/images/china-hero/xin-chao-bg.webp?v=1.6",
         logo: "/images/china-hero/xin-chao-logo.webp?v=1.6",
+        actor: "/images/china-hero/xin-chao-actor.webp"
     },
     "duong-cung-ky-an-thanh-vu-phong-minh": {
         bg: "/images/china-hero/tang-cung-bg.png?v=1.6",
         logo: "/images/china-hero/tang-cung-logo.png?v=1.6",
+        actor: "/images/china-hero/tang-cung-actor.png"
     }
 };
 
@@ -153,6 +164,24 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                         {/* THE "ONFLIX" BOTTOM FADE - Multi-layered for maximum smoothness */}
                         <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-black via-black/80 to-transparent z-10" />
                         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent z-20" />
+                        
+                        {/* Layer 2: Character Overlay */}
+                        {currentMovie.actor && (
+                            <motion.div
+                                initial={{ x: 20, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                transition={{ delay: 0.3, duration: 1, ease: slideEase }}
+                                className="absolute inset-0 z-[15]"
+                            >
+                                <Image
+                                    src={currentMovie.actor}
+                                    alt=""
+                                    fill
+                                    className="object-contain object-right-bottom scale-[0.8] md:scale-100 origin-right-bottom"
+                                    priority
+                                />
+                            </motion.div>
+                        )}
                     </motion.div>
 
                     {/* Layer 3: IQIYI Style Content */}
