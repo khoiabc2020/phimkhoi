@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
     const memKey = `${url}-${width}-${quality}`;
     if (memoryCache.has(memKey)) {
         const { contentType, buffer } = memoryCache.get(memKey)!;
-        return new Response(new Uint8Array(buffer), {
+        return new Response(new Uint8Array(buffer as any), {
             headers: {
                 'Content-Type': contentType,
                 'Cache-Control': 'public, max-age=31536000, immutable',
@@ -106,7 +106,7 @@ export async function GET(req: NextRequest) {
             if (width > 0) {
                 pipeline = pipeline.resize({ width, withoutEnlargement: true });
             }
-            buffer = await pipeline.webp({ quality }).toBuffer();
+            buffer = Buffer.from(await pipeline.webp({ quality }).toBuffer());
         } catch (e) {
             console.error("Sharp processing failed, using original:", e);
         }
