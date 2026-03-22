@@ -10,7 +10,8 @@ import { ChevronLeft } from "lucide-react";
 import MovieRow from "@/components/MovieRow";
 import ActorRow from "@/components/ActorRow";
 import LazySection from "@/components/LazySection";
-import { cn } from "@/lib/utils";
+import { detectOrientation, cn } from "@/lib/utils";
+import { getThemeBySlug } from "@/lib/theme";
 
 export async function generateMetadata(): Promise<Metadata> {
     const { countries } = await getMenuData();
@@ -145,6 +146,7 @@ export default async function PhimHanPage({ searchParams }: { searchParams: Prom
     const sParams = await searchParams;
     const currentPage = Number(sParams.page) || 1;
     const slug = "han-quoc";
+    const theme = getThemeBySlug(slug);
 
     const menuData = await getMenuData();
     const categories = menuData?.categories || [];
@@ -179,7 +181,7 @@ export default async function PhimHanPage({ searchParams }: { searchParams: Prom
                 "lg:pl-20"
             )}>
                 {/* Decorative background glow */}
-                <div className="absolute top-0 left-0 right-0 h-[400px] bg-gradient-to-b from-[#0e1621] via-transparent to-transparent pointer-events-none -z-10 blur-[120px]" />
+                <div className={cn("absolute top-0 left-0 right-0 h-[600px] via-transparent to-transparent pointer-events-none -z-10 blur-[150px] opacity-50", theme.glow)} />
 
                 {currentPage === 1 ? (
                     <div className="-mt-4 md:-mt-8 lg:-mt-12 relative z-50 w-full">

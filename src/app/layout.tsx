@@ -94,6 +94,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Sidebar from "@/components/Sidebar";
 import LayoutTransition from "@/components/LayoutTransition";
+import LoadingBar from "@/components/LoadingBar";
 import { getMenuData } from "@/services/api";
 
 export default async function RootLayout({
@@ -130,6 +131,7 @@ export default async function RootLayout({
         className={`${interSans.variable} ${beVietnamPro.variable} ${logoFont.variable} ${outfitFont.variable} antialiased pb-20 lg:pb-0 font-sans`}
       >
         <Providers>
+          <LoadingBar />
           <div className="flex flex-col min-h-screen">
             <Suspense fallback={<div className="h-16 bg-black/50" />}>
               <Header categories={categories} countries={countries} />

@@ -1,10 +1,20 @@
-export default function Loading() {
+export default function CountryLoading() {
     return (
-        <div className="min-h-[60vh] pt-24 w-full max-w-[1920px] mx-auto px-4 md:px-12">
-            <div className="h-8 w-48 bg-white/10 rounded mb-6 animate-pulse" />
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2 sm:gap-2.5 md:gap-3 mt-6 [contain:layout_paint]">
-                {Array.from({ length: 18 }).map((_, i) => (
-                    <div key={i} className="aspect-[2/3] rounded-lg bg-white/5 animate-pulse" />
+        <div className="min-h-screen bg-[#0a0a0a] animate-pulse">
+            {/* Hero Skeleton (if page 1) */}
+            <div className="relative w-full aspect-video lg:h-[80vh] bg-neutral-900 overflow-hidden" />
+            
+            <div className="pt-8 px-4 sm:px-6 md:px-12 lg:pl-24 lg:pr-12 space-y-12">
+                {/* Row Skeleton */}
+                {[1, 2, 3].map((i) => (
+                    <div key={i} className="space-y-4">
+                        <div className="w-48 h-8 bg-white/5 rounded" />
+                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-3 overflow-hidden">
+                            {Array.from({ length: 7 }).map((_, j) => (
+                                <div key={j} className="aspect-[2/3] bg-white/5 rounded-lg" />
+                            ))}
+                        </div>
+                    </div>
                 ))}
             </div>
         </div>
