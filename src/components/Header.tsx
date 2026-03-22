@@ -186,15 +186,18 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
 
     return (
         <>
+    return (
+        <>
             <header
-                suppressHydrationWarning
                 className={cn(
-                    "fixed top-0 left-0 right-0 z-50 transition-all duration-500", // Giảm thời gian transition xuống chút cho mượt
-                    isScrolled
-                        ? "h-[54px] lg:h-[64px] bg-[#0a0a0a]/90 backdrop-blur-[8px] shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
-                        : (pathname === "/" || pathname === "/phim-trung" || pathname === "/phim-han")
-                            ? "h-[64px] lg:h-[90px] bg-transparent shadow-none"
-                            : "h-[64px] lg:h-[84px] bg-gradient-to-b from-black/80 to-transparent"
+                    "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
+                    !mounted 
+                        ? "h-[64px] lg:h-[84px] bg-gradient-to-b from-black/80 to-transparent"
+                        : isScrolled
+                            ? "h-[54px] lg:h-[64px] bg-[#0a0a0a]/90 backdrop-blur-[8px] shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
+                            : (pathname === "/" || pathname === "/phim-trung" || pathname === "/phim-han")
+                                ? "h-[64px] lg:h-[90px] bg-transparent shadow-none"
+                                : "h-[64px] lg:h-[84px] bg-gradient-to-b from-black/80 to-transparent"
                 )}
             >
                 <div className="w-full h-[54px] lg:h-[64px] flex items-center justify-between gap-3 flex-nowrap pointer-events-auto px-4 lg:px-8">

@@ -47,7 +47,7 @@ function MovieCard({
     const [isTouchDevice, setIsTouchDevice] = useState(false);
 
     useEffect(() => {
-        setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+        setIsTouchDevice(window.matchMedia("(pointer: coarse)").matches);
     }, []);
 
     const [posterIndex, setPosterIndex] = useState(0);
