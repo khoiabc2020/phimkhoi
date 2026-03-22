@@ -351,12 +351,12 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                     {/* Gradient overlays */}
                     <div className="absolute inset-0 z-[2] pointer-events-none">
                         <div className="absolute inset-y-0 left-0 w-[80%] lg:w-[60%] bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
-                        <div className="absolute inset-0 bg-[#0a0a0a]/20" />
-                        <div className="absolute bottom-0 left-0 right-0 h-40 md:h-56 lg:h-72 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
+                        <div className="absolute inset-0 bg-[#0a0a0a]/10" />
+                        <div className="absolute bottom-0 left-0 right-0 h-48 md:h-64 lg:h-80 xl:h-[350px] bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/90 to-transparent z-[5]" />
                     </div>
 
                     {/* Content Block */}
-                    <div className="relative z-[10] h-full w-full max-w-[1920px] mx-auto px-6 md:pl-24 md:pr-14 lg:pl-32 lg:pr-12 xl:pl-[140px] flex items-end pb-12 md:pb-16 lg:pb-24 pointer-events-none">
+                    <div className="relative z-[10] h-full w-full max-w-[1920px] mx-auto px-6 md:pl-24 md:pr-14 lg:pl-32 lg:pr-12 xl:pl-[140px] flex items-end pb-20 md:pb-28 lg:pb-36 xl:pb-48 pointer-events-none">
                         <div className="w-full flex justify-between items-end">
                             <div className="w-full md:w-[75%] lg:w-[65%] xl:w-[60%] space-y-3 lg:space-y-4 pointer-events-auto pr-0 lg:pr-[300px] xl:pr-[400px]">
                                 
