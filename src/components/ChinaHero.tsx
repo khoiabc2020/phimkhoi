@@ -131,7 +131,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
 
     const currentMovie = slides[current];
 
-    const slideEase = [0.22, 1, 0.36, 1];
+    const slideEase = [0.22, 1, 0.36, 1] as const;
 
     return (
         <section 

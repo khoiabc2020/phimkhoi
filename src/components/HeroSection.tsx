@@ -144,7 +144,7 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
         if (endX - startX > 50) prev();
     };
 
-    const ease = [0.22, 1, 0.36, 1];
+    const ease = [0.22, 1, 0.36, 1] as const;
 
     return (
         <div 
@@ -296,7 +296,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
         }
     }, [index]);
 
-    const ease = [0.22, 1, 0.36, 1];
+    const ease = [0.22, 1, 0.36, 1] as const;
 
     return (
         <div

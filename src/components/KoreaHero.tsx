@@ -112,7 +112,7 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
 
     if (slides.length === 0) return null;
 
-    const slideEase = [0.22, 1, 0.36, 1];
+    const slideEase = [0.22, 1, 0.36, 1] as const;
 
     return (
         <section 
