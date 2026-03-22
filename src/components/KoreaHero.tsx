@@ -135,7 +135,7 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                         initial={{ scale: 1.03 }}
                         animate={{ scale: 1 }}
                         transition={{ duration: 8, ease: "linear" }}
-                        className="absolute inset-0 z-0"
+                        className="absolute inset-0 z-0 optimize-gpu will-change-transform"
                     >
                         <Image 
                             src={currentMovie.bg}
@@ -161,7 +161,7 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                                 initial={{ x: 40, opacity: 0, scale: (currentMovie.actorScale || 0.85) + 0.05 }}
                                 animate={{ x: 0, opacity: 0.9, scale: currentMovie.actorScale || 0.85 }}
                                 transition={{ delay: 0.1, duration: 1.2, ease: slideEase }}
-                                className="relative w-[70%] h-[80%] md:w-[60%] md:h-[90%] lg:w-[45%] lg:h-[100%] mr-[5%] md:mr-[8%] lg:mr-[12%]"
+                                className="relative w-[70%] h-[80%] md:w-[60%] md:h-[90%] lg:w-[45%] lg:h-[100%] mr-[5%] md:mr-[8%] lg:mr-[12%] optimize-gpu will-change-transform"
                             >
                                 <Image 
                                     src={currentMovie.actor}
@@ -205,26 +205,26 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                                 )}
                             </motion.div>
 
-                            {/* Metadata Badges */}
+                            {/* Metadata Badges - Onflix Style */}
                             <motion.div
                                 initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.4, duration: 0.8 }}
-                                className="flex flex-wrap items-center gap-2 md:gap-3"
+                                className="flex flex-wrap items-center gap-3 text-[13px] md:text-[15px] font-bold text-white/90"
                             >
-                                <div className="flex items-center gap-1.5 bg-primary/20 backdrop-blur-md px-2 py-0.5 md:px-2.5 md:py-1 rounded-md border border-primary/30 shadow-lg shadow-primary/10">
-                                    <Star className="w-3 md:w-3.5 h-3 md:h-3.5 fill-primary text-primary" />
-                                    <span className="text-[11px] md:text-[13px] font-bold text-primary">10.0</span>
+                                <div className="bg-[#00A859] text-white px-2 py-0.5 rounded-sm text-[10px] md:text-[11px] font-black tracking-tighter uppercase">
+                                    TOP 10
                                 </div>
-                                <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-2 py-0.5 md:px-2.5 md:py-1 rounded-md border border-white/10">
-                                    <Calendar className="w-3 md:w-3.5 h-3 md:h-3.5 text-white/60" />
-                                    <span className="text-[11px] md:text-[13px] font-semibold text-white/90">{currentMovie.year}</span>
+                                <div className="flex items-center gap-2">
+                                    <span>{currentMovie.year}</span>
+                                    <span className="text-white/30 font-light">|</span>
+                                    <span>Hàn Quốc</span>
+                                    <span className="text-white/30 font-light">|</span>
+                                    <span className="text-primary">{currentMovie.displayEpisodes}</span>
                                 </div>
-                                <span className="px-2 py-0.5 rounded border border-white/20 text-[10px] md:text-[11px] font-bold text-white/70 uppercase tracking-wider">Vietsub</span>
-                                <span className="text-[12px] md:text-[14px] font-bold text-white/90">{currentMovie.displayEpisodes}</span>
                             </motion.div>
 
-                            {/* Tags */}
+                            {/* Tags - Onflix Style Pill Layout */}
                             <motion.div
                                 initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
@@ -232,7 +232,7 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                                 className="hidden sm:flex flex-wrap gap-2"
                             >
                                 {currentMovie.displayTags.map((tag: string) => (
-                                    <span key={tag} className="text-[11px] md:text-[12px] font-medium text-white/50 hover:text-white transition-colors cursor-default">
+                                    <span key={tag} className="px-3 py-1 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 rounded-full text-[11px] md:text-[12px] font-bold text-white/80 transition-all cursor-default shadow-sm">
                                         {tag}
                                     </span>
                                 ))}
@@ -257,7 +257,7 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                             >
                                 <Link 
                                     href={`/phim/${currentMovie.slug}`}
-                                    className="flex items-center gap-2 md:gap-3 px-6 md:px-10 h-11 md:h-14 bg-primary text-black rounded-full font-black text-[14px] md:text-[16px] hover:bg-yellow-400 hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-primary/30 group uppercase tracking-wider"
+                                    className="flex items-center gap-2 md:gap-3 px-6 md:px-10 h-11 md:h-14 bg-[#00A859] text-white rounded-full font-black text-[14px] md:text-[16px] hover:bg-[#00c86a] hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-green-900/30 group uppercase tracking-wider"
                                 >
                                     <Play className="w-4 h-4 md:w-5 md:h-5 fill-current" />
                                     Xem Ngay
@@ -274,16 +274,19 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                 </motion.div>
             </AnimatePresence>
 
-            {/* Pagination Indicators */}
-            <div className="absolute bottom-12 left-6 md:left-12 lg:left-32 xl:left-40 z-40 flex items-center gap-2">
+            {/* Pagination Indicators - Bottom Right (Onflix Style) */}
+            <div className="absolute bottom-12 right-6 md:right-12 lg:right-32 z-40 flex items-center gap-1.5 md:gap-2">
                 {slides.map((_, idx) => (
                     <button
                         key={idx}
                         onClick={() => { setIsAutoPlay(false); setCurrent(idx); }}
                         className={cn(
-                            "h-1 rounded-full transition-all duration-500",
-                            current === idx ? "w-10 bg-primary" : "w-4 bg-white/20 hover:bg-white/40"
+                            "rounded-full transition-all duration-500",
+                            current === idx 
+                                ? "w-8 md:w-10 h-1.5 md:h-2 bg-[#00A859] shadow-[0_0_12px_#00A859]" 
+                                : "w-1.5 md:w-2 h-1.5 md:h-2 bg-white/20 hover:bg-white/40"
                         )}
+                        aria-label={`Go to slide ${idx + 1}`}
                     />
                 ))}
             </div>

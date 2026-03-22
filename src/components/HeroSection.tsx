@@ -226,15 +226,17 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                             initial={{ y: 15, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ delay: 0.3, duration: 0.5, ease }}
-                            className="flex items-center gap-3"
+                            className="flex items-center gap-3 text-[13px] font-bold text-white/90"
                         >
-                            <span className="bg-[#E50914] text-white text-[10px] font-black px-1.5 py-0.5 rounded-sm">TOP 10</span>
-                            <div className="text-white/60 text-[12px] font-bold flex items-center gap-2">
+                            <div className="bg-[#00A859] text-white px-2 py-0.5 rounded-sm text-[10px] md:text-[11px] font-black tracking-tighter uppercase">
+                                TOP 10
+                            </div>
+                            <div className="flex items-center gap-2">
                                 <span>{movie.year}</span>
-                                <span>•</span>
+                                <span className="text-white/30 font-light">|</span>
                                 <span>{movie.country?.[0]?.name || "Phim"}</span>
-                                <span>•</span>
-                                <span className="text-primary/90">{movie.episode_current || "1 Tập"}</span>
+                                <span className="text-white/30 font-light">|</span>
+                                <span className="text-[#00A859]">{movie.episode_current || "Full"}</span>
                             </div>
                         </motion.div>
 
@@ -246,7 +248,7 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                         >
                             <Link
                                 href={`/phim/${movie.slug}`}
-                                className="h-11 px-8 rounded-full bg-[#8FA7C5] text-black font-black text-[13px] uppercase tracking-wider flex items-center gap-2"
+                                className="h-11 px-8 rounded-full bg-[#00A859] text-white font-black text-[13px] uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-green-900/20 active:scale-95 transition-all"
                             >
                                 <Play className="w-4 h-4 fill-current" />
                                 Xem Ngay
@@ -261,14 +263,14 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                 </motion.div>
             </AnimatePresence>
 
-            {/* Indicators */}
+            {/* Indicators - Onflix Style Pill Dots */}
             <div className="absolute bottom-6 left-0 right-0 z-20 flex justify-center gap-1.5">
                 {movies.map((_, i) => (
                     <div 
                         key={i} 
                         className={cn(
-                            "h-1 rounded-full transition-all duration-300",
-                            i === index ? "w-6 bg-primary" : "w-1.5 bg-white/20"
+                            "h-1.5 rounded-full transition-all duration-300",
+                            i === index ? "w-6 bg-[#00A859] shadow-[0_0_8px_#00A859]" : "w-1.5 bg-white/20"
                         )} 
                     />
                 ))}
@@ -320,7 +322,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                         initial={{ scale: 1.03 }}
                         animate={{ scale: 1 }}
                         transition={{ duration: 8, ease: "linear" }}
-                        className="absolute inset-0 z-0"
+                        className="absolute inset-0 z-0 optimize-gpu will-change-transform"
                     >
                         <Image
                             src={getHeroImage(movie, "backdrop", "desktop")}
@@ -402,26 +404,26 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                     )}
                                 </motion.div>
 
-                                {/* Tags & Metadata */}
+                                {/* Tags & Metadata - Onflix Style */}
                                 <motion.div 
                                     initial={{ y: 20, opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
                                     transition={{ delay: 0.3, duration: 0.6, ease }}
-                                    className="flex flex-wrap items-center gap-3 lg:gap-4"
+                                    className="flex flex-wrap items-center gap-3 lg:gap-4 font-bold text-[14px] lg:text-[15px] text-white/90"
                                 >
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded-[2px] bg-[#E50914] text-white text-[11px] lg:text-[12px] font-black uppercase tracking-wider shadow-[0_2px_10px_rgba(229,9,20,0.4)]">
+                                    <div className="bg-[#00A859] text-white px-2 py-0.5 rounded-sm text-[11px] lg:text-[12px] font-black tracking-tighter uppercase shadow-lg shadow-green-900/20">
                                         TOP 10
-                                    </span>
-                                    <div className="flex items-center gap-3 text-white/90 font-bold text-[14px] lg:text-[15px] drop-shadow-md">
+                                    </div>
+                                    <div className="flex items-center gap-3">
                                         {movie.year && <span>{movie.year}</span>}
-                                        {movie.country?.[0] && <span className="opacity-40">|</span>}
+                                        {movie.country?.[0] && <span className="text-white/20 font-light">|</span>}
                                         {movie.country?.[0] && <span>{movie.country[0].name}</span>}
-                                        {movie.episode_current && <span className="opacity-40">|</span>}
-                                        {movie.episode_current && <span>{movie.episode_current}</span>}
+                                        {movie.episode_current && <span className="text-white/20 font-light">|</span>}
+                                        <span className="text-[#00A859]">{movie.episode_current || "Full"}</span>
                                     </div>
                                 </motion.div>
 
-                                {/* Categories */}
+                                {/* Categories - Onflix Style Pills */}
                                 <motion.div 
                                     initial={{ y: 20, opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
@@ -432,13 +434,13 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                         <Link
                                             key={c.id || c.name}
                                             href={`/the-loai/${c.slug}`}
-                                            className="text-[13px] font-semibold text-white/90 bg-white/5 border border-white/20 rounded-full px-4 py-1.5 hover:bg-white/20 transition-all duration-200"
+                                            className="text-[12px] lg:text-[13px] font-bold text-white/80 bg-white/10 hover:bg-white/20 border border-white/10 backdrop-blur-md rounded-full px-4 py-1.5 transition-all duration-300 shadow-sm"
                                         >
                                             {c.name}
                                         </Link>
                                     ))}
                                     {movie.quality && (
-                                        <span className="text-[13px] font-bold text-white/90 bg-transparent border border-white/40 rounded-full px-4 py-1.5 opacity-80">
+                                        <span className="text-[12px] lg:text-[13px] font-black text-white/60 border border-white/20 rounded-full px-4 py-1.5 uppercase tracking-tight">
                                             {formatQualityLabel(movie.quality) || movie.quality}
                                         </span>
                                     )}
@@ -465,9 +467,9 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                 >
                                     <Link
                                         href={`/phim/${movie.slug}`}
-                                        className="flex items-center justify-center gap-2 h-12 md:h-14 px-8 md:px-10 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[15px] lg:text-[16px] uppercase tracking-wide transition-all duration-300 hover:scale-105 active:scale-95 group shadow-xl shadow-black/20"
+                                        className="flex items-center justify-center gap-2 h-12 md:h-14 px-8 md:px-10 rounded-full bg-[#00A859] text-white font-black text-[15px] lg:text-[16px] uppercase tracking-wide transition-all duration-300 hover:scale-105 active:scale-95 group shadow-xl shadow-green-900/30"
                                     >
-                                        <Play className="w-5 h-5 fill-[#0a0a0a] shrink-0 group-hover:scale-110 transition-transform" />
+                                        <Play className="w-5 h-5 fill-white shrink-0 group-hover:scale-110 transition-transform" />
                                         Xem Ngay
                                     </Link>
                                     <WatchlistButton
@@ -498,7 +500,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                 className={cn(
                                     "relative w-[85px] md:w-[100px] lg:w-[115px] xl:w-[125px] aspect-[16/9] rounded-lg overflow-hidden cursor-pointer flex-shrink-0 transition-all duration-400 box-border group snap-center",
                                     isActive 
-                                        ? "ring-[2px] ring-primary scale-100 opacity-100 shadow-[0_4px_20px_rgba(0,0,0,0.8)] z-10" 
+                                        ? "ring-[3px] ring-[#00A859] scale-100 opacity-100 shadow-[0_0_20px_rgba(0,168,89,0.4)] z-10" 
                                         : "ring-1 ring-white/10 scale-95 opacity-50 hover:opacity-100 hover:scale-[0.98] z-0"
                                 )}
                             >

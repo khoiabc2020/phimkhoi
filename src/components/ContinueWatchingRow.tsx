@@ -175,12 +175,12 @@ function ContinueWatchingRowInner() {
                                         alt={item.movieName}
                                         fill
                                         sizes="(max-width: 768px) 140px, (max-width: 1024px) 160px, 180px"
-                                        className="object-cover group-hover/card:scale-105 transition-transform duration-300"
+                                        className="object-cover group-hover/card:scale-105 transition-transform duration-500 will-change-transform"
                                     />
                                     
                                     {/* Play button on hover */}
-                                    <div className="absolute inset-0 bg-black/20 md:bg-black/30 md:opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
-                                        <div className="w-10 h-10 rounded-full bg-[#d3deec] flex items-center justify-center scale-90 md:scale-0 group-hover/card:scale-100 transition-transform duration-300 delay-75">
+                                    <div className="absolute inset-0 bg-black/20 md:bg-black/30 md:opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 flex items-center justify-center z-10 translate-z-0">
+                                        <div className="w-10 h-10 rounded-full bg-[#d3deec] flex items-center justify-center scale-90 md:scale-0 group-hover/card:scale-100 transition-transform duration-500 delay-75 will-change-transform">
                                             <Play className="w-5 h-5 text-[#0d1119] fill-[#0d1119] ml-0.5" />
                                         </div>
                                     </div>

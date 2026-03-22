@@ -159,8 +159,9 @@ body {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: none;
   overflow-x: hidden;
-  /* Reduced paint overhead */
+  /* Reduced paint overhead & hardware acceleration hints */
   text-rendering: optimizeLegibility;
+  font-display: swap;
 }
 
 /* Performance: Content Visibility & Layout Stability */
@@ -241,14 +242,16 @@ h2 {
 
   /* 3D Card Hover Effect — use transform only (no box-shadow transition) for perf */
   .card-hover-3d {
-    transition: transform 0.35s cubic-bezier(0.2, 0, 0, 1);
+    transition: transform 0.4s cubic-bezier(0.2, 0, 0, 1);
     will-change: transform;
+    backface-visibility: hidden;
+    transform: translateZ(0);
   }
 
   .card-hover-3d:hover {
-    transform: scale(1.015) translateY(-2px) translateZ(0);
+    transform: scale(1.02) translateY(-4px) translateZ(0);
     /* box-shadow paint is kept off transition to avoid repaint triggering */
-    box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.44);
+    box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.5);
   }
 
   /* Button Styles */
