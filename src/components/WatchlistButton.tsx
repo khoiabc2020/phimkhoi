@@ -52,7 +52,7 @@ export default function WatchlistButton({ slug, className = "", showLabel = fals
             title={inWatchlist ? "Xóa khỏi danh sách" : "Thêm vào danh sách"}
         >
             {inWatchlist ? (
-                <BookmarkCheck className="w-5 h-5 text-green-600 shrink-0" />
+                <BookmarkCheck className="w-5 h-5 text-[#8FA7C5] shrink-0" />
             ) : (
                 <BookmarkPlus className="w-5 h-5 text-current transition-colors shrink-0" />
             )}

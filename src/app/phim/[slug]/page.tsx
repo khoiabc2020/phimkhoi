@@ -308,8 +308,8 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 font-bold text-sm mt-3 drop-shadow-md">
                                     {isCompleted ? (
                                         <>
-                                            <span className="inline-flex items-center gap-1.5 bg-green-500/15 text-green-400 border border-green-500/30 px-3 py-1 rounded-full text-xs font-bold">
-                                                <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
+                                            <span className="inline-flex items-center gap-1.5 bg-[#8FA7C5]/15 text-[#8FA7C5] border border-[#8FA7C5]/30 px-3 py-1 rounded-full text-xs font-bold">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-[#8FA7C5] inline-block" />
                                                 Hoàn Tất
                                             </span>
                                             <span className="text-gray-300 text-xs font-medium bg-white/5 border border-white/10 px-3 py-1 rounded-full">{total} Tập</span>

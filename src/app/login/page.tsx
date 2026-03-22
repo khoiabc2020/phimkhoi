@@ -83,7 +83,7 @@ function LoginForm() {
             <p className="text-white/45 text-[15px] mb-8 text-center w-full">Cùng thưởng thức những bộ phim tuyệt vời nhất.</p>
 
             {registered && (
-                <div className="mb-6 p-4 bg-green-500/20 border border-green-500/50 rounded text-green-400 text-center font-medium animate-in fade-in slide-in-from-top-4">
+                <div className="mb-6 p-4 bg-[#8FA7C5]/20 border border-[#8FA7C5]/50 rounded text-[#8FA7C5] text-center font-medium animate-in fade-in slide-in-from-top-4">
                     🎉 Đăng ký thành công! Hãy đăng nhập ngay.
                 </div>
             )}

@@ -176,13 +176,13 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                     {currentMovie.actor && (
                         <div className="absolute inset-0 z-20 pointer-events-none flex items-end justify-end overflow-hidden">
                             <motion.div
-                                initial={{ x: 40, opacity: 0, scale: (currentMovie.actorScale || 0.85) + 0.05 }}
-                                animate={{ x: 0, opacity: 0.9, scale: currentMovie.actorScale || 0.85 }}
-                                transition={{ delay: 0.1, duration: 1.2, ease: slideEase }}
-                                className="relative w-[70%] h-[80%] md:w-[60%] md:h-[90%] lg:w-[45%] lg:h-[100%] mr-[5%] md:mr-[8%] lg:mr-[12%] optimize-gpu will-change-transform"
+                                initial={{ x: 30, opacity: 0, scale: (currentMovie.actorScale || 0.75) + 0.05 }}
+                                animate={{ x: 0, opacity: 0.9, scale: currentMovie.actorScale || 0.75 }}
+                                transition={{ delay: 0.1, duration: 0.8, ease: slideEase }}
+                                className="relative w-[60%] h-[70%] md:w-[50%] md:h-[80%] lg:w-[38%] lg:h-[90%] mr-[4%] md:mr-[6%] lg:mr-[10%] optimize-gpu will-change-transform"
                             >
                                 <Image 
-                                    src={currentMovie.actor}
+                                    src={`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(currentMovie.actor)}&w=1000&q=85`}
                                     alt="Characters"
                                     fill
                                     className="object-contain object-right-bottom drop-shadow-[0_25px_50px_rgba(0,0,0,0.9)]"
@@ -226,7 +226,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                                 transition={{ delay: 0.4, duration: 0.8 }}
                                 className="flex flex-wrap items-center gap-3 text-[13px] md:text-[15px] font-bold text-white/90"
                             >
-                                <div className="bg-[#00A859] text-white px-2 py-0.5 rounded-sm text-[10px] md:text-[11px] font-black tracking-tighter uppercase">
+                                <div className="bg-[#8FA7C5] text-[#0a0a0a] px-2 py-0.5 rounded-sm text-[10px] md:text-[11px] font-black tracking-tighter uppercase">
                                     TOP 10
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -234,7 +234,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                                     <span className="text-white/30 font-light">|</span>
                                     <span>Trung Quốc</span>
                                     <span className="text-white/30 font-light">|</span>
-                                    <span className="text-primary">{currentMovie.displayEpisodes}</span>
+                                    <span className="text-[#8FA7C5]">{currentMovie.displayEpisodes}</span>
                                 </div>
                             </motion.div>
 
@@ -271,7 +271,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                             >
                                 <Link 
                                     href={`/phim/${currentMovie.slug}`}
-                                    className="flex items-center gap-2 md:gap-3 px-6 md:px-10 h-11 md:h-14 bg-[#00A859] text-white rounded-full font-black text-[14px] md:text-[16px] hover:bg-[#00c86a] hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-green-900/30 group uppercase tracking-wider"
+                                    className="flex items-center gap-2 md:gap-3 px-6 md:px-10 h-11 md:h-14 bg-[#8FA7C5] text-[#0a0a0a] rounded-full font-black text-[14px] md:text-[16px] hover:bg-white hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-[#8FA7C5]/20 group uppercase tracking-wider"
                                 >
                                     <Play className="w-4 h-4 md:w-5 md:h-5 fill-current" />
                                     Xem Ngay

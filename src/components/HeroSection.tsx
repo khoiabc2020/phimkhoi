@@ -131,7 +131,7 @@ function Dots({ count, active, onGo }: { count: number; active: number; onGo: (i
 // ─── MOBILE HERO ──────────────────────────────────────────────────────────────
 
 function MobileHero({ movies, active = true }: { movies: Movie[], active?: boolean }) {
-    const { index, next, prev } = useAutoplay(movies.length, 5000, !active);
+    const { index, go, next, prev } = useAutoplay(movies.length, 5000, !active);
     const movie = movies[index] as any;
     
     // touch swipe
@@ -148,12 +148,12 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
 
     return (
         <div 
-            className="relative w-full aspect-[2/3] sm:aspect-[16/10] overflow-hidden bg-[#0a0a0a]"
+            className="relative w-full aspect-[10/14] sm:aspect-[16/10] overflow-hidden bg-[#0a0a0a]"
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
         >
-            <AnimatePresence mode="popLayout" initial={false}>
+            <AnimatePresence initial={false}>
                 <motion.div
                     key={`mobile-slide-${movie._id || index}`}
                     initial={{ opacity: 0 }}
@@ -162,51 +162,28 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                     transition={{ duration: 0.6, ease: "easeInOut" }}
                     className="absolute inset-0"
                 >
-                    {/* Background Backdrop (Top/Blurry) */}
-                    <div className="absolute inset-x-0 top-0 h-[60%] opacity-40 blur-xl scale-110">
+                    {/* Background Backdrop (Full Screen) */}
+                    <div className="absolute inset-0">
                         <Image
-                            src={getHeroImage(movie, "backdrop", "mobile")}
+                            src={`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(movie, "backdrop", "mobile"))}&w=1080&q=75`}
                             alt=""
                             fill
                             className="object-cover"
                             priority
-                            unoptimized
+                            decoding="async"
                         />
-                    </div>
-
-                    {/* Gradient Overlays */}
-                    <div className="absolute inset-0 z-[1] bg-gradient-to-b from-black/40 via-[#0a0a0a]/80 to-[#0a0a0a]" />
-
-                    {/* Poster Center Stage */}
-                    <div className="absolute inset-x-0 top-[8%] flex justify-center px-8 z-[2]">
-                        <motion.div
-                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
-                            animate={{ scale: 1, opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, ease }}
-                            className="relative w-full max-w-[220px] sm:max-w-[260px] aspect-[2/3] rounded-xl overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.6)] border border-white/10"
-                        >
-                            <Image
-                                src={getHeroImage(movie, "poster", "mobile")}
-                                alt={decodeHtml(movie.name)}
-                                fill
-                                className="object-cover"
-                                priority
-                                unoptimized
-                                placeholder="blur"
-                                blurDataURL={blurData}
-                            />
-                        </motion.div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/40 to-black/20" />
                     </div>
 
                     {/* Content Block */}
-                    <div className="absolute inset-x-0 bottom-0 z-[10] px-6 pb-12 text-center flex flex-col items-center gap-2">
+                    <div className="absolute inset-x-0 bottom-0 z-[10] px-6 pb-12 flex flex-col items-center gap-2 text-center">
                         <motion.div
                             initial={{ y: 20, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
-                            transition={{ delay: 0.2, duration: 0.5, ease }}
+                            transition={{ delay: 0.1, duration: 0.5, ease }}
                         >
                             {movie.isCustomHero && movie.layer_logo ? (
-                                <div className="relative w-[180px] h-[54px] mb-2">
+                                <div className="relative w-[180px] h-[54px] mb-2 mx-auto">
                                     <Image
                                         src={movie.layer_logo}
                                         alt={decodeHtml(movie.name)}
@@ -216,7 +193,7 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                                     />
                                 </div>
                             ) : (
-                                <h1 className="text-[20px] md:text-[24px] font-black text-white leading-tight mb-1 uppercase drop-shadow-lg">
+                                <h1 className="text-[24px] md:text-[28px] font-black text-white leading-tight mb-1 uppercase drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] px-4">
                                     {decodeHtml(movie.name)}
                                 </h1>
                             )}
@@ -225,10 +202,10 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                         <motion.div 
                             initial={{ y: 15, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
-                            transition={{ delay: 0.3, duration: 0.5, ease }}
+                            transition={{ delay: 0.2, duration: 0.5, ease }}
                             className="flex items-center gap-3 text-[13px] font-bold text-white/90"
                         >
-                            <div className="bg-[#00A859] text-white px-2 py-0.5 rounded-sm text-[10px] md:text-[11px] font-black tracking-tighter uppercase">
+                            <div className="bg-[#8FA7C5] text-[#0a0a0a] px-2 py-0.5 rounded-sm text-[10px] md:text-[11px] font-black tracking-tighter uppercase">
                                 TOP 10
                             </div>
                             <div className="flex items-center gap-2">
@@ -236,26 +213,26 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                                 <span className="text-white/30 font-light">|</span>
                                 <span>{movie.country?.[0]?.name || "Phim"}</span>
                                 <span className="text-white/30 font-light">|</span>
-                                <span className="text-[#00A859]">{movie.episode_current || "Full"}</span>
+                                <span className="text-[#8FA7C5]">{movie.episode_current || "Full"}</span>
                             </div>
                         </motion.div>
 
                         <motion.div
                             initial={{ y: 15, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
-                            transition={{ delay: 0.4, duration: 0.5, ease }}
-                            className="flex items-center gap-3 pt-3"
+                            transition={{ delay: 0.3, duration: 0.5, ease }}
+                            className="flex items-center gap-3 pt-4"
                         >
                             <Link
                                 href={`/phim/${movie.slug}`}
-                                className="h-11 px-8 rounded-full bg-[#00A859] text-white font-black text-[13px] uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-green-900/20 active:scale-95 transition-all"
+                                className="h-12 px-10 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[14px] uppercase tracking-wider flex items-center gap-2 shadow-xl shadow-[#8FA7C5]/20 active:scale-95 transition-all"
                             >
-                                <Play className="w-4 h-4 fill-current" />
+                                <Play className="w-5 h-5 fill-current" />
                                 Xem Ngay
                             </Link>
                             <WatchlistButton
                                 slug={movie.slug}
-                                className="h-11 w-11 rounded-full bg-white/10 border border-white/20 text-white flex items-center justify-center p-0"
+                                className="h-12 w-12 rounded-full bg-white/10 border border-white/20 text-white flex items-center justify-center p-0 backdrop-blur-md"
                                 showLabel={false}
                             />
                         </motion.div>
@@ -263,14 +240,15 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                 </motion.div>
             </AnimatePresence>
 
-            {/* Indicators - Onflix Style Pill Dots */}
-            <div className="absolute bottom-6 left-0 right-0 z-20 flex justify-center gap-1.5">
-                {movies.map((_, i) => (
-                    <div 
+            {/* Indicators - Pill Style */}
+            <div className="absolute bottom-6 left-0 right-0 z-20 flex justify-center gap-1.5 px-4 overflow-hidden">
+                {movies.slice(0, 10).map((_, i) => (
+                    <button 
                         key={i} 
+                        onClick={() => go(i)}
                         className={cn(
                             "h-1.5 rounded-full transition-all duration-300",
-                            i === index ? "w-6 bg-[#00A859] shadow-[0_0_8px_#00A859]" : "w-1.5 bg-white/20"
+                            i === index ? "w-6 bg-[#8FA7C5] shadow-[0_0_8px_#8FA7C5]" : "w-1.5 bg-white/30"
                         )} 
                     />
                 ))}
@@ -308,13 +286,13 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
             style={{ contain: "layout size" }}
         >
             {/* ── Crossfade backdrop stack (Cinematic Full Bleed) ── */}
-            <AnimatePresence mode="popLayout" initial={false}>
+            <AnimatePresence initial={false}>
                 <motion.div
                     key={`slide-${movie._id || index}`}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.8, ease: "easeInOut" }}
+                    transition={{ duration: 0.6, ease: "easeInOut" }}
                     className="absolute inset-0"
                 >
                     {/* Background Layer with scaling effect */}
@@ -348,12 +326,11 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                 className="relative w-full h-full"
                             >
                                 <Image
-                                    src={movie.layer_character}
+                                    src={`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(movie.layer_character)}&w=1200&q=85`}
                                     alt=""
                                     fill
                                     className="object-cover object-[center_bottom]"
                                     sizes="100vw"
-                                    unoptimized
                                     priority
                                 />
                             </motion.div>
@@ -411,7 +388,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                     transition={{ delay: 0.3, duration: 0.6, ease }}
                                     className="flex flex-wrap items-center gap-3 lg:gap-4 font-bold text-[14px] lg:text-[15px] text-white/90"
                                 >
-                                    <div className="bg-[#00A859] text-white px-2 py-0.5 rounded-sm text-[11px] lg:text-[12px] font-black tracking-tighter uppercase shadow-lg shadow-green-900/20">
+                                    <div className="bg-[#8FA7C5] text-[#0a0a0a] px-2 py-0.5 rounded-sm text-[11px] lg:text-[12px] font-black tracking-tighter uppercase shadow-lg shadow-blue-900/20">
                                         TOP 10
                                     </div>
                                     <div className="flex items-center gap-3">
@@ -419,7 +396,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                         {movie.country?.[0] && <span className="text-white/20 font-light">|</span>}
                                         {movie.country?.[0] && <span>{movie.country[0].name}</span>}
                                         {movie.episode_current && <span className="text-white/20 font-light">|</span>}
-                                        <span className="text-[#00A859]">{movie.episode_current || "Full"}</span>
+                                        <span className="text-[#8FA7C5]">{movie.episode_current || "Full"}</span>
                                     </div>
                                 </motion.div>
 
@@ -467,9 +444,9 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                 >
                                     <Link
                                         href={`/phim/${movie.slug}`}
-                                        className="flex items-center justify-center gap-2 h-12 md:h-14 px-8 md:px-10 rounded-full bg-[#00A859] text-white font-black text-[15px] lg:text-[16px] uppercase tracking-wide transition-all duration-300 hover:scale-105 active:scale-95 group shadow-xl shadow-green-900/30"
+                                        className="flex items-center justify-center gap-2 h-12 md:h-14 px-8 md:px-10 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[15px] lg:text-[16px] uppercase tracking-wide transition-all duration-300 hover:scale-105 active:scale-95 group shadow-xl shadow-[#8FA7C5]/30"
                                     >
-                                        <Play className="w-5 h-5 fill-white shrink-0 group-hover:scale-110 transition-transform" />
+                                        <Play className="w-5 h-5 fill-current shrink-0 group-hover:scale-110 transition-transform" />
                                         Xem Ngay
                                     </Link>
                                     <WatchlistButton
