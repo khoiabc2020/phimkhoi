@@ -47,7 +47,7 @@ async function PhimTrungHome() {
     const filterChina = (movies: Movie[]) => movies.filter(m => m.country?.some(c => c.slug === "trung-quoc"));
 
     return (
-        <div className="space-y-12 md:space-y-16 pb-12 pt-6 md:pt-10">
+        <div className="space-y-12 md:space-y-16 pb-12">
             <div style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}>
                 <MovieRow title="Phim Đang Chiếu" movies={latest.items} slug="/quoc-gia/trung-quoc" priorityFirst />
             </div>
@@ -145,7 +145,7 @@ export default async function PhimTrungPage({ searchParams }: { searchParams: Pr
                 <div className="absolute top-0 left-0 right-0 h-[400px] bg-gradient-to-b from-[#0e1621] via-transparent to-transparent pointer-events-none -z-10 blur-[120px]" />
 
                 {currentPage === 1 ? (
-                    <div className="pt-4 lg:pt-8 w-full">
+                    <div className="-mt-24 md:-mt-32 lg:-mt-40 relative z-30 w-full">
                         <Suspense fallback={<div className="h-96 flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" /></div>}>
                             <PhimTrungHome />
                         </Suspense>

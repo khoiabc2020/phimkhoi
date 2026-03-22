@@ -156,10 +156,13 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                             priority
                             quality={90}
                         />
-                        {/* IQIYI Style Masks: Strong left mask for readability + bottom mask */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent z-10" />
-                        <div className="absolute inset-y-0 left-0 w-[40%] bg-gradient-to-r from-black to-transparent z-10 opacity-80" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10" />
+                        {/* IQIYI/Netflix Style Masks */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/20 to-transparent z-10" />
+                        <div className="absolute inset-y-0 left-0 w-[50%] bg-gradient-to-r from-black via-black/60 to-transparent z-10" />
+                        
+                        {/* THE "ONFLIX" BOTTOM FADE - Multi-layered for maximum smoothness */}
+                        <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-black via-black/80 to-transparent z-10" />
+                        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent z-20" />
                     </motion.div>
 
                     {/* Layer 2: Actor Cutout (Parallax) */}
