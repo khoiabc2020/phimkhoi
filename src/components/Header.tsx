@@ -30,9 +30,6 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
     const [openDropdown, setOpenDropdown] = useState<"categories" | "countries" | null>(null);
     const router = useRouter();
     const pathname = usePathname();
-    const searchParams = useSearchParams();
-    const currentPage = searchParams.get("page");
-    const isFirstPage = !currentPage || currentPage === "1";
     const { data: session } = useSession();
     const searchInputRef = useRef<HTMLInputElement>(null);
     const navRef = useRef<HTMLDivElement | null>(null);

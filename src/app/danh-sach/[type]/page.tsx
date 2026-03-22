@@ -113,7 +113,9 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
                                 Trang <span className="text-white font-bold">{pagination?.currentPage}</span> / <span className="text-white/60">{pagination?.totalPages}</span>
                             </p>
                             <div className="w-full md:w-auto">
-                                <FilterBar />
+                                <Suspense fallback={<div className="w-32 h-8 bg-white/5 animate-pulse rounded" />}>
+                                    <FilterBar />
+                                </Suspense>
                             </div>
                         </div>
                     </div>
@@ -133,10 +135,12 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
                 </div>
                 {/* Pagination */}
                 {pagination && (
-                    <Pagination
-                        currentPage={pagination.currentPage}
-                        totalPages={pagination.totalPages}
-                    />
+                    <Suspense fallback={<div className="h-10 bg-white/5 rounded-lg animate-pulse" />}>
+                        <Pagination
+                            currentPage={pagination.currentPage}
+                            totalPages={pagination.totalPages}
+                        />
+                    </Suspense>
                 )}
             </div>
         </main>

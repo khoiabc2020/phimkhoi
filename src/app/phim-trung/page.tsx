@@ -110,10 +110,12 @@ async function CountryGridStream({ slug, page }: { slug: string; page: number })
                     <MovieCard key={movie._id} movie={movie} />
                 ))}
             </div>
-            <Pagination
-                currentPage={data.pagination.currentPage}
-                totalPages={data.pagination.totalPages}
-            />
+            <Suspense fallback={<div className="h-10 bg-white/5 rounded-lg animate-pulse" />}>
+                <Pagination
+                    currentPage={data.pagination.currentPage}
+                    totalPages={data.pagination.totalPages}
+                />
+            </Suspense>
         </div>
     );
 }
@@ -196,7 +198,9 @@ export default async function PhimTrungPage({ searchParams }: { searchParams: Pr
                             </div>
 
                             <div className="w-full md:w-auto bg-[#0a0a0a]/80 backdrop-blur-md rounded-[12px] p-1 border border-white/[0.05] shadow-xl">
-                                <FilterBar categories={categories} countries={countries} />
+                                <Suspense fallback={<div className="w-32 h-8 bg-white/5 animate-pulse rounded" />}>
+                                    <FilterBar categories={categories} countries={countries} />
+                                </Suspense>
                             </div>
                         </div>
 
