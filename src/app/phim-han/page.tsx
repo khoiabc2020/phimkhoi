@@ -23,24 +23,22 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const FEATURED_ACTORS = [
-    { name: "Kim Ji-won", image: "https://image.tmdb.org/t/p/w300_and_h300_face/8V0xY9S6p2f3B0h9R6N5.jpg" },
+    { name: "Kim Ji-won", image: "https://image.tmdb.org/t/p/w300_and_h300_face/3qUaQG8W0lP9S6p2f3B0h9R6N5.jpg" },
     { name: "Ji Chang-wook", image: "https://image.tmdb.org/t/p/w300_and_h300_face/h8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
     { name: "Kim Yoo-jung", image: "https://image.tmdb.org/t/p/w300_and_h300_face/7qS7W8C5uUqQGfF9lqW8u9R6N5.jpg" },
     { name: "Kim Se-jeong", image: "https://image.tmdb.org/t/p/w300_and_h300_face/m9p0q1r2s3t4u5v6w7x8y9z0a1b.jpg" },
     { name: "Ahn Bo-hyun", image: "https://image.tmdb.org/t/p/w300_and_h300_face/k7X8v8K7X8v8K7X8v8K7X8v8K7X.jpg" },
-    { name: "Song Kang", image: "https://image.tmdb.org/t/p/w300_and_h300_face/j8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
-    { name: "IU", image: "https://image.tmdb.org/t/p/w300_and_h300_face/i8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
-    { name: "Park Seo-jun", image: "https://image.tmdb.org/t/p/w300_and_h300_face/g8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
-    { name: "Han So-hee", image: "https://image.tmdb.org/t/p/w300_and_h300_face/f8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
 ];
 
 async function PhimHanHome() {
     // Fetch multiple categories for Korea
-    const [latest, romance, action, historical] = await Promise.all([
+    const [latest, romance, action, historical, animation, crime] = await Promise.all([
         getMoviesByCountry("han-quoc", 1, 14),
         getMoviesByCategory("tinh-cam", 1, 20),
         getMoviesByCategory("hanh-dong", 1, 20),
         getMoviesByCategory("co-trang", 1, 20),
+        getMoviesByCategory("hoat-hinh", 1, 20),
+        getMoviesByCategory("hinh-su", 1, 20),
     ]);
 
     const filterKorea = (movies: Movie[]) => movies.filter(m => m.country?.some(c => c.slug === "han-quoc"));
@@ -55,16 +53,24 @@ async function PhimHanHome() {
                 <MovieRow title="Phim Tình Cảm" movies={filterKorea(romance.items)} slug="/the-loai/tinh-cam" />
             </div>
             
+            <div style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}>
+                <MovieRow title="Phim Hành Động" movies={filterKorea(action.items)} slug="/the-loai/hanh-dong" />
+            </div>
+
+            <div style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}>
+                <MovieRow title="Phim Cổ Trang" movies={filterKorea(historical.items)} slug="/the-loai/co-trang" />
+            </div>
+
             <div style={{ contentVisibility: 'auto', containIntrinsicSize: '0 200px' }}>
                 <ActorRow title="Diễn viên nổi bật" actors={FEATURED_ACTORS} />
             </div>
 
             <div style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}>
-                <MovieRow title="Phim Hành Động" movies={filterKorea(action.items)} slug="/the-loai/hanh-dong" />
+                <MovieRow title="Phim Hoạt Hình" movies={filterKorea(animation.items)} slug="/the-loai/hoat-hinh" />
             </div>
             
             <div style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}>
-                <MovieRow title="Phim Cổ Trang" movies={filterKorea(historical.items)} slug="/the-loai/co-trang" />
+                <MovieRow title="Phim Hình Sự" movies={filterKorea(crime.items)} slug="/the-loai/hinh-su" />
             </div>
         </div>
     );
