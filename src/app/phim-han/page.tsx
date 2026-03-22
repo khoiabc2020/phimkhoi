@@ -24,22 +24,21 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const FEATURED_ACTORS = [
-    { name: "Kim Ji-won", image: "https://image.tmdb.org/t/p/w300_and_h300_face/3qUaQG8W0lP9S6p2f3B0h9R6N5.jpg" },
-    { name: "Ji Chang-wook", image: "https://image.tmdb.org/t/p/w300_and_h300_face/h8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
-    { name: "Kim Yoo-jung", image: "https://image.tmdb.org/t/p/w300_and_h300_face/7qS7W8C5uUqQGfF9lqW8u9R6N5.jpg" },
-    { name: "Kim Se-jeong", image: "https://image.tmdb.org/t/p/w300_and_h300_face/m9p0q1r2s3t4u5v6w7x8y9z0a1b.jpg" },
-    { name: "Ahn Bo-hyun", image: "https://image.tmdb.org/t/p/w300_and_h300_face/k7X8v8K7X8v8K7X8v8K7X8v8K7X.jpg" },
+    { name: "Kim Ji-won", role: "Nữ Hoàng Nước Mắt", image: "https://image.tmdb.org/t/p/w300_and_h450_face/lX7W1j9kg4jV6XNn5XEE3rKsd3x.jpg" },
+    { name: "Ji Chang-wook", role: "Hậu Duệ Mặt Trời", image: "https://image.tmdb.org/t/p/w300_and_h450_face/sBmHrO5Tn27Ot5hy0yAKniROmNb.jpg" },
+    { name: "Song Hye-kyo", role: "Vinh Quang Trong Hận Thù", image: "https://image.tmdb.org/t/p/w300_and_h450_face/3qUaQG8W0lP9S6p2f3B0h9R6N5.jpg" },
+    { name: "Park Seo-joon", role: "Tầng Lớp Itaewon", image: "https://image.tmdb.org/t/p/w300_and_h450_face/96Y63pUf2bE486V02r2K5c0kFf3.jpg" },
+    { name: "Han So-hee", role: "Dẫu Biết", image: "https://image.tmdb.org/t/p/w300_and_h450_face/6LPr0Bov63jS5s6Dk5W6F8G2Y1.jpg" },
+    { name: "Lee Min-ho", role: "Quân Vương Bất Diệt", image: "https://image.tmdb.org/t/p/w300_and_h450_face/6LPr0Bov63jS5s6Dk5W6F8G2Y1.jpg" },
 ];
 
 async function PhimHanHome() {
     // Fetch multiple categories for Korea
-    const [latest, romance, action, historical, animation, crime] = await Promise.all([
-        getMoviesByCountry("han-quoc", 1, 14),
-        getMoviesByCategory("tinh-cam", 1, 20),
-        getMoviesByCategory("hanh-dong", 1, 20),
-        getMoviesByCategory("co-trang", 1, 20),
-        getMoviesByCategory("hoat-hinh", 1, 20),
-        getMoviesByCategory("hinh-su", 1, 20),
+    const [action, romance, comedy, thriller] = await Promise.all([
+        getMoviesByCategory("hanh-dong", 1, 60),
+        getMoviesByCategory("tinh-cam", 1, 60),
+        getMoviesByCategory("hai-huoc", 1, 60),
+        getMoviesByCategory("kinh-di", 1, 60),
     ]);
 
     const filterKorea = (movies: Movie[]) => movies.filter(m => m.country?.some(c => c.slug === "han-quoc"));

@@ -27,26 +27,29 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const FEATURED_ACTORS = [
-    { name: "Tiêu Chiến", image: "https://image.tmdb.org/t/p/w300_and_h300_face/3qUaQG8W0lP9S6p2f3B0h9R6N5.jpg" },
-    { name: "Vương Nhất Bác", image: "https://image.tmdb.org/t/p/w300_and_h300_face/h8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
-    { name: "Triệu Lộ Tư", image: "https://image.tmdb.org/t/p/w300_and_h300_face/7qS7W8C5uUqQGfF9lqW8u9R6N5.jpg" },
-    { name: "Ngu Thư Hân", image: "https://image.tmdb.org/t/p/w300_and_h300_face/m9p0q1r2s3t4u5v6w7x8y9z0a1b.jpg" },
-    { name: "Địch Lệ Nhiệt Ba", image: "https://image.tmdb.org/t/p/w300_and_h300_face/k7X8v8K7X8v8K7X8v8K7X8v8K7X.jpg" },
-    { name: "Dương Tử", image: "https://image.tmdb.org/t/p/w300_and_h300_face/j8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
-    { name: "Hứa Khải", image: "https://image.tmdb.org/t/p/w300_and_h300_face/i8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
-    { name: "Cúc Tịnh Y", image: "https://image.tmdb.org/t/p/w300_and_h300_face/g8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
-    { name: "Trần Tinh Húc", image: "https://image.tmdb.org/t/p/w300_and_h300_face/f8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
+    { name: "Tiêu Chiến", role: "Ngọc Cốt Dao", image: "https://image.tmdb.org/t/p/w300_and_h450_face/468n73j2sSJIbfZvsIZvDpvUaS8.jpg" },
+    { name: "Vương Nhất Bác", role: "Trần Tình Lệnh", image: "https://image.tmdb.org/t/p/w300_and_h450_face/5akr656RvJX8hl1pa1qZckfiQeF.jpg" },
+    { name: "Địch Lệ Nhiệt Ba", role: "Trường Ca Hành", image: "https://image.tmdb.org/t/p/w300_and_h450_face/5LPr0Bov63jS5s6Dk5W6F8G2Y1.jpg" },
+    { name: "Triệu Lộ Tư", role: "Thần Ẩn", image: "https://image.tmdb.org/t/p/w300_and_h450_face/96Y63pUf2bE486V02r2K5c0kFf3.jpg" },
+    { name: "Cung Tuấn", role: "An Lạc Truyện", image: "https://image.tmdb.org/t/p/w300_and_h450_face/6LPr0Bov63jS5s6Dk5W6F8G2Y1.jpg" },
+    { name: "Ngu Thư Hân", role: "Thương Lan Quyết", image: "https://image.tmdb.org/t/p/w300_and_h450_face/468n73j2sSJIbfZvsIZvDpvUaS8.jpg" },
+    { name: "Dương Tử", role: "Trường Tương Tư", image: "https://image.tmdb.org/t/p/w300_and_h450_face/j8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
+    { name: "Hứa Khải", role: "Lạc Du Nguyên", image: "https://image.tmdb.org/t/p/w300_and_h450_face/i8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
+    { name: "Cúc Tịnh Y", role: "Hoa Nhung", image: "https://image.tmdb.org/t/p/w300_and_h450_face/g8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
+    { name: "Trần Tinh Húc", role: "Tinh Lạc Ngưng Thành Đường", image: "https://image.tmdb.org/t/p/w300_and_h450_face/f8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
 ];
 
 async function PhimTrungHome() {
     // Fetch multiple categories for China
-    const [latest, romance, action, historical, animation, crime] = await Promise.all([
+    const [latest, romance, action, historical, animation, crime, comedy, thriller] = await Promise.all([
         getMoviesByCountry("trung-quoc", 1, 14),
-        getMoviesByCategory("tinh-cam", 1, 20),
-        getMoviesByCategory("hanh-dong", 1, 20),
-        getMoviesByCategory("co-trang", 1, 20),
-        getMoviesByCategory("hoat-hinh", 1, 20),
-        getMoviesByCategory("hinh-su", 1, 20),
+        getMoviesByCategory("tinh-cam", 1, 60),
+        getMoviesByCategory("hanh-dong", 1, 60),
+        getMoviesByCategory("co-trang", 1, 60),
+        getMoviesByCategory("hoat-hinh", 1, 60),
+        getMoviesByCategory("hinh-su", 1, 60),
+        getMoviesByCategory("hai-huoc", 1, 60),
+        getMoviesByCategory("kinh-di", 1, 60),
     ]);
 
     // Filter by country if needed (PhimAPI usually groups by category globally)

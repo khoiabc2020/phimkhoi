@@ -234,7 +234,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                                             type="text" 
                                             value={editName}
                                             onChange={(e) => setEditName(e.target.value)}
-                                            className="w-full bg-white/[0.02] border border-white/[0.05] rounded-xl px-4 py-3 text-sm text-white font-medium focus:border-purple-500/40 focus:outline-none transition-all placeholder:text-gray-700"
+                                            className="w-full bg-white/[0.02] border border-white/[0.05] rounded-xl px-4 py-3 text-sm text-white font-medium focus:border-[#8FA7C5]/40 focus:outline-none transition-all placeholder:text-gray-700"
                                             placeholder="Nhập tên của bạn"
                                         />
                                     </div>
@@ -244,7 +244,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                                             type="email" 
                                             value={editEmail}
                                             onChange={(e) => setEditEmail(e.target.value)}
-                                            className="w-full bg-white/[0.02] border border-white/[0.05] rounded-xl px-4 py-3 text-sm text-white font-medium focus:border-purple-500/40 focus:outline-none transition-all placeholder:text-gray-700"
+                                            className="w-full bg-white/[0.02] border border-white/[0.05] rounded-xl px-4 py-3 text-sm text-white font-medium focus:border-[#8FA7C5]/40 focus:outline-none transition-all placeholder:text-gray-700"
                                             placeholder="Nhập email"
                                         />
                                     </div>
@@ -256,7 +256,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                                         {isSavingProfile ? <Loader2 className="w-4 h-4 animate-spin" /> : "Lưu thay đổi"}
                                     </button>
                                     {saveMessage.text && (
-                                        <span className={`ml-3 text-[10px] font-bold uppercase tracking-widest ${saveMessage.type === 'success' ? 'text-green-500' : 'text-red-500'}`}>
+                                        <span className={`ml-3 text-[10px] font-bold uppercase tracking-widest ${saveMessage.type === 'success' ? 'text-[#8FA7C5]' : 'text-red-500'}`}>
                                             {saveMessage.text}
                                         </span>
                                     )}
@@ -316,7 +316,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                                         {isChangingPass ? <Loader2 className="w-4 h-4 animate-spin" /> : "Đặt lại mật khẩu"}
                                     </button>
                                     {passMessage.text && (
-                                        <span className={`ml-3 text-[10px] font-bold uppercase tracking-widest ${passMessage.type === 'success' ? 'text-green-500' : 'text-red-500'}`}>
+                                        <span className={`ml-3 text-[10px] font-bold uppercase tracking-widest ${passMessage.type === 'success' ? 'text-[#8FA7C5]' : 'text-red-500'}`}>
                                             {passMessage.text}
                                         </span>
                                     )}
@@ -371,11 +371,11 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                             <button
                                 key={item.id}
                                 onClick={() => setActiveTab(item.id)}
-                                className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${activeTab === item.id ? "text-purple-400 bg-purple-500/5" : "text-gray-500 hover:text-white hover:bg-white/5"}`}
+                                className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${activeTab === item.id ? "text-[#8FA7C5] bg-[#8FA7C5]/5" : "text-gray-500 hover:text-white hover:bg-white/5"}`}
                             >
                                 <item.icon className="w-4 h-4 shrink-0" />
                                 <span>{item.label}</span>
-                                {activeTab === item.id && <div className="ml-auto w-1 h-1 rounded-full bg-purple-500 hidden md:block"></div>}
+                                {activeTab === item.id && <div className="ml-auto w-1 h-1 rounded-full bg-[#8FA7C5] hidden md:block"></div>}
                             </button>
                         ))}
                     </nav>
@@ -424,9 +424,9 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                                         >
                                             <Image src={url} alt="" fill className="object-cover" unoptimized={url.startsWith('http')} />
                                             {user?.image === url && (
-                                                <div className="absolute inset-0 bg-purple-500/10 flex items-center justify-center">
+                                                <div className="absolute inset-0 bg-[#8FA7C5]/10 flex items-center justify-center">
                                                     <div className="bg-white rounded-full p-1 shadow-xl">
-                                                        <Check className="w-3 h-3 text-purple-600" />
+                                                        <Check className="w-3 h-3 text-[#8FA7C5]" />
                                                     </div>
                                                 </div>
                                             )}

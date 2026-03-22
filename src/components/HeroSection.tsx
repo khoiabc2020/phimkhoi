@@ -303,7 +303,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                         className="absolute inset-0 z-0 optimize-gpu will-change-transform"
                     >
                         <Image
-                            src={getHeroImage(movie, "backdrop", "desktop")}
+                            src={`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(movie, "backdrop", "desktop"))}&w=1920&q=80`}
                             alt=""
                             fill
                             className="object-cover object-[center_20%]"
@@ -311,7 +311,6 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                             sizes="100vw"
                             placeholder={movie.isCustomHero ? "empty" : "blur"}
                             blurDataURL={movie.isCustomHero ? undefined : blurData}
-                            unoptimized={true}
                             decoding="async"
                         />
                     </motion.div>
@@ -482,14 +481,13 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                 )}
                             >
                                 <Image
-                                    src={getHeroImage(m, "backdrop", "mobile")}
+                                    src={`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(m, "backdrop", "mobile"))}&w=300&q=60`}
                                     alt={decodeHtml(m.name)}
                                     fill
                                     className="object-cover group-hover:scale-105 transition-transform duration-700"
-                                    sizes="160px"
+                                    sizes="200px"
                                     placeholder="blur"
                                     blurDataURL={blurData}
-                                    unoptimized={true}
                                 />
                             </div>
                         );

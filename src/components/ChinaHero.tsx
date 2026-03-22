@@ -10,63 +10,48 @@ import WatchlistButton from "./WatchlistButton";
 
 interface MovieSlideAssets {
     bg: string;
-    actor: string;
     logo: string;
-    actorScale?: number;
 }
 
 const ASSETS_MAP: Record<string, MovieSlideAssets> = {
     "bach-nguyet-phan-tinh": {
         bg: "/images/china-hero/bach-nguyet-bg.webp?v=1.6",
-        actor: "/images/china-hero/bach-nguyet-actor.webp?v=1.6",
         logo: "/images/china-hero/bach-nguyet-logo.webp?v=1.6",
     },
     "bui-hoa-hong": {
         bg: "/images/china-hero/bui-hoa-hong-bg.webp?v=1.6",
-        actor: "/images/china-hero/bui-hoa-hong-actor.webp?v=1.6",
         logo: "/images/china-hero/bui-hoa-hong-logo.webp?v=1.6",
-        actorScale: 1.05,
     },
     "dai-mong-quy-ly": {
         bg: "/images/china-hero/dai-mong-bg.webp?v=1.6",
-        actor: "/images/china-hero/dai-mong-actor.webp?v=1.6",
         logo: "/images/china-hero/dai-mong-logo.webp?v=1.6",
-        actorScale: 0.95,
     },
     "giang-ho-da-vu-thap-nien-dang": {
         bg: "/images/china-hero/giang-ho-bg.webp?v=1.6",
-        actor: "/images/china-hero/giang-ho-actor.webp?v=1.6",
         logo: "/images/china-hero/giang-ho-logo.png?v=1.6",
-        actorScale: 1.15,
     },
     "mac-nhan-tang-kieu": {
         bg: "/images/china-hero/mac-nhan-bg.webp?v=1.6",
-        actor: "/images/china-hero/mac-nhan-actor.webp?v=1.6",
         logo: "/images/china-hero/mac-nhan-logo.webp?v=1.6",
     },
     "ngoc-minh-tra-cot": {
         bg: "/images/china-hero/ngoc-minh-bg.webp?v=1.6",
-        actor: "/images/china-hero/ngoc-minh-actor.webp?v=1.6",
         logo: "/images/china-hero/ngoc-minh-logo.webp?v=1.6",
     },
     "con-ra-the-thong-gi-nua": {
         bg: "/images/china-hero/the-thong-bg.webp?v=1.6",
-        actor: "/images/china-hero/the-thong-actor.webp?v=1.6",
         logo: "/images/china-hero/the-thong-logo.webp?v=1.6",
     },
     "truc-ngoc": {
         bg: "/images/china-hero/truc-ngoc-bg.webp?v=1.6",
-        actor: "/images/china-hero/truc-ngoc-actor.webp?v=1.6",
         logo: "/images/china-hero/truc-ngoc-logo.webp?v=1.6",
     },
     "xin-chao-1983": {
         bg: "/images/china-hero/xin-chao-bg.webp?v=1.6",
-        actor: "/images/china-hero/xin-chao-actor.webp?v=1.6",
         logo: "/images/china-hero/xin-chao-logo.webp?v=1.6",
     },
     "duong-cung-ky-an-thanh-vu-phong-minh": {
         bg: "/images/china-hero/tang-cung-bg.png?v=1.6",
-        actor: "/images/china-hero/tang-cung-actor.png?v=1.6",
         logo: "/images/china-hero/tang-cung-logo.png?v=1.6",
     }
 };
@@ -86,9 +71,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
         return initialMovies.map(movie => {
             const assets = ASSETS_MAP[movie.slug] || {
                 bg: movie.thumb_url || movie.poster_url,
-                actor: "",
                 logo: "",
-                actorScale: 0.85
             };
             
             return {
@@ -171,27 +154,6 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                         <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-black via-black/80 to-transparent z-10" />
                         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent z-20" />
                     </motion.div>
-
-                    {/* Layer 2: Actor Cutout (Parallax) */}
-                    {currentMovie.actor && (
-                        <div className="absolute inset-0 z-20 pointer-events-none flex items-end justify-end overflow-hidden">
-                            <motion.div
-                                initial={{ x: 30, opacity: 0, scale: (currentMovie.actorScale || 0.75) + 0.05 }}
-                                animate={{ x: 0, opacity: 0.9, scale: currentMovie.actorScale || 0.75 }}
-                                transition={{ delay: 0.1, duration: 0.8, ease: slideEase }}
-                                className="relative w-[60%] h-[70%] md:w-[50%] md:h-[80%] lg:w-[38%] lg:h-[90%] mr-[4%] md:mr-[6%] lg:mr-[10%] optimize-gpu will-change-transform"
-                            >
-                                <Image 
-                                    src={`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(currentMovie.actor)}&w=1000&q=85`}
-                                    alt="Characters"
-                                    fill
-                                    className="object-contain object-right-bottom drop-shadow-[0_25px_50px_rgba(0,0,0,0.9)]"
-                                    priority
-                                    quality={95}
-                                />
-                            </motion.div>
-                        </div>
-                    )}
 
                     {/* Layer 3: IQIYI Style Content */}
                     <div className="absolute inset-0 z-30 flex items-center px-6 md:pl-24 md:pr-14 lg:pl-32 xl:pl-[140px] max-w-[1920px] mx-auto">

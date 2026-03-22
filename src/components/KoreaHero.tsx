@@ -10,47 +10,29 @@ import WatchlistButton from "./WatchlistButton";
 
 interface MovieSlideAssets {
     bg: string;
-    actor: string;
     logo: string;
-    actorScale?: number;
-    actorTranslateY?: string;
 }
 
 const ASSETS_MAP: Record<string, MovieSlideAssets> = {
     "nghe-thuat-lua-doi-cua-sarah": {
         bg: "/images/korea-hero/nghe-thuat-lua-doi-cua-sarah-bg.webp?v=1.7",
-        actor: "/images/korea-hero/nghe-thuat-lua-doi-cua-sarah-actor.webp?v=1.7",
         logo: "/images/korea-hero/nghe-thuat-lua-doi-cua-sarah-logo.webp?v=1.7",
-        actorScale: 1.15,     // Tăng từ 0.82 lên để cân bằng
-        actorTranslateY: "-7%"
     },
     "khi-cuoc-doi-cho-ban-qua-quyt": {
         bg: "/images/korea-hero/khi-cuoc-doi-cho-ban-qua-quyt-bg.webp?v=1.7",
-        actor: "/images/korea-hero/khi-cuoc-doi-cho-ban-qua-quyt-actor.png?v=1.7",
         logo: "/images/korea-hero/khi-cuoc-doi-cho-ban-qua-quyt-logo.png?v=1.7",
-        actorScale: 1.05,
-        actorTranslateY: "-10%"
     },
     "tieng-yeu-nay-anh-dich-duoc-khong": {
         bg: "/images/korea-hero/tieng-yeu-nay-anh-dich-duoc-khong-bg.png?v=1.7",
-        actor: "/images/korea-hero/tieng-yeu-nay-anh-dich-duoc-khong-actor.png?v=1.7",
         logo: "/images/korea-hero/tieng-yeu-nay-anh-dich-duoc-khong-logo.webp?v=1.7",
-        actorScale: 1.15,     // Giảm từ 1.25 xuống để cân bằng
-        actorTranslateY: "-12%"
     },
     "ban-trai-theo-yeu-cau": {
         bg: "/images/korea-hero/ban-trai-theo-yeu-cau-bg.webp?v=1.7",
-        actor: "/images/korea-hero/ban-trai-theo-yeu-cau-actor.webp?v=1.7",
         logo: "/images/korea-hero/ban-trai-theo-yeu-cau-logo.webp?v=1.7",
-        actorScale: 1.2,      // Giảm từ 1.35 xuống
-        actorTranslateY: "-8%"
     },
     "trao-em-ca-vu-tru": {
         bg: "/images/korea-hero/trao-em-ca-vu-tru-bg.webp?v=1.7",
-        actor: "/images/korea-hero/trao-em-ca-vu-tru-actor.webp?v=1.7",
         logo: "/images/korea-hero/trao-em-ca-vu-tru-logo.png?v=1.7",
-        actorScale: 1.15,     // To hơn chút (yêu cầu phim 5)
-        actorTranslateY: "-12%" // Đẩy lên (yêu cầu phim 5)
     }
 };
 
@@ -68,10 +50,7 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
         return initialMovies.map(movie => {
             const assets = ASSETS_MAP[movie.slug] || {
                 bg: movie.thumb_url || movie.poster_url,
-                actor: "",
                 logo: "",
-                actorScale: 0.85,
-                actorTranslateY: "0%"
             };
             
             return {
@@ -153,31 +132,6 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                         <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-black via-black/80 to-transparent z-10" />
                         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent z-20" />
                     </motion.div>
-
-                    {/* Layer 2: Actor Cutout (Parallax) */}
-                    {currentMovie.actor && (
-                        <div className="absolute inset-0 z-20 pointer-events-none flex items-end justify-end overflow-hidden">
-                            <motion.div
-                                initial={{ x: 30, opacity: 0, scale: (currentMovie.actorScale || 0.75) + 0.05 }}
-                                animate={{ x: 0, opacity: 0.9, scale: currentMovie.actorScale || 0.75 }}
-                                transition={{ delay: 0.1, duration: 0.8, ease: slideEase }}
-                                className="relative w-[60%] h-[70%] md:w-[50%] md:h-[80%] lg:w-[38%] lg:h-[90%] mr-[4%] md:mr-[6%] lg:mr-[10%] optimize-gpu will-change-transform"
-                            >
-                                <Image 
-                                    src={`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(currentMovie.actor)}&w=1000&q=85`}
-                                    alt="Characters"
-                                    fill
-                                    className="object-contain object-right-bottom drop-shadow-[0_20px_40px_rgba(0,0,0,0.8)]"
-                                    style={{ 
-                                        transform: `scale(${currentMovie.actorScale || 0.75}) translateY(${currentMovie.actorTranslateY || "0%"})`,
-                                        transformOrigin: "bottom right" 
-                                    }}
-                                    priority
-                                    quality={95}
-                                />
-                            </motion.div>
-                        </div>
-                    )}
 
                     {/* Layer 3: IQIYI Style Content */}
                     <div className="absolute inset-0 z-30 flex items-center px-6 md:pl-24 md:pr-14 lg:pl-32 xl:pl-[140px] max-w-[1920px] mx-auto">
