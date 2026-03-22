@@ -12,8 +12,11 @@ import ActorRow from "@/components/ActorRow";
 import { cn } from "@/lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
-    const { countries } = await getMenuData();
-    const country = countries.find(c => c.slug === "trung-quoc");
+    const menuData = await getMenuData();
+    const categories = menuData?.categories || [];
+    const countries = menuData?.countries || [];
+    const slug = "trung-quoc"; // Define slug here for metadata
+    const country = countries.find(c => c.slug === slug);
     const countryName = country?.name || "Trung Quốc";
 
     return {
@@ -123,7 +126,9 @@ export default async function PhimTrungPage({ searchParams }: { searchParams: Pr
     const currentPage = Number(sParams.page) || 1;
     const slug = "trung-quoc";
 
-    const { categories, countries } = await getMenuData();
+    const menuData = await getMenuData();
+    const categories = menuData?.categories || [];
+    const countries = menuData?.countries || [];
     const country = countries.find(c => c.slug === slug);
     const countryName = country?.name || "Phim Trung Quốc";
 

@@ -116,7 +116,9 @@ export default async function PhimHanPage({ searchParams }: { searchParams: Prom
     const currentPage = Number(sParams.page) || 1;
     const slug = "han-quoc";
 
-    const { categories, countries } = await getMenuData();
+    const menuData = await getMenuData();
+    const categories = menuData?.categories || [];
+    const countries = menuData?.countries || [];
     const country = countries.find(c => c.slug === slug);
     const countryName = country?.name || "Phim Hàn Quốc";
 
