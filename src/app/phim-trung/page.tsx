@@ -183,4 +183,3 @@ export default async function PhimTrungPage({ searchParams }: { searchParams: Pr
         </main>
     );
 }
-```
