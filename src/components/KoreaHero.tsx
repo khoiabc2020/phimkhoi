@@ -291,19 +291,21 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                 ))}
             </div>
 
-            {/* Slide Navigation Buttons */}
-            <div className="absolute right-8 md:right-16 bottom-12 z-40 flex items-center gap-4">
+            {/* Side Navigation Buttons - Onflix Style */}
+            <div className="absolute inset-y-0 left-0 lg:left-20 right-0 z-40 pointer-events-none flex items-center justify-between px-4 md:px-8">
                 <button 
                     onClick={prev}
-                    className="w-12 h-12 rounded-full border border-white/10 bg-black/20 backdrop-blur-xl flex items-center justify-center text-white/50 hover:bg-white hover:text-black hover:border-white transition-all group shadow-2xl"
+                    className="w-10 h-10 md:w-14 md:h-14 rounded-full bg-black/20 hover:bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/40 hover:text-white transition-all group pointer-events-auto hover:scale-110 active:scale-95 shadow-2xl"
+                    aria-label="Previous slide"
                 >
-                    <ChevronLeft className="w-6 h-6 group-hover:-translate-x-0.5 transition-transform" />
+                    <ChevronLeft className="w-6 h-6 md:w-8 md:h-8 group-hover:-translate-x-0.5 transition-transform" />
                 </button>
                 <button 
                     onClick={next}
-                    className="w-12 h-12 rounded-full border border-white/10 bg-black/20 backdrop-blur-xl flex items-center justify-center text-white/50 hover:bg-white hover:text-black hover:border-white transition-all group shadow-2xl"
+                    className="w-10 h-10 md:w-14 md:h-14 rounded-full bg-black/20 hover:bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/40 hover:text-white transition-all group pointer-events-auto hover:scale-110 active:scale-95 shadow-2xl"
+                    aria-label="Next slide"
                 >
-                    <ChevronRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
+                    <ChevronRight className="w-6 h-6 md:w-8 md:h-8 group-hover:translate-x-0.5 transition-transform" />
                 </button>
             </div>
         </section>
