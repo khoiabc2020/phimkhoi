@@ -417,7 +417,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
             </div>
 
             {/* ── Content ── */}
-            <div className="relative z-[3] h-full w-full max-w-[1920px] mx-auto px-6 md:px-10 lg:pl-32 lg:pr-12 xl:pl-[140px] flex items-end pb-12 md:pb-16 lg:pb-24 pointer-events-none">
+            <div className="relative z-[3] h-full w-full max-w-[1920px] mx-auto px-6 md:pl-24 md:pr-14 lg:pl-32 lg:pr-12 xl:pl-[140px] flex items-end pb-12 md:pb-16 lg:pb-24 pointer-events-none">
                 <div className="w-full flex justify-between items-end">
                     {/* Left: Text block */}
                     <div className="w-full md:w-[75%] lg:w-[65%] xl:w-[60%] space-y-3 lg:space-y-4 pointer-events-auto pr-0 lg:pr-[300px] xl:pr-[400px]">
@@ -557,20 +557,20 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
             </div>
 
             {/* Side Navigation Buttons - Desktop Onflix Style */}
-            <div className="absolute inset-y-0 left-0 lg:left-20 right-0 z-40 pointer-events-none flex items-center justify-between px-4 md:px-8">
+            <div className="absolute inset-y-0 left-0 lg:left-20 right-0 z-40 pointer-events-none flex items-center justify-between px-2 md:px-4 lg:px-8">
                 <button 
                     onClick={prev}
-                    className="w-10 h-10 md:w-14 md:h-14 rounded-full bg-black/20 hover:bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/40 hover:text-white transition-all group pointer-events-auto hover:scale-110 active:scale-95 shadow-2xl"
+                    className="w-10 h-10 md:w-11 md:h-11 lg:w-14 lg:h-14 rounded-full bg-black/20 hover:bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/40 hover:text-white transition-all group pointer-events-auto hover:scale-110 active:scale-95 shadow-2xl"
                     aria-label="Previous slide"
                 >
-                    <ChevronLeft className="w-6 h-6 md:w-8 md:h-8 group-hover:-translate-x-0.5 transition-transform" />
+                    <ChevronLeft className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 group-hover:-translate-x-0.5 transition-transform" />
                 </button>
                 <button 
                     onClick={next}
-                    className="w-10 h-10 md:w-14 md:h-14 rounded-full bg-black/20 hover:bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/40 hover:text-white transition-all group pointer-events-auto hover:scale-110 active:scale-95 shadow-2xl"
+                    className="w-10 h-10 md:w-11 md:h-11 lg:w-14 lg:h-14 rounded-full bg-black/20 hover:bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/40 hover:text-white transition-all group pointer-events-auto hover:scale-110 active:scale-95 shadow-2xl"
                     aria-label="Next slide"
                 >
-                    <ChevronRight className="w-6 h-6 md:w-8 md:h-8 group-hover:translate-x-0.5 transition-transform" />
+                    <ChevronRight className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 group-hover:translate-x-0.5 transition-transform" />
                 </button>
             </div>
         </div>
