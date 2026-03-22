@@ -65,6 +65,7 @@ const ActorRow = ({ title, actors }: ActorRowProps) => {
                                         alt={actor.name}
                                         fill
                                         className="object-cover"
+                                        unoptimized
                                     />
                                 </div>
                                 <span className="text-sm md:text-base font-semibold text-white/70 group-hover/actor:text-primary transition-colors text-center truncate w-full">

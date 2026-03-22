@@ -89,7 +89,15 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                 ...movie,
                 ...assets,
                 displayTitle: movie.name,
-                displayDesc: movie.content ? movie.content.replace(/<[^>]*>?/gm, '') : "Đang cập nhật nội dung...",
+                displayDesc: movie.content 
+                    ? movie.content
+                        .replace(/<[^>]*>?/gm, '')
+                        .replace(/&quot;/g, '"')
+                        .replace(/&amp;/g, '&')
+                        .replace(/&lt;/g, '<')
+                        .replace(/&gt;/g, '>')
+                        .replace(/&#39;/g, "'")
+                    : "Đang cập nhật nội dung...",
                 displayTags: movie.category?.slice(0, 3).map((c: any) => c.name) || ["Phim Trung"],
                 displayEpisodes: movie.episode_current || "Full"
             };
@@ -155,9 +163,9 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                         <div className="absolute inset-0 z-20 pointer-events-none flex items-end justify-end overflow-hidden">
                             <motion.div
                                 initial={{ x: 60, opacity: 0, scale: 0.95 }}
-                                animate={{ x: 0, opacity: 0.9, scale: 1 }}
+                                animate={{ x: 0, opacity: 0.9, scale: 0.85 }}
                                 transition={{ delay: 0.2, duration: 1.5, ease: "easeOut" }}
-                                className="relative w-[75%] h-[85%] md:w-[65%] md:h-[95%] lg:w-[50%] lg:h-[105%] mr-[5%] md:mr-[8%] lg:mr-[12%]"
+                                className="relative w-[70%] h-[80%] md:w-[60%] md:h-[90%] lg:w-[45%] lg:h-[100%] mr-[5%] md:mr-[8%] lg:mr-[12%]"
                             >
                                 <Image 
                                     src={currentMovie.actor}
@@ -173,7 +181,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
 
                     {/* Layer 3: IQIYI Style Content */}
                     <div className="absolute inset-0 z-30 flex items-center px-6 md:px-12 lg:pl-32 xl:pl-40 max-w-[1920px] mx-auto">
-                        <div className="max-w-xl md:max-w-2xl flex flex-col items-start gap-4 md:gap-7">
+                        <div className="max-w-xl md:max-w-2xl flex flex-col items-start gap-3 md:gap-5">
                             
                             {/* Movie Logo or Styled Title */}
                             <motion.div
@@ -249,17 +257,24 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                             >
                                 <Link 
                                     href={`/phim/${currentMovie.slug}`}
-                                    className="flex items-center gap-3 px-8 md:px-12 py-3.5 bg-primary text-black rounded-full font-black text-[15px] md:text-[16px] hover:bg-yellow-400 hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-primary/30 group"
+                                    className="flex items-center gap-3 px-8 md:px-10 py-3.5 bg-primary text-black rounded-full font-black text-[15px] md:text-[16px] hover:bg-yellow-400 hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-primary/30 group"
                                 >
-                                    <Play className="w-6 h-6 fill-current" />
+                                    <Play className="w-5 h-5 fill-current" />
                                     Phát ngay
                                 </Link>
+                                <button 
+                                    className="flex items-center gap-2 px-6 py-3.5 bg-white/10 backdrop-blur-md text-white border border-white/20 rounded-full hover:bg-white/20 transition-all shadow-xl group font-bold text-[14px]"
+                                    title="Thêm vào danh sách"
+                                >
+                                    <Bookmark className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                                    <span className="hidden md:block">Danh sách</span>
+                                </button>
                                 <Link 
                                     href={`/phim/${currentMovie.slug}`}
-                                    className="w-14 h-14 flex items-center justify-center bg-white/10 backdrop-blur-md text-white border border-white/20 rounded-full hover:bg-white/20 transition-all shadow-xl group"
+                                    className="w-13 h-13 flex items-center justify-center bg-white/10 backdrop-blur-md text-white border border-white/20 rounded-full hover:bg-white/20 transition-all shadow-xl group"
                                     title="Thông tin chi tiết"
                                 >
-                                    <Info className="w-7 h-7 group-hover:scale-110 transition-transform" />
+                                    <Info className="w-6 h-6 group-hover:scale-110 transition-transform" />
                                 </Link>
                             </motion.div>
                         </div>

@@ -500,7 +500,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                         </div>
 
                         {/* Minimalist Notification & Profile Group (Image 2 style) */}
-                        <div className={cn("flex items-center gap-3 lg:gap-6 transition-opacity duration-300", isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100")}>
+                        <div className={cn("flex items-center gap-3 lg:gap-6 transition-opacity duration-300", isSearchOpen ? "hidden lg:flex" : "flex")}>
                             {/* Notification Bell Icon */}
                             <Link href="/thong-bao" className="relative p-1.5 sm:p-2 rounded-full hover:bg-white/5 transition-all active:scale-90 group shrink-0" title="Thông báo">
                                 <Bell className="w-[19px] h-[19px] sm:w-[22px] sm:h-[22px] text-white/70 group-hover:text-white transition-colors" />

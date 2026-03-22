@@ -9,6 +9,12 @@ echo "Deploying PhimKhoi to VPS..."
 
 # Check if directory exists
 if [ -d "$APP_DIR" ]; then
+    # Explicit asset cleanup for hero section
+    echo "Cleaning up old hero assets..."
+    rm -f public/images/china-hero/bach-nguyet-phan-tinh-bg.webp 2>/dev/null || true
+
+    # Update web
+    echo "Updating web..."
     echo "Updating existing application..."
     cd "$APP_DIR"
     git pull origin main
