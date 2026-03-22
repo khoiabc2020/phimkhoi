@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
     // 2. Check Memory Cache First (Fastest)
     if (memoryCache.has(url)) {
         const { contentType, buffer } = memoryCache.get(url)!;
-        return new Response(buffer, {
+        return new Response(new Uint8Array(buffer), {
             headers: {
                 'Content-Type': contentType,
                 'Cache-Control': 'public, max-age=31536000, immutable',
@@ -62,7 +62,7 @@ export async function GET(req: NextRequest) {
             const contentType = buffer[0] === 0xff && buffer[1] === 0xd8 ? 'image/jpeg' : 'image/webp';
             
             memoryCache.set(url, { contentType, buffer });
-            return new Response(buffer, {
+            return new Response(new Uint8Array(buffer), {
                 headers: {
                     'Content-Type': contentType,
                     'Cache-Control': 'public, max-age=31536000, immutable',
@@ -99,7 +99,7 @@ export async function GET(req: NextRequest) {
             console.error("Failed to write image cache:", e);
         }
 
-        return new Response(buffer, {
+        return new Response(new Uint8Array(buffer), {
             headers: {
                 'Content-Type': contentType,
                 'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400',
