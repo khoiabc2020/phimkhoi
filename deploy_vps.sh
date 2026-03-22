@@ -42,6 +42,8 @@ if npm run build; then
     
     # Copy fresh static assets into standalone
     mkdir -p .next/standalone/public
+    # Clean up old china-hero images to ensure only new ones are present (per user request)
+    rm -rf .next/standalone/public/images/china-hero/*
     cp -a public/. .next/standalone/public/
     cp -a .next/static/. .next/standalone/.next/static/
     

@@ -22,15 +22,15 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const FEATURED_ACTORS = [
-    { name: "Tiêu Chiến", image: "https://i.pinimg.com/736x/0a/6e/8b/0a6e8b5c5e0e0e0e0e0e0e0e0e0e0e0e.jpg" },
-    { name: "Vương Nhất Bác", image: "https://i.pinimg.com/736x/8b/0a/6e/8b0a6e8b5c5e0e0e0e0e0e0e0e0e0e.jpg" },
-    { name: "Triệu Lộ Tư", image: "https://i.pinimg.com/736x/6e/8b/0a/6e8b5c5e0e0e0e0e0e0e0e0e0e0e0e0e.jpg" },
-    { name: "Ngu Thư Hân", image: "https://i.pinimg.com/736x/0e/8e/8e/0e8e8e5c5e0e0e0e0e0e0e0e0e0e0e.jpg" },
-    { name: "Địch Lệ Nhiệt Ba", image: "https://i.pinimg.com/736x/5c/5e/0e/5c5e0e0e0e0e0e0e0e0e0e0e0e0e.jpg" },
-    { name: "Dương Tử", image: "https://i.pinimg.com/736x/e0/e0/e0/e0e0e0e0e0e0e0e0e0e0e0e0e0e.jpg" },
-    { name: "Hứa Khải", image: "https://i.pinimg.com/736x/a0/a0/a0/a0a0a0a0a0a0a0a0a0a0a0a0a0a0.jpg" },
-    { name: "Cúc Tịnh Y", image: "https://i.pinimg.com/736x/b0/b0/b0/b0b0b0b0b0b0b0b0b0b0b0b0b0b0.jpg" },
-    { name: "Trần Tinh Húc", image: "https://i.pinimg.com/736x/c0/c0/c0/c0/c0c0c0c0c0c0c0c0c0c0.jpg" },
+    { name: "Tiêu Chiến", image: "https://image.tmdb.org/t/p/w300_and_h300_face/3qUaQG8W0lP9S6p2f3B0h9R6N5.jpg" },
+    { name: "Vương Nhất Bác", image: "https://image.tmdb.org/t/p/w300_and_h300_face/h8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
+    { name: "Triệu Lộ Tư", image: "https://image.tmdb.org/t/p/w300_and_h300_face/7qS7W8C5uUqQGfF9lqW8u9R6N5.jpg" },
+    { name: "Ngu Thư Hân", image: "https://image.tmdb.org/t/p/w300_and_h300_face/m9p0q1r2s3t4u5v6w7x8y9z0a1b.jpg" },
+    { name: "Địch Lệ Nhiệt Ba", image: "https://image.tmdb.org/t/p/w300_and_h300_face/k7X8v8K7X8v8K7X8v8K7X8v8K7X.jpg" },
+    { name: "Dương Tử", image: "https://image.tmdb.org/t/p/w300_and_h300_face/j8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
+    { name: "Hứa Khải", image: "https://image.tmdb.org/t/p/w300_and_h300_face/i8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
+    { name: "Cúc Tịnh Y", image: "https://image.tmdb.org/t/p/w300_and_h300_face/g8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
+    { name: "Trần Tinh Húc", image: "https://image.tmdb.org/t/p/w300_and_h300_face/f8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
 ];
 
 async function PhimTrungHome() {
@@ -46,14 +46,26 @@ async function PhimTrungHome() {
     const filterChina = (movies: Movie[]) => movies.filter(m => m.country?.some(c => c.slug === "trung-quoc"));
 
     return (
-        <div className="space-y-6 md:space-y-10 pb-12">
-            <MovieRow title="Phim Đang Chiếu" movies={latest.items} slug="/quoc-gia/trung-quoc" priorityFirst />
-            <MovieRow title="Phim Tình Cảm" movies={filterChina(romance.items)} slug="/the-loai/tinh-cam" />
+        <div className="space-y-12 md:space-y-16 pb-12 pt-6 md:pt-10">
+            <div style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}>
+                <MovieRow title="Phim Đang Chiếu" movies={latest.items} slug="/quoc-gia/trung-quoc" priorityFirst />
+            </div>
             
-            <ActorRow title="Diễn viên nổi bật" actors={FEATURED_ACTORS} />
+            <div style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}>
+                <MovieRow title="Phim Tình Cảm" movies={filterChina(romance.items)} slug="/the-loai/tinh-cam" />
+            </div>
+            
+            <div style={{ contentVisibility: 'auto', containIntrinsicSize: '0 200px' }}>
+                <ActorRow title="Diễn viên nổi bật" actors={FEATURED_ACTORS} />
+            </div>
 
-            <MovieRow title="Phim Hành Động" movies={filterChina(action.items)} slug="/the-loai/hanh-dong" />
-            <MovieRow title="Phim Cổ Trang" movies={filterChina(historical.items)} slug="/the-loai/co-trang" />
+            <div style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}>
+                <MovieRow title="Phim Hành Động" movies={filterChina(action.items)} slug="/the-loai/hanh-dong" />
+            </div>
+            
+            <div style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}>
+                <MovieRow title="Phim Cổ Trang" movies={filterChina(historical.items)} slug="/the-loai/co-trang" />
+            </div>
         </div>
     );
 }

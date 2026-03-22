@@ -194,7 +194,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                 className={cn(
                     "fixed top-0 left-0 right-0 z-50 transition-all duration-700",
                     isScrolled
-                        ? "h-[54px] lg:h-[64px] bg-[#0a0a0a]/95 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
+                        ? "h-[54px] lg:h-[64px] bg-[#0a0a0a]/90 backdrop-blur-[8px] shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
                         : (pathname === "/" || (pathname === "/phim-trung" && isFirstPage))
                             ? "h-[64px] lg:h-[90px] bg-transparent shadow-none"
                             : "h-[64px] lg:h-[84px] bg-gradient-to-b from-black/80 to-transparent"
@@ -356,7 +356,7 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         onFocus={() => setShowHistory(true)}
                                         placeholder="Tìm kiếm..."
-                                        className="w-full h-10 bg-[#0B0B10] border border-white/[0.10] rounded-full pl-4 pr-10 text-sm text-white outline-none focus:border-primary/40 transition-all duration-300 shadow-[0_12px_36px_rgba(0,0,0,0.45)] backdrop-blur-md"
+                                        className="w-full h-10 bg-[#0B0B10]/95 border border-white/[0.10] rounded-full pl-4 pr-10 text-sm text-white outline-none focus:border-primary/40 transition-all duration-300 shadow-[0_12px_36px_rgba(0,0,0,0.45)] backdrop-blur-[8px]"
                                     />
                                     {isSearchOpen && (
                                         <button

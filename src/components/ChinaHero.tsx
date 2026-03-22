@@ -99,7 +99,7 @@ const CHINA_MOVIES_DATA: MovieSlide[] = [
     },
     {
         title: "Thanh Vụ Phong Minh",
-        bg: "/images/china-hero/tang-cung-bg.webp",
+        bg: "/images/china-hero/tang-cung-bg.png",
         actor: "/images/china-hero/tang-cung-actor.png",
         logo: "/images/china-hero/tang-cung-logo.png",
         description: "Loạt vụ án bí ẩn chốn hậu cung nhà Đường dần được phá giải bởi cặp đôi quái kiệt...",
@@ -155,7 +155,7 @@ export default function ChinaHero() {
     };
 
     return (
-        <section className="relative w-full h-[500px] md:h-[600px] lg:h-[750px] xl:h-[880px] overflow-hidden bg-black">
+        <section className="relative w-full h-[450px] md:h-[550px] lg:h-[650px] xl:h-[750px] overflow-hidden bg-black pb-12">
             <AnimatePresence>
                 <motion.div
                     key={current}
@@ -187,8 +187,10 @@ export default function ChinaHero() {
                     {/* Layer 2: Actor Cutout */}
                     <div className="absolute inset-0 z-20 pointer-events-none flex items-end justify-end overflow-hidden">
                         <motion.div
+                            initial={{ x: 40, opacity: 0, scale: 0.98 }}
+                            animate={{ x: 0, opacity: 0.95, scale: 1 }}
                             transition={{ delay: 0.1, duration: 1.4, ease: "easeOut" }}
-                            className="relative w-[85%] h-[95%] md:w-[75%] md:h-full lg:w-[65%] lg:h-[110%] -mr-[10%] md:-mr-[15%] opacity-90"
+                            className="relative w-[70%] h-[80%] md:w-[60%] md:h-[90%] lg:w-[50%] lg:h-[100%] mr-[6%] md:mr-[10%] lg:mr-[15%]"
                         >
                             <Image 
                                 src={CHINA_MOVIES_DATA[current].actor}
