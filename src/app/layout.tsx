@@ -93,6 +93,7 @@ import { Providers } from "@/components/Providers";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Sidebar from "@/components/Sidebar";
+import LayoutTransition from "@/components/LayoutTransition";
 import { getMenuData } from "@/services/api";
 
 export default async function RootLayout({
@@ -136,7 +137,9 @@ export default async function RootLayout({
             <div className="flex flex-1 w-full overflow-x-hidden min-h-screen">
               <Sidebar />
               <main className="flex-1 min-w-0">
-                {children}
+                <LayoutTransition>
+                  {children}
+                </LayoutTransition>
               </main>
             </div>
             <Footer />

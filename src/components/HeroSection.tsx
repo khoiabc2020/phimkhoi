@@ -334,7 +334,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
 
     return (
         <div
-            className="relative w-full h-[60vh] md:h-[58vh] lg:h-[70vh] xl:h-[82vh] overflow-hidden bg-[#0a0a0a]"
+            className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] xl:h-[800px] overflow-hidden bg-[#0a0a0a]"
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}
         >

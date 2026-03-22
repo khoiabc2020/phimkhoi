@@ -18,7 +18,7 @@ export const revalidate = 3600;
 const ROW_LIMIT = 12;
 
 const heroSkeleton = (
-  <div className="relative w-full h-[60vh] md:h-[58vh] lg:h-[70vh] xl:h-[82vh] bg-[#0a0a0a] animate-pulse">
+  <div className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] xl:h-[800px] bg-[#0a0a0a] animate-pulse">
     <div className="absolute bottom-0 left-0 right-0 h-40 md:h-56 lg:h-72 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
   </div>
 );
