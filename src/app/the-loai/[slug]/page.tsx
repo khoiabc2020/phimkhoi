@@ -6,6 +6,7 @@ import { getMoviesByCategory, getMenuData } from "@/services/api";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
+import { getThemeBySlug } from "@/lib/theme";
 
 // Revalidate mỗi 5 phút
 export const revalidate = 300;
@@ -86,11 +87,13 @@ export default async function CategoryPage({ params, searchParams }: { params: P
     const category = categories.find(c => c.slug === slug);
     const categoryName = category?.name || (slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, " "));
 
+    const theme = getThemeBySlug(slug);
+
     return (
         <main className="min-h-screen pb-20">
             <div className="pt-24 w-full max-w-[1920px] mx-auto px-4 sm:px-6 md:px-12 lg:pl-24 lg:pr-12 relative">
                 {/* Decorative background glow */}
-                <div className="absolute top-0 left-0 right-0 h-[400px] bg-gradient-to-b from-[#0e1621] via-transparent to-transparent pointer-events-none -z-10 blur-[120px]" />
+                <div className={cn("absolute top-0 left-0 right-0 h-[500px] via-transparent to-transparent pointer-events-none -z-10 blur-[130px] opacity-60", theme.glow)} />
 
                 <div className="mb-6 md:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div className="max-w-4xl">
