@@ -156,13 +156,13 @@ export default function ChinaHero() {
 
     return (
         <section className="relative w-full h-[500px] md:h-[600px] lg:h-[750px] xl:h-[880px] overflow-hidden bg-black">
-            <AnimatePresence mode="wait">
+            <AnimatePresence>
                 <motion.div
                     key={current}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 1.2, ease: "easeInOut" }}
+                    transition={{ duration: 1.5, ease: "easeInOut" }}
                     className="absolute inset-0"
                 >
                     {/* Layer 1: Background */}
@@ -187,10 +187,8 @@ export default function ChinaHero() {
                     {/* Layer 2: Actor Cutout */}
                     <div className="absolute inset-0 z-20 pointer-events-none flex items-end justify-end overflow-hidden">
                         <motion.div
-                            initial={{ x: 100, opacity: 0, scale: 0.95 }}
-                            animate={{ x: 0, opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.3, duration: 1.2, ease: "easeOut" }}
-                            className="relative w-[80%] h-[90%] md:w-[70%] md:h-full lg:w-[60%] lg:h-[110%] -mr-[5%] md:-mr-[10%]"
+                            transition={{ delay: 0.1, duration: 1.4, ease: "easeOut" }}
+                            className="relative w-[85%] h-[95%] md:w-[75%] md:h-full lg:w-[65%] lg:h-[110%] -mr-[10%] md:-mr-[15%] opacity-90"
                         >
                             <Image 
                                 src={CHINA_MOVIES_DATA[current].actor}
@@ -205,28 +203,24 @@ export default function ChinaHero() {
 
                     {/* Layer 3: Content & Logo */}
                     <div className="absolute inset-0 z-30 flex items-center px-4 md:px-12 lg:pl-28 max-w-[1920px] mx-auto">
-                        <div className="max-w-2xl flex flex-col items-start gap-4 md:gap-6 mt-10 md:mt-20">
+                        <div className="max-w-xl flex flex-col items-start gap-4 md:gap-5">
                             {/* Logo */}
                             <motion.div
-                                initial={{ y: 20, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ delay: 0.5, duration: 0.8 }}
+                                transition={{ delay: 0.2, duration: 1.0 }}
                                 className="relative w-full max-w-[300px] md:max-w-[450px] aspect-[3/1]"
                             >
                                 <Image 
                                     src={CHINA_MOVIES_DATA[current].logo}
                                     alt="Logo"
                                     fill
-                                    className="object-contain object-left drop-shadow-[0_8px_20px_rgba(0,0,0,0.6)]"
+                                    className="object-contain object-left drop-shadow-[0_12px_30px_rgba(0,0,0,0.8)]"
                                     priority={current < 2}
                                 />
                             </motion.div>
 
                             {/* Info */}
                             <motion.div
-                                initial={{ y: 20, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ delay: 0.7, duration: 0.8 }}
+                                transition={{ delay: 0.3, duration: 1.0 }}
                                 className="space-y-4"
                             >
                                 <div className="flex flex-wrap items-center gap-2 md:gap-3">
@@ -234,9 +228,9 @@ export default function ChinaHero() {
                                     <span className="text-white/80 text-[12px] md:text-[14px] font-medium">{CHINA_MOVIES_DATA[current].year}</span>
                                     <span className="w-1 h-1 rounded-full bg-white/30" />
                                     <span className="text-white/80 text-[12px] md:text-[14px] font-medium">{CHINA_MOVIES_DATA[current].episodes}</span>
-                                    <div className="flex gap-2">
-                                        {CHINA_MOVIES_DATA[current].tags.map(tag => (
-                                            <span key={tag} className="text-[11px] md:text-[12px] text-[#8FA7C5] font-medium border border-[#8FA7C5]/30 px-2 rounded-full">
+                                    <div className="flex gap-2.5">
+                                        {CHINA_MOVIES_DATA[current].tags.slice(0, 2).map(tag => (
+                                            <span key={tag} className="text-[11px] md:text-[12px] text-white/60 font-medium bg-white/5 px-2.5 py-0.5 rounded-full border border-white/10">
                                                 {tag}
                                             </span>
                                         ))}
@@ -285,18 +279,18 @@ export default function ChinaHero() {
                 </div>
             </div>
 
-            <div className="absolute right-4 md:right-12 bottom-10 z-40 flex gap-2">
+            <div className="absolute right-6 md:right-12 bottom-12 z-40 flex gap-3">
                 <button 
                     onClick={prev}
-                    className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/20 bg-black/40 backdrop-blur-md flex items-center justify-center text-white hover:bg-white hover:text-black transition-all group"
+                    className="w-10 h-10 md:w-11 md:h-11 rounded-full border border-white/10 bg-white/5 backdrop-blur-md flex items-center justify-center text-white/70 hover:bg-white hover:text-black hover:border-white transition-all group"
                 >
-                    <ChevronLeft className="w-6 h-6 group-hover:-translate-x-0.5 transition-transform" />
+                    <ChevronLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
                 </button>
                 <button 
                     onClick={next}
-                    className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/20 bg-black/40 backdrop-blur-md flex items-center justify-center text-white hover:bg-white hover:text-black transition-all group"
+                    className="w-10 h-10 md:w-11 md:h-11 rounded-full border border-white/10 bg-white/5 backdrop-blur-md flex items-center justify-center text-white/70 hover:bg-white hover:text-black hover:border-white transition-all group"
                 >
-                    <ChevronRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
+                    <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
                 </button>
             </div>
         </section>
