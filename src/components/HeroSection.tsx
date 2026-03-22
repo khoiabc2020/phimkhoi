@@ -464,8 +464,8 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
             <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 lg:bottom-10 lg:right-12 z-[20] flex items-center gap-3 max-w-[calc(100vw-32px)] md:max-w-[40vw] lg:max-w-[60vw]">
                 <div 
                     ref={navRef}
-                    className="flex items-center gap-2 md:gap-2.5 overflow-x-auto no-scrollbar py-2 px-1 scroll-smooth snap-x snap-mandatory min-w-0 w-full"
-                    style={{ maskImage: 'linear-gradient(to right, transparent, black 2%, black 98%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 2%, black 98%, transparent)' }}
+                    className="flex items-center gap-2 md:gap-3 overflow-x-auto no-scrollbar py-3 px-2 scroll-smooth snap-x snap-mandatory min-w-0 w-full"
+                    style={{ maskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)' }}
                 >
                     {movies.map((m: any, idx) => {
                         const isActive = idx === index;
@@ -474,21 +474,24 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                 key={`thumb-${m._id || idx}`}
                                 onClick={() => go(idx)}
                                 className={cn(
-                                    "relative w-[85px] md:w-[100px] lg:w-[115px] xl:w-[125px] aspect-[16/9] rounded-lg overflow-hidden cursor-pointer flex-shrink-0 transition-all duration-400 box-border group snap-center",
+                                    "relative w-[90px] md:w-[110px] lg:w-[130px] xl:w-[140px] aspect-[16/9] rounded-lg overflow-hidden cursor-pointer flex-shrink-0 transition-all duration-300 box-border group snap-center",
                                     isActive 
-                                        ? "ring-[3px] ring-[#00A859] scale-100 opacity-100 shadow-[0_0_20px_rgba(0,168,89,0.4)] z-10" 
-                                        : "ring-1 ring-white/10 scale-95 opacity-50 hover:opacity-100 hover:scale-[0.98] z-0"
+                                        ? "ring-[2.5px] ring-primary scale-105 opacity-100 shadow-[0_0_25px_rgba(143,167,197,0.5)] z-10" 
+                                        : "ring-1 ring-white/10 scale-95 opacity-40 hover:opacity-100 hover:scale-100 z-0 bg-black/40"
                                 )}
                             >
                                 <Image
                                     src={`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(m, "backdrop", "mobile"))}&w=300&q=60`}
                                     alt={decodeHtml(m.name)}
                                     fill
-                                    className="object-cover group-hover:scale-105 transition-transform duration-700"
+                                    className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                                     sizes="200px"
                                     placeholder="blur"
                                     blurDataURL={blurData}
                                 />
+                                {isActive && (
+                                    <div className="absolute inset-0 bg-primary/10 animate-pulse pointer-events-none" />
+                                )}
                             </div>
                         );
                     })}

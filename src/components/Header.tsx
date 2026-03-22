@@ -420,10 +420,45 @@ export default function Header({ categories = [], countries = [] }: HeaderProps)
                                                                                 </div>
                                                                             </Link>
                                                                         ))}
+
+                                                                        {/* Actors Section */}
+                                                                        {searchResults?.actors && searchResults.actors.length > 0 && (
+                                                                            <div className="mt-4 pt-4 border-t border-white/[0.05]">
+                                                                                <div className="px-2 mb-3">
+                                                                                    <span className="text-[11px] font-bold text-white/30 uppercase tracking-[0.1em]">Diễn viên</span>
+                                                                                </div>
+                                                                                <div className="grid grid-cols-1 gap-1">
+                                                                                    {searchResults.actors.map((actor: any) => (
+                                                                                        <Link
+                                                                                            href={`/dien-vien/${actor.name.toLowerCase().replace(/ /g, '-')}`}
+                                                                                            key={actor.id}
+                                                                                            onClick={() => {
+                                                                                                setIsSearchOpen(false);
+                                                                                                setSearchQuery("");
+                                                                                            }}
+                                                                                            className="flex items-center gap-3 p-2 hover:bg-white/[0.06] rounded-xl transition-all group"
+                                                                                        >
+                                                                                            <div className="w-10 h-10 rounded-full overflow-hidden bg-white/5 shrink-0 border border-white/10 group-hover:border-primary/40 transition-colors relative">
+                                                                                                {actor.profile_url ? (
+                                                                                                    <Image src={actor.profile_url} alt={actor.name} fill className="object-cover" unoptimized />
+                                                                                                ) : (
+                                                                                                    <div className="w-full h-full flex items-center justify-center bg-primary/20 text-primary font-bold text-xs uppercase">
+                                                                                                        {actor.name?.charAt(0)}
+                                                                                                    </div>
+                                                                                                )}
+                                                                                            </div>
+                                                                                            <div className="text-sm font-semibold text-white group-hover:text-primary transition-colors truncate">
+                                                                                                {actor.name}
+                                                                                            </div>
+                                                                                        </Link>
+                                                                                    ))}
+                                                                                </div>
+                                                                            </div>
+                                                                        )}
                                                                         
-                                                                        {searchResults && searchResults.movies.length === 0 && !isSearching && (
+                                                                        {searchResults && searchResults.movies.length === 0 && searchResults.actors.length === 0 && !isSearching && (
                                                                             <div className="py-8 text-center">
-                                                                                <p className="text-white/30 text-sm">Không tìm thấy phim phù hợp</p>
+                                                                                <p className="text-white/30 text-sm">Không tìm thấy kết quả phù hợp</p>
                                                                             </div>
                                                                         )}
                                                                     </>

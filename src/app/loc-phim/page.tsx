@@ -1,20 +1,18 @@
-import { getMoviesList } from "@/services/api";
+import { getMoviesList, getMenuData } from "@/services/api";
 import MovieCard from "@/components/MovieCard";
 import { Suspense } from "react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import Link from "next/link";
-import { Filter, SlidersHorizontal, ChevronRight, LayoutGrid, List } from "lucide-react";
+import { Filter, SlidersHorizontal, ChevronRight } from "lucide-react";
 import FilterToolbar from "@/components/FilterToolbar";
 
 interface FilterPageProps {
-    searchParams: {
+    searchParams: Promise<{
         category?: string;
         country?: string;
         year?: string;
         type?: string;
         page?: string;
-    };
+    }>;
 }
 
 const YEARS = Array.from({ length: 16 }, (_, i) => (2025 - i).toString());
@@ -24,24 +22,6 @@ const TYPES = [
     { name: "Phim bộ", slug: "phim-bo" },
     { name: "Hoạt hình", slug: "hoat-hinh" },
     { name: "TV Shows", slug: "tv-shows" },
-];
-
-const CATEGORIES = [
-    { name: "Hành động", slug: "hanh-dong" },
-    { name: "Tình cảm", slug: "tinh-cam" },
-    { name: "Hài hước", slug: "hai-huoc" },
-    { name: "Cổ trang", slug: "co-trang" },
-    { name: "Kinh dị", slug: "kinh-di" },
-    { name: "Viễn tưởng", slug: "vien-tuong" },
-    { name: "Hoạt hình", slug: "hoat-hinh" },
-];
-
-const COUNTRIES = [
-    { name: "Trung Quốc", slug: "trung-quoc" },
-    { name: "Hàn Quốc", slug: "han-quoc" },
-    { name: "Nhật Bản", slug: "nhat-ban" },
-    { name: "Thái Lan", slug: "thai-lan" },
-    { name: "Âu Mỹ", slug: "au-my" },
 ];
 
 async function MovieGrid({ category, country, year, type, page }: any) {
@@ -92,12 +72,14 @@ function LoadingSkeleton() {
     );
 }
 
-export default function AdvancedFilterPage({ searchParams }: FilterPageProps) {
-    const { page } = searchParams;
+export default async function AdvancedFilterPage({ searchParams }: FilterPageProps) {
+    const sParams = await searchParams;
+    const { categories, countries } = await getMenuData();
+    const { page } = sParams;
 
     const buildUrl = (updates: Record<string, string | null>) => {
         const params = new URLSearchParams();
-        Object.entries(searchParams).forEach(([k, v]) => {
+        Object.entries(sParams).forEach(([k, v]) => {
             if (v) params.set(k, v);
         });
         Object.entries(updates).forEach(([k, v]) => {
@@ -109,10 +91,7 @@ export default function AdvancedFilterPage({ searchParams }: FilterPageProps) {
 
     return (
         <main className="min-h-screen bg-[#080b12] text-white">
-            <Header />
-
-            <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-32 pb-20">
-                
+            <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-24 md:pt-32 pb-20">
                 {/* Header & Breadcrumb */}
                 <div className="mb-8 md:mb-12">
                     <div className="flex items-center gap-2 text-[11px] font-bold text-white/30 uppercase tracking-widest mb-4">
@@ -130,19 +109,19 @@ export default function AdvancedFilterPage({ searchParams }: FilterPageProps) {
 
                 {/* Filter Toolbar */}
                 <FilterToolbar 
-                    searchParams={searchParams}
-                    categories={CATEGORIES}
-                    countries={COUNTRIES}
+                    searchParams={sParams}
+                    categories={categories}
+                    countries={countries}
                     years={YEARS}
                     types={TYPES}
                 />
 
                 {/* Results Grid */}
-                <Suspense key={JSON.stringify(searchParams)} fallback={<LoadingSkeleton />}>
-                    <MovieGrid {...searchParams} />
+                <Suspense key={JSON.stringify(sParams)} fallback={<LoadingSkeleton />}>
+                    <MovieGrid {...sParams} />
                 </Suspense>
 
-                {/* Pagination (Load More / Simple) */}
+                {/* Pagination */}
                 <div className="mt-16 flex justify-center gap-4">
                     {parseInt(page || "1") > 1 && (
                         <Link 
@@ -160,8 +139,6 @@ export default function AdvancedFilterPage({ searchParams }: FilterPageProps) {
                     </Link>
                 </div>
             </div>
-
-            <Footer />
         </main>
     );
 }
