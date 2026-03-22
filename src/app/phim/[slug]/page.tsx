@@ -409,7 +409,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             tmdbDetails={tmdbDetails}
                             episodeThumbnails={episodeThumbnails}
                             episodeMetadata={episodeMetadata}
-                            castComponent={<MovieCast movie={movie} slug={slug} isCompact={false} />}
+                            castComponent={<MovieCast movie={movie} slug={slug} isCompact={false} tmdbCast={tmdbDetails?.credits?.cast} />}
                         />
                         {/* Comment Section below tabs */}
                         <div className="mt-8 sm:mt-12">
@@ -440,7 +440,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         {/* Diễn viên (Desktop only Sidebar or always removed to Tabs) */}
                         <div className="hidden lg:block">
                             <div className="text-[11px] font-medium text-gray-400 uppercase tracking-widest mb-3">Diễn viên</div>
-                            <MovieCast movie={movie} slug={movie.slug} isCompact={true} />
+                            <MovieCast movie={movie} slug={movie.slug} isCompact={true} tmdbCast={tmdbDetails?.credits?.cast} />
                         </div>
 
                         {/* Thể loại */}

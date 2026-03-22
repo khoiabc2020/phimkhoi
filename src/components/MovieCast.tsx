@@ -75,20 +75,50 @@ function ActorInitials({ name }: { name: string }) {
     );
 }
 
-export default async function MovieCast({ movie, slug, isCompact = false }: { movie?: any; slug: string; isCompact?: boolean }) {
+export default async function MovieCast({ 
+    movie, 
+    slug, 
+    isCompact = false,
+    tmdbCast = []
+}: { 
+    movie?: any; 
+    slug: string; 
+    isCompact?: boolean;
+    tmdbCast?: any[];
+}) {
     if (!movie) return null;
 
     // Use source actor list (always correct — from Ophim/KKPhim)
     const safeActors = Array.isArray(movie.actor) ? movie.actor : (typeof movie.actor === 'string' ? movie.actor.split(',').map((s: string) => s.trim()) : []);
     const actorNames: string[] = safeActors
         .filter((a: string) => a && typeof a === 'string' && !a.toLowerCase().includes("đang cập nhật") && !a.toLowerCase().includes("updating"))
-        .slice(0, isCompact ? 8 : 15);
+        .slice(0, isCompact ? 10 : 20);
 
     if (actorNames.length === 0) return null;
 
-    // Fetch richer TMDB info per actor so we can render "mini actor cards"
+    // Optimization: Match local actor names with TMDB credits first to avoid global searching
     const cast: CastItem[] = await Promise.all(
-        actorNames.map((name: string) => getActorInfo(name))
+        actorNames.map(async (name: string) => {
+            // Find a match in the pre-fetched TMDB credits
+            // Case 1: Direct name match (e.g. "Kim Ji-won" == "Kim Ji-won")
+            // Case 2: Normalized name match (Hán Việt -> Pinyin/English)
+            const matchedTmdbActor = tmdbCast.find(a => 
+                a.name?.toLowerCase() === name.toLowerCase() || 
+                a.original_name?.toLowerCase() === name.toLowerCase()
+            );
+
+            if (matchedTmdbActor) {
+                return {
+                    name,
+                    photo: matchedTmdbActor.profile_path ? `https://image.tmdb.org/t/p/w185${matchedTmdbActor.profile_path}` : null,
+                    originalName: matchedTmdbActor.original_name,
+                    departmentLabel: "Diễn viên"
+                };
+            }
+
+            // Fallback: Perform global search (expensive, only if not in credits)
+            return getActorInfo(name);
+        })
     );
 
     if (isCompact) {
