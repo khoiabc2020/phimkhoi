@@ -6,7 +6,6 @@ import TopTrendingTabs from "@/components/TopTrendingTabs";
 import QuickNav from "@/components/QuickNav";
 import ContinueWatchingRow from "@/components/ContinueWatchingRow";
 
-import HomeSection from "@/components/HomeSection";
 import LazySection from "@/components/LazySection";
 import { getMoviesList, getTrendMovies } from "@/services/api";
 import { getTMDBDataForCard } from "@/app/actions/tmdb";
