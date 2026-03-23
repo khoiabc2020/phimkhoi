@@ -156,7 +156,6 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
             <AnimatePresence initial={false}>
                 <motion.div
                     key={`mobile-slide-${movie._id || index}`}
-                    initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.6, ease: "easeInOut" }}
@@ -199,7 +198,6 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                     {/* Content Block */}
                     <div className="absolute inset-x-0 bottom-0 z-[10] px-6 pb-16 flex flex-col items-center gap-2 text-center">
                         <motion.div
-                            initial={{ y: 20, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ delay: 0.1, duration: 0.5, ease }}
                         >
@@ -224,7 +222,6 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                         </motion.div>
 
                         <motion.div 
-                            initial={{ y: 15, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ delay: 0.2, duration: 0.5, ease }}
                             className="flex items-center gap-3 text-[13px] font-bold text-white/90"
@@ -242,7 +239,6 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                         </motion.div>
 
                         <motion.div
-                            initial={{ y: 15, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ delay: 0.3, duration: 0.5, ease }}
                             className="flex items-center gap-3 pt-4"
@@ -313,7 +309,6 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
             <AnimatePresence initial={false}>
                 <motion.div
                     key={`slide-${movie._id || index}`}
-                    initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.6, ease: "easeInOut" }}
@@ -339,7 +334,6 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                     {movie.isCustomHero && movie.layer_character && (
                         <div className="absolute inset-0 z-[1] pointer-events-none">
                             <motion.div
-                                initial={{ x: 30, opacity: 0 }}
                                 animate={{ x: 0, opacity: 1 }}
                                 transition={{ delay: 0.1, duration: 1, ease }}
                                 className="relative w-full h-full"
@@ -373,7 +367,6 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                 
                                 {/* Logo / Title */}
                                 <motion.div
-                                    initial={{ y: 20, opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
                                     transition={{ delay: 0.2, duration: 0.6, ease }}
                                 >
@@ -408,7 +401,6 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
 
                                 {/* Tags & Metadata - Onflix Style */}
                                 <motion.div 
-                                    initial={{ y: 20, opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
                                     transition={{ delay: 0.3, duration: 0.6, ease }}
                                     className="flex flex-wrap items-center gap-3 lg:gap-4 font-bold text-[14px] lg:text-[15px] text-white/90"
@@ -427,7 +419,6 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
 
                                 {/* Categories - Onflix Style Pills */}
                                 <motion.div 
-                                    initial={{ y: 20, opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
                                     transition={{ delay: 0.4, duration: 0.6, ease }}
                                     className="flex items-center gap-2 flex-wrap pt-1"
@@ -451,7 +442,6 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                 {/* Description */}
                                 {movie.content && (
                                     <motion.p
-                                        initial={{ y: 20, opacity: 0 }}
                                         animate={{ y: 0, opacity: 1 }}
                                         transition={{ delay: 0.5, duration: 0.6, ease }}
                                         className="text-white/80 text-[14px] lg:text-[15px] xl:text-[16px] leading-[1.6] line-clamp-2 md:line-clamp-3 lg:line-clamp-2 xl:line-clamp-3 max-w-2xl drop-shadow-md font-medium"
@@ -462,7 +452,6 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
 
                                 {/* Buttons */}
                                 <motion.div
-                                    initial={{ y: 20, opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
                                     transition={{ delay: 0.6, duration: 0.6, ease }}
                                     className="flex flex-wrap items-center gap-4 pt-4 lg:pt-6 pointer-events-auto"

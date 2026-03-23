@@ -98,7 +98,6 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
             <AnimatePresence mode="popLayout" initial={false}>
                 <motion.div
                     key={current}
-                    initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.8, ease: "easeInOut" }}
@@ -106,7 +105,6 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                 >
                     {/* Layer 1: Background Parallax */}
                     <motion.div 
-                        initial={{ scale: 1.03 }}
                         animate={{ scale: 1 }}
                         transition={{ duration: 8, ease: "linear" }}
                         className="absolute inset-0 z-0 optimize-gpu will-change-transform"
@@ -159,7 +157,6 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                             
                             {/* Movie Logo or Styled Title */}
                             <motion.div
-                                initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.2, duration: 0.8, ease: slideEase }}
                                 className="relative w-full max-w-[200px] sm:max-w-[280px] md:max-w-[420px] lg:max-w-[480px] aspect-[4/1.5]"
@@ -181,7 +178,6 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
 
                             {/* Metadata Badges - Onflix Style */}
                             <motion.div
-                                initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.4, duration: 0.8 }}
                                 className="flex flex-wrap items-center gap-3 text-[13px] md:text-[15px] font-bold text-white/90"
@@ -200,7 +196,6 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
 
                             {/* Tags - Onflix Style Pill Layout */}
                             <motion.div
-                                initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.5, duration: 0.8 }}
                                 className="hidden sm:flex flex-wrap gap-2"
@@ -214,7 +209,6 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
 
                             {/* Description */}
                             <motion.p
-                                initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.6, duration: 0.8 }}
                                 className="text-[13px] md:text-[14px] lg:text-[16px] text-white/70 line-clamp-2 md:line-clamp-3 leading-relaxed max-w-lg drop-shadow relative"
@@ -224,7 +218,6 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
 
                             {/* Action Buttons - Standardized with Home */}
                             <motion.div
-                                initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.7, duration: 0.8 }}
                                 className="flex items-center gap-3 md:gap-4 pt-2 pointer-events-auto"
