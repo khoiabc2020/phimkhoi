@@ -84,7 +84,7 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
-    apple: "/logo.png",
+    apple: "/icons/apple-touch-icon.png",
   },
   manifest: "/manifest.json",
 };
@@ -111,7 +111,7 @@ export default async function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <link rel="apple-touch-icon" href="/logo.png" />
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
         {/* Preconnect to image CDN domains để giảm latency ảnh tối đa */}
         <link rel="preconnect" href="https://image.tmdb.org" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://image.tmdb.org" />
