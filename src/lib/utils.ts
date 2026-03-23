@@ -55,7 +55,14 @@ export function decodeHtml(html: string) {
         .replace(/&gt;/g, ">")
         .replace(/&quot;/g, '"')
         .replace(/&#039;/g, "'")
-        .replace(/&apos;/g, "'");
+        .replace(/&#39;/g, "'")
+        .replace(/&apos;/g, "'")
+        .replace(/&nbsp;/g, " ");
+}
+
+export function stripHtml(html: string) {
+    if (!html) return "";
+    return decodeHtml(html.replace(/<[^>]*>?/gm, ""));
 }
 
 export function detectOrientation(url?: string | null): "portrait" | "landscape" | "unknown" {

@@ -112,10 +112,11 @@ export default function VideoPlayer({
         } catch { /* silent */ }
     }, [movieData, session]);
 
+    const nextIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
     const handleVideoEnd = useCallback(() => {
         onEnded?.();
         if (autoNextRef.current && nextEpisodeUrlRef.current) {
-            // Thay vì nhảy ngay lập tức, ta cho countdown 5s để tăng UX
             let countdown = 5;
             const container = artRef.current;
             let countdownEl: HTMLDivElement | null = null;
@@ -143,7 +144,7 @@ export default function VideoPlayer({
                     const cancelBtn = countdownEl.querySelector('#cancel-next');
                     if (cancelBtn) {
                         cancelBtn.addEventListener('click', () => {
-                            clearInterval(interval);
+                            if (nextIntervalRef.current) clearInterval(nextIntervalRef.current);
                             if (countdownEl && countdownEl.parentNode) {
                                 countdownEl.parentNode.removeChild(countdownEl);
                             }
@@ -152,7 +153,7 @@ export default function VideoPlayer({
                 }
 
                 if (countdown === 0) {
-                    clearInterval(interval);
+                    if (nextIntervalRef.current) clearInterval(nextIntervalRef.current);
                     if (countdownEl && countdownEl.parentNode) {
                         countdownEl.parentNode.removeChild(countdownEl);
                     }
@@ -161,6 +162,7 @@ export default function VideoPlayer({
                     }
                 }
             }, 1000);
+            nextIntervalRef.current = interval;
         }
     }, [onEnded, router]);
 
@@ -417,6 +419,7 @@ export default function VideoPlayer({
                 art.on("pause", forceHistorySave);
                 art.on("destroy", forceHistorySave);
                 window.addEventListener("beforeunload", forceHistorySave);
+                (artInstance.current as any).forceHistorySave = forceHistorySave;
 
                 // Keyboard shortcuts
                 const handleKeydown = (e: KeyboardEvent) => {
@@ -435,8 +438,12 @@ export default function VideoPlayer({
         initArtPlayer();
 
         return () => {
+            if (nextIntervalRef.current) clearInterval(nextIntervalRef.current);
             if (artInstance.current && (artInstance.current as any).handleKeydown) {
                 document.removeEventListener("keydown", (artInstance.current as any).handleKeydown);
+            }
+            if (artInstance.current && (artInstance.current as any).forceHistorySave) {
+                window.removeEventListener("beforeunload", (artInstance.current as any).forceHistorySave);
             }
             if (art) {
                 art.destroy(false);

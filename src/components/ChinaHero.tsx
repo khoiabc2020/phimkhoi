@@ -5,7 +5,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Play, Info, Star, Calendar, Clock, Bookmark } from "lucide-react";
 import Link from "next/link";
-import { cn, getImageUrl } from "@/lib/utils";
+import { cn, getImageUrl, stripHtml } from "@/lib/utils";
 import WatchlistButton from "./WatchlistButton";
 
 interface MovieSlideAssets {
@@ -89,14 +89,8 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                 ...movie,
                 ...assets,
                 displayTitle: movie.name,
-                displayDesc: movie.content 
-                    ? movie.content
-                        .replace(/<[^>]*>?/gm, '')
-                        .replace(/&quot;/g, '"')
-                        .replace(/&amp;/g, '&')
-                        .replace(/&lt;/g, '<')
-                        .replace(/&gt;/g, '>')
-                        .replace(/&#39;/g, "'")
+                displayDesc: currentMovie.content 
+                    ? stripHtml(currentMovie.content)
                     : "Đang cập nhật nội dung...",
                 displayTags: movie.category?.slice(0, 3).map((c: any) => c.name) || ["Phim Trung"],
                 displayEpisodes: movie.episode_current || "Full"
