@@ -76,25 +76,22 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
     const [isAutoPlay, setIsAutoPlay] = useState(true);
 
     const slides = useMemo((): (any & { bg: string; logo: string; actor?: string; displayTitle: string; displayDesc: string; displayTags: string[]; displayEpisodes: string })[] => {
-        if (!initialMovies || initialMovies.length === 0) return [];
-        
-        return initialMovies.map(movie => {
-            const assets = ASSETS_MAP[movie.slug] || {
-                bg: movie.thumb_url || movie.poster_url,
-                logo: "",
-            };
-            
-            return {
-                ...movie,
-                ...assets,
-                displayTitle: movie.name,
-                displayDesc: movie.content 
-                    ? stripHtml(movie.content)
-                    : "Đang cập nhật nội dung...",
-                displayTags: movie.category?.slice(0, 3).map((c: any) => c.name) || ["Phim Trung"],
-                displayEpisodes: movie.episode_current || "Full"
-            };
-        });
+        return initialMovies
+            .filter(movie => ASSETS_MAP[movie.slug])
+            .map(movie => {
+                const assets = ASSETS_MAP[movie.slug];
+                
+                return {
+                    ...movie,
+                    ...assets,
+                    displayTitle: movie.name,
+                    displayDesc: movie.content 
+                        ? stripHtml(movie.content)
+                        : "Đang cập nhật nội dung...",
+                    displayTags: movie.category?.slice(0, 3).map((c: any) => c.name) || ["Phim Trung"],
+                    displayEpisodes: movie.episode_current || "Full"
+                };
+            });
     }, [initialMovies]);
 
     useEffect(() => {
