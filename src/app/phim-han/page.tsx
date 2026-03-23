@@ -150,16 +150,8 @@ export default async function PhimHanPage({ searchParams }: { searchParams: Prom
             {/* Immersive Hero Section - Flush to Top */}
             {currentPage === 1 && (
                 <Suspense fallback={(
-                    <div className="relative w-full aspect-[10/14] md:aspect-video lg:h-[80vh] flex items-center justify-center bg-black overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-r from-[#111] via-[#0a0a0a] to-[#111] animate-pulse" />
-                        <div className="relative z-10 w-full max-w-7xl px-8 flex flex-col gap-6">
-                            <div className="h-16 w-64 bg-white/5 rounded-lg" />
-                            <div className="h-8 w-48 bg-white/5 rounded-lg" />
-                            <div className="flex gap-4">
-                                <div className="h-14 w-40 bg-white/5 rounded-full" />
-                                <div className="h-14 w-14 bg-white/5 rounded-full" />
-                            </div>
-                        </div>
+                    <div className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] xl:h-[800px] bg-black">
+                        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#111] to-[#0a0a0a]" />
                     </div>
                 )}>
                     <KoreaHeroWithData />

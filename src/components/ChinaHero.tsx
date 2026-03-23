@@ -130,19 +130,14 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                    transition={{ duration: 0.5 }}
                     className="absolute inset-0"
-                    style={{ willChange: "opacity, transform" }}
                 >
+                    {/* Background Layer (Main Crossfade) */}
                     <div className="absolute inset-0 z-0 optimize-gpu">
                         <div className="md:hidden absolute inset-0 overflow-hidden">
                             <Image 
-                                src={currentMovie.poster_url || currentMovie.bg ? (
-                                    (() => {
-                                        const url = getImageUrl(currentMovie.poster_url || currentMovie.bg);
-                                        return url.startsWith("http") || url.includes("/api/img-proxy") ? `${url}&w=720&q=75` : url;
-                                    })()
-                                ) : ""}
+                                src={currentMovie.poster_url || currentMovie.bg ? getImageUrl(currentMovie.poster_url || currentMovie.bg) : ""}
                                 alt={currentMovie.displayTitle}
                                 fill
                                 className="object-cover brightness-[0.45] contrast-[1.15]"
@@ -153,12 +148,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
 
                         <div className="hidden md:block absolute inset-0 overflow-hidden">
                             <Image 
-                                src={currentMovie.bg ? (
-                                    (() => {
-                                        const url = getImageUrl(currentMovie.bg);
-                                        return url.startsWith("http") || url.includes("/api/img-proxy") ? `${url}&w=1280&q=75` : url;
-                                    })()
-                                ) : ""}
+                                src={currentMovie.bg ? getImageUrl(currentMovie.bg) : ""}
                                 alt={currentMovie.displayTitle}
                                 fill
                                 className="object-cover brightness-[0.45] contrast-[1.15]"
@@ -173,23 +163,34 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                         <div className="absolute inset-x-0 bottom-0 h-96 bg-gradient-to-t from-black via-transparent to-transparent z-10 opacity-60" />
                         <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-black via-black/80 to-transparent z-10" />
                         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent z-20" />
-                        
-                        {currentMovie.actor && (
-                            <div className="absolute inset-0 z-[15]">
-                                <Image
-                                    src={currentMovie.actor}
-                                    alt=""
-                                    fill
-                                    className="object-contain object-right-bottom scale-[0.65] md:scale-[0.8] lg:scale-[0.85] origin-right-bottom"
-                                    priority
-                                />
-                            </div>
-                        )}
                     </div>
 
+                    {/* Actor Layer (Independent Slide/Fade) */}
+                    {currentMovie.actor && (
+                        <motion.div 
+                            initial={{ opacity: 0, x: 50 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+                            className="absolute inset-0 z-[15] pointer-events-none"
+                        >
+                            <Image
+                                src={currentMovie.actor}
+                                alt=""
+                                fill
+                                className="object-contain object-right-bottom scale-[0.65] md:scale-[0.8] lg:scale-[0.85] origin-right-bottom"
+                                priority
+                            />
+                        </motion.div>
+                    )}
+
+                    {/* Info Layer (Slide-up) */}
                     <div className="absolute inset-0 z-30 flex items-center px-6 md:pl-24 md:pr-14 lg:pl-32 xl:pl-[140px] max-w-[1920px] mx-auto">
-                        <div className="max-w-[85%] sm:max-w-xl md:max-w-2xl flex flex-col items-start gap-3 md:gap-5">
-                            
+                        <motion.div 
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
+                            className="max-w-[85%] sm:max-w-xl md:max-w-2xl flex flex-col items-start gap-3 md:gap-5"
+                        >
                             <div className="relative w-full max-w-[200px] sm:max-w-[280px] md:max-w-[420px] lg:max-w-[480px] aspect-[4/1.5]">
                                 {currentMovie.logo ? (
                                     <Image 
@@ -246,7 +247,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                                     showLabel={false}
                                 />
                             </div>
-                        </div>
+                        </motion.div>
                     </div>
                 </motion.div>
             </AnimatePresence>
