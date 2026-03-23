@@ -273,7 +273,6 @@ function MovieCard({
                             </span>
                         )}
                     </div>
-                </div>
 
                 {/* Desktop Hidden Info (for SEO/Accessibility, hidden visually on modern grid) */}
                 <div className="sr-only">
