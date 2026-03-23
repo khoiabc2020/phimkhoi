@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-export default function VersionWatcher() {
+export default function VersionWatcher(): null {
     const router = useRouter();
 
     useEffect(() => {
