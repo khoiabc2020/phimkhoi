@@ -2,8 +2,7 @@ module.exports = {
   apps: [
     {
       name: "phimkhoi",
-      script: "npm",
-      args: "start",
+      script: ".next/standalone/server.js",
       exec_mode: "fork",
       instances: 1,
       env: {
