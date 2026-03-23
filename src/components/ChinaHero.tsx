@@ -200,7 +200,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                                     src={currentMovie.actor}
                                     alt=""
                                     fill
-                                    className="object-contain object-right-bottom scale-[0.8] md:scale-100 origin-right-bottom"
+                                    className="object-contain object-right-bottom scale-[0.65] md:scale-[0.8] lg:scale-[0.85] origin-right-bottom"
                                     priority
                                     unoptimized
                                 />
