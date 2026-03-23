@@ -201,17 +201,19 @@ export default function Header({ categories, countries }: HeaderProps) {
                                     Thể loại <ChevronDown className={cn("w-3.5 h-3.5 opacity-60 transition-transform duration-300", openDropdown === "categories" ? "rotate-180 opacity-100" : "")} />
                                 </button>
                                 {openDropdown === "categories" && (
-                                    <div className="absolute top-full left-0 mt-3 w-[520px] bg-[#0d0f14]/98 backdrop-blur-md border border-white/10 rounded-2xl p-4 shadow-2xl grid grid-cols-3 gap-1 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                                        {displayCategories.map((cat) => (
-                                            <Link
-                                                key={cat.slug}
-                                                href={`/the-loai/${cat.slug}`}
-                                                onClick={closeDropdown}
-                                                className="px-3 py-2 rounded-xl text-[13px] font-semibold text-white/50 hover:text-white hover:bg-white/5 transition-all"
-                                            >
-                                                {cat.name}
-                                            </Link>
-                                        ))}
+                                    <div className="absolute top-full left-0 mt-3 w-[560px] bg-[#0d0f14]/98 backdrop-blur-md border border-white/10 rounded-2xl p-4 shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                        <div className="grid grid-cols-3 gap-x-4 gap-y-1">
+                                            {displayCategories.map((cat) => (
+                                                <Link
+                                                    key={cat.slug}
+                                                    href={`/the-loai/${cat.slug}`}
+                                                    onClick={closeDropdown}
+                                                    className="px-3 py-2 rounded-xl text-[13px] font-semibold text-white/50 hover:text-white hover:bg-white/5 transition-all whitespace-nowrap truncate"
+                                                >
+                                                    {cat.name}
+                                                </Link>
+                                            ))}
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -230,14 +232,14 @@ export default function Header({ categories, countries }: HeaderProps) {
                                     Quốc gia <ChevronDown className={cn("w-3.5 h-3.5 opacity-60 transition-transform duration-300", openDropdown === "countries" ? "rotate-180 opacity-100" : "")} />
                                 </button>
                                 {openDropdown === "countries" && (
-                                    <div className="absolute top-full left-0 mt-3 w-[520px] bg-[#0d0f14]/98 backdrop-blur-md border border-white/10 rounded-2xl p-4 shadow-2xl grid grid-cols-3 gap-1 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                                        <div className="grid grid-cols-3 gap-1 max-h-[400px] overflow-y-auto custom-scrollbar">
+                                    <div className="absolute top-full left-0 mt-3 w-[640px] bg-[#0d0f14]/98 backdrop-blur-md border border-white/10 rounded-2xl p-4 shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                        <div className="grid grid-cols-4 gap-x-4 gap-y-1 max-h-[450px] overflow-y-auto custom-scrollbar pr-2">
                                             {displayCountries.map((c) => (
                                                 <Link
                                                     key={c.slug}
                                                     href={`/quoc-gia/${c.slug}`}
                                                     onClick={closeDropdown}
-                                                    className="px-3 py-2 rounded-xl text-[13px] font-semibold text-white/50 hover:text-white hover:bg-white/5 transition-all"
+                                                    className="px-3 py-2 rounded-xl text-[13px] font-semibold text-white/50 hover:text-white hover:bg-white/5 transition-all whitespace-nowrap truncate"
                                                 >
                                                     {c.name}
                                                 </Link>
