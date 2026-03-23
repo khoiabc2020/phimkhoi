@@ -86,15 +86,6 @@ async function PhimHanHome() {
                 <MovieRow title="Phim Hình Sự" movies={filterKorea(crime.items)} slug="/the-loai/hinh-su" />
             </LazySection>
 
-            {/* View All Button */}
-            <div className="flex justify-center pt-8">
-                <Link 
-                    href="/phim-han?page=1"
-                    className="px-8 py-3 bg-white/10 hover:bg-white/20 border border-white/10 rounded-full text-white font-bold transition-all hover:scale-105 active:scale-95"
-                >
-                    Xem tất cả phim
-                </Link>
-            </div>
         </div>
     );
 }
@@ -108,7 +99,7 @@ async function CountryGridStream({ slug, page }: { slug: string; page: number })
 
     return (
         <div className="px-2 sm:px-6 md:px-12 lg:pl-24 lg:pr-12">
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-1.5 sm:gap-3 mb-12">
+            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3 sm:gap-4 mb-12">
                 {data.items.map((movie: any) => (
                     <MovieCard key={movie._id} movie={movie} />
                 ))}

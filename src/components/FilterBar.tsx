@@ -54,48 +54,40 @@ export default function FilterBar({
         <div>
             <div className="flex flex-nowrap items-center gap-1.5 sm:gap-3 py-2 overflow-x-auto no-scrollbar">
                 {/* Category Dropdown */}
-                <div className="relative group flex-1 min-w-[100px] sm:min-w-[120px]">
+                <div className="relative group flex-1 min-w-[90px] sm:min-w-[120px]">
                     <select
                         onChange={(e) => handleFilterChange("category", e.target.value)}
-                        className="appearance-none w-full bg-white/[0.05] border border-white/[0.08] text-white/70 py-1.5 px-2 sm:px-3 pr-6 sm:pr-8 rounded-[8px] leading-tight focus:outline-none focus:border-white/20 focus:text-white cursor-pointer text-[11px] sm:text-[13px] font-medium transition-all"
+                        className="appearance-none w-full bg-white/[0.05] border border-white/[0.1] text-white/80 py-2 px-2 sm:px-3 pr-6 sm:pr-8 rounded-[10px] leading-tight focus:outline-none focus:border-[#8FA7C5]/40 focus:bg-white/[0.08] cursor-pointer text-[12px] sm:text-[14px] font-bold transition-all"
                         value={searchParams.get("category") || "all"}
                         disabled={isPending}
                     >
                         {displayCategories.map((c) => (
                             <option key={c.slug} value={c.slug} className="bg-[#0b0b10] text-white">
-                                {c.name}
+                                {c.slug === "all" ? "Thể loại" : c.name}
                             </option>
                         ))}
                     </select>
-                    {/* Visual label overlay for mobile - shorter text */}
-                    <div className="sm:hidden pointer-events-none absolute inset-y-0 left-2 flex items-center text-white/70 text-[11px] font-medium bg-[#0b0b10]/0 pr-1">
-                        {searchParams.get("category") === null || searchParams.get("category") === "all" ? "T.Loại" : ""}
-                    </div>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 sm:px-2 text-white/40 group-focus-within:text-white">
-                        <ChevronDown className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 sm:px-2 text-white/40 group-focus-within:text-[#8FA7C5]">
+                        <ChevronDown className="w-3.5 h-3.5" />
                     </div>
                 </div>
 
                 {/* Country Dropdown */}
-                <div className="relative group flex-1 min-w-[100px] sm:min-w-[120px]">
+                <div className="relative group flex-1 min-w-[90px] sm:min-w-[120px]">
                     <select
                         onChange={(e) => handleFilterChange("country", e.target.value)}
-                        className="appearance-none w-full bg-white/[0.05] border border-white/[0.08] text-white/70 py-1.5 px-2 sm:px-3 pr-6 sm:pr-8 rounded-[8px] leading-tight focus:outline-none focus:border-white/20 focus:text-white cursor-pointer text-[11px] sm:text-[13px] font-medium transition-all"
+                        className="appearance-none w-full bg-white/[0.05] border border-white/[0.1] text-white/80 py-2 px-2 sm:px-3 pr-6 sm:pr-8 rounded-[10px] leading-tight focus:outline-none focus:border-[#8FA7C5]/40 focus:bg-white/[0.08] cursor-pointer text-[12px] sm:text-[14px] font-bold transition-all"
                         value={searchParams.get("country") || "all"}
                         disabled={isPending}
                     >
                         {displayCountries.map((c) => (
                             <option key={c.slug} value={c.slug} className="bg-[#0b0b10] text-white">
-                                {c.name}
+                                {c.slug === "all" ? "Quốc gia" : c.name}
                             </option>
                         ))}
                     </select>
-                    {/* Visual label overlay for mobile - shorter text */}
-                    <div className="sm:hidden pointer-events-none absolute inset-y-0 left-2 flex items-center text-white/70 text-[11px] font-medium bg-[#0b0b10]/0 pr-1">
-                        {searchParams.get("country") === null || searchParams.get("country") === "all" ? "Q.Gia" : ""}
-                    </div>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 sm:px-2 text-white/40 group-focus-within:text-white">
-                        <ChevronDown className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 sm:px-2 text-white/40 group-focus-within:text-[#8FA7C5]">
+                        <ChevronDown className="w-3.5 h-3.5" />
                     </div>
                 </div>
 

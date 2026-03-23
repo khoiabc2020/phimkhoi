@@ -111,6 +111,16 @@ function MovieCard({
         setPosterIndex(0);
     }, [movie.slug, orientation]);
 
+    const langFlags = useMemo(() => {
+        const langLower = movie.lang?.toLowerCase() || "";
+        const showSub = langLower.includes("phụ đề") || langLower.includes("vietsub") || langLower.includes("tiếng việt") || 
+                       (!langLower.includes("thuyết minh") && !langLower.includes("lồng tiếng") && movie.lang);
+        const showTM = langLower.includes("thuyết minh");
+        const showLT = langLower.includes("lồng tiếng");
+        
+        return { showSub, showTM, showLT };
+    }, [movie.lang]);
+
     const handleMouseEnter = () => {
         if (isTouchDevice) return;
         if (leaveTimeoutRef.current) {
@@ -200,25 +210,26 @@ function MovieCard({
                                                                      (e.target as HTMLImageElement).src = "/placeholder.svg";
                                                                  }}
                         />
-                        
-                        {/* Overlay Gradient for Title (Standard Onflix/Netflix) */}
-                        <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-black/95 via-black/40 to-transparent opacity-90 z-20 pointer-events-none" />
-                        
-                        {/* Overlay Content (Title & Info) */}
-                        <div className="absolute inset-x-0 bottom-0 p-2 sm:p-3 z-30 pointer-events-none">
-                            <h3 className="text-white font-bold text-[12px] sm:text-[14px] leading-tight line-clamp-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] lg:group-hover/static-card:text-[#8FA7C5] transition-colors" title={decodeHtml(movie.name) || movie.slug || ""}>
-                                {decodeHtml(movie.name) || movie.slug || "—"}
-                            </h3>
-                            <div className="flex items-center justify-between gap-1 mt-0.5 opacity-60">
-                                <p className="text-[9px] sm:text-[11px] font-medium truncate flex-1 leading-none shadow-sm">
-                                    {decodeHtml(movie.origin_name || "")}
-                                </p>
-                                {Number(movie.year) > 0 && (
-                                    <span className="text-[9px] sm:text-[11px] font-bold shrink-0 leading-none shadow-sm">{movie.year}</span>
-                                )}
-                            </div>
-                        </div>
                     </Link>
+                </div>
+
+                {/* Movie Info below the poster (User requested "tên phim để ở dưới như cũ") */}
+                <div className="mt-2.5 px-0.5 space-y-1">
+                    <h3 
+                        className="text-white font-bold text-[13px] sm:text-[14px] leading-snug line-clamp-2 transition-colors group-hover/static-card:text-[#8FA7C5]" 
+                        title={decodeHtml(movie.name) || movie.slug || ""}
+                    >
+                        {decodeHtml(movie.name) || movie.slug || "—"}
+                    </h3>
+                    <div className="flex items-center justify-between gap-1 mt-0.5 text-white/40">
+                        <p className="text-[10px] sm:text-[11px] font-medium truncate flex-1 leading-none shadow-sm capitalize">
+                            {decodeHtml(movie.origin_name || "")}
+                        </p>
+                        {Number(movie.year) > 0 && (
+                            <span className="text-[10px] sm:text-[11px] font-bold shrink-0 leading-none shadow-sm">{movie.year}</span>
+                        )}
+                    </div>
+                </div>
 
                     {/* Top-Left: IMDb Rating Badge (Sleeker) */}
                     {(movie as any).tmdbData?.vote_average && (movie as any).tmdbData.vote_average > 0 && (
@@ -244,11 +255,21 @@ function MovieCard({
                         )}
                     </div>
 
-                    {/* Bottom-Left: Language Badge (Mini) - Offset from title */}
-                    <div className="absolute bottom-[48px] sm:bottom-[54px] left-1.5 z-40 pointer-events-none">
-                        {(movie.episode_current || movie.lang) && (
-                            <span className="bg-[#E50914] shadow-lg border border-white/10 text-white text-[9px] font-black px-1.5 py-0.5 rounded-[3px] tracking-tight uppercase">
-                                {movie.lang?.toLowerCase().includes('lồng tiếng') ? 'L.Tiếng' : 'P.Đề'}
+                    {/* Bottom-Left: Language Badges */}
+                    <div className="absolute bottom-1.5 left-1.5 z-40 pointer-events-none flex flex-wrap gap-1">
+                        {langFlags.showSub && (
+                            <span className="bg-[#E50914]/90 shadow-lg border border-white/10 text-white text-[9px] font-black px-1.5 py-0.5 rounded-[3px] tracking-tight uppercase">
+                                P.Đề
+                            </span>
+                        )}
+                        {langFlags.showTM && (
+                            <span className="bg-[#0070f3]/90 shadow-lg border border-white/10 text-white text-[9px] font-black px-1.5 py-0.5 rounded-[3px] tracking-tight uppercase">
+                                T.Minh
+                            </span>
+                        )}
+                        {langFlags.showLT && (
+                            <span className="bg-[#00A859]/90 shadow-lg border border-white/10 text-white text-[9px] font-black px-1.5 py-0.5 rounded-[3px] tracking-tight uppercase">
+                                L.Tiếng
                             </span>
                         )}
                     </div>

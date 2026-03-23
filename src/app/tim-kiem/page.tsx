@@ -164,7 +164,7 @@ async function SearchResultsStream({
                         <span className="w-1 h-5 bg-[#8FA7C5] rounded-full"></span>
                         <h2 className="text-base font-bold text-white">Phim kết quả</h2>
                     </div>
-                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2 sm:gap-2.5 md:gap-3 [contain:layout_paint]">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 [contain:layout_paint]">
                         {visibleMovies.map((movie: any, idx: number) => (
                             <MovieCard 
                                 key={movie._id || movie.slug} 
@@ -191,7 +191,7 @@ async function SearchResultsStream({
 const SearchSkeleton = () => (
     <div className="mt-8">
         <div className="h-4 w-48 bg-white/5 rounded animate-pulse mb-8" />
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2 sm:gap-2.5 md:gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4">
             {Array.from({ length: 14 }).map((_, i) => (
                 <div key={i} className="aspect-[2/3] rounded-lg bg-white/5 animate-pulse" />
             ))}
