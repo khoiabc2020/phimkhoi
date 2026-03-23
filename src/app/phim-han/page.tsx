@@ -37,13 +37,13 @@ async function PhimHanHome() {
     // Fetch multiple categories for Korea
     const [latest, action, romance, comedy, thriller, historical, animation, crime] = await Promise.all([
         getMoviesByCountry("han-quoc", 1, 14),
-        getMoviesByCategory("hanh-dong", 1, 100),
-        getMoviesByCategory("tinh-cam", 1, 100),
-        getMoviesByCategory("hai-huoc", 1, 100),
-        getMoviesByCategory("kinh-di", 1, 100),
-        getMoviesByCategory("co-trang", 1, 100),
-        getMoviesByCategory("hoat-hinh", 1, 100),
-        getMoviesByCategory("hinh-su", 1, 100),
+        getMoviesByCategory("hanh-dong", 1, 200),
+        getMoviesByCategory("tinh-cam", 1, 200),
+        getMoviesByCategory("hai-huoc", 1, 200),
+        getMoviesByCategory("kinh-di", 1, 200),
+        getMoviesByCategory("co-trang", 1, 200),
+        getMoviesByCategory("hoat-hinh", 1, 200),
+        getMoviesByCategory("hinh-su", 1, 200),
     ]);
 
     const filterKorea = (movies: Movie[]) => movies.filter(m => m.country?.some(c => c.slug === "han-quoc"));
@@ -107,8 +107,8 @@ async function CountryGridStream({ slug, page }: { slug: string; page: number })
     }
 
     return (
-        <div className="px-4 sm:px-6 md:px-12 lg:pl-24 lg:pr-12">
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3 mb-12">
+        <div className="px-2 sm:px-6 md:px-12 lg:pl-24 lg:pr-12">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-1.5 sm:gap-3 mb-12">
                 {data.items.map((movie: any) => (
                     <MovieCard key={movie._id} movie={movie} />
                 ))}
@@ -191,7 +191,7 @@ export default async function PhimHanPage({ searchParams }: { searchParams: Prom
                     </div>
                 ) : (
                     <div className="w-full max-w-[1920px] mx-auto">
-                         <div className="px-4 sm:px-6 md:px-12 lg:pl-24 lg:pr-12 mb-6 md:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                         <div className="px-2 sm:px-6 md:px-12 lg:pl-24 lg:pr-12 mb-6 md:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
                             <div className="max-w-4xl">
                                 <Link 
                                     href="/phim-han" 

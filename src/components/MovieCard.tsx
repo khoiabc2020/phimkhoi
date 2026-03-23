@@ -177,13 +177,13 @@ function MovieCard({
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
-                <div className={`relative ${orientation === 'landscape' ? 'aspect-video' : 'aspect-[2/3]'} rounded-[10px] overflow-hidden bg-[#0b101a] ring-1 ring-white/5 group-hover/static-card:ring-2 group-hover/static-card:ring-[#8FA7C5]/60 transition-all duration-300 shadow-lg will-change-transform`}>
+                <div className={`relative ${orientation === 'landscape' ? 'aspect-video' : 'aspect-[2/3]'} rounded-[10px] overflow-hidden bg-[#0b101a] ring-1 ring-white/5 group-hover/static-card:ring-2 group-hover/static-card:ring-[#8FA7C5]/60 transition-all duration-500 shadow-lg will-change-transform`}>
                     <Link href={`/phim/${movie.slug}`} className="block h-full w-full absolute inset-0 z-0">
                         <Image
                             src={activePosterSrc || "/placeholder.svg"}
                             alt={decodeHtml(movie.name) || movie.slug || "Phim"}
                             fill
-                            className="transition-transform duration-200 ease-out group-hover/static-card:scale-[1.05] object-cover z-10 will-change-transform"
+                            className="transition-transform duration-500 ease-out lg:group-hover/static-card:scale-[1.1] object-cover z-10 anchor-top will-change-transform"
                             sizes={orientation === 'landscape' ? "(max-width: 768px) 50vw, 400px" : "(max-width: 768px) 33vw, (max-width: 1280px) 20vw, 300px"}
                             quality={80}
                             loading={priority ? undefined : loading}
@@ -191,64 +191,72 @@ function MovieCard({
                             unoptimized={true}
                             decoding="async"
                             placeholder="blur"
-                            blurDataURL="data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAQCdASoIAAUAAUAmJaQAA3AA/vx5nAAA/uX3L5B5mR5s3h9n189o9D0Nnv/qJ/93sAf//1kP/+cIIf//2I//97kf///eP///zGf//42gAA=="
+                            blurDataURL={BLUR_PLACEHOLDER}
                             onError={(e) => {
                                 if (posterIndex < posterCandidates.length - 1) {
-                                                                        setPosterIndex((prev) => prev + 1);
-                                                                        return;
-                                                                    }
-                                                                    (e.target as HTMLImageElement).src = "/placeholder.svg";
-                                                                }}
+                                                                         setPosterIndex((prev) => prev + 1);
+                                                                         return;
+                                                                     }
+                                                                     (e.target as HTMLImageElement).src = "/placeholder.svg";
+                                                                 }}
                         />
-                        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
+                        
+                        {/* Overlay Gradient for Title (Standard Onflix/Netflix) */}
+                        <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-black/95 via-black/40 to-transparent opacity-90 z-20 pointer-events-none" />
+                        
+                        {/* Overlay Content (Title & Info) */}
+                        <div className="absolute inset-x-0 bottom-0 p-2 sm:p-3 z-30 pointer-events-none">
+                            <h3 className="text-white font-bold text-[12px] sm:text-[14px] leading-tight line-clamp-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] lg:group-hover/static-card:text-[#8FA7C5] transition-colors" title={decodeHtml(movie.name) || movie.slug || ""}>
+                                {decodeHtml(movie.name) || movie.slug || "—"}
+                            </h3>
+                            <div className="flex items-center justify-between gap-1 mt-0.5 opacity-60">
+                                <p className="text-[9px] sm:text-[11px] font-medium truncate flex-1 leading-none shadow-sm">
+                                    {decodeHtml(movie.origin_name || "")}
+                                </p>
+                                {Number(movie.year) > 0 && (
+                                    <span className="text-[9px] sm:text-[11px] font-bold shrink-0 leading-none shadow-sm">{movie.year}</span>
+                                )}
+                            </div>
+                        </div>
                     </Link>
 
-                    {/* Top-Left: IMDb Rating Badge (Onflix Style) */}
+                    {/* Top-Left: IMDb Rating Badge (Sleeker) */}
                     {(movie as any).tmdbData?.vote_average && (movie as any).tmdbData.vote_average > 0 && (
-                        <div className="absolute top-2 left-2 z-10 pointer-events-none transform group-hover/static-card:scale-110 transition-transform">
-                            <div className="flex items-center gap-1 bg-[#FFD700] text-black px-1.5 py-0.5 rounded-[4px] shadow-[0_4px_12px_rgba(255,215,0,0.4)] border border-black/10">
+                        <div className="absolute top-1.5 left-1.5 z-40 pointer-events-none">
+                            <div className="flex items-center gap-1 bg-[#FFD700]/90 backdrop-blur-sm text-black px-1.5 py-0.5 rounded-[4px] shadow-lg border border-white/10">
                                 <Star className="w-2.5 h-2.5 fill-black" />
                                 <span className="text-[10px] font-black tracking-tight">{(movie as any).tmdbData.vote_average.toFixed(1)}</span>
                             </div>
                         </div>
                     )}
 
-                    {/* Top-Right: Premium Quality Badge & Episode */}
-                    <div className="absolute top-2 right-2 z-10 pointer-events-none flex flex-col items-end gap-1.5">
-                        {formatQualityLabel(movie.quality) && (
-                            <span className="bg-[#00A859] shadow-[0_2px_8px_rgba(0,168,89,0.4)] border border-white/10 text-white text-[9px] font-black px-1.5 py-0.5 rounded-[4px] tracking-tight uppercase">
-                                {formatQualityLabel(movie.quality)}
+                    {/* Top-Right: Status Badge (Episode/Quality) */}
+                    <div className="absolute top-1.5 right-1.5 z-40 pointer-events-none flex flex-col items-end gap-1">
+                        {movie.episode_current && (
+                            <span className="bg-white/90 backdrop-blur-md shadow-lg border border-black/10 text-[#0a0a0a] text-[9px] font-black px-1.5 py-0.5 rounded-[4px] tracking-tight whitespace-nowrap uppercase">
+                                {movie.episode_current}
                             </span>
                         )}
-                        {movie.episode_current && (
-                            <span className="bg-white/90 backdrop-blur-md shadow-lg border border-black/10 text-[#0a0a0a] text-[9px] font-black px-1.5 py-0.5 rounded-[4px] tracking-tight whitespace-nowrap max-w-[90px] overflow-hidden text-ellipsis text-right uppercase">
-                                {movie.episode_current}
+                        {!movie.episode_current && formatQualityLabel(movie.quality) && (
+                            <span className="bg-[#009624]/90 backdrop-blur-sm border border-white/10 text-white text-[9px] font-black px-1.5 py-0.5 rounded-[4px] tracking-tight uppercase">
+                                {formatQualityLabel(movie.quality)}
                             </span>
                         )}
                     </div>
 
-                    {/* Bottom-Left: Subtitle / Language Badge (Onflix P.Đề style) */}
-                    <div className="absolute bottom-2 left-2 z-10 pointer-events-none">
+                    {/* Bottom-Left: Language Badge (Mini) - Offset from title */}
+                    <div className="absolute bottom-[48px] sm:bottom-[54px] left-1.5 z-40 pointer-events-none">
                         {(movie.episode_current || movie.lang) && (
-                            <span className="bg-[#E50914] shadow-[0_4px_12px_rgba(229,9,20,0.3)] border border-white/10 text-white text-[10px] font-black px-2 py-0.5 rounded-[4px] tracking-tight uppercase mb-0.5 block w-fit">
+                            <span className="bg-[#E50914] shadow-lg border border-white/10 text-white text-[9px] font-black px-1.5 py-0.5 rounded-[3px] tracking-tight uppercase">
                                 {movie.lang?.toLowerCase().includes('lồng tiếng') ? 'L.Tiếng' : 'P.Đề'}
                             </span>
                         )}
                     </div>
                 </div>
 
-                <div className="mt-2.5 space-y-0.5 px-0.5">
-                    <h3 className="text-white/95 font-semibold text-[14.5px] leading-tight truncate group-hover/static-card:text-[#8FA7C5] transition-colors" title={decodeHtml(movie.name) || movie.slug || ""}>
-                        {decodeHtml(movie.name) || movie.slug || "—"}
-                    </h3>
-                    <div className="flex items-center justify-between gap-2 overflow-hidden">
-                        <p className="text-white/40 text-[11px] truncate font-medium flex-1" title={decodeHtml(movie.origin_name)}>
-                            {decodeHtml(movie.origin_name || "")}
-                        </p>
-                        {Number(movie.year) > 0 ? (
-                            <span className="text-white/30 text-[11px] font-medium shrink-0">{movie.year}</span>
-                        ) : null}
-                    </div>
+                {/* Desktop Hidden Info (for SEO/Accessibility, hidden visually on modern grid) */}
+                <div className="sr-only">
+                    {decodeHtml(movie.name)} - {movie.year}
                 </div>
             </div>
 

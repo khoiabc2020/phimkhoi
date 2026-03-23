@@ -52,12 +52,12 @@ export default function FilterBar({
 
     return (
         <div>
-            <div className="flex flex-wrap gap-2 sm:gap-3 py-3">
+            <div className="flex flex-nowrap items-center gap-1.5 sm:gap-3 py-2 overflow-x-auto no-scrollbar">
                 {/* Category Dropdown */}
-                <div className="relative group">
+                <div className="relative group flex-1 min-w-[100px] sm:min-w-[120px]">
                     <select
                         onChange={(e) => handleFilterChange("category", e.target.value)}
-                        className="appearance-none min-w-[120px] bg-white/[0.05] border border-white/[0.08] text-white/70 py-1.5 px-3 pr-8 rounded-[8px] leading-tight focus:outline-none focus:border-white/20 focus:text-white cursor-pointer text-[13px] font-medium transition-all"
+                        className="appearance-none w-full bg-white/[0.05] border border-white/[0.08] text-white/70 py-1.5 px-2 sm:px-3 pr-6 sm:pr-8 rounded-[8px] leading-tight focus:outline-none focus:border-white/20 focus:text-white cursor-pointer text-[11px] sm:text-[13px] font-medium transition-all"
                         value={searchParams.get("category") || "all"}
                         disabled={isPending}
                     >
@@ -67,16 +67,20 @@ export default function FilterBar({
                             </option>
                         ))}
                     </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/40 group-focus-within:text-white">
-                        <ChevronDown className="w-3.5 h-3.5" />
+                    {/* Visual label overlay for mobile - shorter text */}
+                    <div className="sm:hidden pointer-events-none absolute inset-y-0 left-2 flex items-center text-white/70 text-[11px] font-medium bg-[#0b0b10]/0 pr-1">
+                        {searchParams.get("category") === null || searchParams.get("category") === "all" ? "T.Loại" : ""}
+                    </div>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 sm:px-2 text-white/40 group-focus-within:text-white">
+                        <ChevronDown className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                     </div>
                 </div>
 
                 {/* Country Dropdown */}
-                <div className="relative group">
+                <div className="relative group flex-1 min-w-[100px] sm:min-w-[120px]">
                     <select
                         onChange={(e) => handleFilterChange("country", e.target.value)}
-                        className="appearance-none min-w-[120px] bg-white/[0.05] border border-white/[0.08] text-white/70 py-1.5 px-3 pr-8 rounded-[8px] leading-tight focus:outline-none focus:border-white/20 focus:text-white cursor-pointer text-[13px] font-medium transition-all"
+                        className="appearance-none w-full bg-white/[0.05] border border-white/[0.08] text-white/70 py-1.5 px-2 sm:px-3 pr-6 sm:pr-8 rounded-[8px] leading-tight focus:outline-none focus:border-white/20 focus:text-white cursor-pointer text-[11px] sm:text-[13px] font-medium transition-all"
                         value={searchParams.get("country") || "all"}
                         disabled={isPending}
                     >
@@ -86,16 +90,20 @@ export default function FilterBar({
                             </option>
                         ))}
                     </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/40 group-focus-within:text-white">
-                        <ChevronDown className="w-3.5 h-3.5" />
+                    {/* Visual label overlay for mobile - shorter text */}
+                    <div className="sm:hidden pointer-events-none absolute inset-y-0 left-2 flex items-center text-white/70 text-[11px] font-medium bg-[#0b0b10]/0 pr-1">
+                        {searchParams.get("country") === null || searchParams.get("country") === "all" ? "Q.Gia" : ""}
+                    </div>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 sm:px-2 text-white/40 group-focus-within:text-white">
+                        <ChevronDown className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                     </div>
                 </div>
 
                 {/* Year Dropdown */}
-                <div className="relative group">
+                <div className="relative group flex-1 min-w-[80px] sm:min-w-[110px]">
                     <select
                         onChange={(e) => handleFilterChange("year", e.target.value)}
-                        className="appearance-none min-w-[110px] bg-white/[0.05] border border-white/[0.08] text-white/70 py-1.5 px-3 pr-8 rounded-[8px] leading-tight focus:outline-none focus:border-white/20 focus:text-white cursor-pointer text-[13px] font-medium transition-all"
+                        className="appearance-none w-full bg-white/[0.05] border border-white/[0.08] text-white/70 py-1.5 px-2 sm:px-3 pr-6 sm:pr-8 rounded-[8px] leading-tight focus:outline-none focus:border-white/20 focus:text-white cursor-pointer text-[11px] sm:text-[13px] font-medium transition-all"
                         value={searchParams.get("year") || "all"}
                         disabled={isPending}
                     >
@@ -105,8 +113,8 @@ export default function FilterBar({
                             </option>
                         ))}
                     </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/40 group-focus-within:text-white">
-                        <ChevronDown className="w-3.5 h-3.5" />
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 sm:px-2 text-white/40 group-focus-within:text-white">
+                        <ChevronDown className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                     </div>
                 </div>
             </div>

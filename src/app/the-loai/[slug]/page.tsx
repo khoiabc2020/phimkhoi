@@ -45,7 +45,7 @@ async function CategoryGridStream({
 
     return (
         <>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2 sm:gap-2.5 md:gap-3 mt-6 [contain:layout_paint]">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-1 sm:gap-1.5 md:gap-3 mt-6 [contain:layout_paint]">
                 {items.map((movie: any, idx: number) => (
                     <MovieCard 
                         key={movie._id} 
@@ -69,7 +69,7 @@ async function CategoryGridStream({
 }
 
 const GridSkeleton = () => (
-    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2 sm:gap-2.5 md:gap-3 mt-6">
+    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-1 sm:gap-1.5 md:gap-3 mt-6">
         {Array.from({ length: 14 }).map((_, i) => (
             <div key={i} className="aspect-[2/3] rounded-lg bg-white/5 animate-pulse" />
         ))}
@@ -92,7 +92,7 @@ export default async function CategoryPage({ params, searchParams }: { params: P
 
     return (
         <main className="min-h-screen pb-20">
-            <div className="pt-24 w-full max-w-[1920px] mx-auto px-4 sm:px-6 md:px-12 lg:pl-24 lg:pr-12 relative">
+            <div className="pt-24 w-full max-w-[1920px] mx-auto px-2 sm:px-6 md:px-12 lg:pl-24 lg:pr-12 relative">
                 {/* Decorative background glow */}
                 <div className={cn("absolute top-0 left-0 right-0 h-[500px] via-transparent to-transparent pointer-events-none -z-10 blur-[130px] opacity-60", theme.glow)} />
 
