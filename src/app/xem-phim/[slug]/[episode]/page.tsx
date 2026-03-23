@@ -191,7 +191,7 @@ export default async function WatchPage({ params }: PageProps) {
                                 <div className="p-5 sm:p-6">
                                     <div className="flex flex-col md:flex-row gap-6">
                                         <div className="shrink-0 w-24 md:w-32 aspect-[2/3] relative rounded-lg overflow-hidden shadow-xl ring-1 ring-white/10 hidden md:block">
-                                            <Image src={getImageUrl(movie.poster_url || movie.thumb_url)} alt={movie.name} fill className="object-cover" />
+                                            <Image src={getImageUrl(movieData.moviePoster)} alt={movie.name} fill className="object-cover" />
                                         </div>
                                         <div className="flex-1">
                                             <p className="text-gray-300 text-sm leading-relaxed mb-4" style={{ lineHeight: 1.75 }}>

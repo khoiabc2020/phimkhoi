@@ -24,7 +24,8 @@ const memoryCache = new Map<string, { contentType: string; buffer: Buffer }>();
 const ALLOWED_DOMAINS = [
     'phimimg.com', 'ophim17.cc', 'ophim1.com', 'kkphim.vip',
     'img.phimapi.com', 'image.tmdb.org', 'phim.nguonc.com',
-    'cdn.kkphim.vip', 'i.imgur.com', 'static.phimapi.com'
+    'cdn.kkphim.vip', 'i.imgur.com', 'static.phimapi.com',
+    'img.ophim.live'
 ];
 
 export async function GET(req: NextRequest) {
