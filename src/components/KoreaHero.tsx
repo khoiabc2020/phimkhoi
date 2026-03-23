@@ -113,48 +113,34 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                     >
                         {/* Mobile Background: Use Poster for sharpness */}
                         <div className="md:hidden absolute inset-0 overflow-hidden">
-                            <motion.div 
-                                className="absolute inset-0"
-                                animate={{ scale: [1, 1.05] }}
-                                transition={{ duration: 10, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
-                            >
-                                <Image 
-                                    src={currentMovie.poster_url || currentMovie.bg ? (
-                                        (() => {
-                                            const url = getImageUrl(currentMovie.poster_url || currentMovie.bg);
-                                            return url.startsWith("http") || url.includes("/api/img-proxy") ? `${url}&w=1080&q=95` : url;
-                                        })()
-                                    ) : ""}
-                                    alt={currentMovie.displayTitle}
-                                    fill
-                                    className="object-cover brightness-[0.45] contrast-[1.15]"
-                                    priority
-                                    unoptimized
-                                />
-                            </motion.div>
+                            <Image 
+                                src={currentMovie.poster_url || currentMovie.bg ? (
+                                    (() => {
+                                        const url = getImageUrl(currentMovie.poster_url || currentMovie.bg);
+                                        return url.startsWith("http") || url.includes("/api/img-proxy") ? `${url}&w=720&q=75` : url;
+                                    })()
+                                ) : ""}
+                                alt={currentMovie.displayTitle}
+                                fill
+                                className="object-cover brightness-[0.45] contrast-[1.15]"
+                                priority
+                            />
                         </div>
 
                         {/* Desktop Background: Use Backdrop */}
                         <div className="hidden md:block absolute inset-0 overflow-hidden">
-                            <motion.div 
-                                className="absolute inset-0"
-                                animate={{ scale: [1, 1.08] }}
-                                transition={{ duration: 20, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
-                            >
-                                <Image 
-                                    src={currentMovie.bg ? (
-                                        (() => {
-                                            const url = getImageUrl(currentMovie.bg);
-                                            return url.startsWith("http") || url.includes("/api/img-proxy") ? `${url}&w=1920&q=90` : url;
-                                        })()
-                                    ) : ""}
-                                    alt={currentMovie.displayTitle}
-                                    fill
-                                    className="object-cover brightness-[0.45] contrast-[1.15]"
-                                    priority
-                                    unoptimized
-                                />
-                            </motion.div>
+                            <Image 
+                                src={currentMovie.bg ? (
+                                    (() => {
+                                        const url = getImageUrl(currentMovie.bg);
+                                        return url.startsWith("http") || url.includes("/api/img-proxy") ? `${url}&w=1280&q=75` : url;
+                                    })()
+                                ) : ""}
+                                alt={currentMovie.displayTitle}
+                                fill
+                                className="object-cover brightness-[0.45] contrast-[1.15]"
+                                priority
+                            />
                         </div>
 
                         {/* IQIYI/Netflix Style Masks */}

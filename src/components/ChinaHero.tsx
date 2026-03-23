@@ -145,48 +145,34 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                     >
                         {/* Mobile Background: Use Poster for sharpness */}
                         <div className="md:hidden absolute inset-0 overflow-hidden">
-                            <motion.div 
-                                className="absolute inset-0"
-                                animate={{ scale: [1, 1.05] }}
-                                transition={{ duration: 10, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
-                            >
-                                <Image 
-                                    src={currentMovie.poster_url || currentMovie.bg ? (
-                                        (() => {
-                                            const url = getImageUrl(currentMovie.poster_url || currentMovie.bg);
-                                            return url.startsWith("http") || url.includes("/api/img-proxy") ? `${url}&w=1080&q=95` : url;
-                                        })()
-                                    ) : ""}
-                                    alt={currentMovie.displayTitle}
-                                    fill
-                                    className="object-cover brightness-[0.45] contrast-[1.15]"
-                                    priority
-                                    unoptimized
-                                />
-                            </motion.div>
+                            <Image 
+                                src={currentMovie.poster_url || currentMovie.bg ? (
+                                    (() => {
+                                        const url = getImageUrl(currentMovie.poster_url || currentMovie.bg);
+                                        return url.startsWith("http") || url.includes("/api/img-proxy") ? `${url}&w=720&q=75` : url;
+                                    })()
+                                ) : ""}
+                                alt={currentMovie.displayTitle}
+                                fill
+                                className="object-cover brightness-[0.45] contrast-[1.15]"
+                                priority
+                            />
                         </div>
 
                         {/* Desktop Background: Use Backdrop */}
                         <div className="hidden md:block absolute inset-0 overflow-hidden">
-                            <motion.div 
-                                className="absolute inset-0"
-                                animate={{ scale: [1, 1.08] }}
-                                transition={{ duration: 20, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
-                            >
-                                <Image 
-                                    src={currentMovie.bg ? (
-                                        (() => {
-                                            const url = getImageUrl(currentMovie.bg);
-                                            return url.startsWith("http") || url.includes("/api/img-proxy") ? `${url}&w=1920&q=90` : url;
-                                        })()
-                                    ) : ""}
-                                    alt={currentMovie.displayTitle}
-                                    fill
-                                    className="object-cover brightness-[0.45] contrast-[1.15]"
-                                    priority
-                                    unoptimized
-                                />
-                            </motion.div>
+                            <Image 
+                                src={currentMovie.bg ? (
+                                    (() => {
+                                        const url = getImageUrl(currentMovie.bg);
+                                        return url.startsWith("http") || url.includes("/api/img-proxy") ? `${url}&w=1280&q=75` : url;
+                                    })()
+                                ) : ""}
+                                alt={currentMovie.displayTitle}
+                                fill
+                                className="object-cover brightness-[0.45] contrast-[1.15]"
+                                priority
+                            />
                         </div>
 
                         {/* IQIYI/Netflix Style Masks */}
@@ -212,7 +198,6 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                                     fill
                                     className="object-contain object-right-bottom scale-[0.65] md:scale-[0.8] lg:scale-[0.85] origin-right-bottom"
                                     priority
-                                    unoptimized
                                 />
                             </motion.div>
                         )}
@@ -236,7 +221,6 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                                         fill
                                         className="object-contain object-left drop-shadow-[0_10px_25px_rgba(0,0,0,0.9)]"
                                         priority
-                                        unoptimized
                                     />
                                 ) : (
                                     <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white drop-shadow-xl font-display uppercase italic tracking-tighter line-clamp-2">

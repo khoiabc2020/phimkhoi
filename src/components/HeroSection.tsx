@@ -319,16 +319,11 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                     transition={{ duration: 0.6, ease: "easeInOut" }}
                     className="absolute inset-0"
                 >
-                    {/* Background Layer with scaling effect */}
-                    <motion.div 
-                        initial={{ scale: 1.03 }}
-                        animate={{ scale: 1 }}
-                        transition={{ duration: 8, ease: "linear" }}
-                        className="absolute inset-0 z-0 optimize-gpu will-change-transform"
-                    >
+                    {/* Background Layer */}
+                    <div className="absolute inset-0 z-0 overflow-hidden">
                         <Image
                             src={getHeroImage(movie, "backdrop", "desktop").startsWith('http')
-                                ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(movie, "backdrop", "desktop"))}&w=1920&q=80`
+                                ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(movie, "backdrop", "desktop"))}&w=1280&q=75`
                                 : getHeroImage(movie, "backdrop", "desktop")
                             }
                             alt=""
@@ -336,11 +331,9 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                             className="object-cover object-[center_20%]"
                             priority
                             sizes="100vw"
-                            placeholder={movie.isCustomHero ? "empty" : "blur"}
-                            blurDataURL={movie.isCustomHero ? undefined : blurData}
                             decoding="async"
                         />
-                    </motion.div>
+                    </div>
 
                     {/* Character Overlay (If CustomHero) */}
                     {movie.isCustomHero && movie.layer_character && (
@@ -569,14 +562,12 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
     const heroMovies = movies.slice(0, 10);
 
     return (
-        <div className="relative w-full bg-transparent font-sans" style={{ minHeight: '300px', contain: "layout style paint" }}>
-            {/* Mobile View - Render on server and client for stability */}
-            <div className={cn("md:hidden", !mounted && "block")}>
-                <MobileHero movies={heroMovies} active={mounted && !isDesktop} />
+        <div className="relative w-full bg-[#0a0a0a] font-sans" style={{ minHeight: '400px', contain: "layout" }}>
+            <div className="md:hidden">
+                <MobileHero movies={heroMovies} active={true} />
             </div>
-            {/* Desktop View - Only truly 'active' after mounting and if screen is large */}
-            <div className={cn("hidden md:block", mounted && isDesktop ? "block" : "")}>
-                <DesktopHero movies={heroMovies} active={mounted && isDesktop} />
+            <div className="hidden md:block">
+                <DesktopHero movies={heroMovies} active={true} />
             </div>
         </div>
     );

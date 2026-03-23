@@ -222,8 +222,8 @@ function MovieCard({
                     {/* Top-Left: IMDb Rating Badge (Inside Poster) */}
                     {(movie as any).tmdbData?.vote_average && (movie as any).tmdbData.vote_average > 0 && (
                         <div className="absolute top-1.5 left-1.5 z-40 pointer-events-none">
-                            <div className="flex items-center gap-1 bg-[#FFD700]/90 backdrop-blur-sm text-black px-1.5 py-0.5 rounded-[4px] shadow-lg border border-white/10">
-                                <Star className="w-2.5 h-2.5 fill-black" />
+                            <div className="flex items-center gap-1 bg-black/80 text-white px-1.5 py-0.5 rounded-[4px] shadow-lg border border-white/10">
+                                <Star className="w-2.5 h-2.5 fill-yellow-400 stroke-yellow-400" />
                                 <span className="text-[10px] font-black tracking-tight">{(movie as any).tmdbData.vote_average.toFixed(1)}</span>
                             </div>
                         </div>
@@ -232,12 +232,12 @@ function MovieCard({
                     {/* Top-Right: Status Badge (Inside Poster) */}
                     <div className="absolute top-1.5 right-1.5 z-40 pointer-events-none flex flex-col items-end gap-1">
                         {movie.episode_current && (
-                            <span className="bg-white/90 backdrop-blur-md shadow-lg border border-black/10 text-[#0a0a0a] text-[9px] font-black px-1.5 py-0.5 rounded-[4px] tracking-tight whitespace-nowrap uppercase">
+                            <span className="bg-black/80 shadow-lg border border-white/10 text-white text-[9px] font-black px-1.5 py-0.5 rounded-[4px] tracking-tight whitespace-nowrap uppercase">
                                 {movie.episode_current}
                             </span>
                         )}
                         {!movie.episode_current && formatQualityLabel(movie.quality) && (
-                            <span className="bg-[#009624]/90 backdrop-blur-sm border border-white/10 text-white text-[9px] font-black px-1.5 py-0.5 rounded-[4px] tracking-tight uppercase">
+                            <span className="bg-[#009624]/90 border border-white/10 text-white text-[9px] font-black px-1.5 py-0.5 rounded-[4px] tracking-tight uppercase">
                                 {formatQualityLabel(movie.quality)}
                             </span>
                         )}
