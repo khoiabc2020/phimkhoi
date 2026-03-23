@@ -745,16 +745,23 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
         if (category) query += `&category=${category}`;
         if (country) query += `&country=${country}`;
 
-        // Route "the-loai" categories correctly since they are mapped under danh-sach in the UI
-        const isTheLoaiEndpoint = [
-            'phim-chieu-rap', 'phim-hanh-dong', 'phim-tinh-cam', 'phim-hai-huoc', 
-            'phim-co-trang', 'phim-tam-ly', 'phim-hinh-su', 'phim-chien-tranh', 
-            'phim-vien-tuong', 'phim-kinh-di', 'phim-tai-lieu', 'phim-bi-an', 
-            'phim-hoc-duong', 'phim-khoa-hoc', 'phim-than-thoai', 'phim-vo-thuat', 
-            'phim-gia-dinh', 'phim-18'
-        ].includes(type);
-        const kkEndpoint = isTheLoaiEndpoint ? 'the-loai' : 'danh-sach';
-        const nguoncEndpoint = isTheLoaiEndpoint ? 'the-loai/' : 'danh-sach/';
+        // Determine the correct endpoint based on params or type
+        let baseEndpoint = 'danh-sach';
+        if (params.category || [
+            'phim-chieu-rap', 'hanh-dong', 'tinh-cam', 'hai-huoc', 'co-trang', 'tam-ly', 
+            'hinh-su', 'chien-tranh', 'vien-tuong', 'kinh-di', 'tai-lieu', 'bi-an', 
+            'hoc-duong', 'khoa-hoc', 'than-thoai', 'vo-thuat', 'gia-dinh', 'phim-18'
+        ].includes(type) || type.startsWith('phim-')) {
+            baseEndpoint = 'the-loai';
+        }
+        
+        if (params.country || ['han-quoc', 'trung-quoc', 'au-my', 'nhat-ban', 'thai-lan', 'dai-loan', 'viet-nam'].includes(type)) {
+            // Nếu có country param hoặc type là tên nước, ưu tiên dùng endpoint quoc-gia cho KKPhim
+            if (!params.category) baseEndpoint = 'quoc-gia';
+        }
+
+        const kkEndpoint = baseEndpoint;
+        const nguoncEndpoint = baseEndpoint + '/';
 
         // Fetch from sources in parallel
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([

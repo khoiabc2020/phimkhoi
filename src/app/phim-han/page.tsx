@@ -3,7 +3,7 @@ import KoreaHero from "@/components/KoreaHero";
 import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
-import { getMoviesByCategory, getMenuData, getMoviesByCountry, Movie, getMovieDetail } from "@/services/api";
+import { getMoviesByCategory, getMenuData, getMoviesByCountry, Movie, getMovieDetail, getMoviesList } from "@/services/api";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
@@ -34,8 +34,9 @@ const FEATURED_ACTORS = [
 ];
 
 async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'default', minHeight = 380 }: { title: string; categorySlug: string; countrySlug: string; variant?: 'default' | 'sidebar'; minHeight?: number }) {
-    const data = await getMoviesByCategory(categorySlug, 1, 200);
-    const filteredMovies = data.items.filter(m => m.country?.some(c => c.slug === countrySlug));
+    // Gọi trực tiếp API với cả thể loại và quốc gia để được list đầy đủ (chuẩn Elite)
+    const data = await getMoviesList(categorySlug, { country: countrySlug, limit: 24 });
+    const filteredMovies = data.items;
     
     return (
         <LazySection minHeight={minHeight} className={variant === 'sidebar' ? "movie-row-sidebar" : "movie-row-standard"}>
