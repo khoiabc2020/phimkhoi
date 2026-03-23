@@ -202,6 +202,7 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                                 showLabel={false}
                             />
                         </div>
+                    </div>
                 </motion.div>
             </AnimatePresence>
 
