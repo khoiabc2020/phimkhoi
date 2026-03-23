@@ -33,20 +33,19 @@ const FEATURED_ACTORS = [
     { name: "Lee Min-ho", role: "Quân Vương Bất Diệt", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/iqopuz6cKuRZRUPZQrj7lFZcWWb.jpg" },
 ];
 
-async function PhimHanHome() {
-    // Fetch multiple categories for Korea
-    const [latest, action, romance, comedy, thriller, historical, animation, crime] = await Promise.all([
-        getMoviesByCountry("han-quoc", 1, 14),
-        getMoviesByCategory("hanh-dong", 1, 200),
-        getMoviesByCategory("tinh-cam", 1, 200),
-        getMoviesByCategory("hai-huoc", 1, 200),
-        getMoviesByCategory("kinh-di", 1, 200),
-        getMoviesByCategory("co-trang", 1, 200),
-        getMoviesByCategory("hoat-hinh", 1, 200),
-        getMoviesByCategory("hinh-su", 1, 200),
-    ]);
+async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'default', minHeight = 380 }: { title: string; categorySlug: string; countrySlug: string; variant?: 'default' | 'sidebar'; minHeight?: number }) {
+    const data = await getMoviesByCategory(categorySlug, 1, 200);
+    const filteredMovies = data.items.filter(m => m.country?.some(c => c.slug === countrySlug));
+    
+    return (
+        <LazySection minHeight={minHeight} className={variant === 'sidebar' ? "movie-row-sidebar" : "movie-row-standard"}>
+            <MovieRow title={title} movies={filteredMovies} slug={`/the-loai/${categorySlug}`} variant={variant} />
+        </LazySection>
+    );
+}
 
-    const filterKorea = (movies: Movie[]) => movies.filter(m => m.country?.some(c => c.slug === "han-quoc"));
+async function PhimHanHome() {
+    const latest = await getMoviesByCountry("han-quoc", 1, 14);
 
     return (
         <div className="space-y-12 md:space-y-16 pb-12">
@@ -54,38 +53,37 @@ async function PhimHanHome() {
                 <MovieRow title="Phim Mới Cập Nhật" movies={latest.items} slug="/quoc-gia/han-quoc" priorityFirst />
             </LazySection>
             
-            <LazySection minHeight={380} className="movie-row-standard">
-                <MovieRow title="Phim Tình Cảm" movies={filterKorea(romance.items)} slug="/the-loai/tinh-cam" />
-            </LazySection>
+            <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
+                <CountryMovieRow title="Phim Tình Cảm" categorySlug="tinh-cam" countrySlug="han-quoc" />
+            </Suspense>
             
-            <LazySection minHeight={380} className="movie-row-standard">
-                <MovieRow title="Phim Hành Động" movies={filterKorea(action.items)} slug="/the-loai/hanh-dong" />
-            </LazySection>
+            <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
+                <CountryMovieRow title="Phim Hành Động" categorySlug="hanh-dong" countrySlug="han-quoc" />
+            </Suspense>
 
-            <LazySection minHeight={380} className="movie-row-standard">
-                <MovieRow title="Phim Cổ Trang" movies={filterKorea(historical.items)} slug="/the-loai/co-trang" />
-            </LazySection>
+            <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
+                <CountryMovieRow title="Phim Cổ Trang" categorySlug="co-trang" countrySlug="han-quoc" />
+            </Suspense>
 
             <LazySection minHeight={200} className="movie-row-landscape">
                 <ActorRow title="Diễn viên nổi bật" actors={FEATURED_ACTORS} />
             </LazySection>
 
-            <LazySection minHeight={380} className="movie-row-standard">
-                <MovieRow title="Phim Hài Hước" movies={filterKorea(comedy.items)} slug="/the-loai/hai-huoc" />
-            </LazySection>
+            <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
+                <CountryMovieRow title="Phim Hài Hước" categorySlug="hai-huoc" countrySlug="han-quoc" />
+            </Suspense>
 
-            <LazySection minHeight={380} className="movie-row-standard">
-                <MovieRow title="Phim Kinh Dị" movies={filterKorea(thriller.items)} slug="/the-loai/kinh-di" />
-            </LazySection>
+            <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
+                <CountryMovieRow title="Phim Kinh Dị" categorySlug="kinh-di" countrySlug="han-quoc" />
+            </Suspense>
 
-            <LazySection minHeight={380} className="movie-row-standard">
-                <MovieRow title="Phim Hoạt Hình" movies={filterKorea(animation.items)} slug="/the-loai/hoat-hinh" />
-            </LazySection>
+            <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
+                <CountryMovieRow title="Phim Hoạt Hình" categorySlug="hoat-hinh" countrySlug="han-quoc" />
+            </Suspense>
             
-            <LazySection minHeight={380} className="movie-row-standard">
-                <MovieRow title="Phim Hình Sự" movies={filterKorea(crime.items)} slug="/the-loai/hinh-su" />
-            </LazySection>
-
+            <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
+                <CountryMovieRow title="Phim Hình Sự" categorySlug="hinh-su" countrySlug="han-quoc" />
+            </Suspense>
         </div>
     );
 }

@@ -39,13 +39,13 @@ function MovieRowInner({ title, movies, slug, variant = 'default', priorityFirst
                             {title}
                         </h2>
                         {slug && (
-                            <a
+                            <Link
                                 href={slug.startsWith('/') ? slug : `/danh-sach/${slug}`}
                                 className="inline-flex items-center gap-2 text-sm font-bold text-[#8FA7C5] hover:text-white transition-all group/link mt-2"
                             >
                                 <span className="border-b-2 border-[#8FA7C5] group-hover/link:border-white pb-0.5 transition-colors">Xem tất cả</span>
                                 <ChevronRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
-                            </a>
+                            </Link>
                         )}
                         <div className="hidden md:block w-16 h-1.5 bg-[#8FA7C5] rounded-full mt-4" />
                     </div>
@@ -104,13 +104,13 @@ function MovieRowInner({ title, movies, slug, variant = 'default', priorityFirst
                             <span>{title}</span>
                         </h2>
                         {slug && (
-                            <a
+                            <Link
                                 href={slug.startsWith('/') ? slug : `/danh-sach/${slug}`}
                                 className="text-xs sm:text-sm font-semibold text-[#8FA7C5] hover:text-white flex items-center gap-1 transition-colors group/link"
                             >
                                 Xem tất cả
                                 <ChevronRight className="w-4 h-4 transition-transform group-hover/link:translate-x-1" />
-                            </a>
+                            </Link>
                         )}
                     </div>
 
