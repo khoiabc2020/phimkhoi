@@ -256,7 +256,7 @@ function MovieCard({
                 <div 
                     className="fixed z-[9999] pointer-events-auto"
                     style={{
-                        top: position.top,
+                        top: position.top + ((position.rectHeight || 0) / 2),
                         left: position.left + (position.width / 2),
                         width: 0, // Container is a point for centering
                         height: 0
