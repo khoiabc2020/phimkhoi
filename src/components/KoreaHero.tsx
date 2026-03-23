@@ -45,10 +45,12 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
     const [isAutoPlay, setIsAutoPlay] = useState(true);
 
     const slides = useMemo((): (any & { bg: string; logo: string; actor?: string; displayTitle: string; displayDesc: string; displayTags: string[]; displayEpisodes: string })[] => {
-        return initialMovies
-            .filter(movie => ASSETS_MAP[movie.slug])
+        return (initialMovies || [])
             .map(movie => {
-                const assets = ASSETS_MAP[movie.slug];
+                const assets = ASSETS_MAP[movie.slug] || {
+                    bg: movie.thumb_url || movie.poster_url,
+                    logo: "",
+                };
                 
                 return {
                     ...movie,
