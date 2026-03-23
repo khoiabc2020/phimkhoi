@@ -1,5 +1,6 @@
 import { getMenuData } from "@/services/api";
 import Link from "next/link";
+import Image from "next/image";
 import { ChevronLeft, LayoutGrid, Sparkles } from "lucide-react";
 import { Metadata } from "next";
 import { cn } from "@/lib/utils";
@@ -156,10 +157,13 @@ export default async function GenresIndexPage() {
                             >
                                 {/* Background Image - Căn lề phải, effect zoom */}
                                 <div className="absolute top-0 bottom-0 right-0 w-[85%] sm:w-[75%] lg:w-[80%] transition-transform duration-700 ease-out group-hover:scale-[1.05]">
-                                    <img 
+                                    <Image 
                                         src={meta.image} 
-                                        alt=""
-                                        className="w-full h-full object-cover object-center sm:object-[center_20%] opacity-50 group-hover:opacity-80 transition-opacity duration-500 will-change-transform mix-blend-luminosity group-hover:mix-blend-normal"
+                                        alt={cat.name}
+                                        fill
+                                        className="object-cover object-center sm:object-[center_20%] opacity-50 group-hover:opacity-80 transition-opacity duration-500 will-change-transform mix-blend-luminosity group-hover:mix-blend-normal"
+                                        sizes="(max-width: 768px) 100vw, 400px"
+                                        unoptimized={true}
                                     />
                                     {/* Gradient thông minh: che mờ từ trái sang phải để lẫn vào màu nền */}
                                     <div className={`absolute inset-0 bg-gradient-to-r via-transparent to-transparent opacity-100 ${meta.color.replace('bg-', 'from-')}`} />

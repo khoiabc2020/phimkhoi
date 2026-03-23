@@ -204,34 +204,15 @@ function MovieCard({
                             blurDataURL={BLUR_PLACEHOLDER}
                             onError={(e) => {
                                 if (posterIndex < posterCandidates.length - 1) {
-                                                                         setPosterIndex((prev) => prev + 1);
-                                                                         return;
-                                                                     }
-                                                                     (e.target as HTMLImageElement).src = "/placeholder.svg";
-                                                                 }}
+                                    setPosterIndex((prev) => prev + 1);
+                                    return;
+                                }
+                                (e.target as HTMLImageElement).src = "/placeholder.svg";
+                            }}
                         />
                     </Link>
-                </div>
 
-                {/* Movie Info below the poster (User requested "tên phim để ở dưới như cũ") */}
-                <div className="mt-2.5 px-0.5 space-y-1">
-                    <h3 
-                        className="text-white font-bold text-[13px] sm:text-[14px] leading-snug line-clamp-2 transition-colors group-hover/static-card:text-[#8FA7C5]" 
-                        title={decodeHtml(movie.name) || movie.slug || ""}
-                    >
-                        {decodeHtml(movie.name) || movie.slug || "—"}
-                    </h3>
-                    <div className="flex items-center justify-between gap-1 mt-0.5 text-white/40">
-                        <p className="text-[10px] sm:text-[11px] font-medium truncate flex-1 leading-none shadow-sm capitalize">
-                            {decodeHtml(movie.origin_name || "")}
-                        </p>
-                        {Number(movie.year) > 0 && (
-                            <span className="text-[10px] sm:text-[11px] font-bold shrink-0 leading-none shadow-sm">{movie.year}</span>
-                        )}
-                    </div>
-                </div>
-
-                    {/* Top-Left: IMDb Rating Badge (Sleeker) */}
+                    {/* Top-Left: IMDb Rating Badge (Inside Poster) */}
                     {(movie as any).tmdbData?.vote_average && (movie as any).tmdbData.vote_average > 0 && (
                         <div className="absolute top-1.5 left-1.5 z-40 pointer-events-none">
                             <div className="flex items-center gap-1 bg-[#FFD700]/90 backdrop-blur-sm text-black px-1.5 py-0.5 rounded-[4px] shadow-lg border border-white/10">
@@ -241,7 +222,7 @@ function MovieCard({
                         </div>
                     )}
 
-                    {/* Top-Right: Status Badge (Episode/Quality) */}
+                    {/* Top-Right: Status Badge (Inside Poster) */}
                     <div className="absolute top-1.5 right-1.5 z-40 pointer-events-none flex flex-col items-end gap-1">
                         {movie.episode_current && (
                             <span className="bg-white/90 backdrop-blur-md shadow-lg border border-black/10 text-[#0a0a0a] text-[9px] font-black px-1.5 py-0.5 rounded-[4px] tracking-tight whitespace-nowrap uppercase">
@@ -255,7 +236,7 @@ function MovieCard({
                         )}
                     </div>
 
-                    {/* Bottom-Left: Language Badges */}
+                    {/* Bottom-Left: Language Badges (Inside Poster) */}
                     <div className="absolute bottom-1.5 left-1.5 z-40 pointer-events-none flex flex-wrap gap-1">
                         {langFlags.showSub && (
                             <span className="bg-[#E50914]/90 shadow-lg border border-white/10 text-white text-[9px] font-black px-1.5 py-0.5 rounded-[3px] tracking-tight uppercase">
@@ -273,6 +254,25 @@ function MovieCard({
                             </span>
                         )}
                     </div>
+                </div>
+
+                {/* Movie Info below the poster */}
+                <div className="mt-2.5 px-0.5 space-y-1">
+                    <h3 
+                        className="text-white font-bold text-[13px] sm:text-[14px] leading-snug line-clamp-1 transition-colors group-hover/static-card:text-[#8FA7C5]" 
+                        title={decodeHtml(movie.name) || movie.slug || ""}
+                    >
+                        {decodeHtml(movie.name) || movie.slug || "—"}
+                    </h3>
+                    <div className="flex items-center justify-between gap-1 mt-0.5 text-white/40">
+                        <p className="text-[10px] sm:text-[11px] font-medium truncate flex-1 leading-none shadow-sm capitalize group-hover/static-card:text-white/60 transition-colors">
+                            {decodeHtml(movie.origin_name || "")}
+                        </p>
+                        {Number(movie.year) > 0 && (
+                            <span className="text-[10px] sm:text-[11px] font-bold shrink-0 leading-none shadow-sm">{movie.year}</span>
+                        )}
+                    </div>
+                </div>
 
                 {/* Desktop Hidden Info (for SEO/Accessibility, hidden visually on modern grid) */}
                 <div className="sr-only">
