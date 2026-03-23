@@ -44,7 +44,8 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
     const [current, setCurrent] = useState(0);
     const [isAutoPlay, setIsAutoPlay] = useState(true);
 
-    const slides = useMemo(() => {
+    // Merge API data with high-quality local assets
+    const slides = useMemo((): (any & { bg: string; logo: string; actor?: string; displayTitle: string; displayDesc: string; displayTags: string[]; displayEpisodes: string })[] => {
         if (!initialMovies || initialMovies.length === 0) return [];
         
         return initialMovies.map(movie => {

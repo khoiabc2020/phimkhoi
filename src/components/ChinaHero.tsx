@@ -76,7 +76,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
     const [isAutoPlay, setIsAutoPlay] = useState(true);
 
     // Merge API data with high-quality local assets
-    const slides = useMemo(() => {
+    const slides = useMemo((): (any & { bg: string; logo: string; actor?: string; displayTitle: string; displayDesc: string; displayTags: string[]; displayEpisodes: string })[] => {
         if (!initialMovies || initialMovies.length === 0) return [];
         
         return initialMovies.map(movie => {
@@ -89,8 +89,8 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                 ...movie,
                 ...assets,
                 displayTitle: movie.name,
-                displayDesc: currentMovie.content 
-                    ? stripHtml(currentMovie.content)
+                displayDesc: movie.content 
+                    ? stripHtml(movie.content)
                     : "Đang cập nhật nội dung...",
                 displayTags: movie.category?.slice(0, 3).map((c: any) => c.name) || ["Phim Trung"],
                 displayEpisodes: movie.episode_current || "Full"
