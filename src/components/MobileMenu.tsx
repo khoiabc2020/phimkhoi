@@ -74,80 +74,78 @@ export default function MobileMenu({
             {/* Drawer */}
             <div
                 className={cn(
-                    "fixed top-0 left-0 bottom-0 z-[10000] lg:hidden w-[min(360px,92vw)] flex flex-col transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] shadow-[0_18px_60px_rgba(0,0,0,0.55)]",
-                    "border-r border-white/[0.10] backdrop-blur-xl",
+                    "fixed top-0 left-0 bottom-0 z-[10000] lg:hidden w-[min(320px,85vw)] flex flex-col transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] shadow-[0_18px_60px_rgba(0,0,0,0.8)]",
+                    "border-r border-white/[0.03] backdrop-blur-2xl bg-[#0a0a0a]",
                     isOpen ? "translate-x-0" : "-translate-x-full"
                 )}
-                style={{ background: "linear-gradient(180deg, #1a1f2e 0%, #0d0f14 100%)" }}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between px-5 h-[72px] shrink-0 border-b border-white/[0.06] bg-[#1a1f2e]/92">
-                    <Link href="/" onClick={onClose} className="flex items-center">
-                        <span className="font-display text-[24px] font-black uppercase tracking-tighter text-white">
+                <div className="flex items-center justify-between px-6 h-[72px] shrink-0 border-b border-white/[0.04] bg-[#0a0a0a]">
+                    <Link href="/" onClick={onClose} className="flex items-center group">
+                        <span className="font-display text-[22px] font-black uppercase tracking-tighter text-white group-active:scale-95 transition-transform">
                             KHOIPHIM<span className="text-[#8FA7C5] ml-0.5">.</span>
                         </span>
                     </Link>
                     <button
                         onClick={onClose}
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-white/40 hover:text-white hover:bg-white/[0.08] transition-all"
+                        className="w-9 h-9 rounded-full flex items-center justify-center text-white/30 hover:text-white hover:bg-white/[0.05] transition-all active:scale-90"
                         aria-label="Đóng menu"
                     >
-                        <X className="w-4 h-4" strokeWidth={2} />
+                        <X className="w-5 h-5" strokeWidth={2.5} />
                     </button>
                 </div>
 
                 {/* Scrollable Content */}
-                <div className="flex-1 overflow-y-auto min-h-0 px-4 py-4 space-y-4">
+                <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-6 space-y-6">
 
-                    {/* User Card */}
+                    {/* User Profile Section */}
                     {session ? (
-                        <div className="rounded-[12px] p-4 border border-white/[0.08] bg-[#0B0B10]">
-                            <div className="flex items-center gap-3 mb-3">
-                                <div className="w-11 h-11 rounded-full overflow-hidden border border-[#8FA7C5]/26 shrink-0 ring-1 ring-[#8FA7C5]/14">
+                        <div className="rounded-2xl p-4 border border-white/[0.04] bg-[#111111]/50 backdrop-blur-sm">
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#8FA7C5]/30 shrink-0 shadow-lg shadow-[#8FA7C5]/10">
                                     <img
-                                        src={session.user?.image || `https://ui-avatars.com/api/?name=${session.user?.name}&background=1e2235&color=F4C84A&bold=true`}
+                                        src={session.user?.image || `https://ui-avatars.com/api/?name=${session.user?.name}&background=1a1a1a&color=8FA7C5&bold=true`}
                                         alt={session.user?.name || "User"}
                                         className="w-full h-full object-cover"
                                     />
                                 </div>
                                 <div className="min-w-0">
-                                    <p className="font-bold text-white text-[15px] truncate">{session.user?.name}</p>
+                                    <p className="font-bold text-white text-[16px] truncate tracking-tight">{session.user?.name}</p>
                                     <div className="flex items-center gap-1.5 mt-0.5">
-                                        <Star className="w-3 h-3 text-[#8FA7C5]" fill="#8FA7C5" />
-                                        <p className="text-[12px] text-[#8FA7C5]/80 font-medium">Thành viên</p>
+                                        <div className="w-1.5 h-1.5 rounded-full bg-[#00A859] animate-pulse" />
+                                        <p className="text-[12px] text-white/40 font-bold uppercase tracking-widest text-[10px]">Premium Member</p>
                                     </div>
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-2">
+                            <div className="grid grid-cols-1 gap-2">
                                 <Link href="/lich-su-xem" onClick={onClose}
-                                    className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-[13px] text-white/70 hover:text-white transition-colors bg-white/[0.04] hover:bg-white/[0.07]"
+                                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold text-white/70 hover:text-white transition-all bg-white/[0.03] hover:bg-white/[0.08] active:scale-[0.98]"
                                 >
-                                    <History className="w-3.5 h-3.5" strokeWidth={1.5} /> Lịch sử
+                                    <History className="w-4 h-4 text-[#8FA7C5]" /> Lịch sử xem phim
                                 </Link>
                                 <Link href="/phim-yeu-thich" onClick={onClose}
-                                    className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-[13px] text-white/70 hover:text-white transition-colors bg-white/[0.04] hover:bg-white/[0.07]"
+                                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold text-white/70 hover:text-white transition-all bg-white/[0.03] hover:bg-white/[0.08] active:scale-[0.98]"
                                 >
-                                    <Heart className="w-3.5 h-3.5" strokeWidth={1.5} /> Yêu thích
+                                    <Heart className="w-4 h-4 text-[#ff4b4b]" /> Phim đã yêu thích
                                 </Link>
                             </div>
                         </div>
                     ) : (
-                        <div className="rounded-[12px] p-4 border border-white/[0.08] text-center bg-[#0B0B10]">
-                            <p className="text-white/45 mb-4 text-[13px] leading-relaxed">Đăng nhập để lưu phim yêu thích và lịch sử xem</p>
+                        <div className="rounded-2xl p-5 border border-white/[0.04] text-center bg-[#111111]/50">
+                            <p className="text-white/30 mb-5 text-[13px] leading-relaxed font-medium">Đăng nhập để đồng bộ lịch sử xem & phim yêu thích của bạn.</p>
                             <Link href="/login" onClick={onClose}
-                                className="flex items-center justify-center gap-2 w-full bg-[#263243] hover:bg-[#2d3d54] text-[#d8e3f2] font-bold py-2.5 rounded-lg text-[14px] transition-all border border-white/5 active:scale-[0.98]"
+                                className="flex items-center justify-center gap-2 w-full bg-white text-black font-black py-3 rounded-xl text-[14px] transition-all hover:scale-[1.02] active:scale-[0.98] shadow-xl shadow-white/5"
                             >
                                 <LogIn className="w-4 h-4" />
-                                <span>Đăng nhập</span>
+                                <span>Đăng nhập ngay</span>
                             </Link>
                         </div>
                     )}
 
-                    {/* Divider */}
-                    <div className="flex items-center gap-3">
-                        <div className="flex-1 h-px bg-white/[0.06]" />
-                        <span className="text-[11px] text-white/20 font-medium uppercase tracking-wider">Khám phá</span>
-                        <div className="flex-1 h-px bg-white/[0.06]" />
+                    {/* Navigation Heading */}
+                    <div className="flex items-center gap-4 px-2">
+                        <span className="text-[10px] text-white/20 font-black uppercase tracking-[0.3em] whitespace-nowrap italic">Duyệt Phim</span>
+                        <div className="flex-1 h-px bg-white/[0.03]" />
                     </div>
 
                     {/* Navigation */}

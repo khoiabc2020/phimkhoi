@@ -149,20 +149,38 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                         transition={{ duration: 8, ease: "linear" }}
                         className="absolute inset-0 z-0 optimize-gpu will-change-transform"
                     >
-                        <Image 
-                            src={currentMovie.bg}
-                            alt={currentMovie.displayTitle}
-                            fill
-                            className="object-cover brightness-[0.5] contrast-[1.1]"
-                            priority
-                            quality={90}
-                            unoptimized={currentMovie.bg.startsWith('/')}
-                        />
+                        {/* Mobile Background: Use Poster for sharpness */}
+                        <div className="md:hidden absolute inset-0">
+                            <Image 
+                                src={currentMovie.poster_url || currentMovie.bg}
+                                alt={currentMovie.displayTitle}
+                                fill
+                                className="object-cover brightness-[0.5] contrast-[1.1]"
+                                priority
+                                quality={90}
+                                unoptimized={ (currentMovie.poster_url || currentMovie.bg).startsWith('/') }
+                            />
+                        </div>
+
+                        {/* Desktop Background: Use Backdrop */}
+                        <div className="hidden md:block absolute inset-0">
+                            <Image 
+                                src={currentMovie.bg}
+                                alt={currentMovie.displayTitle}
+                                fill
+                                className="object-cover brightness-[0.5] contrast-[1.1]"
+                                priority
+                                quality={90}
+                                unoptimized={currentMovie.bg.startsWith('/')}
+                            />
+                        </div>
+
                         {/* IQIYI/Netflix Style Masks */}
                         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/20 to-transparent z-10" />
                         <div className="absolute inset-y-0 left-0 w-[50%] bg-gradient-to-r from-black via-black/60 to-transparent z-10" />
                         
                         {/* THE "ONFLIX" BOTTOM FADE - Multi-layered for maximum smoothness */}
+                        <div className="absolute inset-x-0 bottom-0 h-96 bg-gradient-to-t from-black via-transparent to-transparent z-10 opacity-60" />
                         <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-black via-black/80 to-transparent z-10" />
                         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent z-20" />
                         

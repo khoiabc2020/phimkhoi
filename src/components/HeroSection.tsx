@@ -162,12 +162,27 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                     transition={{ duration: 0.6, ease: "easeInOut" }}
                     className="absolute inset-0"
                 >
-                    {/* Background Backdrop (Full Screen) */}
+                    {/* Background Layers */}
                     <div className="absolute inset-0">
+                        {/* Layer 1: Blurred Backdrop for texture and color spill */}
+                        <div className="absolute inset-0 opacity-40 blur-3xl scale-110 pointer-events-none">
+                             <Image
+                                src={getHeroImage(movie, "backdrop", "mobile").startsWith('http')
+                                    ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(movie, "backdrop", "mobile"))}&w=400&q=30`
+                                    : getHeroImage(movie, "backdrop", "mobile")
+                                }
+                                alt=""
+                                fill
+                                className="object-cover"
+                                decoding="async"
+                            />
+                        </div>
+
+                        {/* Layer 2: Sharp Poster (Requested by user for sharpness) */}
                         <Image
-                            src={getHeroImage(movie, "backdrop", "mobile").startsWith('http')
-                                ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(movie, "backdrop", "mobile"))}&w=800&q=75`
-                                : getHeroImage(movie, "backdrop", "mobile")
+                            src={getHeroImage(movie, "poster", "mobile").startsWith('http')
+                                ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(movie, "poster", "mobile"))}&w=800&q=85`
+                                : getHeroImage(movie, "poster", "mobile")
                             }
                             alt=""
                             fill
@@ -175,7 +190,10 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                             priority
                             decoding="async"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/40 to-black/20" />
+                        
+                        {/* Layer 3: Cinematic Overlays */}
+                        <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
+                        <div className="absolute inset-0 bg-[#0a0a0a]/20" />
                     </div>
 
                     {/* Content Block */}
