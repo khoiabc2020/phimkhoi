@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import Link from "next/link";
@@ -123,8 +124,16 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
             className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] xl:h-[800px] overflow-hidden bg-black"
             style={{ contain: "layout style paint" }}
         >
-            <div className="absolute inset-0">
-                <div key={current} className="absolute inset-0">
+            <AnimatePresence mode="popLayout" initial={false}>
+                <motion.div 
+                    key={current}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                    className="absolute inset-0"
+                    style={{ willChange: "opacity, transform" }}
+                >
                     <div className="absolute inset-0 z-0 optimize-gpu">
                         <div className="md:hidden absolute inset-0 overflow-hidden">
                             <Image 
@@ -212,7 +221,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
 
                             <div className="hidden sm:flex flex-wrap gap-2">
                                 {currentMovie.displayTags.map((tag: string) => (
-                                    <span key={tag} className="px-3 py-1 bg-white/10 border border-white/10 rounded-full text-[11px] md:text-[12px] font-bold text-white/80 cursor-default shadow-sm backdrop-blur-md">
+                                    <span key={tag} className="px-3 py-1 bg-white/10 border border-white/10 rounded-full text-[11px] md:text-[12px] font-bold text-white/80 cursor-default shadow-sm backdrop-blur-md transition-all duration-300 hover:bg-white/20">
                                         {tag}
                                     </span>
                                 ))}
@@ -225,7 +234,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                             <div className="flex items-center gap-3 md:gap-4 pt-2 pointer-events-auto">
                                 <Link 
                                     href={`/phim/${currentMovie.slug}`}
-                                    className="flex items-center gap-2 md:gap-3 px-6 md:px-10 h-11 md:h-14 bg-[#8FA7C5] text-[#0a0a0a] rounded-full font-black text-[14px] md:text-[16px] active:scale-95 shadow-2xl shadow-[#8FA7C5]/20 uppercase tracking-wider"
+                                    className="flex items-center gap-2 md:gap-3 px-6 md:px-10 h-11 md:h-14 bg-[#8FA7C5] text-[#0a0a0a] rounded-full font-black text-[14px] md:text-[16px] active:scale-95 shadow-2xl shadow-[#8FA7C5]/20 uppercase tracking-wider transition-all duration-300 hover:bg-white hover:scale-105"
                                 >
                                     <Play className="w-4 h-4 md:w-5 md:h-5 fill-current" />
                                     Xem Ngay
@@ -233,14 +242,14 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                                 
                                 <WatchlistButton
                                     slug={currentMovie.slug}
-                                    className="h-11 w-11 md:h-14 md:w-14 rounded-full bg-white/10 border border-white/20 text-white active:scale-95 backdrop-blur-md shadow-xl flex items-center justify-center"
+                                    className="h-11 w-11 md:h-14 md:w-14 rounded-full bg-white/10 border border-white/20 text-white active:scale-95 backdrop-blur-md shadow-xl flex items-center justify-center transition-all duration-300 hover:bg-white/20 hover:scale-110"
                                     showLabel={false}
                                 />
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                </motion.div>
+            </AnimatePresence>
 
             <div className="absolute bottom-12 right-6 md:right-12 lg:right-32 z-40 flex items-center gap-1.5 md:gap-2">
                 {slides.map((_, idx) => (
@@ -248,10 +257,10 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                         key={idx}
                         onClick={() => { setIsAutoPlay(false); setCurrent(idx); }}
                         className={cn(
-                            "rounded-full",
+                            "rounded-full transition-all duration-300",
                             current === idx 
                                 ? "w-8 md:w-10 h-1.5 md:h-2 bg-[#8FA7C5] shadow-[0_0_12px_#8FA7C5]" 
-                                : "w-1.5 md:w-2 h-1.5 md:h-2 bg-white/20"
+                                : "w-1.5 md:w-2 h-1.5 md:h-2 bg-white/20 hover:bg-white/40 hover:scale-110"
                         )}
                         aria-label={`Go to slide ${idx + 1}`}
                     />
@@ -261,14 +270,14 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
             <div className="absolute inset-x-0 top-[35%] md:top-[40%] lg:left-20 right-0 z-40 pointer-events-none flex items-center justify-between px-2 md:px-4 lg:px-8">
                 <button 
                     onClick={prev}
-                    className="w-10 h-10 md:w-11 md:h-11 lg:w-14 lg:h-14 rounded-full bg-black/5 backdrop-blur-sm border border-white/5 flex items-center justify-center text-white/10 active:scale-95 shadow-lg pointer-events-auto"
+                    className="w-10 h-10 md:w-11 md:h-11 lg:w-14 lg:h-14 rounded-full bg-black/5 backdrop-blur-sm border border-white/5 flex items-center justify-center text-white/10 active:scale-95 shadow-lg pointer-events-auto transition-all duration-300 hover:bg-black/40 hover:text-white hover:border-white/20 hover:scale-110"
                     aria-label="Previous slide"
                 >
                     <ChevronLeft className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8" />
                 </button>
                 <button 
                     onClick={next}
-                    className="w-10 h-10 md:w-11 md:h-11 lg:w-14 lg:h-14 rounded-full bg-black/5 backdrop-blur-sm border border-white/5 flex items-center justify-center text-white/10 active:scale-95 shadow-lg pointer-events-auto"
+                    className="w-10 h-10 md:w-11 md:h-11 lg:w-14 lg:h-14 rounded-full bg-black/5 backdrop-blur-sm border border-white/5 flex items-center justify-center text-white/10 active:scale-95 shadow-lg pointer-events-auto transition-all duration-300 hover:bg-black/40 hover:text-white hover:border-white/20 hover:scale-110"
                     aria-label="Next slide"
                 >
                     <ChevronRight className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8" />

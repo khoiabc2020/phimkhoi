@@ -122,6 +122,7 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.4, ease: "easeInOut" }}
                     className="absolute inset-0"
+                    style={{ willChange: "transform, opacity" }}
                 >
                     <div className="absolute inset-0">
                         <div className="absolute inset-0 opacity-40 blur-3xl scale-110 pointer-events-none">
@@ -455,7 +456,7 @@ export default function HeroSection({ movies }: { movies: Movie[] }) {
     const heroMovies = movies.slice(0, 10);
 
     return (
-        <div className="relative w-full bg-[#0a0a0a] font-sans" style={{ minHeight: '400px', contain: "layout transition" }}>
+        <div className="relative w-full bg-[#0a0a0a] font-sans" style={{ minHeight: '400px', contain: "layout transition", willChange: "transform" }}>
             <div className="md:hidden">
                 <MobileHero movies={heroMovies} active={true} />
             </div>
