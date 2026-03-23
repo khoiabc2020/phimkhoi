@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import MovieCard from "./MovieCard";
 import { Movie } from "@/services/api";
 import { useRef, memo } from "react";
