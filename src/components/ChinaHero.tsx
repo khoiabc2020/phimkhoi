@@ -137,7 +137,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                     <div className="absolute inset-0 z-0 optimize-gpu">
                         <div className="md:hidden absolute inset-0 overflow-hidden">
                             <Image 
-                                src={currentMovie.bg || ""}
+                                src={getImageUrl(currentMovie.bg || currentMovie.poster_url || "")}
                                 alt={currentMovie.displayTitle}
                                 fill
                                 className="object-cover brightness-[0.45] contrast-[1.15]"
@@ -150,7 +150,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
 
                         <div className="hidden md:block absolute inset-0 overflow-hidden">
                             <Image 
-                                src={currentMovie.bg || ""}
+                                src={getImageUrl(currentMovie.bg || "")}
                                 alt={currentMovie.displayTitle}
                                 fill
                                 className="object-cover brightness-[0.45] contrast-[1.15]"
@@ -178,7 +178,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                             className="absolute inset-0 z-[15] pointer-events-none"
                         >
                             <Image
-                                src={currentMovie.actor}
+                                src={getImageUrl(currentMovie.actor || "")}
                                 alt=""
                                 fill
                                 className="object-contain object-right-bottom scale-[0.65] md:scale-[0.8] lg:scale-[0.85] origin-right-bottom"
