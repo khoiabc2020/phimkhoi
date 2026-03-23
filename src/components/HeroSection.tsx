@@ -6,6 +6,7 @@ import { Play, ChevronLeft, ChevronRight } from "lucide-react";
 import { Movie } from "@/services/api";
 import { getImageUrl, decodeHtml, cn } from "@/lib/utils";
 import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import WatchlistButton from "./WatchlistButton";
 
 // ─── Utils ────────────────────────────────────────────────────────────────────
@@ -113,8 +114,15 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
         >
-            <div className="absolute inset-0">
-                <div key={`mobile-slide-${movie._id || index}`} className="absolute inset-0">
+            <AnimatePresence mode="popLayout" initial={false}>
+                <motion.div 
+                    key={`mobile-slide-${movie._id || index}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.4, ease: "easeInOut" }}
+                    className="absolute inset-0"
+                >
                     <div className="absolute inset-0">
                         <div className="absolute inset-0 opacity-40 blur-3xl scale-110 pointer-events-none">
                              <Image
@@ -194,9 +202,8 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                                 showLabel={false}
                             />
                         </div>
-                    </div>
-                </div>
-            </div>
+                </motion.div>
+            </AnimatePresence>
 
             <div className="absolute bottom-6 left-0 right-0 z-20 flex justify-center gap-1.5 px-4 overflow-hidden">
                 {movies.slice(0, 10).map((_, i) => (
@@ -204,7 +211,7 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                         key={i} 
                         onClick={() => go(i)}
                         className={cn(
-                            "h-1.5 rounded-full",
+                            "h-1.5 rounded-full transition-all duration-300",
                             i === index ? "w-6 bg-[#8FA7C5] shadow-[0_0_8px_#8FA7C5]" : "w-1.5 bg-white/30"
                         )} 
                     />
@@ -228,7 +235,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
             const activeEl = container.children[index] as HTMLElement;
             if (activeEl) {
                 const scrollLeft = activeEl.offsetLeft - (container.offsetWidth / 2) + (activeEl.offsetWidth / 2);
-                container.scrollTo({ left: scrollLeft });
+                container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
             }
         }
     }, [index]);
@@ -240,8 +247,15 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
             onMouseLeave={() => setPaused(false)}
             style={{ contain: "layout size" }}
         >
-            <div className="absolute inset-0">
-                <div key={`slide-${movie._id || index}`} className="absolute inset-0">
+            <AnimatePresence mode="popLayout" initial={false}>
+                <motion.div 
+                    key={`slide-${movie._id || index}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.6, ease: "easeInOut" }}
+                    className="absolute inset-0"
+                >
                     <div className="absolute inset-0 z-0 overflow-hidden">
                         <Image
                             src={getHeroImage(movie, "backdrop", "desktop").startsWith('http')
@@ -368,8 +382,8 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                </motion.div>
+            </AnimatePresence>
 
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[30] w-full max-w-[90vw] md:max-w-3xl lg:max-w-5xl">
                 <div 
@@ -384,7 +398,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                 key={`thumb-${m._id || idx}`}
                                 onClick={() => go(idx)}
                                 className={cn(
-                                    "relative w-[90px] md:w-[110px] lg:w-[130px] xl:w-[140px] aspect-[16/9] rounded-lg overflow-hidden cursor-pointer flex-shrink-0 box-border group snap-center",
+                                    "relative w-[90px] md:w-[110px] lg:w-[130px] xl:w-[140px] aspect-[16/9] rounded-lg overflow-hidden cursor-pointer flex-shrink-0 transition-all duration-300 box-border group snap-center",
                                     isActive 
                                         ? "ring-[2.5px] ring-primary scale-105 opacity-100 shadow-[0_0_25px_rgba(143,167,197,0.5)] z-10" 
                                         : "ring-1 ring-white/10 scale-95 opacity-40 hover:opacity-100 hover:scale-100 z-0 bg-black/40"

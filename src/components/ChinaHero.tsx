@@ -138,6 +138,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                                 fill
                                 className="object-cover brightness-[0.45] contrast-[1.15]"
                                 priority
+                                decoding="async"
                             />
                         </div>
 
@@ -153,6 +154,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                                 fill
                                 className="object-cover brightness-[0.45] contrast-[1.15]"
                                 priority
+                                decoding="async"
                             />
                         </div>
 
@@ -210,7 +212,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
 
                             <div className="hidden sm:flex flex-wrap gap-2">
                                 {currentMovie.displayTags.map((tag: string) => (
-                                    <span key={tag} className="px-3 py-1 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 rounded-full text-[11px] md:text-[12px] font-bold text-white/80 cursor-default shadow-sm">
+                                    <span key={tag} className="px-3 py-1 bg-white/10 border border-white/10 rounded-full text-[11px] md:text-[12px] font-bold text-white/80 cursor-default shadow-sm backdrop-blur-md">
                                         {tag}
                                     </span>
                                 ))}
@@ -223,7 +225,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                             <div className="flex items-center gap-3 md:gap-4 pt-2 pointer-events-auto">
                                 <Link 
                                     href={`/phim/${currentMovie.slug}`}
-                                    className="flex items-center gap-2 md:gap-3 px-6 md:px-10 h-11 md:h-14 bg-[#8FA7C5] text-[#0a0a0a] rounded-full font-black text-[14px] md:text-[16px] hover:bg-white active:scale-95 shadow-2xl shadow-[#8FA7C5]/20 group uppercase tracking-wider"
+                                    className="flex items-center gap-2 md:gap-3 px-6 md:px-10 h-11 md:h-14 bg-[#8FA7C5] text-[#0a0a0a] rounded-full font-black text-[14px] md:text-[16px] active:scale-95 shadow-2xl shadow-[#8FA7C5]/20 uppercase tracking-wider"
                                 >
                                     <Play className="w-4 h-4 md:w-5 md:h-5 fill-current" />
                                     Xem Ngay
@@ -231,7 +233,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                                 
                                 <WatchlistButton
                                     slug={currentMovie.slug}
-                                    className="h-11 w-11 md:h-14 md:w-14 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white active:scale-95 backdrop-blur-md shadow-xl flex items-center justify-center group"
+                                    className="h-11 w-11 md:h-14 md:w-14 rounded-full bg-white/10 border border-white/20 text-white active:scale-95 backdrop-blur-md shadow-xl flex items-center justify-center"
                                     showLabel={false}
                                 />
                             </div>
@@ -249,7 +251,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                             "rounded-full",
                             current === idx 
                                 ? "w-8 md:w-10 h-1.5 md:h-2 bg-[#8FA7C5] shadow-[0_0_12px_#8FA7C5]" 
-                                : "w-1.5 md:w-2 h-1.5 md:h-2 bg-white/20 hover:bg-white/40"
+                                : "w-1.5 md:w-2 h-1.5 md:h-2 bg-white/20"
                         )}
                         aria-label={`Go to slide ${idx + 1}`}
                     />
@@ -259,14 +261,14 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
             <div className="absolute inset-x-0 top-[35%] md:top-[40%] lg:left-20 right-0 z-40 pointer-events-none flex items-center justify-between px-2 md:px-4 lg:px-8">
                 <button 
                     onClick={prev}
-                    className="w-10 h-10 md:w-11 md:h-11 lg:w-14 lg:h-14 rounded-full bg-black/5 hover:bg-black/40 backdrop-blur-sm border border-white/5 hover:border-white/20 flex items-center justify-center text-white/10 hover:text-white group pointer-events-auto active:scale-95 shadow-lg"
+                    className="w-10 h-10 md:w-11 md:h-11 lg:w-14 lg:h-14 rounded-full bg-black/5 backdrop-blur-sm border border-white/5 flex items-center justify-center text-white/10 active:scale-95 shadow-lg pointer-events-auto"
                     aria-label="Previous slide"
                 >
                     <ChevronLeft className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8" />
                 </button>
                 <button 
                     onClick={next}
-                    className="w-10 h-10 md:w-11 md:h-11 lg:w-14 lg:h-14 rounded-full bg-black/5 hover:bg-black/40 backdrop-blur-sm border border-white/5 hover:border-white/20 flex items-center justify-center text-white/10 hover:text-white group pointer-events-auto active:scale-95 shadow-lg"
+                    className="w-10 h-10 md:w-11 md:h-11 lg:w-14 lg:h-14 rounded-full bg-black/5 backdrop-blur-sm border border-white/5 flex items-center justify-center text-white/10 active:scale-95 shadow-lg pointer-events-auto"
                     aria-label="Next slide"
                 >
                     <ChevronRight className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8" />
