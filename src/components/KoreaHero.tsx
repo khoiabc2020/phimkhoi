@@ -103,23 +103,27 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                     <div className="absolute inset-0 z-0 optimize-gpu">
                         <div className="md:hidden absolute inset-0 overflow-hidden">
                             <Image 
-                                src={currentMovie.poster_url || currentMovie.bg ? getImageUrl(currentMovie.poster_url || currentMovie.bg) : ""}
+                                src={currentMovie.bg || ""}
                                 alt={currentMovie.displayTitle}
                                 fill
                                 className="object-cover brightness-[0.45] contrast-[1.15]"
                                 priority
                                 decoding="async"
+                                quality={100}
+                                sizes="100vw"
                             />
                         </div>
 
                         <div className="hidden md:block absolute inset-0 overflow-hidden">
                             <Image 
-                                src={currentMovie.bg ? getImageUrl(currentMovie.bg) : ""}
+                                src={currentMovie.bg || ""}
                                 alt={currentMovie.displayTitle}
                                 fill
                                 className="object-cover brightness-[0.45] contrast-[1.15]"
                                 priority
                                 decoding="async"
+                                quality={100}
+                                sizes="100vw"
                             />
                         </div>
 
