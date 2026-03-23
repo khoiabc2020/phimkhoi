@@ -78,12 +78,12 @@ function LoginForm() {
     };
 
     return (
-        <div className="relative z-10 w-full max-w-[450px] mx-4 p-8 md:p-12 bg-black/70 border border-white/15 rounded-2xl shadow-2xl flex flex-col items-center backdrop-blur-xl">
+        <div className="relative z-10 w-full max-w-[450px] mx-4 p-8 md:p-12 bg-[#050505]/80 border border-white/10 rounded-2xl shadow-2xl flex flex-col items-center backdrop-blur-3xl">
             <h1 className="text-3xl font-bold text-white mb-2 text-center w-full">Chào mừng trở lại</h1>
-            <p className="text-white/45 text-[15px] mb-8 text-center w-full">Cùng thưởng thức những bộ phim tuyệt vời nhất.</p>
+            <p className="text-white/40 text-[15px] mb-8 text-center w-full">Cùng thưởng thức những bộ phim tuyệt vời nhất.</p>
 
             {registered && (
-                <div className="mb-6 p-4 bg-[#8FA7C5]/20 border border-[#8FA7C5]/50 rounded text-[#8FA7C5] text-center font-medium animate-in fade-in slide-in-from-top-4">
+                <div className="mb-6 p-4 bg-[#8FA7C5]/10 border border-[#8FA7C5]/30 rounded-xl text-[#8FA7C5] text-center font-medium animate-in fade-in slide-in-from-top-4">
                     🎉 Đăng ký thành công! Hãy đăng nhập ngay.
                 </div>
             )}
@@ -92,57 +92,57 @@ function LoginForm() {
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
                 {error && (
-                    <div className="px-4 py-3 bg-[#8FA7C5]/15 border border-[#8FA7C5]/25 rounded text-[#ffd1d1] text-sm">
+                    <div className="px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm text-center">
                         {error}
                     </div>
                 )}
 
                 <div className="relative group w-full">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8c8c8c]" />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within:text-[#8FA7C5] transition-colors" />
                     <input
                         type="text"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        className="w-full h-[54px] bg-white/5 border border-white/10 rounded outline-none px-12 text-white text-base focus:bg-white/10 focus:border-white/20 transition-colors placeholder:text-[#8c8c8c]"
+                        className="w-full h-[56px] bg-white/[0.03] border border-white/5 rounded-xl outline-none px-12 text-white text-base focus:bg-white/[0.06] focus:border-[#8FA7C5]/40 transition-all placeholder:text-white/20"
                         placeholder="Email hoặc Tên đăng nhập"
                         required
                     />
                 </div>
 
                 <div className="relative group w-full">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8c8c8c]" />
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within:text-[#8FA7C5] transition-colors" />
                     <input
                         type={showPassword ? "text" : "password"}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full h-[54px] bg-white/5 border border-white/10 rounded outline-none px-12 text-white text-base focus:bg-white/10 focus:border-white/20 transition-colors placeholder:text-[#8c8c8c]"
+                        className="w-full h-[56px] bg-white/[0.03] border border-white/5 rounded-xl outline-none px-12 text-white text-base focus:bg-white/[0.06] focus:border-[#8FA7C5]/40 transition-all placeholder:text-white/20"
                         placeholder="Mật khẩu"
                         required
                     />
                     <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8c8c8c] hover:text-[#b3b3b3] p-1 transition-colors"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white p-1 transition-colors"
                     >
                         {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                 </div>
 
                 <div className="flex justify-end w-full cursor-pointer mb-2">
-                    <Link href="/forgot-password" className="text-white/55 text-[13px] hover:underline hover:text-[#8FA7C5] transition-colors">Quên mật khẩu?</Link>
+                    <Link href="/forgot-password" university-mode="true" className="text-white/30 text-[13px] hover:text-[#8FA7C5] transition-colors">Quên mật khẩu?</Link>
                 </div>
 
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-[#8FA7C5] hover:bg-[#ff2a2a] text-white font-bold h-12 rounded transition-colors flex items-center justify-center shadow-[0_2px_10px_#8FA7C533] disabled:opacity-70 disabled:cursor-not-allowed mt-1"
+                    className="w-full bg-[#8FA7C5] hover:bg-[#a8bdd8] text-[#0a0a0a] font-black h-14 rounded-xl transition-all flex items-center justify-center shadow-xl shadow-[#8FA7C5]/10 disabled:opacity-50 disabled:cursor-not-allowed mt-2 active:scale-[0.98]"
                 >
                     {isLoading ? "Đang xử lý..." : "Đăng nhập"}
                 </button>
 
-                <div className="text-white/45 text-[15px] mt-8 text-center w-full pb-2">
+                <div className="text-white/30 text-[15px] mt-8 text-center w-full pb-2">
                     Chưa có tài khoản?{" "}
-                    <Link href="/register" className="text-[#8FA7C5] hover:underline font-bold ml-1">
+                    <Link href="/register" className="text-[#8FA7C5] hover:text-[#a8bdd8] font-bold ml-1 transition-colors">
                         Đăng ký ngay
                     </Link>
                 </div>

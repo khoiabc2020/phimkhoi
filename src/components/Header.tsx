@@ -406,11 +406,7 @@ export default function Header({ categories, countries }: HeaderProps) {
                                         </button>
                                     </div>
                                 </div>
-                            ) : (
-                                <Link href="/login" className="px-5 py-2 rounded-full bg-white text-black text-sm font-black hover:bg-gray-200 transition-all active:scale-95">
-                                    Đăng nhập
-                                </Link>
-                            )}
+                            ) : null}
                         </div>
                     </div>
                 </div>

@@ -152,26 +152,24 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                         {/* Mobile Background: Use Poster for sharpness */}
                         <div className="md:hidden absolute inset-0">
                             <Image 
-                                src={currentMovie.poster_url || currentMovie.bg}
+                                src={`${getImageUrl(currentMovie.poster_url || currentMovie.bg)}&w=1280&q=100`}
                                 alt={currentMovie.displayTitle}
                                 fill
                                 className="object-cover brightness-[0.5] contrast-[1.1]"
                                 priority
-                                quality={90}
-                                unoptimized={ (currentMovie.poster_url || currentMovie.bg).startsWith('/') }
+                                unoptimized
                             />
                         </div>
 
                         {/* Desktop Background: Use Backdrop */}
                         <div className="hidden md:block absolute inset-0">
                             <Image 
-                                src={currentMovie.bg}
+                                src={`${getImageUrl(currentMovie.bg)}&w=1920&q=90`}
                                 alt={currentMovie.displayTitle}
                                 fill
                                 className="object-cover brightness-[0.5] contrast-[1.1]"
                                 priority
-                                quality={90}
-                                unoptimized={currentMovie.bg.startsWith('/')}
+                                unoptimized
                             />
                         </div>
 
