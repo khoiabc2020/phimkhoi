@@ -17,8 +17,8 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     staleTimes: {
-      dynamic: 60,     // client-side cache for dynamic pages (tăng từ 30 lên 60s)
-      static: 300,     // tăng từ 180 lên 300s
+      dynamic: 0,      // Disable client-side cache for dynamic pages during active dev
+      static: 180,    // Lower static cache
     },
   },
   // Add Cache-Control headers for static assets
@@ -34,16 +34,6 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: "/_next/static/(.*)",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-        ],
-      },
-      {
-        // API routes: CDN caches for 60s, stale-while-revalidate for 5 minutes
         source: "/api/((?!auth).*)",
         headers: [
           {

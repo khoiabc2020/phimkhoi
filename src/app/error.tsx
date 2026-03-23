@@ -12,8 +12,27 @@ export default function Error({
     reset: () => void;
 }) {
     useEffect(() => {
-        // Log the error to an error reporting service
+        // Log the error
         console.error("Global Error Boundary:", error);
+
+        // Build ID mismatch or hydration error detection
+        const errorMsg = error.message?.toLowerCase() || "";
+        const isSuspenseError = errorMsg.includes("suspense") || errorMsg.includes("loading");
+        const isFetchError = errorMsg.includes("fetch") || errorMsg.includes("network");
+        const isHydrationError = errorMsg.includes("hydration") || errorMsg.includes("did not match");
+
+        // If it's a version mismatch or fetch error, try one auto-refresh
+        if (isFetchError || isHydrationError || isSuspenseError) {
+            const lastReload = sessionStorage.getItem("last-error-reload");
+            const now = Date.now();
+            
+            // Only auto-reload once every 10 seconds to avoid infinite loops
+            if (!lastReload || now - parseInt(lastReload) > 10000) {
+                sessionStorage.setItem("last-error-reload", now.toString());
+                console.warn("Detecting build mismatch or fetch error. Attempting auto-reload...");
+                window.location.reload();
+            }
+        }
     }, [error]);
 
     return (

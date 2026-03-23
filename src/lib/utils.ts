@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-export function getImageUrl(url: string, proxy = true): string {
+export function getImageUrl(url: string, proxy = false): string {
     if (!url) return "";
 
     let finalUrl = url;
@@ -19,7 +19,7 @@ export function getImageUrl(url: string, proxy = true): string {
         }
     }
 
-    // Trường hợp ép proxy: luôn đi qua /api/img-proxy để VPS + Cloudflare cache
+    // Trường hợp ép proxy (cho các component không dùng Next Image)
     if (proxy && finalUrl.startsWith("http")) {
         return `/api/img-proxy?url=${encodeURIComponent(finalUrl)}`;
     }
