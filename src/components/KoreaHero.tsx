@@ -119,10 +119,15 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                                 transition={{ duration: 10, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
                             >
                                 <Image 
-                                    src={`${getImageUrl(currentMovie.poster_url || currentMovie.bg)}&w=1080&q=95`}
+                                    src={currentMovie.poster_url || currentMovie.bg ? (
+                                        (() => {
+                                            const url = getImageUrl(currentMovie.poster_url || currentMovie.bg);
+                                            return url.startsWith("http") || url.includes("/api/img-proxy") ? `${url}&w=1080&q=95` : url;
+                                        })()
+                                    ) : ""}
                                     alt={currentMovie.displayTitle}
                                     fill
-                                    className="object-cover brightness-[0.5] contrast-[1.1]"
+                                    className="object-cover brightness-[0.45] contrast-[1.15]"
                                     priority
                                     unoptimized
                                 />
@@ -137,10 +142,15 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                                 transition={{ duration: 20, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
                             >
                                 <Image 
-                                    src={`${getImageUrl(currentMovie.bg)}&w=1920&q=90`}
+                                    src={currentMovie.bg ? (
+                                        (() => {
+                                            const url = getImageUrl(currentMovie.bg);
+                                            return url.startsWith("http") || url.includes("/api/img-proxy") ? `${url}&w=1920&q=90` : url;
+                                        })()
+                                    ) : ""}
                                     alt={currentMovie.displayTitle}
                                     fill
-                                    className="object-cover brightness-[0.5] contrast-[1.1]"
+                                    className="object-cover brightness-[0.45] contrast-[1.15]"
                                     priority
                                     unoptimized
                                 />
