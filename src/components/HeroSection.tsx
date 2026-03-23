@@ -146,7 +146,7 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                             alt=""
                             fill
                             className="object-cover"
-                            priority
+                            priority={index === 0}
                             decoding="async"
                         />
                         
@@ -267,7 +267,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                             alt=""
                             fill
                             className="object-cover object-[center_20%]"
-                            priority
+                            priority={index === 0}
                             sizes="100vw"
                             decoding="async"
                         />

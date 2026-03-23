@@ -100,8 +100,8 @@ function MovieCard({
         const raw = posterCandidates[posterIndex] || "";
         if (!raw) return "/placeholder.svg";
         const base = getImageUrl(raw);
-        // Optimize for grid: portrait ~500px, landscape ~800px. Quality 95 for extra sharpness.
-        const suffix = orientation === 'landscape' ? '&w=800&q=95' : '&w=500&q=95';
+        // Optimize for grid: portrait ~500px, landscape ~800px. Quality 80 is optimal for WebP.
+        const suffix = orientation === 'landscape' ? '&w=800&q=80' : '&w=500&q=80';
         return base.includes('?') ? `${base}${suffix}` : `${base}?${suffix.replace('&', '')}`;
     }, [posterCandidates, posterIndex, orientation]);
 
@@ -200,7 +200,7 @@ function MovieCard({
                             src={activePosterSrc || "/placeholder.svg"}
                             alt={decodeHtml(movie.name) || movie.slug || "Phim"}
                             fill
-                            className="transition-transform duration-500 ease-out lg:group-hover/static-card:scale-[1.1] object-cover z-10 anchor-top will-change-transform"
+                            className="transition-transform duration-500 ease-out lg:group-hover/static-card:scale-[1.1] object-cover z-10 anchor-top"
                             sizes={orientation === 'landscape' ? "(max-width: 768px) 50vw, 400px" : "(max-width: 768px) 33vw, (max-width: 1280px) 20vw, 300px"}
                             quality={95}
                             loading={priority ? undefined : loading}

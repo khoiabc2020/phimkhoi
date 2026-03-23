@@ -18,22 +18,23 @@ export const revalidate = 3600;
 const ROW_LIMIT = 12;
 
 const heroSkeleton = (
-  <div className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] xl:h-[800px] bg-[#0a0a0a] animate-pulse">
-    <div className="absolute bottom-0 left-0 right-0 h-40 md:h-56 lg:h-72 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
+  <div className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] xl:h-[800px] bg-[#0a0a0a] overflow-hidden">
+    <div className="absolute inset-0 shimmer" />
+    <div className="absolute bottom-0 left-0 right-0 h-40 md:h-56 lg:h-72 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent z-10" />
   </div>
 );
 const contentSkeleton = (
   <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 lg:pl-24 lg:pr-12 py-8 space-y-8">
-    <div className="h-6 w-48 bg-white/10 rounded animate-pulse" />
+    <div className="h-6 w-48 bg-white/5 rounded shimmer" />
     <div className="flex gap-4 overflow-hidden">
       {[1, 2, 3, 4, 5].map((i) => (
-        <div key={i} className="min-w-[150px] aspect-[2/3] rounded-lg bg-white/10 animate-pulse" />
+        <div key={i} className="min-w-[150px] aspect-[2/3] rounded-lg bg-white/5 shimmer overflow-hidden" />
       ))}
     </div>
-    <div className="h-6 w-40 bg-white/10 rounded animate-pulse mt-8" />
+    <div className="h-6 w-40 bg-white/5 rounded shimmer mt-8" />
     <div className="flex gap-4 overflow-hidden">
       {[1, 2, 3, 4, 5].map((i) => (
-        <div key={i} className="min-w-[150px] aspect-[2/3] rounded-lg bg-white/10 animate-pulse" />
+        <div key={i} className="min-w-[150px] aspect-[2/3] rounded-lg bg-white/5 shimmer overflow-hidden" />
       ))}
     </div>
   </div>

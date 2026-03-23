@@ -37,12 +37,11 @@
   }
 
   @keyframes shimmer {
-    from {
-      background-position: 0 0;
+    0% {
+      background-position: -1000px 0;
     }
-
-    to {
-      background-position: -200% 0;
+    100% {
+      background-position: 1000px 0;
     }
   }
 
@@ -287,6 +286,18 @@ h2 {
 
   .hover\:bg-yellow-500:hover {
     background-color: rgba(143, 167, 197, 0.9) !important;
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.03) 25%,
+      rgba(255, 255, 255, 0.08) 50%,
+      rgba(255, 255, 255, 0.03) 75%
+    );
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite linear;
+    will-change: background-position;
   }
 }
 
