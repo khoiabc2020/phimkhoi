@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Play, Info, Star, Calendar, Clock, Bookmark } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import Link from "next/link";
 import { cn, getImageUrl, stripHtml } from "@/lib/utils";
 import WatchlistButton from "./WatchlistButton";
@@ -75,7 +74,6 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
     const [current, setCurrent] = useState(0);
     const [isAutoPlay, setIsAutoPlay] = useState(true);
 
-    // Merge API data with high-quality local assets
     const slides = useMemo((): (any & { bg: string; logo: string; actor?: string; displayTitle: string; displayDesc: string; displayTags: string[]; displayEpisodes: string })[] => {
         if (!initialMovies || initialMovies.length === 0) return [];
         
@@ -120,28 +118,14 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
 
     const currentMovie = slides[current];
 
-    const slideEase = [0.22, 1, 0.36, 1] as const;
-
     return (
         <section 
             className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] xl:h-[800px] overflow-hidden bg-black"
             style={{ contain: "layout style paint" }}
         >
-            <AnimatePresence mode="popLayout" initial={false}>
-                <motion.div
-                    key={current}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.8, ease: "easeInOut" }}
-                    className="absolute inset-0"
-                >
-                    {/* Layer 1: Background Parallax */}
-                    <motion.div 
-                        animate={{ scale: 1 }}
-                        transition={{ duration: 8, ease: "linear" }}
-                        className="absolute inset-0 z-0 optimize-gpu will-change-transform"
-                    >
-                        {/* Mobile Background: Use Poster for sharpness */}
+            <div className="absolute inset-0">
+                <div key={current} className="absolute inset-0">
+                    <div className="absolute inset-0 z-0 optimize-gpu">
                         <div className="md:hidden absolute inset-0 overflow-hidden">
                             <Image 
                                 src={currentMovie.poster_url || currentMovie.bg ? (
@@ -157,7 +141,6 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                             />
                         </div>
 
-                        {/* Desktop Background: Use Backdrop */}
                         <div className="hidden md:block absolute inset-0 overflow-hidden">
                             <Image 
                                 src={currentMovie.bg ? (
@@ -173,22 +156,15 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                             />
                         </div>
 
-                        {/* IQIYI/Netflix Style Masks */}
                         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/20 to-transparent z-10" />
                         <div className="absolute inset-y-0 left-0 w-[50%] bg-gradient-to-r from-black via-black/60 to-transparent z-10" />
                         
-                        {/* THE "ONFLIX" BOTTOM FADE - Multi-layered for maximum smoothness */}
                         <div className="absolute inset-x-0 bottom-0 h-96 bg-gradient-to-t from-black via-transparent to-transparent z-10 opacity-60" />
                         <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-black via-black/80 to-transparent z-10" />
                         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent z-20" />
                         
-                        {/* Layer 2: Character Overlay */}
                         {currentMovie.actor && (
-                            <motion.div
-                                animate={{ x: 0, opacity: 1 }}
-                                transition={{ delay: 0.3, duration: 1, ease: slideEase }}
-                                className="absolute inset-0 z-[15]"
-                            >
+                            <div className="absolute inset-0 z-[15]">
                                 <Image
                                     src={currentMovie.actor}
                                     alt=""
@@ -196,20 +172,14 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                                     className="object-contain object-right-bottom scale-[0.65] md:scale-[0.8] lg:scale-[0.85] origin-right-bottom"
                                     priority
                                 />
-                            </motion.div>
+                            </div>
                         )}
-                    </motion.div>
+                    </div>
 
-                    {/* Layer 3: IQIYI Style Content */}
                     <div className="absolute inset-0 z-30 flex items-center px-6 md:pl-24 md:pr-14 lg:pl-32 xl:pl-[140px] max-w-[1920px] mx-auto">
                         <div className="max-w-[85%] sm:max-w-xl md:max-w-2xl flex flex-col items-start gap-3 md:gap-5">
                             
-                            {/* Movie Logo or Styled Title */}
-                            <motion.div
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ delay: 0.2, duration: 0.8, ease: slideEase }}
-                                className="relative w-full max-w-[200px] sm:max-w-[280px] md:max-w-[420px] lg:max-w-[480px] aspect-[4/1.5]"
-                            >
+                            <div className="relative w-full max-w-[200px] sm:max-w-[280px] md:max-w-[420px] lg:max-w-[480px] aspect-[4/1.5]">
                                 {currentMovie.logo ? (
                                     <Image 
                                         src={currentMovie.logo}
@@ -223,14 +193,9 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                                         {currentMovie.displayTitle}
                                     </h2>
                                 )}
-                            </motion.div>
+                            </div>
 
-                            {/* Metadata Badges - Onflix Style */}
-                            <motion.div
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ delay: 0.4, duration: 0.8 }}
-                                className="flex flex-wrap items-center gap-3 text-[13px] md:text-[15px] font-bold text-white/90"
-                            >
+                            <div className="flex flex-wrap items-center gap-3 text-[13px] md:text-[15px] font-bold text-white/90">
                                 <div className="bg-[#8FA7C5] text-[#0a0a0a] px-2 py-0.5 rounded-sm text-[10px] md:text-[11px] font-black tracking-tighter uppercase">
                                     TOP 10
                                 </div>
@@ -241,39 +206,24 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                                     <span className="text-white/30 font-light">|</span>
                                     <span className="text-[#8FA7C5]">{currentMovie.displayEpisodes}</span>
                                 </div>
-                            </motion.div>
+                            </div>
 
-                            {/* Tags - Onflix Style Pill Layout */}
-                            <motion.div
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ delay: 0.5, duration: 0.8 }}
-                                className="hidden sm:flex flex-wrap gap-2"
-                            >
+                            <div className="hidden sm:flex flex-wrap gap-2">
                                 {currentMovie.displayTags.map((tag: string) => (
-                                    <span key={tag} className="px-3 py-1 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 rounded-full text-[11px] md:text-[12px] font-bold text-white/80 transition-all cursor-default shadow-sm">
+                                    <span key={tag} className="px-3 py-1 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 rounded-full text-[11px] md:text-[12px] font-bold text-white/80 cursor-default shadow-sm">
                                         {tag}
                                     </span>
                                 ))}
-                            </motion.div>
+                            </div>
 
-                            {/* Description */}
-                            <motion.p
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ delay: 0.6, duration: 0.8 }}
-                                className="text-[13px] md:text-[14px] lg:text-[16px] text-white/70 line-clamp-2 md:line-clamp-3 leading-relaxed max-w-lg drop-shadow relative"
-                            >
+                            <p className="text-[13px] md:text-[14px] lg:text-[16px] text-white/70 line-clamp-2 md:line-clamp-3 leading-relaxed max-w-lg drop-shadow relative">
                                 {currentMovie.displayDesc}
-                            </motion.p>
+                            </p>
 
-                            {/* Action Buttons - Standardized with Home */}
-                            <motion.div
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ delay: 0.7, duration: 0.8 }}
-                                className="flex items-center gap-3 md:gap-4 pt-2 pointer-events-auto"
-                            >
+                            <div className="flex items-center gap-3 md:gap-4 pt-2 pointer-events-auto">
                                 <Link 
                                     href={`/phim/${currentMovie.slug}`}
-                                    className="flex items-center gap-2 md:gap-3 px-6 md:px-10 h-11 md:h-14 bg-[#8FA7C5] text-[#0a0a0a] rounded-full font-black text-[14px] md:text-[16px] hover:bg-white hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-[#8FA7C5]/20 group uppercase tracking-wider"
+                                    className="flex items-center gap-2 md:gap-3 px-6 md:px-10 h-11 md:h-14 bg-[#8FA7C5] text-[#0a0a0a] rounded-full font-black text-[14px] md:text-[16px] hover:bg-white active:scale-95 shadow-2xl shadow-[#8FA7C5]/20 group uppercase tracking-wider"
                                 >
                                     <Play className="w-4 h-4 md:w-5 md:h-5 fill-current" />
                                     Xem Ngay
@@ -281,25 +231,24 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                                 
                                 <WatchlistButton
                                     slug={currentMovie.slug}
-                                    className="h-11 w-11 md:h-14 md:w-14 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all hover:scale-110 active:scale-95 backdrop-blur-md shadow-xl flex items-center justify-center group"
+                                    className="h-11 w-11 md:h-14 md:w-14 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white active:scale-95 backdrop-blur-md shadow-xl flex items-center justify-center group"
                                     showLabel={false}
                                 />
-                            </motion.div>
+                            </div>
                         </div>
                     </div>
-                </motion.div>
-            </AnimatePresence>
+                </div>
+            </div>
 
-            {/* Pagination Indicators - Bottom Right (Onflix Style) */}
             <div className="absolute bottom-12 right-6 md:right-12 lg:right-32 z-40 flex items-center gap-1.5 md:gap-2">
                 {slides.map((_, idx) => (
                     <button
                         key={idx}
                         onClick={() => { setIsAutoPlay(false); setCurrent(idx); }}
                         className={cn(
-                            "rounded-full transition-all duration-500",
+                            "rounded-full",
                             current === idx 
-                                ? "w-8 md:w-10 h-1.5 md:h-2 bg-[#00A859] shadow-[0_0_12px_#00A859]" 
+                                ? "w-8 md:w-10 h-1.5 md:h-2 bg-[#8FA7C5] shadow-[0_0_12px_#8FA7C5]" 
                                 : "w-1.5 md:w-2 h-1.5 md:h-2 bg-white/20 hover:bg-white/40"
                         )}
                         aria-label={`Go to slide ${idx + 1}`}
@@ -307,21 +256,20 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                 ))}
             </div>
 
-            {/* Side Navigation Buttons - Onflix Style - Semi-transparent by default to avoid blocking content */}
             <div className="absolute inset-x-0 top-[35%] md:top-[40%] lg:left-20 right-0 z-40 pointer-events-none flex items-center justify-between px-2 md:px-4 lg:px-8">
                 <button 
                     onClick={prev}
-                    className="w-10 h-10 md:w-11 md:h-11 lg:w-14 lg:h-14 rounded-full bg-black/5 hover:bg-black/40 backdrop-blur-sm border border-white/5 hover:border-white/20 flex items-center justify-center text-white/10 hover:text-white transition-all group pointer-events-auto hover:scale-110 active:scale-95 shadow-lg"
+                    className="w-10 h-10 md:w-11 md:h-11 lg:w-14 lg:h-14 rounded-full bg-black/5 hover:bg-black/40 backdrop-blur-sm border border-white/5 hover:border-white/20 flex items-center justify-center text-white/10 hover:text-white group pointer-events-auto active:scale-95 shadow-lg"
                     aria-label="Previous slide"
                 >
-                    <ChevronLeft className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 group-hover:-translate-x-0.5 transition-transform" />
+                    <ChevronLeft className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8" />
                 </button>
                 <button 
                     onClick={next}
-                    className="w-10 h-10 md:w-11 md:h-11 lg:w-14 lg:h-14 rounded-full bg-black/5 hover:bg-black/40 backdrop-blur-sm border border-white/5 hover:border-white/20 flex items-center justify-center text-white/10 hover:text-white transition-all group pointer-events-auto hover:scale-110 active:scale-95 shadow-lg"
+                    className="w-10 h-10 md:w-11 md:h-11 lg:w-14 lg:h-14 rounded-full bg-black/5 hover:bg-black/40 backdrop-blur-sm border border-white/5 hover:border-white/20 flex items-center justify-center text-white/10 hover:text-white group pointer-events-auto active:scale-95 shadow-lg"
                     aria-label="Next slide"
                 >
-                    <ChevronRight className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 group-hover:translate-x-0.5 transition-transform" />
+                    <ChevronRight className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8" />
                 </button>
             </div>
         </section>

@@ -2,11 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Play, Info, ChevronLeft, ChevronRight } from "lucide-react";
+import { Play, ChevronLeft, ChevronRight } from "lucide-react";
 import { Movie } from "@/services/api";
 import { getImageUrl, decodeHtml, cn } from "@/lib/utils";
 import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import WatchlistButton from "./WatchlistButton";
 
 // ─── Utils ────────────────────────────────────────────────────────────────────
@@ -41,22 +40,8 @@ function formatQualityLabel(quality?: string) {
     return orig.length > 6 ? orig.slice(0, 6) : orig;
 }
 
-function getFavoriteData(movie: Movie) {
-    return {
-        movieId: movie._id || "",
-        movieSlug: movie.slug,
-        movieName: movie.name,
-        movieOriginName: movie.origin_name,
-        moviePoster: movie.poster_url || movie.thumb_url,
-        movieYear: Number(movie.year) || new Date().getFullYear(),
-        movieQuality: movie.quality || "HD",
-        movieCategories: movie.category?.map((c) => c.name) || [],
-    };
-}
-
 function tmdbImage(path: string, size: string) {
     if (!path) return "";
-    // If it's already a full URL, don't prepend tmdb domain
     if (path.startsWith("http")) return path;
     const p = path.startsWith("/") ? path : `/${path}`;
     return `https://image.tmdb.org/t/p/${size}${p}`;
@@ -77,7 +62,6 @@ function getHeroImage(movie: any, type: "poster" | "backdrop" | "character" | "l
         if (type === "backdrop" && tmdb.backdrop_path)
             return getImageUrl(tmdbImage(tmdb.backdrop_path, variant === "desktop" ? "original" : "w780"), true);
     }
-    // Backdrop must stay landscape-only, do not fallback to poster here.
     const api = type === "backdrop" ? movie.thumb_url : movie.poster_url || movie.thumb_url;
     return api ? getImageUrl(api, true) : "/placeholder.jpg";
 }
@@ -107,34 +91,12 @@ function useAutoplay(count: number, delay: number, paused: boolean) {
     return { index, go, next, prev };
 }
 
-// ─── Dot indicators ───────────────────────────────────────────────────────────
-
-function Dots({ count, active, onGo }: { count: number; active: number; onGo: (i: number) => void }) {
-    if (count <= 1) return null;
-    return (
-        <div className="flex items-center gap-2">
-            {Array.from({ length: count }).map((_, i) => (
-                <button
-                    key={i}
-                    onClick={() => onGo(i)}
-                    aria-label={`Slide ${i + 1}`}
-                    className={cn(
-                        "rounded-full transition-all duration-400 ease-out",
-                        i === active ? "w-7 h-1.5 bg-[#8FA7C5]" : "w-1.5 h-1.5 bg-white/30 hover:bg-white/60"
-                    )}
-                />
-            ))}
-        </div>
-    );
-}
-
 // ─── MOBILE HERO ──────────────────────────────────────────────────────────────
 
 function MobileHero({ movies, active = true }: { movies: Movie[], active?: boolean }) {
     const { index, go, next, prev } = useAutoplay(movies.length, 5000, !active);
     const movie = movies[index] as any;
     
-    // touch swipe
     const touchRef = useRef({ startX: 0, endX: 0 });
     const handleTouchStart = (e: React.TouchEvent) => touchRef.current.startX = e.touches[0].clientX;
     const handleTouchMove = (e: React.TouchEvent) => touchRef.current.endX = e.touches[0].clientX;
@@ -144,8 +106,6 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
         if (endX - startX > 50) prev();
     };
 
-    const ease = [0.22, 1, 0.36, 1] as const;
-
     return (
         <div 
             className="relative w-full aspect-[10/14] sm:aspect-[16/10] overflow-hidden bg-[#0a0a0a]"
@@ -153,17 +113,9 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
         >
-            <AnimatePresence initial={false}>
-                <motion.div
-                    key={`mobile-slide-${movie._id || index}`}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.6, ease: "easeInOut" }}
-                    className="absolute inset-0"
-                >
-                    {/* Background Layers */}
+            <div className="absolute inset-0">
+                <div key={`mobile-slide-${movie._id || index}`} className="absolute inset-0">
                     <div className="absolute inset-0">
-                        {/* Layer 1: Blurred Backdrop for texture and color spill */}
                         <div className="absolute inset-0 opacity-40 blur-3xl scale-110 pointer-events-none">
                              <Image
                                 src={getHeroImage(movie, "backdrop", "mobile").startsWith('http')
@@ -177,7 +129,6 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                             />
                         </div>
 
-                        {/* Layer 2: Sharp Poster (Requested by user for sharpness) */}
                         <Image
                             src={getHeroImage(movie, "poster", "mobile").startsWith('http')
                                 ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(movie, "poster", "mobile"))}&w=800&q=85`
@@ -190,17 +141,12 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                             decoding="async"
                         />
                         
-                        {/* Layer 3: Cinematic Overlays */}
                         <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
                         <div className="absolute inset-0 bg-[#0a0a0a]/20" />
                     </div>
 
-                    {/* Content Block */}
                     <div className="absolute inset-x-0 bottom-0 z-[10] px-6 pb-16 flex flex-col items-center gap-2 text-center">
-                        <motion.div
-                            animate={{ y: 0, opacity: 1 }}
-                            transition={{ delay: 0.1, duration: 0.5, ease }}
-                        >
+                        <div className="flex flex-col items-center gap-2 text-center">
                             {movie.isCustomHero && movie.layer_logo ? (
                                 <div className="relative w-[180px] h-[54px] mb-2 mx-auto">
                                     <Image
@@ -219,13 +165,9 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                                     {decodeHtml(movie.name)}
                                 </h1>
                             )}
-                        </motion.div>
+                        </div>
 
-                        <motion.div 
-                            animate={{ y: 0, opacity: 1 }}
-                            transition={{ delay: 0.2, duration: 0.5, ease }}
-                            className="flex items-center gap-3 text-[13px] font-bold text-white/90"
-                        >
+                        <div className="flex items-center gap-3 text-[13px] font-bold text-white/90">
                             <div className="bg-[#8FA7C5] text-[#0a0a0a] px-2 py-0.5 rounded-sm text-[10px] md:text-[11px] font-black tracking-tighter uppercase">
                                 TOP 10
                             </div>
@@ -236,13 +178,9 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                                 <span className="text-white/30 font-light">|</span>
                                 <span className="text-[#8FA7C5]">{movie.episode_current || "Full"}</span>
                             </div>
-                        </motion.div>
+                        </div>
 
-                        <motion.div
-                            animate={{ y: 0, opacity: 1 }}
-                            transition={{ delay: 0.3, duration: 0.5, ease }}
-                            className="flex items-center gap-3 pt-4"
-                        >
+                        <div className="flex items-center gap-3 pt-4">
                             <Link
                                 href={`/phim/${movie.slug}`}
                                 className="h-12 px-10 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[14px] uppercase tracking-wider flex items-center gap-2 shadow-xl shadow-[#8FA7C5]/20 active:scale-95 transition-all"
@@ -255,19 +193,18 @@ function MobileHero({ movies, active = true }: { movies: Movie[], active?: boole
                                 className="h-12 w-12 rounded-full bg-white/10 border border-white/20 text-white flex items-center justify-center p-0 backdrop-blur-md"
                                 showLabel={false}
                             />
-                        </motion.div>
+                        </div>
                     </div>
-                </motion.div>
-            </AnimatePresence>
+                </div>
+            </div>
 
-            {/* Indicators - Pill Style */}
             <div className="absolute bottom-6 left-0 right-0 z-20 flex justify-center gap-1.5 px-4 overflow-hidden">
                 {movies.slice(0, 10).map((_, i) => (
                     <button 
                         key={i} 
                         onClick={() => go(i)}
                         className={cn(
-                            "h-1.5 rounded-full transition-all duration-300",
+                            "h-1.5 rounded-full",
                             i === index ? "w-6 bg-[#8FA7C5] shadow-[0_0_8px_#8FA7C5]" : "w-1.5 bg-white/30"
                         )} 
                     />
@@ -291,12 +228,10 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
             const activeEl = container.children[index] as HTMLElement;
             if (activeEl) {
                 const scrollLeft = activeEl.offsetLeft - (container.offsetWidth / 2) + (activeEl.offsetWidth / 2);
-                container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+                container.scrollTo({ left: scrollLeft });
             }
         }
     }, [index]);
-
-    const ease = [0.22, 1, 0.36, 1] as const;
 
     return (
         <div
@@ -305,16 +240,8 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
             onMouseLeave={() => setPaused(false)}
             style={{ contain: "layout size" }}
         >
-            {/* ── Crossfade backdrop stack (Cinematic Full Bleed) ── */}
-            <AnimatePresence initial={false}>
-                <motion.div
-                    key={`slide-${movie._id || index}`}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.6, ease: "easeInOut" }}
-                    className="absolute inset-0"
-                >
-                    {/* Background Layer */}
+            <div className="absolute inset-0">
+                <div key={`slide-${movie._id || index}`} className="absolute inset-0">
                     <div className="absolute inset-0 z-0 overflow-hidden">
                         <Image
                             src={getHeroImage(movie, "backdrop", "desktop").startsWith('http')
@@ -330,14 +257,9 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                         />
                     </div>
 
-                    {/* Character Overlay (If CustomHero) */}
                     {movie.isCustomHero && movie.layer_character && (
                         <div className="absolute inset-0 z-[1] pointer-events-none">
-                            <motion.div
-                                animate={{ x: 0, opacity: 1 }}
-                                transition={{ delay: 0.1, duration: 1, ease }}
-                                className="relative w-full h-full"
-                            >
+                            <div className="relative w-full h-full">
                                 <Image
                                     src={movie.layer_character.startsWith('http')
                                         ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(movie.layer_character)}&w=1200&q=85`
@@ -349,27 +271,21 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                     sizes="100vw"
                                     priority
                                 />
-                            </motion.div>
+                            </div>
                         </div>
                     )}
 
-                    {/* Gradient overlays */}
                     <div className="absolute inset-0 z-[2] pointer-events-none">
                         <div className="absolute inset-y-0 left-0 w-[80%] lg:w-[60%] bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
                         <div className="absolute inset-0 bg-[#0a0a0a]/10" />
                         <div className="absolute bottom-0 left-0 right-0 h-48 md:h-64 lg:h-80 xl:h-[350px] bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/90 to-transparent z-[5]" />
                     </div>
 
-                    {/* Content Block */}
                     <div className="relative z-[10] h-full w-full max-w-[1920px] mx-auto px-6 md:pl-24 md:pr-14 lg:pl-32 lg:pr-12 xl:pl-[140px] flex items-end pb-20 md:pb-28 lg:pb-36 xl:pb-48 pointer-events-none">
                         <div className="w-full flex justify-between items-end">
                             <div className="w-full md:w-[75%] lg:w-[65%] xl:w-[60%] space-y-3 lg:space-y-4 pointer-events-auto pr-0 lg:pr-[300px] xl:pr-[400px]">
                                 
-                                {/* Logo / Title */}
-                                <motion.div
-                                    animate={{ y: 0, opacity: 1 }}
-                                    transition={{ delay: 0.2, duration: 0.6, ease }}
-                                >
+                                <div>
                                     {movie.isCustomHero && movie.layer_logo ? (
                                         <div className="relative w-full max-w-[400px] md:max-w-[500px] lg:max-w-[600px] h-[100px] md:h-[130px] lg:h-[160px] mb-4">
                                             <Image
@@ -397,14 +313,9 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                             {decodeHtml(movie.name)}
                                         </h1>
                                     )}
-                                </motion.div>
+                                </div>
 
-                                {/* Tags & Metadata - Onflix Style */}
-                                <motion.div 
-                                    animate={{ y: 0, opacity: 1 }}
-                                    transition={{ delay: 0.3, duration: 0.6, ease }}
-                                    className="flex flex-wrap items-center gap-3 lg:gap-4 font-bold text-[14px] lg:text-[15px] text-white/90"
-                                >
+                                <div className="flex flex-wrap items-center gap-3 lg:gap-4 font-bold text-[14px] lg:text-[15px] text-white/90">
                                     <div className="bg-[#8FA7C5] text-[#0a0a0a] px-2 py-0.5 rounded-sm text-[11px] lg:text-[12px] font-black tracking-tighter uppercase shadow-lg shadow-blue-900/20">
                                         TOP 10
                                     </div>
@@ -415,19 +326,14 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                         {movie.episode_current && <span className="text-white/20 font-light">|</span>}
                                         <span className="text-[#8FA7C5]">{movie.episode_current || "Full"}</span>
                                     </div>
-                                </motion.div>
+                                </div>
 
-                                {/* Categories - Onflix Style Pills */}
-                                <motion.div 
-                                    animate={{ y: 0, opacity: 1 }}
-                                    transition={{ delay: 0.4, duration: 0.6, ease }}
-                                    className="flex items-center gap-2 flex-wrap pt-1"
-                                >
+                                <div className="flex items-center gap-2 flex-wrap pt-1">
                                     {movie.category?.slice(0, 3).map((c: any) => (
                                         <Link
                                             key={c.id || c.name}
                                             href={`/the-loai/${c.slug}`}
-                                            className="text-[12px] lg:text-[13px] font-bold text-white/80 bg-white/10 hover:bg-white/20 border border-white/10 backdrop-blur-md rounded-full px-4 py-1.5 transition-all duration-300 shadow-sm"
+                                            className="text-[12px] lg:text-[13px] font-bold text-white/80 bg-white/10 hover:bg-white/20 border border-white/10 backdrop-blur-md rounded-full px-4 py-1.5 shadow-sm"
                                         >
                                             {c.name}
                                         </Link>
@@ -437,50 +343,39 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                             {formatQualityLabel(movie.quality) || movie.quality}
                                         </span>
                                     )}
-                                </motion.div>
+                                </div>
 
-                                {/* Description */}
                                 {movie.content && (
-                                    <motion.p
-                                        animate={{ y: 0, opacity: 1 }}
-                                        transition={{ delay: 0.5, duration: 0.6, ease }}
-                                        className="text-white/80 text-[14px] lg:text-[15px] xl:text-[16px] leading-[1.6] line-clamp-2 md:line-clamp-3 lg:line-clamp-2 xl:line-clamp-3 max-w-2xl drop-shadow-md font-medium"
-                                    >
+                                    <p className="text-white/80 text-[14px] lg:text-[15px] xl:text-[16px] leading-[1.6] line-clamp-2 md:line-clamp-3 lg:line-clamp-2 xl:line-clamp-3 max-w-2xl drop-shadow-md font-medium">
                                         {decodeHtml(stripHtml(movie.content))}
-                                    </motion.p>
+                                    </p>
                                 )}
 
-                                {/* Buttons */}
-                                <motion.div
-                                    animate={{ y: 0, opacity: 1 }}
-                                    transition={{ delay: 0.6, duration: 0.6, ease }}
-                                    className="flex flex-wrap items-center gap-4 pt-4 lg:pt-6 pointer-events-auto"
-                                >
+                                <div className="flex flex-wrap items-center gap-4 pt-4 lg:pt-6 pointer-events-auto">
                                     <Link
                                         href={`/phim/${movie.slug}`}
-                                        className="flex items-center justify-center gap-2 h-12 md:h-14 px-8 md:px-10 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[15px] lg:text-[16px] uppercase tracking-wide transition-all duration-300 hover:scale-105 active:scale-95 group shadow-xl shadow-[#8FA7C5]/30"
+                                        className="flex items-center justify-center gap-2 h-12 md:h-14 px-8 md:px-10 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[15px] lg:text-[16px] uppercase tracking-wide group shadow-xl shadow-[#8FA7C5]/30"
                                     >
-                                        <Play className="w-5 h-5 fill-current shrink-0 group-hover:scale-110 transition-transform" />
+                                        <Play className="w-5 h-5 fill-current shrink-0" />
                                         Xem Ngay
                                     </Link>
                                     <WatchlistButton
                                         slug={movie.slug}
-                                        className="h-12 w-12 md:h-14 md:w-14 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all hover:scale-110 active:scale-95 backdrop-blur-md shadow-xl flex items-center justify-center group"
+                                        className="h-12 w-12 md:h-14 md:w-14 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white backdrop-blur-md shadow-xl flex items-center justify-center group"
                                         showLabel={false}
                                     />
-                                </motion.div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </motion.div>
-            </AnimatePresence>
+                </div>
+            </div>
 
-            {/* Thumbnail Nav Overlay - Centered to avoid overlap */}
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[30] w-full max-w-[90vw] md:max-w-3xl lg:max-w-5xl">
                 <div 
                     ref={navRef}
                     className="flex items-center gap-2 md:gap-3 overflow-x-auto no-scrollbar py-3 px-2 scroll-smooth snap-x snap-mandatory min-w-0 w-full"
-                    style={{ maskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)' }}
+                    style={{ maskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)' }}
                 >
                     {movies.map((m: any, idx) => {
                         const isActive = idx === index;
@@ -489,7 +384,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                 key={`thumb-${m._id || idx}`}
                                 onClick={() => go(idx)}
                                 className={cn(
-                                    "relative w-[90px] md:w-[110px] lg:w-[130px] xl:w-[140px] aspect-[16/9] rounded-lg overflow-hidden cursor-pointer flex-shrink-0 transition-all duration-300 box-border group snap-center",
+                                    "relative w-[90px] md:w-[110px] lg:w-[130px] xl:w-[140px] aspect-[16/9] rounded-lg overflow-hidden cursor-pointer flex-shrink-0 box-border group snap-center",
                                     isActive 
                                         ? "ring-[2.5px] ring-primary scale-105 opacity-100 shadow-[0_0_25px_rgba(143,167,197,0.5)] z-10" 
                                         : "ring-1 ring-white/10 scale-95 opacity-40 hover:opacity-100 hover:scale-100 z-0 bg-black/40"
@@ -502,7 +397,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                     }
                                     alt={decodeHtml(m.name)}
                                     fill
-                                    className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                                    className="object-cover"
                                     sizes="200px"
                                     placeholder="blur"
                                     blurDataURL={blurData}
@@ -516,21 +411,20 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                 </div>
             </div>
 
-            {/* Side Navigation Buttons - Desktop Onflix Style */}
             <div className="absolute top-[18%] h-[25%] left-0 right-0 z-[35] pointer-events-none flex items-center justify-between px-4 lg:px-0">
                 <button 
                     onClick={prev}
-                    className="w-10 h-10 md:w-11 md:h-11 lg:w-12 lg:h-12 lg:ml-24 rounded-full bg-black/20 hover:bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/40 hover:text-white transition-all group pointer-events-auto hover:scale-110 active:scale-95 shadow-2xl"
+                    className="w-10 h-10 md:w-11 md:h-11 lg:w-12 lg:h-12 lg:ml-24 rounded-full bg-black/20 hover:bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/40 hover:text-white group pointer-events-auto shadow-2xl"
                     aria-label="Previous slide"
                 >
-                    <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 group-hover:-translate-x-0.5 transition-transform" />
+                    <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7" />
                 </button>
                 <button 
                     onClick={next}
-                    className="w-10 h-10 md:w-11 md:h-11 lg:w-12 lg:h-12 lg:mr-8 rounded-full bg-black/20 hover:bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/40 hover:text-white transition-all group pointer-events-auto hover:scale-110 active:scale-95 shadow-2xl"
+                    className="w-10 h-10 md:w-11 md:h-11 lg:w-12 lg:h-12 lg:mr-8 rounded-full bg-black/20 hover:bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/40 hover:text-white group pointer-events-auto shadow-2xl"
                     aria-label="Next slide"
                 >
-                    <ChevronRight className="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 group-hover:translate-x-0.5 transition-transform" />
+                    <ChevronRight className="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7" />
                 </button>
             </div>
         </div>
@@ -540,18 +434,13 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
 // ─── Export ───────────────────────────────────────────────────────────────────
 
 export default function HeroSection({ movies }: { movies: Movie[] }) {
-    const [mounted, setMounted] = useState(false);
     const isDesktop = useMediaQuery("(min-width: 768px)");
     
-    useEffect(() => {
-        setMounted(true);
-    }, []);
-
     if (!movies || movies.length === 0) return null;
     const heroMovies = movies.slice(0, 10);
 
     return (
-        <div className="relative w-full bg-[#0a0a0a] font-sans" style={{ minHeight: '400px', contain: "layout" }}>
+        <div className="relative w-full bg-[#0a0a0a] font-sans" style={{ minHeight: '400px', contain: "layout transition" }}>
             <div className="md:hidden">
                 <MobileHero movies={heroMovies} active={true} />
             </div>
