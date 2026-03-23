@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useMemo, useCallback, memo } from "react";
+import { createPortal } from "react-dom";
 
 import FavoriteButton from "@/components/FavoriteButton";
 import WatchlistInlineButton from "@/components/WatchlistInlineButton";
@@ -122,8 +123,8 @@ function MovieCard({
             if (cardRef.current) {
                 const rect = cardRef.current.getBoundingClientRect();
                 setPosition({
-                    top: rect.top + window.scrollY,
-                    left: rect.left + window.scrollX,
+                    top: rect.top,
+                    left: rect.left,
                     width: rect.width,
                     rectTop: rect.top,
                     innerHeight: window.innerHeight,
@@ -251,20 +252,31 @@ function MovieCard({
                 </div>
             </div>
 
-            <AnimatePresence>
-                {isHovered && !isTouchDevice && (
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] w-[320px] pointer-events-auto">
-                        <OnflixHoverCard
-                            movie={movie}
-                            position={position}
-                            displayBackdrop={displayBackdrop}
-                            orientation={orientation}
-                            onMouseEnter={handlePortalMouseEnter}
-                            onMouseLeave={handlePortalMouseLeave}
-                        />
+            {isHovered && !isTouchDevice && typeof document !== 'undefined' && createPortal(
+                <div 
+                    className="fixed z-[9999] pointer-events-auto"
+                    style={{
+                        top: position.top,
+                        left: position.left + (position.width / 2),
+                        width: 0, // Container is a point for centering
+                        height: 0
+                    }}
+                >
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px]">
+                        <AnimatePresence>
+                            <OnflixHoverCard
+                                movie={movie}
+                                position={position}
+                                displayBackdrop={displayBackdrop}
+                                orientation={orientation}
+                                onMouseEnter={handlePortalMouseEnter}
+                                onMouseLeave={handlePortalMouseLeave}
+                            />
+                        </AnimatePresence>
                     </div>
-                )}
-            </AnimatePresence>
+                </div>,
+                document.body
+            )}
         </>
     );
 }
