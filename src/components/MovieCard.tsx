@@ -96,7 +96,14 @@ function MovieCard({
         return Array.from(new Set(list.filter(Boolean))) as string[];
     }, [orientation, movie.thumb_url, movie.poster_url, portraitPosterSource, tmdbPoster, tmdbBackdropPath]);
 
-    const activePosterSrc = posterCandidates[posterIndex] ? getImageUrl(posterCandidates[posterIndex]) : "/placeholder.svg";
+    const activePosterSrc = useMemo(() => {
+        const raw = posterCandidates[posterIndex] || "";
+        if (!raw) return "/placeholder.svg";
+        const base = getImageUrl(raw);
+        // Optimize for grid: portrait ~500px, landscape ~800px. Quality 95 for extra sharpness.
+        const suffix = orientation === 'landscape' ? '&w=800&q=95' : '&w=500&q=95';
+        return base.includes('?') ? `${base}${suffix}` : `${base}?${suffix.replace('&', '')}`;
+    }, [posterCandidates, posterIndex, orientation]);
 
     // Backdrop/overlay (ảnh ngang): TMDB backdrop first, then whichever source URL is truly landscape.
     const displayBackdrop = useMemo(() => {
@@ -195,7 +202,7 @@ function MovieCard({
                             fill
                             className="transition-transform duration-500 ease-out lg:group-hover/static-card:scale-[1.1] object-cover z-10 anchor-top will-change-transform"
                             sizes={orientation === 'landscape' ? "(max-width: 768px) 50vw, 400px" : "(max-width: 768px) 33vw, (max-width: 1280px) 20vw, 300px"}
-                            quality={80}
+                            quality={95}
                             loading={priority ? undefined : loading}
                             priority={priority}
                             unoptimized={true}

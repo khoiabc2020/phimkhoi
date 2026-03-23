@@ -117,27 +117,39 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                         className="absolute inset-0 z-0 optimize-gpu will-change-transform"
                     >
                         {/* Mobile Background: Use Poster for sharpness */}
-                        <div className="md:hidden absolute inset-0">
-                            <Image 
-                                src={`${getImageUrl(currentMovie.poster_url || currentMovie.bg)}&w=1280&q=100`}
-                                alt={currentMovie.displayTitle}
-                                fill
-                                className="object-cover brightness-[0.5] contrast-[1.1]"
-                                priority
-                                unoptimized
-                            />
+                        <div className="md:hidden absolute inset-0 overflow-hidden">
+                            <motion.div 
+                                className="absolute inset-0"
+                                animate={{ scale: [1, 1.05] }}
+                                transition={{ duration: 10, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
+                            >
+                                <Image 
+                                    src={`${getImageUrl(currentMovie.poster_url || currentMovie.bg)}&w=1080&q=95`}
+                                    alt={currentMovie.displayTitle}
+                                    fill
+                                    className="object-cover brightness-[0.5] contrast-[1.1]"
+                                    priority
+                                    unoptimized
+                                />
+                            </motion.div>
                         </div>
 
                         {/* Desktop Background: Use Backdrop */}
-                        <div className="hidden md:block absolute inset-0">
-                            <Image 
-                                src={`${getImageUrl(currentMovie.bg)}&w=1920&q=90`}
-                                alt={currentMovie.displayTitle}
-                                fill
-                                className="object-cover brightness-[0.5] contrast-[1.1]"
-                                priority
-                                unoptimized
-                            />
+                        <div className="hidden md:block absolute inset-0 overflow-hidden">
+                            <motion.div 
+                                className="absolute inset-0"
+                                animate={{ scale: [1, 1.08] }}
+                                transition={{ duration: 20, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
+                            >
+                                <Image 
+                                    src={`${getImageUrl(currentMovie.bg)}&w=1920&q=90`}
+                                    alt={currentMovie.displayTitle}
+                                    fill
+                                    className="object-cover brightness-[0.5] contrast-[1.1]"
+                                    priority
+                                    unoptimized
+                                />
+                            </motion.div>
                         </div>
 
                         {/* IQIYI/Netflix Style Masks */}
