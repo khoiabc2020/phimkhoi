@@ -48,6 +48,7 @@ function MovieCard({
     const cardRef = useRef<HTMLDivElement>(null);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const router = useRouter();
     const [isTouchDevice, setIsTouchDevice] = useState(false);
 
     useEffect(() => {
@@ -158,7 +159,6 @@ function MovieCard({
         return { showSub, showTM, showLT };
     }, [movie.lang]);
 
-    const router = useRouter();
 
     const handleMouseEnter = () => {
         if (isTouchDevice) return;
