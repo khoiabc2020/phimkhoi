@@ -188,30 +188,59 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                     </div>
                 );
 
-            case "history":
+                    </div>
+                );
+            
+            case "lists":
                 return (
                     <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                        <h2 className={titleClasses}>Lịch Sử Xem</h2>
-                        {history.length === 0 ? (
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className={titleClasses}>Bộ sưu tập</h2>
+                            <button 
+                                onClick={() => { setModalMode("create"); setSelectedPlaylist(null); setIsModalOpen(true); }}
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 text-white text-[11px] font-bold uppercase tracking-wider rounded-lg hover:bg-white/10 transition-all active:scale-95"
+                            >
+                                <Plus className="w-3.5 h-3.5" />
+                                Tạo bộ sưu tập
+                            </button>
+                        </div>
+                        {playlists.length === 0 ? (
                             <div className="text-gray-600 text-center py-20 bg-[#0a0a0c] rounded-2xl border border-white/[0.04]">
-                                <History className="w-10 h-10 mx-auto mb-4 opacity-10" />
-                                <p className="text-sm font-medium">Bạn chưa xem phim nào.</p>
+                                <ListVideo className="w-10 h-10 mx-auto mb-4 opacity-10" />
+                                <p className="text-sm font-medium">Bạn chưa có bộ sưu tập nào.</p>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                                {history.map((item) => (
-                                    <Link key={item._id} href={`/xem-phim/${item.movieSlug}/${item.episodeSlug}`} className="group">
-                                        <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-[#0a0a0c] border border-white/[0.05]">
-                                            <Image src={getImageUrl(item.moviePoster)} alt={item.movieName} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
-                                            <div className="absolute inset-x-0 bottom-0 h-1 bg-white/5">
-                                                <div className="h-full bg-purple-500" style={{ width: `${item.progress}%` }} />
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {playlists.map((playlist) => (
+                                    <div key={playlist._id} className="group relative bg-[#0a0a0c] border border-white/[0.04] rounded-2xl p-5 hover:border-[#8FA7C5]/30 transition-all duration-300 overflow-hidden">
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-[#8FA7C5]/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-[#8FA7C5]/10 transition-all" />
+                                        
+                                        <h3 className="text-[17px] font-bold text-white mb-2 tracking-tight group-hover:text-[#8FA7C5] transition-colors">{playlist.name}</h3>
+                                        <p className="text-gray-600 text-xs font-medium line-clamp-2 min-h-[32px] mb-6">{playlist.description || "Danh sách phim yêu thích cá nhân."}</p>
+                                        
+                                        <div className="flex items-center justify-between mt-auto">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
+                                                    <Video className="w-4 h-4 text-white/40" />
+                                                </div>
+                                                <span className="text-white text-xs font-bold">{playlist.movies?.length || 0} phim</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <button 
+                                                    onClick={() => { setModalMode("edit"); setSelectedPlaylist(playlist); setIsModalOpen(true); }}
+                                                    className="p-2 text-gray-600 hover:text-white transition-colors"
+                                                >
+                                                    <Edit2 className="w-4 h-4" />
+                                                </button>
+                                                <Link 
+                                                    href={`/thu-vien/${playlist._id}`}
+                                                    className="p-2 text-gray-600 hover:text-[#8FA7C5] transition-colors translate-x-1"
+                                                >
+                                                    <ChevronRight className="w-5 h-5" />
+                                                </Link>
                                             </div>
                                         </div>
-                                        <div className="mt-2.5">
-                                            <h3 className="text-white text-xs font-semibold truncate group-hover:text-purple-400 transition-colors uppercase tracking-wide">{item.movieName}</h3>
-                                            <p className="text-gray-600 text-[10px] font-bold mt-0.5">{item.episodeName} • {item.progress}%</p>
-                                        </div>
-                                    </Link>
+                                    </div>
                                 ))}
                             </div>
                         )}
@@ -221,8 +250,30 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
             case "account":
             default:
                 return (
-                    <div className="animate-in fade-in duration-300 max-w-[800px]">
-                        <h2 className={titleClasses}>Thông tin tài khoản</h2>
+                    <div className="animate-in fade-in duration-300 max-w-[900px]">
+                        <h2 className={titleClasses}>Trực quan hoạt động</h2>
+
+                        {/* ELITE Dashboard Stats */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+                            {[
+                                { label: "Phim đã xem", value: history.length, icon: Play, color: "#8FA7C5" },
+                                { label: "Yêu thích", value: favorites.length, icon: Heart, color: "#ef4444" },
+                                { label: "Bộ sưu tập", value: playlists.length, icon: ListVideo, color: "#a855f7" }
+                            ].map((stat, i) => (
+                                <div key={i} className="bg-[#0a0a0c] border border-white/[0.05] rounded-[20px] p-6 relative overflow-hidden group">
+                                    <div className="absolute top-0 right-0 w-20 h-20 opacity-10 blur-2xl rounded-full" style={{ backgroundColor: stat.color }} />
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/[0.02] border border-white/[0.05]">
+                                            <stat.icon className="w-5 h-5" style={{ color: stat.color }} />
+                                        </div>
+                                        <span className="text-[28px] font-black text-white tracking-tighter">{stat.value}</span>
+                                    </div>
+                                    <p className="text-gray-600 text-[11px] font-bold uppercase tracking-[2px]">{stat.label}</p>
+                                </div>
+                            ))}
+                        </div>
+
+                        <h2 className={titleClasses}>Thông tin cá nhân</h2>
                         
                         {/* Static Info Section */}
                         <div className={sectionClasses}>
@@ -323,6 +374,63 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                                 </div>
                             </form>
                         </div>
+
+                        {/* UI Customization Section */}
+                        <h2 className="text-xl font-bold text-white mt-12 mb-6 tracking-tight">Tùy chỉnh giao diện</h2>
+                        <div className={sectionClasses}>
+                            <div className="space-y-6">
+                                {[
+                                    { label: "Hiệu ứng Cinematic Glow", description: "Bật hiệu ứng ánh sáng rực rỡ cho Poster phim.", checked: true },
+                                    { label: "Giao diện Glassmorphism", description: "Sử dụng hiệu ứng kính mờ cao cấp cho UI.", checked: true },
+                                    { label: "Tự động phát Trailer", description: "Tự động phát trailer khi di chuột qua phim.", checked: false }
+                                ].map((item, i) => (
+                                    <div key={i} className="flex items-center justify-between group cursor-pointer">
+                                        <div className="space-y-1">
+                                            <p className="text-sm font-bold text-white group-hover:text-[#8FA7C5] transition-colors">{item.label}</p>
+                                            <p className="text-[11px] font-medium text-gray-700">{item.description}</p>
+                                        </div>
+                                        <div className={`w-10 h-5 rounded-full relative transition-all ${item.checked ? 'bg-[#8FA7C5]/40' : 'bg-white/10'}`}>
+                                            <div className={`absolute top-1 w-3 h-3 rounded-full transition-all ${item.checked ? 'right-1 bg-white shadow-[0_0_8px_white]' : 'left-1 bg-gray-700'}`} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Security Summary Section */}
+                        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                                    <ShieldCheck className="w-4 h-4 text-[#8FA7C5]" />
+                                    Tóm tắt bảo mật
+                                </h3>
+                                <div className="space-y-3">
+                                    {[
+                                        { label: "Mật khẩu", value: "Đã thiết lập", status: "active" },
+                                        { label: "Xác thực 2 lớp", value: "Chưa kích hoạt", status: "inactive" },
+                                        { label: "Thiết bị đã đăng nhập", value: "1 thiết bị", status: "active" }
+                                    ].map((item, i) => (
+                                        <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                                            <span className="text-gray-500 text-xs font-medium">{item.label}</span>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-white text-[11px] font-bold">{item.value}</span>
+                                                <div className={`w-1.5 h-1.5 rounded-full ${item.status === 'active' ? 'bg-[#8FA7C5]' : 'bg-orange-500/50'}`} />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                                    <Trophy className="w-4 h-4 text-yellow-500/70" />
+                                    Huy chương & Danh hiệu
+                                </h3>
+                                <div className="flex flex-wrap gap-2">
+                                    <div className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-black text-gray-400 uppercase tracking-wider">Mọt phim Tập sự</div>
+                                    <div className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-black text-gray-400 uppercase tracking-wider opacity-30">Phê Phim Vương</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 );
         }
@@ -336,26 +444,26 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                     {/* User Profile Header in Sidebar */}
                     <div className="mb-10 text-center md:text-left">
                         <div className="relative inline-block group mb-4">
-                            <div className="relative w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden border border-white/10 p-1 bg-black">
-                                <div className="relative w-full h-full rounded-full overflow-hidden">
+                            <div className="relative w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden border border-white/5 p-1 bg-[#0a0a0c]">
+                                <div className="relative w-full h-full rounded-full overflow-hidden shadow-2xl">
                                     {user?.image ? (
                                         <Image src={user.image} alt="" fill className="object-cover" />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-4xl font-bold bg-[#1a1a1f] text-gray-700">
-                                            {user?.name?.[0]?.toUpperCase()}
+                                        <div className="w-full h-full flex items-center justify-center text-4xl font-outfit font-black bg-[#00695C] text-white tracking-tighter shadow-inner">
+                                            {user?.name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() || "KH"}
                                         </div>
                                     )}
                                     <button 
                                         onClick={() => setIsAvatarModalOpen(true)}
-                                        className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+                                        className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all duration-300 backdrop-blur-[2px]"
                                     >
                                         <Camera className="w-6 h-6 text-white" />
                                     </button>
                                 </div>
                             </div>
                         </div>
-                        <h1 className="text-lg font-bold text-white truncate max-w-full">{user?.name}</h1>
-                        <p className="text-xs font-medium text-gray-600 mt-1 truncate">{user?.email}</p>
+                        <h1 className="text-lg font-black text-white truncate max-w-full tracking-tight">{user?.name}</h1>
+                        <p className="text-xs font-bold text-gray-600 mt-1 truncate tracking-tight opacity-70">{user?.email}</p>
                     </div>
 
                     <div className="h-px bg-white/[0.06] mb-8 hidden md:block w-12"></div>
@@ -365,8 +473,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                             { id: "account", label: "Tài khoản", icon: User },
                             { id: "favorites", label: "Yêu thích", icon: Heart },
                             { id: "history", label: "Lịch sử", icon: History },
-                            { id: "lists", label: "Thư viện", icon: ListVideo },
-                            { id: "settings", label: "Cài đặt", icon: Settings },
+                            { id: "lists", label: "Bộ sưu tập", icon: ListVideo },
                         ].map((item) => (
                             <button
                                 key={item.id}
