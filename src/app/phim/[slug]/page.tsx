@@ -495,7 +495,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
             <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:pl-24 lg:pr-12 mt-2 lg:mt-4 relative z-10">
                 
                 {/* On mobile/tablet: RIGHT column (tabs) first, then sidebar info below */}
-                <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+                <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-12 items-start [contain-intrinsic-size:0_1000px] [content-visibility:auto]">
 
                     {/* RIGHT COLUMN (Tabs & Content) */}
                     <div className="w-full lg:col-span-7 xl:col-span-8">

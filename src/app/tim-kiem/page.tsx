@@ -164,7 +164,7 @@ async function SearchResultsStream({
                         <span className="w-1 h-5 bg-[#8FA7C5] rounded-full"></span>
                         <h2 className="text-base font-bold text-white">Phim kết quả</h2>
                     </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 [contain:layout_paint]">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 [contain-intrinsic-size:0_500px] [content-visibility:auto]">
                         {visibleMovies.map((movie: any, idx: number) => (
                             <MovieCard 
                                 key={movie._id || movie.slug} 

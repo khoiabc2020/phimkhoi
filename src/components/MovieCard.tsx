@@ -59,6 +59,14 @@ function MovieCard({
     const hasInitialTmdb = !!(movie as any).tmdbData;
 
     useEffect(() => {
+        // [Elite Predictive] Prefetch early
+        const prefetchTimer = setTimeout(() => {
+            router.prefetch(`/phim/${movie.slug}`);
+        }, 800);
+        return () => clearTimeout(prefetchTimer);
+    }, [movie.slug, router]);
+
+    useEffect(() => {
         if (hasInitialTmdb || lazyTmdbData) return;
 
         // Lazy fetch when in view or on slight delay to avoid initial load blocking
@@ -179,7 +187,7 @@ function MovieCard({
                 });
                 setIsHovered(true);
             }
-        }, 350);
+        }, 250);
     };
 
     const handleMouseLeave = () => {

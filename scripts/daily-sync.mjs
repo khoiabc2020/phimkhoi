@@ -155,8 +155,8 @@ async function syncTrendingWithViewCount() {
 
     for (const type of lists) {
         try {
-            // DEEP SCAN: Quét 5 trang đầu của mỗi loại để đảm bảo không sót phim mới
-            await syncMovieList(type, 5, 48);
+            // DEEP SATURATION: Quét 15 trang đầu của mỗi loại để đảm bảo 100% phim hot có mặt trong DB
+            await syncMovieList(type, 15, 48);
         } catch (e) {
             log(`  ✗ Error syncing ${type}: ${e.message}`);
         }
