@@ -567,7 +567,7 @@ export const getMovieDetail = async (slug: string) => {
             if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
                 const nguoncEpisodes = nguoncRes.value.movie?.episodes || [];
                 const taggedNguoncEpisodes = nguoncEpisodes.map((epGroup: { server_name?: string; items?: { name: string; slug: string; embed: string; m3u8: string }[] }) => ({
-                    server_name: `NguonC #${epGroup.server_name || "1"}`,
+                    server_name: epGroup.server_name ? (epGroup.server_name.includes("NguonC") ? epGroup.server_name : `NguonC ${epGroup.server_name.startsWith('#') ? epGroup.server_name : `#${epGroup.server_name}`}`) : "NguonC",
                     // Convert NguonC format (items) to standard format (server_data)
                     server_data: (epGroup.items || []).map((ep) => ({
                         name: ep.name,
@@ -614,7 +614,7 @@ export const getMovieDetail = async (slug: string) => {
                     trailer_url: data.trailer_url || "",
                 } as Movie),
                 episodes: (data.episodes || []).map((epGroup: { server_name?: string; items?: { name: string; slug: string; embed: string; m3u8: string }[] }) => ({
-                    server_name: `NguonC #${epGroup.server_name || "1"}`,
+                    server_name: epGroup.server_name ? (epGroup.server_name.includes("NguonC") ? epGroup.server_name : `NguonC ${epGroup.server_name.startsWith('#') ? epGroup.server_name : `#${epGroup.server_name}`}`) : "NguonC",
                     server_data: (epGroup.items || []).map((ep) => ({
                         name: ep.name,
                         slug: ep.slug,

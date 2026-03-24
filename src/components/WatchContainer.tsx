@@ -59,10 +59,10 @@ export default function WatchContainer({
     const activeEpisode =
         currentServerEpisodes.find((ep: { slug?: string }) => ep.slug === currentEpisodeSlug) || initialCurrentEpisode;
 
-    // NguonC: mặc định phát bằng iframe (link_embed) để hạn chế lỗi CORS/Referer.
-    // Các server khác vẫn ưu tiên HLS qua hls-proxy nếu có link_m3u8.
+    // NguonC: mặc định phát bằng iframe (link_embed) để hạn chế lỗi CORS/Referer / Chặn nhúng.
+    // Các server khác (KKPhim, OPhim) vẫn ưu tiên Artplayer qua hls-proxy.
     const effectiveM3u8 =
-        activeEpisode?.link_m3u8
+        (activeEpisode?.link_m3u8 && !activeServerName.toLowerCase().includes("nguonc"))
             ? `/api/hls-proxy?url=${encodeURIComponent(activeEpisode.link_m3u8)}`
             : undefined;
 
