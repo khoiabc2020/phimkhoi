@@ -86,7 +86,7 @@ export default async function CategoryPage({
                 </div>
 
                 <Suspense key={`${slug}-${currentPage}-${sParams.country || 'all'}-${sParams.year || 'all'}`} fallback={<GridSkeleton />}>
-                    <CategoryGridStream 
+                    <CategoryGridClient 
                         slug={slug} 
                         page={currentPage} 
                         country={sParams.country}

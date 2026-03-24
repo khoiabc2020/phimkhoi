@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import {
     User, LogOut, History, Heart, Plus, Clock,
-    Play, X, Edit2, Loader2, ListVideo, Camera, Bookmark, Mail, Trophy, Upload, ChevronRight, Check, ShieldCheck, Lock, Eye, EyeOff, Settings
+    Play, X, Edit2, Loader2, ListVideo, Camera, Bookmark, Mail, Trophy, Upload, ChevronRight, Check, ShieldCheck, Lock, Eye, EyeOff, Settings, Video
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { getImageUrl } from "@/lib/utils";
@@ -185,9 +185,6 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                                 ))}
                             </div>
                         )}
-                    </div>
-                );
-
                     </div>
                 );
             
