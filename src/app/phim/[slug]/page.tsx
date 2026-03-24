@@ -322,7 +322,6 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             )}
                             sizes="100vw"
                             quality={100}
-                            unoptimized={true} 
                         />
                     </div>
                 )}
