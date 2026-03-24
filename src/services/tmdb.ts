@@ -97,11 +97,16 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
                     }
                 }
 
-                const res = await fetch(url, { next: { revalidate: 300 } });
-                const data = await res.json();
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3500);
 
-                // Quick pre-filter: if searching for a modern movie/show, reject ancient results 
-                const filteredResults = data.results?.filter((item: any) => {
+                try {
+                    const res = await fetch(url, { signal: controller.signal, next: { revalidate: 300 } });
+                    const data = await res.json();
+                    clearTimeout(timeoutId);
+
+                    // Quick pre-filter: if searching for a modern movie/show, reject ancient results 
+                    const filteredResults = data.results?.filter((item: any) => {
                     if (!year || year < 2010) return true; // Don't filter old searches
                     const itemDate = endpoint === 'movie' ? item.release_date : item.first_air_date;
                     const itemYear = itemDate ? parseInt(itemDate.substring(0, 4)) : null;

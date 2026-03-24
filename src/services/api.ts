@@ -340,40 +340,52 @@ const enrichMoviesWithTMDB = async (movies: Movie[], maxItems = 18): Promise<Mov
     const head = movies.slice(0, limit);
     const tail = movies.slice(limit);
 
-    const enrichedHead = await Promise.all(head.map(async (movie) => {
-        try {
-            const query = movie.origin_name || movie.name;
-            if (!query) return movie;
-            const tmdb = await searchTMDBMovie(
-                query,
-                toValidYear(movie.year),
-                inferTmdbType(movie),
-                { originalName: movie.origin_name, localName: movie.name, countrySlug: movie.country?.[0]?.slug }
-            );
-            if (!tmdb) return movie;
+    const enrichedResults: Movie[] = [];
+    
+    // Split into batches of 5 to avoid connection saturation
+    const BATCH_SIZE = 5;
+    for (let i = 0; i < head.length; i += BATCH_SIZE) {
+        const batch = head.slice(i, i + BATCH_SIZE);
+        const batchResults = await Promise.all(batch.map(async (movie) => {
+            const controller = new AbortController();
+            const sid = setTimeout(() => controller.abort(), 2500); // Strict 2.5s per item
+            
+            try {
+                const query = movie.origin_name || movie.name;
+                if (!query) return movie;
+                const tmdb = await searchTMDBMovie(
+                    query,
+                    toValidYear(movie.year),
+                    inferTmdbType(movie),
+                    { originalName: movie.origin_name, localName: movie.name, countrySlug: movie.country?.[0]?.slug }
+                );
+                clearTimeout(sid);
+                if (!tmdb) return movie;
 
-            const tmdbYear = toValidYear((tmdb as any).release_date || (tmdb as any).first_air_date);
-            const tmdbPoster = (tmdb as any).poster_path ? `https://image.tmdb.org/t/p/w780${(tmdb as any).poster_path}` : "";
-            const tmdbBackdrop = (tmdb as any).backdrop_path ? `https://image.tmdb.org/t/p/original${(tmdb as any).backdrop_path}` : "";
+                const tmdbYear = toValidYear((tmdb as any).release_date || (tmdb as any).first_air_date);
+                const tmdbPoster = (tmdb as any).poster_path ? `https://image.tmdb.org/t/p/w780${(tmdb as any).poster_path}` : "";
+                const tmdbBackdrop = (tmdb as any).backdrop_path ? `https://image.tmdb.org/t/p/original${(tmdb as any).backdrop_path}` : "";
 
-            return normalizeMovieImageRoles({
-                ...movie,
-                year: tmdbYear || movie.year || 0,
-                // Prioritize TMDB images if they exist
-                poster_url: tmdbPoster || movie.poster_url,
-                thumb_url: tmdbBackdrop || movie.thumb_url,
-                tmdbData: {
-                    vote_average: (tmdb as any).vote_average,
-                    poster_path: (tmdb as any).poster_path,
-                    backdrop_path: (tmdb as any).backdrop_path,
-                },
-            } as Movie);
-        } catch {
-            return movie;
-        }
-    }));
+                return normalizeMovieImageRoles({
+                    ...movie,
+                    year: tmdbYear || movie.year || 0,
+                    poster_url: tmdbPoster || movie.poster_url,
+                    thumb_url: tmdbBackdrop || movie.thumb_url,
+                    tmdbData: {
+                        vote_average: (tmdb as any).vote_average,
+                        poster_path: (tmdb as any).poster_path,
+                        backdrop_path: (tmdb as any).backdrop_path,
+                    },
+                } as Movie);
+            } catch {
+                clearTimeout(sid);
+                return movie;
+            }
+        }));
+        enrichedResults.push(...batchResults);
+    }
 
-    return [...enrichedHead, ...tail];
+    return [...enrichedResults, ...tail];
 };
 
 // --- Ophim Native Extensions ---
