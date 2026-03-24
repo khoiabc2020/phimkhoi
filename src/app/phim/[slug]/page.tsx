@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic";
 import { getMovieDetail, getMoviesList } from "@/services/api";
+import { getMovieDetailFromCache } from "@/lib/movie-cache";
 import { Metadata } from "next";
 import Link from "next/link";
 import { Play, PlayCircle, Share2, Star, Clock, Film } from "lucide-react";
@@ -25,7 +26,9 @@ export const revalidate = 300;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params;
-    const data = await getMovieDetail(slug);
+    // [Elite Performance] Try cache first for metadata
+    const cached = await getMovieDetailFromCache(slug);
+    const data = cached || await getMovieDetail(slug);
     const movie: any = data?.movie;
     if (!movie) return { title: "Không tìm thấy phim - KHOIPHIM" };
 
@@ -77,7 +80,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function MovieDetailPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
-    const data = await getMovieDetail(slug);
+    // [Elite Performance] Optimistic detail load
+    const cached = await getMovieDetailFromCache(slug);
+    const data = cached || await getMovieDetail(slug);
 
     if (!data) {
         return <div className="text-center py-20 text-white">Không tìm thấy phim</div>;

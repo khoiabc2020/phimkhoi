@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { getMovieDetail, Movie } from "@/services/api";
+import { getMovieDetailFromCache } from "@/lib/movie-cache";
 import { getImageUrl, cn } from "@/lib/utils";
 import CommentSection from "@/components/CommentSection";
 import WatchEngagementBar from "@/components/WatchEngagementBar";
@@ -20,7 +21,9 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { slug, episode } = await params;
-    const data = await getMovieDetail(slug);
+    // [Elite Performance] Try cache first
+    const cached = await getMovieDetailFromCache(slug);
+    const data = cached || await getMovieDetail(slug);
     const movie = data?.movie as any;
     const servers = data?.episodes || [];
     let currentEpisode = null;
@@ -48,7 +51,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function WatchPage({ params }: PageProps) {
     const { slug, episode } = await params;
-    const data = await getMovieDetail(slug);
+    // [Elite Performance] Optimistic detail load for player
+    const cached = await getMovieDetailFromCache(slug);
+    const data = cached || await getMovieDetail(slug);
     if (!data?.movie) return notFound();
 
     const movie = data.movie as Movie;

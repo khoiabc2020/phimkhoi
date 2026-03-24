@@ -161,6 +161,66 @@ async function syncTrendingWithViewCount() {
             log(`  ✗ Error syncing ${type}: ${e.message}`);
         }
     }
+
+    // [Elite Persistence] Sync FULL details for all movies in TrendingCache
+    await syncFullMovieDetails();
+}
+
+async function syncFullMovieDetails() {
+    log('Syncing FULL movie details for all trending items...');
+    
+    // Get all slugs currently in cache
+    const caches = await TrendingCache.find({});
+    const allSlugs = new Set();
+    caches.forEach(c => c.movies.forEach(m => allSlugs.add(m.slug)));
+    
+    log(`  → Found ${allSlugs.size} unique trending slugs to hydrate`);
+    
+    let hydrated = 0;
+    const slugsArray = Array.from(allSlugs);
+    
+    for (const slug of slugsArray) {
+        try {
+            // Check if already synced recently (within 24h)
+            const existing = await Movie.findOne({ slug }).lean();
+            if (existing && existing.episodes && existing.episodes.length > 0 && 
+                existing.lastSynced && (new Date() - new Date(existing.lastSynced) < 86400000)) {
+                continue; 
+            }
+
+            // Fetch full detail (try KKPHIM first as it usually has better data)
+            const detailData = await fetchJson(`${KKPHIM_API}/v1/api/phim/${slug}`);
+            if (!detailData || !detailData.data?.item) continue;
+            
+            const item = detailData.data.item;
+            const episodes = detailData.data.episodes || [];
+
+            await Movie.findOneAndUpdate(
+                { slug },
+                { 
+                    $set: { 
+                        ...item, 
+                        episodes, 
+                        lastSynced: new Date(),
+                        content: item.content || existing?.content,
+                        actor: item.actor || existing?.actor,
+                        director: item.director || existing?.director
+                    } 
+                },
+                { upsert: true }
+            );
+            
+            hydrated++;
+            if (hydrated % 20 === 0) log(`    ... Hydrated ${hydrated}/${slugsArray.length} movies`);
+            
+            // Rate limit to be nice to the API
+            await new Promise(r => setTimeout(r, 200)); 
+        } catch (e) {
+            log(`  ✗ Error hydrating ${slug}: ${e.message}`);
+        }
+    }
+    
+    log(`  ✓ Successfully hydrated ${hydrated} movies with full metadata`);
 }
 
 async function syncTMDBTrending(timeWindow = 'day') {

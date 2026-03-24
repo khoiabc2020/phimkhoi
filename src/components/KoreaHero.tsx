@@ -111,7 +111,7 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                                 className="object-cover brightness-[0.45] contrast-[1.15]"
                                 priority
                                 decoding="async"
-                                quality={100}
+                                quality={85}
                                 sizes="100vw"
                             />
                         </div>
@@ -124,7 +124,7 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                                 className="object-cover brightness-[0.45] contrast-[1.15]"
                                 priority
                                 decoding="async"
-                                quality={100}
+                                quality={85}
                                 sizes="100vw"
                             />
                         </div>

@@ -4,6 +4,7 @@ import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
 import { getMoviesByCategory, getMenuData, getMoviesByCountry, Movie, getMovieDetail, getMoviesList, getMoviesByCountryAndCategory } from "@/services/api";
+import { getMoviesFromCache } from "@/lib/movie-cache";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
@@ -43,9 +44,20 @@ const FEATURED_ACTORS = [
 ];
 
 async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'default', minHeight = 380 }: { title: string; categorySlug: string; countrySlug: string; variant?: 'default' | 'sidebar'; minHeight?: number }) {
-    // Ưu tiên filter từ MovieCountry (lấy mẫu lớn 450 phim) để đảm bảo 100% phim thuộc đúng Quốc Gia (Hàn/Trung)
-    const data = await getMoviesByCountryAndCategory(countrySlug, categorySlug, 32);
-    const filteredMovies = data.items;
+    // [Elite Performance] Try regional cache first
+    const cachedData = await getMoviesFromCache(countrySlug, 1, 60);
+    let filteredMovies: Movie[] = [];
+    
+    if (cachedData) {
+        filteredMovies = cachedData.items.filter(m => 
+            categorySlug === 'all' || m.category?.some(c => c.slug === categorySlug)
+        ).slice(0, 32);
+    }
+
+    if (filteredMovies.length < 12) {
+        const data = await getMoviesByCountryAndCategory(countrySlug, categorySlug, 32);
+        filteredMovies = data.items;
+    }
     
     return (
         <LazySection minHeight={minHeight} className={variant === 'sidebar' ? "movie-row-sidebar" : "movie-row-standard"}>
@@ -55,7 +67,8 @@ async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'de
 }
 
 async function PhimTrungHome() {
-    const latest = await getMoviesByCountry("trung-quoc", 1, 14);
+    const cached = await getMoviesFromCache("trung-quoc", 1, 14);
+    const latest = cached || await getMoviesByCountry("trung-quoc", 1, 14);
 
     return (
         <div className="space-y-12 md:space-y-16 pb-12">
@@ -100,7 +113,8 @@ async function PhimTrungHome() {
 
 /** Legacy Grid Stream for Pagination pages */
 async function CountryGridStream({ slug, page }: { slug: string; page: number }) {
-    const data = await getMoviesByCountry(slug, page);
+    const cached = page <= 3 ? await getMoviesFromCache(slug, page, 60) : null;
+    const data = cached || await getMoviesByCountry(slug, page);
     
     if (!data.items || data.items.length === 0) {
         return <div className="py-20 text-center text-white/40">Không tìm thấy phim nào.</div>;
@@ -144,8 +158,8 @@ async function ChinaHeroWithData() {
 
     // [Hardening] Fallback to latest movies if featured slugs are missing
     if (filteredMovies.length === 0) {
-        const fallback = await getMoviesByCountry("trung-quoc", 1, 8);
-        filteredMovies = fallback.items;
+        const cached = await getMoviesFromCache("trung-quoc", 1, 20);
+        filteredMovies = cached ? cached.items.slice(0, 8) : (await getMoviesByCountry("trung-quoc", 1, 8)).items;
     }
 
     return <ChinaHero initialMovies={filteredMovies} />;
