@@ -51,8 +51,48 @@ export const getMovieDetailFromCache = async (slug: string): Promise<any | null>
             movie,
             episodes: movie.episodes
         };
+/**
+ * [Elite Persistence] Save movie details to MongoDB on-demand (JIT)
+ */
+export const saveMovieToCache = async (slug: string, data: any) => {
+    try {
+        await dbConnect();
+        // Normalize different API response structures
+        const movie = data.movie || data.data?.item;
+        const episodes = data.episodes || data.data?.episodes || [];
+        if (!movie) return;
+
+        const pathImage = data.pathImage || data.data?.pathImage || "";
+        
+        // Basic normalization
+        let thumb_url = movie.thumb_url?.startsWith('http') ? movie.thumb_url : (pathImage + movie.thumb_url);
+        let poster_url = movie.poster_url?.startsWith('http') ? movie.poster_url : (pathImage + movie.poster_url);
+
+        // NguonC Swap logic (NguonC specific signature)
+        if (data.status === 'success' && data.movie && !data.data) {
+             const temp = thumb_url;
+             thumb_url = poster_url;
+             poster_url = temp;
+        }
+
+        const { _id, id: movie_id, ...rest } = movie;
+        const finalId = _id || movie_id || movie.slug;
+
+        await MovieModel.findOneAndUpdate(
+            { slug },
+            { 
+                $set: { 
+                    ...rest,
+                    _id: String(finalId),
+                    thumb_url,
+                    poster_url,
+                    episodes,
+                    updatedAt: new Date()
+                } 
+            },
+            { upsert: true, setDefaultsOnInsert: true }
+        );
     } catch (error) {
-        console.error(`[MovieCache] Detail Fetch Error [${slug}]:`, error);
-        return null;
+        console.warn(`[MovieCache] Save Error [${slug}]:`, error);
     }
 };
