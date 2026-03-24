@@ -100,6 +100,13 @@ export default function VideoPlayer({
     const streamUrl = m3u8 || url;
     const [fallbackIframe, setFallbackIframe] = useState(false);
     const [showSkipAd, setShowSkipAd] = useState(false);
+    const [useProxy, setUseProxy] = useState(false); // New state to trigger proxy
+
+    // Logic to determine the final stream URL (potentially proxied)
+    const finalStreamUrl = useProxy 
+        ? `/api/hls-proxy?url=${encodeURIComponent(streamUrl)}`
+        : streamUrl;
+
     const shouldUseArtPlayer = !fallbackIframe && isDirectStream(streamUrl);
     const AD_START = 900;  // 15:00
     const AD_END = 930;    // 15:30
@@ -183,7 +190,7 @@ export default function VideoPlayer({
 
                 art = new Artplayer({
                     container: artRef.current!,
-                    url: streamUrl,
+                    url: finalStreamUrl,
                     type: isHls ? "m3u8" : "",
                     autoplay: true,
                     autoSize: false,
@@ -393,35 +400,49 @@ export default function VideoPlayer({
                     handleVideoEnd();
                 });
 
-                // Nếu player báo lỗi (nguồn chặn, HLS lỗi, CORS...), fallback sang iframe embed gốc
-                // Chờ 1s để tránh trường hợp HLS proxy đang khởi tạo chậm
+                // Nếu player báo lỗi (nguồn chặn, HLS lỗi, CORS...), thử qua PROXY trước khi sang iframe
                 art.on("error", () => {
                     setTimeout(() => {
                         if (artInstance.current && artInstance.current.video && artInstance.current.video.readyState === 0) {
-                            onPlayerError?.();
-                            setFallbackIframe(true);
+                            if (!useProxy) {
+                                console.log("ArtPlayer error detected, retrying with Proxy...");
+                                setUseProxy(true);
+                            } else {
+                                console.warn("ArtPlayer failed even with proxy, falling back to Iframe...");
+                                onPlayerError?.();
+                                setFallbackIframe(true);
+                            }
                         }
-                    }, 5000); // Tăng lên 5s để đảm bảo proxy tải xong trên mọi đường truyền
+                    }, 4000); 
                 });
                 art.on("video:error", () => {
                     setTimeout(() => {
                         if (artInstance.current && artInstance.current.video && artInstance.current.video.readyState === 0) {
-                            onPlayerError?.();
-                            setFallbackIframe(true);
+                            if (!useProxy) {
+                                console.log("ArtPlayer video error, retrying with Proxy...");
+                                setUseProxy(true);
+                            } else {
+                                setFallbackIframe(true);
+                                onPlayerError?.();
+                            }
                         }
-                    }, 5000); // Tăng lên 5s để đảm bảo proxy tải xong trên mọi đường truyền
+                    }, 4000);
                 });
 
-                // Thêm một timeout an toàn: nếu sau 10s vẫn không play được thì cũng fallback
+                // Thêm một timeout an toàn: nếu sau 10s vẫn không play được thì thử proxy hoặc fallback
                 setTimeout(() => {
                     try {
                         if (!art || !art.duration || Number.isNaN(art.duration)) {
-                            setFallbackIframe(true);
+                            if (!useProxy) {
+                                setUseProxy(true);
+                            } else {
+                                setFallbackIframe(true);
+                            }
                         }
                     } catch {
                         setFallbackIframe(true);
                     }
-                }, 10000);
+                }, 12000);
 
                 // Save on pause/destroy
                 const forceHistorySave = () => {
