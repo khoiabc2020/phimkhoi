@@ -3,10 +3,10 @@ import { getToken } from "next-auth/jwt";
 import type { NextRequest } from "next/server";
 
 /**
- * [Elite Security] Unified Middleware
+ * [Elite Security] Unified Proxy
  * Combines Zero-Leak Session Hardening and Navigation Route Protection.
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const token = await getToken({ req: request });
     
