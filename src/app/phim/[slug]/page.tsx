@@ -138,7 +138,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
             ]);
 
             const tmdbSearchVal = tmdbSearch.status === 'fulfilled' ? tmdbSearch.value : null;
-            const tmdbDetails = tmdbSearchVal ? await getTMDBDetails(tmdbSearchVal.id, type).catch(() => null) : null;
+            const tmdbDetails = tmdbSearchVal ? await getTMDBDetails(tmdbSearchVal.id, type).catch(() => null as any) : null;
             
             return {
                 tmdbDetails,
