@@ -332,8 +332,8 @@ const enrichMoviesWithTMDB = async (movies: Movie[], maxItems = 18): Promise<Mov
             if (!tmdb) return movie;
 
             const tmdbYear = toValidYear((tmdb as any).release_date || (tmdb as any).first_air_date);
-            const tmdbPoster = (tmdb as any).poster_path ? `https://image.tmdb.org/t/p/w500${(tmdb as any).poster_path}` : "";
-            const tmdbBackdrop = (tmdb as any).backdrop_path ? `https://image.tmdb.org/t/p/w1280${(tmdb as any).backdrop_path}` : "";
+            const tmdbPoster = (tmdb as any).poster_path ? `https://image.tmdb.org/t/p/w780${(tmdb as any).poster_path}` : "";
+            const tmdbBackdrop = (tmdb as any).backdrop_path ? `https://image.tmdb.org/t/p/original${(tmdb as any).backdrop_path}` : "";
 
             return normalizeMovieImageRoles({
                 ...movie,
