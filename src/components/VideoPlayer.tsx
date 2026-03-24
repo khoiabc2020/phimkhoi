@@ -398,14 +398,14 @@ export default function VideoPlayer({
                         if (artInstance.current && artInstance.current.video && artInstance.current.video.readyState === 0) {
                             setFallbackIframe(true);
                         }
-                    }, 3000); // Tăng lên 3s để đợi proxy phản hồi
+                    }, 1500); // 1.5s cho cảm giác "tức thì" hơn
                 });
                 art.on("video:error", () => {
                     setTimeout(() => {
                         if (artInstance.current && artInstance.current.video && artInstance.current.video.readyState === 0) {
                             setFallbackIframe(true);
                         }
-                    }, 3000); // Tăng lên 3s để đợi proxy phản hồi
+                    }, 1500); // 1.5s cho cảm giác "tức thì" hơn
                 });
 
                 // Thêm một timeout an toàn: nếu sau 10s vẫn không play được thì cũng fallback

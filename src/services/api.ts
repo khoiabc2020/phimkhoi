@@ -187,6 +187,9 @@ const mergeMovieImages = (primary: Movie, candidate: Movie): Movie => {
             // OPhim/NguonC "thumb" is portrait, "poster" is landscape.
             if (u.includes("-thumb.") || u.includes("/thumb-") || u.endsWith("/thumb.jpg") || u.endsWith("/thumb.png")) return "portrait";
             if (u.includes("-poster.") || u.includes("/poster-") || u.endsWith("/poster.jpg") || u.endsWith("/poster.png")) return "landscape";
+            
+            // NguonC specific horizontal suffixes (like -1.jpg, -2.jpg)
+            if (isNguonc && (u.includes("-1.") || u.includes("-2.") || u.includes("-backdrop"))) return "landscape";
         }
 
         if (u.includes("backdrop") || u.includes("banner") || u.includes("landscape") || u.includes("horizontal")) return "landscape";
