@@ -19,6 +19,7 @@ async function ensureCacheDir() {
 
 // Memory fallback to avoid hitting disk too often for the same session
 const memoryCache = new Map<string, { contentType: string; buffer: Buffer }>();
+const MAX_MEM_CACHE = 150; // Balanced limit for 2GB RAM VPS
 
 const ALLOWED_DOMAINS = [
     'phimimg.com', 'ophim17.cc', 'ophim1.com', 'kkphim.vip',
@@ -69,6 +70,7 @@ export async function GET(req: NextRequest) {
             const buffer = await fs.readFile(cachePath);
             const contentType = 'image/webp';
             
+            if (memoryCache.size >= MAX_MEM_CACHE) memoryCache.clear();
             memoryCache.set(memKey, { contentType, buffer });
             return new Response(new Uint8Array(buffer), {
                 headers: {
@@ -113,6 +115,7 @@ export async function GET(req: NextRequest) {
         // 6. Save to Disk & Memory
         try {
             await fs.writeFile(cachePath, buffer);
+            if (memoryCache.size >= MAX_MEM_CACHE) memoryCache.clear();
             memoryCache.set(memKey, { contentType, buffer });
         } catch (e) {
             console.error("Failed to write image cache:", e);
