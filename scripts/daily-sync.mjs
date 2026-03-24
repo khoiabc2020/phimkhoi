@@ -39,6 +39,35 @@ function fetchJson(url) {
     });
 }
 
+/** Fetch TMDB data for a movie/tv show */
+async function fetchTMDBData(name, originName, year) {
+    if (!TMDB_API_KEY) return null;
+    try {
+        // Try original name first (more accurate on TMDB)
+        const queries = [originName, name].filter(Boolean);
+        for (const q of queries) {
+            const encoded = encodeURIComponent(q);
+            const url = `${TMDB_API_URL}/search/multi?api_key=${TMDB_API_KEY}&query=${encoded}&language=vi-VN&page=1`;
+            const data = await fetchJson(url);
+            if (data?.results?.length > 0) {
+                // Find best match (year match or just the first result)
+                let match = data.results[0];
+                if (year) {
+                    const found = data.results.find(r => {
+                        const rYear = (r.release_date || r.first_air_date || '').substring(0, 4);
+                        return Math.abs(parseInt(rYear) - parseInt(year)) <= 1;
+                    });
+                    if (found) match = found;
+                }
+                return match;
+            }
+        }
+    } catch (e) {
+        return null;
+    }
+    return null;
+}
+
 function getItems(data) {
     if (!data) return [];
     if (Array.isArray(data.items)) return data.items;
@@ -257,12 +286,20 @@ async function syncFullMovieDetails() {
                 const episodes = detailData.data.episodes || [];
 
                 const { _id, ...itemData } = item;
+                
+                // [Elite Enrichment] Fetch TMDB data if missing
+                let tmdbData = existing?.tmdbData;
+                if (!tmdbData) {
+                    tmdbData = await fetchTMDBData(itemData.name, itemData.origin_name, itemData.year);
+                }
+
                 await Movie.findOneAndUpdate(
                     { slug },
                     { 
                         $set: { 
                             ...itemData, 
                             episodes, 
+                            tmdbData,
                             lastSynced: new Date()
                         } 
                     },
@@ -442,9 +479,12 @@ async function hydrateAllMovies() {
                 if (itemData.thumb_url && !itemData.thumb_url.startsWith('http')) itemData.thumb_url = pathImage + itemData.thumb_url;
                 if (itemData.poster_url && !itemData.poster_url.startsWith('http')) itemData.poster_url = pathImage + itemData.poster_url;
 
+                // [Elite Enrichment] Fetch TMDB data
+                const tmdbData = await fetchTMDBData(itemData.name, itemData.origin_name, itemData.year);
+
                 await Movie.findOneAndUpdate(
                     { slug },
-                    { $set: { ...itemData, episodes, lastSynced: new Date() } },
+                    { $set: { ...itemData, episodes, tmdbData, lastSynced: new Date() } },
                     { upsert: true }
                 );
                 hydrated++;
