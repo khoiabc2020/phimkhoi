@@ -128,8 +128,9 @@ async function syncMovieList(type, pages = 1, limitPerPage = 48) {
         const nguoncItems = (nguoncRes?.items || []).map(item => ({
             ...item,
             _id: item.id || item.slug,
-            thumb_url: item.thumb_url, // NguonC usually provides full URLs or different format
-            poster_url: item.poster_url
+            // NguonC: thumb is vertical, poster is horizontal -> Swap to match our standard
+            thumb_url: item.poster_url, 
+            poster_url: item.thumb_url
         }));
 
         if (kkItems.length === 0 && ophimItems.length === 0 && nguoncItems.length === 0) break;
