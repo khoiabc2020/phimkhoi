@@ -16,6 +16,7 @@ dotenv.config({ path: path.join(__dirname, '../.env.local') });
 
 const KKPHIM_API = 'https://phimapi.com';
 const OPHIM_API = 'https://ophim1.com';
+const NGUONC_API = 'https://phim.nguonc.com';
 const TMDB_API_URL = 'https://api.themoviedb.org/3';
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/phimkhoi';
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
@@ -93,16 +94,47 @@ async function syncMovieList(type, pages = 1, limitPerPage = 48) {
     
     for (let page = 1; page <= pages; page++) {
         log(`  → Fetching page ${page}...`);
-        const [kkData, ophimData] = await Promise.all([
+        
+        // Translate type for NguonC (they use 'films' prefix in some cases)
+        let nguoncUrl = `${NGUONC_API}/api/films/the-loai/${type}?page=${page}`;
+        if (['phim-bo', 'phim-le', 'tv-shows', 'hoat-hinh'].includes(type) || type.startsWith('phim-')) {
+            nguoncUrl = `${NGUONC_API}/api/films/danh-sach/${type}?page=${page}`;
+        }
+        if (['han-quoc', 'trung-quoc', 'viet-nam'].includes(type)) {
+            nguoncUrl = `${NGUONC_API}/api/films/quoc-gia/${type}?page=${page}`;
+        }
+
+        const [kkRes, ophimRes, nguoncRes] = await Promise.all([
             fetchJson(`${KKPHIM_API}/v1/api/danh-sach/${type}?page=${page}&limit=${limitPerPage}&sort_field=modified.time`),
-            fetchJson(`${OPHIM_API}/v1/api/danh-sach/${type}?page=${page}&limit=${limitPerPage}&sort_field=modified.time`)
+            fetchJson(`${OPHIM_API}/v1/api/danh-sach/${type}?page=${page}&limit=${limitPerPage}&sort_field=modified.time`),
+            fetchJson(nguoncUrl)
         ]);
 
-        const kkItems = getItems(kkData);
-        const ophimItems = getItems(ophimData);
-        if (kkItems.length === 0 && ophimItems.length === 0) break;
+        const kkPathImage = kkRes?.pathImage || kkRes?.data?.pathImage || "";
+        const ophimPathImage = ophimRes?.pathImage || ophimRes?.data?.pathImage || "https://img.ophim.live/uploads/movies/";
+
+        const kkItems = getItems(kkRes).map(item => ({
+            ...item,
+            thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : (kkPathImage + item.thumb_url),
+            poster_url: item.poster_url?.startsWith('http') ? item.poster_url : (kkPathImage + item.poster_url)
+        }));
         
-        allItems = [...allItems, ...kkItems, ...ophimItems];
+        const ophimItems = getItems(ophimRes).map(item => ({
+            ...item,
+            thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : (ophimPathImage + item.thumb_url),
+            poster_url: item.poster_url?.startsWith('http') ? item.poster_url : (ophimPathImage + item.poster_url)
+        }));
+
+        const nguoncItems = (nguoncRes?.items || []).map(item => ({
+            ...item,
+            _id: item.id || item.slug,
+            thumb_url: item.thumb_url, // NguonC usually provides full URLs or different format
+            poster_url: item.poster_url
+        }));
+
+        if (kkItems.length === 0 && ophimItems.length === 0 && nguoncItems.length === 0) break;
+        
+        allItems = [...allItems, ...kkItems, ...ophimItems, ...nguoncItems];
     }
 
     // Deduplicate by slug
@@ -154,7 +186,7 @@ async function syncTrendingWithViewCount(deep = false) {
     log(`Syncing trending sorted by view count (deep=${deep})...`);
 
     const lists = ['phim-bo', 'phim-le', 'hoat-hinh', 'tv-shows', 'phim-chieu-rap', 'phim-moi-cap-nhat', 'trung-quoc', 'han-quoc', 'viet-nam'];
-    const pagesToSync = deep ? 50 : 15;
+    const pagesToSync = deep ? 100 : 15;
 
     // Parallel sync for categories
     await Promise.all(lists.map(async (type) => {
@@ -198,10 +230,24 @@ async function syncFullMovieDetails() {
                     return; 
                 }
 
-                // 2. Fetch full detail (try KKPHIM first, then OPHIM as fallback)
+                // 2. Fetch full detail (try KKPHIM first, then OPHIM, then NguonC)
                 let detailData = await fetchJson(`${KKPHIM_API}/v1/api/phim/${slug}`);
                 if (!detailData || !detailData.data?.item) {
                     detailData = await fetchJson(`${OPHIM_API}/v1/api/phim/${slug}`);
+                }
+                if (!detailData || !detailData.data?.item) {
+                    const nc = await fetchJson(`${NGUONC_API}/api/film/${slug}`);
+                    if (nc?.status === 'success') {
+                        detailData = {
+                            data: {
+                                item: { ...nc.movie, thumb_url: nc.movie.poster_url, poster_url: nc.movie.thumb_url },
+                                episodes: nc.movie.episodes?.map(e => ({
+                                    server_name: e.server_name,
+                                    server_data: e.items?.map(it => ({ name: it.name, slug: it.slug, link_embed: it.embed, link_m3u8: it.m3u8 }))
+                                })) || []
+                            }
+                        };
+                    }
                 }
                 
                 if (!detailData || !detailData.data?.item) return;
@@ -330,11 +376,12 @@ async function syncTMDBTrending(timeWindow = 'day') {
 
 async function hydrateAllMovies() {
     log('=== FULL LIBRARY HYDRATION MODE ===');
-    // Find all movies that have no episodes (dark cards)
+    // Find all movies that have no episodes (dark cards) OR relative image paths
     const missingData = await Movie.find(
         { $or: [
             { episodes: { $in: [null, [], undefined] } },
             { thumb_url: { $in: [null, '', undefined] } },
+            { thumb_url: { $not: /^http/ } }, // Catch relative paths like "uploads/..."
         ]},
         { slug: 1, _id: 0 }
     ).lean();
@@ -355,11 +402,44 @@ async function hydrateAllMovies() {
                 if (!detailData?.data?.item) {
                     detailData = await fetchJson(`${OPHIM_API}/v1/api/phim/${slug}`);
                 }
+                // Try NguonC fallback too for detail
+                if (!detailData?.data?.item) {
+                    const nc = await fetchJson(`${NGUONC_API}/api/film/${slug}`);
+                    if (nc?.status === 'success') {
+                        // Normalize NguonC detail to match our expected structure
+                        detailData = {
+                            data: {
+                                item: {
+                                    ...nc.movie,
+                                    origin_name: nc.movie.original_name,
+                                    content: nc.movie.description,
+                                    thumb_url: nc.movie.poster_url, // NguonC flips these
+                                    poster_url: nc.movie.thumb_url
+                                },
+                                episodes: nc.movie.episodes?.map(e => ({
+                                    server_name: e.server_name,
+                                    server_data: e.items?.map(it => ({
+                                        name: it.name,
+                                        slug: it.slug,
+                                        link_embed: it.embed,
+                                        link_m3u8: it.m3u8
+                                    }))
+                                })) || []
+                            }
+                        };
+                    }
+                }
                 if (!detailData?.data?.item) { failed++; return; }
 
                 const item = detailData.data.item;
                 const episodes = detailData.data.episodes || [];
+                const pathImage = detailData.data?.pathImage || detailData.pathImage || "";
+                
                 const { _id, ...itemData } = item;
+                
+                // Final safety: ensure absolute URLs in DB
+                if (itemData.thumb_url && !itemData.thumb_url.startsWith('http')) itemData.thumb_url = pathImage + itemData.thumb_url;
+                if (itemData.poster_url && !itemData.poster_url.startsWith('http')) itemData.poster_url = pathImage + itemData.poster_url;
 
                 await Movie.findOneAndUpdate(
                     { slug },

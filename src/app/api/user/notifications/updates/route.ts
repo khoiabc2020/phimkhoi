@@ -10,19 +10,11 @@ export async function GET(req: NextRequest) {
     }
 
     try {
-        // 1. Fetch user's favorites from DB via internal API
-        // We use the absolute URL for the server-side fetch
-        const favoritesRes = await fetch(`${process.env.NEXTAUTH_URL || "http://localhost:3000"}/api/user/favorites`, {
-            headers: { cookie: req.headers.get("cookie") || "" },
-            cache: 'no-store'
-        });
-        
-        if (!favoritesRes.ok) throw new Error("Failed to fetch favorites");
-        
-        const favoritesData = await favoritesRes.json();
-        const favorites = favoritesData.favorites || [];
+        // 1. Fetch user's favorites from DB directly
+        const Favorite = (await import("@/models/Favorite")).default;
+        const favorites = await Favorite.find({ userId: session.user.id }).lean();
 
-        if (favorites.length === 0) {
+        if (!favorites || favorites.length === 0) {
             return NextResponse.json({ notifications: [] });
         }
 
