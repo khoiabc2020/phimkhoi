@@ -1,5 +1,3 @@
-import dbConnect from "@/lib/db";
-import TrendingCache from "@/models/TrendingCache";
 export const API_URL = "https://phimapi.com";
 
 export interface Movie {
@@ -810,50 +808,9 @@ const normalizeOphimItem = (item: any, pathImage: string): Movie => {
     } as Movie;
 };
 
-/**
- * [Elite Performance] Fetch movie list from MongoDB cache if available.
- * Supports high-density Page 1 loads for major categories and regions.
- */
-export const getMoviesFromCache = async (type: string, page: number = 1, limit: number = 28): Promise<{ items: Movie[], pagination: any } | null> => {
-    try {
-        await dbConnect();
-        const cache = await TrendingCache.findOne({ type }).lean();
-        if (!cache || !cache.movies || cache.movies.length === 0) return null;
-
-        const allMovies = cache.movies as Movie[];
-        const totalItems = allMovies.length;
-        const totalPages = Math.ceil(totalItems / limit);
-        const startIndex = (page - 1) * limit;
-        const paginatedItems = allMovies.slice(startIndex, startIndex + limit);
-
-        if (paginatedItems.length === 0) return null;
-
-        return {
-            items: paginatedItems,
-            pagination: {
-                totalItems,
-                totalPages,
-                currentPage: page,
-                totalItemsPerPage: limit
-            }
-        };
-    } catch (error) {
-        console.error(`Cache Fetch Error [${type}]:`, error);
-        return null;
-    }
-};
-
 export const getMoviesList = async (type: string, params: { page?: number; year?: number; category?: string; country?: string; limit?: number; quality?: string } = {}) => {
     try {
         const { page = 1, year, category, country, limit = 28, quality } = params;
-        
-        // --- [Elite Performance] DB Cache Interception ---
-        // If it's a standard list request (Page 1-2, no complex filters), use DB Cache
-        if (!year && !category && !country && !quality && page <= 3) {
-            const cachedData = await getMoviesFromCache(type, page, limit);
-            if (cachedData) return cachedData;
-        }
-
         let query = `?page=${page}&limit=${limit}`;
         if (year) query += `&year=${year}`;
         if (category) query += `&category=${category}`;
@@ -1140,19 +1097,6 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
 
 
 export const getMoviesByCountryAndCategory = async (countrySlug: string, categorySlug: string, limit: number = 24) => {
-    // [Elite Performance] Try regional cache first (e.g. trung-quoc, han-quoc)
-    // The daily-sync script now populates these specific slugs with high-density data.
-    const cachedData = await getMoviesFromCache(countrySlug, 1, limit);
-    if (cachedData) {
-        // Filter by category within the cached regional list if possible
-        const filtered = cachedData.items.filter(m => 
-            categorySlug === 'all' || m.category?.some(c => c.slug === categorySlug)
-        );
-        if (filtered.length >= limit / 2) {
-             return { items: filtered.slice(0, limit), pagination: { currentPage: 1, totalPages: 1 } };
-        }
-    }
-
     try {
         // --- ELITE REGIONAL ENFORCEMENT ---
         // Slugs to merge for "Cổ Trang" row depth

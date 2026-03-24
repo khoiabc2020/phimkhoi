@@ -3,6 +3,7 @@ import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
 import { getMoviesList, getMenuData } from "@/services/api";
+import { getMoviesFromCache } from "@/lib/movie-cache";
 import { Metadata } from "next";
 
 // Revalidate mỗi 5 phút - cân bằng giữa freshness và server load
@@ -82,14 +83,24 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
     const { categories, countries } = await getMenuData();
     const typeName = TYPE_NAMES[type] || type;
 
-    // Handle special case for 'phim-moi-cap-nhat' vs 'danh-sach'
+    // [Elite Performance] Try DB Cache on page 1-3 with no complex filters
     let data;
     try {
-        if (type === 'phim-moi' || type === 'tat-ca-the-loai') {
-            const endpoint = type === 'tat-ca-the-loai' ? 'phim-moi-cap-nhat' : type;
-            data = await getMoviesList(endpoint, { page, year, category, country, quality, limit });
-        } else {
-            data = await getMoviesList(type, { page, year, category, country, quality, limit });
+        if (!year && !category && !country && !quality && page <= 3) {
+            const endpoint = type === 'tat-ca-the-loai' ? 'phim-moi-cap-nhat' : (type === 'phim-moi' ? 'phim-moi' : type);
+            const cached = await getMoviesFromCache(endpoint, page, limit);
+            if (cached) {
+                data = cached;
+            }
+        }
+
+        if (!data) {
+            if (type === 'phim-moi' || type === 'tat-ca-the-loai') {
+                const endpoint = type === 'tat-ca-the-loai' ? 'phim-moi-cap-nhat' : type;
+                data = await getMoviesList(endpoint, { page, year, category, country, quality, limit });
+            } else {
+                data = await getMoviesList(type, { page, year, category, country, quality, limit });
+            }
         }
     } catch (error) {
         console.error("Catalog Error", error);
