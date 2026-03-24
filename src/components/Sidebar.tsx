@@ -19,7 +19,7 @@ const navItems = [
     { name: "Trang chủ", href: "/", icon: Home },
     { name: "Phim Hàn", href: "/phim-han", icon: Tv },
     { name: "Phim Trung", href: "/phim-trung", icon: Video },
-    { name: "Duyệt Tìm", href: "/tim-kiem", icon: LayoutGrid },
+    { name: "Duyệt Tìm", href: "/loc-phim", icon: Search },
     { name: "Chủ đề", href: "/the-loai", icon: Hash },
     { name: "Thư viện", href: "/thu-vien", icon: Library },
     { name: "Lịch sử", href: "/lich-su-xem", icon: History },
@@ -34,7 +34,7 @@ export default function Sidebar() {
     }
 
     return (
-        <aside className="fixed left-0 top-[54px] lg:top-[64px] bottom-0 z-40 hidden lg:flex flex-col w-20 bg-transparent transition-all duration-300 overflow-y-auto no-scrollbar">
+        <aside className="fixed left-0 top-[54px] lg:top-[64px] bottom-0 z-[100] hidden lg:flex flex-col w-20 bg-transparent transition-all duration-300 border-r border-white/5 overflow-y-auto no-scrollbar">
             <div className="h-4 shrink-0" />
 
             {/* Navigation Section */}

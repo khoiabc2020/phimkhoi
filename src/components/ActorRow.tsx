@@ -55,9 +55,10 @@ const ActorRow = ({ title, actors }: ActorRowProps) => {
                         className="flex gap-6 md:gap-8 overflow-x-auto overflow-y-hidden px-4 sm:px-6 md:px-12 lg:pl-24 lg:pr-12 pb-6 no-scrollbar snap-x scroll-smooth"
                     >
                         {actors.map((actor, idx) => (
-                            <div 
+                            <Link 
                                 key={idx} 
-                                className="flex flex-col items-center gap-3 min-w-[100px] md:min-w-[140px] snap-start group/actor cursor-pointer"
+                                href={`/tim-kiem?keyword=${encodeURIComponent(actor.name)}`}
+                                className="flex flex-col items-center gap-3 min-w-[100px] md:min-w-[140px] snap-start group/actor"
                             >
                                 <div className="relative w-20 h-20 md:w-28 md:h-28 rounded-full overflow-hidden border-2 border-white/10 group-hover/actor:border-primary transition-all duration-300 shadow-xl group-hover/actor:scale-105 group-hover/actor:shadow-primary/20">
                                     <Image
@@ -70,7 +71,7 @@ const ActorRow = ({ title, actors }: ActorRowProps) => {
                                 <span className="text-sm md:text-base font-semibold text-white/70 group-hover/actor:text-primary transition-colors text-center truncate w-full">
                                     {actor.name}
                                 </span>
-                            </div>
+                            </Link>
                         ))}
                     </div>
 

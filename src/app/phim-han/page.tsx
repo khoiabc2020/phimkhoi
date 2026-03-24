@@ -135,7 +135,15 @@ async function KoreaHeroWithData() {
         })
     );
 
-    return <KoreaHero initialMovies={movieDetails.filter(Boolean)} />;
+    let filteredMovies = movieDetails.filter(Boolean);
+
+    // [Hardening] Fallback to latest movies if featured slugs are missing
+    if (filteredMovies.length === 0) {
+        const fallback = await getMoviesByCountry("han-quoc", 1, 8);
+        filteredMovies = fallback.items;
+    }
+
+    return <KoreaHero initialMovies={filteredMovies} />;
 }
 
 export default async function PhimHanPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
@@ -164,7 +172,7 @@ export default async function PhimHanPage({ searchParams }: { searchParams: Prom
             )}
 
             <div className={cn(
-                "relative z-50",
+                "relative z-10", // Lowered z-index to stay below Header/Sidebar z-100
                 currentPage === 1 ? "" : "pt-24",
                 "lg:pl-20"
             )}>
