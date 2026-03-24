@@ -38,6 +38,9 @@ export const getTMDBConfig = async () => {
 const cleanQueryString = (query: string) => {
     return query
         .replace(/Vietsub|Thuyết Minh|Lồng Tiếng|Tập \d+/gi, "")
+        .replace(/\d+D/gi, "") // Remove 3D, 4D etc
+        .replace(/Phần \d+|Season \d+|SS\d+/gi, "") 
+        .replace(/\(.*\)/g, "") // Remove parenthetical info
         .replace(/\s+/g, " ")
         .trim();
 };

@@ -39,18 +39,36 @@ function fetchJson(url) {
     });
 }
 
-/** Fetch TMDB data for a movie/tv show */
-async function fetchTMDBData(name, originName, year) {
+/**
+ * Improved TMDB search for sync script (Standardized with tmdb.ts)
+ */
+async function searchTMDBMovie(query, year, type = 'movie') {
     if (!TMDB_API_KEY) return null;
+    
+    // Cleaning logic
+    const cleanQuery = query
+        .replace(/Vietsub|Thuyết Minh|Lồng Tiếng|Tập \d+/gi, "")
+        .replace(/\d+D/gi, "") 
+        .replace(/Phần \d+|Season \d+|SS\d+/gi, "") 
+        .replace(/\(.*\)/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+
     try {
-        // Try original name first (more accurate on TMDB)
-        const queries = [originName, name].filter(Boolean);
-        for (const q of queries) {
-            const encoded = encodeURIComponent(q);
-            const url = `${TMDB_API_URL}/search/multi?api_key=${TMDB_API_KEY}&query=${encoded}&language=vi-VN&page=1`;
+        const endpoint = type === 'tv' ? 'tv' : 'movie';
+        // Try with original language/region if it looks like an Asian title
+        const locales = ['vi-VN', 'zh-TW', 'en-US'];
+        
+        for (const locale of locales) {
+            let url = `${TMDB_API_URL}/search/${endpoint}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanQuery)}&language=${locale}`;
+            if (year) {
+                if (endpoint === 'movie') url += `&primary_release_year=${year}`;
+                else url += `&first_air_date_year=${year}`;
+            }
+
             const data = await fetchJson(url);
             if (data?.results?.length > 0) {
-                // Find best match (year match or just the first result)
+                // Return best match
                 let match = data.results[0];
                 if (year) {
                     const found = data.results.find(r => {
@@ -59,9 +77,16 @@ async function fetchTMDBData(name, originName, year) {
                     });
                     if (found) match = found;
                 }
-                return match;
+                return { ...match, media_type: endpoint };
             }
         }
+        
+        // Fallback: search without year
+        if (year) return searchTMDBMovie(query, undefined, type);
+        
+        // Fallback: search other endpoint
+        if (type === 'movie') return searchTMDBMovie(query, year, 'tv');
+
     } catch (e) {
         return null;
     }

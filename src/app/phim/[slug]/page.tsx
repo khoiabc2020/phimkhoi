@@ -240,12 +240,18 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     const tmdbPoster = tmdbDetails?.poster_path ? getTMDBImage(tmdbDetails.poster_path, "original") : "";
 
     // 3. Selection Strategy:
-    // - Always show source thumb as the "Content Layer" to ensure correct movie identity.
-    // - Use TMDB Backdrop as the "Ambient Layer" ONLY if it exists and looks like a match.
-    //   (Actually, even if it's a slight mismatch, the blur [Layer 1] hides the details but provides the palette).
+    // - Prefer TMDB for high-quality ambient glow and subject if source is poor.
+    // - Use source thumb as a secondary content layer if TMDB fails.
+    
+    // [Elite Selection] If it's a NguonC movie (often poor quality), prioritize TMDB images
+    const isNguonC = movie?.episodes?.[0]?.server_name?.toLowerCase().includes('nguonc');
     
     const ambientBgUrl = tmdbBackdrop || sourceThumb || tmdbPoster || sourcePoster;
-    const contentSubjectUrl = sourceThumb || sourcePoster || tmdbBackdrop || tmdbPoster;
+    let contentSubjectUrl = sourceThumb || sourcePoster || tmdbBackdrop || tmdbPoster;
+    
+    if (isNguonC && (tmdbPoster || tmdbBackdrop)) {
+        contentSubjectUrl = tmdbPoster || tmdbBackdrop || sourceThumb || sourcePoster;
+    }
     
     // Determine subject style
     const subjectOrientation = detectOrientation(contentSubjectUrl);
