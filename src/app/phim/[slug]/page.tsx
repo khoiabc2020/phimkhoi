@@ -195,14 +195,11 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     const tmdbBackdrop = tmdbDetails?.backdrop_path ? getTMDBImage(tmdbDetails.backdrop_path, "original") : "";
     const tmdbPosterFallback = tmdbDetails?.poster_path ? getTMDBImage(tmdbDetails.poster_path, "original") : "";
 
-    // Verified source backdrop - User specifically requested "lấy ảnh backdrop của nguồn phim đi"
-    // For Asian dramas, the "thumb_url" usually contains the main actors (Snowy Couple).
     const sourceThumbUrl = movie?.thumb_url ? getImageUrl(movie.thumb_url) : "";
     const sourcePosterUrl = movie?.poster_url ? getImageUrl(movie.poster_url) : "";
     
-    // Final Backdrop Selection
-    // Priority: Source Thumb -> TMDB Backdrop -> TMDB Poster -> Source Poster
-    const backdropUrl = sourceThumbUrl || tmdbBackdrop || tmdbPosterFallback || sourcePosterUrl;
+    // Final Backdrop Selection: Prioritize high-RES TMDB data for "Elite" quality
+    const backdropUrl = tmdbBackdrop || sourceThumbUrl || tmdbPosterFallback || sourcePosterUrl;
     
     // We treat it as a "portrait" style (to apply blur/object-contain) if it's from source 
     // because source images are often smaller/differently aspected than pure backdrops.
