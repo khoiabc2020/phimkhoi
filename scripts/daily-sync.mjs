@@ -150,19 +150,20 @@ async function syncMovieList(type, pages = 1, limitPerPage = 48) {
     return unique.length;
 }
 
-async function syncTrendingWithViewCount() {
-    log('Syncing trending sorted by view count...');
+async function syncTrendingWithViewCount(deep = false) {
+    log(`Syncing trending sorted by view count (deep=${deep})...`);
 
     const lists = ['phim-bo', 'phim-le', 'hoat-hinh', 'tv-shows', 'phim-chieu-rap', 'phim-moi-cap-nhat', 'trung-quoc', 'han-quoc', 'viet-nam'];
+    const pagesToSync = deep ? 50 : 15;
 
-    for (const type of lists) {
+    // Parallel sync for categories
+    await Promise.all(lists.map(async (type) => {
         try {
-            // DEEP SATURATION: Quét 15 trang đầu của mỗi loại để đảm bảo 100% phim hot có mặt trong DB
-            await syncMovieList(type, 15, 48);
+            await syncMovieList(type, pagesToSync, 48);
         } catch (e) {
             log(`  ✗ Error syncing ${type}: ${e.message}`);
         }
-    }
+    }));
 
     // [Elite Persistence] Sync FULL details for all movies in TrendingCache
     await syncFullMovieDetails();
@@ -328,13 +329,14 @@ async function syncTMDBTrending(timeWindow = 'day') {
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
-    log('=== PhimKhoi Daily Sync Started ===');
+    const isFull = process.argv.includes('--full');
+    log(`=== PhimKhoi Daily Sync Started (Mode: ${isFull ? 'FULL' : 'QUICK'}) ===`);
 
     try {
         await mongoose.connect(MONGODB_URI);
         log('✓ Connected to MongoDB');
 
-        await syncTrendingWithViewCount();
+        await syncTrendingWithViewCount(isFull);
         await syncTMDBTrending('day');
         await syncTMDBTrending('week');
 
