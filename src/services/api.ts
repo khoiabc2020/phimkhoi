@@ -498,8 +498,8 @@ export const getHomeData = async () => {
                 }
             }
             const normalized = Array.from(bySlug.values()).map(normalizeMovieImageRoles);
-            // Enrich with TMDB images for "Elite" home page quality
-            return await enrichMoviesWithTMDB(normalized, 12);
+            // Enrich with TMDB images for "Elite" home page quality (Tăng giới hạn lên 24 phim)
+            return await enrichMoviesWithTMDB(normalized, 24);
         };
 
         const [
@@ -938,7 +938,8 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
         }
 
         const uniqueItems = Array.from(bySlug.values()).map(normalizeMovieImageRoles);
-        const enrichedItems = await enrichMoviesWithTMDB(uniqueItems, 16);
+        // Enrich with TMDB images (Tăng lên 24 phim để đảm bảo cả Hero và Row đều nét)
+        const enrichedItems = await enrichMoviesWithTMDB(uniqueItems, 24);
 
         return {
             items: enrichedItems,
@@ -1001,7 +1002,8 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
             }
         }
         const uniqueItems = Array.from(bySlug.values()).map(normalizeMovieImageRoles);
-        const enrichedItems = await enrichMoviesWithTMDB(uniqueItems, 16);
+        // Enrich with TMDB images (Tăng lên 24 phim để đảm bảo cả Hero và Row đều nét)
+        const enrichedItems = await enrichMoviesWithTMDB(uniqueItems, 24);
 
         return {
             items: enrichedItems,

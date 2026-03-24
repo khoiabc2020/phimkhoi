@@ -261,7 +261,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                     <div className="absolute inset-0 z-0 overflow-hidden">
                         <Image
                             src={getHeroImage(movie, "backdrop", "desktop").startsWith('http')
-                                ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(movie, "backdrop", "desktop"))}&w=1280&q=75`
+                                ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(movie, "backdrop", "desktop"))}&w=1920&q=85`
                                 : getHeroImage(movie, "backdrop", "desktop")
                             }
                             alt=""
