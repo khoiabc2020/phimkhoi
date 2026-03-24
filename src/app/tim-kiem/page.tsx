@@ -199,10 +199,10 @@ const SearchSkeleton = () => (
     </div>
 );
 
-export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q: string; category?: string; country?: string; year?: string }> }) {
+export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string; keyword?: string; category?: string; country?: string; year?: string }> }) {
     const sParams = await searchParams;
-    const { q, category, country, year } = sParams;
-    const keyword = (q || "").trim();
+    const { q, keyword: k, category, country, year } = sParams;
+    const keyword = (k || q || "").trim();
 
     return (
         <main className="min-h-screen pb-20">
