@@ -69,9 +69,9 @@ if [ $? -eq 0 ]; then
          -H "Content-Type: application/json" \
          --data '{"purge_everything":true}'
     
-    echo "Warming up trending cache (low priority)..."
-    # Run sync with 'nice' so it doesn't hog CPU - max_old_space 512MB
-    NODE_OPTIONS="--max_old_space_size=512" nice -n 19 node scripts/daily-sync.mjs || echo "Sync skipped"
+    echo "Warming up trending cache in BACKGROUND..."
+    # Run sync in background so deployment finishes instantly
+    NODE_OPTIONS="--max_old_space_size=512" nice -n 19 node scripts/daily-sync.mjs >> /var/log/phimkhoi-sync.log 2>&1 &
 
     echo "Installing cron job for automated 4-hour sync..."
     LOG_FILE="/var/log/phimkhoi-sync.log"
