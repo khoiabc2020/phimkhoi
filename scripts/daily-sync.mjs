@@ -86,17 +86,24 @@ const TrendingCache = mongoose.models.TrendingCache || mongoose.model('TrendingC
 
 // ── Sync Functions ────────────────────────────────────────────────────────────
 
-async function syncMovieList(type, limit = 48) {
-    log(`Syncing [${type}] limit=${limit}...`);
+async function syncMovieList(type, pages = 1, limitPerPage = 48) {
+    log(`Syncing [${type}] depth=${pages}...`);
+    
+    let allItems = [];
+    
+    for (let page = 1; page <= pages; page++) {
+        log(`  → Fetching page ${page}...`);
+        const [kkData, ophimData] = await Promise.all([
+            fetchJson(`${KKPHIM_API}/v1/api/danh-sach/${type}?page=${page}&limit=${limitPerPage}&sort_field=modified.time`),
+            fetchJson(`${OPHIM_API}/v1/api/danh-sach/${type}?page=${page}&limit=${limitPerPage}&sort_field=modified.time`)
+        ]);
 
-    const [kkData, ophimData] = await Promise.all([
-        fetchJson(`${KKPHIM_API}/v1/api/danh-sach/${type}?limit=${limit}&sort_field=modified.time`),
-        fetchJson(`${OPHIM_API}/v1/api/danh-sach/${type}?limit=${limit}&sort_field=modified.time`)
-    ]);
-
-    const kkItems = getItems(kkData);
-    const ophimItems = getItems(ophimData);
-    const allItems = [...kkItems, ...ophimItems];
+        const kkItems = getItems(kkData);
+        const ophimItems = getItems(ophimData);
+        if (kkItems.length === 0 && ophimItems.length === 0) break;
+        
+        allItems = [...allItems, ...kkItems, ...ophimItems];
+    }
 
     // Deduplicate by slug
     const seen = new Set();
@@ -115,7 +122,7 @@ async function syncMovieList(type, limit = 48) {
 
     log(`  → Found ${unique.length} unique movies for [${type}]`);
 
-    // Update cache collection
+    // Update cache collection (Elite Depth: 120 items)
     await TrendingCache.findOneAndUpdate(
         { type },
         { type, movies: unique.slice(0, 120), updatedAt: new Date() },
@@ -148,7 +155,8 @@ async function syncTrendingWithViewCount() {
 
     for (const type of lists) {
         try {
-            await syncMovieList(type, 48);
+            // DEEP SCAN: Quét 5 trang đầu của mỗi loại để đảm bảo không sót phim mới
+            await syncMovieList(type, 5, 48);
         } catch (e) {
             log(`  ✗ Error syncing ${type}: ${e.message}`);
         }

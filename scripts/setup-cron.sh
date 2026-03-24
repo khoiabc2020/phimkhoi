@@ -1,38 +1,31 @@
 #!/bin/bash
-# PhimKhoi VPS Setup Script - Cron Daily Sync
-# Chạy script này 1 lần trên VPS để cài đặt cron job
 
-set -e
+# [Elite Automation] PhimKhoi Cron Job Setup
+# Chạy script này trên VPS để tự động hóa việc đồng bộ phim.
 
-APP_DIR="/var/www/phimkhoi"
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LOG_FILE="/var/log/phimkhoi-sync.log"
-CRON_JOB="0 2 * * * cd $APP_DIR && node scripts/daily-sync.mjs >> $LOG_FILE 2>&1"
+CRON_SCHEDULE="0 */4 * * *" # Chạy mỗi 4 tiếng một lần
+SYNC_COMMAND="cd $PROJECT_DIR && /usr/bin/node scripts/daily-sync.mjs >> $LOG_FILE 2>&1"
 
-echo "=== PhimKhoi Cron Setup ==="
+echo "=== Cài đặt Elite Sync Automation ==="
+echo "Thư mục dự án: $PROJECT_DIR"
+echo "Lịch trình: $CRON_SCHEDULE (Mỗi 4 tiếng)"
 
-# Ensure scripts directory exists
-mkdir -p "$APP_DIR/scripts"
+# Đảm bảo file log có quyền ghi
+sudo touch $LOG_FILE
+sudo chmod 666 $LOG_FILE
 
-# Create log file
-touch "$LOG_FILE"
-chmod 644 "$LOG_FILE"
+# Xóa các dòng cron cũ của phimkhoi (nếu có) để tránh trùng lặp
+(crontab -l 2>/dev/null | grep -v "scripts/daily-sync.mjs") > mycron
 
-# Add cron job if not already present
-if ! crontab -l 2>/dev/null | grep -q "daily-sync.mjs"; then
-    (crontab -l 2>/dev/null; echo "$CRON_JOB") | crontab -
-    echo "✓ Cron job added: runs daily at 2:00 AM"
-else
-    echo "! Cron job already exists, skipping"
-fi
+# Thêm lệnh mới vào file tạm
+echo "$CRON_SCHEDULE $SYNC_COMMAND" >> mycron
 
-# Run sync now (first time)
-echo ""
-echo "Running initial sync now (this may take a few minutes)..."
-cd "$APP_DIR"
-MONGODB_URI="${MONGODB_URI:-$(grep MONGODB_URI .env | cut -d '=' -f2-)}" \
-    node scripts/daily-sync.mjs
+# Cài đặt lại crontab từ file tạm
+crontab mycron
+rm mycron
 
-echo ""
-echo "=== Setup Complete ==="
-echo "Cron: daily at 2:00 AM server time"
-echo "Log:  tail -f $LOG_FILE"
+echo "✓ Đã cài đặt Cron Job thành công!"
+echo "Ông có thể kiểm tra bằng lệnh: crontab -l"
+echo "Xem log đồng bộ tại: tail -f $LOG_FILE"
