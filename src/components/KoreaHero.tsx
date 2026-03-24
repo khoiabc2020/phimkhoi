@@ -222,7 +222,7 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                 ))}
             </div>
 
-            <div className="absolute inset-y-0 left-0 right-0 z-40 pointer-events-none flex items-center justify-between px-4 md:px-8 lg:pl-26 lg:pr-6 xl:pl-34 xl:pr-14">
+            <div className="absolute top-[40%] md:top-1/2 -translate-y-1/2 left-0 right-0 z-40 pointer-events-none flex items-center justify-between px-4 md:px-8 lg:pl-26 lg:pr-6 xl:pl-34 xl:pr-14">
                 <button 
                     onClick={prev}
                     className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-full bg-black/10 hover:bg-black/40 backdrop-blur-md border border-white/5 flex items-center justify-center text-white/20 hover:text-white hover:scale-110 active:scale-95 transition-all duration-300 group pointer-events-auto shadow-lg"

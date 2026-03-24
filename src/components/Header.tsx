@@ -250,9 +250,6 @@ export default function Header({ categories, countries }: HeaderProps) {
                                 )}
                             </div>
 
-                            <Link href="/loc-phim" className="flex items-center gap-1 px-3 py-1.5 rounded-full text-[13px] font-bold text-primary hover:bg-primary/10 transition-all border border-primary/20 shrink-0">
-                                <Filter className="w-3.5 h-3.5" /> Lọc phim
-                            </Link>
                             <Link href="/danh-sach/phim-moi-cap-nhat" className="hidden xl:block px-3 py-1.5 rounded-full text-[13px] font-medium text-white/70 hover:text-white">Phim mới</Link>
                             <Link href="/danh-sach/phim-bo" className="hidden 2xl:block px-3 py-1.5 rounded-full text-[13px] font-medium text-white/70 hover:text-white">Phim Bộ</Link>
                             <Link href="/danh-sach/phim-le" className="hidden 2xl:block px-3 py-1.5 rounded-full text-[13px] font-medium text-white/70 hover:text-white">Phim Lẻ</Link>
