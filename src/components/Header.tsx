@@ -381,19 +381,19 @@ export default function Header({ categories, countries }: HeaderProps) {
                                 <div className="w-9 h-9 rounded-full bg-white/5 animate-pulse" />
                             ) : session ? (
                                 <div className="relative group">
-                                    <button className="flex items-center gap-2 py-1 px-1 rounded-full hover:bg-white/5">
-                                        <div className="w-9 h-9 rounded-full overflow-hidden border border-white/10">
+                                    <button className="flex items-center gap-2 py-1 px-1 rounded-full hover:bg-white/5 group">
+                                        <div className="w-9 h-9 rounded-full overflow-hidden border border-white/10 ring-2 ring-transparent group-hover:ring-primary/40 transition-all">
                                             {session.user?.image ? (
                                                 <Image src={session.user.image} alt="" width={36} height={36} className="w-full h-full object-cover" />
                                             ) : (
-                                                <div className="w-full h-full flex items-center justify-center bg-gray-800 text-xs font-bold text-white uppercase">
+                                                <div className="w-full h-full flex items-center justify-center bg-zinc-800 text-xs font-bold text-white uppercase">
                                                     {session.user?.name?.[0]}
                                                 </div>
                                             )}
                                         </div>
                                         <ChevronDown className="hidden xl:block w-4 h-4 text-white/40 group-hover:rotate-180 transition-transform" />
                                     </button>
-                                    <div className="absolute right-0 top-full mt-2 w-52 bg-[#0a0a0c]/98 border border-white/10 rounded-xl p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all shadow-2xl">
+                                    <div className="absolute right-0 top-full mt-2 w-52 bg-[#0a0a0c]/98 border border-white/10 rounded-xl p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all shadow-2xl z-50">
                                         <Link href="/thong-tin-tai-khoan" className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 rounded-lg">
                                             <User className="w-4 h-4" /> <span>Hồ sơ</span>
                                         </Link>
@@ -403,12 +403,19 @@ export default function Header({ categories, countries }: HeaderProps) {
                                             </Link>
                                         )}
                                         <div className="h-px bg-white/5 my-1" />
-                                        <button onClick={() => signOut({ callbackUrl: "/login" })} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-400 hover:bg-red-500/5 rounded-lg">
+                                        <button onClick={() => signOut({ callbackUrl: "/login" })} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-400 hover:bg-red-500/5 rounded-lg text-left">
                                             <LogOut className="w-4 h-4" /> <span>Đăng xuất</span>
                                         </button>
                                     </div>
                                 </div>
-                            ) : null}
+                            ) : (
+                                <Link
+                                    href="/login"
+                                    className="px-5 py-2 rounded-full text-sm font-bold bg-white text-black hover:bg-white/90 transition-all active:scale-95"
+                                >
+                                    Đăng nhập
+                                </Link>
+                            )}
                         </div>
                     </div>
                 </div>

@@ -192,8 +192,8 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     //       PRIORITY 3 = TMDB Poster
     //       PRIORITY 4 = Source Poster (The Horse - least desired)
 
-    const tmdbBackdrop = tmdbDetails?.backdrop_path ? getTMDBImage(tmdbDetails.backdrop_path, "w1280") : "";
-    const tmdbPosterFallback = tmdbDetails?.poster_path ? getTMDBImage(tmdbDetails.poster_path, "w780") : "";
+    const tmdbBackdrop = tmdbDetails?.backdrop_path ? getTMDBImage(tmdbDetails.backdrop_path, "original") : "";
+    const tmdbPosterFallback = tmdbDetails?.poster_path ? getTMDBImage(tmdbDetails.poster_path, "original") : "";
 
     // Verified source backdrop - User specifically requested "lấy ảnh backdrop của nguồn phim đi"
     // For Asian dramas, the "thumb_url" usually contains the main actors (Snowy Couple).
@@ -275,7 +275,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             priority
                             className="object-cover opacity-[0.25] scale-125 blur-[120px] saturate-[2] brightness-[0.8]"
                             sizes="100vw"
-                            quality={10}
+                            quality={50}
                         />
                         {/* Layer 2: Main blurred texture (Subtle Texture) */}
                         <Image
@@ -285,7 +285,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             priority
                             className="object-cover object-[68%_22%] opacity-[0.35] scale-110 blur-[50px] brightness-[0.9]"
                             sizes="100vw"
-                            quality={60}
+                            quality={90}
                         />
                         {/* Layer 3: Sharp focused image on the right (The Subject) */}
                         <Image
