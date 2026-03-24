@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
         } else if (url.includes('kkphim') || url.includes('phim1280.tv') || url.includes('phimapi.com')) {
             referer = 'https://kkphim.com/';
             origin = 'https://kkphim.com';
-        } else if (url.includes('ophim1.com') || url.includes('img.ophim.live')) {
+        } else if (url.includes('ophim1.com') || url.includes('img.ophim.live') || url.includes('opstream')) {
             referer = 'https://ophim10.cc/';
             origin = 'https://ophim10.cc';
         }
