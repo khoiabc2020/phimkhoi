@@ -205,11 +205,11 @@ async function HeroStream() {
       }));
     } else {
       // 2. Không có Custom Hero -> Fallback tải dữ liệu top trending từ Database trực tiếp
-      const cache = await TrendingCache.findOne({ type: 'tmdb-trending-day' } as any).lean() as any;
+      const cache = await TrendingCache.findOne({ type: 'tmdb-trending-day' }).lean();
       finalHeroData = (cache?.movies || []).slice(0, 10);
       
       if (finalHeroData.length < 3) {
-        const backupCache = await TrendingCache.findOne({ type: 'phim-bo' } as any).lean() as any;
+        const backupCache = await TrendingCache.findOne({ type: 'phim-bo' }).lean();
         finalHeroData = (backupCache?.movies || []).slice(0, 10);
       }
     }

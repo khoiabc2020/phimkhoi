@@ -9,6 +9,13 @@ const trendingSchema = new mongoose.Schema({
     collection: 'trendingcache'
 });
 
-const TrendingCache = mongoose.models.TrendingCache || mongoose.model('TrendingCache', trendingSchema);
+interface ITrendingCache extends mongoose.Document {
+    type: string;
+    movies: any[];
+    updatedAt: Date;
+}
+
+const TrendingCache = (mongoose.models.TrendingCache as mongoose.Model<ITrendingCache>) || 
+                      mongoose.model<ITrendingCache>('TrendingCache', trendingSchema);
 
 export default TrendingCache;
