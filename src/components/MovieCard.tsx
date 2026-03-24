@@ -236,7 +236,7 @@ function MovieCard({
                         <div className="absolute top-1.5 left-1.5 z-40 pointer-events-none">
                             <div className="flex items-center gap-1 bg-black/80 text-white px-1.5 py-0.5 rounded-[4px] shadow-lg border border-white/10">
                                 <Star className="w-2.5 h-2.5 fill-yellow-400 stroke-yellow-400" />
-                                <span className="text-[10px] font-black tracking-tight">{(movie as any).tmdbData.vote_average.toFixed(1)}</span>
+                                <span className="text-[10px] font-bold tracking-tight">{(movie as any).tmdbData.vote_average.toFixed(1)}</span>
                             </div>
                         </div>
                     )}
@@ -244,12 +244,12 @@ function MovieCard({
                     {/* Top-Right: Status Badge (Inside Poster) */}
                     <div className="absolute top-1.5 right-1.5 z-40 pointer-events-none flex flex-col items-end gap-1">
                         {movie.episode_current && (
-                            <span className="bg-black/80 shadow-lg border border-white/10 text-white text-[9px] font-black px-1.5 py-0.5 rounded-[4px] tracking-tight whitespace-nowrap uppercase">
+                            <span className="bg-black/80 shadow-lg border border-white/10 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[4px] tracking-tight whitespace-nowrap uppercase">
                                 {movie.episode_current}
                             </span>
                         )}
                         {!movie.episode_current && formatQualityLabel(movie.quality) && (
-                            <span className="bg-[#009624]/90 border border-white/10 text-white text-[9px] font-black px-1.5 py-0.5 rounded-[4px] tracking-tight uppercase">
+                            <span className="bg-[#009624]/90 border border-white/10 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[4px] tracking-tight uppercase">
                                 {formatQualityLabel(movie.quality)}
                             </span>
                         )}
@@ -258,17 +258,17 @@ function MovieCard({
                     {/* Bottom-Left: Language Badges (Inside Poster) */}
                     <div className="absolute bottom-1.5 left-1.5 z-40 pointer-events-none flex flex-wrap gap-1">
                         {langFlags.showSub && (
-                            <span className="bg-[#E50914]/90 shadow-lg border border-white/10 text-white text-[9px] font-black px-1.5 py-0.5 rounded-[3px] tracking-tight uppercase">
+                            <span className="bg-[#E50914]/90 shadow-lg border border-white/10 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[3px] tracking-tight uppercase">
                                 P.Đề
                             </span>
                         )}
                         {langFlags.showTM && (
-                            <span className="bg-[#0070f3]/90 shadow-lg border border-white/10 text-white text-[9px] font-black px-1.5 py-0.5 rounded-[3px] tracking-tight uppercase">
+                            <span className="bg-[#0070f3]/90 shadow-lg border border-white/10 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[3px] tracking-tight uppercase">
                                 T.Minh
                             </span>
                         )}
                         {langFlags.showLT && (
-                            <span className="bg-[#00A859]/90 shadow-lg border border-white/10 text-white text-[9px] font-black px-1.5 py-0.5 rounded-[3px] tracking-tight uppercase">
+                            <span className="bg-[#00A859]/90 shadow-lg border border-white/10 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[3px] tracking-tight uppercase">
                                 L.Tiếng
                             </span>
                         )}
@@ -408,7 +408,7 @@ function OnflixHoverCard({
                             {/* Play button (Yellow) */}
                             <Link
                                 href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                className="flex-1 min-w-0 flex items-center justify-center gap-1.5 bg-[#8FA7C5] hover:bg-[#a8bdd8] text-[#0a0a0a] font-extrabold text-[13px] h-9 px-3 rounded-full transition-all hover:scale-105"
+                                className="flex-1 min-w-0 flex items-center justify-center gap-1.5 bg-[#8FA7C5] hover:bg-[#a8bdd8] text-[#0a0a0a] font-bold text-[13px] h-9 px-3 rounded-full transition-all hover:scale-105"
                             >
                                 <Play className="w-3.5 h-3.5 fill-current shrink-0" />
                                 <span className="truncate">Xem</span>

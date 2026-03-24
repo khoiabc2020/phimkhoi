@@ -154,7 +154,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
     };
 
     const renderContent = () => {
-        const titleClasses = "text-xl font-bold text-white mb-6 tracking-tight";
+        const titleClasses = "text-xl font-bold text-white mb-6";
         const sectionClasses = "bg-[#0a0a0c] border border-white/[0.04] p-6 md:p-8 rounded-2xl mb-6 shadow-sm";
 
         switch (activeTab) {
@@ -178,7 +178,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                                             </Link>
                                         </div>
                                         <div className="mt-2.5">
-                                            <h3 className="text-white text-xs font-semibold truncate group-hover:text-purple-400 transition-colors uppercase tracking-wide">{movie.movieName}</h3>
+                                            <h3 className="text-white text-xs font-bold truncate group-hover:text-purple-400 transition-colors">{movie.movieName}</h3>
                                             <p className="text-gray-600 text-[10px] font-bold mt-0.5">{movie.movieYear}</p>
                                         </div>
                                     </div>
@@ -195,7 +195,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                             <h2 className={titleClasses}>Bộ sưu tập</h2>
                             <button 
                                 onClick={() => { setModalMode("create"); setSelectedPlaylist(null); setIsModalOpen(true); }}
-                                className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 text-white text-[11px] font-bold uppercase tracking-wider rounded-lg hover:bg-white/10 transition-all active:scale-95"
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 text-white text-[12px] font-bold rounded-lg hover:bg-white/10 transition-all active:scale-95"
                             >
                                 <Plus className="w-3.5 h-3.5" />
                                 Tạo bộ sưu tập
@@ -212,8 +212,8 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                                     <div key={playlist._id} className="group relative bg-[#0a0a0c] border border-white/[0.04] rounded-2xl p-5 hover:border-[#8FA7C5]/30 transition-all duration-300 overflow-hidden">
                                         <div className="absolute top-0 right-0 w-32 h-32 bg-[#8FA7C5]/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-[#8FA7C5]/10 transition-all" />
                                         
-                                        <h3 className="text-[17px] font-bold text-white mb-2 tracking-tight group-hover:text-[#8FA7C5] transition-colors">{playlist.name}</h3>
-                                        <p className="text-gray-600 text-xs font-medium line-clamp-2 min-h-[32px] mb-6">{playlist.description || "Danh sách phim yêu thích cá nhân."}</p>
+                                        <h3 className="text-[17px] font-bold text-white mb-2 group-hover:text-[#8FA7C5] transition-colors">{playlist.name}</h3>
+                                        <p className="text-gray-600 text-xs line-clamp-2 min-h-[32px] mb-6">{playlist.description || "Danh sách phim yêu thích cá nhân."}</p>
                                         
                                         <div className="flex items-center justify-between mt-auto">
                                             <div className="flex items-center gap-2">
@@ -263,9 +263,9 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                                         <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/[0.02] border border-white/[0.05]">
                                             <stat.icon className="w-5 h-5" style={{ color: stat.color }} />
                                         </div>
-                                        <span className="text-[28px] font-black text-white tracking-tighter">{stat.value}</span>
+                                        <span className="text-[28px] font-bold text-white">{stat.value}</span>
                                     </div>
-                                    <p className="text-gray-600 text-[11px] font-bold uppercase tracking-[2px]">{stat.label}</p>
+                                    <p className="text-gray-600 text-[11px] font-bold uppercase">{stat.label}</p>
                                 </div>
                             ))}
                         </div>
@@ -277,7 +277,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div className="space-y-6">
                                     <div className="space-y-1.5">
-                                        <label className="text-gray-600 text-[11px] font-bold uppercase tracking-wider ml-0.5">Tên hiển thị</label>
+                                        <label className="text-gray-600 text-[11px] font-bold uppercase ml-0.5">Tên hiển thị</label>
                                         <input 
                                             type="text" 
                                             value={editName}
@@ -287,7 +287,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                                         />
                                     </div>
                                     <div className="space-y-1.5">
-                                        <label className="text-gray-600 text-[11px] font-bold uppercase tracking-wider ml-0.5">Địa chỉ Email</label>
+                                        <label className="text-gray-600 text-[11px] font-bold uppercase ml-0.5">Địa chỉ Email</label>
                                         <input 
                                             type="email" 
                                             value={editEmail}
@@ -325,7 +325,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                         </div>
 
                         {/* Password Section */}
-                        <h2 className="text-xl font-bold text-white mt-12 mb-6 tracking-tight">Cài đặt mật khẩu</h2>
+                        <h2 className="text-xl font-bold text-white mt-12 mb-6">Cài đặt mật khẩu</h2>
                         <div className={sectionClasses}>
                             <form onSubmit={handleChangePass} className="space-y-6">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -373,7 +373,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                         </div>
 
                         {/* UI Customization Section */}
-                        <h2 className="text-xl font-bold text-white mt-12 mb-6 tracking-tight">Tùy chỉnh giao diện</h2>
+                        <h2 className="text-xl font-bold text-white mt-12 mb-6">Tùy chỉnh giao diện</h2>
                         <div className={sectionClasses}>
                             <div className="space-y-6">
                                 {[
@@ -423,8 +423,8 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                                     Huy chương & Danh hiệu
                                 </h3>
                                 <div className="flex flex-wrap gap-2">
-                                    <div className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-black text-gray-400 uppercase tracking-wider">Mọt phim Tập sự</div>
-                                    <div className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-black text-gray-400 uppercase tracking-wider opacity-30">Phê Phim Vương</div>
+                                    <div className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-bold text-gray-400">Mọt phim Tập sự</div>
+                                    <div className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-bold text-gray-400 opacity-30">Phê Phim Vương</div>
                                 </div>
                             </div>
                         </div>
@@ -446,7 +446,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                                     {user?.image ? (
                                         <Image src={user.image} alt="" fill className="object-cover" />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-4xl font-outfit font-black bg-[#00695C] text-white tracking-tighter shadow-inner">
+                                        <div className="w-full h-full flex items-center justify-center text-3xl font-bold bg-[#00695C] text-white shadow-inner">
                                             {user?.name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() || "KH"}
                                         </div>
                                     )}
@@ -459,8 +459,8 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                                 </div>
                             </div>
                         </div>
-                        <h1 className="text-lg font-black text-white truncate max-w-full tracking-tight">{user?.name}</h1>
-                        <p className="text-xs font-bold text-gray-600 mt-1 truncate tracking-tight opacity-70">{user?.email}</p>
+                        <h1 className="text-lg font-bold text-white truncate max-w-full">{user?.name}</h1>
+                        <p className="text-xs text-gray-600 mt-1 truncate opacity-70">{user?.email}</p>
                     </div>
 
                     <div className="h-px bg-white/[0.06] mb-8 hidden md:block w-12"></div>
@@ -488,7 +488,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
 
                     <button
                         onClick={() => signOut({ callbackUrl: "/login" })}
-                        className="flex items-center gap-3 px-4 py-2.5 text-gray-600 hover:text-red-500 transition-all text-sm font-bold uppercase tracking-widest group"
+                        className="flex items-center gap-3 px-4 py-2.5 text-gray-600 hover:text-red-500 transition-all text-sm font-bold group"
                     >
                         <LogOut className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         <span>Đăng xuất</span>
@@ -506,15 +506,15 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
                     <div className="bg-[#0a0a0c] border border-white/[0.08] rounded-24px w-full max-w-lg overflow-hidden flex flex-col max-h-[85vh] shadow-2xl">
                         <div className="flex items-center justify-between p-8 pb-4">
-                            <h2 className="text-xl font-bold text-white tracking-tight">Cá nhân hóa</h2>
+                            <h2 className="text-xl font-bold text-white">Cá nhân hóa</h2>
                             <button onClick={() => setIsAvatarModalOpen(false)} className="text-gray-600 hover:text-white transition-all">
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
                         
                         <div className="flex gap-8 px-8 border-b border-white/[0.04]">
-                            <button onClick={() => setAvatarTab("preset")} className={`pb-4 text-[11px] font-bold uppercase tracking-widest transition-all ${avatarTab === 'preset' ? 'text-purple-500 border-b-2 border-purple-500' : 'text-gray-600 hover:text-gray-400'}`}>Mặc định</button>
-                            <button onClick={() => setAvatarTab("upload")} className={`pb-4 text-[11px] font-bold uppercase tracking-widest transition-all ${avatarTab === 'upload' ? 'text-purple-500 border-b-2 border-purple-500' : 'text-gray-600 hover:text-gray-400'}`}>Tải lên</button>
+                            <button onClick={() => setAvatarTab("preset")} className={`pb-4 text-[12px] font-bold transition-all ${avatarTab === 'preset' ? 'text-purple-500 border-b-2 border-purple-500' : 'text-gray-600 hover:text-gray-400'}`}>Mặc định</button>
+                            <button onClick={() => setAvatarTab("upload")} className={`pb-4 text-[12px] font-bold transition-all ${avatarTab === 'upload' ? 'text-purple-500 border-b-2 border-purple-500' : 'text-gray-600 hover:text-gray-400'}`}>Tải lên</button>
                         </div>
 
                         <div className="p-8 overflow-y-auto flex-1 custom-scrollbar">

@@ -89,7 +89,7 @@ export default function NotificationDropdown() {
                     <div className="px-5 py-4 border-b border-white/[0.05] flex items-center justify-between bg-white/[0.02]">
                         <div className="flex items-center gap-2.5">
                             <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                            <h3 className="text-[13px] font-black text-white uppercase tracking-[2px] italic">Thông báo mới</h3>
+                            <h3 className="text-[14px] font-bold text-white">Thông báo mới</h3>
                         </div>
                         {notifications.length > 0 && (
                             <button 
@@ -97,7 +97,7 @@ export default function NotificationDropdown() {
                                     setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
                                     setHasUnread(false);
                                 }}
-                                className="text-[10px] text-white/30 hover:text-primary uppercase font-black transition-colors tracking-tighter"
+                                className="text-[11px] text-white/40 hover:text-primary font-bold transition-colors"
                             >
                                 Đánh dấu đã đọc
                             </button>
@@ -111,20 +111,20 @@ export default function NotificationDropdown() {
                                 <div className="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center mx-auto ring-1 ring-white/10">
                                     <User className="w-7 h-7 text-white/20" />
                                 </div>
-                                <p className="text-[12px] text-white/40 font-bold max-w-[220px] mx-auto italic leading-relaxed">Vui lòng đăng nhập để theo dõi cập nhật từ phim yêu thích</p>
-                                <NextLink href="/login" onClick={() => setIsOpen(false)} className="inline-block px-10 py-3 bg-[#8FA7C5] text-black text-[12px] font-black rounded-full uppercase tracking-[2px] hover:bg-[#a8bdd8] transition-all active:scale-95 shadow-lg shadow-[#8FA7C5]/20">Đăng nhập</NextLink>
+                                <p className="text-[13px] text-white/50 font-medium max-w-[220px] mx-auto leading-relaxed">Vui lòng đăng nhập để theo dõi cập nhật từ phim yêu thích</p>
+                                <NextLink href="/login" onClick={() => setIsOpen(false)} className="inline-block px-10 py-3 bg-[#8FA7C5] text-black text-[13px] font-bold rounded-full hover:bg-[#a8bdd8] transition-all active:scale-95 shadow-lg shadow-[#8FA7C5]/20">Đăng nhập</NextLink>
                             </div>
                         ) : loading ? (
                             <div className="p-16 flex flex-col items-center justify-center gap-4">
                                 <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                                <span className="text-[10px] text-primary/40 font-black tracking-[4px] uppercase animate-pulse">Scanning DB...</span>
+                                <span className="text-[11px] text-primary/60 font-bold tracking-wider uppercase animate-pulse">Đang kiểm tra...</span>
                             </div>
                         ) : notifications.length === 0 ? (
                             <div className="p-20 text-center space-y-4">
                                 <div className="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center mx-auto opacity-10 ring-1 ring-white/20">
                                     <Bell className="w-7 h-7 text-white" />
                                 </div>
-                                <p className="text-[11px] text-white/30 font-black tracking-[1px] px-8 uppercase italic">Bạn đã cập nhật hết!</p>
+                                <p className="text-[13px] text-white/40 font-medium px-8">Bạn đã cập nhật hết!</p>
                             </div>
                         ) : (
                             <div className="divide-y divide-white/[0.03]">
@@ -150,7 +150,7 @@ export default function NotificationDropdown() {
                                         
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-start justify-between gap-2 mb-1.5">
-                                                <span className="text-[14px] font-black text-white group-hover:text-[#8FA7C5] transition-colors truncate tracking-[-0.01em]">
+                                                <span className="text-[14px] font-bold text-white group-hover:text-[#8FA7C5] transition-colors truncate">
                                                     {notif.movieName}
                                                 </span>
                                             </div>
@@ -158,7 +158,7 @@ export default function NotificationDropdown() {
                                                 <span className="shrink-0 text-[11px] font-bold text-primary px-1.5 py-0.5 bg-primary/10 rounded uppercase">
                                                     Tập {notif.newEpisode}
                                                 </span>
-                                                <span className="text-[11px] text-white/40 truncate font-semibold italic">
+                                                <span className="text-[11px] text-white/40 truncate font-medium">
                                                     Vừa cập nhật • {notif.updatedAt}
                                                 </span>
                                             </div>
@@ -178,7 +178,7 @@ export default function NotificationDropdown() {
                         <NextLink
                             href="/thong-bao?tab=updates" // Correct routing to unified notification page
                             onClick={() => setIsOpen(false)}
-                            className="group flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-white/5 hover:bg-white/10 text-center text-[11px] text-[#8FA7C5] font-black uppercase tracking-[3px] transition-all border border-white/5 hover:border-[#8FA7C5]/30"
+                            className="group flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-white/5 hover:bg-white/10 text-center text-[12px] text-[#8FA7C5] font-bold transition-all border border-white/5 hover:border-[#8FA7C5]/30"
                         >
                             Xem tất cả <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                         </NextLink>

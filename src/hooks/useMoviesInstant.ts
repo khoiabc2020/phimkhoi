@@ -37,20 +37,19 @@ export function useMoviesInstant(
     const sync = useCallback(async () => {
         try {
             const res = await fetcher();
-            if (res.items && res.items.length > 0) {
-                setMovies(res.items);
-                setPagination(res.pagination);
-                setIsFresh(true);
-                setIsLoading(false);
+            const items = res.items || [];
+            setMovies(items);
+            setPagination(res.pagination);
+            setIsFresh(true);
+            setIsLoading(false);
 
-                // Update Cache
-                const dataToCache: InstantData = {
-                    movies: res.items,
-                    pagination: res.pagination,
-                    timestamp: Date.now()
-                };
-                localStorage.setItem(`phimkhoi_cache_${cacheKey}`, JSON.stringify(dataToCache));
-            }
+            // Update Cache
+            const dataToCache: InstantData = {
+                movies: items,
+                pagination: res.pagination,
+                timestamp: Date.now()
+            };
+            localStorage.setItem(`phimkhoi_cache_${cacheKey}`, JSON.stringify(dataToCache));
         } catch (error) {
             console.error("Sync Error:", error);
             setIsLoading(false);

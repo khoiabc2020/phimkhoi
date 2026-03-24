@@ -6,10 +6,14 @@ import EliteSelect from "./EliteSelect";
 
 export default function FilterBar({ 
     categories = [], 
-    countries = [] 
+    countries = [],
+    hideCategory = false,
+    hideCountry = false
 }: { 
     categories?: { name: string; slug: string }[]; 
     countries?: { name: string; slug: string }[]; 
+    hideCategory?: boolean;
+    hideCountry?: boolean;
 }) {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -43,6 +47,9 @@ export default function FilterBar({
             name: `${currentYear - i}`,
             slug: `${currentYear - i}`,
         })),
+        { name: "2010s", slug: "2010" },
+        { name: "2000s", slug: "2000" },
+        { name: "1990s", slug: "1990" },
     ];
 
     // Ensure we have "All" option if provided list doesn't have it
@@ -54,22 +61,26 @@ export default function FilterBar({
         <div>
             <div className="flex flex-nowrap items-center gap-2 sm:gap-3 py-2 overflow-x-auto no-scrollbar">
                 {/* Category Dropdown */}
-                <EliteSelect 
-                    options={displayCategories}
-                    value={searchParams.get("category") || "all"}
-                    onChange={(val) => handleFilterChange("category", val)}
-                    placeholder="Thể loại"
-                    disabled={isPending}
-                />
+                {!hideCategory && (
+                    <EliteSelect 
+                        options={displayCategories}
+                        value={searchParams.get("category") || "all"}
+                        onChange={(val) => handleFilterChange("category", val)}
+                        placeholder="Thể loại"
+                        disabled={isPending}
+                    />
+                )}
 
                 {/* Country Dropdown */}
-                <EliteSelect 
-                    options={displayCountries}
-                    value={searchParams.get("country") || "all"}
-                    onChange={(val) => handleFilterChange("country", val)}
-                    placeholder="Quốc gia"
-                    disabled={isPending}
-                />
+                {!hideCountry && (
+                    <EliteSelect 
+                        options={displayCountries}
+                        value={searchParams.get("country") || "all"}
+                        onChange={(val) => handleFilterChange("country", val)}
+                        placeholder="Quốc gia"
+                        disabled={isPending}
+                    />
+                )}
 
                 {/* Year Dropdown */}
                 <EliteSelect 

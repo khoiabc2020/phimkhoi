@@ -24,7 +24,7 @@ export interface TMDBCredit {
 // Elite Title Mapping: Resolve common translation mismatches for top-tier content
 const ELITE_TITLE_MAPPINGS: Record<string, string> = {
     "bong ma anh quoc": "Peaky Blinders",
-    "bong ma anh quoc nguoi bat tu": "Peaky Blinders", // Fallback to main show if movie not found or same title
+    "bong ma anh quoc nguoi bat tu": "Peaky Blinders: The Immortal Man", // Specific movie title
     "thanh guomu": "Demon Slayer",
     "ke san mat trang": "Moon Knight",
 };

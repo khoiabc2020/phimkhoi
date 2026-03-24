@@ -69,10 +69,10 @@ export default function NotificationsPage() {
 
             <div className="w-full max-w-[900px] mx-auto px-4 sm:px-6">
                 <div className="mb-8 md:mb-12 text-center pt-6">
-                    <h1 className="text-3xl md:text-5xl font-black text-white mb-4 tracking-tight">
+                    <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">
                         Trung tâm thông báo
                     </h1>
-                    <p className="text-gray-400 text-sm md:text-base max-w-[600px] mx-auto font-medium">
+                    <p className="text-gray-400 text-sm md:text-base max-w-[600px] mx-auto">
                         Theo dõi mọi cập nhật mới nhất từ bộ sưu tập phim yêu thích và thông báo quan trọng của hệ thống.
                     </p>
                 </div>
@@ -82,14 +82,14 @@ export default function NotificationsPage() {
                     <button
                         onClick={() => setActiveTab("updates")}
                         className={cn(
-                            "flex items-center gap-2.5 px-6 py-2.5 rounded-xl text-[13px] font-black uppercase tracking-widest transition-all",
+                            "flex items-center gap-2.5 px-6 py-2.5 rounded-xl text-[14px] font-bold transition-all",
                             activeTab === "updates" ? "bg-[#8FA7C5] text-black shadow-lg" : "text-white/40 hover:text-white"
                         )}
                     >
                         <Bookmark className={cn("w-4 h-4", activeTab === "updates" ? "text-black" : "text-white/20")} />
                         Cập nhật phim
                         {movieUpdates.length > 0 && (
-                            <span className={cn("ml-1 px-1.5 py-0.5 rounded-md text-[10px] font-black", activeTab === "updates" ? "bg-black/10" : "bg-white/10")}>
+                            <span className={cn("ml-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold", activeTab === "updates" ? "bg-black/10" : "bg-white/10")}>
                                 {movieUpdates.length}
                             </span>
                         )}
@@ -97,7 +97,7 @@ export default function NotificationsPage() {
                     <button
                         onClick={() => setActiveTab("system")}
                         className={cn(
-                            "flex items-center gap-2.5 px-6 py-2.5 rounded-xl text-[13px] font-black uppercase tracking-widest transition-all",
+                            "flex items-center gap-2.5 px-6 py-2.5 rounded-xl text-[14px] font-bold transition-all",
                             activeTab === "system" ? "bg-[#8FA7C5] text-black shadow-lg" : "text-white/40 hover:text-white"
                         )}
                     >
@@ -107,44 +107,30 @@ export default function NotificationsPage() {
                 </div>
 
                 {/* VPS / System Status Card */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                    <div className="bg-[#0B0B10]/60 backdrop-blur-md border border-white/[0.08] rounded-2xl p-5 flex items-center justify-between group hover:border-primary/30 transition-all">
-                        <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center border border-green-500/20">
-                                <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse" />
-                            </div>
-                            <div>
-                                <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-0.5">Trạng thái VPS</p>
-                                <p className="text-sm font-bold text-white">Đang hoạt động</p>
-                            </div>
-                        </div>
-                        <span className="text-[10px] font-bold text-green-500/80 bg-green-500/10 px-2 py-0.5 rounded border border-green-500/20">ONLINE</span>
-                    </div>
-
-                    <div className="bg-[#0B0B10]/60 backdrop-blur-md border border-white/[0.08] rounded-2xl p-5 flex items-center justify-between group hover:border-primary/30 transition-all">
-                        <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-                                <CheckCircle className="w-5 h-5 text-blue-500" />
-                            </div>
-                            <div>
-                                <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-0.5">Cơ sở dữ liệu</p>
-                                <p className="text-sm font-bold text-white">Kết nối tốt</p>
-                            </div>
-                        </div>
-                        <span className="text-[10px] font-bold text-blue-500/80 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">CONNECTED</span>
-                    </div>
-
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                     <div className="bg-[#0B0B10]/60 backdrop-blur-md border border-white/[0.08] rounded-2xl p-5 flex items-center justify-between group hover:border-primary/30 transition-all">
                         <div className="flex items-center gap-4">
                             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
-                                <Clock className="w-5 h-5 text-primary" />
+                                <Bookmark className="w-5 h-5 text-primary" />
                             </div>
                             <div>
-                                <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-0.5">Lần cuối đồng bộ</p>
-                                <p className="text-sm font-bold text-white">Vừa xong</p>
+                                <p className="text-[11px] font-bold text-gray-500 uppercase mb-0.5">Phim theo dõi</p>
+                                <p className="text-sm font-bold text-white">{movieUpdates.length} phim có tập mới</p>
                             </div>
                         </div>
-                        <span className="text-[10px] font-bold text-primary/80 bg-primary/10 px-2 py-0.5 rounded border border-primary/20">SYNCED</span>
+                    </div>
+
+                    <div className="bg-[#0B0B10]/60 backdrop-blur-md border border-white/[0.08] rounded-2xl p-5 flex items-center justify-between group hover:border-primary/30 transition-all">
+                        <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center border border-green-500/20">
+                                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                            </div>
+                            <div>
+                                <p className="text-[11px] font-bold text-gray-500 uppercase mb-0.5">Trạng thái hệ thống</p>
+                                <p className="text-sm font-bold text-white">Hoạt động ổn định</p>
+                            </div>
+                        </div>
+                        <span className="text-[10px] font-bold text-green-500/80 bg-green-500/10 px-2 py-0.5 rounded border border-green-500/20">ỔN ĐỊNH</span>
                     </div>
                 </div>
 
@@ -162,8 +148,8 @@ export default function NotificationsPage() {
                                     <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6 opacity-20">
                                         <Bookmark className="w-8 h-8 text-white" />
                                     </div>
-                                    <h3 className="text-xl font-black text-white mb-2 uppercase tracking-tight italic">Tất cả đã sẵn sàng!</h3>
-                                    <p className="text-white/30 text-sm font-medium">Hiện không có tập phim mới nào trong danh sách yêu thích của bạn.</p>
+                                    <h3 className="text-xl font-bold text-white mb-2">Tất cả đã sẵn sàng!</h3>
+                                    <p className="text-white/30 text-sm">Hiện không có tập phim mới nào trong danh sách yêu thích của bạn.</p>
                                 </div>
                             ) : (
                                 movieUpdates.map((notif) => (
@@ -186,7 +172,7 @@ export default function NotificationsPage() {
                                         
                                         <div className="flex-1 min-w-0">
                                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-                                                <h3 className="text-lg sm:text-2xl font-black text-white group-hover:text-[#8FA7C5] transition-colors truncate tracking-tighter uppercase italic">
+                                                <h3 className="text-lg sm:text-2xl font-bold text-white group-hover:text-[#8FA7C5] transition-colors truncate">
                                                     {notif.movieName}
                                                 </h3>
                                                 <span className="flex items-center gap-1.5 text-[12px] text-white/30 font-bold shrink-0">
@@ -196,10 +182,10 @@ export default function NotificationsPage() {
                                             </div>
                                             
                                             <div className="flex items-center gap-3">
-                                                <span className="shrink-0 text-[13px] font-black text-black px-3 py-1 bg-[#8FA7C5] rounded-full uppercase shadow-lg shadow-[#8FA7C5]/20">
+                                                <span className="shrink-0 text-[13px] font-bold text-black px-3 py-1 bg-[#8FA7C5] rounded-full uppercase shadow-lg shadow-[#8FA7C5]/20">
                                                     Tập {notif.newEpisode}
                                                 </span>
-                                                <p className="text-white/50 text-[13px] sm:text-sm font-medium leading-relaxed italic truncate">
+                                                <p className="text-white/50 text-[13px] sm:text-sm leading-relaxed truncate">
                                                     Vừa cập nhật bản dịch mới nhất. Hãy thưởng thức ngay!
                                                 </p>
                                             </div>
@@ -220,8 +206,8 @@ export default function NotificationsPage() {
                                     <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6 opacity-20">
                                         <Bell className="w-8 h-8 text-white" />
                                     </div>
-                                    <h3 className="text-xl font-black text-white mb-2 uppercase tracking-tight italic">Hệ thống đang ổn định!</h3>
-                                    <p className="text-white/30 text-sm font-medium">Hiện không có thông báo bảo trì hay tin tức mới từ ban quản trị.</p>
+                                    <h3 className="text-xl font-bold text-white mb-2">Hệ thống đang ổn định!</h3>
+                                    <p className="text-white/30 text-sm">Hiện không có thông báo bảo trì hay tin tức mới từ ban quản trị.</p>
                                 </div>
                             ) : (
                                 systemNotifs.map((notif) => (
@@ -247,20 +233,20 @@ export default function NotificationsPage() {
 
                                         <div className="flex-1 min-w-0">
                                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-                                                <h3 className="text-xl font-black text-white leading-tight group-hover:text-[#8FA7C5] transition-colors uppercase tracking-tight italic">{notif.title}</h3>
+                                                <h3 className="text-xl font-bold text-white leading-tight group-hover:text-[#8FA7C5] transition-colors">{notif.title}</h3>
                                                 <span className="flex items-center gap-2 text-[12px] text-white/30 font-bold shrink-0">
                                                     <Clock className="w-3.5 h-3.5" />
                                                     {new Date(notif.createdAt).toLocaleDateString("vi-VN", { hour: '2-digit', minute:'2-digit', day: '2-digit', month: '2-digit', year: 'numeric' })}
                                                 </span>
                                             </div>
-                                            <p className="text-white/50 leading-relaxed mb-5 font-medium">{notif.message}</p>
+                                            <p className="text-white/50 leading-relaxed mb-5">{notif.message}</p>
                                             
                                             {notif.link && (
                                                 <a 
                                                     href={notif.link} 
                                                     target="_blank" 
                                                     rel="noreferrer"
-                                                    className="inline-flex items-center gap-2 px-6 py-2.5 bg-white/5 hover:bg-white/10 text-white text-[12px] font-black rounded-xl transition-all border border-white/10 shadow-lg"
+                                                    className="inline-flex items-center gap-2 px-6 py-2.5 bg-white/5 hover:bg-white/10 text-white text-[12px] font-bold rounded-xl transition-all border border-white/10 shadow-lg"
                                                 >
                                                     Xem chi tiết <ChevronRight className="w-4 h-4" />
                                                 </a>

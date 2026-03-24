@@ -69,7 +69,7 @@ export default async function CountryPage({
                         
                         <div className="space-y-1">
                             <span className="text-[#8FA7C5] text-xs font-bold uppercase tracking-[0.2em] opacity-80 pl-1">Quốc gia</span>
-                            <h1 className="text-[32px] md:text-[40px] lg:text-[48px] font-outfit font-extrabold text-white tracking-tighter leading-tight italic uppercase drop-shadow-lg">
+                            <h1 className="text-[32px] md:text-[40px] lg:text-[48px] font-bold text-white leading-tight">
                                 {countryName}
                             </h1>
                         </div>
@@ -77,7 +77,7 @@ export default async function CountryPage({
 
                     <div className="w-full md:w-auto bg-[#0a0a0a]/80 backdrop-blur-md rounded-[12px] p-1 shadow-xl">
                         <Suspense fallback={<div className="w-32 h-8 bg-white/5 animate-pulse rounded" />}>
-                            <FilterBar categories={categories} countries={countries} />
+                            <FilterBar categories={categories} countries={countries} hideCountry={true} />
                         </Suspense>
                     </div>
                 </div>
