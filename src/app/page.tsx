@@ -230,7 +230,7 @@ export default function Home() {
         <HeroStream />
       </Suspense>
 
-      <div className="w-full max-w-[1920px] mx-auto px-1.5 sm:px-3 md:px-5 lg:pl-24 lg:pr-12 relative z-30 pb-16 -mt-10 md:-mt-16 lg:-mt-20 xl:-mt-24">
+      <div className="w-full max-w-[1920px] mx-auto px-1.5 sm:px-3 md:px-5 lg:pl-24 lg:pr-12 relative z-30 pb-16 -mt-6 md:-mt-10 lg:-mt-12 xl:-mt-14">
         {/* Decorative background glow - Deep Indigo for Premium feel */}
         <div className="absolute top-0 left-0 right-0 h-[800px] bg-indigo-500/10 via-transparent to-transparent pointer-events-none -z-10 blur-[150px]" />
         

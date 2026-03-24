@@ -1002,18 +1002,39 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
 
 export const getMoviesByCountryAndCategory = async (countrySlug: string, categorySlug: string, limit: number = 24) => {
     try {
-        // Fetch a much larger batch (450 items = 3 pages of default 150) to ensure we find enough for the specific category
-        // Note: For most countries, the first 300-500 movies cover the vast majority of popular content in a specific genre.
-        const data = await getMoviesByCountry(countrySlug, 1, 450);
-        
-        // Filter locally by category
-        const filteredMovies = data.items.filter(movie => 
+        // Step 1: Try filtering from the Country list (Ensures 100% correct country)
+        const countryData = await getMoviesByCountry(countrySlug, 1, 450);
+        const fromCountry = countryData.items.filter(movie => 
             movie.category?.some(cat => cat.slug === categorySlug)
         );
 
+        // Step 2: If we have very few results (Elite standard means we want a full row), 
+        // fallback to filtering from the Category list
+        let items = [...fromCountry];
+        if (items.length < 12) {
+            try {
+                // Fetch a large sample of the category (e.g. "Cổ Trang") and pick out the specific country
+                const categoryData = await getMoviesByCategory(categorySlug, 1, 250);
+                const fromCategory = categoryData.items.filter(movie => 
+                    movie.country?.some(c => c.slug === countrySlug)
+                );
+                
+                // Merge and deduplicate
+                const seenSlugs = new Set(items.map(m => m.slug));
+                for (const movie of fromCategory) {
+                    if (!seenSlugs.has(movie.slug)) {
+                        items.push(movie);
+                        seenSlugs.add(movie.slug);
+                    }
+                }
+            } catch (err) {
+                console.error("Hybrid filter fallback error:", err);
+            }
+        }
+
         return {
-            items: filteredMovies.slice(0, limit),
-            pagination: data.pagination
+            items: items.slice(0, limit),
+            pagination: countryData.pagination
         };
     } catch (error) {
         console.error(`Error filtering country [${countrySlug}] by category [${categorySlug}]:`, error);

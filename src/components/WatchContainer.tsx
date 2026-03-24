@@ -61,9 +61,8 @@ export default function WatchContainer({
 
     // NguonC: mặc định phát bằng iframe (link_embed) để hạn chế lỗi CORS/Referer.
     // Các server khác vẫn ưu tiên HLS qua hls-proxy nếu có link_m3u8.
-    const isNguoncServer = /nguonc/i.test(activeServerName);
     const effectiveM3u8 =
-        !isNguoncServer && activeEpisode?.link_m3u8
+        activeEpisode?.link_m3u8
             ? `/api/hls-proxy?url=${encodeURIComponent(activeEpisode.link_m3u8)}`
             : undefined;
 
@@ -87,25 +86,29 @@ export default function WatchContainer({
         }
     }, [isTheaterMode]);
 
-    // Fetch initial progress on client side to avoid dynamic server rendering
+    // Fetch initial progress on client side - Non-blocking for the player
     useEffect(() => {
         let isMounted = true;
-        setProgressLoaded(false);
-        setProgress(0);
+        // DO NOT reset progressLoaded here, we want the player to render immediately
+        // Just set it to true so the player renders while history is being fetched
+        setProgressLoaded(true);
 
         if (movie._id && currentEpisodeSlug) {
             getWatchHistoryForEpisode(movie._id, currentEpisodeSlug)
                 .then((res) => {
                     if (isMounted && res.success && res.data) {
-                        setProgress(res.data.progress || 0);
+                        const savedProgress = res.data.progress || 0;
+                        setProgress(savedProgress);
+                        // If player is already ready, seek it
+                        if (savedProgress > 5 && (window as any).art) {
+                            const art = (window as any).art;
+                            if (art.duration > 0) {
+                                art.seek = (savedProgress / 100) * art.duration;
+                            }
+                        }
                     }
                 })
-                .catch(() => {})
-                .finally(() => {
-                    if (isMounted) setProgressLoaded(true);
-                });
-        } else {
-            setProgressLoaded(true);
+                .catch(() => {});
         }
 
         return () => { isMounted = false; };

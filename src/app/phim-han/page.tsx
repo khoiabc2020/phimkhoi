@@ -25,12 +25,18 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const FEATURED_ACTORS = [
+    { name: "Kim Soo-hyun", role: "Nữ Hoàng Nước Mắt", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/q24P4pmtWGhe08T7rTkoDc5EC1p.jpg" },
     { name: "Kim Ji-won", role: "Nữ Hoàng Nước Mắt", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/lX7W1j9kg4jV6XNn5XEE3rKsd3x.jpg" },
     { name: "Ji Chang-wook", role: "Chào mừng tới Samdal-ri", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/sBmHrO5Tn27Ot5hy0yAKniROmNb.jpg" },
-    { name: "Song Hye-kyo", role: "Vinh Quang Trong Hận Thù", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/3qUaQG8W0lP9S6p2f3B0h9R6N5.jpg" },
-    { name: "Park Seo-joon", role: "Tầng Lớp Itaewon", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/k1ALgZkOApYt7PIUBkUitmknXQC.jpg" },
-    { name: "Han So-hee", role: "Dẫu Biết", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/8IvEOnqMjqJWcci3z44haH38Ee8.jpg" },
-    { name: "Lee Min-ho", role: "Quân Vương Bất Diệt", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/iqopuz6cKuRZRUPZQrj7lFZcWWb.jpg" },
+    { name: "Song Hye-kyo", role: "Vinh Quang Trong Hận Thù", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/tlAX3f82Mf5h0rznpVBVK7nD2om.jpg" },
+    { name: "Hyun Bin", role: "Hạ Cánh Nơi Anh", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/JQFzhO9j8HRiyr7leGPj6cqhvM.jpg" },
+    { name: "Son Ye-jin", role: "Hạ Cánh Nơi Anh", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/pR3QiJKcMBG7oseZUnnU54lgU1V.jpg" },
+    { name: "Gong Yoo", role: "Yêu Tinh (Goblin)", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/ocGoFb6TrK3uWGXt4WnuibUG1vD.jpg" },
+    { name: "Bae Suzy", role: "Khởi Nghiệp (Start-up)", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/xdmQeM0UuwVGyZucc3eLhynlb7b.jpg" },
+    { name: "Lee Jung-jae", role: "Trò Chơi Con Mực", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/lx8oiTXL9lIx78KOXlrlvNfoz43.jpg" },
+    { name: "Jun Ji-hyun", role: "Vì Sao Đưa Anh Tới", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/pM5U2KH8RmuV1F7RsoE7Pn6AyhP.jpg" },
+    { name: "Song Joong-ki", role: "Hậu Duệ Mặt Trời", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/kgjb5OppOVTh5tz3hhnfDVnTvDv.jpg" },
+    { name: "Park Shin-hye", role: "Người Thừa Kế", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/pumaPD2AtInYXXYsLirfFdYa4yc.jpg" },
 ];
 
 async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'default', minHeight = 380 }: { title: string; categorySlug: string; countrySlug: string; variant?: 'default' | 'sidebar'; minHeight?: number }) {
@@ -166,7 +172,7 @@ export default async function PhimHanPage({ searchParams }: { searchParams: Prom
                 <div className={cn("absolute top-0 left-0 right-0 h-[600px] via-transparent to-transparent pointer-events-none -z-10 blur-[150px] opacity-50", theme.glow)} />
 
                 {currentPage === 1 ? (
-                    <div className="-mt-16 md:-mt-24 lg:-mt-32 xl:-mt-40 relative z-50 w-full">
+                    <div className="-mt-10 md:-mt-16 lg:-mt-20 xl:-mt-24 relative z-50 w-full">
                         <Suspense fallback={<div className="h-96 flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" /></div>}>
                             <PhimHanHome />
                         </Suspense>

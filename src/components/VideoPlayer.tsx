@@ -310,11 +310,12 @@ export default function VideoPlayer({
                                 const hls = new Hls({
                                     enableWorker: true,
                                     lowLatencyMode: true,
-                                    backBufferLength: 30,
-                                    maxBufferLength: 20,
-                                    maxMaxBufferLength: 40,
+                                    backBufferLength: 90,
+                                    maxBufferLength: 30,
+                                    maxMaxBufferLength: 60,
                                     maxBufferHole: 0.5,
                                     startLevel: -1,
+                                    abandonNextLevelRetry: 3,
                                     xhrSetup: (xhr: XMLHttpRequest) => {
                                         xhr.withCredentials = false;
                                     },
@@ -345,6 +346,9 @@ export default function VideoPlayer({
                         const seekTo = Math.floor((percent / 100) * art.duration);
                         if (seekTo > 10) art.seek = seekTo;
                     }
+
+                    // Expose art instance for external seeking (like progress sync)
+                    (window as any).art = art;
                 });
 
                 // Realtime history save - Thêm Logic AUTO SKIP
@@ -493,7 +497,12 @@ export default function VideoPlayer({
     return (
         <>
             <div className="relative w-full h-full">
-                <div ref={artRef} className="w-full h-full bg-black art-ios-theme" style={{ minHeight: "200px" }} />
+                <div ref={artRef} className="w-full h-full bg-black art-ios-theme" style={{ minHeight: "200px" }}>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a0a0b] z-0">
+                        <div className="w-12 h-12 border-4 border-[#8FA7C5]/20 border-t-[#8FA7C5] rounded-full animate-spin mb-4" />
+                        <p className="text-[#8FA7C5] text-xs font-bold uppercase tracking-[0.2em] animate-pulse">KHOIPHIM Player</p>
+                    </div>
+                </div>
                 {showSkipAd && (
                     <button
                         onClick={() => {
@@ -579,11 +588,19 @@ export default function VideoPlayer({
                     box-shadow: 0 0 8px rgba(0,0,0,0.5) !important;
                 }
                 .art-ios-theme.art-video-player .art-progress-loaded {
-                    background: rgba(255,255,255,0.25) !important;
+                    background: rgba(255,255,255,0.15) !important;
                 }
-                /* Transparent bottom for a cleaner look */
+                /* Loading spinner custom color */
+                .art-ios-theme.art-video-player .art-loading svg {
+                    color: #8FA7C5 !important;
+                }
+                /* Transparent bottom for a cleaner look - Premium Gradient */
                 .art-ios-theme.art-video-player .art-bottom {
-                    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent) !important;
+                    background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, transparent 100%) !important;
+                }
+                .art-ios-theme.art-video-player .art-controls-left,
+                .art-ios-theme.art-video-player .art-controls-right {
+                    padding-bottom: 2px !important;
                 }
                 /* Bigger bottom controls on mobile for touch */
                 @media (max-width: 768px) {
@@ -640,9 +657,34 @@ export default function VideoPlayer({
                     /* Ẩn bớt icon Setting / Aspect / Speed để thanh không bị chật */
                     .art-ios-theme.art-video-player .art-setting,
                     .art-ios-theme.art-video-player .art-playbackRate,
-                    .art-ios-theme.art-video-player .art-aspect-ratio {
+                    .art-ios-theme.art-video-player .art-aspect-ratio,
+                    .art-ios-theme.art-video-player .art-pip {
                         display: none !important;
                     }
+                }
+
+                /* Custom scrollbar for settings */
+                .art-ios-theme.art-video-player .art-setting-panel::-webkit-scrollbar {
+                    width: 4px;
+                }
+                .art-ios-theme.art-video-player .art-setting-panel::-webkit-scrollbar-thumb {
+                    background: rgba(255,255,255,0.2);
+                    border-radius: 2px;
+                }
+                
+                /* Elite: Subtle glass backdrop for all panels */
+                .art-ios-theme.art-video-player .art-setting-panel,
+                .art-ios-theme.art-video-player .art-contextmenu-panel {
+                    background: rgba(10, 10, 14, 0.92) !important;
+                    backdrop-filter: blur(12px) !important;
+                    border: 1px solid rgba(255,255,255,0.08) !important;
+                    border-radius: 12px !important;
+                    box-shadow: 0 8px 32px rgba(0,0,0,0.5) !important;
+                    animation: art-panel-in 0.3s ease-out;
+                }
+                @keyframes art-panel-in {
+                    from { transform: translateY(10px); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
                 }
             `}</style>
         </>
