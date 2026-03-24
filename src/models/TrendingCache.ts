@@ -1,19 +1,16 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
-/**
- * [Elite Performance] Trending Cache Model
- * Stores pre-merged and processed movie lists for high-speed catalog delivery.
- */
 export interface ITrendingCache extends Document {
-    type: string; // 'phim-bo', 'trung-quoc', 'phim-moi-cap-nhat', etc.
-    movies: any[]; // Array of processed Movie objects
+    type: string;
+    movies: any[];
     updatedAt: Date;
 }
 
-const TrendingCacheSchema: Schema<ITrendingCache> = new Schema(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const TrendingCacheSchema = new Schema(
     {
         type: { type: String, required: true, unique: true, index: true },
-        movies: { type: [Schema.Types.Mixed], default: [] },
+        movies: { type: Array, default: [] },
         updatedAt: { type: Date, default: Date.now },
     },
     { collection: 'trendingcache' }
