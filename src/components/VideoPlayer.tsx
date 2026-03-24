@@ -71,6 +71,13 @@ function isDirectStream(url: string): boolean {
     return url.includes(".m3u8") || url.includes(".mp4") || url.includes(".webm");
 }
 
+function isNguonC(url: string, serverName: string): boolean {
+    if (!url) return false;
+    const lowerUrl = url.toLowerCase();
+    const lowerServer = serverName.toLowerCase();
+    return lowerUrl.includes('nguonc.com') || lowerUrl.includes('streamc.xyz') || lowerServer.includes('nguonc');
+}
+
 export default function VideoPlayer({
     url,
     m3u8,
@@ -107,7 +114,8 @@ export default function VideoPlayer({
         ? `/api/hls-proxy?url=${encodeURIComponent(streamUrl)}`
         : streamUrl;
 
-    const shouldUseArtPlayer = !fallbackIframe && isDirectStream(streamUrl);
+    const isNguoncSource = isNguonC(streamUrl, serverName);
+    const shouldUseArtPlayer = !fallbackIframe && isDirectStream(streamUrl) && !isNguoncSource;
     const AD_START = 900;  // 15:00
     const AD_END = 930;    // 15:30
 

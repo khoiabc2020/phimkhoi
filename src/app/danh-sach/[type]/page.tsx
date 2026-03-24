@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
-import { getMoviesList } from "@/services/api";
+import { getMoviesList, getMenuData } from "@/services/api";
 import { Metadata } from "next";
 
 // Revalidate mỗi 5 phút - cân bằng giữa freshness và server load
@@ -77,6 +77,7 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
     const category = (resolvedSearchParams.category as string) || undefined;
     const country = (resolvedSearchParams.country as string) || undefined;
     const quality = (resolvedSearchParams.quality as string) || undefined;
+    const { categories, countries } = await getMenuData();
     const typeName = TYPE_NAMES[type] || type;
 
     // Handle special case for 'phim-moi-cap-nhat' vs 'danh-sach'
@@ -115,7 +116,7 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
                             </p>
                             <div className="w-full md:w-auto">
                                 <Suspense fallback={<div className="w-32 h-8 bg-white/5 animate-pulse rounded" />}>
-                                    <FilterBar />
+                                    <FilterBar categories={categories} countries={countries} />
                                 </Suspense>
                             </div>
                         </div>

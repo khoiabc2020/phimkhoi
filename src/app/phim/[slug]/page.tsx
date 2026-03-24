@@ -446,16 +446,6 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             )}
                         </div>
 
-                        {/* NEW: Description Section (Onflix style) */}
-                        <div className="mt-10 sm:mt-14 space-y-4 max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-1000">
-                            <div className="flex items-center gap-2 border-l-[3px] border-[#8FA7C5] pl-4">
-                                <h3 className="text-[17px] sm:text-[18px] font-black text-white/90 tracking-[2.5px] uppercase drop-shadow-md">Nội dung</h3>
-                            </div>
-                            <div 
-                                className="text-[15.5px] sm:text-[17.2px] text-gray-300/90 leading-[1.85] font-medium text-justify drop-shadow-sm" 
-                                dangerouslySetInnerHTML={{ __html: movie?.content }} 
-                            />
-                        </div>
                     </div>
 
                 </div>
@@ -502,11 +492,22 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             <div className="text-[14.5px] font-black text-white drop-shadow-md">{movie?.director?.join(", ") || "Đang cập nhật"}</div>
                         </div>
 
-                        {/* Diễn viên (Desktop only Sidebar or always removed to Tabs) */}
-                        <div className="hidden lg:block pt-2">
-                            <div className="text-[12px] font-black text-gray-500 uppercase tracking-[2px] mb-3.5">Diễn viên</div>
+                        {/* Diễn viên (Sidebar) */}
+                        <div className="pt-2">
+                            <div className="text-[12px] font-black text-gray-400 uppercase tracking-[2px] mb-3.5">Diễn viên</div>
                             <MovieCast movie={movie} slug={movie.slug} isCompact={true} tmdbCast={tmdbDetails?.credits?.cast} />
                         </div>
+
+                        {/* NEW: Description Section (Optimized position) */}
+                        {movie?.content && (
+                            <div className="pt-4 border-t border-white/5 space-y-4">
+                                <div className="text-[12px] font-black text-gray-400 uppercase tracking-[2px]">Nội dung</div>
+                                <div 
+                                    className="text-[14.5px] sm:text-[15.5px] text-gray-300/80 leading-relaxed text-justify font-medium" 
+                                    dangerouslySetInnerHTML={{ __html: movie?.content }} 
+                                />
+                            </div>
+                        )}
 
                         {/* Thể loại */}
                         <div>

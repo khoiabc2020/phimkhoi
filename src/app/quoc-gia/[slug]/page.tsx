@@ -26,12 +26,16 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 /** Stream component for the movie grid */
 async function CountryGridStream({ 
     slug, 
-    page 
+    page,
+    category,
+    year
 }: { 
     slug: string; 
     page: number;
+    category?: string;
+    year?: string;
 }) {
-    const data = await getMoviesByCountry(slug, page);
+    const data = await getMoviesByCountry(slug, page, 28, { category, year });
     const { items, pagination } = data;
 
     if (!items || items.length === 0) {
@@ -75,7 +79,13 @@ const GridSkeleton = () => (
     </div>
 );
 
-export default async function CountryPage({ params, searchParams }: { params: Promise<{ slug: string }>, searchParams: Promise<{ page?: string }> }) {
+export default async function CountryPage({ 
+    params, 
+    searchParams 
+}: { 
+    params: Promise<{ slug: string }>, 
+    searchParams: Promise<{ page?: string; category?: string; year?: string }> 
+}) {
     const { slug } = await params;
     const sParams = await searchParams;
     const currentPage = Number(sParams.page) || 1;
@@ -111,15 +121,20 @@ export default async function CountryPage({ params, searchParams }: { params: Pr
                         </div>
                     </div>
 
-                    <div className="w-full md:w-auto bg-[#0a0a0a]/80 backdrop-blur-md rounded-[12px] p-1 border border-white/[0.05] shadow-xl">
+                    <div className="w-full md:w-auto bg-[#0a0a0a]/80 backdrop-blur-md rounded-[12px] p-1 shadow-xl">
                         <Suspense fallback={<div className="w-32 h-8 bg-white/5 animate-pulse rounded" />}>
                             <FilterBar categories={categories} countries={countries} />
                         </Suspense>
                     </div>
                 </div>
 
-                <Suspense key={`${slug}-${currentPage}`} fallback={<GridSkeleton />}>
-                    <CountryGridStream slug={slug} page={currentPage} />
+                <Suspense key={`${slug}-${currentPage}-${sParams.category || 'all'}-${sParams.year || 'all'}`} fallback={<GridSkeleton />}>
+                    <CountryGridStream 
+                        slug={slug} 
+                        page={currentPage} 
+                        category={sParams.category}
+                        year={sParams.year}
+                    />
                 </Suspense>
             </div>
         </main>

@@ -50,7 +50,7 @@ export default function FilterToolbar({ searchParams, categories, countries, yea
                 <div className="space-y-2">
                     <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.1em] pl-1">Định dạng</label>
                     <select 
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary/50 transition-colors appearance-none cursor-pointer"
+                        className="w-full bg-white/5 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:bg-white/10 transition-colors appearance-none cursor-pointer"
                         value={type || "phim-moi-cap-nhat"}
                         onChange={(e) => handleFilterChange("type", e.target.value)}
                     >
@@ -62,7 +62,7 @@ export default function FilterToolbar({ searchParams, categories, countries, yea
                 <div className="space-y-2">
                     <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.1em] pl-1">Thể loại</label>
                     <select 
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary/50 transition-colors appearance-none cursor-pointer"
+                        className="w-full bg-white/5 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:bg-white/10 transition-colors appearance-none cursor-pointer"
                         value={category || ""}
                         onChange={(e) => handleFilterChange("category", e.target.value)}
                     >
@@ -75,7 +75,7 @@ export default function FilterToolbar({ searchParams, categories, countries, yea
                 <div className="space-y-2">
                     <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.1em] pl-1">Quốc gia</label>
                     <select 
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary/50 transition-colors appearance-none cursor-pointer"
+                        className="w-full bg-white/5 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:bg-white/10 transition-colors appearance-none cursor-pointer"
                         value={country || ""}
                         onChange={(e) => handleFilterChange("country", e.target.value)}
                     >

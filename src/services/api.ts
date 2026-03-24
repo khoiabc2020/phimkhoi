@@ -908,14 +908,21 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
     }
 };
 
-export const getMoviesByCategory = async (slug: string, page: number = 1, limit: number = 28) => {
+export const getMoviesByCategory = async (slug: string, page: number = 1, limit: number = 28, options?: { country?: string; year?: string | number }) => {
     try {
-        // Hybrid fetch for categories too
-        // Hybrid fetch for categories too
+        const country = options?.country && options.country !== 'all' ? options.country : '';
+        const year = options?.year && options.year !== 'all' ? options.year : '';
+
+        // Construct query params
+        let queryStr = `page=${page}&limit=${limit}`;
+        if (country) queryStr += `&country=${country}`;
+        if (year) queryStr += `&year=${year}`;
+
+        // Hybrid fetch for categories
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
-            fetch(`${API_URL}/v1/api/the-loai/${slug}?page=${page}&limit=${limit}`, { next: { revalidate: 3600 } }).then(r => r.json()),
-            fetch(`${OPHIM_API}/v1/api/the-loai/${slug}?page=${page}&limit=${limit}`, { next: { revalidate: 3600 } }).then(r => r.json()),
-            fetch(`${NGUONC_API}/api/films/the-loai/${slug}?page=${page}`, { next: { revalidate: 3600 } }).then(r => r.json())
+            fetch(`${API_URL}/v1/api/the-loai/${slug}?${queryStr}`, { next: { revalidate: 3600 } }).then(r => r.json()),
+            fetch(`${OPHIM_API}/v1/api/the-loai/${slug}?${queryStr}`, { next: { revalidate: 3600 } }).then(r => r.json()),
+            fetch(`${NGUONC_API}/api/films/the-loai/${slug}?page=${page}${country ? `&country=${country}` : ''}`, { next: { revalidate: 3600 } }).then(r => r.json())
         ]);
 
         let items: Movie[] = [];
@@ -986,12 +993,20 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
     }
 };
 
-export const getMoviesByCountry = async (slug: string, page: number = 1, limit: number = 28) => {
+export const getMoviesByCountry = async (slug: string, page: number = 1, limit: number = 28, options?: { category?: string; year?: string | number }) => {
     try {
+        const category = options?.category && options.category !== 'all' ? options.category : '';
+        const year = options?.year && options.year !== 'all' ? options.year : '';
+
+        // Construct query params
+        let queryStr = `page=${page}&limit=${limit}`;
+        if (category) queryStr += `&category=${category}`;
+        if (year) queryStr += `&year=${year}`;
+
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
-            fetch(`${API_URL}/v1/api/quoc-gia/${slug}?page=${page}&limit=${limit}`, { next: { revalidate: 3600 } }).then(r => r.json()),
-            fetch(`${OPHIM_API}/v1/api/quoc-gia/${slug}?page=${page}&limit=${limit}`, { next: { revalidate: 3600 } }).then(r => r.json()),
-            fetch(`${NGUONC_API}/api/films/quoc-gia/${slug}?page=${page}`, { next: { revalidate: 3600 } }).then(r => r.json())
+            fetch(`${API_URL}/v1/api/quoc-gia/${slug}?${queryStr}`, { next: { revalidate: 3600 } }).then(r => r.json()),
+            fetch(`${OPHIM_API}/v1/api/quoc-gia/${slug}?${queryStr}`, { next: { revalidate: 3600 } }).then(r => r.json()),
+            fetch(`${NGUONC_API}/api/films/quoc-gia/${slug}?page=${page}${category ? `&category=${category}` : ''}`, { next: { revalidate: 3600 } }).then(r => r.json())
         ]);
 
 

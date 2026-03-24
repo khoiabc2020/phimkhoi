@@ -57,7 +57,7 @@ export default function FilterBar({
                 <div className="relative group flex-1 min-w-[90px] sm:min-w-[120px]">
                     <select
                         onChange={(e) => handleFilterChange("category", e.target.value)}
-                        className="appearance-none w-full bg-white/[0.05] border border-white/[0.1] text-white/80 py-2 px-2 sm:px-3 pr-6 sm:pr-8 rounded-[10px] leading-tight focus:outline-none focus:border-[#8FA7C5]/40 focus:bg-white/[0.08] cursor-pointer text-[12px] sm:text-[14px] font-bold transition-all"
+                        className="appearance-none w-full bg-white/[0.05] text-white/80 py-2 px-2 sm:px-3 pr-6 sm:pr-8 rounded-[10px] leading-tight focus:outline-none focus:bg-white/[0.08] cursor-pointer text-[12px] sm:text-[14px] font-bold transition-all"
                         value={searchParams.get("category") || "all"}
                         disabled={isPending}
                     >
@@ -76,7 +76,7 @@ export default function FilterBar({
                 <div className="relative group flex-1 min-w-[90px] sm:min-w-[120px]">
                     <select
                         onChange={(e) => handleFilterChange("country", e.target.value)}
-                        className="appearance-none w-full bg-white/[0.05] border border-white/[0.1] text-white/80 py-2 px-2 sm:px-3 pr-6 sm:pr-8 rounded-[10px] leading-tight focus:outline-none focus:border-[#8FA7C5]/40 focus:bg-white/[0.08] cursor-pointer text-[12px] sm:text-[14px] font-bold transition-all"
+                        className="appearance-none w-full bg-white/[0.05] text-white/80 py-2 px-2 sm:px-3 pr-6 sm:pr-8 rounded-[10px] leading-tight focus:outline-none focus:bg-white/[0.08] cursor-pointer text-[12px] sm:text-[14px] font-bold transition-all"
                         value={searchParams.get("country") || "all"}
                         disabled={isPending}
                     >
@@ -95,7 +95,7 @@ export default function FilterBar({
                 <div className="relative group flex-1 min-w-[80px] sm:min-w-[110px]">
                     <select
                         onChange={(e) => handleFilterChange("year", e.target.value)}
-                        className="appearance-none w-full bg-white/[0.05] border border-white/[0.08] text-white/70 py-1.5 px-2 sm:px-3 pr-6 sm:pr-8 rounded-[8px] leading-tight focus:outline-none focus:border-white/20 focus:text-white cursor-pointer text-[11px] sm:text-[13px] font-medium transition-all"
+                        className="appearance-none w-full bg-white/[0.05] text-white/70 py-1.5 px-2 sm:px-3 pr-6 sm:pr-8 rounded-[8px] leading-tight focus:outline-none focus:text-white cursor-pointer text-[11px] sm:text-[13px] font-medium transition-all"
                         value={searchParams.get("year") || "all"}
                         disabled={isPending}
                     >

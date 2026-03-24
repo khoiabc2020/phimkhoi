@@ -21,6 +21,14 @@ export interface TMDBCredit {
     profile_path: string;
 }
 
+// Elite Title Mapping: Resolve common translation mismatches for top-tier content
+const ELITE_TITLE_MAPPINGS: Record<string, string> = {
+    "bong ma anh quoc": "Peaky Blinders",
+    "bong ma anh quoc nguoi bat tu": "Peaky Blinders", // Fallback to main show if movie not found or same title
+    "thanh guomu": "Demon Slayer",
+    "ke san mat trang": "Moon Knight",
+};
+
 export const getTMDBConfig = async () => {
     // Helper to get image base url if needed, though usually hardcoded is fine
     // https://image.tmdb.org/t/p/original
@@ -56,8 +64,12 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
     try {
         if (!TMDB_API_KEY) return null;
 
+        // Detect English title from mapping
+        const qLower = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9\s]/g, "").replace(/\s+/g, " ").trim();
+        const mappedTitle = ELITE_TITLE_MAPPINGS[qLower];
+        
         // Force both originalName (English/Pinyin) and localName (Vietnamese) into the query queue.
-        const queries = [verification?.originalName, verification?.localName, query].filter(Boolean) as string[];
+        const queries = [mappedTitle, verification?.originalName, verification?.localName, query].filter(Boolean) as string[];
         // Deduplicate
         const uniqueQueries = [...new Set(queries)];
 
