@@ -179,21 +179,25 @@ const mergeMovieImages = (primary: Movie, candidate: Movie): Movie => {
         const u = toLower(v);
         if (!u) return "unknown";
         
-        const isNguonc = u.includes("nguonc.com") || u.includes("streamc.xyz") || u.includes("phimmoi.net") || u.includes("1080.com.vn");
+        const isNguonc = u.includes("nguonc.com") || u.includes("streamc.xyz") || u.includes("phimmoi.net") || u.includes("1080.com.vn") || u.includes("nguonc.top");
         const isOphim = u.includes("img.ophim.live") || u.includes("phimimg.com") || u.includes("img.ophim1.com");
+        const isStandard = u.includes("tmdb.org") || u.includes("phimapi.com") || u.includes("cloudinary") || u.includes("img.phimapi.com");
 
         if (isOphim || isNguonc) {
-            // Internal semantics: we want to KNOW if the source URL is portrait or landscape
             // OPhim/NguonC "thumb" is portrait, "poster" is landscape.
             if (u.includes("-thumb.") || u.includes("/thumb-") || u.endsWith("/thumb.jpg") || u.endsWith("/thumb.png")) return "portrait";
             if (u.includes("-poster.") || u.includes("/poster-") || u.endsWith("/poster.jpg") || u.endsWith("/poster.png")) return "landscape";
-            
-            // NguonC specific horizontal suffixes (like -1.jpg, -2.jpg)
-            if (isNguonc && (u.includes("-1.") || u.includes("-2.") || u.includes("-backdrop"))) return "landscape";
+            // NguonC specific horizontal suffixes
+            if (isNguonc && (u.includes("-1.") || u.includes("-2.") || u.includes("-backdrop") || u.includes("-banner"))) return "landscape";
+        } else if (isStandard) {
+            // Standard (TMDB/KKPhim): poster is portrait, backdrop/thumb is landscape
+            if (u.includes("poster") || u.includes("w500") || u.includes("w780") || u.includes("w300")) return "portrait";
+            if (u.includes("backdrop") || u.includes("thumb") || u.includes("w1280") || u.includes("original")) return "landscape";
         }
 
-        if (u.includes("backdrop") || u.includes("banner") || u.includes("landscape") || u.includes("horizontal")) return "landscape";
-        if (u.includes("poster-vertical") || u.includes("portrait") || u.includes("vertical")) return "portrait";
+        // Generic patterns
+        if (u.includes("backdrop") || u.includes("banner") || u.includes("landscape") || u.includes("horizontal") || u.includes("/thumb/")) return "landscape";
+        if (u.includes("poster-vertical") || u.includes("portrait") || u.includes("vertical") || u.includes("/poster/")) return "portrait";
         if (u.includes("/poster") || u.includes("poster.")) return "portrait";
         return detectByDimensionToken(v);
     };
@@ -434,8 +438,8 @@ async function fetchWithRetry(url: string, options: RequestInit = {}, retries = 
 }
 
 export const getHomeData = async () => {
-    // Cache 20 phút trên VPS để giảm tải khi lượng xem lớn
-    const CACHE_TTL_MS = 20 * 60 * 1000;
+    // Cache tạm thời ngắn để USER thấy rõ thay đổi
+    const CACHE_TTL_MS = 10 * 1000; 
     if (homeCache && Date.now() - homeCacheTime < CACHE_TTL_MS) {
         return homeCache;
     }
@@ -977,16 +981,7 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
         }
 
         if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
-            const nguoncItems = (nguoncRes.value.items || []).map((item: Record<string, unknown>) => ({
-                _id: (item.id || item.slug) as string,
-                name: item.name as string,
-                slug: item.slug as string,
-                origin_name: (item.original_name || item.name) as string,
-                thumb_url: item.thumb_url as string,
-                poster_url: item.poster_url as string,
-                year: toValidYear(item.year as string) || 0,
-                quality: (item.quality as string) || 'FHD',
-            })) as Movie[];
+            const nguoncItems = (nguoncRes.value.items || []).map((item: Record<string, unknown>) => normalizeNguoncItem(item));
             items = [...items, ...nguoncItems];
         }
 
