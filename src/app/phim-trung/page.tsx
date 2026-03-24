@@ -34,10 +34,12 @@ const FEATURED_ACTORS = [
     { name: "Triệu Lộ Tư", role: "Thần Ẩn", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/y82wmaDqTdXqvtasb4kxAIuT44U.jpg" },
     { name: "Cung Tuấn", role: "An Lạc Truyện", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/rtjBdEF61NySmDDnoDgAtuclAJJ.jpg" },
     { name: "Ngu Thư Hân", role: "Thương Lan Quyết", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/xQ2Bur9AEy0IX3qHMvLbr7tmTyD.jpg" },
-    { name: "Dương Tử", role: "Trường Tương Tư", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/20Nc1xnRFC5XGsb896ZxVNUOzFU.jpg" },
-    { name: "Hứa Khải", role: "Lạc Du Nguyên", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/f8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
-    { name: "Cúc Tịnh Y", role: "Hoa Nhung", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/g8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
-    { name: "Trần Tinh Húc", role: "Tinh Lạc Ngưng Thành Đường", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/f8I79Gf7L3N9L6C5uUqQGfF9lqW.jpg" },
+    { name: "Dương Tử", role: "Trường Tương Tư", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/uS80R3jOnm9Fm8k6P9uT8H6zF7x.jpg" },
+    { name: "Hứa Khải", role: "Kháng Chiến Bút Mặc", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/n555fWjI0uVscG6S5Y0XnB7R5P0.jpg" },
+    { name: "Cúc Tịnh Y", role: "Tiên Kiếm Kỳ Hiệp 4", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/jFf6pC5zS5s6E5vXf7G9u6W2zRr.jpg" },
+    { name: "Trần Tinh Húc", role: "Người Phiên Dịch", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/pS7m1Gq7b5qWf0z9h8M6p2uX4u.jpg" },
+    { name: "Trần Triết Viễn", role: "Vụng Trộm Không Thể Giấu", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/pS7m1Gq7b5qWf0z9h8M6p2uX4u.jpg" }, // Reuse for now or find better
+    { name: "Vương Tử Kỳ", role: "Tình Yêu Thôi Mà", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/uS80R3jOnm9Fm8k6P9uT8H6zF7x.jpg" }
 ];
 
 async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'default', minHeight = 380 }: { title: string; categorySlug: string; countrySlug: string; variant?: 'default' | 'sidebar'; minHeight?: number }) {
