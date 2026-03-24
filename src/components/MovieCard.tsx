@@ -244,7 +244,7 @@ function MovieCard({
                             fill
                             className="transition-transform duration-500 ease-out lg:group-hover/static-card:scale-[1.1] object-cover z-10 anchor-top"
                             sizes={orientation === 'landscape' ? "(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 400px" : "(max-width: 768px) 33vw, (max-width: 1200px) 20vw, (max-width: 1920px) 15vw, 300px"}
-                            quality={75}
+                            quality={100}
                             loading={priority ? undefined : loading}
                             priority={priority}
                             decoding="async"
