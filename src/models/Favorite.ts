@@ -10,6 +10,7 @@ export interface IFavorite extends Document {
     movieYear: number;
     movieQuality: string;
     movieCategories: string[];
+    lastEpisode: string; // To track new updates
     addedAt: Date;
 }
 
@@ -53,6 +54,10 @@ const FavoriteSchema = new Schema<IFavorite>(
         movieCategories: {
             type: [String],
             default: [],
+        },
+        lastEpisode: {
+            type: String,
+            default: "",
         },
         addedAt: {
             type: Date,

@@ -14,9 +14,11 @@ const CommentSection = dynamic(() => import("@/components/CommentSection"), {
 import MovieTabs from "@/components/MovieTabs";
 import MovieCast from "@/components/MovieCast";
 import { searchTMDBMovie, getTMDBDetails, getTMDBImage } from "@/services/tmdb";
+import { Suspense } from "react";
 import WatchlistButton from "@/components/WatchlistButton";
 import ShareButton from "@/components/ShareButton";
 import { getTMDBEpisodeImages, TMDBEpisodeMeta } from "@/app/actions/tmdb";
+import RelatedMoviesRow from "@/components/RelatedMoviesRow";
 
 // Revalidate every 5 minutes (was 60s). ISR means first visitor triggers refresh, others get cache.
 export const revalidate = 300;
@@ -111,7 +113,11 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
         type = 'tv';
     }
 
-    // ==> TỐI ƯU: Fetch song song tất cả dữ liệu phụ (TMDB + Related)
+    // --- OPTIMIZATION (PHASE 8): STREAMING ARCHITECTURE ---
+    // We only await the core movie data here. The rest will be streamed.
+    // (Actual streaming requires separate components or passing promises)
+    
+    // For now, we keep the parallel fetch but mark images for priority loading.
     const [tmdbSearch, relatedMoviesRaw, tmdbEpisodeImagesRes] = await Promise.allSettled([
         searchTMDBMovie(
             movie?.origin_name || movie?.name,
@@ -192,18 +198,30 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     //       PRIORITY 3 = TMDB Poster
     //       PRIORITY 4 = Source Poster (The Horse - least desired)
 
+    // --- BACKDROP & VISUAL ENGINE ---
+    // GOAL: Authentic "Source-First" thumbnails + High-Res TMDB ambient glow.
+    // This solves both "Blurry" source images and "Mismatch" with TMDB (wrong movies).
+    
+    // 1. Authenticity: The Source Thumb (usually what the user expects to see)
+    const sourceThumb = movie?.thumb_url ? getImageUrl(movie.thumb_url) : "";
+    const sourcePoster = movie?.poster_url ? getImageUrl(movie.poster_url) : "";
+    
+    // 2. High-Fidelity: TMDB Backdrop (for the ambient atmosphere)
     const tmdbBackdrop = tmdbDetails?.backdrop_path ? getTMDBImage(tmdbDetails.backdrop_path, "original") : "";
-    const tmdbPosterFallback = tmdbDetails?.poster_path ? getTMDBImage(tmdbDetails.poster_path, "original") : "";
+    const tmdbPoster = tmdbDetails?.poster_path ? getTMDBImage(tmdbDetails.poster_path, "original") : "";
 
-    const sourceThumbUrl = movie?.thumb_url ? getImageUrl(movie.thumb_url) : "";
-    const sourcePosterUrl = movie?.poster_url ? getImageUrl(movie.poster_url) : "";
+    // 3. Selection Strategy:
+    // - Always show source thumb as the "Content Layer" to ensure correct movie identity.
+    // - Use TMDB Backdrop as the "Ambient Layer" ONLY if it exists and looks like a match.
+    //   (Actually, even if it's a slight mismatch, the blur [Layer 1] hides the details but provides the palette).
     
-    // Final Backdrop Selection: Prioritize high-RES TMDB data for "Elite" quality
-    const backdropUrl = tmdbBackdrop || sourceThumbUrl || tmdbPosterFallback || sourcePosterUrl;
+    const ambientBgUrl = tmdbBackdrop || sourceThumb || tmdbPoster || sourcePoster;
+    const contentSubjectUrl = sourceThumb || sourcePoster || tmdbBackdrop || tmdbPoster;
     
-    // We treat it as a "portrait" style (to apply blur/object-contain) if it's from source 
-    // because source images are often smaller/differently aspected than pure backdrops.
-    const isPortraitFallback = !tmdbBackdrop && !!backdropUrl;
+    // Determine subject style
+    const subjectOrientation = detectOrientation(contentSubjectUrl);
+    const isSubjectPortrait = subjectOrientation === "portrait";
+
     const rating = tmdbDetails?.vote_average ? Number(tmdbDetails.vote_average).toFixed(1) : "9.7";
 
     const jsonLd = {
@@ -211,7 +229,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
         "@type": type === 'tv' ? "TVSeries" : "Movie",
         "name": movie?.name,
         "alternativeHeadline": movie?.origin_name,
-        "image": sourcePosterUrl || sourceThumbUrl || tmdbBackdrop,
+        "image": sourcePoster || sourceThumb || tmdbBackdrop,
         "description": movie?.content?.replace(/<[^>]+>/g, ''),
         "dateCreated": movie?.year?.toString(),
         "genre": movie?.category?.map((c: any) => c.name) || [],
@@ -262,35 +280,46 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 <div className="absolute inset-0 bg-[#0a0a0a]" />
 
                 {/* Backdrop layer: Cinematic Image Palette Glow */}
-                {backdropUrl && (
+                {(ambientBgUrl || contentSubjectUrl) && (
                     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                        {/* Layer 1: Base blur for ambient color filling (Super Deep Glow) */}
+                        {/* Layer 1: Ambient Palette (Deep Blur) - Uses TMDB for colors if possible */}
                         <Image
-                            src={backdropUrl}
+                            src={ambientBgUrl || "/fallback.png"}
                             alt=""
                             fill
                             priority
-                            className="object-cover opacity-[0.25] scale-125 blur-[120px] saturate-[2] brightness-[0.8]"
+                            className="object-cover opacity-[0.3] scale-125 blur-[100px] saturate-[2.5]"
                             sizes="100vw"
-                            quality={50}
+                            quality={10}
                         />
-                        {/* Layer 2: Main blurred texture (Subtle Texture) */}
+                        
+                        {/* Layer 2: Atmospheric Texture (Mid Blur) */}
                         <Image
-                            src={backdropUrl}
+                            src={ambientBgUrl || "/fallback.png"}
                             alt=""
                             fill
                             priority
-                            className="object-cover object-[68%_22%] opacity-[0.35] scale-110 blur-[50px] brightness-[0.9]"
+                            className="object-cover opacity-[0.25] blur-[40px] brightness-[0.7]"
                             sizes="100vw"
-                            quality={90}
+                            quality={30}
                         />
-                        {/* Layer 3: Sharp focused image on the right (The Subject) */}
+
+                        {/* Layer 3: THE SUBJECT (Authentic Source Thumbnail) */}
+                        {/* If it's landscape, we use it as a Cinematic background strip on the right */}
                         <Image
-                            src={backdropUrl}
-                            alt={movie?.name || ""}
+                            src={contentSubjectUrl}
+                            alt=""
                             fill
                             priority
-                            className={`opacity-100 mix-blend-screen brightness-[1.05] ${isPortraitFallback ? 'object-cover sm:object-contain sm:object-right-top' : 'object-cover object-[62%_20%] sm:object-right'}`}
+                            fetchPriority="high"
+                            loading="eager"
+                            decoding="sync"
+                            className={cn(
+                                "opacity-100 mix-blend-screen brightness-[1.02]",
+                                isSubjectPortrait 
+                                    ? "object-contain object-right-top sm:object-right opacity-80" 
+                                    : "object-cover object-[70%_25%] sm:object-right"
+                            )}
                             sizes="100vw"
                             quality={100}
                             unoptimized={true} 
@@ -306,15 +335,16 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 {/* Hero Info Content aligned left/bottom on desktop, center on mobile */}
                 <div className="relative z-10 w-full max-w-[1920px] mx-auto flex flex-col md:flex-row items-center md:items-end justify-center md:justify-between gap-6 md:gap-12 text-center md:text-left mt-0 sm:mt-4">
                     
-                    {/* Poster on Mobile (Centered, no negative margin to avoid topbar) */}
+                    {/* Poster on Mobile (Centered) */}
                     <div className="w-[140px] sm:w-[180px] md:hidden shrink-0 rounded-xl overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.8)] border border-white/15 relative aspect-[2/3] z-20">
                         <Image 
-                            src={sourcePosterUrl || sourceThumbUrl || tmdbPosterFallback || "/fallback.png"} 
+                            src={sourcePoster || sourceThumb || tmdbPoster || "/fallback.png"} 
                             alt={movie?.name || "Poster"} 
                             fill 
                             className="object-cover" 
                             sizes="180px"
                             priority
+                            unoptimized
                         />
                     </div>
 
@@ -397,16 +427,19 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                             movieSlug: String(movie.slug || ""),
                                             movieName: String(movie.name || ""),
                                             movieOriginName: String(movie.origin_name || ""),
-                                            moviePoster: sourcePosterUrl || sourceThumbUrl || tmdbBackdrop || "/fallback.png",
+                                            moviePoster: sourcePoster || sourceThumb || tmdbPoster || "/fallback.png",
                                             movieYear: Number(movie.year) || new Date().getFullYear(),
                                             movieQuality: String(movie.quality || "HD"),
                                             movieCategories: Array.isArray(movie.category) ? movie.category.map((c: any) => String(c.name || "")) : [],
+                                            lastEpisode: String(movie?.episode_current || ""),
                                         }}
                                         className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/10 py-3.5 px-5 sm:px-6 rounded-full font-medium shadow-sm transition-all w-full md:w-auto"
                                         showLabel={true}
                                     />
                                     <WatchlistButton
                                         slug={movie.slug}
+                                        movieName={movie.name}
+                                        poster={sourcePoster || sourceThumb || tmdbPoster || "/fallback.png"}
                                         className="!bg-white/5 hover:!bg-white/10 text-gray-300 hover:text-white border border-white/10 py-3.5 px-5 sm:px-6 rounded-full font-medium shadow-sm transition-all w-full md:w-auto"
                                         showLabel={true}
                                     />
@@ -426,59 +459,63 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 <div className="lg:hidden mb-10 pt-4">
                     <div className="bg-[#07070b]/60 backdrop-blur-xl rounded-lg p-5 sm:p-6 border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
                         <div className="flex items-center gap-2 mb-4 border-l-4 border-[#8FA7C5] pl-3">
-                            <h3 className="text-[16px] font-black text-white tracking-widest uppercase">Nội dung</h3>
+                            <h3 className="text-[18px] font-black text-white tracking-widest uppercase">Nội dung</h3>
                         </div>
                         <div 
-                            className="text-[14px] text-gray-300 leading-relaxed font-light text-justify" 
+                            className="text-[15.5px] sm:text-[16.5px] text-gray-300 leading-relaxed font-medium text-justify" 
                             dangerouslySetInnerHTML={{ __html: movie?.content }} 
                         />
                     </div>
                 </div>
 
                 {/* On mobile/tablet: RIGHT column (tabs) first, then sidebar info below */}
-                <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 items-start">
+                <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-12 items-start">
 
                     {/* RIGHT COLUMN (Tabs & Content) */}
-                    <div className="w-full lg:col-span-8 xl:col-span-9">
-                        <MovieTabs
-                            movie={movie}
-                            relatedMovies={relatedMovies}
-                            episodes={episodes}
-                            slug={slug}
-                            tmdbDetails={tmdbDetails}
-                            episodeThumbnails={episodeThumbnails}
-                            episodeMetadata={episodeMetadata}
-                            castComponent={<MovieCast movie={movie} slug={slug} isCompact={false} tmdbCast={tmdbDetails?.credits?.cast} />}
-                        />
+                    <div className="w-full lg:col-span-7 xl:col-span-8">
+                        <Suspense fallback={<div className="h-96 rounded-2xl bg-white/5 animate-pulse flex items-center justify-center text-white/20 font-black uppercase tracking-[4px]">Loading Movie Data...</div>}>
+                            <MovieTabs
+                                movie={movie}
+                                relatedMovies={relatedMovies}
+                                episodes={episodes}
+                                slug={slug}
+                                tmdbDetails={tmdbDetails}
+                                episodeThumbnails={episodeThumbnails}
+                                episodeMetadata={episodeMetadata}
+                                castComponent={<MovieCast movie={movie} slug={slug} isCompact={false} tmdbCast={tmdbDetails?.credits?.cast} />}
+                            />
+                        </Suspense>
                         {/* Comment Section below tabs */}
                         <div className="mt-8 sm:mt-12">
                             <div className="flex items-center gap-2 mb-6 border-l-2 border-[#8FA7C5] pl-3">
-                                <h3 className="text-[15px] font-bold text-white uppercase tracking-widest">Bình luận</h3>
+                                <h3 className="text-[17px] sm:text-[19px] font-black text-white uppercase tracking-widest">Bình luận</h3>
                             </div>
-                            <CommentSection movieId={String(movie._id || movie.id || "")} movieSlug={String(movie.slug || "")} />
+                            <Suspense fallback={<div className="h-32 rounded-lg bg-white/5 animate-pulse" />}>
+                                <CommentSection movieId={String(movie._id || movie.id || "")} movieSlug={String(movie.slug || "")} />
+                            </Suspense>
                         </div>
                     </div>
 
                     {/* LEFT SIDEBAR (shown after tabs on mobile, beside on desktop) */}
-                    <div className="w-full lg:col-span-4 xl:col-span-3 order-2 lg:order-1 space-y-6 sm:space-y-8 lg:pr-4">
+                    <div className="w-full lg:col-span-5 xl:col-span-4 order-2 lg:order-1 space-y-6 sm:space-y-8">
                         <div className="rounded-[10px] border border-white/[0.06] bg-[#07070b]/78 p-4 sm:p-5 space-y-6 sm:space-y-8 shadow-[0_10px_24px_#00000066]">
                         {/* Nội dung (Desktop only) */}
                         <div className="hidden lg:block">
-                            <div className="flex items-center gap-2 mb-3 sm:mb-4 border-l-2 border-[#8FA7C5] pl-3">
-                                <h3 className="text-[14px] sm:text-[15px] font-bold text-white uppercase tracking-widest">Nội dung</h3>
+                            <div className="flex items-center gap-2 mb-4 border-l-2 border-[#8FA7C5] pl-3">
+                                <h3 className="text-[16px] sm:text-[17px] font-black text-white uppercase tracking-widest">Nội dung</h3>
                             </div>
-                            <div className="text-[13px] text-gray-400 leading-relaxed font-light text-justify line-clamp-6 sm:line-clamp-[12]" dangerouslySetInnerHTML={{ __html: movie?.content }} />
+                            <div className="text-[15px] sm:text-[16px] text-gray-300 leading-[1.8] font-medium text-justify line-clamp-[15] drop-shadow-sm" dangerouslySetInnerHTML={{ __html: movie?.content }} />
                         </div>
 
                         {/* Đạo diễn */}
-                        <div>
-                            <div className="text-[11px] font-medium text-gray-400 uppercase tracking-widest mb-2">Đạo diễn</div>
-                            <div className="text-[13px] font-bold text-white">{movie?.director?.join(", ") || "Đang cập nhật"}</div>
+                        <div className="pt-2">
+                            <div className="text-[12px] font-black text-gray-500 uppercase tracking-[2px] mb-2.5">Đạo diễn</div>
+                            <div className="text-[14.5px] font-black text-white drop-shadow-md">{movie?.director?.join(", ") || "Đang cập nhật"}</div>
                         </div>
 
                         {/* Diễn viên (Desktop only Sidebar or always removed to Tabs) */}
-                        <div className="hidden lg:block">
-                            <div className="text-[11px] font-medium text-gray-400 uppercase tracking-widest mb-3">Diễn viên</div>
+                        <div className="hidden lg:block pt-2">
+                            <div className="text-[12px] font-black text-gray-500 uppercase tracking-[2px] mb-3.5">Diễn viên</div>
                             <MovieCast movie={movie} slug={movie.slug} isCompact={true} tmdbCast={tmdbDetails?.credits?.cast} />
                         </div>
 

@@ -411,9 +411,7 @@ function OnflixHoverCard({
                                     size="md"
                                     className="!w-9 !h-9 shrink-0 rounded-full text-white/80 hover:text-white bg-white/5 hover:bg-white/15 border border-white/20 hover:border-white transition-all hover:scale-105 flex items-center justify-center"
                                 />
-
-                                {/* Favorite button */}
-                                <div className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full border border-white/20 hover:border-white text-white/80 hover:text-white bg-white/5 hover:bg-white/15 cursor-pointer transition-all hover:scale-105">
+                                 <div className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full border border-white/20 hover:border-white text-white/80 hover:text-white bg-white/5 hover:bg-white/15 cursor-pointer transition-all hover:scale-105">
                                     <FavoriteButton
                                         movieData={{
                                             movieId: movie._id || "",
@@ -421,16 +419,16 @@ function OnflixHoverCard({
                                             movieName: movie.name,
                                             movieOriginName: movie.origin_name,
                                             moviePoster: movie.poster_url || movie.thumb_url,
-                                            movieYear: movie.year,
+                                            movieYear: Number(movie.year),
                                             movieQuality: movie.quality,
                                             movieCategories: movie.category?.map((c) => c.name) || [],
+                                            lastEpisode: movie.episode_current || "",
                                         }}
                                         size="sm"
                                         className="w-4 h-4"
                                     />
                                 </div>
-
-                                <Link
+                                 <Link
                                     href={`/phim/${movie.slug}`}
                                     className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full border border-white/20 hover:border-white text-white/80 hover:text-white bg-white/5 hover:bg-white/15 transition-all hover:scale-105"
                                     title="Chi tiết"
@@ -442,12 +440,12 @@ function OnflixHoverCard({
 
                         {/* Info: Year & Quality */}
                         <div className="flex items-center gap-2 text-[13px] mt-2">
-                            {movie.year && (
+                            {movie.year && Number(movie.year) > 0 && (
                                 <span className="text-white/70 font-medium">{movie.year}</span>
                             )}
                             {movie.quality && (
                                 <span className="border border-white/30 text-white/80 px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider">
-                                    {movie.quality}
+                                    {formatQualityLabel(movie.quality)}
                                 </span>
                             )}
                             {movie.episode_current && (

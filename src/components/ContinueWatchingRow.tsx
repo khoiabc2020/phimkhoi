@@ -121,8 +121,8 @@ function ContinueWatchingRowInner() {
                     <div className="h-4 w-16 bg-white/10 rounded animate-pulse" />
                 </div>
                 <div className="flex gap-3 overflow-x-hidden pb-4">
-                    {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="flex-[0_0_160px] sm:flex-[0_0_200px] md:flex-[0_0_240px] aspect-video rounded-md bg-white/10 animate-pulse" />
+                    {[1, 2, 3].map((i) => (
+                        <div key={i} className="flex-[0_0_220px] sm:flex-[0_0_260px] md:flex-[0_0_300px] aspect-video rounded-xl bg-white/5 animate-pulse border border-white/5" />
                     ))}
                 </div>
             </div>
@@ -162,8 +162,8 @@ function ContinueWatchingRowInner() {
                     className="flex gap-4 md:gap-5 overflow-x-auto pb-4 pt-4 no-scrollbar snap-x px-1"
                     style={{ scrollbarWidth: "none", msOverflowStyle: "none", scrollBehavior: "smooth", contain: "layout paint" }}
                 >
-                    {movies.map((item) => (
-                        <div key={item._id} className="relative group/card flex-[0_0_140px] md:flex-[0_0_160px] lg:flex-[0_0_180px] snap-start">
+                    {displayMovies.map((item) => (
+                        <div key={item._id} className="relative group/card flex-[0_0_220px] sm:flex-[0_0_260px] md:flex-[0_0_300px] snap-start">
                             <Link
                                 href={`/xem-phim/${item.movieSlug}/${item.episodeSlug}`}
                                 className="block w-full outline-none"
@@ -177,21 +177,24 @@ function ContinueWatchingRowInner() {
                                         sizes="(max-width: 768px) 140px, (max-width: 1024px) 160px, 180px"
                                         className="object-cover group-hover/card:scale-105 transition-transform duration-500 will-change-transform"
                                     />
-                                    
-                                    {/* Play button on hover */}
-                                    <div className="absolute inset-0 bg-black/20 md:bg-black/30 md:opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 flex items-center justify-center z-10 translate-z-0">
-                                        <div className="w-10 h-10 rounded-full bg-[#d3deec] flex items-center justify-center scale-90 md:scale-0 group-hover/card:scale-100 transition-transform duration-500 delay-75 will-change-transform">
-                                            <Play className="w-5 h-5 text-[#0d1119] fill-[#0d1119] ml-0.5" />
+
+                                    {/* Premium Overlay */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-100 transition-opacity duration-300 pointer-events-none" />
+
+                                    {/* Play button Overlay */}
+                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-all duration-500 pointer-events-none">
+                                        <div className="w-12 h-12 rounded-full bg-[#d3deec] shadow-[0_0_20px_rgba(255,255,255,0.2)] flex items-center justify-center scale-75 group-hover/card:scale-100 transition-transform duration-500">
+                                            <Play className="w-6 h-6 text-[#0d1119] fill-[#0d1119] ml-1" />
                                         </div>
                                     </div>
 
                                     {/* Nút X xóa */}
                                     <button
                                         onClick={(e) => handleRemove(e, item._id)}
-                                        className="absolute top-1.5 right-1.5 md:top-2 md:right-2 w-8 h-8 md:w-6 md:h-6 rounded-full bg-black/80 hover:bg-red-600 flex items-center justify-center text-white/90 hover:text-white transition-colors opacity-100 md:opacity-0 md:group-hover/card:opacity-100 z-30 touch-manipulation"
+                                        className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/80 hover:bg-red-600 flex items-center justify-center text-white/90 hover:text-white transition-all opacity-0 group-hover/card:opacity-100 z-30 touch-manipulation hover:scale-110"
                                         title="Xóa khỏi lịch sử"
                                     >
-                                        <X className="w-4 h-4 md:w-3 md:h-3" />
+                                        <X className="w-3.5 h-3.5" />
                                     </button>
 
                                     {/* Progress Bar */}
@@ -203,14 +206,14 @@ function ContinueWatchingRowInner() {
                                     </div>
                                 </div>
 
-                                {/* Text bên dưới ảnh */}
-                                <div className="mt-2.5 px-0.5">
-                                    <h3 className="text-white font-semibold text-[14.5px] line-clamp-1 group-hover/card:text-[#8FA7C5] transition-colors leading-tight" title={item.movieName}>
+                                {/* Text Info */}
+                                <div className="mt-3 px-1">
+                                    <h3 className="text-white font-bold text-[15.5px] sm:text-[17px] line-clamp-1 group-hover/card:text-[#8FA7C5] transition-colors leading-tight drop-shadow-md" title={item.movieName}>
                                         {item.movieName}
                                     </h3>
-                                    <div className="flex items-center justify-between mt-1 mb-1.5">
-                                        <span className="text-white/40 text-[11px] truncate mr-2 font-medium">{item.episodeName || "Tiếp tục xem"}</span>
-                                        <span className="text-white/50 text-[11px] font-bold shrink-0">{item.progress}%</span>
+                                    <div className="flex items-center justify-between mt-1.5 opacity-60 group-hover/card:opacity-100 transition-opacity">
+                                        <span className="text-gray-300 text-[12px] font-medium truncate italic">{item.episodeName || "Tiếp tục xem"}</span>
+                                        <span className="text-[#8FA7C5] text-[12px] font-black uppercase tracking-wider">{item.progress}%</span>
                                     </div>
                                 </div>
                             </Link>

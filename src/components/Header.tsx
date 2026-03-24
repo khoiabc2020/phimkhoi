@@ -10,6 +10,7 @@ import { signOut, useSession } from "next-auth/react";
 import MobileMenu from "./MobileMenu";
 import { getRealtimeSearch } from "@/app/actions/search";
 import SearchSkeleton from "./SearchSkeleton";
+import NotificationDropdown from "./NotificationDropdown";
 
 interface HeaderProps {
     categories: any[];
@@ -372,10 +373,7 @@ export default function Header({ categories, countries }: HeaderProps) {
                         </div>
 
                         <div className={cn("flex items-center gap-3 lg:gap-6", isSearchOpen ? "hidden lg:flex" : "flex")}>
-                            <Link href="/thong-bao" className="relative p-2 rounded-full hover:bg-white/5 transition-all text-white/70 hover:text-white">
-                                <Bell className="w-5 h-5" />
-                                <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 border-2 border-[#0a0a0a] rounded-full" />
-                            </Link>
+                            <NotificationDropdown />
 
                             {!mounted ? (
                                 <div className="w-9 h-9 rounded-full bg-white/5 animate-pulse" />

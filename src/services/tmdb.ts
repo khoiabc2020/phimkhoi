@@ -106,15 +106,17 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
                             : (item.first_air_date ? parseInt(item.first_air_date.substring(0, 4)) : null);
 
                         // Country Check: Prevent Western movies from matching Asian dramas
-                        if (verification?.countrySlug) {
-                            const isAsianDrama = ["trung-quoc", "han-quoc", "nhat-ban", "thai-lan"].includes(verification.countrySlug);
-                            const itemCountries = item.origin_country || [];
-                            // If it's a known Asian drama, it must originate from CN, KR, JP, TH, TW, HK.
-                            if (isAsianDrama) {
-                                const hasAsianOrigin = itemCountries.some((c: string) => ["CN", "KR", "JP", "TH", "TW", "HK"].includes(c));
-                                if (itemCountries.length > 0 && !hasAsianOrigin) {
-                                    return false; // Reject false positive (e.g. US movie named "Pursuit of Jade")
-                                }
+                        const isAsianDramaSource = ["trung-quoc", "han-quoc", "nhat-ban", "thai-lan"].includes(verification?.countrySlug || "");
+                        const itemCountries = item.origin_country || [];
+                        const itemOriginalLang = item.original_language || "";
+                        
+                        if (isAsianDramaSource) {
+                            // If it's a known Asian drama source, it MUST be from an Asian country OR have an Asian original language
+                            const hasAsianOrigin = itemCountries.some((c: string) => ["CN", "KR", "JP", "TH", "TW", "HK"].includes(c));
+                            const hasAsianLang = ["zh", "ko", "ja", "th"].includes(itemOriginalLang);
+                            
+                            if (itemCountries.length > 0 && !hasAsianOrigin && !hasAsianLang) {
+                                return false; // Reject US/Western matches for Asian drama queries
                             }
                         }
 
@@ -124,33 +126,35 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
                         // 1. Check original name from verification
                         if (verification?.originalName) {
                             const originalTitle = endpoint === 'movie' ? item.original_title : item.original_name;
-                            if (originalTitle && calculateSimilarity(verification.originalName, originalTitle) >= 0.35) {
+                            const similarity = calculateSimilarity(verification.originalName, originalTitle || "");
+                            if (similarity >= 0.7) {
+                                isMatch = true;
+                            } else if (similarity >= 0.4 && itemYear === year) {
                                 isMatch = true;
                             }
                         }
 
-                        // 1b. Check local name from verification (New & Critical!)
+                        // 1b. Check local name from verification
                         if (!isMatch && verification?.localName) {
                             const localTitle = endpoint === 'movie' ? item.title : item.name;
                             const originalTitleSearch = endpoint === 'movie' ? item.original_title : item.original_name;
-                            if (localTitle && calculateSimilarity(verification.localName, localTitle) >= 0.5) isMatch = true;
-                            if (!isMatch && originalTitleSearch && calculateSimilarity(verification.localName, originalTitleSearch) >= 0.5) isMatch = true;
+                            
+                            // High threshold for local titles to avoid "Anh yêu em" common phrases matching wrong movies
+                            if (localTitle && calculateSimilarity(verification.localName, localTitle) >= 0.85) isMatch = true;
+                            if (!isMatch && originalTitleSearch && calculateSimilarity(verification.localName, originalTitleSearch) >= 0.85) isMatch = true;
+                            
+                            // If year matches perfectly, we can be slightly more lenient
+                            if (!isMatch && itemYear === year && localTitle && calculateSimilarity(verification.localName, localTitle) >= 0.6) isMatch = true;
                         }
 
-                        // Year Check: Allow +/- 5 year tolerance for very new or future movies
-                        if (!isMatch && year && itemYear && Math.abs(itemYear - year) > 5) {
-                            if (verification?.originalName && (
-                                item.original_title?.toLowerCase() === verification.originalName.toLowerCase() ||
-                                item.original_name?.toLowerCase() === verification.originalName.toLowerCase()
-                            )) {
-                                isMatch = true;
-                            } else if (verification?.localName && (
-                                item.title?.toLowerCase() === verification.localName.toLowerCase() ||
-                                item.name?.toLowerCase() === verification.localName.toLowerCase()
-                            )) {
-                                isMatch = true;
+                        // Year Check: Be strict if we have a year
+                        if (year && itemYear && Math.abs(itemYear - year) > 1) {
+                            // If title is EXACT, we can allow +/- 1 year (TMDB vs source discrepancy)
+                            // But 5 years is too much for modern movies
+                            if (isMatch) {
+                                // Keep it
                             } else {
-                                return false; // Fail year check
+                                return false;
                             }
                         }
 

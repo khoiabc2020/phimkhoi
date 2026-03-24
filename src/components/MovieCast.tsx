@@ -68,7 +68,7 @@ function ActorInitials({ name }: { name: string }) {
     return (
         <div className={`relative w-full h-full bg-gradient-to-br ${colors[colorIdx]} flex items-center justify-center`}>
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_25%,rgba(255,255,255,0.28),transparent_45%)]" />
-            <span className="relative text-white font-black text-[12px] uppercase tracking-wide drop-shadow-md">
+            <span className="relative text-white font-black text-[14px] uppercase tracking-wider drop-shadow-md">
                 {initials}
             </span>
         </div>
@@ -128,17 +128,17 @@ export default async function MovieCast({
                     <Link
                         href={`/dien-vien/${actor.name.toLowerCase().replace(/ /g, '-')}`}
                         key={actor.name}
-                        className="flex flex-col items-center gap-2 w-[4.5rem] group"
+                        className="flex flex-col items-center gap-2.5 w-[5.5rem] group"
                         title={actor.name}
                     >
-                        <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border border-white/15 group-hover:border-[#8FA7C5] transition-colors relative bg-white/5 ring-1 ring-white/5 group-hover:ring-[#8FA7C5]/40">
+                        <div className="w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-full overflow-hidden shrink-0 border-2 border-white/10 group-hover:border-[#8FA7C5] transition-all duration-300 relative bg-[#0c1018] ring-1 ring-white/5 group-hover:ring-[#8FA7C5]/40 shadow-lg">
                             {actor.photo ? (
-                                <Image src={actor.photo} alt={actor.name} fill className="object-cover" unoptimized />
+                                <Image src={actor.photo} alt={actor.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" unoptimized />
                             ) : (
                                 <ActorInitials name={actor.name} />
                             )}
                         </div>
-                        <p className="text-[11px] text-gray-400 group-hover:text-white transition-colors text-center font-medium leading-tight line-clamp-2 w-full">
+                        <p className="text-[12px] sm:text-[13px] text-gray-300 group-hover:text-white transition-colors text-center font-bold leading-tight line-clamp-2 w-full drop-shadow-sm">
                             {actor.name}
                         </p>
                     </Link>

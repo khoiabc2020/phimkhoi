@@ -31,9 +31,15 @@ export async function GET(request: NextRequest) {
         let origin = upstreamOrigin;
 
         // Special handling for known providers who are strict about Referer
-        if (url.includes('nguonc.com') || url.includes('streamc.xyz') || url.includes('phimmoi.net') || url.includes('1080.com.vn')) {
-            referer = 'https://phim.nguonc.com/';
-            origin = 'https://phim.nguonc.com';
+        if (url.includes('nguonc.com') || url.includes('streamc') || url.includes('phimmoi.net') || url.includes('1080.com.vn')) {
+            // NguonC specifically often needs the simple domain or exactly what their embed uses
+            referer = 'https://nguonc.com/';
+            origin = 'https://nguonc.com';
+            
+            // If it's a specific CDN, try to match it
+            if (url.includes('phim.nguonc.com')) {
+                referer = 'https://phim.nguonc.com/';
+            }
         } else if (url.includes('kkphim') || url.includes('phim1280.tv') || url.includes('phimapi.com')) {
             referer = 'https://kkphim.com/';
             origin = 'https://kkphim.com';

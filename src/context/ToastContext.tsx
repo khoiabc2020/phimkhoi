@@ -61,80 +61,76 @@ function ToastItem({ toast, onRemove }: { toast: ToastData; onRemove: () => void
     const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
     useEffect(() => {
-        // Slide in
         requestAnimationFrame(() => setVisible(true));
-
         timerRef.current = setTimeout(() => {
             setExiting(true);
             setTimeout(onRemove, 350);
         }, 3800);
-
         return () => clearTimeout(timerRef.current);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [onRemove]);
 
     const cfg = TYPE_CONFIG[toast.type];
 
     return (
         <div
             className={`
-                flex items-center gap-3 px-4 py-3
-                rounded-lg border shadow-2xl
+                relative flex items-stretch gap-4 p-0
+                rounded-2xl border shadow-[0_30px_60px_rgba(0,0,0,0.5)]
                 ${cfg.border}
-                transition-all duration-350 ease-out
+                transition-all duration-500 cubic-bezier(0.2, 1, 0.2, 1)
                 ${visible && !exiting
                     ? "opacity-100 translate-y-0 scale-100"
-                    : "opacity-0 -translate-y-4 scale-95"
+                    : "opacity-0 -translate-y-6 scale-90 blur-md"
                 }
+                overflow-hidden backdrop-blur-[32px] bg-[#0a0a0f]/85
             `}
             style={{
-                background: "rgba(18, 20, 28, 0.92)",
-                backdropFilter: "blur(28px)",
-                WebkitBackdropFilter: "blur(28px)",
-                minWidth: "300px",
-                maxWidth: "420px",
+                width: "420px",
+                maxWidth: "calc(100vw - 32px)",
             }}
         >
-            {/* Poster */}
-            {toast.poster ? (
-                <div className="relative w-10 h-14 flex-shrink-0 rounded-lg overflow-hidden ring-1 ring-white/10 shadow-lg">
-                    <Image
-                        src={getImageUrl(toast.poster)}
-                        alt=""
-                        fill
-                        className="object-cover"
-                        unoptimized
-                    />
-                </div>
-            ) : (
-                <div className={`w-8 h-8 flex-shrink-0 rounded-full flex items-center justify-center bg-white/10`}>
+            {/* Cinematic Poster - Bigger for "Elite" impact */}
+            <div className="relative w-[80px] sm:w-[100px] aspect-[2/3] shrink-0 overflow-hidden border-r border-white/5 group">
+                <Image
+                    src={getImageUrl(toast.poster || "")}
+                    alt=""
+                    fill
+                    className="object-cover transition-transform duration-700 hover:scale-110"
+                    unoptimized
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent" />
+                {/* Status Icon Overlay */}
+                <div className="absolute top-2 left-2 w-7 h-7 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center">
                     {cfg.icon}
                 </div>
-            )}
+            </div>
 
-            {/* Content */}
-            <div className="flex-1 min-w-0">
-                {/* Type label + icon */}
-                <div className={`flex items-center gap-1.5 ${cfg.color} text-[11px] font-semibold uppercase tracking-wide mb-0.5`}>
-                    {!toast.poster && cfg.icon}
+            {/* Content Area */}
+            <div className="flex-1 flex flex-col justify-center py-4 pr-10 pl-1 min-w-0">
+                <div className={`flex items-center gap-2 ${cfg.color} text-[13px] font-black uppercase tracking-[2px] mb-1 italic`}>
                     <span>{toast.title}</span>
                 </div>
                 {toast.description && (
-                    <p className="text-white/60 text-xs leading-snug truncate">{toast.description}</p>
+                    <p className="text-white/50 text-[12px] leading-[1.4] font-medium tracking-tight line-clamp-2 italic">
+                        {toast.description}
+                    </p>
                 )}
             </div>
 
-            {/* Close */}
+            {/* Close Button */}
             <button
                 onClick={() => { setExiting(true); setTimeout(onRemove, 300); }}
-                className="flex-shrink-0 text-white/25 hover:text-white/70 transition-colors ml-1"
+                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/20 hover:text-white hover:bg-white/10 transition-all pointer-events-auto"
             >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-4 h-4" />
             </button>
 
-            {/* Bottom progress bar */}
-            <div className="absolute bottom-0 left-3 right-3 h-[2px] rounded-full overflow-hidden">
-                <div className={`h-full ${toast.type === "error" ? "bg-red-400/40" : toast.type === "favorite" ? "bg-rose-400/40" : "bg-yellow-400/40"} animate-[shrink_3.8s_linear_forwards]`} />
+            {/* Bottom Progress Bar - Styled for "Elite" */}
+            <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-white/[0.03]">
+                <div 
+                    className={`h-full ${cfg.color.replace('text-', 'bg-')} shadow-[0_0_10px_rgba(255,255,255,0.3)] animate-shrink`}
+                    style={{ animationDuration: '3.8s', animationTimingFunction: 'linear', animationFillMode: 'forwards' }}
+                />
             </div>
         </div>
     );

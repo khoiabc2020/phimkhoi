@@ -15,6 +15,7 @@ export async function addFavorite(movieData: {
     movieYear: number;
     movieQuality: string;
     movieCategories: string[];
+    lastEpisode?: string;
 }) {
     try {
         const session = await getServerSession(authOptions);
@@ -27,6 +28,7 @@ export async function addFavorite(movieData: {
         const favorite = await Favorite.create({
             userId: session.user.id,
             ...movieData,
+            lastEpisode: movieData.lastEpisode || "",
         });
 
         revalidatePath("/phim-yeu-thich");

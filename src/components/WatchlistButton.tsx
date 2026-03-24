@@ -6,12 +6,14 @@ import { useToast } from "@/context/ToastContext";
 
 interface WatchlistButtonProps {
     slug: string;
+    movieName?: string;
+    poster?: string;
     className?: string;
     showLabel?: boolean;
     label?: string;
 }
 
-export default function WatchlistButton({ slug, className = "", showLabel = false, label = "Xem sau" }: WatchlistButtonProps) {
+export default function WatchlistButton({ slug, movieName, poster, className = "", showLabel = false, label = "Xem sau" }: WatchlistButtonProps) {
     const { isInWatchlist, addToWatchlist, removeFromWatchlist, isLoaded } = useWatchlist();
     const { showToast } = useToast();
     const inWatchlist = isInWatchlist(slug);
@@ -25,14 +27,16 @@ export default function WatchlistButton({ slug, className = "", showLabel = fals
             showToast({
                 type: "success",
                 title: "Đã xóa khỏi Xem Sau",
-                description: "Danh sách của bạn đã được cập nhật.",
+                description: movieName || "Danh sách của bạn đã được cập nhật.",
+                poster: poster,
             });
         } else {
             await addToWatchlist(slug);
             showToast({
                 type: "watchlist",
-                title: label || "Phim đã được lưu",
+                title: movieName || "Phim đã được lưu",
                 description: "Đã thêm vào Danh Sách Xem Sau",
+                poster: poster,
             });
         }
     };
