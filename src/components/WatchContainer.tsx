@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import VideoPlayer from "@/components/VideoPlayer";
 import WatchEngagementBar from "@/components/WatchEngagementBar";
 import WatchEpisodeSection from "@/components/WatchEpisodeSection";
-import { Movie } from "@/services/api";
+import { Movie, saveWatchHistory } from "@/services/api";
 import { Monitor, ChevronLeft, ChevronRight, SkipForward, Loader2 } from "lucide-react";
 import { getWatchHistoryForEpisode } from "@/app/actions/watchHistory";
 
