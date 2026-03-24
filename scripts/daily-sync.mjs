@@ -328,15 +328,76 @@ async function syncTMDBTrending(timeWindow = 'day') {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 
+async function hydrateAllMovies() {
+    log('=== FULL LIBRARY HYDRATION MODE ===');
+    // Find all movies that have no episodes (dark cards)
+    const missingData = await Movie.find(
+        { $or: [
+            { episodes: { $in: [null, [], undefined] } },
+            { thumb_url: { $in: [null, '', undefined] } },
+        ]},
+        { slug: 1, _id: 0 }
+    ).lean();
+
+    log(`  → Found ${missingData.length} movies needing hydration`);
+
+    let hydrated = 0;
+    let failed = 0;
+    const slugs = missingData.map(m => m.slug).filter(Boolean);
+    const BATCH_SIZE = 8; // Larger batch for faster throughput
+
+    for (let i = 0; i < slugs.length; i += BATCH_SIZE) {
+        const batch = slugs.slice(i, i + BATCH_SIZE);
+
+        await Promise.all(batch.map(async (slug) => {
+            try {
+                let detailData = await fetchJson(`${KKPHIM_API}/v1/api/phim/${slug}`);
+                if (!detailData?.data?.item) {
+                    detailData = await fetchJson(`${OPHIM_API}/v1/api/phim/${slug}`);
+                }
+                if (!detailData?.data?.item) { failed++; return; }
+
+                const item = detailData.data.item;
+                const episodes = detailData.data.episodes || [];
+                const { _id, ...itemData } = item;
+
+                await Movie.findOneAndUpdate(
+                    { slug },
+                    { $set: { ...itemData, episodes, lastSynced: new Date() } },
+                    { upsert: true }
+                );
+                hydrated++;
+            } catch (e) { failed++; }
+        }));
+
+        if ((i + BATCH_SIZE) % 80 === 0 || i + BATCH_SIZE >= slugs.length) {
+            log(`    ... Hydrated ${hydrated}/${slugs.length} | Failed: ${failed}`);
+        }
+        // Avoid rate limits
+        await new Promise(r => setTimeout(r, 300));
+    }
+
+    log(`  ✓ Full library hydration complete: ${hydrated} hydrated, ${failed} failed`);
+}
+
 async function main() {
     const isFull = process.argv.includes('--full');
-    log(`=== PhimKhoi Daily Sync Started (Mode: ${isFull ? 'FULL' : 'QUICK'}) ===`);
+    const isHydrateAll = process.argv.includes('--hydrate-all');
+    const mode = isHydrateAll ? 'HYDRATE-ALL' : isFull ? 'FULL' : 'QUICK';
+    log(`=== PhimKhoi Daily Sync Started (Mode: ${mode}) ===`);
 
     try {
         await mongoose.connect(MONGODB_URI);
         log('✓ Connected to MongoDB');
 
-        await syncTrendingWithViewCount(isFull);
+        if (isHydrateAll) {
+            // Deep hydrate all movies in DB with missing data
+            await syncTrendingWithViewCount(true); // Pull latest list data first
+            await hydrateAllMovies();             // Then hydrate every missing movie
+        } else {
+            await syncTrendingWithViewCount(isFull);
+        }
+
         await syncTMDBTrending('day');
         await syncTMDBTrending('week');
 
