@@ -1,6 +1,6 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, { Schema, Model } from "mongoose";
 
-export interface IMovieDetail extends Document {
+export interface IMovieDetail {
     _id: string; // Map from external ID or slug
     name: string;
     origin_name: string;
