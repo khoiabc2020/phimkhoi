@@ -390,7 +390,7 @@ let homeCacheTime = 0;
 /** Cấu hình đề mục trang chủ — slug + endpoint chuẩn (PhimAPI/KKPhim + NguonC) */
 type HomeCacheKey = 'phimMoi' | 'phimLe' | 'phimBo' | 'hoatHinh' | 'tvShows' | 'phimChieuRap' | 'phimSapChieu' | 'hanQuoc' | 'trungQuoc' | 'hanhDong' | 'tinhCam';
 const HOME_CATEGORIES: { key: HomeCacheKey; slug: string; endpoint: 'danh-sach' | 'the-loai' | 'quoc-gia' }[] = [
-    { key: 'phimMoi', slug: 'phim-moi', endpoint: 'danh-sach' }, // Changed from phim-moi-cap-nhat
+    { key: 'phimMoi', slug: 'phim-moi-cap-nhat', endpoint: 'danh-sach' },
     { key: 'phimLe', slug: 'phim-le', endpoint: 'danh-sach' },
     { key: 'phimBo', slug: 'phim-bo', endpoint: 'danh-sach' },
     { key: 'hoatHinh', slug: 'hoat-hinh', endpoint: 'the-loai' }, // specific category
