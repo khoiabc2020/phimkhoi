@@ -123,18 +123,18 @@ export default async function PersonPage({ params, searchParams }: PersonPagePro
                         )}
 
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-6 pt-4">
-                            <div className="p-5 rounded-3xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-md shadow-xl hover:bg-white/[0.05] transition-colors group/card">
-                                <div className="text-white/30 text-[10px] uppercase font-black tracking-widest mb-2 group-hover/card:text-primary transition-colors">Giới tính</div>
-                                <div className="text-lg font-black">{details.gender === 1 ? "Nữ" : "Nam"}</div>
+                            <div className="p-5 rounded-3xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-md shadow-xl hover:bg-white/[0.05] transition-all group/card ring-1 ring-white/5">
+                                <div className="text-[#8FA7C5]/50 text-[10px] uppercase font-black tracking-widest mb-2 group-hover:text-[#8FA7C5] transition-colors">Giới tính</div>
+                                <div className="text-lg font-black text-white/90">{details.gender === 1 ? "Nữ" : "Nam"}</div>
                             </div>
-                            <div className="p-5 rounded-3xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-md shadow-xl hover:bg-white/[0.05] transition-colors group/card">
-                                <div className="text-white/30 text-[10px] uppercase font-black tracking-widest mb-2 group-hover/card:text-primary transition-colors">Nghề nghiệp</div>
-                                <div className="text-lg font-black text-primary">{details.known_for_department === 'Acting' ? 'Diễn viên' : details.known_for_department}</div>
+                            <div className="p-5 rounded-3xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-md shadow-xl hover:bg-white/[0.05] transition-all group/card ring-1 ring-white/5">
+                                <div className="text-[#8FA7C5]/50 text-[10px] uppercase font-black tracking-widest mb-2 group-hover:text-[#8FA7C5] transition-colors">Nghề nghiệp</div>
+                                <div className="text-lg font-black text-[#8FA7C5]">{details.known_for_department === 'Acting' ? 'Diễn viên' : details.known_for_department}</div>
                             </div>
-                            <div className="p-5 rounded-3xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-md shadow-xl hover:bg-white/[0.05] transition-colors group/card">
-                                <div className="text-white/30 text-[10px] uppercase font-black tracking-widest mb-2 group-hover/card:text-primary transition-colors">Độ hot</div>
-                                <div className="text-lg font-black flex items-center gap-2">
-                                    <Star className="w-5 h-5 fill-primary text-primary" />
+                            <div className="p-5 rounded-3xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-md shadow-xl hover:bg-white/[0.05] transition-all group/card ring-1 ring-white/5">
+                                <div className="text-[#8FA7C5]/50 text-[10px] uppercase font-black tracking-widest mb-2 group-hover:text-[#8FA7C5] transition-colors">Độ hot</div>
+                                <div className="text-lg font-black flex items-center gap-2 text-white/90">
+                                    <Star className="w-5 h-5 fill-[#8FA7C5] text-[#8FA7C5]" />
                                     {details.popularity?.toFixed(1)}
                                 </div>
                             </div>
@@ -151,16 +151,16 @@ export default async function PersonPage({ params, searchParams }: PersonPagePro
                         <h2 className="text-2xl font-bold text-white tracking-tight">Sự nghiệp</h2>
                     </div>
                     
-                    <div className="flex items-center gap-1 p-1 bg-white/[0.03] border border-white/[0.06] rounded-full">
+                    <div className="flex items-center gap-1 p-1 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl">
                         <Link 
                             href={`/dien-vien/${slug}`}
-                            className={`flex items-center gap-2 px-6 py-2 rounded-full text-[13px] font-bold transition-all ${view === 'global' ? 'bg-primary text-black shadow-lg shadow-primary/20' : 'text-white/40 hover:text-white'}`}
+                            className={`flex items-center gap-2 px-6 py-2 rounded-xl text-[13px] font-black uppercase tracking-wider transition-all ${view === 'global' ? 'bg-[#8FA7C5] text-black shadow-lg shadow-[#8FA7C5]/20' : 'text-white/40 hover:text-white'}`}
                         >
                             <Globe className="w-4 h-4" /> Kho phim quốc tế
                         </Link>
                         <Link 
                             href={`/dien-vien/${slug}?view=local`}
-                            className={`flex items-center gap-2 px-6 py-2 rounded-full text-[13px] font-bold transition-all ${view === 'local' ? 'bg-primary text-black shadow-lg shadow-primary/20' : 'text-white/40 hover:text-white'}`}
+                            className={`flex items-center gap-2 px-6 py-2 rounded-xl text-[13px] font-black uppercase tracking-wider transition-all ${view === 'local' ? 'bg-[#8FA7C5] text-black shadow-lg shadow-[#8FA7C5]/20' : 'text-white/40 hover:text-white'}`}
                         >
                             <Grid className="w-4 h-4" /> Phim tại KHOIPHIM
                         </Link>
@@ -171,16 +171,16 @@ export default async function PersonPage({ params, searchParams }: PersonPagePro
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
                         {globalFilmography.map((movie: any) => (
                             <Link 
-                                href={`/phim/${movie.title?.toLowerCase().replace(/[^a-z0-9]/g, '-') || movie.name?.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
+                                href={`/tim-kiem?keyword=${encodeURIComponent(movie.title || movie.name)}`} // Fix: robust routing to search instead of guessing slug
                                 key={movie.id} 
                                 className="group"
                             >
-                                <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-white/5 border border-white/5 group-hover:border-primary/40 transition-all duration-300 shadow-lg">
+                                <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-[#0c0c14] border border-white/5 group-hover:border-[#8FA7C5]/50 transition-all duration-300 shadow-2xl ring-1 ring-white/5 group-hover:ring-[#8FA7C5]/30">
                                     <Image 
-                                        src={getTMDBImage(movie.poster_path, "w500") || "/placeholder-poster.jpg"} 
+                                        src={getTMDBImage(movie.poster_path, "w342") || "/placeholder-poster.jpg"} 
                                         alt={movie.title || movie.name} 
                                         fill 
-                                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                                        className="object-cover group-hover:scale-110 transition-transform duration-700"
                                         unoptimized
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">

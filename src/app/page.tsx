@@ -222,6 +222,8 @@ async function HeroStream() {
   return <AsyncHeroSection initialMovies={finalHeroData} />;
 }
 
+import HomeRowInstant from "@/components/HomeRowInstant";
+
 export default function Home() {
   return (
     <main className="min-h-screen pb-16 bg-[#0a0a0a]">
@@ -252,40 +254,24 @@ export default function Home() {
           </LazySection>
 
           {/* Group: Phim Mới */}
-          <Suspense fallback={<div className="h-[380px] w-full animate-pulse bg-white/5 rounded-xl" />}>
-            <HomeRowSection title="Phim Chiếu Rạp Mới" slug="phim-chieu-rap" viewAllHref="/danh-sach/phim-chieu-rap" priorityFirst={true} />
-          </Suspense>
+          <HomeRowInstant title="Phim Chiếu Rạp Mới" slug="phim-chieu-rap" viewAllHref="/danh-sach/phim-chieu-rap" priorityFirst={true} />
 
-          <Suspense fallback={<div className="h-[380px] w-full animate-pulse bg-white/5 rounded-xl" />}>
-            <HomeRowSection title="Phim Mới Cập Nhật" slug="phim-moi-cap-nhat" viewAllHref="/danh-sach/phim-moi" priorityFirst={true} />
-          </Suspense>
+          <HomeRowInstant title="Phim Mới Cập Nhật" slug="phim-moi-cap-nhat" viewAllHref="/danh-sach/phim-moi" priorityFirst={true} />
 
           {/* Group: Quốc gia */}
-          <Suspense fallback={<div className="h-[380px] w-full animate-pulse bg-white/5 rounded-xl" />}>
-            <HomeRowSection title="Phim Hàn Quốc" slug="han-quoc" endpoint="quoc-gia" viewAllHref="/quoc-gia/han-quoc" />
-          </Suspense>
+          <HomeRowInstant title="Phim Hàn Quốc" slug="han-quoc" endpoint="quoc-gia" viewAllHref="/quoc-gia/han-quoc" />
 
-          <Suspense fallback={<div className="h-[380px] w-full animate-pulse bg-white/5 rounded-xl" />}>
-            <HomeRowSection title="Phim Trung Quốc" slug="trung-quoc" endpoint="quoc-gia" viewAllHref="/quoc-gia/trung-quoc" />
-          </Suspense>
+          <HomeRowInstant title="Phim Trung Quốc" slug="trung-quoc" endpoint="quoc-gia" viewAllHref="/quoc-gia/trung-quoc" />
 
           {/* Group: Mới cập nhật khác */}
-          <Suspense fallback={<div className="h-[380px] w-full animate-pulse bg-white/5 rounded-xl" />}>
-            <HomeRowSection title="Phim Lẻ Mới" slug="phim-le" viewAllHref="/danh-sach/phim-le" />
-          </Suspense>
+          <HomeRowInstant title="Phim Lẻ Mới" slug="phim-le" viewAllHref="/danh-sach/phim-le" />
 
-          <Suspense fallback={<div className="h-[380px] w-full animate-pulse bg-white/5 rounded-xl" />}>
-            <HomeRowSection title="Phim Bộ Mới" slug="phim-bo" viewAllHref="/danh-sach/phim-bo" />
-          </Suspense>
+          <HomeRowInstant title="Phim Bộ Mới" slug="phim-bo" viewAllHref="/danh-sach/phim-bo" />
 
           {/* Group: Thể loại */}
-          <Suspense fallback={<div className="h-[380px] w-full animate-pulse bg-white/5 rounded-xl" />}>
-            <HomeRowSection title="Phim Hành Động" slug="hanh-dong" endpoint="the-loai" viewAllHref="/the-loai/hanh-dong" />
-          </Suspense>
+          <HomeRowInstant title="Phim Hành Động" slug="hanh-dong" endpoint="the-loai" viewAllHref="/the-loai/hanh-dong" />
 
-          <Suspense fallback={<div className="h-[380px] w-full animate-pulse bg-white/5 rounded-xl" />}>
-            <HomeRowSection title="Phim Hoạt Hình" slug="hoat-hinh" endpoint="the-loai" viewAllHref="/the-loai/hoat-hinh" />
-          </Suspense>
+          <HomeRowInstant title="Phim Hoạt Hình" slug="hoat-hinh" endpoint="the-loai" viewAllHref="/the-loai/hoat-hinh" />
         </div>
       </div>
     </main>

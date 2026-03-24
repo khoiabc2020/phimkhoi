@@ -66,9 +66,9 @@ function ActorInitials({ name }: { name: string }) {
     ];
     const colorIdx = (name.charCodeAt(0) || 0) % colors.length;
     return (
-        <div className={`relative w-full h-full bg-gradient-to-br ${colors[colorIdx]} flex items-center justify-center`}>
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_25%,rgba(255,255,255,0.28),transparent_45%)]" />
-            <span className="relative text-white font-black text-[14px] uppercase tracking-wider drop-shadow-md">
+        <div className="relative w-full h-full bg-[#1A1D29] flex items-center justify-center overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent" />
+            <span className="relative text-white/50 font-black text-[14px] uppercase tracking-[4px] drop-shadow-md">
                 {initials}
             </span>
         </div>
@@ -123,22 +123,22 @@ export default async function MovieCast({
 
     if (isCompact) {
         return (
-            <div className="flex flex-wrap gap-4 pt-1">
+            <div className="flex flex-wrap gap-3 pt-1">
                 {cast.map((actor) => (
                     <Link
                         href={`/dien-vien/${actor.name.toLowerCase().replace(/ /g, '-')}`}
                         key={actor.name}
-                        className="flex flex-col items-center gap-2.5 w-[5.5rem] group"
+                        className="flex flex-col items-center gap-2 group w-[4.5rem]"
                         title={actor.name}
                     >
-                        <div className="w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-full overflow-hidden shrink-0 border-2 border-white/10 group-hover:border-[#8FA7C5] transition-all duration-300 relative bg-[#0c1018] ring-1 ring-white/5 group-hover:ring-[#8FA7C5]/40 shadow-lg">
+                        <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border border-white/10 group-hover:border-[#8FA7C5]/60 transition-all duration-300 relative bg-[#0c1018] shadow-lg ring-1 ring-white/5">
                             {actor.photo ? (
                                 <Image src={actor.photo} alt={actor.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" unoptimized />
                             ) : (
                                 <ActorInitials name={actor.name} />
                             )}
                         </div>
-                        <p className="text-[12px] sm:text-[13px] text-gray-300 group-hover:text-white transition-colors text-center font-bold leading-tight line-clamp-2 w-full drop-shadow-sm">
+                        <p className="text-[11px] text-gray-400 group-hover:text-white transition-colors text-center font-bold leading-tight line-clamp-2 w-full">
                             {actor.name}
                         </p>
                     </Link>
@@ -148,53 +148,48 @@ export default async function MovieCast({
     }
 
     return (
-        <div className="mt-8">
-            <div className="flex items-center gap-2 mb-4">
-                <div className="w-1.5 h-5 bg-[#8FA7C5] rounded-full" />
-                <h3 className="text-xl font-bold text-white">Diễn Viên</h3>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="w-full relative py-2">
+            <div className="flex items-center gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-4 px-1">
                 {cast.map((actor) => (
                     <Link
                         href={`/dien-vien/${actor.name.toLowerCase().replace(/ /g, '-')}`}
                         key={actor.name}
-                        className="relative flex items-center gap-3 bg-white/5 rounded-lg p-3 group hover:bg-white/10 transition-colors border border-white/5 hover:border-[#8FA7C5]/60"
+                        className="flex flex-col items-center gap-3 shrink-0 w-[100px] group"
                     >
-                        <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-[#8FA7C5] transition-colors shrink-0">
+                        {/* Avatar */}
+                        <div className="relative w-20 h-20 rounded-full overflow-hidden border border-white/10 group-hover:border-[#8FA7C5]/60 group-hover:shadow-[0_0_20px_rgba(143,167,197,0.2)] transition-all duration-300">
                             {actor.photo ? (
-                                <Image src={actor.photo} alt={actor.name} fill className="object-cover" unoptimized />
+                                <Image 
+                                    src={actor.photo} 
+                                    alt={actor.name} 
+                                    fill 
+                                    className="object-cover group-hover:scale-110 transition-transform duration-500" 
+                                    unoptimized 
+                                />
                             ) : (
                                 <ActorInitials name={actor.name} />
                             )}
+                            {/* Accent Ring */}
+                            <div className="absolute inset-0 ring-1 ring-inset ring-white/10 group-hover:ring-white/20 transition-all" />
                         </div>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-white truncate group-hover:text-[#8FA7C5] transition-colors">
+                        
+                        {/* Info */}
+                        <div className="text-center px-1">
+                            <p className="text-[13px] font-black text-white leading-tight group-hover:text-primary transition-colors line-clamp-2">
                                 {actor.name}
                             </p>
                             {actor.originalName && actor.originalName !== actor.name && (
-                                <p className="text-xs text-gray-400 truncate italic mt-0.5">
+                                <p className="text-[10px] text-gray-500 truncate mt-1 italic font-medium">
                                     {actor.originalName}
                                 </p>
                             )}
-                            <div className="flex flex-wrap items-center gap-2 mt-1 text-[11px] text-gray-400">
-                                {actor.departmentLabel && (
-                                    <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 uppercase tracking-wide">
-                                        {actor.departmentLabel}
-                                    </span>
-                                )}
-                                {actor.genderLabel && (
-                                    <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10">
-                                        {actor.genderLabel}
-                                    </span>
-                                )}
-                            </div>
                         </div>
-                        <span className="hidden sm:inline text-[11px] font-semibold text-gray-400 group-hover:text-[#8FA7C5] transition-colors ml-2">
-                            Xem trang
-                        </span>
                     </Link>
                 ))}
             </div>
+            
+            {/* Gradient Mask for overflow hint */}
+            <div className="absolute top-0 right-0 bottom-6 w-12 bg-gradient-to-l from-[#07070b] to-transparent pointer-events-none z-10" />
         </div>
     );
 }

@@ -815,22 +815,27 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
         }
         
         if (params.country || ['han-quoc', 'trung-quoc', 'au-my', 'nhat-ban', 'thai-lan', 'dai-loan', 'viet-nam'].includes(type)) {
-            // Nếu có country param hoặc type là tên nước, ưu tiên dùng endpoint quoc-gia cho KKPhim
             if (!params.category) baseEndpoint = 'quoc-gia';
         }
 
+        // --- SOURCE-SPECIFIC SLUG TRANSLATION ---
+        // 'phim-moi-cap-nhat' is a special case. NguonC uses it as is, but KK/OPhim use 'phim-moi'
+        const kkType = type === 'phim-moi-cap-nhat' ? 'phim-moi' : type;
+        const ophimType = type === 'phim-moi-cap-nhat' ? 'phim-moi' : type;
+        
         const kkEndpoint = baseEndpoint;
         const nguoncEndpoint = baseEndpoint + '/';
 
         // Fetch from sources in parallel
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
-            fetchWithFastTimeout(`${API_URL}/v1/api/${kkEndpoint}/${type}${query}`, 3000, { next: { revalidate: 3600 } }),
-            fetchWithFastTimeout(`${OPHIM_API}/v1/api/${kkEndpoint}/${type}${query}`, 2500, { next: { revalidate: 3600 } }),
-            fetchWithFastTimeout(`${NGUONC_API}/api/films/${type === 'phim-moi-cap-nhat' ? '' : nguoncEndpoint}${type}?page=${page}`, 2000, { next: { revalidate: 3600 } })
+            fetchWithFastTimeout(`${API_URL}/v1/api/${kkEndpoint}/${kkType}${query}`, 3000, { next: { revalidate: 3600 } }),
+            fetchWithFastTimeout(`${OPHIM_API}/v1/api/${kkEndpoint}/${ophimType}${query}`, 2500, { next: { revalidate: 3600 } }),
+            fetchWithFastTimeout(`${NGUONC_API}/api/films/${type === 'phim-moi-cap-nhat' ? '' : nguoncEndpoint}${type}?page=${page}`, 2500, { next: { revalidate: 3600 } })
         ]);
 
         let items: Movie[] = [];
         let kkPagination = { currentPage: 1, totalPages: 1 };
+        let hasData = false;
 
         // Process KKPhim Data
         if (kkRes.status === 'fulfilled' && kkRes.value?.data?.items) {
@@ -843,6 +848,7 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
             }));
             items = [...items, ...kkItems];
             kkPagination = data.data?.params?.pagination || kkPagination;
+            hasData = true;
         }
 
         // Process OPhim Data
@@ -854,6 +860,7 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
             }
             const ophimItems = getItems(data).map(item => normalizeOphimItem(item, pathImage));
             items = [...items, ...ophimItems];
+            hasData = true;
         }
 
         if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
@@ -868,9 +875,18 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
                 quality: (item.quality as string) || 'FHD',
             })) as Movie[];
             items = [...items, ...nguoncItems];
+            
+            // If KKPhim is empty, use NguonC pagination
+            if (!hasData && nguoncRes.value.paginate) {
+                kkPagination = {
+                    currentPage: nguoncRes.value.paginate.current_page || page,
+                    totalPages: nguoncRes.value.paginate.total_page || 1
+                };
+            }
+            hasData = true;
         }
 
-        // Deduplicate by Slug + merge images theo thứ tự nguồn (KKPhim -> OPhim -> NguonC)
+        // Deduplicate and filter...
         const bySlug = new Map<string, Movie>();
         for (const item of items) {
             if (!item?.slug) continue;
@@ -883,12 +899,10 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
         }
         let uniqueItems = Array.from(bySlug.values()).map(normalizeMovieImageRoles);
 
-        // Filter out trailer-only / unreleased movies (unless explicitly browsing that category)
         if (type !== 'phim-sap-chieu') {
             uniqueItems = uniqueItems.filter(item => !isTrailer(item));
         }
 
-        // Optional client-side quality filter (e.g. 4K only)
         if (quality) {
             const q = String(quality).toUpperCase();
             uniqueItems = uniqueItems.filter(item =>
@@ -896,11 +910,12 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
             );
         }
 
-        const enrichedItems = await enrichMoviesWithTMDB(uniqueItems, 16);
+        // Lift limit to support full list view breadth
+        const enrichedItems = await enrichMoviesWithTMDB(uniqueItems, limit);
 
         return {
             items: enrichedItems,
-            pagination: kkPagination // Use KK pagination as primary source of truth for simplicity in this hybrid mode
+            pagination: kkPagination
         };
     } catch (error) {
         console.error(`Error fetching movies list [${type}]:`, error);

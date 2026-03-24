@@ -108,11 +108,11 @@ export default function NotificationDropdown() {
                     <div className="max-h-[500px] overflow-y-auto custom-scrollbar">
                         {!session ? (
                             <div className="p-10 text-center space-y-4">
-                                <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto">
-                                    <User className="w-8 h-8 text-white/10" />
+                                <div className="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center mx-auto ring-1 ring-white/10">
+                                    <User className="w-7 h-7 text-white/20" />
                                 </div>
-                                <p className="text-[13px] text-white/40 font-medium max-w-[200px] mx-auto italic">Vui lòng đăng nhập để theo dõi cập nhật từ phim yêu thích</p>
-                                <NextLink href="/login" onClick={() => setIsOpen(false)} className="inline-block px-8 py-2.5 bg-primary text-black text-[12px] font-black rounded-full uppercase tracking-widest hover:bg-[#a8bdd8] transition-all active:scale-95 shadow-lg shadow-primary/20">Đăng nhập</NextLink>
+                                <p className="text-[12px] text-white/40 font-bold max-w-[220px] mx-auto italic leading-relaxed">Vui lòng đăng nhập để theo dõi cập nhật từ phim yêu thích</p>
+                                <NextLink href="/login" onClick={() => setIsOpen(false)} className="inline-block px-10 py-3 bg-[#8FA7C5] text-black text-[12px] font-black rounded-full uppercase tracking-[2px] hover:bg-[#a8bdd8] transition-all active:scale-95 shadow-lg shadow-[#8FA7C5]/20">Đăng nhập</NextLink>
                             </div>
                         ) : loading ? (
                             <div className="p-16 flex flex-col items-center justify-center gap-4">
@@ -120,11 +120,11 @@ export default function NotificationDropdown() {
                                 <span className="text-[10px] text-primary/40 font-black tracking-[4px] uppercase animate-pulse">Scanning DB...</span>
                             </div>
                         ) : notifications.length === 0 ? (
-                            <div className="p-16 text-center space-y-4">
-                                <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mx-auto opacity-20">
-                                    <Bell className="w-6 h-6 text-white" />
+                            <div className="p-20 text-center space-y-4">
+                                <div className="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center mx-auto opacity-10 ring-1 ring-white/20">
+                                    <Bell className="w-7 h-7 text-white" />
                                 </div>
-                                <p className="text-[12px] text-white/30 font-bold tracking-tight px-8">Hiện chưa có tập phim mới nào từ danh sách yêu thích của bạn.</p>
+                                <p className="text-[11px] text-white/30 font-black tracking-[1px] px-8 uppercase italic">Bạn đã cập nhật hết!</p>
                             </div>
                         ) : (
                             <div className="divide-y divide-white/[0.03]">
@@ -149,8 +149,8 @@ export default function NotificationDropdown() {
                                         </div>
                                         
                                         <div className="flex-1 min-w-0">
-                                            <div className="flex items-start justify-between gap-2 mb-1">
-                                                <span className="text-[14px] font-black text-white group-hover:text-primary transition-colors truncate tracking-[-0.03em] uppercase italic">
+                                            <div className="flex items-start justify-between gap-2 mb-1.5">
+                                                <span className="text-[14px] font-black text-white group-hover:text-[#8FA7C5] transition-colors truncate tracking-[-0.01em]">
                                                     {notif.movieName}
                                                 </span>
                                             </div>
@@ -173,14 +173,16 @@ export default function NotificationDropdown() {
                         )}
                     </div>
 
-                    {/* Action Footer */}
-                    <NextLink
-                        href="/loc-phim?type=favorites" // Redirect to filtered favorite page
-                        onClick={() => setIsOpen(false)}
-                        className="group flex items-center justify-center gap-2 w-full py-4 bg-primary hover:bg-[#a8bdd8] text-center text-[12px] text-black font-black uppercase tracking-[3px] transition-all"
-                    >
-                        Xem tất cả <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                    </NextLink>
+                    {/* Action Footer (Elite Glassmorphic) */}
+                    <div className="p-2 border-t border-white/[0.05] bg-white/[0.01]">
+                        <NextLink
+                            href="/thong-bao?tab=updates" // Correct routing to unified notification page
+                            onClick={() => setIsOpen(false)}
+                            className="group flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-white/5 hover:bg-white/10 text-center text-[11px] text-[#8FA7C5] font-black uppercase tracking-[3px] transition-all border border-white/5 hover:border-[#8FA7C5]/30"
+                        >
+                            Xem tất cả <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        </NextLink>
+                    </div>
                 </div>
             )}
         </div>

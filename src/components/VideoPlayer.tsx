@@ -119,13 +119,31 @@ export default function VideoPlayer({
     const AD_START = 900;  // 15:00
     const AD_END = 930;    // 15:30
 
-    // Realtime watch history save — throttled every 15s
+    // Realtime watch history save — throttled every 10s (Netflix-style)
     const saveHistory = useCallback(async (currentTime: number, duration: number) => {
         if (!movieData || !session?.user) return;
-        if (currentTime - lastSavedRef.current < 15) return;
+        if (currentTime - lastSavedRef.current < 10) return;
         lastSavedRef.current = currentTime;
         try {
-            await addWatchHistory({ ...movieData, duration, currentTime });
+            const res = await addWatchHistory({ ...movieData, duration, currentTime });
+            if (res.success) {
+                // Broadcast update to other tabs (e.g. ContinueWatchingRow on home)
+                const channel = new BroadcastChannel('phimkhoi_history_sync');
+                channel.postMessage({
+                    type: 'HISTORY_UPDATE',
+                    movieId: movieData.movieId,
+                    movieSlug: movieData.movieSlug,
+                    episodeSlug: movieData.episodeSlug,
+                    currentTime,
+                    duration,
+                    progress: Math.min(100, Math.round((currentTime / duration) * 100)),
+                    movieName: movieData.movieName,
+                    moviePoster: movieData.moviePoster,
+                    episodeName: movieData.episodeName,
+                    lastWatched: new Date().toISOString()
+                });
+                channel.close();
+            }
         } catch { /* silent */ }
     }, [movieData, session]);
 
@@ -752,17 +770,48 @@ function IframePlayer({ url, slug, episode, movieData, initialProgress, session,
 
         const firstSave = setTimeout(async () => {
             const elapsed = (Date.now() - startTime) / 1000;
-            await addWatchHistory({
+            const currentTime = Math.max(elapsed, initialProgress > 0 ? (initialProgress / 100) * estimatedDuration : 10);
+            const res = await addWatchHistory({
                 ...movieData,
                 duration: estimatedDuration,
-                currentTime: Math.max(elapsed, initialProgress > 0 ? (initialProgress / 100) * estimatedDuration : 10),
+                currentTime,
             });
-        }, 10000);
+            if (res.success) {
+                const channel = new BroadcastChannel('phimkhoi_history_sync');
+                channel.postMessage({ 
+                    type: 'HISTORY_UPDATE', 
+                    movieId: movieData.movieId, 
+                    movieSlug: movieData.movieSlug,
+                    episodeSlug: movieData.episodeSlug,
+                    movieName: movieData.movieName,
+                    moviePoster: movieData.moviePoster,
+                    episodeName: movieData.episodeName,
+                    progress: Math.min(100, Math.round((currentTime / estimatedDuration) * 100)),
+                    lastWatched: new Date().toISOString()
+                });
+                channel.close();
+            }
+        }, 8000);
 
         const interval = setInterval(async () => {
             const elapsed = (Date.now() - startTime) / 1000;
-            await addWatchHistory({ ...movieData, duration: estimatedDuration, currentTime: elapsed });
-        }, 30000);
+            const res = await addWatchHistory({ ...movieData, duration: estimatedDuration, currentTime: elapsed });
+            if (res.success) {
+                const channel = new BroadcastChannel('phimkhoi_history_sync');
+                channel.postMessage({ 
+                    type: 'HISTORY_UPDATE', 
+                    movieId: movieData.movieId, 
+                    movieSlug: movieData.movieSlug,
+                    episodeSlug: movieData.episodeSlug,
+                    movieName: movieData.movieName,
+                    moviePoster: movieData.moviePoster,
+                    episodeName: movieData.episodeName,
+                    progress: Math.min(100, Math.round((elapsed / estimatedDuration) * 100)),
+                    lastWatched: new Date().toISOString()
+                });
+                channel.close();
+            }
+        }, 15000);
 
         return () => {
             clearTimeout(firstSave);

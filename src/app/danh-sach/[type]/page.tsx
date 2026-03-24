@@ -20,6 +20,7 @@ const TYPE_NAMES: Record<string, string> = {
     "tv-shows": "TV Shows",
     "phim-sap-chieu": "Phim Sắp Chiếu",
     "phim-moi": "Phim Mới",
+    "phim-moi-cap-nhat": "Phim Mới Cập Nhật",
     "phim-vietsub": "Phim Vietsub",
     "phim-thuyet-minh": "Phim Thuyết Minh",
     "phim-long-tieng": "Phim Lồng Tiếng",

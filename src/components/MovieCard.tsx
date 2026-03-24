@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import FavoriteButton from "@/components/FavoriteButton";
 import WatchlistInlineButton from "@/components/WatchlistInlineButton";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Play, Info, Star, ChevronDown } from "lucide-react";
 import { getImageUrl, decodeHtml, cn, detectOrientation } from "@/lib/utils";
@@ -128,8 +129,16 @@ function MovieCard({
         return { showSub, showTM, showLT };
     }, [movie.lang]);
 
+    const router = useRouter();
+
     const handleMouseEnter = () => {
         if (isTouchDevice) return;
+        
+        // --- PREDICTIVE PREFETCHING ---
+        // Begin loading the detail page as soon as the user hovers.
+        // This reduces perceived latency to near-zero when they finally click.
+        router.prefetch(`/phim/${movie.slug}`);
+
         if (leaveTimeoutRef.current) {
             clearTimeout(leaveTimeoutRef.current);
             leaveTimeoutRef.current = null;
@@ -194,7 +203,11 @@ function MovieCard({
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
-                <div className={`relative ${orientation === 'landscape' ? 'aspect-video' : 'aspect-[2/3]'} rounded-[10px] overflow-hidden bg-[#0b101a] ring-1 ring-white/5 group-hover/static-card:ring-2 group-hover/static-card:ring-[#8FA7C5]/60 transition-all duration-500 shadow-lg will-change-transform`}>
+                <div className={cn(
+                    "relative overflow-hidden rounded-[10px] bg-[#0b101a] ring-1 ring-white/5 transition-all duration-500 ease-out shadow-lg transform-gpu",
+                    orientation === 'landscape' ? 'aspect-video' : 'aspect-[2/3]',
+                    "lg:group-hover/static-card:scale-[1.03] lg:group-hover/static-card:ring-2 lg:group-hover/static-card:ring-[#8FA7C5]/40 lg:group-hover/static-card:shadow-[0_0_25px_rgba(143,167,197,0.25)]"
+                )}>
                     <Link href={`/phim/${movie.slug}`} className="block h-full w-full absolute inset-0 z-0">
                         <Image
                             src={activePosterSrc || "/placeholder.svg"}

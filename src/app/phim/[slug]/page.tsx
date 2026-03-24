@@ -331,7 +331,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/65 to-transparent z-[1]" />
 
                 {/* Hero Info Content aligned left/bottom on desktop, center on mobile */}
-                <div className="relative z-10 w-full max-w-[1920px] mx-auto flex flex-col md:flex-row items-center md:items-end justify-center md:justify-between gap-6 md:gap-12 text-center md:text-left mt-0 sm:mt-4">
+                <div className="relative z-10 w-full max-w-[1920px] mx-auto flex flex-col md:flex-row items-center md:items-end justify-center md:justify-between gap-6 md:gap-12 text-center md:text-left mt-0 sm:mt-2">
                     
                     {/* Poster on Mobile (Centered) */}
                     <div className="w-[140px] sm:w-[180px] md:hidden shrink-0 rounded-xl overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.8)] border border-white/15 relative aspect-[2/3] z-20">
@@ -394,6 +394,28 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             );
                         })()}
 
+                        {/* Metadata Row for Mobile/Tablet - Promoting to reduce scroll */}
+                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-3 gap-y-2 mt-2 lg:hidden">
+                            {movie.category?.slice(0, 3).map((cat: any) => (
+                                <Link 
+                                    href={`/the-loai/${cat.slug}`} 
+                                    key={cat.id}
+                                    className="text-[10px] font-black text-[#8FA7C5] bg-[#8FA7C5]/10 px-2.5 py-1 rounded-full uppercase tracking-wider hover:bg-[#8FA7C5]/20 transition-colors"
+                                >
+                                    {cat.name}
+                                </Link>
+                            ))}
+                            {movie.country?.map((c: any) => (
+                                <Link 
+                                    href={`/quoc-gia/${c.slug}`} 
+                                    key={c.id}
+                                    className="text-[10px] font-black text-white/40 uppercase tracking-wider hover:text-white transition-colors border border-white/5 px-2 py-0.5 rounded-md"
+                                >
+                                    {c.name}
+                                </Link>
+                            ))}
+                        </div>
+
                         <div className="text-xs sm:text-sm text-gray-300 flex flex-wrap items-center justify-center md:justify-start gap-2 sm:gap-4 py-2 drop-shadow-md">
                             {(movie?.director && movie.director.length > 0 && !movie.director.includes("Đang cập nhật")) || tmdbDetails?.credits?.crew?.find((c: { job?: string; name?: string }) => c.job === "Director") ? (
                                 <span><span className="text-gray-500">Đạo diễn:</span> {movie?.director?.join(", ") || tmdbDetails?.credits?.crew?.find((c: { job?: string; name?: string }) => c.job === "Director")?.name}</span>
@@ -451,8 +473,16 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 </div>
             </div>
 
+            {/* Cast Section (Horizontal Carousel) - Moved above tabs for better hierarchy */}
+            <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:pl-24 lg:pr-12 mt-6 lg:mt-8 mb-2 lg:mb-4 relative z-10">
+                <div className="flex items-center gap-2 mb-4 lg:mb-6 border-l-2 border-[#8FA7C5] pl-3">
+                    <h3 className="text-[16px] sm:text-[19px] font-black text-white uppercase tracking-widest">Diễn viên chính</h3>
+                </div>
+                <MovieCast movie={movie} slug={slug} isCompact={false} tmdbCast={tmdbDetails?.credits?.cast} />
+            </div>
+
             {/* Bottom Content: responsive — stacked on mobile, 2-col on desktop */}
-            <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:pl-24 lg:pr-12 mt-6 sm:mt-8 lg:mt-12 relative z-10">
+            <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:pl-24 lg:pr-12 mt-2 lg:mt-4 relative z-10">
                 
                 {/* On mobile/tablet: RIGHT column (tabs) first, then sidebar info below */}
                 <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-12 items-start">
@@ -468,7 +498,6 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                 tmdbDetails={tmdbDetails}
                                 episodeThumbnails={episodeThumbnails}
                                 episodeMetadata={episodeMetadata}
-                                castComponent={<MovieCast movie={movie} slug={slug} isCompact={false} tmdbCast={tmdbDetails?.credits?.cast} />}
                             />
                         </Suspense>
                         {/* Comment Section below tabs */}
@@ -488,20 +517,14 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
 
                         {/* Đạo diễn */}
                         <div className="pt-2">
-                            <div className="text-[12px] font-black text-gray-500 uppercase tracking-[2px] mb-2.5">Đạo diễn</div>
-                            <div className="text-[14.5px] font-black text-white drop-shadow-md">{movie?.director?.join(", ") || "Đang cập nhật"}</div>
-                        </div>
-
-                        {/* Diễn viên (Sidebar) */}
-                        <div className="pt-2">
-                            <div className="text-[12px] font-black text-gray-400 uppercase tracking-[2px] mb-3.5">Diễn viên</div>
-                            <MovieCast movie={movie} slug={movie.slug} isCompact={true} tmdbCast={tmdbDetails?.credits?.cast} />
+                            <div className="text-[12px] font-black text-[#8FA7C5]/40 uppercase tracking-[2px] mb-2.5">Đạo diễn</div>
+                            <div className="text-[14.5px] font-black text-white/90 drop-shadow-md">{movie?.director?.join(", ") || "Đang cập nhật"}</div>
                         </div>
 
                         {/* NEW: Description Section (Optimized position) */}
                         {movie?.content && (
                             <div className="pt-4 border-t border-white/5 space-y-4">
-                                <div className="text-[12px] font-black text-gray-400 uppercase tracking-[2px]">Nội dung</div>
+                                <div className="text-[12px] font-black text-[#8FA7C5]/40 uppercase tracking-[2px]">Nội dung</div>
                                 <div 
                                     className="text-[14.5px] sm:text-[15.5px] text-gray-300/80 leading-relaxed text-justify font-medium" 
                                     dangerouslySetInnerHTML={{ __html: movie?.content }} 

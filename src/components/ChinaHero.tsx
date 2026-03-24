@@ -188,12 +188,12 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                     )}
 
                     {/* Info Layer (Slide-up) */}
-                    <div className="absolute inset-0 z-30 flex items-center px-6 md:pl-24 md:pr-14 lg:pl-32 xl:pl-[140px] max-w-[1920px] mx-auto">
+                    <div className="absolute inset-0 z-30 flex items-end lg:items-center px-6 pb-20 md:pb-0 md:pl-24 md:pr-14 lg:pl-32 xl:pl-[140px] max-w-[1920px] mx-auto">
                         <motion.div 
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
-                            className="max-w-[85%] sm:max-w-xl md:max-w-2xl flex flex-col items-start gap-3 md:gap-5"
+                            className="max-w-[90%] sm:max-w-xl md:max-w-2xl flex flex-col items-start gap-2.5 md:gap-5"
                         >
                             <div className="relative w-full max-w-[200px] sm:max-w-[280px] md:max-w-[420px] lg:max-w-[480px] aspect-[4/1.5]">
                                 {currentMovie.logo ? (

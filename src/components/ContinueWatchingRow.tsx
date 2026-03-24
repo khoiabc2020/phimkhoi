@@ -65,8 +65,53 @@ function ContinueWatchingRowInner() {
         };
 
         fetchData();
-        // Poll for realtime sync (web receives app updates after a few seconds)
-        interval = setInterval(fetchData, 15000);
+        // Poll for realtime sync as fallback
+        interval = setInterval(fetchData, 30000);
+
+        // 3. LISTEN FOR INSTANT BROADCAST UPDATES (From VideoPlayer)
+        const channel = new BroadcastChannel('phimkhoi_history_sync');
+        channel.onmessage = (event) => {
+            if (event.data?.type === 'HISTORY_UPDATE') {
+                const { movieId, progress, episodeSlug, episodeName, movieName, moviePoster } = event.data;
+                setMovies(prev => {
+                    const existing = prev.find(m => m.movieId === movieId);
+                    let newMovies = prev;
+
+                    if (existing) {
+                        // VALIDATE: Only update if the incoming data is NEWER than existing
+                        const isNewer = !existing.lastWatched || (event.data.lastWatched && new Date(event.data.lastWatched) > new Date(existing.lastWatched));
+                        if (!isNewer) return prev;
+
+                        newMovies = prev.map(m => m.movieId === movieId ? { 
+                            ...m, 
+                            progress, 
+                            episodeSlug: episodeSlug || m.episodeSlug,
+                            episodeName: episodeName || m.episodeName,
+                            lastWatched: event.data.lastWatched || new Date().toISOString()
+                        } : m).sort((a,b) => new Date(b.lastWatched).getTime() - new Date(a.lastWatched).getTime());
+                    } else if (movieName) {
+                        // Feed entry for a new movie
+                        newMovies = [{
+                            _id: `temp_${Date.now()}`,
+                            movieId,
+                            movieSlug: event.data.movieSlug,
+                            movieName,
+                            moviePoster,
+                            episodeSlug,
+                            episodeName,
+                            progress,
+                            lastWatched: event.data.lastWatched || new Date().toISOString()
+                        }, ...prev].slice(0, 10);
+                    }
+
+                    // CRITICAL: Persist to LocalStorage so refresh doesn't show stale data
+                    if (newMovies !== prev) {
+                        localStorage.setItem(CACHE_KEY, JSON.stringify(newMovies));
+                    }
+                    return newMovies;
+                });
+            }
+        };
 
         const onVis = () => {
             if (document.visibilityState === "visible") fetchData();
@@ -76,6 +121,7 @@ function ContinueWatchingRowInner() {
         return () => {
             cancelled = true;
             if (interval) clearInterval(interval);
+            channel.close();
             document.removeEventListener("visibilitychange", onVis);
         };
     }, [session]);
@@ -197,10 +243,10 @@ function ContinueWatchingRowInner() {
                                         <X className="w-3.5 h-3.5" />
                                     </button>
 
-                                    {/* Progress Bar */}
-                                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20 z-20">
+                                    {/* Progress Bar (Netflix Style) */}
+                                    <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-white/20 z-20">
                                         <div
-                                            className="h-full bg-[#8FA7C5] rounded-r-sm"
+                                            className="h-full bg-[#8FA7C5] rounded-r-full shadow-[0_0_8px_#8FA7C5] transition-all duration-1000 ease-linear"
                                             style={{ width: `${Math.max(2, Math.min(100, item.progress || 0))}%` }}
                                         />
                                     </div>

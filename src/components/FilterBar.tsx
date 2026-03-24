@@ -2,7 +2,7 @@
 
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useCallback, useTransition } from "react";
-import { ChevronDown } from "lucide-react";
+import EliteSelect from "./EliteSelect";
 
 export default function FilterBar({ 
     categories = [], 
@@ -39,76 +39,46 @@ export default function FilterBar({
 
     const currentYear = new Date().getFullYear();
     const years = [
-        { name: "Năm", value: "all" },
         ...Array.from({ length: 25 }, (_, i) => ({
             name: `${currentYear - i}`,
-            value: `${currentYear - i}`,
+            slug: `${currentYear - i}`,
         })),
     ];
 
     // Ensure we have "All" option if provided list doesn't have it
-    const displayCategories = [{ name: "Thể loại", slug: "all" }, ...categories];
-    const displayCountries = [{ name: "Quốc gia", slug: "all" }, ...countries];
+    const displayCategories = [{ name: "Tất cả thể loại", slug: "all" }, ...categories];
+    const displayCountries = [{ name: "Tất cả quốc gia", slug: "all" }, ...countries];
+    const displayYears = [{ name: "Tất cả năm", slug: "all" }, ...years];
 
     return (
         <div>
-            <div className="flex flex-nowrap items-center gap-1.5 sm:gap-3 py-2 overflow-x-auto no-scrollbar">
+            <div className="flex flex-nowrap items-center gap-2 sm:gap-3 py-2 overflow-x-auto no-scrollbar">
                 {/* Category Dropdown */}
-                <div className="relative group flex-1 min-w-[90px] sm:min-w-[120px]">
-                    <select
-                        onChange={(e) => handleFilterChange("category", e.target.value)}
-                        className="appearance-none w-full bg-white/[0.05] text-white/80 py-2 px-2 sm:px-3 pr-6 sm:pr-8 rounded-[10px] leading-tight focus:outline-none focus:bg-white/[0.08] cursor-pointer text-[12px] sm:text-[14px] font-bold transition-all"
-                        value={searchParams.get("category") || "all"}
-                        disabled={isPending}
-                    >
-                        {displayCategories.map((c) => (
-                            <option key={c.slug} value={c.slug} className="bg-[#0b0b10] text-white">
-                                {c.slug === "all" ? "Thể loại" : c.name}
-                            </option>
-                        ))}
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 sm:px-2 text-white/40 group-focus-within:text-[#8FA7C5]">
-                        <ChevronDown className="w-3.5 h-3.5" />
-                    </div>
-                </div>
+                <EliteSelect 
+                    options={displayCategories}
+                    value={searchParams.get("category") || "all"}
+                    onChange={(val) => handleFilterChange("category", val)}
+                    placeholder="Thể loại"
+                    disabled={isPending}
+                />
 
                 {/* Country Dropdown */}
-                <div className="relative group flex-1 min-w-[90px] sm:min-w-[120px]">
-                    <select
-                        onChange={(e) => handleFilterChange("country", e.target.value)}
-                        className="appearance-none w-full bg-white/[0.05] text-white/80 py-2 px-2 sm:px-3 pr-6 sm:pr-8 rounded-[10px] leading-tight focus:outline-none focus:bg-white/[0.08] cursor-pointer text-[12px] sm:text-[14px] font-bold transition-all"
-                        value={searchParams.get("country") || "all"}
-                        disabled={isPending}
-                    >
-                        {displayCountries.map((c) => (
-                            <option key={c.slug} value={c.slug} className="bg-[#0b0b10] text-white">
-                                {c.slug === "all" ? "Quốc gia" : c.name}
-                            </option>
-                        ))}
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 sm:px-2 text-white/40 group-focus-within:text-[#8FA7C5]">
-                        <ChevronDown className="w-3.5 h-3.5" />
-                    </div>
-                </div>
+                <EliteSelect 
+                    options={displayCountries}
+                    value={searchParams.get("country") || "all"}
+                    onChange={(val) => handleFilterChange("country", val)}
+                    placeholder="Quốc gia"
+                    disabled={isPending}
+                />
 
                 {/* Year Dropdown */}
-                <div className="relative group flex-1 min-w-[80px] sm:min-w-[110px]">
-                    <select
-                        onChange={(e) => handleFilterChange("year", e.target.value)}
-                        className="appearance-none w-full bg-white/[0.05] text-white/70 py-1.5 px-2 sm:px-3 pr-6 sm:pr-8 rounded-[8px] leading-tight focus:outline-none focus:text-white cursor-pointer text-[11px] sm:text-[13px] font-medium transition-all"
-                        value={searchParams.get("year") || "all"}
-                        disabled={isPending}
-                    >
-                        {years.map((y) => (
-                            <option key={y.value} value={y.value} className="bg-[#0b0b10] text-white">
-                                {y.name}
-                            </option>
-                        ))}
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 sm:px-2 text-white/40 group-focus-within:text-white">
-                        <ChevronDown className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                    </div>
-                </div>
+                <EliteSelect 
+                    options={displayYears}
+                    value={searchParams.get("year") || "all"}
+                    onChange={(val) => handleFilterChange("year", val)}
+                    placeholder="Năm"
+                    disabled={isPending}
+                />
             </div>
 
             {isPending && (

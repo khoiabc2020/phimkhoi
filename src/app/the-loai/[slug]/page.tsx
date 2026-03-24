@@ -24,53 +24,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     };
 }
 
-/** Stream component for the movie grid */
-async function CategoryGridStream({ 
-    slug, 
-    page,
-    country,
-    year
-}: { 
-    slug: string; 
-    page: number;
-    country?: string;
-    year?: string;
-}) {
-    const data = await getMoviesByCategory(slug, page, 28, { country, year });
-    const { items, pagination } = data;
-
-    if (!items || items.length === 0) {
-        return (
-            <div className="col-span-full text-center py-20 text-gray-400">
-                Không tìm thấy phim nào cho thể loại này.
-            </div>
-        );
-    }
-
-    return (
-        <>
-            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 mt-6 [contain:layout_paint]">
-                {items.map((movie: any, idx: number) => (
-                    <MovieCard 
-                        key={movie._id} 
-                        movie={movie} 
-                        priority={page === 1 && idx < 7}
-                        loading={page === 1 && idx < 14 ? "eager" : "lazy"}
-                    />
-                ))}
-            </div>
-
-            {pagination && (
-                <Suspense fallback={<div className="h-10 bg-white/5 rounded-lg animate-pulse" />}>
-                    <Pagination
-                        currentPage={pagination.currentPage}
-                        totalPages={pagination.totalPages}
-                    />
-                </Suspense>
-            )}
-        </>
-    );
-}
+import CategoryGridClient from "@/components/CategoryGridClient";
 
 const GridSkeleton = () => (
     <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 mt-6">

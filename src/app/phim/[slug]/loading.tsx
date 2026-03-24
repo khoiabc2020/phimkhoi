@@ -2,26 +2,39 @@ export default function Loading() {
     return (
         <div className="min-h-screen bg-[#0a0a0a]">
             {/* Base dark layout matcher for Hero */}
-            <div className="relative w-full pt-20 sm:pt-28 md:pt-32 pb-8 px-4 md:px-8 lg:pl-24 lg:pr-12 flex items-end min-h-[500px] sm:min-h-[560px] overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/95 via-[45%] to-transparent z-0" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent z-0" />
+            <div className="relative w-full pt-12 sm:pt-20 md:pt-32 pb-8 px-4 md:px-8 lg:pl-24 lg:pr-12 flex items-center md:items-end min-h-[500px] sm:min-h-[560px] overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/92 via-[40%] to-transparent z-[1]" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/65 to-transparent z-[1]" />
                 
-                <div className="relative z-10 w-full max-w-[1920px] mx-auto flex flex-col md:flex-row items-end justify-between gap-8 md:gap-12">
-                    <div className="space-y-4 max-w-[760px] flex-1">
-                        <div className="flex items-center gap-2 mb-2">
+                <div className="relative z-10 w-full max-w-[1920px] mx-auto flex flex-col md:flex-row items-center md:items-end justify-center md:justify-between gap-6 md:gap-12 text-center md:text-left">
+                    
+                    {/* Poster Skeleton on Mobile */}
+                    <div className="w-[140px] sm:w-[180px] md:hidden shrink-0 aspect-[2/3] rounded-xl bg-white/5 border border-white/10 animate-pulse" />
+
+                    <div className="space-y-3 sm:space-y-4 max-w-[760px] flex-1 flex flex-col items-center md:items-start w-full">
+                        <div className="flex items-center gap-2 mb-1">
                              <div className="h-5 w-12 bg-white/10 rounded animate-pulse" />
                              <div className="h-5 w-16 bg-[#8FA7C5]/20 rounded animate-pulse" />
                         </div>
-                        <div className="h-10 sm:h-12 w-3/4 max-w-[400px] bg-white/10 rounded-lg animate-pulse" />
+                        <div className="h-10 sm:h-12 w-full max-w-[450px] bg-white/10 rounded-lg animate-pulse" />
                         <div className="h-6 w-1/2 max-w-[300px] bg-white/5 rounded-md animate-pulse hidden sm:block mt-2" />
-                        <div className="h-4 w-3/4 bg-white/5 rounded-md animate-pulse mt-4" />
-                        <div className="h-4 w-2/3 bg-white/5 rounded-md animate-pulse mt-2" />
                         
-                        <div className="flex gap-3 pt-4">
-                            <div className="w-32 h-12 rounded-full bg-white/10 animate-pulse" />
-                            <div className="w-12 h-12 rounded-full bg-white/5 animate-pulse" />
-                            <div className="w-12 h-12 rounded-full bg-white/5 animate-pulse" />
-                            <div className="w-12 h-12 rounded-full bg-white/5 animate-pulse" />
+                        {/* Status/Episode Badge Skeleton */}
+                        <div className="h-6 w-40 bg-white/10 rounded-full animate-pulse mt-2" />
+
+                        {/* Promoted Metadata Row Skeleton (Mobile) */}
+                        <div className="flex gap-2 mt-2 lg:hidden">
+                            <div className="h-6 w-20 bg-[#8FA7C5]/10 rounded-full animate-pulse" />
+                            <div className="h-6 w-20 bg-[#8FA7C5]/10 rounded-full animate-pulse" />
+                            <div className="h-6 w-16 bg-white/5 rounded-md animate-pulse" />
+                        </div>
+                        
+                        {/* Action Buttons Skeleton (2x2 on mobile) */}
+                        <div className="grid grid-cols-2 md:flex gap-3 sm:gap-4 pt-4 pb-2 w-full max-w-[500px]">
+                            <div className="h-14 rounded-full bg-[#8FA7C5]/20 animate-pulse w-full md:w-40" />
+                            <div className="h-14 rounded-full bg-white/10 animate-pulse w-full md:w-14" />
+                            <div className="hidden md:block h-14 w-14 rounded-full bg-white/5 animate-pulse" />
+                            <div className="hidden md:block h-14 w-14 rounded-full bg-white/5 animate-pulse" />
                         </div>
                     </div>
                 </div>

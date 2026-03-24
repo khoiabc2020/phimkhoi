@@ -326,6 +326,7 @@ export default function Header({ categories, countries }: HeaderProps) {
                                                                             href={`/phim/${movie.slug}`}
                                                                             key={movie._id}
                                                                             onClick={() => { setIsSearchOpen(false); setSearchQuery(""); }}
+                                                                            onMouseEnter={() => router.prefetch(`/phim/${movie.slug}`)}
                                                                             className="flex items-center gap-3 p-2 hover:bg-white/5 rounded-lg transition-all group"
                                                                         >
                                                                             <div className="w-9 h-12 relative rounded overflow-hidden">
@@ -358,8 +359,14 @@ export default function Header({ categories, countries }: HeaderProps) {
                                                 )}
                                             </div>
                                             {searchQuery.length > 0 && (
-                                                <button onClick={handleSearch} className="w-full bg-primary py-3 text-black font-extrabold text-[12px] uppercase tracking-widest hover:bg-[#a8bdd8] transition-colors">
-                                                    Xem tất cả kết quả
+                                                <button 
+                                                    onClick={handleSearch} 
+                                                    className="w-full mt-2 py-4 px-4 flex items-center justify-between group/action transition-all hover:bg-white/5 active:bg-white/10 border-t border-white/5"
+                                                >
+                                                    <span className="text-[11px] font-black text-white/40 group-hover/action:text-primary uppercase tracking-[2px] transition-colors">Xem tất cả kết quả</span>
+                                                    <div className="w-8 h-8 rounded-full bg-white/5 group-hover/action:bg-primary group-hover/action:scale-110 flex items-center justify-center transition-all">
+                                                        <Search className="w-3.5 h-3.5 text-white group-hover/action:text-black" />
+                                                    </div>
                                                 </button>
                                             )}
                                         </div>
