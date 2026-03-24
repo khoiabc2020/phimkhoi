@@ -392,11 +392,20 @@ export default function VideoPlayer({
                 });
 
                 // Nếu player báo lỗi (nguồn chặn, HLS lỗi, CORS...), fallback sang iframe embed gốc
+                // Chờ 1s để tránh trường hợp HLS proxy đang khởi tạo chậm
                 art.on("error", () => {
-                    setFallbackIframe(true);
+                    setTimeout(() => {
+                        if (artInstance.current && artInstance.current.video && artInstance.current.video.readyState === 0) {
+                            setFallbackIframe(true);
+                        }
+                    }, 1000);
                 });
                 art.on("video:error", () => {
-                    setFallbackIframe(true);
+                    setTimeout(() => {
+                        if (artInstance.current && artInstance.current.video && artInstance.current.video.readyState === 0) {
+                            setFallbackIframe(true);
+                        }
+                    }, 1000);
                 });
 
                 // Thêm một timeout an toàn: nếu sau 10s vẫn không play được thì cũng fallback

@@ -24,13 +24,28 @@ export async function GET(request: NextRequest) {
 
     try {
         // Spoof Referer to be the origin of the video URL, as many servers block external referers
-        // or set it to empty to avoid tracking/blocking
-        const upstreamOrigin = new URL(url).origin;
+        const upstreamUrl = new URL(url);
+        const upstreamOrigin = upstreamUrl.origin;
+        
+        let referer = upstreamOrigin + '/';
+        let origin = upstreamOrigin;
+
+        // Special handling for known providers who are strict about Referer
+        if (url.includes('nguonc.com') || url.includes('streamc.xyz') || url.includes('phimmoi.net') || url.includes('1080.com.vn')) {
+            referer = 'https://phim.nguonc.com/';
+            origin = 'https://phim.nguonc.com';
+        } else if (url.includes('kkphim') || url.includes('phim1280.tv') || url.includes('phimapi.com')) {
+            referer = 'https://kkphim.com/';
+            origin = 'https://kkphim.com';
+        } else if (url.includes('ophim1.com') || url.includes('img.ophim.live')) {
+            referer = 'https://ophim10.cc/';
+            origin = 'https://ophim10.cc';
+        }
 
         const headers: Record<string, string> = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Referer': upstreamOrigin + '/',
-            'Origin': upstreamOrigin,
+            'Referer': referer,
+            'Origin': origin,
             'Accept': '*/*',
             'Accept-Encoding': 'gzip, deflate, br'
         };

@@ -73,13 +73,16 @@ export function detectOrientation(url?: string | null): "portrait" | "landscape"
     if (!url) return "unknown";
     const u = url.toLowerCase();
     
-    // OPhim uses *-thumb.jpg for portrait, *-poster.jpg for backdrop
-    if (u.includes("img.ophim.live") || u.includes("phimimg.com")) {
-        if (u.includes("-thumb.") || u.includes("/thumb-")) return "portrait";
-        if (u.includes("-poster.") || u.includes("/poster-")) return "landscape";
+    // OPhim, NguonC often use "thumb" for portrait and "poster" for landscape (reverse of standard)
+    const isNguonc = u.includes("nguonc.com") || u.includes("streamc.xyz") || u.includes("phimmoi.net") || u.includes("1080.com.vn");
+    const isOphim = u.includes("img.ophim.live") || u.includes("phimimg.com") || u.includes("img.ophim1.com");
+
+    if (isOphim || isNguonc) {
+        if (u.includes("-thumb.") || u.includes("/thumb-") || u.endsWith("/thumb.jpg") || u.endsWith("/thumb.png")) return "portrait";
+        if (u.includes("-poster.") || u.includes("/poster-") || u.endsWith("/poster.jpg") || u.endsWith("/poster.png")) return "landscape";
     }
 
-    // KKPhim and NguonC generic checks
+    // Standard checks for other sources (KKPhim, TMDB, etc.)
     if (u.includes("backdrop") || u.includes("banner") || u.includes("landscape") || u.includes("horizontal")) {
         return "landscape";
     }

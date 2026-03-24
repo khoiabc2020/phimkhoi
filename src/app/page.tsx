@@ -205,11 +205,11 @@ async function HeroStream() {
       }));
     } else {
       // 2. Không có Custom Hero -> Fallback tải dữ liệu top trending từ Database trực tiếp
-      const cache = await TrendingCache.findOne({ type: 'tmdb-trending-day' }).lean() as any;
+      const cache = await TrendingCache.findOne({ type: 'tmdb-trending-day' } as any).lean() as any;
       finalHeroData = (cache?.movies || []).slice(0, 10);
       
       if (finalHeroData.length < 3) {
-        const backupCache = await TrendingCache.findOne({ type: 'phim-bo' }).lean() as any;
+        const backupCache = await TrendingCache.findOne({ type: 'phim-bo' } as any).lean() as any;
         finalHeroData = (backupCache?.movies || []).slice(0, 10);
       }
     }
@@ -230,7 +230,7 @@ export default function Home() {
         <HeroStream />
       </Suspense>
 
-      <div className="w-full max-w-[1920px] mx-auto px-1.5 sm:px-3 md:px-5 lg:pl-24 lg:pr-12 relative z-30 pb-16 -mt-6 md:-mt-10 lg:-mt-12 xl:-mt-14">
+      <div className="w-full max-w-[1920px] mx-auto px-1.5 sm:px-3 md:px-5 lg:pl-24 lg:pr-12 relative z-30 pb-16 -mt-0 md:-mt-2 lg:-mt-4 xl:-mt-6">
         {/* Decorative background glow - Deep Indigo for Premium feel */}
         <div className="absolute top-0 left-0 right-0 h-[800px] bg-indigo-500/10 via-transparent to-transparent pointer-events-none -z-10 blur-[150px]" />
         

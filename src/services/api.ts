@@ -63,10 +63,10 @@ function normalizeNguoncItem(item: Record<string, unknown>): Movie {
         content: "",
         type: (item.type as string) || "single",
         status: "",
-        thumb_url: (item.thumb_url as string) || "",
-        // Poster must stay "poster-only". Do not auto-fallback to thumb here,
-        // otherwise portrait slots get landscape images too early.
-        poster_url: (item.poster_url as string) || "",
+        // NguonC: thumb_url is vertical (portrait), poster_url is horizontal (landscape/backdrop).
+        // Align with our internal semantics:
+        poster_url: (item.thumb_url as string) || "", 
+        thumb_url: (item.poster_url as string) || "",
         is_copyright: false,
         sub_docquyen: false,
         chieurap: false,
@@ -178,10 +178,17 @@ const mergeMovieImages = (primary: Movie, candidate: Movie): Movie => {
     const detectOrientation = (v?: string): "portrait" | "landscape" | "unknown" => {
         const u = toLower(v);
         if (!u) return "unknown";
-        // OPhim thực tế hay dùng *-thumb.jpg làm ảnh dọc card.
-        if (isOphimAsset(v) && (u.includes("-thumb.") || u.includes("/thumb-"))) return "portrait";
-        // Với OPhim, *-poster.jpg thường là ảnh ngang.
-        if (isOphimAsset(v) && (u.includes("-poster.") || u.includes("/poster-"))) return "landscape";
+        
+        const isNguonc = u.includes("nguonc.com") || u.includes("streamc.xyz") || u.includes("phimmoi.net") || u.includes("1080.com.vn");
+        const isOphim = u.includes("img.ophim.live") || u.includes("phimimg.com") || u.includes("img.ophim1.com");
+
+        if (isOphim || isNguonc) {
+            // Internal semantics: we want to KNOW if the source URL is portrait or landscape
+            // OPhim/NguonC "thumb" is portrait, "poster" is landscape.
+            if (u.includes("-thumb.") || u.includes("/thumb-") || u.endsWith("/thumb.jpg") || u.endsWith("/thumb.png")) return "portrait";
+            if (u.includes("-poster.") || u.includes("/poster-") || u.endsWith("/poster.jpg") || u.endsWith("/poster.png")) return "landscape";
+        }
+
         if (u.includes("backdrop") || u.includes("banner") || u.includes("landscape") || u.includes("horizontal")) return "landscape";
         if (u.includes("poster-vertical") || u.includes("portrait") || u.includes("vertical")) return "portrait";
         if (u.includes("/poster") || u.includes("poster.")) return "portrait";
@@ -572,6 +579,9 @@ export const getMovieDetail = async (slug: string) => {
                 }));
                 combinedData.episodes = [...((combinedData.episodes as unknown[]) || []), ...taggedNguoncEpisodes];
             }
+            if (combinedData.movie) {
+                combinedData.movie = normalizeMovieImageRoles(combinedData.movie as Movie);
+            }
             return combinedData;
         }
 
@@ -580,7 +590,7 @@ export const getMovieDetail = async (slug: string) => {
             const data = nguoncRes.value.movie;
             return {
                 status: true,
-                movie: {
+                movie: normalizeMovieImageRoles({
                     _id: data.id || data.slug,
                     name: data.name,
                     slug: data.slug,
@@ -588,8 +598,9 @@ export const getMovieDetail = async (slug: string) => {
                     content: data.description,
                     type: data.type === 'single' ? 'single' : 'series',
                     status: data.current_episode,
-                    thumb_url: data.thumb_url,
-                    poster_url: data.poster_url,
+                    // NguonC: thumb is vertical, poster is horizontal
+                    poster_url: data.thumb_url,
+                    thumb_url: data.poster_url,
                     time: data.time || "",
                     episode_current: data.current_episode,
                     episode_total: data.total_episodes,
@@ -601,7 +612,7 @@ export const getMovieDetail = async (slug: string) => {
                     category: data.category?.['2']?.list || [],
                     country: data.category?.['4']?.list || [],
                     trailer_url: data.trailer_url || "",
-                },
+                } as Movie),
                 episodes: (data.episodes || []).map((epGroup: { server_name?: string; items?: { name: string; slug: string; embed: string; m3u8: string }[] }) => ({
                     server_name: `NguonC #${epGroup.server_name || "1"}`,
                     server_data: (epGroup.items || []).map((ep) => ({
@@ -668,8 +679,9 @@ export const searchMovies = async (keyword: string, options: { enrichTMDB?: bool
                 name: item.name as string,
                 slug: item.slug as string,
                 origin_name: (item.original_name || item.name) as string,
-                thumb_url: item.thumb_url as string,
-                poster_url: (item.poster_url as string) || "",
+                // NguonC: thumb is vertical, poster is horizontal
+                poster_url: item.thumb_url as string,
+                thumb_url: (item.poster_url as string) || "",
                 year: toValidYear(item.year as string) || 0,
                 quality: (item.quality as string) || 'FHD',
             })) as Movie[];
@@ -1010,30 +1022,37 @@ export const getMoviesByCountryAndCategory = async (countrySlug: string, categor
 
         // Step 2: If we have very few results (Elite standard means we want a full row), 
         // fallback to filtering from the Category list
+
+            // Step 2: If we have very few results (Elite standard means we want a full row),
+            // fallback to filtering from the Category list
         let items = [...fromCountry];
+        // 2. Nếu thiếu (< 12 phim), quét thêm từ danh mục gốc của thể loại đó (không giới hạn quốc gia ban đầu)
+        // NHƯNG phải lọc lại đúng Quốc Gia để tránh lẫn lộn (ví dụ Phim Hàn Cổ Trang không được có phim Trung)
         if (items.length < 12) {
             try {
-                // Fetch a large sample of the category (e.g. "Cổ Trang") and pick out the specific country
-                const categoryData = await getMoviesByCategory(categorySlug, 1, 250);
-                const fromCategory = categoryData.items.filter(movie => 
-                    movie.country?.some(c => c.slug === countrySlug)
-                );
-                
-                // Merge and deduplicate
+                const fromCategory = await getMoviesByCategory(categorySlug, 1, 64).then(res => res.items || []);
                 const seenSlugs = new Set(items.map(m => m.slug));
                 for (const movie of fromCategory) {
                     if (!seenSlugs.has(movie.slug)) {
-                        items.push(movie);
-                        seenSlugs.add(movie.slug);
+                        // Kiểm tra xem phim có thuộc đúng quốc gia yêu cầu không
+                        const isCorrectCountry = movie.country?.some(c => c.slug === countrySlug);
+                        if (isCorrectCountry) {
+                            items.push(movie);
+                            seenSlugs.add(movie.slug);
+                        }
                     }
+                    if (items.length >= limit) break;
                 }
             } catch (err) {
                 console.error("Hybrid filter fallback error:", err);
             }
         }
 
+        const normalized = items.slice(0, limit).map(normalizeMovieImageRoles);
+        const enriched = await enrichMoviesWithTMDB(normalized, limit);
+
         return {
-            items: items.slice(0, limit),
+            items: enriched,
             pagination: countryData.pagination
         };
     } catch (error) {
