@@ -1,21 +1,25 @@
-import mongoose from 'mongoose';
+import mongoose, { Schema, Document, Model } from "mongoose";
 
-const trendingSchema = new mongoose.Schema({
-    type: { type: String, required: true, index: true },
-    movies: { type: Array, default: [] },
-    updatedAt: { type: Date, default: Date.now }
-}, { 
-    strict: false,
-    collection: 'trendingcache'
-});
-
-interface ITrendingCache extends mongoose.Document {
-    type: string;
-    movies: any[];
+/**
+ * [Elite Performance] Trending Cache Model
+ * Stores pre-merged and processed movie lists for high-speed catalog delivery.
+ */
+export interface ITrendingCache extends Document {
+    type: string; // 'phim-bo', 'trung-quoc', 'phim-moi-cap-nhat', etc.
+    movies: any[]; // Array of processed Movie objects
     updatedAt: Date;
 }
 
-const TrendingCache = (mongoose.models.TrendingCache as mongoose.Model<ITrendingCache>) || 
-                      mongoose.model<ITrendingCache>('TrendingCache', trendingSchema);
+const TrendingCacheSchema: Schema<ITrendingCache> = new Schema(
+    {
+        type: { type: String, required: true, unique: true, index: true },
+        movies: { type: [Schema.Types.Mixed], default: [] },
+        updatedAt: { type: Date, default: Date.now },
+    },
+    { collection: 'trendingcache' }
+);
+
+const TrendingCache: Model<ITrendingCache> =
+    mongoose.models.TrendingCache || mongoose.model<ITrendingCache>("TrendingCache", TrendingCacheSchema);
 
 export default TrendingCache;

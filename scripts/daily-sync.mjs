@@ -118,7 +118,7 @@ async function syncMovieList(type, limit = 48) {
     // Update cache collection
     await TrendingCache.findOneAndUpdate(
         { type },
-        { type, movies: unique.slice(0, 24), updatedAt: new Date() },
+        { type, movies: unique.slice(0, 120), updatedAt: new Date() },
         { upsert: true }
     );
 
@@ -144,7 +144,7 @@ async function syncMovieList(type, limit = 48) {
 async function syncTrendingWithViewCount() {
     log('Syncing trending sorted by view count...');
 
-    const lists = ['phim-bo', 'phim-le', 'hoat-hinh', 'tv-shows', 'phim-chieu-rap'];
+    const lists = ['phim-bo', 'phim-le', 'hoat-hinh', 'tv-shows', 'phim-chieu-rap', 'phim-moi-cap-nhat', 'trung-quoc', 'han-quoc', 'viet-nam'];
 
     for (const type of lists) {
         try {

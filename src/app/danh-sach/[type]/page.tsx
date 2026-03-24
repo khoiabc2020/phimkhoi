@@ -74,6 +74,7 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
     const resolvedSearchParams = await searchParams;
 
     const page = Number(resolvedSearchParams.page) || 1;
+    const limit = 60; // Elite High-Density Catalog
     const year = Number(resolvedSearchParams.year) || undefined;
     const category = (resolvedSearchParams.category as string) || undefined;
     const country = (resolvedSearchParams.country as string) || undefined;
@@ -86,9 +87,9 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
     try {
         if (type === 'phim-moi' || type === 'tat-ca-the-loai') {
             const endpoint = type === 'tat-ca-the-loai' ? 'phim-moi-cap-nhat' : type;
-            data = await getMoviesList(endpoint, { page, year, category, country, quality });
+            data = await getMoviesList(endpoint, { page, year, category, country, quality, limit });
         } else {
-            data = await getMoviesList(type, { page, year, category, country, quality });
+            data = await getMoviesList(type, { page, year, category, country, quality, limit });
         }
     } catch (error) {
         console.error("Catalog Error", error);
