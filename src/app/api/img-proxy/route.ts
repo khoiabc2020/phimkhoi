@@ -4,7 +4,6 @@ import path from 'path';
 import crypto from 'crypto';
 import sharp from 'sharp';
 
-// Persistent Disk Cache Configuration
 // Persistent Disk Cache Configuration - Use absolute path on VPS for stability
 const CACHE_DIR = process.env.NODE_ENV === 'production' 
     ? '/home/bitnami/phimkhoi-img-cache' 
@@ -43,20 +42,19 @@ export async function GET(req: NextRequest) {
         return NextResponse.redirect(url, 302);
     }
 
-    // 1. Generate unique hash for the URL + Params to cache resized versions separately
+    // 1. Generate unique hash for the URL + Params
     const hash = crypto.createHash('md5').update(`${url}-${width}-${quality}`).digest('hex');
-    const ext = '.webp'; // Always use webp as output for optimized storage
+    const ext = '.webp';
     const cachePath = path.join(CACHE_DIR, `${hash}${ext}`);
 
-    // 2. Check Memory Cache First (Fastest)
-    // 2. Check Memory Cache First (Fastest)
+    // 2. Check Memory Cache First
     const memKey = `${url}-${width}-${quality}`;
     if (memoryCache.has(memKey)) {
         const { contentType, buffer } = memoryCache.get(memKey)!;
         return new Response(new Uint8Array(buffer as any), {
             headers: {
                 'Content-Type': contentType,
-                'Cache-Control': 'public, max-age=31536000, immutable, stale-while-revalidate=604800',
+                'Cache-Control': 'public, max-age=31536000, immutable',
                 'X-Cache-Status': 'MEMORY-HIT',
             },
         });
@@ -66,22 +64,22 @@ export async function GET(req: NextRequest) {
     try {
         await ensureCacheDir();
         const stats = await fs.stat(cachePath);
-        // Only use disk cache if it's less than 7 days old
-        if (Date.now() - stats.mtimeMs < 7 * 24 * 60 * 60 * 1000) {
+        // Only use disk cache if it's less than 30 days old
+        if (Date.now() - stats.mtimeMs < 30 * 24 * 60 * 60 * 1000) {
             const buffer = await fs.readFile(cachePath);
             const contentType = 'image/webp';
             
-            memoryCache.set(`${url}-${width}-${quality}`, { contentType, buffer });
+            memoryCache.set(memKey, { contentType, buffer });
             return new Response(new Uint8Array(buffer), {
                 headers: {
                     'Content-Type': contentType,
-                    'Cache-Control': 'public, max-age=31536000, immutable, stale-while-revalidate=604800',
+                    'Cache-Control': 'public, max-age=31536000, immutable',
                     'X-Cache-Status': 'DISK-HIT',
                 },
             });
         }
     } catch {
-        // Not in disk cache, proceed to fetch
+        // Not in disk cache
     }
 
     // 4. Fetch from Upstream
@@ -109,13 +107,13 @@ export async function GET(req: NextRequest) {
             }
             buffer = Buffer.from(await pipeline.webp({ quality }).toBuffer());
         } catch (e) {
-            console.error("Sharp processing failed, using original:", e);
+            console.error("Sharp processing failed:", e);
         }
 
-        // 6. Save to Disk & Memory for future requests
+        // 6. Save to Disk & Memory
         try {
             await fs.writeFile(cachePath, buffer);
-            memoryCache.set(`${url}-${width}-${quality}`, { contentType, buffer });
+            memoryCache.set(memKey, { contentType, buffer });
         } catch (e) {
             console.error("Failed to write image cache:", e);
         }
@@ -123,7 +121,7 @@ export async function GET(req: NextRequest) {
         return new Response(new Uint8Array(buffer), {
             headers: {
                 'Content-Type': contentType,
-                'Cache-Control': 'public, max-age=31536000, immutable, stale-while-revalidate=604800',
+                'Cache-Control': 'public, max-age=31536000, immutable',
                 'X-Cache-Status': 'MISS',
             },
         });
