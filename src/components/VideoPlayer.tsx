@@ -315,7 +315,6 @@ export default function VideoPlayer({
                                     maxMaxBufferLength: 60,
                                     maxBufferHole: 0.5,
                                     startLevel: -1,
-                                    abandonNextLevelRetry: 3,
                                     xhrSetup: (xhr: XMLHttpRequest) => {
                                         xhr.withCredentials = false;
                                     },
