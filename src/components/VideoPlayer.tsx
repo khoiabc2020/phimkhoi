@@ -27,6 +27,7 @@ interface VideoPlayerProps {
     /** Khi bật chế độ rạp phim, container đổi kích thước — cần resize player */
     isTheaterMode?: boolean;
     serverName?: string;
+    onPlayerError?: () => void;
 }
 
 // Vietnamese i18n for ArtPlayer
@@ -396,6 +397,7 @@ export default function VideoPlayer({
                 art.on("error", () => {
                     setTimeout(() => {
                         if (artInstance.current && artInstance.current.video && artInstance.current.video.readyState === 0) {
+                            onPlayerError?.();
                             setFallbackIframe(true);
                         }
                     }, 5000); // Tăng lên 5s để đảm bảo proxy tải xong trên mọi đường truyền
@@ -403,6 +405,7 @@ export default function VideoPlayer({
                 art.on("video:error", () => {
                     setTimeout(() => {
                         if (artInstance.current && artInstance.current.video && artInstance.current.video.readyState === 0) {
+                            onPlayerError?.();
                             setFallbackIframe(true);
                         }
                     }, 5000); // Tăng lên 5s để đảm bảo proxy tải xong trên mọi đường truyền

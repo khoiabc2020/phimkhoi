@@ -31,6 +31,7 @@ interface WatchContainerProps {
     episodeMetadata?: Record<string, { title?: string; overview?: string; airDate?: string; runtime?: number; voteAverage?: number }>;
     movieData: any;
     initialServerName: string;
+    onPlayerError?: () => void;
 }
 
 export default function WatchContainer({
@@ -59,8 +60,14 @@ export default function WatchContainer({
     const activeEpisode =
         currentServerEpisodes.find((ep: { slug?: string }) => ep.slug === currentEpisodeSlug) || initialCurrentEpisode;
 
-    // Theo yêu cầu của USER: Ưu tiên Iframe gốc để "phát ăn ngay" và ổn định 100%
-    const effectiveM3u8: string | undefined = undefined;
+    /** ArtPlayer vs Iframe control */
+    const [useIframe, setUseIframe] = useState(false);
+    const [playerError, setPlayerError] = useState(false);
+
+    // Determine the content to play based on error state and server type
+    // If it's NguonC, we try M3U8 first but allow quick fallback
+    const effectiveM3u8 = activeEpisode?.link_m3u8;
+    const canUseCustom = !!effectiveM3u8 && !useIframe && !playerError;
 
     // Compute prev/next episode index
     const currentIdx = currentServerEpisodes.findIndex((ep: { slug?: string }) => ep.slug === currentEpisodeSlug);
@@ -192,7 +199,7 @@ export default function WatchContainer({
                                     <Loader2 className="w-8 h-8 animate-spin text-[#8FA7C5]" />
                                     <p className="text-gray-400 text-sm animate-pulse">Đang tải trình phát...</p>
                                 </div>
-                            ) : activeEpisode && effectiveM3u8 ? (
+                            ) : activeEpisode && canUseCustom ? (
                                 <VideoPlayer
                                     url={activeEpisode.link_embed}
                                     m3u8={effectiveM3u8}
@@ -204,15 +211,28 @@ export default function WatchContainer({
                                     nextEpisodeUrl={nextEpisodeUrl}
                                     isTheaterMode={isTheaterMode}
                                     serverName={activeServerName}
+                                    onPlayerError={() => {
+                                        console.warn("ArtPlayer failed, falling back to Iframe...");
+                                        setPlayerError(true);
+                                    }}
                                 />
                             ) : activeEpisode ? (
-                                <iframe
-                                    src={activeEpisode.link_embed}
-                                    className="w-full h-full border-0 overflow-hidden"
-                                    allowFullScreen
-                                    allow="autoplay; encrypted-media"
-                                    scrolling="no"
-                                />
+                                <div className="w-full h-full relative">
+                                    <iframe
+                                        src={activeEpisode.link_embed}
+                                        className="w-full h-full border-0 overflow-hidden"
+                                        allowFullScreen
+                                        allow="autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                                        scrolling="no"
+                                    />
+                                    {playerError && (
+                                        <div className="absolute top-4 right-4 z-20">
+                                            <div className="bg-yellow-500/90 text-black px-3 py-1.5 rounded-lg text-[11px] font-bold shadow-xl backdrop-blur-md animate-in fade-in slide-in-from-top-2">
+                                                TỰ ĐỘNG CHUYỂN IFRAME (PLAYER GỐC LỖI)
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             ) : (
                                 <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-white gap-3">
                                     <span className="text-4xl">🎬</span>
@@ -313,6 +333,15 @@ export default function WatchContainer({
                         autoNext={autoNext}
                         onAutoNextToggle={() => setAutoNext(!autoNext)}
                         currentEpisodeName={activeEpisode ? displayEpisodeName(activeEpisode.name) : undefined}
+                        useIframe={!canUseCustom}
+                        onTogglePlayer={() => {
+                            if (playerError) {
+                                setPlayerError(false);
+                                setUseIframe(false);
+                            } else {
+                                setUseIframe(!useIframe);
+                            }
+                        }}
                     />
                 </div>
 

@@ -17,6 +17,8 @@ interface WatchEngagementBarProps {
     autoNext?: boolean;
     onAutoNextToggle?: () => void;
     currentEpisodeName?: string;
+    useIframe?: boolean;
+    onTogglePlayer?: () => void;
 }
 
 export default function WatchEngagementBar({
@@ -28,6 +30,8 @@ export default function WatchEngagementBar({
     autoNext = true,
     onAutoNextToggle,
     currentEpisodeName,
+    useIframe = false,
+    onTogglePlayer,
 }: WatchEngagementBarProps) {
     const { showToast } = useToast();
     const movieData = {
@@ -140,6 +144,21 @@ export default function WatchEngagementBar({
                             {isLightOff ? "OFF" : "ON"}
                         </span>
                     </button>}
+                    {onTogglePlayer && (
+                        <button onClick={onTogglePlayer}
+                            className={cn("flex items-center gap-2 text-xs font-semibold transition-all", !useIframe ? "text-primary shadow-[0_0_10px_rgba(143,167,197,0.3)]" : "text-gray-200 hover:text-white")}>
+                            <div className="relative">
+                                <Monitor className="w-4 h-4" />
+                                {!useIframe && <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full animate-ping" />}
+                            </div>
+                            {useIframe ? "Dùng Elite Player" : "Dùng Player Gốc"}
+                            <span className={cn("px-1.5 py-0.5 rounded text-[10px] font-bold border", !useIframe
+                                ? "bg-primary/20 text-primary border-primary/40"
+                                : "bg-white/10 text-gray-100 border-white/25")}>
+                                {!useIframe ? "ELITE" : "MODERN"}
+                            </span>
+                        </button>
+                    )}
                 </div>
 
                 {/* Right */}
