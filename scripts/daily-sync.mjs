@@ -454,7 +454,7 @@ async function hydrateAllMovies() {
     let hydrated = 0;
     let failed = 0;
     const slugs = missingData.map(m => m.slug).filter(Boolean);
-    const BATCH_SIZE = 8; // Larger batch for faster throughput
+    const BATCH_SIZE = 30; // 3x faster
 
     for (let i = 0; i < slugs.length; i += BATCH_SIZE) {
         const batch = slugs.slice(i, i + BATCH_SIZE);
@@ -505,7 +505,17 @@ async function hydrateAllMovies() {
                 if (itemData.poster_url && !itemData.poster_url.startsWith('http')) itemData.poster_url = pathImage + itemData.poster_url;
 
                 // [Elite Enrichment] Fetch TMDB data
-                const tmdbData = await fetchTMDBData(itemData.name, itemData.origin_name, itemData.year);
+                const tmdbData = await searchTMDBMovie(itemData.origin_name || itemData.name, itemData.year);
+
+                // [Image Quality Engine] Prefer TMDB higher-res images if match found
+                if (tmdbData) {
+                    if (tmdbData.poster_path) {
+                        itemData.poster_url = `https://image.tmdb.org/t/p/original${tmdbData.poster_path}`;
+                    }
+                    if (tmdbData.backdrop_path) {
+                        itemData.thumb_url = `https://image.tmdb.org/t/p/original${tmdbData.backdrop_path}`;
+                    }
+                }
 
                 await Movie.findOneAndUpdate(
                     { slug },
@@ -516,11 +526,11 @@ async function hydrateAllMovies() {
             } catch (e) { failed++; }
         }));
 
-        if ((i + BATCH_SIZE) % 80 === 0 || i + BATCH_SIZE >= slugs.length) {
+        if ((i + BATCH_SIZE) % 150 === 0 || i + BATCH_SIZE >= slugs.length) {
             log(`    ... Hydrated ${hydrated}/${slugs.length} | Failed: ${failed}`);
         }
-        // Avoid rate limits
-        await new Promise(r => setTimeout(r, 300));
+        // Avoid rate limits while staying fast
+        await new Promise(r => setTimeout(r, 100));
     }
 
     log(`  ✓ Full library hydration complete: ${hydrated} hydrated, ${failed} failed`);
