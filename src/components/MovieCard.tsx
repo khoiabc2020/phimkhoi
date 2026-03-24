@@ -440,17 +440,22 @@ function OnflixHoverCard({
 
                         {/* Info: Year & Quality */}
                         <div className="flex items-center gap-2 text-[13px] mt-2">
-                            {movie.year && Number(movie.year) > 0 && (
+                            {movie.year && Number(movie.year) > 1900 && (
                                 <span className="text-white/70 font-medium">{movie.year}</span>
                             )}
-                            {movie.quality && (
+                            {movie.quality && movie.quality !== "0" && (
                                 <span className="border border-white/30 text-white/80 px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider">
                                     {formatQualityLabel(movie.quality)}
                                 </span>
                             )}
-                            {movie.episode_current && (
+                            {movie.episode_current && movie.episode_current !== "0" && movie.episode_current.toLowerCase() !== "trailer" && (
                                 <span className="border border-white/30 text-white/80 px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider">
                                     {movie.episode_current}
+                                </span>
+                            )}
+                            {movie.view && Number(movie.view) > 0 && (
+                                <span className="text-white/40 text-[11px] ml-auto">
+                                    {movie.view.toLocaleString()} lượt xem
                                 </span>
                             )}
                         </div>

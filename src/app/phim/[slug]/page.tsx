@@ -299,9 +299,9 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             alt=""
                             fill
                             priority
-                            className="object-cover opacity-[0.25] blur-[40px] brightness-[0.7]"
+                            className="object-cover opacity-[0.2] blur-[20px] brightness-[0.5]"
                             sizes="100vw"
-                            quality={30}
+                            quality={40}
                         />
 
                         {/* Layer 3: THE SUBJECT (Authentic Source Thumbnail) */}
@@ -315,10 +315,10 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             loading="eager"
                             decoding="sync"
                             className={cn(
-                                "opacity-100 mix-blend-screen brightness-[1.02]",
+                                "opacity-90 brightness-[1.1] transition-opacity duration-700",
                                 isSubjectPortrait 
-                                    ? "object-contain object-right-top sm:object-right opacity-80" 
-                                    : "object-cover object-[70%_25%] sm:object-right"
+                                    ? "object-contain object-right-top sm:object-right opacity-70" 
+                                    : "object-cover object-[70%_30%] sm:object-right"
                             )}
                             sizes="100vw"
                             quality={100}
@@ -330,7 +330,6 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 {/* Cinematic Vignette & Edge Blending */}
                 <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/92 via-[40%] to-transparent z-[1]" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/65 to-transparent z-[1]" />
-                <div className="absolute inset-0 bg-[#0a0a0a]/10 backdrop-blur-[2px] z-[1]" />
 
                 {/* Hero Info Content aligned left/bottom on desktop, center on mobile */}
                 <div className="relative z-10 w-full max-w-[1920px] mx-auto flex flex-col md:flex-row items-center md:items-end justify-center md:justify-between gap-6 md:gap-12 text-center md:text-left mt-0 sm:mt-4">
@@ -447,6 +446,17 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                 </>
                             )}
                         </div>
+
+                        {/* NEW: Description Section (Onflix style) */}
+                        <div className="mt-10 sm:mt-14 space-y-4 max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-1000">
+                            <div className="flex items-center gap-2 border-l-[3px] border-[#8FA7C5] pl-4">
+                                <h3 className="text-[17px] sm:text-[18px] font-black text-white/90 tracking-[2.5px] uppercase drop-shadow-md">Nội dung</h3>
+                            </div>
+                            <div 
+                                className="text-[15.5px] sm:text-[17.2px] text-gray-300/90 leading-[1.85] font-medium text-justify drop-shadow-sm" 
+                                dangerouslySetInnerHTML={{ __html: movie?.content }} 
+                            />
+                        </div>
                     </div>
 
                 </div>
@@ -455,19 +465,6 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
             {/* Bottom Content: responsive — stacked on mobile, 2-col on desktop */}
             <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:pl-24 lg:pr-12 mt-6 sm:mt-8 lg:mt-12 relative z-10">
                 
-                {/* Mobile prioritized Section: Description */}
-                <div className="lg:hidden mb-10 pt-4">
-                    <div className="bg-[#07070b]/60 backdrop-blur-xl rounded-lg p-5 sm:p-6 border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
-                        <div className="flex items-center gap-2 mb-4 border-l-4 border-[#8FA7C5] pl-3">
-                            <h3 className="text-[18px] font-black text-white tracking-widest uppercase">Nội dung</h3>
-                        </div>
-                        <div 
-                            className="text-[15.5px] sm:text-[16.5px] text-gray-300 leading-relaxed font-medium text-justify" 
-                            dangerouslySetInnerHTML={{ __html: movie?.content }} 
-                        />
-                    </div>
-                </div>
-
                 {/* On mobile/tablet: RIGHT column (tabs) first, then sidebar info below */}
                 <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-12 items-start">
 
@@ -499,13 +496,6 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                     {/* LEFT SIDEBAR (shown after tabs on mobile, beside on desktop) */}
                     <div className="w-full lg:col-span-5 xl:col-span-4 order-2 lg:order-1 space-y-6 sm:space-y-8">
                         <div className="rounded-[10px] border border-white/[0.06] bg-[#07070b]/78 p-4 sm:p-5 space-y-6 sm:space-y-8 shadow-[0_10px_24px_#00000066]">
-                        {/* Nội dung (Desktop only) */}
-                        <div className="hidden lg:block">
-                            <div className="flex items-center gap-2 mb-4 border-l-2 border-[#8FA7C5] pl-3">
-                                <h3 className="text-[16px] sm:text-[17px] font-black text-white uppercase tracking-widest">Nội dung</h3>
-                            </div>
-                            <div className="text-[15px] sm:text-[16px] text-gray-300 leading-[1.8] font-medium text-justify line-clamp-[15] drop-shadow-sm" dangerouslySetInnerHTML={{ __html: movie?.content }} />
-                        </div>
 
                         {/* Đạo diễn */}
                         <div className="pt-2">

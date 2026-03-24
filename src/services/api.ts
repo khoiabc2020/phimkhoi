@@ -79,7 +79,7 @@ function normalizeNguoncItem(item: Record<string, unknown>): Movie {
         notify: "",
         showtimes: "",
         year: toValidYear(item.year as string) || 0,
-        view: 0,
+        view: undefined as any,
         actor: [],
         director: [],
         category: Array.isArray(item.category) ? item.category as { id: string; name: string; slug: string }[] : [],
