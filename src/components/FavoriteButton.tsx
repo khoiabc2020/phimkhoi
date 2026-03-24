@@ -16,6 +16,7 @@ interface FavoriteButtonProps {
         movieYear: number;
         movieQuality: string;
         movieCategories: string[];
+        lastEpisode?: string;
     };
     size?: "sm" | "md" | "lg";
     className?: string;

@@ -22,15 +22,16 @@ export async function GET() {
             .limit(200)
             .lean();
 
-        const movies = favorites.map((f: { _id?: string; movieID?: string; movieId?: string; movieSlug: string; movieName: string; movieOriginName?: string; moviePoster?: string; movieYear?: number; movieQuality?: string; }) => ({
-            slug: f.movieSlug,
-            name: f.movieName,
-            poster: f.moviePoster,
-            year: f.movieYear,
-            quality: f.movieQuality,
+        const movies = favorites.map((f: any) => ({
+            movieSlug: f.movieSlug,
+            movieName: f.movieName,
+            moviePoster: f.moviePoster,
+            movieYear: f.movieYear,
+            movieQuality: f.movieQuality,
+            lastEpisode: f.lastEpisode,
         }));
 
-        return NextResponse.json({ movies });
+        return NextResponse.json({ success: true, favorites: movies });
     } catch (error) {
         console.error("GET /api/user/favorites error:", error);
         return NextResponse.json({ movies: [] });

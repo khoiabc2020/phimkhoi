@@ -104,6 +104,27 @@ const toValidYear = (value: unknown): number | undefined => {
     return parsed;
 };
 
+/** 
+ * Elite Content Purity Engine: Detects if a movie is just a trailer/teaser 
+ * based on episode labels and status.
+ */
+export const isTrailer = (movie: Movie): boolean => {
+    if (!movie) return true;
+    const current = String(movie.episode_current || "").toLowerCase();
+    const name = String(movie.name || "").toLowerCase();
+    const notify = String(movie.notify || "").toLowerCase();
+    
+    // 1. Check common trailer markers
+    if (current.includes("trailer") || current.includes("teaser") || current.includes("preview")) return true;
+    if (name.includes("trailer") || name.includes("teaser") || name.includes("nhá hàng")) return true;
+    if (notify.includes("trailer") || notify.includes("sắp có")) return true;
+    
+    // 2. Check for empty episode data (optional, but safe for browse lists)
+    // if (!movie.episode_current && movie.status === "trailer") return true;
+
+    return false;
+};
+
 // --- Utilities ---
 export const parseServerLabel = (
     serverName: string,
@@ -512,7 +533,7 @@ export const getHomeData = async () => {
                     bySlug.set(item.slug, mergeMovieImages(existing, item));
                 }
             }
-            const normalized = Array.from(bySlug.values()).map(normalizeMovieImageRoles);
+            const normalized = Array.from(bySlug.values()).map(normalizeMovieImageRoles).filter(m => !isTrailer(m));
             // Enrich with TMDB images for "Elite" home page quality (Tăng giới hạn lên 24 phim)
             return await enrichMoviesWithTMDB(normalized, 24);
         };
@@ -725,7 +746,7 @@ export const searchMovies = async (keyword: string, options: { enrichTMDB?: bool
                 bySlug.set(item.slug, mergeMovieImages(existing, item));
             }
         }
-        const normalized = Array.from(bySlug.values()).map(normalizeMovieImageRoles);
+        const normalized = Array.from(bySlug.values()).map(normalizeMovieImageRoles).filter(m => !isTrailer(m));
         if (!enrichTMDB) {
             return normalized;
         }
@@ -864,11 +885,7 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
 
         // Filter out trailer-only / unreleased movies (unless explicitly browsing that category)
         if (type !== 'phim-sap-chieu') {
-            uniqueItems = uniqueItems.filter(item => {
-                const ep = (item.episode_current || '').toLowerCase();
-                const st = ((item as any).status || '').toLowerCase();
-                return !ep.includes('trailer') && !st.includes('trailer');
-            });
+            uniqueItems = uniqueItems.filter(item => !isTrailer(item));
         }
 
         // Optional client-side quality filter (e.g. 4K only)
@@ -957,10 +974,7 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
         const enrichedItems = await enrichMoviesWithTMDB(uniqueItems, 24);
 
         // Global Trailer Cleanse for categories
-        const playable = enrichedItems.filter(item => {
-            const ep = (item.episode_current || '').toLowerCase();
-            return !ep.includes('trailer');
-        });
+        const playable = enrichedItems.filter(item => !isTrailer(item));
 
         return {
             items: playable,
@@ -1027,10 +1041,7 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
         const enrichedItems = await enrichMoviesWithTMDB(uniqueItems, 24);
 
         // Global Trailer Cleanse for countries
-        const playable = enrichedItems.filter(item => {
-            const ep = (item.episode_current || '').toLowerCase();
-            return !ep.includes('trailer');
-        });
+        const playable = enrichedItems.filter(item => !isTrailer(item));
 
         return {
             items: playable,
@@ -1088,12 +1099,7 @@ export const getMoviesByCountryAndCategory = async (countrySlug: string, categor
         }
 
         // --- GLOBAL TRAILER & QUALITY CLEANSE ---
-        const filtered = finalItems.filter(item => {
-            const ep = (item.episode_current || '').toLowerCase();
-            const st = ((item as any).status || '').toLowerCase();
-            const nm = (item.name || '').toLowerCase();
-            return !ep.includes('trailer') && !st.includes('trailer') && !nm.includes('trailer');
-        });
+        const filtered = finalItems.filter(item => !isTrailer(item));
 
         const normalized = filtered.slice(0, limit).map(normalizeMovieImageRoles);
         const enriched = await enrichMoviesWithTMDB(normalized, limit);
