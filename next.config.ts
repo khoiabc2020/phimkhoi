@@ -4,6 +4,8 @@ const nextConfig: NextConfig = {
   output: "standalone",
   compress: true,           // gzip/brotli responses
   poweredByHeader: false,
+  // Ensure mongoose/mongodb only run on server, never bundled for browser
+  serverExternalPackages: ["mongoose", "mongodb"],
   images: {
     // Sử dụng custom loader wsrv.nl thay cho Next.js optimization (không tiêu tốn CPU của VPS)
     unoptimized: false,
