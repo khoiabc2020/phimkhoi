@@ -133,14 +133,16 @@ async function syncMovieList(type, pages = 1, limitPerPage = 48) {
     let upserted = 0;
     for (const movie of unique) {
         try {
+            // FIX: Destructure _id out of movie object to avoid "modifying immutable field _id" error
+            const { _id, ...updateData } = movie;
             await Movie.findOneAndUpdate(
                 { slug: movie.slug },
-                { $set: { ...movie, lastSynced: new Date() } },
+                { $set: { ...updateData, lastSynced: new Date() } },
                 { upsert: true, setDefaultsOnInsert: true }
             );
             upserted++;
         } catch (e) {
-            // Skip duplicates
+            // Skip duplicates or other errors
         }
     }
 
@@ -179,45 +181,55 @@ async function syncFullMovieDetails() {
     let hydrated = 0;
     const slugsArray = Array.from(allSlugs);
     
-    for (const slug of slugsArray) {
-        try {
-            // Check if already synced recently (within 24h)
-            const existing = await Movie.findOne({ slug }).lean();
-            if (existing && existing.episodes && existing.episodes.length > 0 && 
-                existing.lastSynced && (new Date() - new Date(existing.lastSynced) < 86400000)) {
-                continue; 
+    // BATCH PROCESSING: Hydrate in parallel groups of 5 to speed up significantly
+    const BATCH_SIZE = 5;
+    for (let i = 0; i < slugsArray.length; i += BATCH_SIZE) {
+        const batch = slugsArray.slice(i, i + BATCH_SIZE);
+        
+        await Promise.all(batch.map(async (slug) => {
+            try {
+                // 1. Check if already synced recently OR if it already has episodes (shallow check)
+                const existing = await Movie.findOne({ slug }, { episodes: 1, lastSynced: 1, content: 1 }).lean();
+                
+                // If it has episodes and was synced within 48h, skip it (Elite Efficiency)
+                if (existing && existing.episodes && existing.episodes.length > 0 && 
+                    existing.lastSynced && (new Date() - new Date(existing.lastSynced) < 172800000)) {
+                    return; 
+                }
+
+                // 2. Fetch full detail (try KKPHIM first, then OPHIM as fallback)
+                let detailData = await fetchJson(`${KKPHIM_API}/v1/api/phim/${slug}`);
+                if (!detailData || !detailData.data?.item) {
+                    detailData = await fetchJson(`${OPHIM_API}/v1/api/phim/${slug}`);
+                }
+                
+                if (!detailData || !detailData.data?.item) return;
+                
+                const item = detailData.data.item;
+                const episodes = detailData.data.episodes || [];
+
+                const { _id, ...itemData } = item;
+                await Movie.findOneAndUpdate(
+                    { slug },
+                    { 
+                        $set: { 
+                            ...itemData, 
+                            episodes, 
+                            lastSynced: new Date()
+                        } 
+                    },
+                    { upsert: true }
+                );
+                
+                hydrated++;
+            } catch (e) {
+                // Log but continue
             }
+        }));
 
-            // Fetch full detail (try KKPHIM first as it usually has better data)
-            const detailData = await fetchJson(`${KKPHIM_API}/v1/api/phim/${slug}`);
-            if (!detailData || !detailData.data?.item) continue;
-            
-            const item = detailData.data.item;
-            const episodes = detailData.data.episodes || [];
-
-            await Movie.findOneAndUpdate(
-                { slug },
-                { 
-                    $set: { 
-                        ...item, 
-                        episodes, 
-                        lastSynced: new Date(),
-                        content: item.content || existing?.content,
-                        actor: item.actor || existing?.actor,
-                        director: item.director || existing?.director
-                    } 
-                },
-                { upsert: true }
-            );
-            
-            hydrated++;
-            if (hydrated % 20 === 0) log(`    ... Hydrated ${hydrated}/${slugsArray.length} movies`);
-            
-            // Rate limit to be nice to the API
-            await new Promise(r => setTimeout(r, 200)); 
-        } catch (e) {
-            log(`  ✗ Error hydrating ${slug}: ${e.message}`);
-        }
+        if (hydrated > 0 && hydrated % 20 === 0) log(`    ... Hydrated ${hydrated}/${slugsArray.length} movies`);
+        // Small pause between batches
+        await new Promise(r => setTimeout(r, 500));
     }
     
     log(`  ✓ Successfully hydrated ${hydrated} movies with full metadata`);
