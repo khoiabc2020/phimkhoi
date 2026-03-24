@@ -53,6 +53,8 @@ export default async function CategoryPage({
     const categoryName = category?.name || (slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, " "));
 
     const theme = getThemeBySlug(slug);
+    const displayLabel = "Thể loại";
+    const displayTitle = categoryName;
 
     const currentYear = new Date().getFullYear();
     const years = [
@@ -91,7 +93,7 @@ export default async function CategoryPage({
 
                     <div className="w-full md:w-auto bg-[#0a0a0a]/80 backdrop-blur-md rounded-[12px] p-1 shadow-xl">
                         <Suspense fallback={<div className="w-32 h-8 bg-white/5 animate-pulse rounded" />}>
-                            <FilterBar categories={categories} countries={countries} years={years} hideCategory={!!category} hideCountry={!!country} />
+                            <FilterBar categories={categories} countries={countries} years={years} hideCategory={!!category} hideCountry={!!sParams.country} />
                         </Suspense>
                     </div>
                 </div>

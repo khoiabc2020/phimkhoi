@@ -8,10 +8,12 @@ export default function FilterBar({
     categories = [], 
     countries = [],
     hideCategory = false,
-    hideCountry = false
+    hideCountry = false,
+    years = []
 }: { 
     categories?: { name: string; slug: string }[]; 
     countries?: { name: string; slug: string }[]; 
+    years?: { name: string; slug: string }[];
     hideCategory?: boolean;
     hideCountry?: boolean;
 }) {
@@ -42,7 +44,7 @@ export default function FilterBar({
     };
 
     const currentYear = new Date().getFullYear();
-    const years = [
+    const defaultYears = [
         ...Array.from({ length: 25 }, (_, i) => ({
             name: `${currentYear - i}`,
             slug: `${currentYear - i}`,
@@ -55,7 +57,8 @@ export default function FilterBar({
     // Ensure we have "All" option if provided list doesn't have it
     const displayCategories = [{ name: "Tất cả thể loại", slug: "all" }, ...categories];
     const displayCountries = [{ name: "Tất cả quốc gia", slug: "all" }, ...countries];
-    const displayYears = [{ name: "Tất cả năm", slug: "all" }, ...years];
+    const internalYears = years && years.length > 0 ? years : defaultYears;
+    const displayYears = [{ name: "Tất cả năm", slug: "all" }, ...internalYears];
 
     return (
         <div>
