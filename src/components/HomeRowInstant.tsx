@@ -35,7 +35,6 @@ export default function HomeRowInstant({
 
     if (isLoading && movies.length === 0) {
         return (
-        return (
             <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 lg:pl-24 lg:pr-12 md:py-6 py-4 space-y-3">
                 <div className="h-5 w-40 bg-white/10 rounded-full shimmer opacity-50" />
                 <div className="flex gap-3 md:gap-4 overflow-hidden">
@@ -49,7 +48,6 @@ export default function HomeRowInstant({
                     ))}
                 </div>
             </div>
-        );
         );
     }
 
