@@ -100,7 +100,16 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
 
                 if (filteredResults.length > 0) {
                     // Filter best match
-                    const bestMatch = filteredResults.find((item: { title?: string; name?: string; release_date?: string; first_air_date?: string; original_title?: string; original_name?: string; origin_country?: string[] }) => {
+                    const bestMatch = filteredResults.find((item: { 
+                        title?: string; 
+                        name?: string; 
+                        release_date?: string; 
+                        first_air_date?: string; 
+                        original_title?: string; 
+                        original_name?: string; 
+                        origin_country?: string[];
+                        original_language?: string;
+                    }) => {
                         const itemYear = endpoint === 'movie'
                             ? (item.release_date ? parseInt(item.release_date.substring(0, 4)) : null)
                             : (item.first_air_date ? parseInt(item.first_air_date.substring(0, 4)) : null);
@@ -186,7 +195,7 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
 
         // SECONDARY FALLBACK: Broader search without year if first pass failed
         if (year) {
-            return searchTMDBMovie(query, undefined, type, verification);
+            return await searchTMDBMovie(query, undefined, type, verification);
         }
 
         return null;
@@ -211,6 +220,26 @@ export const searchTMDBPerson = async (query: string) => {
     } catch (error) {
         console.error("TMDB Person Search Error:", error);
         return [];
+    }
+};
+
+/**
+ * Elite Actor Resolver: Finds a person and retrieves their full bio/metadata.
+ * Used by MovieCast for cinematic actor portraits and details.
+ */
+export const getActorDetailsFromTMDB = async (actorName: string) => {
+    try {
+        if (!TMDB_API_KEY) return null;
+        
+        // 1. Search for the person
+        const results = await searchTMDBPerson(actorName);
+        if (!results || results.length === 0) return null;
+        
+        // 2. Fetch full details for the best match
+        return await getTMDBPersonDetails(results[0].id);
+    } catch (error) {
+        console.error("getActorDetailsFromTMDB error:", error);
+        return null;
     }
 };
 

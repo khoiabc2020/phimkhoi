@@ -97,67 +97,8 @@ export async function getMovieCast(
 
 export async function getActorDetailsFromTMDB(actorName: string) {
     try {
-        const apiUrl = process.env.TMDB_API_URL || "https://api.themoviedb.org/3";
-        const apiKey = process.env.TMDB_API_KEY;
-        if (!apiKey || !actorName?.trim()) return null;
-
-        const normalize = (value: string) =>
-            String(value || "")
-                .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, "")
-                .toLowerCase()
-                .replace(/[^a-z0-9\s]/g, " ")
-                .replace(/\s+/g, " ")
-                .trim();
-
-        const actorNorm = normalize(actorName);
-
-        const fetchSearch = async (lang: "vi-VN" | "en-US") => {
-            const searchUrl = `${apiUrl}/search/person?api_key=${apiKey}&query=${encodeURIComponent(actorName)}&language=${lang}`;
-            const res = await fetch(searchUrl, { next: { revalidate: 86400 } });
-            const data = await res.json();
-            return Array.isArray(data?.results) ? data.results : [];
-        };
-
-        const [viResults, enResults] = await Promise.all([
-            fetchSearch("vi-VN"),
-            fetchSearch("en-US"),
-        ]);
-
-        const merged = [...viResults, ...enResults];
-        const unique = Array.from(new Map(merged.map((p: any) => [p.id, p])).values());
-        if (unique.length === 0) return null;
-
-        const scorePerson = (person: any) => {
-            const names = [
-                person?.name,
-                person?.original_name,
-                ...(Array.isArray(person?.also_known_as) ? person.also_known_as : []),
-            ]
-                .map((n: string) => normalize(n))
-                .filter(Boolean);
-
-            let score = 0;
-            for (const n of names) {
-                if (n === actorNorm) score = Math.max(score, 120);
-                else if (n.includes(actorNorm) || actorNorm.includes(n)) score = Math.max(score, 95);
-            }
-
-            if (person?.known_for_department === "Acting") score += 20;
-            if (person?.profile_path) score += 10;
-            score += Math.min(Number(person?.popularity || 0), 25);
-            return score;
-        };
-
-        const bestPerson = unique
-            .map((p: any) => ({ person: p, score: scorePerson(p) }))
-            .sort((a, b) => b.score - a.score)[0]?.person;
-
-        if (bestPerson?.id) {
-            return await getTMDBPersonDetails(bestPerson.id);
-        }
-
-        return null;
+        const { getActorDetailsFromTMDB: getActorService } = await import("@/services/tmdb");
+        return await getActorService(actorName);
     } catch (error) {
         console.error("Fetch Actor Details Error:", error);
         return null;

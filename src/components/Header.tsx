@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { Search, Bell, User, LogOut, ChevronDown, Filter, Shield, Loader2, X } from "lucide-react";
+import { Search, User, LogOut, ChevronDown, Filter, Shield, Loader2, X } from "lucide-react";
 import { getImageUrl, cn } from "@/lib/utils";
 import { signOut, useSession } from "next-auth/react";
 import MobileMenu from "./MobileMenu";

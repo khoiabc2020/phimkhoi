@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getActorDetailsFromTMDB } from "@/app/actions/tmdb";
+import { getActorDetailsFromTMDB } from "@/services/tmdb";
 
 type CastItem = {
     name: string;

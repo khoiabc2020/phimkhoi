@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Link from "next/image";
-import { Bell, Film, ChevronRight, Loader2, Sparkles, User } from "lucide-react";
+import { Bell, ChevronRight, Loader2, User } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { getImageUrl, cn } from "@/lib/utils";
 import NextLink from "next/link";
