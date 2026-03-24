@@ -454,7 +454,7 @@ async function hydrateAllMovies() {
     let hydrated = 0;
     let failed = 0;
     const slugs = missingData.map(m => m.slug).filter(Boolean);
-    const BATCH_SIZE = 30; // 3x faster
+    const BATCH_SIZE = 120; // Hyper-Sync Mode
 
     for (let i = 0; i < slugs.length; i += BATCH_SIZE) {
         const batch = slugs.slice(i, i + BATCH_SIZE);
@@ -526,11 +526,11 @@ async function hydrateAllMovies() {
             } catch (e) { failed++; }
         }));
 
-        if ((i + BATCH_SIZE) % 150 === 0 || i + BATCH_SIZE >= slugs.length) {
+        if ((i + BATCH_SIZE) % 240 === 0 || i + BATCH_SIZE >= slugs.length) {
             log(`    ... Hydrated ${hydrated}/${slugs.length} | Failed: ${failed}`);
         }
-        // Avoid rate limits while staying fast
-        await new Promise(r => setTimeout(r, 100));
+        // Hyper-Sync delay
+        await new Promise(r => setTimeout(r, 30));
     }
 
     log(`  ✓ Full library hydration complete: ${hydrated} hydrated, ${failed} failed`);
