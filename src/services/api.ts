@@ -1059,7 +1059,7 @@ export const getMoviesByCountryAndCategory = async (countrySlug: string, categor
         // --- ELITE REGIONAL ENFORCEMENT ---
         // Slugs to merge for "Cổ Trang" row depth
         const categorySlugs = categorySlug === "co-trang" 
-            ? ["co-trang", "co-dai", "than-thoai", "vo-thuat"] 
+            ? ["co-trang", "co-dai", "than-thoai", "vo-thuat", "lich-su", "kiem-hiep"] 
             : [categorySlug];
 
         // Step 1: Deep scan of the Country list (Pages 1-5)
@@ -1081,7 +1081,7 @@ export const getMoviesByCountryAndCategory = async (countrySlug: string, categor
         
         if (finalItems.length < limit) {
              const categoryScan = await Promise.all(
-                categorySlugs.map(slug => getMoviesByCategory(slug, 1, 64))
+                categorySlugs.map(slug => getMoviesByCategory(slug, 1, 128))
              );
              const fromCategories = categoryScan.flatMap(res => res.items || []);
              
@@ -1102,7 +1102,7 @@ export const getMoviesByCountryAndCategory = async (countrySlug: string, categor
         const filtered = finalItems.filter(item => !isTrailer(item));
 
         const normalized = filtered.slice(0, limit).map(normalizeMovieImageRoles);
-        const enriched = await enrichMoviesWithTMDB(normalized, limit);
+        const enriched = await enrichMoviesWithTMDB(normalized, limit + 8);
 
         return {
             items: enriched,

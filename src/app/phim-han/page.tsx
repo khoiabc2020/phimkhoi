@@ -41,7 +41,7 @@ const FEATURED_ACTORS = [
 
 async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'default', minHeight = 380 }: { title: string; categorySlug: string; countrySlug: string; variant?: 'default' | 'sidebar'; minHeight?: number }) {
     // Ưu tiên filter từ MovieCountry (lấy mẫu lớn 450 phim) để đảm bảo 100% phim thuộc đúng Quốc Gia (Hàn/Trung)
-    const data = await getMoviesByCountryAndCategory(countrySlug, categorySlug, 24);
+    const data = await getMoviesByCountryAndCategory(countrySlug, categorySlug, 32);
     const filteredMovies = data.items;
     
     return (
