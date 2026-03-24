@@ -21,6 +21,7 @@ interface MovieTabsProps {
     tmdbDetails?: any;
     episodeThumbnails?: Record<string, string>;
     episodeMetadata?: Record<string, { title?: string; overview?: string; airDate?: string; runtime?: number; voteAverage?: number }>;
+    cast?: React.ReactNode;
 }
 
 const EPISODES_PER_CHUNK = 50;
@@ -33,9 +34,10 @@ export default function MovieTabs({
     tmdbDetails,
     episodeThumbnails = {},
     episodeMetadata = {},
+    cast,
 }: MovieTabsProps) {
     const defaultTab = (episodes && episodes.length > 0) ? "episodes" : "related";
-    const [activeTab, setActiveTab] = useState<"episodes" | "trailer" | "related">(defaultTab);
+    const [activeTab, setActiveTab] = useState<"episodes" | "trailer" | "related" | "cast">(defaultTab);
     const [activeServer, setActiveServer] = useState(0);
     const [currentChunk, setCurrentChunk] = useState(0);
     const [activeLangTab, setActiveLangTab] = useState<string>("");
@@ -125,10 +127,11 @@ export default function MovieTabs({
     }, [activeLangTab, activeServer, episodes, groupedServers, activeLanguageGroups.length]);
 
     const tabs = [
-        { id: "episodes", label: "DANH SÁCH TẬP" },
-        { id: "related", label: "ĐỀ XUẤT" },
-        { id: "trailer", label: "TRAILER" },
-    ];
+        { id: "episodes", label: "DANH SÁCH TẬP", show: episodes && episodes.length > 0 },
+        { id: "cast", label: "DIỄN VIÊN", show: !!cast },
+        { id: "related", label: "ĐỀ XUẤT", show: relatedMovies.length > 0 },
+        { id: "trailer", label: "TRAILER", show: tmdbVideos.length > 0 || (!!movie?.trailer_url && movie.trailer_url.includes("youtube")) },
+    ].filter(t => t.show);
 
     const currentServerData = episodes?.[activeServer]?.server_data || [];
     const totalChunks = Math.ceil(currentServerData.length / EPISODES_PER_CHUNK);
@@ -500,6 +503,13 @@ export default function MovieTabs({
                         ) : (
                             <div className="text-center py-8 text-gray-400 text-sm">Chưa có phim đề xuất.</div>
                         )}
+                    </div>
+                )}
+
+                {/* CAST TAB */}
+                {activeTab === "cast" && cast && (
+                    <div className="bg-[#07070b]/78 border border-white/[0.05] rounded-[10px] p-4 sm:p-6 shadow-[0_10px_26px_#00000055]">
+                         {cast}
                     </div>
                 )}
 

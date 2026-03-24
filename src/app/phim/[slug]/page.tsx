@@ -486,14 +486,6 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 </div>
             </div>
 
-            {/* Cast Section (Horizontal Carousel) - Moved above tabs for better hierarchy */}
-            <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:pl-24 lg:pr-12 mt-6 lg:mt-8 mb-2 lg:mb-4 relative z-10">
-                <div className="flex items-center gap-2 mb-4 lg:mb-6 border-l-2 border-[#8FA7C5] pl-3">
-                    <h3 className="text-[16px] sm:text-[19px] font-black text-white uppercase tracking-widest">Diễn viên chính</h3>
-                </div>
-                <MovieCast movie={movie} slug={slug} isCompact={false} tmdbCast={tmdbDetails?.credits?.cast} />
-            </div>
-
             {/* Bottom Content: responsive — stacked on mobile, 2-col on desktop */}
             <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:pl-24 lg:pr-12 mt-2 lg:mt-4 relative z-10">
                 
@@ -511,6 +503,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                 tmdbDetails={tmdbDetails}
                                 episodeThumbnails={episodeThumbnails}
                                 episodeMetadata={episodeMetadata}
+                                cast={<MovieCast movie={movie} slug={slug} isCompact={false} tmdbCast={tmdbDetails?.credits?.cast} />}
                             />
                         </Suspense>
                         {/* Comment Section below tabs */}
