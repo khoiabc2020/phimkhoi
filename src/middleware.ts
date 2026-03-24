@@ -1,21 +1,47 @@
 import { NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 import type { NextRequest } from "next/server";
 
 /**
- * [Elite Security] Zero-Leak Session Middleware
- * Ensures that any request with an active session cookie NEVER gets cached by proxies/CDNs.
+ * [Elite Security] Unified Middleware
+ * Combines Zero-Leak Session Hardening and Navigation Route Protection.
  */
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
+    const { pathname } = request.nextUrl;
+    const token = await getToken({ req: request });
+    
+    // 1. Navigation & Route Protection (Legacy Proxy logic)
+    const protectedPaths = ["/admin", "/lich-su-xem", "/phim-yeu-thich", "/cai-dat", "/thong-tin-tai-khoan"];
+    const isProtected = protectedPaths.some((path) => pathname.startsWith(path));
+
+    // Redirect logged-in users from login/register to home
+    if ((pathname.startsWith("/login") || pathname.startsWith("/register")) && token) {
+        return NextResponse.redirect(new URL("/", request.url));
+    }
+
+    // Redirect guest users from protected pages to login
+    if (isProtected && !token) {
+        const loginUrl = new URL("/login", request.url);
+        loginUrl.searchParams.set("callbackUrl", pathname);
+        return NextResponse.redirect(loginUrl);
+    }
+
+    // Admin-only protection
+    if (pathname.startsWith("/admin") && token?.role !== "admin") {
+        return NextResponse.redirect(new URL("/", request.url));
+    }
+
+    // 2. [Elite Security] Zero-Leak Session Hardening
     const response = NextResponse.next();
     
-    // 1. Detect active session cookies
+    // Detect active session cookies
     const hasSession = request.cookies.has("next-auth.session-token") || 
-                       request.cookies.has("__Secure-next-auth.session-token");
+                       request.cookies.has("__Secure-next-auth.session-token") ||
+                       !!token;
     
-    const isAuthApi = request.nextUrl.pathname.startsWith("/api/auth");
-    const isAccountPage = request.nextUrl.pathname.startsWith("/thong-tin-tai-khoan");
+    const isAuthApi = pathname.startsWith("/api/auth");
+    const isAccountPage = pathname.startsWith("/thong-tin-tai-khoan");
 
-    // 2. Harden headers for authenticated or sensitive routes
     if (hasSession || isAuthApi || isAccountPage) {
         // Force no-cache across all layers (Browser, Cloudflare, Nginx)
         response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0");
@@ -28,7 +54,6 @@ export function middleware(request: NextRequest) {
     return response;
 }
 
-// Apply to all routes to be safe, or just sensitive ones
 export const config = {
     matcher: [
         /*
