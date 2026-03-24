@@ -107,104 +107,108 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
 
                     // Quick pre-filter: if searching for a modern movie/show, reject ancient results 
                     const filteredResults = data.results?.filter((item: any) => {
-                    if (!year || year < 2010) return true; // Don't filter old searches
-                    const itemDate = endpoint === 'movie' ? item.release_date : item.first_air_date;
-                    const itemYear = itemDate ? parseInt(itemDate.substring(0, 4)) : null;
-                    // Reject if the result is more than 10 years older than what we're searching for
-                    if (itemYear && itemYear < year - 10) return false;
-                    return true;
-                }) || [];
+                        if (!year || year < 2010) return true; // Don't filter old searches
+                        const itemDate = endpoint === 'movie' ? item.release_date : item.first_air_date;
+                        const itemYear = itemDate ? parseInt(itemDate.substring(0, 4)) : null;
+                        // Reject if the result is more than 10 years older than what we're searching for
+                        if (itemYear && itemYear < year - 10) return false;
+                        return true;
+                    }) || [];
 
-                if (filteredResults.length > 0) {
-                    // Filter best match
-                    const bestMatch = filteredResults.find((item: { 
-                        title?: string; 
-                        name?: string; 
-                        release_date?: string; 
-                        first_air_date?: string; 
-                        original_title?: string; 
-                        original_name?: string; 
-                        origin_country?: string[];
-                        original_language?: string;
-                    }) => {
-                        const itemYear = endpoint === 'movie'
-                            ? (item.release_date ? parseInt(item.release_date.substring(0, 4)) : null)
-                            : (item.first_air_date ? parseInt(item.first_air_date.substring(0, 4)) : null);
+                    if (filteredResults.length > 0) {
+                        // Filter best match
+                        const bestMatch = filteredResults.find((item: { 
+                            title?: string; 
+                            name?: string; 
+                            release_date?: string; 
+                            first_air_date?: string; 
+                            original_title?: string; 
+                            original_name?: string; 
+                            origin_country?: string[];
+                            original_language?: string;
+                        }) => {
+                            const itemYear = endpoint === 'movie'
+                                ? (item.release_date ? parseInt(item.release_date.substring(0, 4)) : null)
+                                : (item.first_air_date ? parseInt(item.first_air_date.substring(0, 4)) : null);
 
-                        // Country Check: Prevent Western movies from matching Asian dramas
-                        const isAsianDramaSource = ["trung-quoc", "han-quoc", "nhat-ban", "thai-lan"].includes(verification?.countrySlug || "");
-                        const itemCountries = item.origin_country || [];
-                        const itemOriginalLang = item.original_language || "";
-                        
-                        if (isAsianDramaSource) {
-                            // If it's a known Asian drama source, it MUST be from an Asian country OR have an Asian original language
-                            const hasAsianOrigin = itemCountries.some((c: string) => ["CN", "KR", "JP", "TH", "TW", "HK"].includes(c));
-                            const hasAsianLang = ["zh", "ko", "ja", "th"].includes(itemOriginalLang);
+                            // Country Check: Prevent Western movies from matching Asian dramas
+                            const isAsianDramaSource = ["trung-quoc", "han-quoc", "nhat-ban", "thai-lan"].includes(verification?.countrySlug || "");
+                            const itemCountries = item.origin_country || [];
+                            const itemOriginalLang = item.original_language || "";
                             
-                            if (itemCountries.length > 0 && !hasAsianOrigin && !hasAsianLang) {
-                                return false; // Reject US/Western matches for Asian drama queries
+                            if (isAsianDramaSource) {
+                                // If it's a known Asian drama source, it MUST be from an Asian country OR have an Asian original language
+                                const hasAsianOrigin = itemCountries.some((c: string) => ["CN", "KR", "JP", "TH", "TW", "HK"].includes(c));
+                                const hasAsianLang = ["zh", "ko", "ja", "th"].includes(itemOriginalLang);
+                                
+                                if (itemCountries.length > 0 && !hasAsianOrigin && !hasAsianLang) {
+                                    return false; // Reject US/Western matches for Asian drama queries
+                                }
                             }
-                        }
 
-                        // Title Check:
-                        let isMatch = false;
+                            // Title Check:
+                            let isMatch = false;
 
-                        // 1. Check original name from verification
-                        if (verification?.originalName) {
-                            const originalTitle = endpoint === 'movie' ? item.original_title : item.original_name;
-                            const similarity = calculateSimilarity(verification.originalName, originalTitle || "");
-                            if (similarity >= 0.7) {
-                                isMatch = true;
-                            } else if (similarity >= 0.4 && itemYear === year) {
-                                isMatch = true;
+                            // 1. Check original name from verification
+                            if (verification?.originalName) {
+                                const originalTitle = endpoint === 'movie' ? item.original_title : item.original_name;
+                                const similarity = calculateSimilarity(verification.originalName, originalTitle || "");
+                                if (similarity >= 0.7) {
+                                    isMatch = true;
+                                } else if (similarity >= 0.4 && itemYear === year) {
+                                    isMatch = true;
+                                }
                             }
-                        }
 
-                        // 1b. Check local name from verification
-                        if (!isMatch && verification?.localName) {
+                            // 1b. Check local name from verification
+                            if (!isMatch && verification?.localName) {
+                                const localTitle = endpoint === 'movie' ? item.title : item.name;
+                                const originalTitleSearch = endpoint === 'movie' ? item.original_title : item.original_name;
+                                
+                                // High threshold for local titles to avoid "Anh yêu em" common phrases matching wrong movies
+                                if (localTitle && calculateSimilarity(verification.localName, localTitle) >= 0.85) isMatch = true;
+                                if (!isMatch && originalTitleSearch && calculateSimilarity(verification.localName, originalTitleSearch) >= 0.85) isMatch = true;
+                                
+                                // If year matches perfectly, we can be slightly more lenient
+                                if (!isMatch && itemYear === year && localTitle && calculateSimilarity(verification.localName, localTitle) >= 0.6) isMatch = true;
+                            }
+
+                            // Year Check: Be strict if we have a year
+                            if (year && itemYear && Math.abs(itemYear - year) > 1) {
+                                // If title is EXACT, we can allow +/- 1 year (TMDB vs source discrepancy)
+                                // But 5 years is too much for modern movies
+                                if (isMatch) {
+                                    // Keep it
+                                } else {
+                                    return false;
+                                }
+                            }
+
+                            // 2. Check current query q against local title and original title
                             const localTitle = endpoint === 'movie' ? item.title : item.name;
                             const originalTitleSearch = endpoint === 'movie' ? item.original_title : item.original_name;
-                            
-                            // High threshold for local titles to avoid "Anh yêu em" common phrases matching wrong movies
-                            if (localTitle && calculateSimilarity(verification.localName, localTitle) >= 0.85) isMatch = true;
-                            if (!isMatch && originalTitleSearch && calculateSimilarity(verification.localName, originalTitleSearch) >= 0.85) isMatch = true;
-                            
-                            // If year matches perfectly, we can be slightly more lenient
-                            if (!isMatch && itemYear === year && localTitle && calculateSimilarity(verification.localName, localTitle) >= 0.6) isMatch = true;
-                        }
 
-                        // Year Check: Be strict if we have a year
-                        if (year && itemYear && Math.abs(itemYear - year) > 1) {
-                            // If title is EXACT, we can allow +/- 1 year (TMDB vs source discrepancy)
-                            // But 5 years is too much for modern movies
-                            if (isMatch) {
-                                // Keep it
-                            } else {
-                                return false;
+                            if (localTitle && calculateSimilarity(cleanQuery, localTitle) >= 0.5) isMatch = true;
+                            if (!isMatch && originalTitleSearch && calculateSimilarity(cleanQuery, originalTitleSearch) >= 0.5) isMatch = true;
+
+                            // 3. Fallback: If Chinese/Korean names fail to match TMDB's English names
+                            if (!isMatch && itemYear === year) {
+                                // If q matches originalName or localName exactly, and it's the #1 result, trust it
+                                if ((q === verification?.originalName || q === verification?.localName) && filteredResults.indexOf(item) === 0) {
+                                    isMatch = true;
+                                }
                             }
+
+                            return isMatch;
+                        });
+
+                        if (bestMatch) {
+                            return { ...bestMatch, media_type: endpoint };
                         }
-
-                        // 2. Check current query q against local title and original title
-                        const localTitle = endpoint === 'movie' ? item.title : item.name;
-                        const originalTitleSearch = endpoint === 'movie' ? item.original_title : item.original_name;
-
-                        if (localTitle && calculateSimilarity(cleanQuery, localTitle) >= 0.5) isMatch = true;
-                        if (!isMatch && originalTitleSearch && calculateSimilarity(cleanQuery, originalTitleSearch) >= 0.5) isMatch = true;
-
-                        // 3. Fallback: If Chinese/Korean names fail to match TMDB's English names
-                        if (!isMatch && itemYear === year) {
-                            // If q matches originalName or localName exactly, and it's the #1 result, trust it
-                            if ((q === verification?.originalName || q === verification?.localName) && filteredResults.indexOf(item) === 0) {
-                                isMatch = true;
-                            }
-                        }
-
-                        return isMatch;
-                    });
-
-                    if (bestMatch) {
-                        return { ...bestMatch, media_type: endpoint };
                     }
+                } catch (fetchError) {
+                    clearTimeout(timeoutId);
+                    console.warn(`TMDB Fetch Exception for ${q} [${locale}]:`, fetchError);
                 }
                 } // end locale loop
             }
