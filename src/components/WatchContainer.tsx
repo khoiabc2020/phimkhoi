@@ -208,9 +208,10 @@ export default function WatchContainer({
                             ) : activeEpisode ? (
                                 <iframe
                                     src={activeEpisode.link_embed}
-                                    className="w-full h-full border-0"
+                                    className="w-full h-full border-0 overflow-hidden"
                                     allowFullScreen
                                     allow="autoplay; encrypted-media"
+                                    scrolling="no"
                                 />
                             ) : (
                                 <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-white gap-3">

@@ -28,22 +28,29 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     if (!movie) return { title: "Không tìm thấy phim - KHOIPHIM" };
 
     // Giới hạn description để SEO tốt hơn
-    const desc = movie.content ? movie.content.replace(/<[^>]+>/g, '').substring(0, 160) + '...' : `Xem phim ${movie.name} chất lượng cao tại KHOIPHIM.`;
+    const plainContent = movie.content ? movie.content.replace(/<[^>]+>/g, '').trim() : "";
+    const desc = plainContent ? plainContent.substring(0, 160) + '...' : `Xem phim ${movie.name} chất lượng cao tại KHOIPHIM.`;
     const poster = getImageUrl(movie.poster_url || movie.thumb_url || "");
     const url = `https://khoiphim.io.vn/phim/${slug}`;
+    
+    // Tạo keywords từ thể loại và tên phim
+    const categories = Array.isArray(movie.category) ? movie.category.map((c: any) => c.name).join(", ") : "";
+    const keywords = [movie.name, movie.origin_name, "xem phim", "phim online", "vietsub", categories].filter(Boolean).join(", ");
 
     return {
         title: `${movie.name || "Phim"} - Xem phim tại KHOIPHIM`,
         description: desc,
+        keywords: keywords,
         alternates: {
             canonical: url,
         },
         robots: {
             index: true,
             follow: true,
+            "max-image-preview": "large",
         },
         openGraph: {
-            title: `${movie.name} | ${movie.origin_name}`,
+            title: `${movie.name} | ${movie.origin_name} | KHOIPHIM`,
             description: desc,
             url,
             images: [
@@ -55,6 +62,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
                 }
             ],
             type: "video.movie",
+            siteName: "KHOIPHIM",
         },
         twitter: {
             card: "summary_large_image",
@@ -209,6 +217,12 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
         "image": sourcePosterUrl || sourceThumbUrl || tmdbBackdrop,
         "description": movie?.content?.replace(/<[^>]+>/g, ''),
         "dateCreated": movie?.year?.toString(),
+        "genre": movie?.category?.map((c: any) => c.name) || [],
+        "contentRating": "TV-MA",
+        "actor": movie?.actor?.map((a: string) => ({
+            "@type": "Person",
+            "name": a
+        })) || [],
         "director": {
             "@type": "Person",
             "name": movie?.director?.[0] || tmdbDetails?.credits?.crew?.find((c: any) => c.job === "Director")?.name || "Đang cập nhật"
@@ -218,6 +232,23 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
             "ratingValue": rating,
             "bestRating": "10",
             "ratingCount": "100"
+        },
+        "potentialAction": {
+            "@type": "WatchAction",
+            "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": `https://khoiphim.io.vn/xem-phim/${movie?.slug}/${serverData?.[0]?.slug || 'tap-1'}`,
+                "actionPlatform": [
+                    "http://schema.org/DesktopWebPlatform",
+                    "http://schema.org/MobileWebPlatform",
+                    "http://schema.org/AndroidPlatform",
+                    "http://schema.org/IOSPlatform"
+                ]
+            },
+            "expectsAcceptanceOf": {
+                "@type": "Offer",
+                "category": "free"
+            }
         }
     };
 
@@ -233,26 +264,36 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 {/* Base dark layer */}
                 <div className="absolute inset-0 bg-[#0a0a0a]" />
 
-                {/* Backdrop layer: full canvas, anchored right to keep subject in right half */}
+                {/* Backdrop layer: Cinematic Image Palette Glow */}
                 {backdropUrl && (
-                    <div className="absolute inset-0">
-                        {/* 1. Blurred background filling the empty space */}
+                    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                        {/* Layer 1: Base blur for ambient color filling (Super Deep Glow) */}
                         <Image
                             src={backdropUrl}
-                            alt={movie?.name || ""}
+                            alt=""
                             fill
                             priority
-                            className="object-cover object-[68%_22%] opacity-[0.4] scale-110 blur-[45px]"
+                            className="object-cover opacity-[0.25] scale-125 blur-[120px] saturate-[2] brightness-[0.8]"
+                            sizes="100vw"
+                            quality={10}
+                        />
+                        {/* Layer 2: Main blurred texture (Subtle Texture) */}
+                        <Image
+                            src={backdropUrl}
+                            alt=""
+                            fill
+                            priority
+                            className="object-cover object-[68%_22%] opacity-[0.35] scale-110 blur-[50px] brightness-[0.9]"
                             sizes="100vw"
                             quality={60}
                         />
-                        {/* 2. Sharp focused image on the right */}
+                        {/* Layer 3: Sharp focused image on the right (The Subject) */}
                         <Image
                             src={backdropUrl}
                             alt={movie?.name || ""}
                             fill
                             priority
-                            className={`opacity-100 ${isPortraitFallback ? 'object-cover sm:object-contain sm:object-right-top' : 'object-cover object-[62%_20%] sm:object-right'}`}
+                            className={`opacity-100 mix-blend-screen brightness-[1.05] ${isPortraitFallback ? 'object-cover sm:object-contain sm:object-right-top' : 'object-cover object-[62%_20%] sm:object-right'}`}
                             sizes="100vw"
                             quality={100}
                             unoptimized={true} 
@@ -260,9 +301,10 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                     </div>
                 )}
 
-                {/* Softer cinematic feather blend: tránh đường chia cứng trái/phải */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/95 via-[45%] to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
+                {/* Cinematic Vignette & Edge Blending */}
+                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/92 via-[40%] to-transparent z-[1]" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/65 to-transparent z-[1]" />
+                <div className="absolute inset-0 bg-[#0a0a0a]/10 backdrop-blur-[2px] z-[1]" />
 
                 {/* Hero Info Content aligned left/bottom on desktop, center on mobile */}
                 <div className="relative z-10 w-full max-w-[1920px] mx-auto flex flex-col md:flex-row items-center md:items-end justify-center md:justify-between gap-6 md:gap-12 text-center md:text-left mt-0 sm:mt-4">

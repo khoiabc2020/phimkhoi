@@ -38,10 +38,10 @@
 
   @keyframes shimmer {
     0% {
-      background-position: -1000px 0;
+      background-position: -200% 0;
     }
     100% {
-      background-position: 1000px 0;
+      background-position: 200% 0;
     }
   }
 
@@ -291,12 +291,14 @@ h2 {
   .shimmer {
     background: linear-gradient(
       90deg,
-      rgba(255, 255, 255, 0.03) 25%,
+      rgba(255, 255, 255, 0.01) 0%,
+      rgba(255, 255, 255, 0.01) 40%,
       rgba(255, 255, 255, 0.08) 50%,
-      rgba(255, 255, 255, 0.03) 75%
+      rgba(255, 255, 255, 0.01) 60%,
+      rgba(255, 255, 255, 0.01) 100%
     );
-    background-size: 1000px 100%;
-    animation: shimmer 2s infinite linear;
+    background-size: 200% 100%;
+    animation: shimmer 1.8s infinite linear;
     will-change: background-position;
   }
 }

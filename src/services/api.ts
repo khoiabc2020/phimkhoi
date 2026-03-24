@@ -246,46 +246,61 @@ const mergeMovieImages = (primary: Movie, candidate: Movie): Movie => {
 const normalizeMovieImageRoles = (movie: Movie): Movie => {
     const isEmpty = (v?: string) => !v || String(v).trim() === "";
     const toLower = (v?: string) => String(v || "").toLowerCase();
-    const isOphimAsset = (v?: string) => toLower(v).includes("img.ophim.live");
-    const detectByDimensionToken = (v?: string): "portrait" | "landscape" | "unknown" => {
-        const u = toLower(v);
-        const m = u.match(/(\d{2,4})x(\d{2,4})/);
-        if (!m) return "unknown";
-        const w = parseInt(m[1], 10);
-        const h = parseInt(m[2], 10);
-        if (!Number.isFinite(w) || !Number.isFinite(h)) return "unknown";
-        if (w === h) return "unknown";
-        return h > w ? "portrait" : "landscape";
-    };
+    
     const detectOrientation = (v?: string): "portrait" | "landscape" | "unknown" => {
         const u = toLower(v);
         if (!u) return "unknown";
-        if (isOphimAsset(v) && (u.includes("-thumb.") || u.includes("/thumb-"))) return "portrait";
-        if (isOphimAsset(v) && (u.includes("-poster.") || u.includes("/poster-"))) return "landscape";
-        if (u.includes("backdrop") || u.includes("banner") || u.includes("landscape") || u.includes("horizontal")) return "landscape";
-        if (u.includes("poster-vertical") || u.includes("portrait") || u.includes("vertical")) return "portrait";
-        if (u.includes("/poster") || u.includes("poster.")) return "portrait";
-        return detectByDimensionToken(v);
-    };
-    const pickPortrait = (arr: (string | undefined)[]) => {
-        for (const v of arr) if (!isEmpty(v) && detectOrientation(v) === "portrait") return v as string;
-        for (const v of arr) if (!isEmpty(v) && detectOrientation(v) === "unknown") return v as string;
-        return "";
-    };
-    const pickLandscape = (arr: (string | undefined)[]) => {
-        for (const v of arr) if (!isEmpty(v) && detectOrientation(v) === "landscape") return v as string;
-        for (const v of arr) if (!isEmpty(v) && detectOrientation(v) === "unknown") return v as string;
-        return "";
+        
+        // 1. Check for explicit vertical/horizontal tokens
+        if (u.includes("poster-vertical") || u.includes("portrait") || u.includes("vertical") || u.includes("/poster/")) return "portrait";
+        if (u.includes("backdrop") || u.includes("banner") || u.includes("landscape") || u.includes("horizontal") || u.includes("/thumb/")) return "landscape";
+        
+        // 2. Ophim/NguonC/PhimImg specific logic (very common in this project)
+        // - "thumb" in Ophim/NguonC is usually vertical (portrait)
+        // - "poster" in Ophim/NguonC is usually horizontal (landscape)
+        const isCommonSource = u.includes("img.ophim") || u.includes("phimimg.com") || u.includes("nguonc.com") || u.includes("streamc.xyz");
+        if (isCommonSource) {
+            if (u.includes("-thumb.") || u.includes("/thumb-") || u.endsWith("/thumb.jpg") || u.endsWith("/thumb.png")) return "portrait";
+            if (u.includes("-poster.") || u.includes("/poster-") || u.endsWith("/poster.jpg") || u.endsWith("/poster.png")) return "landscape";
+            // NguonC numbered backdrop patterns
+            if (u.includes("-1.") || u.includes("-2.") || u.includes("-backdrop") || u.includes("-banner")) return "landscape";
+        }
+
+        // 3. TMDB patterns
+        if (u.includes("tmdb.org")) {
+            if (u.includes("/p/original/") || u.includes("backdrop")) return "landscape";
+            return "portrait"; // default TMDB images are posters
+        }
+
+        // 4. Dimension check from URL (e.g., ..._300x450.jpg)
+        const m = u.match(/(\d{2,4})x(\d{2,4})/);
+        if (m) {
+            const w = parseInt(m[1], 10);
+            const h = parseInt(m[2], 10);
+            if (h > w * 1.2) return "portrait";
+            if (w > h * 1.2) return "landscape";
+        }
+
+        return "unknown";
     };
 
-    const portrait = pickPortrait([movie.poster_url, movie.thumb_url]);
-    const landscape = pickLandscape([movie.thumb_url, movie.poster_url]);
+    const p = movie.poster_url;
+    const t = movie.thumb_url;
+    
+    const pOrient = detectOrientation(p);
+    const tOrient = detectOrientation(t);
 
-    return {
-        ...movie,
-        poster_url: portrait || movie.poster_url || "",
-        thumb_url: landscape || movie.thumb_url || movie.poster_url || "",
-    };
+    // DANGEROUS CASE: Poster is landscape and Thumb is portrait -> MUST SWAP
+    if (pOrient === "landscape" && tOrient === "portrait") {
+        return { ...movie, poster_url: t, thumb_url: p };
+    }
+    
+    // CASE: Poster is landscape but Thumb is unknown -> Swap if Thumb exists
+    if (pOrient === "landscape" && !isEmpty(t) && tOrient === "unknown") {
+        return { ...movie, poster_url: t, thumb_url: p };
+    }
+
+    return movie;
 };
 
 const inferTmdbType = (movie: Movie): "movie" | "tv" => {
@@ -375,10 +390,10 @@ let homeCacheTime = 0;
 /** Cấu hình đề mục trang chủ — slug + endpoint chuẩn (PhimAPI/KKPhim + NguonC) */
 type HomeCacheKey = 'phimMoi' | 'phimLe' | 'phimBo' | 'hoatHinh' | 'tvShows' | 'phimChieuRap' | 'phimSapChieu' | 'hanQuoc' | 'trungQuoc' | 'hanhDong' | 'tinhCam';
 const HOME_CATEGORIES: { key: HomeCacheKey; slug: string; endpoint: 'danh-sach' | 'the-loai' | 'quoc-gia' }[] = [
-    { key: 'phimMoi', slug: 'phim-moi-cap-nhat', endpoint: 'danh-sach' },
+    { key: 'phimMoi', slug: 'phim-moi', endpoint: 'danh-sach' }, // Changed from phim-moi-cap-nhat
     { key: 'phimLe', slug: 'phim-le', endpoint: 'danh-sach' },
     { key: 'phimBo', slug: 'phim-bo', endpoint: 'danh-sach' },
-    { key: 'hoatHinh', slug: 'hoat-hinh', endpoint: 'danh-sach' },
+    { key: 'hoatHinh', slug: 'hoat-hinh', endpoint: 'the-loai' }, // specific category
     { key: 'tvShows', slug: 'tv-shows', endpoint: 'danh-sach' },
     { key: 'phimChieuRap', slug: 'phim-chieu-rap', endpoint: 'the-loai' },
     { key: 'phimSapChieu', slug: 'phim-sap-chieu', endpoint: 'danh-sach' },
