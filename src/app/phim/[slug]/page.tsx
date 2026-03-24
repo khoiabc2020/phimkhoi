@@ -4,7 +4,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Play, PlayCircle, Share2, Star, Clock, Film } from "lucide-react";
 import FavoriteButton from "@/components/FavoriteButton";
-import { getImageUrl, detectOrientation } from "@/lib/utils";
+import { getImageUrl, detectOrientation, cn } from "@/lib/utils";
 import Image from "next/image";
 
 const CommentSection = dynamic(() => import("@/components/CommentSection"), {
