@@ -19,8 +19,8 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     staleTimes: {
-      dynamic: 0,      // Disable client-side cache for dynamic pages during active dev
-      static: 180,    // Lower static cache
+      dynamic: 30,    // 30s router cache for dynamic pages (better UX on navigation)
+      static: 180,   // 3min for static pages
     },
   },
   // Add Cache-Control headers for static assets
@@ -44,11 +44,11 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Cache-Control",
-            value: "public, s-maxage=31536000, stale-while-revalidate=604800",
+            value: "public, s-maxage=300, stale-while-revalidate=3600",  // 5min CDN, 1hr stale
           },
           {
             key: "Vary",
-            value: "Accept", // Vary by Accept header for webp/avif support
+            value: "Accept",
           },
         ],
       },
@@ -61,10 +61,6 @@ const nextConfig: NextConfig = {
             key: "Cache-Control",
             value: "public, s-maxage=3600, stale-while-revalidate=86400",
           },
-          {
-            key: "Vary",
-            value: "Cookie",
-          },
         ],
       },
       // Special case: Homepage
@@ -74,10 +70,6 @@ const nextConfig: NextConfig = {
           {
             key: "Cache-Control",
             value: "public, s-maxage=3600, stale-while-revalidate=86400",
-          },
-          {
-            key: "Vary",
-            value: "Cookie",
           },
         ],
       },
