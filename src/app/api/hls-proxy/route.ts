@@ -37,9 +37,15 @@ export async function GET(request: NextRequest) {
         } else if (url.includes('kkphim') || url.includes('phim1280.tv') || url.includes('phimapi.com')) {
             referer = 'https://kkphim.com/';
             origin = 'https://kkphim.com';
-        } else if (url.includes('ophim1.com') || url.includes('img.ophim.live') || url.includes('opstream')) {
+        } else if (url.includes('ophim') || url.includes('phim.live') || url.includes('opstream')) {
+            // Ophim CDNs: use their main sites as referer
             referer = 'https://ophim10.cc/';
             origin = 'https://ophim10.cc';
+            // Also try phim.live if first one is blocked by some strict CDNs
+            if (url.includes('opstream')) {
+                referer = 'https://phim.live/';
+                origin = 'https://phim.live';
+            }
         }
 
         const headers: Record<string, string> = {
