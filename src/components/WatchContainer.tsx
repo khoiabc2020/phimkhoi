@@ -192,7 +192,7 @@ export default function WatchContainer({
                                     <Loader2 className="w-8 h-8 animate-spin text-[#8FA7C5]" />
                                     <p className="text-gray-400 text-sm animate-pulse">Đang tải trình phát...</p>
                                 </div>
-                            ) : activeEpisode ? (
+                            ) : activeEpisode && effectiveM3u8 ? (
                                 <VideoPlayer
                                     url={activeEpisode.link_embed}
                                     m3u8={effectiveM3u8}
@@ -204,6 +204,13 @@ export default function WatchContainer({
                                     nextEpisodeUrl={nextEpisodeUrl}
                                     isTheaterMode={isTheaterMode}
                                     serverName={activeServerName}
+                                />
+                            ) : activeEpisode ? (
+                                <iframe
+                                    src={activeEpisode.link_embed}
+                                    className="w-full h-full border-0"
+                                    allowFullScreen
+                                    allow="autoplay; encrypted-media"
                                 />
                             ) : (
                                 <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-white gap-3">
