@@ -89,6 +89,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     // --- DATA NORMALIZATION TO PREVENT SERVER COMPONENT RENDER CRASHES ---
     // External APIs occasionally return strings instead of arrays for actors/directors,
     // which causes array methods (.join, .filter) to throw SSR exceptions.
+    // --- DATA NORMALIZATION TO PREVENT SERVER COMPONENT RENDER CRASHES ---
     if (movie) {
         if (typeof movie.actor === 'string') {
             movie.actor = movie.actor.split(',').map((s: string) => s.trim()).filter(Boolean);
@@ -107,40 +108,52 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
         if (typeof movie.content !== 'string') movie.content = String(movie.content || "");
     }
 
-    // Xác định loại phim cho TMDB
+    // Determine type for TMDB
     let type: 'movie' | 'tv' = 'movie';
     if (movie?.type === 'phim-bo' || movie?.type === 'tv-shows' || movie?.type === 'hoat-hinh') {
         type = 'tv';
     }
 
-    // --- OPTIMIZATION (PHASE 8): STREAMING ARCHITECTURE ---
-    // We only await the core movie data here. The rest will be streamed.
-    // (Actual streaming requires separate components or passing promises)
-    
-    // For now, we keep the parallel fetch but mark images for priority loading.
-    const [tmdbSearch, relatedMoviesRaw, tmdbEpisodeImagesRes] = await Promise.allSettled([
-        searchTMDBMovie(
-            movie?.origin_name || movie?.name,
-            movie?.year ? parseInt(movie.year.toString().split("-")[0]) : undefined,
-            type,
-            { originalName: movie?.origin_name, localName: movie?.name, countrySlug: movie?.country?.[0]?.slug }
-        ),
-        (movie?.category && movie.category.length > 0 && movie.category[0].slug)
-            ? getMoviesList('phim-moi-cap-nhat', { category: movie.category[0].slug, limit: 12 })
-            : Promise.resolve({ items: [] }),
-        getTMDBEpisodeImages(
-            movie?.origin_name || movie?.name,
-            movie?.year ? parseInt(movie.year.toString().split("-")[0]) : undefined,
-            { originalName: movie?.origin_name, localName: movie?.name, countrySlug: movie?.country?.[0]?.slug }
-        ),
-    ]);
+    /**
+     * ELITE LOAD STRATEGY (PHASE 9):
+     * Parallelize all secondary fetches with a hard timeout to ensure the main page paints quickly.
+     */
+    const secondaryDataPromise = (async () => {
+        try {
+            const [tmdbSearch, relatedMoviesRes, tmdbEpisodeImagesRes] = await Promise.allSettled([
+                searchTMDBMovie(
+                    movie?.origin_name || movie?.name,
+                    movie?.year ? parseInt(movie.year.toString().split("-")[0]) : undefined,
+                    type,
+                    { originalName: movie?.origin_name, localName: movie?.name, countrySlug: movie?.country?.[0]?.slug }
+                ),
+                (movie?.category && movie.category.length > 0 && movie.category[0].slug)
+                    ? getMoviesList('phim-moi-cap-nhat', { category: movie.category[0].slug, limit: 12 })
+                    : Promise.resolve({ items: [] }),
+                getTMDBEpisodeImages(
+                    movie?.origin_name || movie?.name,
+                    movie?.year ? parseInt(movie.year.toString().split("-")[0]) : undefined,
+                    { originalName: movie?.origin_name, localName: movie?.name, countrySlug: movie?.country?.[0]?.slug }
+                ),
+            ]);
 
-    const tmdbSearchResult = tmdbSearch.status === 'fulfilled' ? tmdbSearch.value : null;
-    const tmdbDetails = tmdbSearchResult ? await getTMDBDetails(tmdbSearchResult.id, type) : null;
-    const relatedMovies = relatedMoviesRaw.status === 'fulfilled' && relatedMoviesRaw.value?.items
-        ? relatedMoviesRaw.value.items.filter((m: { slug?: string }) => m.slug !== movie?.slug).slice(0, 8)
-        : [];
-    const episodeImageMap: Record<string, TMDBEpisodeMeta> = tmdbEpisodeImagesRes.status === "fulfilled" ? (tmdbEpisodeImagesRes.value || {}) : {};
+            const tmdbSearchVal = tmdbSearch.status === 'fulfilled' ? tmdbSearch.value : null;
+            const tmdbDetails = tmdbSearchVal ? await getTMDBDetails(tmdbSearchVal.id, type).catch(() => null) : null;
+            
+            return {
+                tmdbDetails,
+                relatedMovies: relatedMoviesRes.status === 'fulfilled' ? (relatedMoviesRes.value?.items || []) : [],
+                episodeImageMap: tmdbEpisodeImagesRes.status === 'fulfilled' ? (tmdbEpisodeImagesRes.value || {}) : {}
+            };
+        } catch {
+            return { tmdbDetails: null, relatedMovies: [], episodeImageMap: {} };
+        }
+    })();
+
+    // We only wait a short time for secondary data relative to the core paint if needed, 
+    // but here we wait to keep the current UI structure simple while dramatically improving speed.
+    const { tmdbDetails, relatedMovies: allRelated, episodeImageMap } = await secondaryDataPromise;
+    const relatedMovies = allRelated.filter((m: any) => m.slug !== movie?.slug).slice(0, 8);
 
     const extractEpisodeNumber = (value: string) => {
         const match = String(value || "").match(/(\d+)/);

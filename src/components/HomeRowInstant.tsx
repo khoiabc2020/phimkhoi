@@ -35,11 +35,14 @@ export default function HomeRowInstant({
 
     if (isLoading && movies.length === 0) {
         return (
-            <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 lg:pl-24 lg:pr-12 py-8 space-y-4">
-                <div className="h-6 w-48 bg-white/5 rounded shimmer" />
-                <div className="flex gap-4 overflow-hidden">
-                    {[1, 2, 3, 4, 5, 6].map((i) => (
-                        <div key={i} className="min-w-[180px] aspect-[2/3] rounded-lg bg-white/5 shimmer" />
+            <div className="w-full max-w-[1920px] mx-auto px-1.5 sm:px-3 md:px-5 lg:pl-24 lg:pr-12 md:py-6 py-4 space-y-4">
+                <div className="h-6 w-48 bg-white/10 rounded shimmer" />
+                <div className="flex gap-3 md:gap-4 overflow-hidden">
+                    {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+                        <div 
+                            key={i} 
+                            className="min-w-[140px] md:min-w-[180px] aspect-[2/3] rounded-lg bg-indigo-500/5 border border-white/5 shimmer" 
+                        />
                     ))}
                 </div>
             </div>

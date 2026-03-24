@@ -59,90 +59,90 @@ function getHeroImage(movie: any, type: "poster" | "backdrop" | "character" | "l
     const tmdb = movie?.tmdbData;
     if (tmdb) {
         if (type === "poster" && tmdb.poster_path)
-            return getImageUrl(tmdbImage(tmdb.poster_path, variant === "desktop" ? "w500" : "w342"), true);
-        if (type === "backdrop" && tmdb.backdrop_path)
-            return getImageUrl(tmdbImage(tmdb.backdrop_path, variant === "desktop" ? "original" : "w780"), true);
-    }
-    const api = type === "backdrop" ? movie.thumb_url : movie.poster_url || movie.thumb_url;
-    return api ? getImageUrl(api, true) : "/placeholder.jpg";
+        return getImageUrl(tmdbImage(tmdb.poster_path, variant === "desktop" ? "w500" : "w780"), true);
+    if (type === "backdrop" && tmdb.backdrop_path)
+        return getImageUrl(tmdbImage(tmdb.backdrop_path, variant === "desktop" ? "original" : "w780"), true);
+}
+const api = type === "backdrop" ? movie.thumb_url : movie.poster_url || movie.thumb_url;
+return api ? getImageUrl(api, true) : "/placeholder.jpg";
 }
 
 // ─── Autoplay hook ────────────────────────────────────────────────────────────
 
 function useAutoplay(count: number, delay: number, paused: boolean) {
-    const [index, setIndex] = useState(0);
-    const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+const [index, setIndex] = useState(0);
+const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-    const go = useCallback((i: number) => setIndex((i + count) % count), [count]);
+const go = useCallback((i: number) => setIndex((i + count) % count), [count]);
 
-    useEffect(() => {
-        if (paused || count <= 1) return;
-        timerRef.current = setInterval(() => setIndex((p) => (p + 1) % count), delay);
-        return () => { if (timerRef.current) clearInterval(timerRef.current); };
-    }, [count, delay, paused]);
+useEffect(() => {
+    if (paused || count <= 1) return;
+    timerRef.current = setInterval(() => setIndex((p) => (p + 1) % count), delay);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+}, [count, delay, paused]);
 
-    const next = useCallback(() => {
-        setIndex((p) => (p + 1) % count);
-    }, [count]);
+const next = useCallback(() => {
+    setIndex((p) => (p + 1) % count);
+}, [count]);
 
-    const prev = useCallback(() => {
-        setIndex((p) => (p - 1 + count) % count);
-    }, [count]);
+const prev = useCallback(() => {
+    setIndex((p) => (p - 1 + count) % count);
+}, [count]);
 
-    return { index, go, next, prev };
+return { index, go, next, prev };
 }
 
 // ─── MOBILE HERO ──────────────────────────────────────────────────────────────
 
 function MobileHero({ movies, active = true }: { movies: Movie[], active?: boolean }) {
-    const { index, go, next, prev } = useAutoplay(movies.length, 5000, !active);
-    const movie = movies[index] as any;
-    
-    const touchRef = useRef({ startX: 0, endX: 0 });
-    const handleTouchStart = (e: React.TouchEvent) => touchRef.current.startX = e.touches[0].clientX;
-    const handleTouchMove = (e: React.TouchEvent) => touchRef.current.endX = e.touches[0].clientX;
-    const handleTouchEnd = () => {
-        const { startX, endX } = touchRef.current;
-        if (startX - endX > 50) next();
-        if (endX - startX > 50) prev();
-    };
+const { index, go, next, prev } = useAutoplay(movies.length, 5000, !active);
+const movie = movies[index] as any;
 
-    return (
-        <div 
-            className="relative w-full aspect-[10/14] sm:aspect-[16/10] overflow-hidden bg-[#0a0a0a]"
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-        >
-            <AnimatePresence mode="popLayout" initial={false}>
-                <motion.div 
-                    key={`mobile-slide-${movie._id || index}`}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.4, ease: "easeInOut" }}
-                    className="absolute inset-0"
-                    style={{ willChange: "transform, opacity" }}
-                >
-                    <div className="absolute inset-0">
-                        <div className="absolute inset-0 opacity-40 blur-3xl scale-110 pointer-events-none">
-                             <Image
-                                src={getHeroImage(movie, "backdrop", "mobile").startsWith('http')
-                                    ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(movie, "backdrop", "mobile"))}&w=400&q=30`
-                                    : getHeroImage(movie, "backdrop", "mobile")
-                                }
-                                alt=""
-                                fill
-                                className="object-cover"
-                                decoding="async"
-                            />
-                        </div>
+const touchRef = useRef({ startX: 0, endX: 0 });
+const handleTouchStart = (e: React.TouchEvent) => touchRef.current.startX = e.touches[0].clientX;
+const handleTouchMove = (e: React.TouchEvent) => touchRef.current.endX = e.touches[0].clientX;
+const handleTouchEnd = () => {
+    const { startX, endX } = touchRef.current;
+    if (startX - endX > 50) next();
+    if (endX - startX > 50) prev();
+};
 
-                        <Image
-                            src={getHeroImage(movie, "poster", "mobile").startsWith('http')
-                                ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(movie, "poster", "mobile"))}&w=800&q=85`
-                                : getHeroImage(movie, "poster", "mobile")
+return (
+    <div 
+        className="relative w-full aspect-[9/13] sm:aspect-[16/10] overflow-hidden bg-[#0a0a0a]"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+    >
+        <AnimatePresence mode="popLayout" initial={false}>
+            <motion.div 
+                key={`mobile-slide-${movie._id || index}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4, ease: "easeInOut" }}
+                className="absolute inset-0"
+                style={{ willChange: "transform, opacity" }}
+            >
+                <div className="absolute inset-0">
+                    <div className="absolute inset-0 opacity-40 blur-3xl scale-110 pointer-events-none">
+                         <Image
+                            src={getHeroImage(movie, "backdrop", "mobile").startsWith('http')
+                                ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(movie, "backdrop", "mobile"))}&w=500&q=40`
+                                : getHeroImage(movie, "backdrop", "mobile")
                             }
+                            alt=""
+                            fill
+                            className="object-cover"
+                            decoding="async"
+                        />
+                    </div>
+
+                    <Image
+                        src={getHeroImage(movie, "poster", "mobile").startsWith('http')
+                            ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(movie, "poster", "mobile"))}&w=780&q=90`
+                            : getHeroImage(movie, "poster", "mobile")
+                        }
                             alt=""
                             fill
                             className="object-cover"
