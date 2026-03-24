@@ -130,11 +130,7 @@ async function ChinaHeroWithData() {
         "dai-mong-quy-ly",
         "giang-ho-da-vu-thap-nien-dang",
         "mac-nhan-tang-kieu",
-        "ngoc-minh-tra-cot",
-        "con-ra-the-thong-gi-nua",
-        "truc-ngoc",
-        "xin-chao-1983",
-        "duong-cung-ky-an-thanh-vu-phong-minh"
+        "ngoc-minh-tra-cot"
     ];
 
     const movieDetails = await Promise.all(

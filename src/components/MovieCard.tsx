@@ -121,8 +121,9 @@ function MovieCard({
         const raw = posterCandidates[posterIndex] || "";
         if (!raw) return "/placeholder.svg";
         const base = getImageUrl(raw);
-        // [Elite Quality] Increase resolution and quality to avoid blur on high-DPI screens
-        const suffix = orientation === 'landscape' ? '&w=1000&q=90' : '&w=600&q=90';
+        // [Elite Performance] Balanced resolution/quality for high-speed WebP delivery.
+        // w=800/q=75 (Landscape) and w=500/q=75 (Portrait) is optimal for mobile/web bandwidth.
+        const suffix = orientation === 'landscape' ? '&w=800&q=75' : '&w=500&q=75';
         return base.includes('?') ? `${base}${suffix}` : `${base}?${suffix.replace('&', '')}`;
     }, [posterCandidates, posterIndex, orientation]);
 

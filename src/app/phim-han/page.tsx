@@ -124,10 +124,7 @@ async function KoreaHeroWithData() {
         "nghe-thuat-lua-doi-cua-sarah",
         "khi-cuoc-doi-cho-ban-qua-quyt",
         "tieng-yeu-nay-anh-dich-duoc-khong",
-        "ban-trai-theo-yeu-cau",
-        "trao-em-ca-vu-tru"
     ];
-
     const movieDetails = await Promise.all(
         HERO_SLUGS.map(async (slug) => {
             const data = await getMovieDetail(slug);
