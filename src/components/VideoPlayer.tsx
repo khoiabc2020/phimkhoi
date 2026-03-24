@@ -83,6 +83,7 @@ export default function VideoPlayer({
     onEnded,
     isTheaterMode = false,
     serverName = "",
+    onPlayerError,
 }: VideoPlayerProps) {
     const artRef = useRef<HTMLDivElement>(null);
     const artInstance = useRef<any>(null);
