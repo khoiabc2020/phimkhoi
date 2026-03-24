@@ -6,9 +6,9 @@ import { cn } from "@/lib/utils";
 import VideoPlayer from "@/components/VideoPlayer";
 import WatchEngagementBar from "@/components/WatchEngagementBar";
 import WatchEpisodeSection from "@/components/WatchEpisodeSection";
-import { Movie, saveWatchHistory } from "@/services/api";
+import { Movie } from "@/services/api";
 import { Monitor, ChevronLeft, ChevronRight, SkipForward, Loader2 } from "lucide-react";
-import { getWatchHistoryForEpisode } from "@/app/actions/watchHistory";
+import { getWatchHistoryForEpisode, addWatchHistory } from "@/app/actions/watchHistory";
 
 interface Episode {
     slug: string;
@@ -113,7 +113,18 @@ export default function WatchContainer({
     // Đồng bộ lịch sử khi chọn tập phim (ngay cả với Iframe gốc)
     useEffect(() => {
         if (movie && activeEpisode) {
-            saveWatchHistory(movie, activeEpisode, 0);
+            addWatchHistory({
+                movieId: movie._id,
+                movieSlug: movie.slug,
+                movieName: movie.name,
+                movieOriginName: movie.origin_name || movie.name,
+                moviePoster: movie.poster_url,
+                movieThumb: movie.thumb_url,
+                episodeSlug: activeEpisode.slug || "",
+                episodeName: activeEpisode.name || "",
+                duration: 0,
+                currentTime: 0,
+            }).catch(() => {});
         }
     }, [movie, activeEpisode]);
 
