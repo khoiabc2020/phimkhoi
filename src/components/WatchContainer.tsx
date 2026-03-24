@@ -60,7 +60,7 @@ export default function WatchContainer({
         currentServerEpisodes.find((ep: { slug?: string }) => ep.slug === currentEpisodeSlug) || initialCurrentEpisode;
 
     // Theo yêu cầu của USER: Ưu tiên Iframe gốc để "phát ăn ngay" và ổn định 100%
-    const effectiveM3u8 = undefined;
+    const effectiveM3u8: string | undefined = undefined;
 
     // Compute prev/next episode index
     const currentIdx = currentServerEpisodes.findIndex((ep: { slug?: string }) => ep.slug === currentEpisodeSlug);
