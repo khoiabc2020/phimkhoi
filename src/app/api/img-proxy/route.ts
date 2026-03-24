@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
         return new Response(new Uint8Array(buffer as any), {
             headers: {
                 'Content-Type': contentType,
-                'Cache-Control': 'public, max-age=31536000, immutable',
+                'Cache-Control': 'public, max-age=31536000, immutable, stale-while-revalidate=604800',
                 'X-Cache-Status': 'MEMORY-HIT',
             },
         });
@@ -75,7 +75,7 @@ export async function GET(req: NextRequest) {
             return new Response(new Uint8Array(buffer), {
                 headers: {
                     'Content-Type': contentType,
-                    'Cache-Control': 'public, max-age=31536000, immutable',
+                    'Cache-Control': 'public, max-age=31536000, immutable, stale-while-revalidate=604800',
                     'X-Cache-Status': 'DISK-HIT',
                 },
             });
@@ -123,7 +123,7 @@ export async function GET(req: NextRequest) {
         return new Response(new Uint8Array(buffer), {
             headers: {
                 'Content-Type': contentType,
-                'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400',
+                'Cache-Control': 'public, max-age=31536000, immutable, stale-while-revalidate=604800',
                 'X-Cache-Status': 'MISS',
             },
         });

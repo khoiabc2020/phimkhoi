@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "**" },
     ],
-    minimumCacheTTL: 86400, // 24 hours browser-level cache
+    minimumCacheTTL: 31536000, // 1 year cache
   },
   experimental: {
     staleTimes: {
@@ -44,11 +44,11 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Cache-Control",
-            value: "public, s-maxage=60, stale-while-revalidate=300",
+            value: "public, s-maxage=31536000, stale-while-revalidate=604800",
           },
           {
             key: "Vary",
-            value: "Cookie",
+            value: "Accept", // Vary by Accept header for webp/avif support
           },
         ],
       },
