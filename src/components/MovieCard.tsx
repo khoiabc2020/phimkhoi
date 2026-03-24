@@ -12,6 +12,7 @@ import { Play, Info, Star, ChevronDown } from "lucide-react";
 import { getImageUrl, decodeHtml, cn, detectOrientation } from "@/lib/utils";
 import { Movie } from "@/services/api";
 import { getTMDBImage } from "@/services/tmdb";
+import { getTMDBDataForCard } from "@/app/actions/tmdb"; // Import Server Action
 import { motion, AnimatePresence } from "framer-motion";
 
 // Tiny LQIP blur placeholder shared across all movie cards
@@ -52,11 +53,30 @@ function MovieCard({
     useEffect(() => {
         setIsTouchDevice(window.matchMedia("(pointer: coarse)").matches);
     }, []);
+    
+    // Lazy TMDB Enrichment
+    const [lazyTmdbData, setLazyTmdbData] = useState<any>(null);
+    const hasInitialTmdb = !!(movie as any).tmdbData;
+
+    useEffect(() => {
+        if (hasInitialTmdb || lazyTmdbData) return;
+
+        // Lazy fetch when in view or on slight delay to avoid initial load blocking
+        const timer = setTimeout(async () => {
+            const data = await getTMDBDataForCard(movie.name, Number(movie.year), 'movie', {
+                originalName: movie.origin_name,
+                localName: movie.name
+            });
+            if (data) setLazyTmdbData(data);
+        }, 2000); // 2s delay to prioritize critical path
+
+        return () => clearTimeout(timer);
+    }, [movie.slug, hasInitialTmdb, movie.name, movie.year, movie.origin_name, lazyTmdbData]);
 
     const [posterIndex, setPosterIndex] = useState(0);
 
-    // Safe access for tmdbData
-    const tmdbData = (movie as any).tmdbData;
+    // Safe access for tmdbData (either initial or lazy)
+    const tmdbData = (movie as any).tmdbData || lazyTmdbData;
     const tmdbPosterPath = tmdbData?.poster_path;
     const tmdbBackdropPath = tmdbData?.backdrop_path;
 
@@ -74,25 +94,25 @@ function MovieCard({
         const thumbAsPoster = movie.thumb_url && detectOrientation(movie.thumb_url) === "portrait"
             ? movie.thumb_url
             : null;
-        const relaxedPosterSource = movie.poster_url || movie.thumb_url || tmdbPoster || "";
+        const relaxedPosterSource = tmdbPoster || movie.poster_url || movie.thumb_url || "";
         
-        return sourcePoster || thumbAsPoster || tmdbPoster || relaxedPosterSource;
+        return tmdbPoster || sourcePoster || thumbAsPoster || relaxedPosterSource;
     }, [movie.poster_url, movie.thumb_url, tmdbPoster]);
 
     // Build robust fallback candidates to avoid blank placeholder cards.
     const posterCandidates = useMemo(() => {
         const list = orientation === "landscape"
             ? [
+                tmdbBackdropPath ? getTMDBImage(tmdbBackdropPath, "w780") : null,
                 movie.thumb_url,
                 movie.poster_url,
-                tmdbBackdropPath ? getTMDBImage(tmdbBackdropPath, "w780") : null,
                 tmdbPoster,
             ]
             : [
+                tmdbPoster,
                 portraitPosterSource,
                 movie.thumb_url,
                 movie.poster_url,
-                tmdbPoster,
             ];
         return Array.from(new Set(list.filter(Boolean))) as string[];
     }, [orientation, movie.thumb_url, movie.poster_url, portraitPosterSource, tmdbPoster, tmdbBackdropPath]);
@@ -101,8 +121,8 @@ function MovieCard({
         const raw = posterCandidates[posterIndex] || "";
         if (!raw) return "/placeholder.svg";
         const base = getImageUrl(raw);
-        // Optimize for grid: portrait ~500px, landscape ~800px. Quality 80 is optimal for WebP.
-        const suffix = orientation === 'landscape' ? '&w=800&q=80' : '&w=500&q=80';
+        // [Elite Quality] Increase resolution and quality to avoid blur on high-DPI screens
+        const suffix = orientation === 'landscape' ? '&w=1000&q=90' : '&w=600&q=90';
         return base.includes('?') ? `${base}${suffix}` : `${base}?${suffix.replace('&', '')}`;
     }, [posterCandidates, posterIndex, orientation]);
 
