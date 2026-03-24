@@ -243,7 +243,10 @@ function MovieCard({
                             alt={decodeHtml(movie.name) || movie.slug || "Phim"}
                             fill
                             className="transition-transform duration-500 ease-out lg:group-hover/static-card:scale-[1.1] object-cover z-10 anchor-top"
-                            sizes={orientation === 'landscape' ? "(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 400px" : "(max-width: 768px) 33vw, (max-width: 1200px) 20vw, (max-width: 1920px) 15vw, 300px"}
+                            sizes={orientation === 'landscape' ? 
+                                "(max-width: 640px) 90vw, (max-width: 1024px) 50vw, (max-width: 1536px) 33vw, 420px" : 
+                                "(max-width: 640px) 50vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, (max-width: 1536px) 16vw, 240px"
+                            }
                             quality={75}
                             loading={priority ? undefined : loading}
                             priority={priority}
