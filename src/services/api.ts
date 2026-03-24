@@ -215,21 +215,23 @@ const mergeMovieImages = (primary: Movie, candidate: Movie): Movie => {
         return "";
     };
 
-    // Enforce semantics:
-    // - poster_url: portrait-first
-    // - thumb_url: landscape-first
-    const portrait = pickPortrait([
-        merged.poster_url,
-        candidate.poster_url,
-        merged.thumb_url,
-        candidate.thumb_url,
-    ]);
-    const landscape = pickLandscape([
-        merged.thumb_url,
-        candidate.thumb_url,
-        merged.poster_url,
-        candidate.poster_url,
-    ]);
+    // Enforce semantics strictly:
+    // - poster_url: MUST be portrait if possible
+    // - thumb_url: MUST be landscape if possible
+
+    let portrait = pickPortrait([merged.poster_url, candidate.poster_url, merged.thumb_url, candidate.thumb_url]);
+    let landscape = pickLandscape([merged.thumb_url, candidate.thumb_url, merged.poster_url, candidate.poster_url]);
+
+    // If we have a portrait image but it's empty, or vice versa, fallback to first non-empty
+    if (!portrait) portrait = pickFirstNonEmpty([merged.poster_url, candidate.poster_url, merged.thumb_url, candidate.thumb_url]);
+    if (!landscape) landscape = pickFirstNonEmpty([merged.thumb_url, candidate.thumb_url, merged.poster_url, candidate.poster_url]);
+
+    // Final Force-Swap: If poster looks like landscape and thumb looks like portrait, SWAP THEM.
+    if (looksLandscape(portrait) && looksPortrait(landscape)) {
+        const tmp = portrait;
+        portrait = landscape;
+        landscape = tmp;
+    }
 
     merged.poster_url = portrait || merged.poster_url || candidate.poster_url || "";
     merged.thumb_url =
@@ -495,7 +497,9 @@ export const getHomeData = async () => {
                     bySlug.set(item.slug, mergeMovieImages(existing, item));
                 }
             }
-            return Array.from(bySlug.values()).map(normalizeMovieImageRoles);
+            const normalized = Array.from(bySlug.values()).map(normalizeMovieImageRoles);
+            // Enrich with TMDB images for "Elite" home page quality
+            return await enrichMoviesWithTMDB(normalized, 12);
         };
 
         const [

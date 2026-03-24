@@ -59,12 +59,8 @@ export default function WatchContainer({
     const activeEpisode =
         currentServerEpisodes.find((ep: { slug?: string }) => ep.slug === currentEpisodeSlug) || initialCurrentEpisode;
 
-    // NguonC: mặc định phát bằng iframe (link_embed) để hạn chế lỗi CORS/Referer / Chặn nhúng.
-    // Các server khác (KKPhim, OPhim) vẫn ưu tiên Artplayer qua hls-proxy.
-    const effectiveM3u8 =
-        (activeEpisode?.link_m3u8 && !activeServerName.toLowerCase().includes("nguonc"))
-            ? `/api/hls-proxy?url=${encodeURIComponent(activeEpisode.link_m3u8)}`
-            : undefined;
+    // Theo yêu cầu của USER: Ưu tiên Iframe gốc để "phát ăn ngay" và ổn định 100%
+    const effectiveM3u8 = undefined;
 
     // Compute prev/next episode index
     const currentIdx = currentServerEpisodes.findIndex((ep: { slug?: string }) => ep.slug === currentEpisodeSlug);
@@ -113,6 +109,13 @@ export default function WatchContainer({
 
         return () => { isMounted = false; };
     }, [movie._id, currentEpisodeSlug]);
+
+    // Đồng bộ lịch sử khi chọn tập phim (ngay cả với Iframe gốc)
+    useEffect(() => {
+        if (movie && activeEpisode) {
+            saveWatchHistory(movie, activeEpisode, 0);
+        }
+    }, [movie, activeEpisode]);
 
     return (
         <div className={cn("relative w-full", isTheaterMode ? "z-[50]" : (isLightOff ? "z-[60]" : "z-10"))}>
