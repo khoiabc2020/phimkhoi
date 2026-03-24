@@ -294,7 +294,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                     <div className="absolute inset-0 z-[2] pointer-events-none">
                         <div className="absolute inset-y-0 left-0 w-[80%] lg:w-[60%] bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
                         <div className="absolute inset-0 bg-[#0a0a0a]/10" />
-                        <div className="absolute bottom-0 left-0 right-0 h-48 md:h-64 lg:h-80 xl:h-[350px] bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/90 to-transparent z-[5]" />
+                        <div className="absolute inset-x-0 bottom-0 z-30 pt-40 pb-12 md:pb-20 lg:pb-32 px-4 md:px-8 lg:pl-26 xl:pl-34 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
                     </div>
 
                     <div className="relative z-[10] h-full w-full max-w-[1920px] mx-auto px-6 md:pl-24 md:pr-14 lg:pl-32 lg:pr-12 xl:pl-[140px] flex items-end pb-20 md:pb-28 lg:pb-36 xl:pb-48 pointer-events-none">
@@ -427,7 +427,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                 </div>
             </div>
 
-            <div className="absolute top-[40%] md:top-1/2 -translate-y-1/2 left-0 right-0 z-[35] pointer-events-none flex items-center justify-between px-4 md:px-8 lg:pl-26 lg:pr-6 xl:pl-34 xl:pr-14">
+            <div className="absolute top-[40%] md:top-1/2 -translate-y-1/2 left-0 right-0 z-[35] pointer-events-none flex items-center justify-between px-4 md:px-8 lg:pl-32 lg:pr-10 xl:pl-40 xl:pr-16">
                 <button 
                     onClick={prev}
                     className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-full bg-black/10 hover:bg-black/40 backdrop-blur-md border border-white/5 flex items-center justify-center text-white/20 hover:text-white hover:scale-110 active:scale-95 transition-all duration-300 group pointer-events-auto shadow-2xl"
