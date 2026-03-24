@@ -356,15 +356,20 @@ export default function Header({ categories, countries }: HeaderProps) {
                                                 )}
                                             </div>
                                             {searchQuery.length > 0 && (
-                                                <button 
-                                                    onClick={handleSearch} 
+                                                <Link 
+                                                    href={`/tim-kiem?keyword=${encodeURIComponent(searchQuery.trim())}`}
+                                                    onClick={() => {
+                                                        saveHistoryItem("movies", searchQuery.trim());
+                                                        setIsSearchOpen(false);
+                                                        setSearchQuery("");
+                                                    }}
                                                     className="w-full mt-2 py-4 px-4 flex items-center justify-between group/action transition-all hover:bg-white/5 active:bg-white/10 border-t border-white/5"
                                                 >
                                                     <span className="text-[11px] font-black text-white/40 group-hover/action:text-primary uppercase tracking-[2px] transition-colors">Xem tất cả kết quả</span>
                                                     <div className="w-8 h-8 rounded-full bg-white/5 group-hover/action:bg-primary group-hover/action:scale-110 flex items-center justify-center transition-all">
                                                         <Search className="w-3.5 h-3.5 text-white group-hover/action:text-black" />
                                                     </div>
-                                                </button>
+                                                </Link>
                                             )}
                                         </div>
                                     )}
