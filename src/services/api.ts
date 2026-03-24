@@ -1000,6 +1000,27 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
 };
 
 
+export const getMoviesByCountryAndCategory = async (countrySlug: string, categorySlug: string, limit: number = 24) => {
+    try {
+        // Fetch a much larger batch (450 items = 3 pages of default 150) to ensure we find enough for the specific category
+        // Note: For most countries, the first 300-500 movies cover the vast majority of popular content in a specific genre.
+        const data = await getMoviesByCountry(countrySlug, 1, 450);
+        
+        // Filter locally by category
+        const filteredMovies = data.items.filter(movie => 
+            movie.category?.some(cat => cat.slug === categorySlug)
+        );
+
+        return {
+            items: filteredMovies.slice(0, limit),
+            pagination: data.pagination
+        };
+    } catch (error) {
+        console.error(`Error filtering country [${countrySlug}] by category [${categorySlug}]:`, error);
+        return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
+    }
+};
+
 // ... existing code ...
 import { getTMDBTrending, searchTMDBMovie } from "./tmdb";
 

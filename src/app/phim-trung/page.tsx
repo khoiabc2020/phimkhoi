@@ -3,7 +3,7 @@ import ChinaHero from "@/components/ChinaHero";
 import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
-import { getMoviesByCategory, getMenuData, getMoviesByCountry, Movie, getMovieDetail, getMoviesList } from "@/services/api";
+import { getMoviesByCategory, getMenuData, getMoviesByCountry, Movie, getMovieDetail, getMoviesList, getMoviesByCountryAndCategory } from "@/services/api";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
@@ -41,8 +41,8 @@ const FEATURED_ACTORS = [
 ];
 
 async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'default', minHeight = 380 }: { title: string; categorySlug: string; countrySlug: string; variant?: 'default' | 'sidebar'; minHeight?: number }) {
-    // Gọi trực tiếp API với cả thể loại và quốc gia để được list đầy đủ (chuẩn Elite)
-    const data = await getMoviesList(categorySlug, { country: countrySlug, limit: 24 });
+    // Ưu tiên filter từ MovieCountry (lấy mẫu lớn 450 phim) để đảm bảo 100% phim thuộc đúng Quốc Gia (Hàn/Trung)
+    const data = await getMoviesByCountryAndCategory(countrySlug, categorySlug, 24);
     const filteredMovies = data.items;
     
     return (
