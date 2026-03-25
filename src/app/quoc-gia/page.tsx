@@ -12,8 +12,10 @@ export default async function CountriesIndexPage() {
     const { countries } = await getMenuData();
 
     return (
-        <main className="min-h-screen pb-20">
+        <main className="min-h-screen pb-20 bg-[#0a0a0a] relative overflow-hidden">
             <div className="pt-24 w-full max-w-[1400px] mx-auto px-4 sm:px-6 md:px-12 lg:pl-24 lg:pr-12 relative">
+                {/* Decorative background glow */}
+                <div className="absolute top-0 left-0 right-0 h-[600px] bg-indigo-500/10 via-transparent to-transparent pointer-events-none -z-10 blur-[150px]" />
                 <div className="mb-10">
                     <Link 
                         href="/" 

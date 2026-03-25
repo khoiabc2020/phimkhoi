@@ -34,6 +34,7 @@ export default function Header({ categories, countries }: HeaderProps) {
     const [showHistory, setShowHistory] = useState(false);
     const [movieSearchHistory, setMovieSearchHistory] = useState<string[]>([]);
     const [isSearchNavigating, setIsSearchNavigating] = useState(false);
+    const [selectedIndex, setSelectedIndex] = useState(-1);
 
     const navRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
@@ -80,6 +81,11 @@ export default function Header({ categories, countries }: HeaderProps) {
         return () => clearTimeout(timer);
     }, [searchQuery]);
 
+    // Reset selection when results change
+    useEffect(() => {
+        setSelectedIndex(-1);
+    }, [searchResults, searchQuery]);
+
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         if (searchQuery.trim()) {
@@ -111,8 +117,33 @@ export default function Header({ categories, countries }: HeaderProps) {
     useEffect(() => {
         if (isSearchOpen && searchInputRef.current) {
             searchInputRef.current.focus();
+        } else {
+            setSelectedIndex(-1);
         }
     }, [isSearchOpen]);
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        const results = searchResults?.movies?.slice(0, 5) || [];
+        const maxIndex = results.length - 1;
+
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            setSelectedIndex(prev => (prev < maxIndex ? prev + 1 : prev));
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            setSelectedIndex(prev => (prev > -1 ? prev - 1 : -1));
+        } else if (e.key === "Enter") {
+            if (selectedIndex >= 0 && results[selectedIndex]) {
+                e.preventDefault();
+                const movie = results[selectedIndex];
+                setIsSearchOpen(false);
+                setSearchQuery("");
+                router.push(`/phim/${movie.slug}`);
+            }
+        } else if (e.key === "Escape") {
+            setIsSearchOpen(false);
+        }
+    };
 
     const closeDropdown = () => setOpenDropdown(null);
 
@@ -286,6 +317,7 @@ export default function Header({ categories, countries }: HeaderProps) {
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         onFocus={() => setShowHistory(true)}
+                                        onKeyDown={handleKeyDown}
                                         placeholder="Tìm kiếm..."
                                         className="w-full h-10 bg-[#0B0B10]/95 border border-white/[0.10] rounded-full pl-4 pr-10 text-sm text-white outline-none focus:border-primary/40 shadow-2xl backdrop-blur-md"
                                     />
@@ -318,19 +350,25 @@ export default function Header({ categories, countries }: HeaderProps) {
                                                         <div className="space-y-1">
                                                             {isSearching && !searchResults ? <SearchSkeleton /> : (
                                                                 <>
-                                                                    {searchResults?.movies?.slice(0, 5).map((movie: any) => (
+                                                                    {searchResults?.movies?.slice(0, 5).map((movie: any, idx: number) => (
                                                                         <Link
                                                                             href={`/phim/${movie.slug}`}
                                                                             key={movie._id}
                                                                             onClick={() => { setIsSearchOpen(false); setSearchQuery(""); }}
-                                                                            onMouseEnter={() => router.prefetch(`/phim/${movie.slug}`)}
-                                                                            className="flex items-center gap-3 p-2 hover:bg-white/5 rounded-lg transition-all group"
+                                                                            onMouseEnter={() => {
+                                                                                router.prefetch(`/phim/${movie.slug}`);
+                                                                                setSelectedIndex(idx);
+                                                                            }}
+                                                                            className={cn(
+                                                                                "flex items-center gap-3 p-2 rounded-lg transition-all group",
+                                                                                selectedIndex === idx ? "bg-white/10 ring-1 ring-white/10" : "hover:bg-white/5"
+                                                                            )}
                                                                         >
                                                                             <div className="w-9 h-12 relative rounded overflow-hidden">
                                                                                 <Image src={getImageUrl(movie.poster_url || movie.thumb_url)} alt="" fill className="object-cover" unoptimized />
                                                                             </div>
                                                                             <div className="flex-1 min-w-0">
-                                                                                <div className="text-sm font-semibold truncate group-hover:text-primary">{movie.name}</div>
+                                                                                <div className={cn("text-sm font-semibold truncate group-hover:text-primary", selectedIndex === idx ? "text-primary" : "text-white")}>{movie.name}</div>
                                                                                 <div className="text-[11px] text-white/40">{movie.year} • {movie.quality}</div>
                                                                             </div>
                                                                         </Link>

@@ -6,6 +6,9 @@ import { searchTMDBPerson } from "@/services/tmdb";
 import { SearchX, User } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { headers } from "next/headers";
+import { getThemeBySlug } from "@/lib/theme";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
     title: "Tìm kiếm phim",
@@ -17,20 +20,13 @@ export const metadata: Metadata = {
 };
 
 /** Stream component for search results */
-async function SearchResultsStream({ 
-    keyword,
-    category,
-    country,
-    year
-}: { 
-    keyword: string;
-    category?: string;
-    country?: string;
     year?: string;
+    limit?: number;
 }) {
-    // Fetch movies + actors concurrently
+    // Phase 1: Deep scan of local and external sources
+    const moviesCount = limit || 49;
     const [movies, actors] = await Promise.all([
-        searchMovies(keyword, { enrichTMDB: false, limit: 12 }),
+        searchMovies(keyword, { enrichTMDB: false, limit: moviesCount * 2 }),
         keyword.length >= 3 ? searchTMDBPerson(keyword) : Promise.resolve([])
     ]);
 
@@ -111,7 +107,7 @@ async function SearchResultsStream({
     });
 
     const visibleActors = (actors || []).slice(0, 8);
-    const visibleMovies = filteredMovies.slice(0, 54);
+    const visibleMovies = filteredMovies.slice(0, moviesCount);
     const hasActors = visibleActors.length > 0;
     const hasMovies = visibleMovies.length > 0;
 
@@ -188,11 +184,11 @@ async function SearchResultsStream({
     );
 }
 
-const SearchSkeleton = () => (
+const SearchSkeleton = ({ limit = 49 }: { limit?: number }) => (
     <div className="mt-8">
         <div className="h-4 w-48 bg-white/5 rounded animate-pulse mb-8" />
         <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4">
-            {Array.from({ length: 14 }).map((_, i) => (
+            {Array.from({ length: limit }).map((_, i) => (
                 <div key={i} className="aspect-[2/3] rounded-lg bg-white/5 animate-pulse" />
             ))}
         </div>
@@ -200,14 +196,22 @@ const SearchSkeleton = () => (
 );
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string; keyword?: string; category?: string; country?: string; year?: string }> }) {
+    const userAgent = (await headers()).get('user-agent') || '';
+    const isMobile = /mobile|android|iphone|ipad/i.test(userAgent);
+    const limit = isMobile ? 28 : 49;
+    const theme = getThemeBySlug("tim-kiem");
+
     const sParams = await searchParams;
     const { q, keyword: k, category, country, year } = sParams;
     const keyword = (k || q || "").trim();
 
     return (
-        <main className="min-h-screen pb-20">
+        <main className="min-h-screen pb-20 bg-[#0a0a0a] relative overflow-hidden">
+            {/* Decorative background glow */}
+            <div className={cn("absolute top-0 left-0 right-0 h-[600px] via-transparent to-transparent pointer-events-none -z-10 blur-[150px] opacity-50", theme.glow)} />
+            
             <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 lg:pl-24 lg:pr-12 pt-24">
-                <div className="mb-6 rounded-[12px] border border-white/[0.06] bg-[#07070b]/78 p-4 md:p-5 shadow-xl transition-all flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div className="mb-6 rounded-[12px] border border-white/[0.06] bg-[#07070b]/78 backdrop-blur-md p-4 md:p-5 shadow-xl transition-all flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <div className="space-y-1">
                         <h1 className="text-[26px] md:text-[32px] font-outfit font-extrabold text-white tracking-tight leading-tight">
                             {keyword ? (
@@ -234,12 +238,13 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                         <p className="text-gray-500 mt-2">Tìm theo tên phim, diễn viên hoặc đạo diễn</p>
                     </div>
                 ) : (
-                    <Suspense key={`${keyword}-${category}-${country}-${year}`} fallback={<SearchSkeleton />}>
+                    <Suspense key={`${keyword}-${category}-${country}-${year}`} fallback={<SearchSkeleton limit={limit} />}>
                         <SearchResultsStream 
                             keyword={keyword} 
                             category={category} 
                             country={country} 
                             year={year} 
+                            limit={limit}
                         />
                     </Suspense>
                 )}

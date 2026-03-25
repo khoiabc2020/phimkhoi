@@ -12,6 +12,7 @@ import WatchContainer from "@/components/WatchContainer";
 import { Info } from "lucide-react";
 import { getMovieCast, getTMDBDataForCard, getTMDBEpisodeImages, TMDBEpisodeMeta } from "@/app/actions/tmdb";
 import RelatedMovies from "@/components/RelatedMovies";
+import { getThemeBySlug } from "@/lib/theme";
 
 export const revalidate = 300;
 
@@ -138,6 +139,9 @@ export default async function WatchPage({ params }: PageProps) {
         });
     } catch { }
 
+    const firstCategory = movie.category?.[0]?.slug || 'all';
+    const theme = getThemeBySlug(firstCategory);
+
     const displayEpisodeName = (name: string) => name?.startsWith("Tập") ? name : `Tập ${name}`;
 
     const movieData = {
@@ -157,8 +161,9 @@ export default async function WatchPage({ params }: PageProps) {
     };
 
     return (
-        <div className="min-h-screen bg-[#0a0a0a] text-gray-300" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+        <div className="min-h-screen bg-[#0a0a0a] text-gray-300 relative overflow-hidden" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
             <div className="fixed inset-0 pointer-events-none z-0">
+                <div className={cn("absolute top-0 left-0 right-0 h-[800px] via-black/80 to-transparent blur-[150px] opacity-40", theme.glow)} />
                 <div className="absolute inset-0 bg-gradient-radial from-[#101014]/22 via-[#0a0a0a] to-[#0a0a0a]" />
             </div>
 
@@ -189,8 +194,8 @@ export default async function WatchPage({ params }: PageProps) {
                             {/* Movie description */}
                             <div className="relative z-30 rounded-[10px] border border-white/[0.06] overflow-hidden bg-[#07070b]/82 shadow-[0_10px_24px_#00000066] mx-3 sm:mx-0">
                                 <div className="px-5 sm:px-6 pt-4 pb-3 border-b border-white/[0.06] bg-[#09090d]">
-                                    <h3 className="text-white font-bold text-[14px] sm:text-[15px] flex items-center gap-2 tracking-wide uppercase">
-                                        <Info className="w-4 h-4 text-[#8FA7C5]" /> Nội dung
+                                    <h3 className="text-white font-outfit font-extrabold text-[14px] sm:text-[15px] flex items-center gap-2 tracking-wider uppercase italic">
+                                        <Info className="w-4 h-4" style={{ color: theme.primary }} /> Nội dung
                                     </h3>
                                 </div>
                                 <div className="p-5 sm:p-6">
@@ -247,7 +252,7 @@ export default async function WatchPage({ params }: PageProps) {
                             {movie.category && movie.category.length > 0 && (
                                 <div className="relative z-30 rounded-[10px] border border-white/[0.06] overflow-hidden bg-[#07070b]/82 shadow-[0_10px_24px_#00000066]">
                                     <div className="px-5 pt-5 pb-4 border-b border-white/[0.06] bg-[#09090d]">
-                                        <h3 className="text-white font-bold text-[15px] tracking-wide">Thể loại</h3>
+                                        <h3 className="text-white font-outfit font-extrabold text-[15px] tracking-wider uppercase italic">Thể loại</h3>
                                     </div>
                                     <div className="p-5 flex flex-wrap gap-2">
                                         {movie.category.map((c: { id: React.Key | null | undefined; slug: string; name: string }) => (
@@ -265,8 +270,8 @@ export default async function WatchPage({ params }: PageProps) {
                             {movie.category?.[0]?.slug && (
                                 <div className="relative z-30 rounded-[10px] border border-white/[0.06] overflow-hidden bg-[#07070b]/82 shadow-[0_10px_24px_#00000066]">
                                     <div className="px-5 pt-5 pb-4 border-b border-white/[0.06] flex items-center gap-2 bg-[#09090d]">
-                                        <div className="w-1.5 h-4 rounded-full bg-[#8FA7C5]" />
-                                        <h3 className="text-white font-bold text-[15px] tracking-wide">Phim đề xuất</h3>
+                                        <div className="w-1.5 h-4 rounded-full" style={{ backgroundColor: theme.primary }} />
+                                        <h3 className="text-white font-outfit font-extrabold text-[15px] tracking-wider uppercase italic">Phim đề xuất</h3>
                                     </div>
                                     <div className="p-4">
                                         <RelatedMovies categorySlug={movie.category[0].slug} currentMovieId={movie._id} mode="vertical" />

@@ -7,6 +7,7 @@ import { Play, PlayCircle, Share2, Star, Clock, Film } from "lucide-react";
 import FavoriteButton from "@/components/FavoriteButton";
 import { getImageUrl, detectOrientation, cn } from "@/lib/utils";
 import Image from "next/image";
+import { getThemeBySlug } from "@/lib/theme";
 
 const CommentSection = dynamic(() => import("@/components/CommentSection"), {
     ssr: true,
@@ -129,6 +130,9 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     if (movie?.type === 'phim-bo' || movie?.type === 'tv-shows' || movie?.type === 'hoat-hinh') {
         type = 'tv';
     }
+
+    const firstCategory = movie?.category?.[0]?.slug || 'all';
+    const theme = getThemeBySlug(firstCategory);
 
     /**
      * ELITE LOAD STRATEGY (PHASE 9):
@@ -328,6 +332,9 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             quality={10}
                         />
                         
+                        {/* Layer 1.5: Theme Specific Glow */}
+                        <div className={cn("absolute inset-0 opacity-40 blur-[120px] -z-10", theme.glow)} />
+                        
                         {/* Layer 2: Atmospheric Texture (Mid Blur) */}
                         <Image
                             src={ambientBgUrl || "/fallback.png"}
@@ -389,12 +396,17 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                     {movie?.year}
                                 </span>
                             )}
-                            <span className="px-2.5 py-1 rounded-md border border-[#8FA7C5]/40 bg-[#8FA7C5]/10 text-[#8FA7C5] text-[11px] font-bold leading-none uppercase drop-shadow-md">
+                            <span 
+                                className="px-2.5 py-1 rounded-md border border-white/15 text-white text-[11px] font-bold leading-none uppercase drop-shadow-md"
+                                style={{ backgroundColor: `${theme.primary}20`, borderColor: `${theme.primary}40`, color: theme.primary }}
+                            >
                                 {movie?.quality || "FHD"}
                             </span>
                         </div>
-                        <h1 className="font-display text-3xl sm:text-4xl lg:text-[44px] font-black text-white leading-tight tracking-tight pt-1 drop-shadow-2xl capitalize w-full">
-                            {movie?.name?.toLowerCase()}
+                        <h1 
+                            className="font-outfit text-3xl sm:text-4xl lg:text-[48px] font-black text-white leading-tight tracking-tighter pt-1 drop-shadow-2xl capitalize w-full italic"
+                        >
+                            {movie?.name}
                         </h1>
                         <h2 className="hidden sm:block text-base md:text-xl text-gray-300 font-medium tracking-wide drop-shadow-md capitalize opacity-80">
                             {movie?.origin_name?.toLowerCase()}
@@ -466,8 +478,8 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         <div className="grid grid-cols-2 md:flex md:flex-wrap items-center justify-center md:justify-start gap-3 sm:gap-4 pt-4 pb-2 w-full max-w-[500px] md:max-w-none">
                             {serverData.length > 0 && (
                                 <Link
-                                    href={`/xem-phim/${movie?.slug}/${serverData[0].slug}`}
-                                    className="flex items-center justify-center gap-2 bg-[#8FA7C5] text-[#0a0a0a] px-5 sm:px-10 py-3.5 rounded-full font-black text-[14px] sm:text-[15px] hover:bg-[#a8bdd8] hover:scale-105 transition-all duration-300 shadow-[0_4px_20px_rgba(143,167,197,0.3)] w-full md:w-auto"
+                                    className="flex items-center justify-center gap-2 px-5 sm:px-10 py-3.5 rounded-full font-black text-[14px] sm:text-[15px] hover:scale-105 transition-all duration-300 shadow-xl w-full md:w-auto"
+                                    style={{ backgroundColor: theme.primary, color: '#0a0a0a', boxShadow: `0 4px 20px ${theme.primary}4d` }}
                                 >
                                     <Play className="w-5 h-5 fill-current shrink-0" />
                                     Xem Phim

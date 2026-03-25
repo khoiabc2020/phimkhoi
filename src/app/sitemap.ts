@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getMoviesList } from "@/services/api";
+import connectDB from "@/lib/db";
+import MovieModel from "@/models/Movie";
 
 const BASE_URL = "https://khoiphim.io.vn";
 
@@ -16,29 +18,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   try {
-    const [latest, series, single] = await Promise.all([
-      getMoviesList("phim-moi", { page: 1, limit: 120 }),
-      getMoviesList("phim-bo", { page: 1, limit: 120 }),
-      getMoviesList("phim-le", { page: 1, limit: 120 }),
-    ]);
+    // [Elite SEO] Query local Database for ALL registered movies (35,000+ titles)
+    await connectDB();
+    const dbMovies = await MovieModel.find({}, { slug: 1, updatedAt: 1 })
+      .sort({ updatedAt: -1 })
+      .limit(45000) // Safe limit for a single sitemap.xml file (max 50k)
+      .lean();
 
-    const bySlug = new Map<string, any>();
-    for (const source of [latest?.items || [], series?.items || [], single?.items || []]) {
-      for (const movie of source) {
-        if (!movie?.slug || bySlug.has(movie.slug)) continue;
-        bySlug.set(movie.slug, movie);
-      }
-    }
-
-    const movieRoutes: MetadataRoute.Sitemap = Array.from(bySlug.values()).slice(0, 300).map((movie: any) => ({
+    const movieRoutes: MetadataRoute.Sitemap = dbMovies.map((movie: any) => ({
       url: `${BASE_URL}/phim/${movie.slug}`,
-      lastModified: new Date(),
+      lastModified: movie.updatedAt ? new Date(movie.updatedAt) : new Date(),
       changeFrequency: "daily",
       priority: 0.8,
     }));
 
     return [...staticRoutes, ...movieRoutes];
-  } catch {
+  } catch (error) {
+    console.error("Sitemap generation error:", error);
     return staticRoutes;
   }
 }

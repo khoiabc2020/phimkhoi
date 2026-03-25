@@ -7,15 +7,17 @@ export default function CategoryGridClient({
     slug, 
     page,
     country,
-    year
+    year,
+    limit = 49
 }: { 
     slug: string; 
     page: number;
     country?: string;
     year?: string;
+    limit?: number;
 }) {
     const fetcher = async () => {
-        return await getMoviesByCategory(slug, page, 28, { country, year });
+        return await getMoviesByCategory(slug, page, limit, { country, year });
     };
 
     const cacheKey = `category_${slug}_p${page}_c${country || 'all'}_y${year || 'all'}`;

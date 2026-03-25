@@ -11,7 +11,7 @@ import type { Movie } from "@/services/api";
 export const getMoviesFromCache = async (
     type: string,
     page: number = 1,
-    limit: number = 28
+    limit: number = 49
 ): Promise<{ items: Movie[]; pagination: any } | null> => {
     try {
         await dbConnect();
@@ -32,6 +32,56 @@ export const getMoviesFromCache = async (
         };
     } catch (error) {
         console.error(`[MovieCache] Fetch Error [${type}]:`, error);
+        return null;
+    }
+};
+
+/** 
+ * [Elite Retrieval] Query for movies by specific filter (Category, Country, etc.)
+ * Provides perfectly filled "full" pages as requested.
+ */
+export const getMoviesByFilterFromCache = async (
+    filterType: 'category' | 'country',
+    slug: string,
+    page: number = 1,
+    limit: number = 49,
+    options: { year?: string | number; category?: string } = {}
+): Promise<{ items: Movie[]; pagination: any } | null> => {
+    try {
+        await dbConnect();
+        const skip = (page - 1) * limit;
+        
+        // Construct query
+        const query: any = {};
+        if (filterType === 'category') query["category.slug"] = slug;
+        if (filterType === 'country') query["country.slug"] = slug;
+        
+        if (options.year && options.year !== 'all') query.year = Number(options.year);
+        if (options.category && options.category !== 'all') query["category.slug"] = options.category;
+
+        // Perform count and find in parallel
+        const [totalItems, movies] = await Promise.all([
+            MovieModel.countDocuments(query),
+            MovieModel.find(query)
+                .sort({ updatedAt: -1, lastSynced: -1 })
+                .skip(skip)
+                .limit(limit)
+                .lean()
+        ]);
+
+        if (movies.length === 0) return null;
+
+        return {
+            items: movies as unknown as Movie[],
+            pagination: {
+                totalItems,
+                totalPages: Math.ceil(totalItems / limit),
+                currentPage: page,
+                totalItemsPerPage: limit
+            }
+        };
+    } catch (error) {
+        console.error(`[MovieCache] Filter Error [${slug}]:`, error);
         return null;
     }
 };

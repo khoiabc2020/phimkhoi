@@ -810,7 +810,7 @@ const normalizeOphimItem = (item: any, pathImage: string): Movie => {
 
 export const getMoviesList = async (type: string, params: { page?: number; year?: number; category?: string; country?: string; limit?: number; quality?: string } = {}) => {
     try {
-        const { page = 1, year, category, country, limit = 28, quality } = params;
+        const { page = 1, year, category, country, limit = 49, quality } = params;
         let query = `?page=${page}&limit=${limit}`;
         if (year) query += `&year=${year}`;
         if (category) query += `&category=${category}`;
@@ -838,7 +838,19 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
         const kkEndpoint = baseEndpoint;
         const nguoncEndpoint = baseEndpoint + '/';
 
-        // Fetch from sources in parallel
+        // 1. [Elite Choice] Try local Database-First API
+        try {
+            const localUrl = `/api/movies/list?type=list&slug=${kkType}&${query}`;
+            const localRes = await fetch(localUrl, { next: { revalidate: 300 } });
+            if (localRes.ok) {
+                const localData = await localRes.json();
+                if (localData.items?.length > 0 && !localData.fallback) {
+                    return localData;
+                }
+            }
+        } catch (e) { /* Fallback to external */ }
+
+        // 2. Fallback: Fetch from sources in parallel
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
             fetchWithFastTimeout(`${API_URL}/v1/api/${kkEndpoint}/${kkType}${query}`, 3000, { next: { revalidate: 3600 } }),
             fetchWithFastTimeout(`${OPHIM_API}/v1/api/${kkEndpoint}/${ophimType}${query}`, 2500, { next: { revalidate: 3600 } }),
@@ -935,7 +947,7 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
     }
 };
 
-export const getMoviesByCategory = async (slug: string, page: number = 1, limit: number = 28, options?: { country?: string; year?: string | number }) => {
+export const getMoviesByCategory = async (slug: string, page: number = 1, limit: number = 49, options?: { country?: string; year?: string | number }) => {
     try {
         const country = options?.country && options.country !== 'all' ? options.country : '';
         const year = options?.year && options.year !== 'all' ? options.year : '';
@@ -945,7 +957,19 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
         if (country) queryStr += `&country=${country}`;
         if (year) queryStr += `&year=${year}`;
 
-        // Hybrid fetch for categories
+        // 1. [Elite Choice] Try local Database-First API
+        try {
+            const localUrl = `/api/movies/list?type=category&slug=${slug}&${queryStr}`;
+            const localRes = await fetch(localUrl, { next: { revalidate: 300 } });
+            if (localRes.ok) {
+                const localData = await localRes.json();
+                if (localData.items?.length > 0 && !localData.fallback) {
+                    return localData;
+                }
+            }
+        } catch (e) { /* Fallback to external */ }
+
+        // 2. Fallback: Hybrid fetch for categories
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
             fetch(`${API_URL}/v1/api/the-loai/${slug}?${queryStr}`, { next: { revalidate: 3600 } }).then(r => r.json()),
             fetch(`${OPHIM_API}/v1/api/the-loai/${slug}?${queryStr}`, { next: { revalidate: 3600 } }).then(r => r.json()),
@@ -1020,7 +1044,7 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
     }
 };
 
-export const getMoviesByCountry = async (slug: string, page: number = 1, limit: number = 28, options?: { category?: string; year?: string | number }) => {
+export const getMoviesByCountry = async (slug: string, page: number = 1, limit: number = 49, options?: { category?: string; year?: string | number }) => {
     try {
         const category = options?.category && options.category !== 'all' ? options.category : '';
         const year = options?.year && options.year !== 'all' ? options.year : '';
@@ -1030,6 +1054,19 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
         if (category) queryStr += `&category=${category}`;
         if (year) queryStr += `&year=${year}`;
 
+        // 1. [Elite Choice] Try local Database-First API
+        try {
+            const localUrl = `/api/movies/list?type=country&slug=${slug}&${queryStr}`;
+            const localRes = await fetch(localUrl, { next: { revalidate: 300 } });
+            if (localRes.ok) {
+                const localData = await localRes.json();
+                if (localData.items?.length > 0 && !localData.fallback) {
+                    return localData;
+                }
+            }
+        } catch (e) { /* Fallback to external */ }
+
+        // 2. Fallback: External APIs
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
             fetch(`${API_URL}/v1/api/quoc-gia/${slug}?${queryStr}`, { next: { revalidate: 3600 } }).then(r => r.json()),
             fetch(`${OPHIM_API}/v1/api/quoc-gia/${slug}?${queryStr}`, { next: { revalidate: 3600 } }).then(r => r.json()),

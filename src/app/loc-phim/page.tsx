@@ -4,6 +4,9 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { Filter, SlidersHorizontal, ChevronRight } from "lucide-react";
 import FilterToolbar from "@/components/FilterToolbar";
+import { headers } from "next/headers";
+import { getThemeBySlug } from "@/lib/theme";
+import { cn } from "@/lib/utils";
 
 interface FilterPageProps {
     searchParams: Promise<{
@@ -24,13 +27,13 @@ const TYPES = [
     { name: "TV Shows", slug: "tv-shows" },
 ];
 
-async function MovieGrid({ category, country, year, type, page }: any) {
+async function MovieGrid({ category, country, year, type, page, limit = 49 }: any) {
     const data = await getMoviesList(type || "phim-moi-cap-nhat", {
         category,
         country,
         year: year ? parseInt(year) : undefined,
         page: page ? parseInt(page) : 1,
-        limit: 30
+        limit
     });
 
     const movies = data.items || [];
@@ -48,7 +51,7 @@ async function MovieGrid({ category, country, year, type, page }: any) {
     }
 
     return (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4">
             {movies.map((movie: any) => (
                 <div key={movie._id || movie.slug} className="animate-in fade-in duration-500">
                     <MovieCard movie={movie} />
@@ -58,10 +61,10 @@ async function MovieGrid({ category, country, year, type, page }: any) {
     );
 }
 
-function LoadingSkeleton() {
+function LoadingSkeleton({ limit = 49 }: { limit?: number }) {
     return (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
-            {Array.from({ length: 12 }).map((_, i) => (
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4">
+            {Array.from({ length: limit }).map((_, i) => (
                 <div key={i} className="space-y-3">
                     <div className="aspect-[2/3] w-full bg-white/5 rounded-xl animate-pulse" />
                     <div className="h-4 w-3/4 bg-white/5 rounded animate-pulse" />
@@ -76,6 +79,11 @@ export default async function AdvancedFilterPage({ searchParams }: FilterPagePro
     const sParams = await searchParams;
     const { categories, countries } = await getMenuData();
     const { page } = sParams;
+    const theme = getThemeBySlug("loc-phim");
+
+    const userAgent = (await headers()).get('user-agent') || '';
+    const isMobile = /mobile|android|iphone|ipad/i.test(userAgent);
+    const limit = isMobile ? 28 : 49;
 
     const buildUrl = (updates: Record<string, string | null>) => {
         const params = new URLSearchParams();
@@ -90,7 +98,10 @@ export default async function AdvancedFilterPage({ searchParams }: FilterPagePro
     };
 
     return (
-        <main className="min-h-screen bg-[#080b12] text-white">
+        <main className="min-h-screen bg-[#080b12] text-white relative overflow-hidden">
+            {/* Decorative background glow */}
+            <div className={cn("absolute top-0 left-0 right-0 h-[600px] via-transparent to-transparent pointer-events-none -z-10 blur-[150px] opacity-50", theme.glow)} />
+            
             <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-24 md:pt-32 pb-20">
                 {/* Header & Breadcrumb */}
                 <div className="mb-8 md:mb-12">
@@ -117,8 +128,8 @@ export default async function AdvancedFilterPage({ searchParams }: FilterPagePro
                 />
 
                 {/* Results Grid */}
-                <Suspense key={JSON.stringify(sParams)} fallback={<LoadingSkeleton />}>
-                    <MovieGrid {...sParams} />
+                <Suspense key={JSON.stringify(sParams)} fallback={<LoadingSkeleton limit={limit} />}>
+                    <MovieGrid {...sParams} limit={limit} />
                 </Suspense>
 
                 {/* Pagination */}

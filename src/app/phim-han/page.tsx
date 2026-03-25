@@ -13,6 +13,7 @@ import ActorRow from "@/components/ActorRow";
 import LazySection from "@/components/LazySection";
 import { detectOrientation, cn } from "@/lib/utils";
 import { getThemeBySlug } from "@/lib/theme";
+import { headers } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {
     const { countries } = await getMenuData();
@@ -108,9 +109,9 @@ async function PhimHanHome() {
     );
 }
 
-async function CountryGridStream({ slug, page }: { slug: string; page: number }) {
-    const cached = page <= 3 ? await getMoviesFromCache(slug, page, 60) : null;
-    const data = cached || await getMoviesByCountry(slug, page);
+async function CountryGridStream({ slug, page, limit = 49 }: { slug: string; page: number; limit?: number }) {
+    const cached = page <= 3 ? await getMoviesFromCache(slug, page, limit) : null;
+    const data = cached || await getMoviesByCountry(slug, page, limit);
     
     if (!data.items || data.items.length === 0) {
         return <div className="py-20 text-center text-white/40">Không tìm thấy phim nào.</div>;
@@ -158,6 +159,10 @@ async function KoreaHeroWithData() {
 }
 
 export default async function PhimHanPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+    const userAgent = (await headers()).get('user-agent') || '';
+    const isMobile = /mobile|android|iphone|ipad/i.test(userAgent);
+    const limit = isMobile ? 28 : 49;
+
     const sParams = await searchParams;
     const currentPage = Number(sParams.page) || 1;
     const slug = "han-quoc";
@@ -222,8 +227,8 @@ export default async function PhimHanPage({ searchParams }: { searchParams: Prom
                             </div>
                         </div>
 
-                        <Suspense key={`${slug}-${currentPage}`} fallback={<div className="px-12 grid grid-cols-7 gap-4">{Array.from({length: 14}).map((_, i) => <div key={i} className="aspect-[2/3] bg-white/5 animate-pulse rounded-lg"/>)}</div>}>
-                            <CountryGridStream slug={slug} page={currentPage} />
+                        <Suspense key={`${slug}-${currentPage}`} fallback={<div className="px-2 sm:px-6 md:px-12 lg:pl-24 lg:pr-12 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3 sm:gap-4">{Array.from({length: limit}).map((_, i) => <div key={i} className="aspect-[2/3] bg-white/5 animate-pulse rounded-lg"/>)}</div>}>
+                            <CountryGridStream slug={slug} page={currentPage} limit={limit} />
                         </Suspense>
                     </div>
                 )}

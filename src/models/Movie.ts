@@ -69,6 +69,11 @@ const MovieSchema = new Schema(
     { collection: 'movies', timestamps: true }
 );
 
+// Fast filtering indexes for Category & Country
+MovieSchema.index({ "category.slug": 1 });
+MovieSchema.index({ "country.slug": 1 });
+MovieSchema.index({ updatedAt: -1 });
+
 // Search optimization
 MovieSchema.index({ name: 'text', origin_name: 'text' });
 

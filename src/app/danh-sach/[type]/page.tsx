@@ -2,9 +2,11 @@ import { Suspense } from "react";
 import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
-import { getMoviesList, getMenuData } from "@/services/api";
 import { getMoviesFromCache } from "@/lib/movie-cache";
 import { Metadata } from "next";
+import { headers } from "next/headers";
+import { getThemeBySlug } from "@/lib/theme";
+import { cn } from "@/lib/utils";
 
 // Revalidate mỗi 5 phút - cân bằng giữa freshness và server load
 export const revalidate = 300;
@@ -75,7 +77,11 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
     const resolvedSearchParams = await searchParams;
 
     const page = Number(resolvedSearchParams.page) || 1;
-    const limit = 60; // Elite High-Density Catalog
+    const userAgent = (await headers()).get('user-agent') || '';
+    const isMobile = /mobile|android|iphone|ipad/i.test(userAgent);
+    const limit = isMobile ? 28 : 49;
+    
+    const theme = getThemeBySlug(type);
     const year = Number(resolvedSearchParams.year) || undefined;
     const category = (resolvedSearchParams.category as string) || undefined;
     const country = (resolvedSearchParams.country as string) || undefined;
@@ -110,9 +116,12 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
     const { items, pagination } = data;
 
     return (
-        <main className="min-h-screen pb-20">
+        <main className="min-h-screen pb-20 bg-[#0a0a0a] relative overflow-hidden">
+            {/* Decorative background glow */}
+            <div className={cn("absolute top-0 left-0 right-0 h-[600px] via-transparent to-transparent pointer-events-none -z-10 blur-[150px] opacity-50", theme.glow)} />
+            
             <div className="pt-24 w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 lg:pl-24 lg:pr-12">
-                <div className="mb-6 rounded-[12px] border border-white/[0.06] bg-[#07070b]/78 p-4 md:p-5 shadow-xl transition-all">
+                <div className="mb-6 rounded-[12px] border border-white/[0.06] bg-[#07070b]/78 backdrop-blur-md p-4 md:p-5 shadow-xl transition-all">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                         <div className="space-y-1">
                             <p className="text-[#8FA7C5] text-[11px] font-bold uppercase tracking-[0.2em] opacity-80 pl-1">
