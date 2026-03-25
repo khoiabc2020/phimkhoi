@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
     const searchParams = req.nextUrl.searchParams;
     const url = searchParams.get('url');
     const width = parseInt(searchParams.get('w') || '0');
-    const quality = parseInt(searchParams.get('q') || '75');
+    const quality = parseInt(searchParams.get('q') || '85');
 
     if (!url || !url.startsWith('http')) {
         return NextResponse.json({ error: 'Invalid URL' }, { status: 400 });
