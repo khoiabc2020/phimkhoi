@@ -1302,6 +1302,7 @@ export const getMenuData = async (): Promise<{ categories: Category[], countries
             ]
         };
     }
+    try {
         // Fetch from both KKPhim and OPhim to maximize coverage
         const [kkCatRes, kkCountRes, ophimCountRes] = await Promise.all([
             fetch(`${API_URL}/the-loai`, { next: { revalidate: 86400 } }),
