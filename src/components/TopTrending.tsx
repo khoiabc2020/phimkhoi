@@ -54,7 +54,7 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
                             {/* Rank Number (Inside Image) */}
                             <div className="absolute top-0 left-0 w-8 h-8 md:w-9 md:h-9 flex items-center justify-center bg-black/75 backdrop-blur-md rounded-br-lg z-20">
                                 <span className={cn(
-                                    "font-black text-lg md:text-xl italic",
+                                    "font-black text-lg md:text-xl",
                                     index === 0 ? "text-[#c6d6ea]" :
                                         index === 1 ? "text-gray-200" :
                                             index === 2 ? "text-[#8FA7C5]" : "text-white"

@@ -144,7 +144,7 @@ export default function MobileMenu({
 
                     {/* Navigation Heading */}
                     <div className="flex items-center gap-4 px-2">
-                        <span className="text-[10px] text-white/20 font-black uppercase tracking-[0.3em] whitespace-nowrap italic">Duyệt Phim</span>
+                        <span className="text-[10px] text-white/20 font-black uppercase tracking-[0.3em] whitespace-nowrap">Duyệt Phim</span>
                         <div className="flex-1 h-px bg-white/[0.03]" />
                     </div>
 

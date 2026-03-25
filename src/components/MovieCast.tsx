@@ -179,7 +179,7 @@ export default async function MovieCast({
                                 {actor.name}
                             </p>
                             {actor.originalName && actor.originalName !== actor.name && (
-                                <p className="text-[10px] text-gray-500 truncate mt-1 italic font-medium">
+                                <p className="text-[10px] text-gray-500 truncate mt-1 font-medium">
                                     {actor.originalName}
                                 </p>
                             )}

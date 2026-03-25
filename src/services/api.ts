@@ -701,9 +701,9 @@ export const getMovieDetail = async (slug: string) => {
                 status: true,
                 movie: normalizeMovieImageRoles({
                     _id: data.id || data.slug,
-                    name: data.name,
+                    name: decodeHtmlEntities(data.name || ""),
                     slug: data.slug,
-                    origin_name: data.original_name,
+                    origin_name: decodeHtmlEntities(data.original_name || ""),
                     content: data.description,
                     type: data.type === 'single' ? 'single' : 'series',
                     status: data.current_episode,
@@ -841,9 +841,9 @@ const normalizeOphimItem = (item: any, pathImage: string): Movie => {
     return {
         ...item,
         _id: item._id as string,
-        name: item.name as string,
+        name: decodeHtmlEntities(item.name as string || ""),
         slug: item.slug as string,
-        origin_name: item.origin_name as string,
+        origin_name: decodeHtmlEntities(item.origin_name as string || ""),
         thumb_url: normalizedThumb,
         poster_url: normalizedPoster,
         type: (item.type as string) || 'unknown',
@@ -943,9 +943,9 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
         if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
             const nguoncItems = (nguoncRes.value.items || []).map((item: Record<string, unknown>) => ({
                 _id: (item.id || item.slug) as string,
-                name: item.name as string,
+                name: decodeHtmlEntities(item.name as string || ""),
                 slug: item.slug as string,
-                origin_name: (item.original_name || item.name) as string,
+                origin_name: decodeHtmlEntities((item.original_name || item.name) as string || ""),
                 thumb_url: item.thumb_url as string,
                 poster_url: (item.poster_url as string) || "",
                 year: toValidYear(item.year as string) || 0,

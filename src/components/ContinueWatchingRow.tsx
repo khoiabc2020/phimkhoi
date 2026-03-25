@@ -82,13 +82,13 @@ function ContinueWatchingRowInner() {
                         const isNewer = !existing.lastWatched || (event.data.lastWatched && new Date(event.data.lastWatched) > new Date(existing.lastWatched));
                         if (!isNewer) return prev;
 
-                        newMovies = prev.map(m => m.movieId === movieId ? { 
-                            ...m, 
-                            progress, 
+                        newMovies = prev.map(m => m.movieId === movieId ? {
+                            ...m,
+                            progress,
                             episodeSlug: episodeSlug || m.episodeSlug,
                             episodeName: episodeName || m.episodeName,
                             lastWatched: event.data.lastWatched || new Date().toISOString()
-                        } : m).sort((a,b) => new Date(b.lastWatched).getTime() - new Date(a.lastWatched).getTime());
+                        } : m).sort((a, b) => new Date(b.lastWatched).getTime() - new Date(a.lastWatched).getTime());
                     } else if (movieName) {
                         // Feed entry for a new movie
                         newMovies = [{
@@ -258,7 +258,7 @@ function ContinueWatchingRowInner() {
                                         {item.movieName}
                                     </h3>
                                     <div className="flex items-center justify-between mt-1.5 opacity-60 group-hover/card:opacity-100 transition-opacity">
-                                        <span className="text-gray-300 text-[12px] font-medium truncate italic">{item.episodeName || "Tiếp tục xem"}</span>
+                                        <span className="text-gray-300 text-[12px] font-medium truncate">{item.episodeName || "Tiếp tục xem"}</span>
                                         <span className="text-[#8FA7C5] text-[12px] font-black uppercase tracking-wider">{item.progress}%</span>
                                     </div>
                                 </div>

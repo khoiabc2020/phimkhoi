@@ -156,7 +156,7 @@ export default async function WatchlistPage() {
                                             {movie.name}
                                         </h3>
                                         {movie.origin_name && (
-                                            <p className="text-white/40 text-[11px] truncate italic">{movie.origin_name}</p>
+                                            <p className="text-white/40 text-[11px] truncate">{movie.origin_name}</p>
                                         )}
                                         <p className="text-white/30 text-[10px]">{movie.year}</p>
                                     </div>

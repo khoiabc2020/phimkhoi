@@ -99,7 +99,7 @@ export default async function FavoritesPage() {
                                             {item.movieName}
                                         </h3>
                                         {item.movieOriginName && (
-                                            <p className="text-yellow-400 text-xs line-clamp-1 italic">
+                                            <p className="text-yellow-400 text-xs line-clamp-1">
                                                 {item.movieOriginName}
                                             </p>
                                         )}
