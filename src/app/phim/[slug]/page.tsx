@@ -404,7 +404,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             </span>
                         </div>
                         <h1 
-                            className="font-outfit text-3xl sm:text-4xl lg:text-[48px] font-black text-white leading-tight tracking-tighter pt-1 drop-shadow-2xl capitalize w-full italic"
+                            className="font-outfit text-3xl sm:text-4xl lg:text-[48px] font-black text-white leading-tight tracking-tighter pt-1 drop-shadow-2xl capitalize w-full"
                         >
                             {movie?.name}
                         </h1>

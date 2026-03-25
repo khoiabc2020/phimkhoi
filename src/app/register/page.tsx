@@ -47,7 +47,7 @@ function RegisterForm() {
     };
 
     return (
-        <div className="relative z-10 w-full max-w-[450px] mx-4 p-8 md:p-12 bg-[#050505]/80 border border-white/10 rounded-2xl shadow-2xl flex flex-col items-center backdrop-blur-3xl">
+        <div className="relative z-10 w-full max-w-[450px] mx-4 p-8 md:p-12 bg-black/40 border border-white/10 rounded-[32px] shadow-2xl flex flex-col items-center backdrop-blur-3xl">
             <h1 className="text-3xl font-bold text-white mb-2 text-center w-full">Tạo tài khoản</h1>
             <p className="text-white/40 text-[15px] mb-6 text-center w-full">Tham gia cộng đồng yêu phim ngay hôm nay.</p>
 
@@ -110,7 +110,7 @@ function RegisterForm() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-[#8FA7C5] hover:bg-[#a8bdd8] text-[#0a0a0a] font-black h-14 rounded-xl transition-all flex items-center justify-center shadow-xl shadow-[#8FA7C5]/10 disabled:opacity-50 disabled:cursor-not-allowed mt-2 active:scale-[0.98]"
+                    className="w-full bg-[#8FA7C5] hover:bg-[#8FA7C5]/80 text-[#0a0a0a] font-black h-14 rounded-2xl transition-all flex items-center justify-center shadow-xl shadow-[#8FA7C5]/10 disabled:opacity-50 disabled:cursor-not-allowed mt-4 active:scale-[0.98]"
                 >
                     {loading ? "Đang xử lý..." : "Đăng ký"}
                 </button>

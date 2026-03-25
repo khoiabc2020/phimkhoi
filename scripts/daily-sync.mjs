@@ -147,7 +147,10 @@ const STATS = {
     totalUpdated: 0
 };
 
-// ── Sync Functions ────────────────────────────────────────────────────────────
+const isTrailer = (m) => {
+    const status = String(m.status || m.episode_current || "").toLowerCase();
+    return status.includes("trailer") || status.includes("sắp chiếu");
+};
 
 async function syncMovieList(slug, pages = 1) {
     log(`Syncing [${slug}] depth=${pages}...`);
@@ -223,6 +226,7 @@ async function syncMovieList(slug, pages = 1) {
         const seen = new Set();
         const unique = allItems.filter(m => {
             if (!m.slug || seen.has(m.slug)) return false;
+            if (isTrailer(m)) return false;
             seen.add(m.slug);
             return true;
         });

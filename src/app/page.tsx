@@ -8,7 +8,7 @@ import QuickNav from "@/components/QuickNav";
 import ContinueWatchingRow from "@/components/ContinueWatchingRow";
 
 import LazySection from "@/components/LazySection";
-import { getMoviesList, getTrendMovies } from "@/services/api";
+import { getMoviesList, getTrendMovies, isTrailer } from "@/services/api";
 import { getTMDBDataForCard } from "@/app/actions/tmdb";
 import { cn } from "@/lib/utils";
 import connectDB from "@/lib/db";
@@ -50,6 +50,7 @@ async function buildTopList(
   const seenMedia = new Set<string>();
 
   data = data.filter((item) => {
+    if (!item || isTrailer(item)) return false;
     const mediaUrl = item.poster_url || item.thumb_url;
     if (!mediaUrl) return true;
     if (seenMedia.has(mediaUrl)) return false;

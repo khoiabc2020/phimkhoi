@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { getMovieDetail, Movie } from "@/services/api";
-import { getMovieDetailFromCache } from "@/lib/movie-cache";
+import { getMovieDetailFromCache, saveMovieToCache } from "@/lib/movie-cache";
 import { getImageUrl, cn } from "@/lib/utils";
 import CommentSection from "@/components/CommentSection";
 import WatchEngagementBar from "@/components/WatchEngagementBar";
@@ -56,6 +56,11 @@ export default async function WatchPage({ params }: PageProps) {
     const cached = await getMovieDetailFromCache(slug);
     const data = cached || await getMovieDetail(slug);
     if (!data?.movie) return notFound();
+
+    // Background optimization: Cache full details if this was an external hit
+    if (!cached && data.movie) {
+        saveMovieToCache(slug, data).catch(() => {});
+    }
 
     const movie = data.movie as Movie;
     const servers = data.episodes || [];

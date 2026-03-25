@@ -52,10 +52,10 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         text: "text-white",
     },
     "vien-tuong": {
-        primary: "#b100ff",
-        secondary: "#1a0d4a",
-        gradient: "from-[#1a0d4a] via-black to-black",
-        glow: "bg-[#1a0d4a]",
+        primary: "#3b82f6", // Premium Sci-Fi Blue
+        secondary: "#0d1a3b",
+        gradient: "from-[#0d1a3b] via-black to-black",
+        glow: "bg-[#0d1a3b]",
         text: "text-white",
     },
     
