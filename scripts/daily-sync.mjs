@@ -291,11 +291,15 @@ async function syncFullMovieDetails() {
     log(`  → Found ${allSlugs.size} unique trending slugs to hydrate`);
     
     const slugsArray = Array.from(allSlugs);
+    log(`Hydrating ${slugsArray.length} movies...`);
     const BATCH_SIZE = 8;
     let hydrated = 0;
 
     for (let i = 0; i < slugsArray.length; i += BATCH_SIZE) {
         const batch = slugsArray.slice(i, i + BATCH_SIZE);
+        if (i % (BATCH_SIZE * 5) === 0) {
+            console.log(`  > Progress: ${i}/${slugsArray.length} (${Math.round(i/slugsArray.length*100)}%)`);
+        }
         await Promise.all(batch.map(async (slug) => {
             try {
                 const existing = await Movie.findOne({ slug }, { lastSynced: 1, tmdbData: 1 }).lean();
