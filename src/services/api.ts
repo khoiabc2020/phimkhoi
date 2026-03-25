@@ -816,7 +816,8 @@ const normalizeOphimItem = (item: any, pathImage: string): Movie => {
 };
 
 export const getMoviesList = async (type: string, params: { page?: number; year?: number; category?: string; country?: string; limit?: number; quality?: string } = {}) => {
-    console.log(`[BuildDiag] getMoviesList start: ${type}`);
+    const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
+    if (isBuildPhase) return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
     try {
         const { page = 1, year, category, country, limit = 49, quality } = params;
         let query = `?page=${page}&limit=${limit}`;
@@ -956,6 +957,8 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
 };
 
 export const getMoviesByCategory = async (slug: string, page: number = 1, limit: number = 49, options?: { country?: string; year?: string | number }) => {
+    const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
+    if (isBuildPhase) return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
     try {
         const country = options?.country && options.country !== 'all' ? options.country : '';
         const year = options?.year && options.year !== 'all' ? options.year : '';
