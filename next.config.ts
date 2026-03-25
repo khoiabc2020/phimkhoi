@@ -23,6 +23,10 @@ const nextConfig: NextConfig = {
       static: 180,   // 3min for static pages
     },
   },
+  staticPageGenerationTimeout: 300, // 5 minutes to allow slow TMDB fetches
+  httpAgentOptions: {
+    keepAlive: true,
+  },
   // Add Cache-Control headers for static assets
   async headers() {
     return [
