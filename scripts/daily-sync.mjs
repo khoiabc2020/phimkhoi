@@ -227,6 +227,13 @@ async function syncMovieList(slug, pages = 1) {
         const unique = allItems.filter(m => {
             if (!m.slug || seen.has(m.slug)) return false;
             if (isTrailer(m)) return false;
+            
+            // Fix MongoDB "language override unsupported" error
+            if (m.language) {
+                m.lang = m.language;
+                delete m.language;
+            }
+            
             seen.add(m.slug);
             return true;
         });
