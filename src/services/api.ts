@@ -1198,31 +1198,44 @@ export const getMoviesByCountryAndCategory = async (countrySlug: string, categor
         const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
         if (isBuildPhase) return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
 
-        // Slugs to merge for "Cổ Trang" row depth
+        // 1. Expand slugs for broad matching (e.g. "Cổ Trang" includes "Võ Thuật")
         const categorySlugs = categorySlug === "co-trang"
             ? ["co-trang", "co-dai", "than-thoai", "vo-thuat", "lich-su", "kiem-hiep"]
             : [categorySlug];
 
-        // ── STEP 1: Lightweight 2-page country scan (fast, ~0.5s) ──
-        const [page1, page2] = await Promise.all([
-            getMoviesByCountry(countrySlug, 1, 49).catch(() => ({ items: [] as Movie[] })),
-            getMoviesByCountry(countrySlug, 2, 49).catch(() => ({ items: [] as Movie[] })),
-        ]);
-        const allMovies = [...(page1.items || []), ...(page2.items || [])];
+        // 2. [FAST SCAN] Check the first 100 movies in this country
+        const countryData = await getMoviesByCountry(countrySlug, 1, 100).catch(() => ({ items: [] as Movie[] }));
+        const allMovies = countryData.items || [];
 
         let matched = allMovies.filter((m: Movie) =>
             categorySlug === 'all' ||
             m.category?.some((cat: any) => categorySlugs.includes(cat.slug))
         );
 
-        // ── STEP 2: If still < 8, pull from category API (single fetch) ──
-        if (matched.length < 8) {
-            const catFetch = await getMoviesByCategory(categorySlug, 1, limit * 2).catch(() => ({ items: [] as Movie[] }));
-            const fromCat = (catFetch.items || []).filter((m: Movie) =>
-                !matched.find(x => x.slug === m.slug) &&
-                (m.country?.some((c: any) => c.slug === countrySlug) ?? true)
-            );
+        // 3. [DEEP FETCH] If scan is shallow, fetch directly from category API and filter by country
+        if (matched.length < 8 && categorySlug !== 'all') {
+            const catFetch = await getMoviesByCategory(categorySlug, 1, 100).catch(() => ({ items: [] as Movie[] }));
+            
+            // Be more lenient with country matching (check slug OR name)
+            const countryIdentifier = countrySlug.toLowerCase().replace(/-/g, ' ');
+
+            const fromCat = (catFetch.items || []).filter((m: Movie) => {
+                const isAlreadyInMatched = matched.find(x => x.slug === m.slug);
+                if (isAlreadyInMatched) return false;
+
+                const matchesCountry = !m.country || m.country.length === 0 || 
+                    m.country.some((c: any) => 
+                        String(c.slug || "").toLowerCase() === countrySlug || 
+                        String(c.name || "").toLowerCase().includes(countryIdentifier)
+                    );
+                return matchesCountry;
+            });
             matched = [...matched, ...fromCat];
+        }
+
+        // 4. [FINAL FALLBACK] If still empty, just take the newest movies from that country to avoid "OPS!" or empty rows
+        if (matched.length === 0) {
+            matched = allMovies.slice(0, 12);
         }
 
         const filtered = matched.filter((m: Movie) => !isTrailer(m)).slice(0, limit);
