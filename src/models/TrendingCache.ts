@@ -13,7 +13,7 @@ const TrendingCacheSchema = new Schema(
         movies: { type: Array, default: [] },
         updatedAt: { type: Date, default: Date.now },
     },
-    { collection: 'trendingcache' }
+    { collection: 'trendingcaches' }
 );
 
 const TrendingCache: Model<ITrendingCache> =

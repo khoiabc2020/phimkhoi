@@ -135,7 +135,7 @@ const trendingSchema = new mongoose.Schema({
     updatedAt: { type: Date, default: Date.now }
 });
 
-const TrendingCache = mongoose.models.TrendingCache || mongoose.model('TrendingCache', trendingSchema, 'trendingcache');
+const TrendingCache = mongoose.models.TrendingCache || mongoose.model('TrendingCache', trendingSchema, 'trendingcaches');
 
 // ── Stats ────────────────────────────────────────────────────────────────────
 

@@ -1256,7 +1256,7 @@ export const getTrendMovies = async (
             const query = tmdbItem.original_name || tmdbItem.original_title || tmdbItem.name || tmdbItem.title;
             const searchResults = await searchMovies(query, { enrichTMDB: false }); 
 
-            if (searchResults && searchResults.length > 0) {
+            if (searchResults && searchResults.length > 0 && searchResults[0]) {
                 const movie = searchResults[0];
                 const useTmdbImages = isSameMovieByYear(tmdbItem, movie);
 
