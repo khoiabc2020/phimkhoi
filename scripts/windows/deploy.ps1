@@ -23,13 +23,18 @@ git clean -fd
 
 ssh -i "$PEM_PATH" -o StrictHostKeyChecking=no $SSH_HOST $RemoteCmds
 
-Write-Host "`n>>> [3/4] Building application on VPS..." -ForegroundColor Cyan
+Write-Host "`n>>> [3/4] Building application on VPS (CLEAN BUILD)..." -ForegroundColor Cyan
 $BuildCmds = @"
 cd $REMOTE_DIR
 export NODE_OPTIONS="--max_old_space_size=3072"
+echo "Cleaning old build and dependencies..."
+rm -rf .next node_modules 2>/dev/null || true
+echo "Installing dependencies..."
 npm install --legacy-peer-deps
+echo "Running next build..."
 npm run build
 # Standalone setup
+echo "Setting up standalone directory..."
 mkdir -p .next/standalone/public
 cp -a public/. .next/standalone/public/
 cp -a .next/static/. .next/standalone/.next/static/
