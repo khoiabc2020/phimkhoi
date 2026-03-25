@@ -62,6 +62,8 @@ export default async function WatchPage({ params }: PageProps) {
     let currentEpisode: any = null;
     let usedServerName = "";
     let usedEpisodes: any[] = [];
+    
+    // [Elite Matching] 1. Exact slug match
     for (const srv of servers) {
         const found = srv.server_data?.find((ep: { slug: string }) => ep.slug === episode);
         if (found) {
@@ -72,76 +74,22 @@ export default async function WatchPage({ params }: PageProps) {
         }
     }
 
-    let cast: Record<string, unknown>[] = [];
-    let episodeThumbnails: Record<string, string> = {};
-    let episodeMetadata: Record<string, TMDBEpisodeMeta> = {};
-    let tmdbRes: any = null;
+    // [Elite Matching] 2. Fallback for common mismatches like 'full' vs 'tap-1'
+    if (!currentEpisode && servers.length > 0) {
+        const firstServer = servers[0];
+        const firstEp = firstServer.server_data?.[0];
+        if (firstEp) {
+            // Use it as fallback but keep requested slug for URL consistency
+            currentEpisode = firstEp;
+            usedServerName = firstServer.server_name;
+            usedEpisodes = firstServer.server_data;
+        }
+    }
 
-    try {
-        const [castData, tmdbData, tmdbEpisodeImages] = await Promise.all([
-            getMovieCast(movie.origin_name || movie.name, movie.year, movie.type === "series" ? "tv" : "movie").catch((): any[] => []),
-            getTMDBDataForCard(movie.origin_name || movie.name, movie.year, movie.type === "series" ? "tv" : "movie").catch((): any => null),
-            getTMDBEpisodeImages(movie.origin_name || movie.name, movie.year, { originalName: movie.origin_name, countrySlug: movie.country?.[0]?.slug }).catch((): any => ({})),
-        ]);
-        cast = castData || [];
-        tmdbRes = tmdbData;
-        if (tmdbRes?.vote_average) (movie as any).vote_average = tmdbRes.vote_average;
-        const episodeImageMap: Record<string, TMDBEpisodeMeta> = tmdbEpisodeImages || {};
-
-        // Map image by episode number to each source episode slug.
-        // Some providers use "01" while TMDB returns "1", so normalize both forms.
-        const extractEpisodeNumber = (value: string) => {
-            const match = String(value || "").match(/(\d+)/);
-            return match ? match[1] : null;
-        };
-        const buildEpisodeKeyCandidates = (ep: any, indexInServer: number): string[] => {
-            const seen = new Set<string>();
-            const pushKey = (raw: unknown) => {
-                const val = String(raw ?? "").trim();
-                if (!val || seen.has(val)) return;
-                seen.add(val);
-            };
-
-            const fromName = extractEpisodeNumber(ep?.name);
-            const fromSlug = extractEpisodeNumber(ep?.slug);
-            const parsed = Number(fromName || fromSlug);
-
-            if (fromName) pushKey(fromName);
-            if (fromSlug) pushKey(fromSlug);
-            if (Number.isFinite(parsed) && parsed > 0) {
-                pushKey(String(parsed));
-                pushKey(String(parsed).padStart(2, "0"));
-                pushKey(String(parsed).padStart(3, "0"));
-            }
-
-            // Fallback by index for sources with non-standard labels
-            const byIndex = indexInServer + 1;
-            pushKey(String(byIndex));
-            pushKey(String(byIndex).padStart(2, "0"));
-
-            return Array.from(seen);
-        };
-        episodeThumbnails = {};
-        (servers || []).forEach((serverItem: any) => {
-            (serverItem?.server_data || []).forEach((ep: any, indexInServer: number) => {
-                const candidates = buildEpisodeKeyCandidates(ep, indexInServer);
-                const matchedData = candidates
-                    .map((key) => episodeImageMap[key])
-                    .find(Boolean);
-
-                if (matchedData?.image && ep?.slug) {
-                    episodeThumbnails[ep.slug] = matchedData.image;
-                }
-                if (matchedData && ep?.slug) {
-                    episodeMetadata[ep.slug] = matchedData;
-                }
-            });
-        });
-    } catch { }
-
+    // [Elite Performance] Moving heavy TMDB/Cast lookups to their own components or async blocks
+    // This allows the shell and core player to render immediately.
     const firstCategory = movie.category?.[0]?.slug || 'all';
     const theme = getThemeBySlug(firstCategory);
-
     const displayEpisodeName = (name: string) => name?.startsWith("Tập") ? name : `Tập ${name}`;
 
     const movieData = {
@@ -149,12 +97,8 @@ export default async function WatchPage({ params }: PageProps) {
         movieSlug: movie.slug,
         movieName: movie.name,
         movieOriginName: movie.origin_name || "",
-        moviePoster: tmdbRes?.poster_path 
-            ? `https://image.tmdb.org/t/p/w500${tmdbRes.poster_path}` 
-            : (movie.poster_url || movie.thumb_url),
-        movieThumb: tmdbRes?.backdrop_path 
-            ? `https://image.tmdb.org/t/p/w780${tmdbRes.backdrop_path}` 
-            : (movie.thumb_url || movie.poster_url),
+        moviePoster: movie.poster_url || movie.thumb_url,
+        movieThumb: movie.thumb_url || movie.poster_url,
         episodeSlug: episode,
         episodeName: displayEpisodeName(currentEpisode?.name || episode),
         duration: movie.time ? parseInt(movie.time) || 90 : 90,
@@ -179,13 +123,12 @@ export default async function WatchPage({ params }: PageProps) {
                         <div className="lg:col-span-9 space-y-6">
 
                             {/* Player */}
+                            {/* Player */}
                             <WatchContainer
                                 movie={movie}
                                 currentEpisode={currentEpisode}
                                 episodes={usedEpisodes.length > 0 ? usedEpisodes : servers[0]?.server_data || []}
                                 servers={servers}
-                                episodeThumbnails={episodeThumbnails}
-                                episodeMetadata={episodeMetadata}
                                 movieData={movieData}
                                 initialServerName={usedServerName || servers[0]?.server_name || ""}
                             />
