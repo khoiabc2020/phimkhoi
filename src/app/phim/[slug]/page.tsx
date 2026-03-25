@@ -478,7 +478,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         <div className="grid grid-cols-2 md:flex md:flex-wrap items-center justify-center md:justify-start gap-3 sm:gap-4 pt-4 pb-2 w-full max-w-[500px] md:max-w-none">
                             {serverData.length > 0 && (
                                 <Link
-                                    href={`/xem-phim/${slug}/${serverData[0].server_data[0].slug}`}
+                                    href={`/xem-phim/${slug}/${serverData[0].slug}`}
                                     className="flex items-center justify-center gap-2 px-5 sm:px-10 py-3.5 rounded-full font-black text-[14px] sm:text-[15px] hover:scale-105 transition-all duration-300 shadow-xl w-full md:w-auto"
                                     style={{ backgroundColor: theme.primary, color: '#0a0a0a', boxShadow: `0 4px 20px ${theme.primary}4d` }}
                                 >
