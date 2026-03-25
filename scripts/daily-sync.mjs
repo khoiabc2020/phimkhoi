@@ -21,6 +21,8 @@ const TMDB_API_URL = 'https://api.themoviedb.org/3';
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/phimkhoi';
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
 
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function fetchJson(url) {
@@ -184,6 +186,9 @@ async function syncMovieList(slug, pages = 1, limitPerPage = 48) {
                 fetchJson(nguoncUrl)
             ]);
 
+            // [Elite Throttling] Wait after each page batch to prevent 429
+            await sleep(500);
+
             const kkPathImage = kkRes?.pathImage || kkRes?.data?.pathImage || "";
             const ophimPathImage = ophimRes?.pathImage || ophimRes?.data?.pathImage || "https://img.ophim.live/uploads/movies/";
 
@@ -263,9 +268,17 @@ async function syncMovieList(slug, pages = 1, limitPerPage = 48) {
 
 async function syncTrendingWithViewCount(deep = false) {
     const lists = ['phim-bo', 'phim-le', 'hoat-hinh', 'tv-shows', 'phim-chieu-rap', 'phim-moi-cap-nhat', 'trung-quoc', 'han-quoc', 'viet-nam'];
-    const pagesToSync = deep ? 150 : 15;
+    const pagesToSync = deep ? 150 : 25; // Increase depth for better population
 
-    await Promise.all(lists.map(slug => syncMovieList(slug, pagesToSync)));
+    // [Elite Sequential] Sync one by one to avoid overwhelming APIs & DB
+    for (const slug of lists) {
+        try {
+            await syncMovieList(slug, pagesToSync);
+            await sleep(1000); // 1s breather between categories
+        } catch (e) {
+            log(`  ✗ Error syncing ${slug}: ${e.message}`);
+        }
+    }
     await syncFullMovieDetails();
 }
 
@@ -285,7 +298,7 @@ async function syncFullMovieDetails() {
         const batch = slugsArray.slice(i, i + BATCH_SIZE);
         await Promise.all(batch.map(async (slug) => {
             try {
-                const existing = await Movie.findOne({ slug }, { lastSynced: 1 }).lean();
+                const existing = await Movie.findOne({ slug }, { lastSynced: 1, tmdbData: 1 }).lean();
                 if (existing?.lastSynced && (new Date() - new Date(existing.lastSynced) < 86400000)) return;
 
                 let detailData = await fetchJson(`${KKPHIM_API}/v1/api/phim/${slug}`);
@@ -294,7 +307,12 @@ async function syncFullMovieDetails() {
                 if (detailData?.data?.item) {
                     const { _id, ...itemData } = detailData.data.item;
                     const episodes = detailData.data.episodes || [];
-                    const tmdbData = await searchTMDBMovie(itemData.origin_name || itemData.name, itemData.year);
+                    
+                    // Only search TMDB if missing or old
+                    let tmdbData = existing?.tmdbData;
+                    if (!tmdbData) {
+                        tmdbData = await searchTMDBMovie(itemData.origin_name || itemData.name, itemData.year);
+                    }
                     
                     await Movie.updateOne(
                         { slug },
@@ -304,6 +322,7 @@ async function syncFullMovieDetails() {
                 }
             } catch (e) {}
         }));
+        await sleep(300); // Throttling hydration batch
     }
     log(`  ✓ Successfully hydrated ${hydrated} movies`);
 }
@@ -320,10 +339,14 @@ async function syncTMDBTrending(timeWindow = 'day') {
         
         if (data?.results) {
             for (const item of data.results) {
+                const itemName = item.title || item.name;
+                const itemOriginalName = item.original_title || item.original_name;
+
                 const localMovie = await Movie.findOne({
                     $or: [
-                        { name: new RegExp(`^${item.title || item.name}$`, 'i') },
-                        { origin_name: new RegExp(`^${item.original_title || item.original_name}$`, 'i') }
+                        { name: new RegExp(`^${itemName}$`, 'i') },
+                        { origin_name: new RegExp(`^${itemOriginalName}$`, 'i') },
+                        { name: { $regex: itemName.split(' - ')[0], $options: 'i' } } // Broader match
                     ]
                 }).lean();
 
@@ -332,10 +355,17 @@ async function syncTMDBTrending(timeWindow = 'day') {
                         ...localMovie,
                         poster_url: item.poster_path ? `https://image.tmdb.org/t/p/original${item.poster_path}` : localMovie.poster_url,
                         thumb_url: item.backdrop_path ? `https://image.tmdb.org/t/p/original${item.backdrop_path}` : localMovie.thumb_url,
-                        tmdbData: item
+                        tmdbData: {
+                            id: item.id,
+                            vote_average: item.vote_average,
+                            poster_path: item.poster_path,
+                            backdrop_path: item.backdrop_path,
+                            media_type: item.media_type || 'movie'
+                        }
                     });
                 }
             }
+            // Save even if partially filled to show something
             await TrendingCache.findOneAndUpdate({ type }, { type, movies: mappedMovies, updatedAt: new Date() }, { upsert: true });
             log(`  ✓ Saved ${mappedMovies.length} items for [${type}]`);
         }
