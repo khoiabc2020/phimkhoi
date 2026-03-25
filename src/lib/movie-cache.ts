@@ -138,7 +138,6 @@ export const saveMovieToCache = async (slug: string, data: any) => {
             { 
                 $set: { 
                     ...rest,
-                    _id: String(finalId),
                     thumb_url,
                     poster_url,
                     episodes,
