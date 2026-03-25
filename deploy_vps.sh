@@ -50,13 +50,14 @@ if [ $? -eq 0 ]; then
     fi
 
     # 4. START APP
-    echo "Starting PM2..."
-    # Check if ecosystem file exists
-    if [ -f ecosystem.config.cjs ]; then
-        npx pm2 start ecosystem.config.cjs --update-env
-    else
-        npx pm2 start npm --name phimkhoi -- start
-    fi
+    echo "Starting PM2 (TRIET DE FIX)..."
+    npx pm2 delete phimkhoi || true
+    
+    # Run from standalone directory for correct paths
+    cd .next/standalone
+    PORT=3000 HOSTNAME=0.0.0.0 npx pm2 start server.js --name phimkhoi -- --update-env
+    cd ../..
+    
     npx pm2 save
     
     echo "Warming up trending cache in BACKGROUND..."
