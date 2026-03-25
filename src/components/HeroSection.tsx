@@ -427,17 +427,17 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                 </div>
             </div>
 
-            <div className="absolute top-[40%] md:top-1/2 -translate-y-1/2 left-0 right-0 z-[35] pointer-events-none flex items-center justify-between px-4 md:px-8 lg:pl-32 lg:pr-10 xl:pl-40 xl:pr-16">
+            <div className="absolute top-[35%] md:top-[40%] -translate-y-1/2 left-0 right-0 z-[35] pointer-events-none flex items-center justify-between px-2 md:px-8 lg:pl-32 lg:pr-10 xl:pl-40 xl:pr-16">
                 <button 
                     onClick={prev}
-                    className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-full bg-black/10 hover:bg-black/40 backdrop-blur-md border border-white/5 flex items-center justify-center text-white/20 hover:text-white hover:scale-110 active:scale-95 transition-all duration-300 group pointer-events-auto shadow-2xl"
+                    className="w-9 h-9 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-full bg-black/20 hover:bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/30 hover:text-white hover:scale-110 active:scale-95 transition-all duration-300 group pointer-events-auto shadow-2xl"
                     aria-label="Previous slide"
                 >
                     <ChevronLeft className="w-5 h-5 md:w-7 md:h-7 lg:w-8 lg:h-8" />
                 </button>
                 <button 
                     onClick={next}
-                    className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-full bg-black/10 hover:bg-black/40 backdrop-blur-md border border-white/5 flex items-center justify-center text-white/20 hover:text-white hover:scale-110 active:scale-95 transition-all duration-300 group pointer-events-auto shadow-2xl"
+                    className="w-9 h-9 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-full bg-black/20 hover:bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/30 hover:text-white hover:scale-110 active:scale-95 transition-all duration-300 group pointer-events-auto shadow-2xl"
                     aria-label="Next slide"
                 >
                     <ChevronRight className="w-5 h-5 md:w-7 md:h-7 lg:w-8 lg:h-8" />
