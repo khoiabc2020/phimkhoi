@@ -336,6 +336,9 @@ const enrichMoviesWithTMDB = async (movies: Movie[], maxItems = 18): Promise<Mov
     if (!Array.isArray(movies) || movies.length === 0) return movies;
     if (!process.env.TMDB_API_KEY) return movies;
 
+    const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
+    if (isBuildPhase) return movies; // Skip heavy enrichment during static generation to avoid build timeouts
+
     const limit = Math.max(0, Math.min(maxItems, movies.length));
     const head = movies.slice(0, limit);
     const tail = movies.slice(limit);

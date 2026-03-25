@@ -120,7 +120,8 @@ async function AsyncHeroSection({ initialMovies }: { initialMovies: any[] }) {
       if (movie.isCustomHero) return movie;
 
       // Chỉ enrich TMDB cho các slide đầu để giảm thời gian render trang chủ
-      if (idx > 2) return { ...movie, tmdbData: null };
+      // Skip hoàn toàn trong lúc build để tránh treo build (TMDB hay bị timeout)
+      if (idx > 2 || process.env.NEXT_PHASE === 'phase-production-build') return { ...movie, tmdbData: null };
       const year = movie.year ? parseInt(movie.year.toString().split("-")[0]) : undefined;
       let type: 'movie' | 'tv' = 'movie';
       if (movie.type === 'phim-bo' || movie.type === 'tv-shows' || movie.type === 'hoat-hinh') type = 'tv';
