@@ -144,14 +144,7 @@ async function CountryGridStream({ slug, page, limit = 49 }: { slug: string; pag
 
 async function ChinaHeroWithData() {
     try {
-        // [Hardening] Always prefer cache — fast, reliable, 0 external calls
-        const cached = await getMoviesFromCache("trung-quoc", 1, 20).catch((): null => null);
-        if (cached && cached.items.length >= 4) {
-            return <ChinaHero initialMovies={cached.items.slice(0, 8)} />;
-        }
-
-        // Fallback: fetch individual slugs safely (each slug has its own catch)
-        // Full list of slugs that have custom assets in ASSETS_MAP
+        // [Priority 1] Always fetch the custom-designed slides first to respect the user's design
         const HERO_SLUGS = [
             "duong-cung-ky-an-thanh-vu-phong-minh",
             "xin-chao-1983",
@@ -164,6 +157,7 @@ async function ChinaHeroWithData() {
             "ngoc-minh-tra-cot",
             "truc-ngoc"
         ];
+        
         const movieDetails = await Promise.all(
             HERO_SLUGS.map(slug =>
                 getMovieDetail(slug).then(d => d?.movie || { slug, name: slug.replace(/-/g, ' ') }).catch((): null => null)
@@ -171,11 +165,21 @@ async function ChinaHeroWithData() {
         );
         let filteredMovies = movieDetails.filter(Boolean);
 
+        // [Priority 2] If custom slides are missing/empty, fallback to top trending from cache or API
+        if (filteredMovies.length < 3) {
+            const cached = await getMoviesFromCache("trung-quoc", 1, 12).catch((): null => null);
+            if (cached && cached.items.length > 0) {
+                const existingSlugs = new Set(filteredMovies.map(m => m.slug));
+                const trending = (cached.items || []).filter(m => !existingSlugs.has(m.slug));
+                filteredMovies = [...filteredMovies, ...trending];
+            }
+        }
+
         if (filteredMovies.length === 0) {
             const fallback = await getMoviesByCountry("trung-quoc", 1, 8).catch((): { items: never[] } => ({ items: [] }));
             filteredMovies = fallback.items.slice(0, 8);
         }
-        return <ChinaHero initialMovies={filteredMovies} />;
+        return <ChinaHero initialMovies={filteredMovies.slice(0, 10)} />;
     } catch {
         return <ChinaHero initialMovies={[]} />;
     }
