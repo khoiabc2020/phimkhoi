@@ -57,28 +57,41 @@ async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'de
         }
 
         if (filteredMovies.length < 8) {
-            const data = await getMoviesByCountryAndCategory(countrySlug, categorySlug, 32).catch((): { items: Movie[] } => ({ items: [] as Movie[] }));
-            filteredMovies = data.items;
+            const data = await getMoviesByCountryAndCategory(countrySlug, categorySlug, 32).catch(() => ({ items: [] }));
+            if (data?.items?.length > 0) {
+                filteredMovies = data.items;
+            }
+        }
+
+        if (!filteredMovies || filteredMovies.length === 0) {
+            return null; // Silent hide if truly no data
         }
 
         return (
             <LazySection minHeight={minHeight} className={variant === 'sidebar' ? "movie-row-sidebar" : "movie-row-standard"}>
-                <MovieRow title={title} movies={filteredMovies} slug={`/the-loai/${categorySlug}`} variant={variant} />
+                <MovieRow 
+                    title={title} 
+                    movies={filteredMovies} 
+                    slug={`/the-loai/${categorySlug}`} 
+                    variant={variant} 
+                />
             </LazySection>
         );
-    } catch {
-        return null; // Silent fail — row just won't appear
+    } catch (e) {
+        console.error(`Error in CountryMovieRow [${title}]:`, e);
+        return null;
     }
 }
 
 async function PhimTrungHome() {
-    const cached = await getMoviesFromCache("trung-quoc", 1, 14);
-    const latest = cached || await getMoviesByCountry("trung-quoc", 1, 14);
+    const cached = await getMoviesFromCache("trung-quoc", 1, 14).catch(() => null);
+    const latest = cached || await getMoviesByCountry("trung-quoc", 1, 14).catch(() => ({ items: [] }));
+    const movies = latest?.items || [];
 
     return (
         <div className="space-y-12 md:space-y-16 pb-12">
             <LazySection minHeight={380} className="movie-row-standard">
-                <MovieRow title="Phim Đang Chiếu" movies={latest.items} slug="/quoc-gia/trung-quoc" priorityFirst />
+                <MovieRow title="Phim Đang Chiếu" movies={movies} slug="/quoc-gia/trung-quoc" priorityFirst />
             </LazySection>
             
             <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>

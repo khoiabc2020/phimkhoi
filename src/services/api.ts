@@ -1198,14 +1198,14 @@ export const getMoviesByCountryAndCategory = async (countrySlug: string, categor
         const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
         if (isBuildPhase) return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
 
-        // 1. Expand slugs for broad matching (e.g. "Cổ Trang" includes "Võ Thuật")
+        // 1. Expand slugs for broad matching
         const categorySlugs = categorySlug === "co-trang"
             ? ["co-trang", "co-dai", "than-thoai", "vo-thuat", "lich-su", "kiem-hiep"]
             : [categorySlug];
 
         // 2. [FAST SCAN] Check the first 100 movies in this country
-        const countryData = await getMoviesByCountry(countrySlug, 1, 100).catch(() => ({ items: [] as Movie[] }));
-        const allMovies = countryData.items || [];
+        const countryData = await getMoviesByCountry(countrySlug, 1, 100).catch(() => ({ items: [] }));
+        const allMovies = countryData?.items || [];
 
         let matched = allMovies.filter((m: Movie) =>
             categorySlug === 'all' ||
@@ -1214,12 +1214,11 @@ export const getMoviesByCountryAndCategory = async (countrySlug: string, categor
 
         // 3. [DEEP FETCH] If scan is shallow, fetch directly from category API and filter by country
         if (matched.length < 8 && categorySlug !== 'all') {
-            const catFetch = await getMoviesByCategory(categorySlug, 1, 100).catch(() => ({ items: [] as Movie[] }));
+            const catFetch = await getMoviesByCategory(categorySlug, 1, 100).catch(() => ({ items: [] }));
             
-            // Be more lenient with country matching (check slug OR name)
             const countryIdentifier = countrySlug.toLowerCase().replace(/-/g, ' ');
 
-            const fromCat = (catFetch.items || []).filter((m: Movie) => {
+            const fromCat = (catFetch?.items || []).filter((m: Movie) => {
                 const isAlreadyInMatched = matched.find((x: Movie) => x.slug === m.slug);
                 if (isAlreadyInMatched) return false;
 
@@ -1233,17 +1232,25 @@ export const getMoviesByCountryAndCategory = async (countrySlug: string, categor
             matched = [...matched, ...fromCat];
         }
 
-        // 4. [FINAL FALLBACK] If still empty, just take the newest movies from that country to avoid "OPS!" or empty rows
+        // 4. [FINAL FALLBACK] If still empty, JUST TAKE ANY MOVIES from that country
+        // This prevents "OPS!" or black sections when the specific category is sparse
         if (matched.length === 0) {
-            matched = allMovies.slice(0, 12);
+            matched = allMovies.slice(0, 16);
         }
 
-        const filtered = matched.filter((m: Movie) => !isTrailer(m)).slice(0, limit);
+        // If STILL empty, try a broad fetch from the country list
+        if (matched.length === 0) {
+            const broad = await getMoviesByCountry(countrySlug, 1, 24).catch(() => ({ items: [] }));
+            matched = broad.items || [];
+        }
+
+        const filtered = matched.filter((m: Movie) => m && !isTrailer(m)).slice(0, limit);
         const normalized = filtered.map(normalizeMovieImageRoles);
 
         return { items: normalized, pagination: { currentPage: 1, totalPages: 1 } };
     } catch (error) {
         console.error(`Error filtering country [${countrySlug}] by category [${categorySlug}]:`, error);
+        // ABSOLUTE FALLBACK to prevent "OPS!"
         return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
     }
 };
