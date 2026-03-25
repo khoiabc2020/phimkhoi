@@ -348,7 +348,7 @@ const enrichMoviesWithTMDB = async (movies: Movie[], maxItems = 18): Promise<Mov
     if (!Array.isArray(movies) || movies.length === 0) return movies;
     if (!process.env.TMDB_API_KEY) return movies;
 
-    const isBuildPhase = process.env.IS_BUILD_PHASE === 'true';
+    const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
     if (isBuildPhase) return movies; // Skip heavy enrichment during static generation to avoid build timeouts
 
     const limit = Math.max(0, Math.min(maxItems, movies.length));
@@ -503,14 +503,6 @@ async function fetchWithRetry(url: string, options: RequestInit = {}, retries = 
 }
 
 export const getHomeData = async () => {
-    const isBuildPhase = process.env.IS_BUILD_PHASE === 'true';
-    if (isBuildPhase) {
-        return {
-            phimMoi: [], phimLe: [], phimBo: [], hoatHinh: [],
-            tvShows: [], phimChieuRap: [], phimSapChieu: [],
-            hanQuoc: [], trungQuoc: [], hanhDong: [], tinhCam: [],
-        };
-    }
     // Cache tạm thời ngắn để USER thấy rõ thay đổi
     const CACHE_TTL_MS = 10 * 1000; 
     if (homeCache && Date.now() - homeCacheTime < CACHE_TTL_MS) {
@@ -834,8 +826,6 @@ const normalizeOphimItem = (item: any, pathImage: string): Movie => {
 };
 
 export const getMoviesList = async (type: string, params: { page?: number; year?: number; category?: string; country?: string; limit?: number; quality?: string } = {}) => {
-    const isBuildPhase = process.env.IS_BUILD_PHASE === 'true';
-    if (isBuildPhase) return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
     try {
         const { page = 1, year, category, country, limit = 49, quality } = params;
         let query = `?page=${page}&limit=${limit}`;
@@ -975,8 +965,6 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
 };
 
 export const getMoviesByCategory = async (slug: string, page: number = 1, limit: number = 49, options?: { country?: string; year?: string | number }) => {
-    const isBuildPhase = process.env.IS_BUILD_PHASE === 'true';
-    if (isBuildPhase) return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
     try {
         const country = options?.country && options.country !== 'all' ? options.country : '';
         const year = options?.year && options.year !== 'all' ? options.year : '';
@@ -1241,7 +1229,7 @@ export const getTrendMovies = async (
     type: 'movie' | 'tv' | 'all' = 'all',
     timeWindow: 'day' | 'week' = 'day'
 ) => {
-    const isBuildPhase = process.env.IS_BUILD_PHASE === 'true';
+    const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
     if (isBuildPhase) return [];
 
     try {
@@ -1289,20 +1277,12 @@ export const getTrendMovies = async (
 };
 
 export const getMenuData = async (): Promise<{ categories: Category[], countries: Country[] }> => {
-    const isBuildPhase = process.env.IS_BUILD_PHASE === 'true';
-    if (isBuildPhase) {
-        return {
-            categories: [
-                { name: "Hành Động", slug: "hanh-dong" },
-                { name: "Tình Cảm", slug: "tinh-cam" }
-            ],
-            countries: [
-                { name: "Trung Quốc", slug: "trung-quoc" },
-                { name: "Hàn Quốc", slug: "han-quoc" }
-            ]
-        };
-    }
     try {
+    const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
+    if (isBuildPhase) {
+        // Trả về dữ liệu tối giản nếy thực sự là build phase để tránh timeout
+        return { categories: [], countries: [] };
+    }
         // Fetch from both KKPhim and OPhim to maximize coverage
         const [kkCatRes, kkCountRes, ophimCountRes] = await Promise.all([
             fetch(`${API_URL}/the-loai`, { next: { revalidate: 86400 } }),

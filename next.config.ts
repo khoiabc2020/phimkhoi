@@ -3,9 +3,6 @@ import type { NextConfig } from "next";
 const config = (phase: string): NextConfig => {
   return {
     output: "standalone",
-    env: {
-      IS_BUILD_PHASE: phase === "phase-production-build" ? "true" : "false",
-    },
     compress: true,           // gzip/brotli responses
     poweredByHeader: false,
     // Ensure mongoose/mongodb only run on server, never bundled for browser
