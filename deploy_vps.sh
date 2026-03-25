@@ -1,44 +1,39 @@
 #!/bin/bash
-# set -e is intentionally removed so partial failures don't abort the deploy
-
 # Configuration
-APP_DIR="/home/bitnami/phimkhoi" 
+APP_DIR="/home/admin/phimkhoi" 
 REPO_URL="https://github.com/khoiabc2020/phimkhoi.git"
 
 echo "Deploying PhimKhoi (CLEAN BUILD) to VPS..."
 
-# 1. STOP APP TO FREE RAM & PREPARE CACHE
-echo "Stopping PM2 to free RAM for build..."
-npx pm2 stop phimkhoi || true
-mkdir -p /home/bitnami/phimkhoi-img-cache
+# 0. KILL ALL PROCESSES TO FREE RAM (Gratefully requested by USER)
+echo "Killing all node/next/pm2 processes..."
+npx pm2 delete all || true
+sudo pkill -f next || true
+sudo pkill -f node || true
 
-# 2. UPDATE SOURCE
+# 1. UPDATE SOURCE
 if [ -d "$APP_DIR" ]; then
     echo "Updating web..."
     cd "$APP_DIR"
     git fetch --all
     git reset --hard origin/main
     git clean -fd
-    if [ "$CLEAN_CACHE" = "true" ]; then
-        echo "Cleaning persistent image cache..."
-        rm -rf /home/bitnami/phimkhoi-img-cache/*
-    fi
 else
     echo "Cloning repository..."
     git clone "$REPO_URL" "$APP_DIR"
     cd "$APP_DIR"
 fi
 
-# 3. DEEP CLEAN
+# 2. DEEP CLEAN
 echo "Cleaning build and dependencies..."
 rm -rf .next node_modules 2>/dev/null || true
 
-# 4. INSTALL & BUILD
+# 3. INSTALL & BUILD
 echo "Installing dependencies..."
 npm install --legacy-peer-deps
 
-echo "Building application (Limit: 1536MB)..."
-export NODE_OPTIONS="--max_old_space_size=1536"
+echo "Building application (Limit: 3072MB for 4GB RAM VPS)..."
+export NODE_OPTIONS="--max_old_space_size=3072"
 npm run build
 
 if [ $? -eq 0 ]; then
@@ -54,38 +49,23 @@ if [ $? -eq 0 ]; then
         cp .env.local .next/standalone/.env.production
     fi
 
-    # 5. START APP
+    # 4. START APP
     echo "Starting PM2..."
-    npx pm2 start ecosystem.config.cjs --update-env || npx pm2 restart phimkhoi --update-env
+    # Check if ecosystem file exists
+    if [ -f ecosystem.config.cjs ]; then
+        npx pm2 start ecosystem.config.cjs --update-env
+    else
+        npx pm2 start npm --name phimkhoi -- start
+    fi
     npx pm2 save
     
-    echo "System cleanup..."
-    npx pm2 flush
-    
-    # 6. PURGE CACHE
-    echo "Purging Cloudflare Cache..."
-    curl -X POST "https://api.cloudflare.com/client/v4/zones/1164dbc3e64ce7eb80bceefaf277e500/purge_cache" \
-         -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-         -H "Content-Type: application/json" \
-         --data '{"purge_everything":true}'
-    
     echo "Warming up trending cache in BACKGROUND..."
-    # Run sync in background so deployment finishes instantly
-    NODE_OPTIONS="--max_old_space_size=512" nice -n 19 node scripts/daily-sync.mjs >> /var/log/phimkhoi-sync.log 2>&1 &
-
-    echo "Installing cron job for automated 4-hour sync..."
-    LOG_FILE="/var/log/phimkhoi-sync.log"
-    touch $LOG_FILE 2>/dev/null || true
-    CRON_CMD="0 */4 * * * cd $APP_DIR && NODE_OPTIONS='--max_old_space_size=512' nice -n 19 /usr/bin/node scripts/daily-sync.mjs >> $LOG_FILE 2>&1"
-    (crontab -l 2>/dev/null | grep -v "daily-sync.mjs"; echo "$CRON_CMD") | crontab -
-    echo "✓ Cron job active: every 4 hours"
+    NODE_OPTIONS="--max_old_space_size=512" nice -n 19 node scripts/daily-sync.mjs >> /home/admin/phimkhoi-sync.log 2>&1 &
 
     echo "Deployment complete and successful!"
 else
     echo "=========================================="
     echo "   [ERROR] CLEAN BUILD FAILED!           "
     echo "=========================================="
-    echo "Attempting to restart existing app..."
-    npx pm2 start ecosystem.config.cjs --update-env
     exit 1
 fi

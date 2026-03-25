@@ -12,16 +12,14 @@ set "PEM=C:\Users\LE HUY KHOI\Downloads\khoiphim.pem"
 ::  HOST : User va dia chi SSH cua may chu VPS
 ::         EC2:          ubuntu@ec2-xx-xx-xx-xx.ap-southeast-1.compute.amazonaws.com
 ::         DigitalOcean: root@xxx.xxx.xxx.xxx
-set "HOST=bitnami@13.212.99.28"
-
-::  DIR  : Duong dan thu muc du an tren VPS (tuyet doi)
-set "DIR=/home/bitnami/phimkhoi"
+set "HOST=admin@54.254.213.121"
+set "DIR=/home/admin/phimkhoi"
 :: ============================================================
 
 cd /d "%~dp0..\.."
 echo.
 echo ==========================================
-echo    DONG BO CODE LEN VPS (13.212.99.28)
+echo    DONG BO CODE LEN VPS (54.254.213.121)
 echo ==========================================
 echo    SSH Key: %PEM%
 echo    Host   : %HOST%
@@ -64,7 +62,7 @@ if errorlevel 1 (
 
 echo.
 echo [XONG] VPS da duoc dong bo thanh cong!
-echo        Kiem tra tai: https://khoiphim.io.vn
+echo        Kiem tra tai: https://khoiphim.org
 exit /b 0
 
 :no_commit
