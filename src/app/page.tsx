@@ -1,4 +1,6 @@
 import { Suspense } from 'react';
+export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 import { cache } from "react";
 import HeroSection from "@/components/HeroSection";
 import MovieRow from "@/components/MovieRow";
