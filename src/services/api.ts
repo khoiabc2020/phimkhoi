@@ -1145,14 +1145,14 @@ export const getMoviesByCountryAndCategory = async (countrySlug: string, categor
         // This is safe because these are parallel fetches (thanks to Promise.all internally)
         const pagesToScan = [1, 2, 3, 4, 5];
         const countryPageResults = await Promise.all(
-            pagesToScan.map(p => getMoviesByCountry(countrySlug, p, 40))
+            pagesToScan.map((p: number) => getMoviesByCountry(countrySlug, p, 40))
         );
         
         const allCountryMovies = countryPageResults.flatMap(res => res.items || []);
         
         // Filter by the target categories (OR logic for merged slugs)
-        const matchedMovies = allCountryMovies.filter(movie => 
-            movie.category?.some(cat => categorySlugs.includes(cat.slug))
+        const matchedMovies = allCountryMovies.filter((movie: Movie) => 
+            movie.category?.some((cat: any) => categorySlugs.includes(cat.slug))
         );
 
         // Step 2: Hybrid Fallback from Category lists
@@ -1160,7 +1160,7 @@ export const getMoviesByCountryAndCategory = async (countrySlug: string, categor
         
         if (finalItems.length < limit) {
              const categoryScan = await Promise.all(
-                categorySlugs.map(slug => getMoviesByCategory(slug, 1, 128))
+                categorySlugs.map((slug: string) => getMoviesByCategory(slug, 1, 128))
              );
              const fromCategories = categoryScan.flatMap(res => res.items || []);
              
@@ -1168,7 +1168,7 @@ export const getMoviesByCountryAndCategory = async (countrySlug: string, categor
              for (const movie of fromCategories) {
                  if (!seenSlugs.has(movie.slug)) {
                      // HARD ENFORCEMENT: Strictly check country slug for regional rows
-                     if (movie.country?.some(c => c.slug === countrySlug)) {
+                     if (movie.country?.some((c: any) => c.slug === countrySlug)) {
                          finalItems.push(movie);
                          seenSlugs.add(movie.slug);
                      }
@@ -1178,7 +1178,7 @@ export const getMoviesByCountryAndCategory = async (countrySlug: string, categor
         }
 
         // --- GLOBAL TRAILER & QUALITY CLEANSE ---
-        const filtered = finalItems.filter(item => !isTrailer(item));
+        const filtered = finalItems.filter((item: Movie) => !isTrailer(item));
 
         const normalized = filtered.slice(0, limit).map(normalizeMovieImageRoles);
         const enriched = await enrichMoviesWithTMDB(normalized, limit + 8);
