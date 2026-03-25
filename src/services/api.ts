@@ -1270,8 +1270,20 @@ export const getTrendMovies = async (
     }
 };
 
-export const getMenuData = async () => {
-    try {
+export const getMenuData = async (): Promise<{ categories: Category[], countries: Country[] }> => {
+    const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
+    if (isBuildPhase) {
+        return {
+            categories: [
+                { name: "Hành Động", slug: "hanh-dong" },
+                { name: "Tình Cảm", slug: "tinh-cam" }
+            ],
+            countries: [
+                { name: "Trung Quốc", slug: "trung-quoc" },
+                { name: "Hàn Quốc", slug: "han-quoc" }
+            ]
+        };
+    }
         // Fetch from both KKPhim and OPhim to maximize coverage
         const [kkCatRes, kkCountRes, ophimCountRes] = await Promise.all([
             fetch(`${API_URL}/the-loai`, { next: { revalidate: 86400 } }),
