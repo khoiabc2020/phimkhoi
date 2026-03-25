@@ -241,7 +241,7 @@ async function syncTrendingWithViewCount(deep = false) {
     log(`Syncing trending sorted by view count (deep=${deep})...`);
 
     const lists = ['phim-bo', 'phim-le', 'hoat-hinh', 'tv-shows', 'phim-chieu-rap', 'phim-moi-cap-nhat', 'trung-quoc', 'han-quoc', 'viet-nam'];
-    const pagesToSync = deep ? 100 : 15;
+    const pagesToSync = deep ? 1500 : 15;
 
     // Parallel sync for categories
     await Promise.all(lists.map(async (type) => {
