@@ -504,6 +504,7 @@ async function fetchWithRetry(url: string, options: RequestInit = {}, retries = 
 
 export const getHomeData = async () => {
     const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
+    console.log(`[getHomeData] NEXT_PHASE: ${process.env.NEXT_PHASE}, isBuildPhase: ${isBuildPhase}`);
     if (isBuildPhase) {
         return {
             phimMoi: [], phimLe: [], phimBo: [], hoatHinh: [],
