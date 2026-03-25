@@ -16,7 +16,7 @@ import connectDB from "@/lib/db";
 import CustomHero from "@/models/CustomHero";
 import TrendingCache from "@/models/TrendingCache";
 
-export const revalidate = 3600;
+
 const ROW_LIMIT = 12;
 
 const heroSkeleton = (
