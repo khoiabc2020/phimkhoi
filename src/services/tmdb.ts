@@ -347,6 +347,9 @@ export const getTMDBTrending = async (
     type: 'movie' | 'tv' | 'all' = 'all',
     timeWindow: 'day' | 'week' = 'day'
 ) => {
+    const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
+    if (isBuildPhase) return [];
+
     try {
         if (!TMDB_API_KEY) return [];
 

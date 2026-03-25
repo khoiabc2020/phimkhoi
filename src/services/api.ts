@@ -1215,6 +1215,9 @@ export const getTrendMovies = async (
     type: 'movie' | 'tv' | 'all' = 'all',
     timeWindow: 'day' | 'week' = 'day'
 ) => {
+    const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
+    if (isBuildPhase) return [];
+
     try {
         const trendList = await getTMDBTrending(type, timeWindow);
 
