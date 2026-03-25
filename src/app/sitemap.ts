@@ -18,11 +18,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   try {
-    // [Elite SEO] Query local Database for ALL registered movies (35,000+ titles)
+    // [Elite Performance] During build phase, skip large DB queries to prevent hang/OOM
+    // Sitemap will be generated on-demand in production or via a different trigger
+    const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
+    
     await connectDB();
+    const movieLimit = isBuildPhase ? 100 : 45000;
+    
     const dbMovies = await MovieModel.find({}, { slug: 1, updatedAt: 1 })
       .sort({ updatedAt: -1 })
-      .limit(45000) // Safe limit for a single sitemap.xml file (max 50k)
+      .limit(movieLimit)
       .lean();
 
     const movieRoutes: MetadataRoute.Sitemap = dbMovies.map((movie: any) => ({
