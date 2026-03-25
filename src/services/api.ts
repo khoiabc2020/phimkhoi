@@ -491,6 +491,8 @@ async function fetchWithRetry(url: string, options: RequestInit = {}, retries = 
 }
 
 export const getHomeData = async () => {
+    const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
+    console.log(`[BuildDiag] getHomeData entry. Phase: ${process.env.NEXT_PHASE}`);
     // Cache tạm thời ngắn để USER thấy rõ thay đổi
     const CACHE_TTL_MS = 10 * 1000; 
     if (homeCache && Date.now() - homeCacheTime < CACHE_TTL_MS) {
@@ -499,6 +501,7 @@ export const getHomeData = async () => {
 
     try {
         const fetchCategory = async (slug: string, endpoint: 'danh-sach' | 'the-loai' | 'quoc-gia' = 'danh-sach') => {
+            console.log(`[BuildDiag] fetchCategory start: ${slug} (${endpoint})`);
             let nguoncUrl = `${NGUONC_API}/api/films/${endpoint}/${slug}?page=1`;
             if (slug === 'phim-moi-cap-nhat') nguoncUrl = `${NGUONC_API}/api/films/phim-moi-cap-nhat?page=1`;
 
@@ -699,6 +702,7 @@ export const OPHIM_API = "https://ophim1.com";
 export const NGUONC_API = "https://phim.nguonc.com";
 
 export const searchMovies = async (keyword: string, options: { enrichTMDB?: boolean; limit?: number } = {}) => {
+    console.log(`[BuildDiag] searchMovies start: ${keyword}`);
     try {
         const q = String(keyword || "").trim();
         if (q.length < 2) return [];
@@ -812,6 +816,7 @@ const normalizeOphimItem = (item: any, pathImage: string): Movie => {
 };
 
 export const getMoviesList = async (type: string, params: { page?: number; year?: number; category?: string; country?: string; limit?: number; quality?: string } = {}) => {
+    console.log(`[BuildDiag] getMoviesList start: ${type}`);
     try {
         const { page = 1, year, category, country, limit = 49, quality } = params;
         let query = `?page=${page}&limit=${limit}`;
