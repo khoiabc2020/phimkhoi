@@ -61,7 +61,12 @@ async function buildTopList(
     // 1. [Strong Fallback] Try TrendingCache from MongoDB directly
     try {
       await connectDB();
-      const cacheType = sourceType === 'all' ? `tmdb-trending-${timeWindow}` : sourceType;
+      const typeMap: Record<string, string> = {
+        'all': `tmdb-trending-${timeWindow}`,
+        'tv': 'phim-bo',
+        'movie': 'phim-le'
+      };
+      const cacheType = typeMap[sourceType] || sourceType;
       const cache = await TrendingCache.findOne({ type: cacheType }).lean();
       if (cache?.movies?.length > 0) {
         const sourceIds = new Set(data.map((m: { _id?: string }) => m._id));

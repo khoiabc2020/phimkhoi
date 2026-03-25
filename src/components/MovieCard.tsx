@@ -261,11 +261,11 @@ function MovieCard({
                     </Link>
 
                     {/* Top-Left: IMDb Rating Badge (Inside Poster) */}
-                    {(movie as any).tmdbData?.vote_average && (movie as any).tmdbData.vote_average > 0 && (
+                    {tmdbData?.vote_average && tmdbData.vote_average > 0 && (
                         <div className="absolute top-1.5 left-1.5 z-40 pointer-events-none">
                             <div className="flex items-center gap-1 bg-black/80 text-white px-1.5 py-0.5 rounded-[4px] shadow-lg border border-white/10">
                                 <Star className="w-2.5 h-2.5 fill-yellow-400 stroke-yellow-400" />
-                                <span className="text-[10px] font-bold tracking-tight">{(movie as any).tmdbData.vote_average.toFixed(1)}</span>
+                                <span className="text-[10px] font-bold tracking-tight">{tmdbData.vote_average.toFixed(1)}</span>
                             </div>
                         </div>
                     )}
