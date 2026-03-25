@@ -348,7 +348,7 @@ const enrichMoviesWithTMDB = async (movies: Movie[], maxItems = 18): Promise<Mov
     if (!Array.isArray(movies) || movies.length === 0) return movies;
     if (!process.env.TMDB_API_KEY) return movies;
 
-    const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
+    const isBuildPhase = process.env.IS_BUILD_PHASE === 'true';
     if (isBuildPhase) return movies; // Skip heavy enrichment during static generation to avoid build timeouts
 
     const limit = Math.max(0, Math.min(maxItems, movies.length));
@@ -503,7 +503,7 @@ async function fetchWithRetry(url: string, options: RequestInit = {}, retries = 
 }
 
 export const getHomeData = async () => {
-    const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
+    const isBuildPhase = process.env.IS_BUILD_PHASE === 'true';
     if (isBuildPhase) {
         return {
             phimMoi: [], phimLe: [], phimBo: [], hoatHinh: [],
@@ -834,7 +834,7 @@ const normalizeOphimItem = (item: any, pathImage: string): Movie => {
 };
 
 export const getMoviesList = async (type: string, params: { page?: number; year?: number; category?: string; country?: string; limit?: number; quality?: string } = {}) => {
-    const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
+    const isBuildPhase = process.env.IS_BUILD_PHASE === 'true';
     if (isBuildPhase) return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
     try {
         const { page = 1, year, category, country, limit = 49, quality } = params;
@@ -975,7 +975,7 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
 };
 
 export const getMoviesByCategory = async (slug: string, page: number = 1, limit: number = 49, options?: { country?: string; year?: string | number }) => {
-    const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
+    const isBuildPhase = process.env.IS_BUILD_PHASE === 'true';
     if (isBuildPhase) return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
     try {
         const country = options?.country && options.country !== 'all' ? options.country : '';
@@ -1241,7 +1241,7 @@ export const getTrendMovies = async (
     type: 'movie' | 'tv' | 'all' = 'all',
     timeWindow: 'day' | 'week' = 'day'
 ) => {
-    const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
+    const isBuildPhase = process.env.IS_BUILD_PHASE === 'true';
     if (isBuildPhase) return [];
 
     try {
@@ -1289,7 +1289,7 @@ export const getTrendMovies = async (
 };
 
 export const getMenuData = async (): Promise<{ categories: Category[], countries: Country[] }> => {
-    const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
+    const isBuildPhase = process.env.IS_BUILD_PHASE === 'true';
     if (isBuildPhase) {
         return {
             categories: [

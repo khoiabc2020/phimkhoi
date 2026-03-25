@@ -4,7 +4,7 @@ const config = (phase: string): NextConfig => {
   return {
     output: "standalone",
     env: {
-      NEXT_PHASE: phase,
+      IS_BUILD_PHASE: phase === "phase-production-build" ? "true" : "false",
     },
     compress: true,           // gzip/brotli responses
     poweredByHeader: false,
