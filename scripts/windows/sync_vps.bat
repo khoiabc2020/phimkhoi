@@ -12,14 +12,14 @@ set "PEM=C:\Users\LE HUY KHOI\Downloads\khoiphim.pem"
 ::  HOST : User va dia chi SSH cua may chu VPS
 ::         EC2:          ubuntu@ec2-xx-xx-xx-xx.ap-southeast-1.compute.amazonaws.com
 ::         DigitalOcean: root@xxx.xxx.xxx.xxx
-set "HOST=admin@54.254.213.121"
-set "DIR=/home/admin/phimkhoi"
+set "HOST=bitnami@13.250.33.6"
+set "DIR=/home/bitnami/phimkhoi"
 :: ============================================================
 
 cd /d "%~dp0..\.."
 echo.
 echo ==========================================
-echo    DONG BO CODE LEN VPS (54.254.213.121)
+echo    DONG BO CODE LEN VPS (13.250.33.6)
 echo ==========================================
 echo    SSH Key: %PEM%
 echo    Host   : %HOST%

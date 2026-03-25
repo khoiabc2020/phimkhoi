@@ -1,6 +1,6 @@
 #!/bin/bash
 # Configuration
-APP_DIR="/home/admin/phimkhoi" 
+APP_DIR="/home/bitnami/phimkhoi"
 REPO_URL="https://github.com/khoiabc2020/phimkhoi.git"
 
 echo "Deploying PhimKhoi (CLEAN BUILD) to VPS..."
@@ -61,7 +61,7 @@ if [ $? -eq 0 ]; then
     npx pm2 save
     
     echo "Warming up trending cache in BACKGROUND..."
-    NODE_OPTIONS="--max_old_space_size=512" nice -n 19 node scripts/daily-sync.mjs >> /home/admin/phimkhoi-sync.log 2>&1 &
+    NODE_OPTIONS="--max_old_space_size=512" nice -n 19 node scripts/daily-sync.mjs >> /home/bitnami/phimkhoi-sync.log 2>&1 &
 
     echo "Deployment complete and successful!"
 else
