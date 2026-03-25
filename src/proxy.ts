@@ -12,6 +12,7 @@ import type { NextRequest } from "next/server";
 export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const host = request.headers.get("host") || "";
+    console.log(`[Proxy] Request: ${host}${pathname}`);
 
     // 1. [Elite Redirect] Domain Migration (khoiphim.io.vn -> khoiphim.org)
     if (host.includes("khoiphim.io.vn")) {
