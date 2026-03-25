@@ -160,17 +160,17 @@ async function ChinaHeroWithData() {
         
         const movieDetails = await Promise.all(
             HERO_SLUGS.map(slug =>
-                getMovieDetail(slug).then(d => d?.movie || { slug, name: slug.replace(/-/g, ' ') }).catch((): null => null)
+                getMovieDetail(slug).then(d => d?.movie || { slug, name: slug.replace(/-/g, ' ') } as any).catch((): null => null)
             )
         );
-        let filteredMovies = movieDetails.filter(Boolean);
+        let filteredMovies = movieDetails.filter((m): m is any => !!m);
 
         // [Priority 2] If custom slides are missing/empty, fallback to top trending from cache or API
         if (filteredMovies.length < 3) {
             const cached = await getMoviesFromCache("trung-quoc", 1, 12).catch((): null => null);
-            if (cached && cached.items.length > 0) {
-                const existingSlugs = new Set(filteredMovies.map(m => m.slug));
-                const trending = (cached.items || []).filter(m => !existingSlugs.has(m.slug));
+            if (cached && (cached.items?.length || 0) > 0) {
+                const existingSlugs = new Set(filteredMovies.map(m => (m as any).slug));
+                const trending = (cached.items || []).filter((m: any) => !existingSlugs.has(m.slug));
                 filteredMovies = [...filteredMovies, ...trending];
             }
         }
