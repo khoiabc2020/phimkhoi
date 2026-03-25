@@ -125,6 +125,14 @@ async function PhimTrungHome() {
             <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
                 <CountryMovieRow title="Phim Hình Sự" categorySlug="hinh-su" countrySlug="trung-quoc" />
             </Suspense>
+
+            <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
+                <CountryMovieRow title="Phim Thuyết Minh" categorySlug="thuyet-minh" countrySlug="trung-quoc" />
+            </Suspense>
+
+            <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
+                <CountryMovieRow title="Phim Vietsub" categorySlug="vietsub" countrySlug="trung-quoc" />
+            </Suspense>
         </div>
     );
 }
