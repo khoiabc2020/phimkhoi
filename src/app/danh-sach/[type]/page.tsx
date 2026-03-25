@@ -3,6 +3,7 @@ import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
 import { getMoviesFromCache } from "@/lib/movie-cache";
+import { getMenuData, getMoviesList } from "@/services/api";
 import { Metadata } from "next";
 import { headers } from "next/headers";
 import { getThemeBySlug } from "@/lib/theme";
