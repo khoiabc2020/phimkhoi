@@ -492,7 +492,13 @@ async function fetchWithRetry(url: string, options: RequestInit = {}, retries = 
 
 export const getHomeData = async () => {
     const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
-    console.log(`[BuildDiag] getHomeData entry. Phase: ${process.env.NEXT_PHASE}`);
+    if (isBuildPhase) {
+        return {
+            phimMoi: [], phimLe: [], phimBo: [], hoatHinh: [],
+            tvShows: [], phimChieuRap: [], phimSapChieu: [],
+            hanQuoc: [], trungQuoc: [], hanhDong: [], tinhCam: [],
+        };
+    }
     // Cache tạm thời ngắn để USER thấy rõ thay đổi
     const CACHE_TTL_MS = 10 * 1000; 
     if (homeCache && Date.now() - homeCacheTime < CACHE_TTL_MS) {
@@ -1284,6 +1290,7 @@ export const getMenuData = async (): Promise<{ categories: Category[], countries
             ]
         };
     }
+    try {
         // Fetch from both KKPhim and OPhim to maximize coverage
         const [kkCatRes, kkCountRes, ophimCountRes] = await Promise.all([
             fetch(`${API_URL}/the-loai`, { next: { revalidate: 86400 } }),
