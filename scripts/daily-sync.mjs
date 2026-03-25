@@ -298,6 +298,12 @@ async function syncFullMovieDetails() {
                     const { _id, ...itemData } = detailData.data.item;
                     const episodes = detailData.data.episodes || [];
                     
+                    // Fix MongoDB "language override unsupported" error
+                    if (itemData.language) {
+                        itemData.lang = itemData.language;
+                        delete itemData.language;
+                    }
+
                     let tmdbData = existing?.tmdbData;
                     if (!tmdbData) {
                         tmdbData = await searchTMDBMovie(itemData.origin_name || itemData.name, itemData.year);
