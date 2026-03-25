@@ -136,27 +136,32 @@ export const isTrailer = (movie: Movie): boolean => {
     if (!movie) return true;
     const current = String(movie.episode_current || "").toLowerCase();
     const name = String(movie.name || "").toLowerCase();
+    const originName = String(movie.origin_name || "").toLowerCase();
     const notify = String(movie.notify || "").toLowerCase();
     const quality = String(movie.quality || "").toLowerCase();
+    const status = String(movie.status || "").toLowerCase();
 
-    // 1. Check common trailer markers in episode/name/notify
-    if (current.includes("trailer") || current.includes("teaser") || current.includes("preview")) return true;
-    if (name.includes("trailer") || name.includes("teaser") || name.includes("nhá hàng")) return true;
-    if (notify.includes("trailer") || notify.includes("sắp có")) return true;
-    if (quality === "trailer") return true;
+    // 1. Common trailer markers in major fields
+    const trailerMarkers = ["trailer", "teaser", "preview", "nhá hàng", "sắp chiếu", "coming soon"];
+    
+    if (trailerMarkers.some(m => current.includes(m))) return true;
+    if (trailerMarkers.some(m => name.includes(m))) return true;
+    if (trailerMarkers.some(m => originName.includes(m))) return true;
+    if (trailerMarkers.some(m => notify.includes(m))) return true;
+    if (trailerMarkers.some(m => quality.includes(m))) return true;
+    if (trailerMarkers.some(m => status.includes(m))) return true;
 
-    // 2. Check category array — most reliable signal (e.g. movie tagged with category 'Trailer')
+    // 2. Check category array — highly reliable
     if (Array.isArray(movie.category)) {
         for (const cat of movie.category) {
             const catSlug = String(cat?.slug || "").toLowerCase();
             const catName = String(cat?.name || "").toLowerCase();
-            if (catSlug === "trailer" || catName === "trailer") return true;
+            if (catSlug.includes("trailer") || catName.includes("trailer")) return true;
         }
     }
 
-    // 3. chieurap + no episode data = cinema release not yet available
-    // (Keep commented — too agressive for phim-sap-chieu)
-    // if (movie.chieurap && !movie.episode_current) return true;
+    // 3. Special case: if episode_current is just a number but status is specifically "trailer"
+    if (status === "trailer") return true;
 
     return false;
 };

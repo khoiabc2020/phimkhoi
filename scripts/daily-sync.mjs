@@ -148,8 +148,18 @@ const STATS = {
 };
 
 const isTrailer = (m) => {
-    const status = String(m.status || m.episode_current || "").toLowerCase();
-    return status.includes("trailer") || status.includes("sắp chiếu");
+    if (!m) return true;
+    const s = String(m.status || "").toLowerCase();
+    const e = String(m.episode_current || "").toLowerCase();
+    const n = String(m.name || "").toLowerCase();
+    const q = String(m.quality || "").toLowerCase();
+    const ny = String(m.notify || "").toLowerCase();
+    
+    const markers = ["trailer", "teaser", "preview", "nhá hàng", "sắp chiếu", "coming soon"];
+    
+    return markers.some(mkr => 
+        s.includes(mkr) || e.includes(mkr) || n.includes(mkr) || q.includes(mkr) || ny.includes(mkr)
+    );
 };
 
 async function syncMovieList(slug, pages = 1) {
