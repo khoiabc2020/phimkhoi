@@ -40,7 +40,7 @@ export async function getRealtimeSearch(query: string, enrichTMDB: boolean = fal
             }
         }
 
-        const actors = await searchTMDBPerson(query).catch(() => []);
+        const actors = await searchTMDBPerson(query).catch((): any[] => []);
 
         const formattedActors = (actors || []).map((actor: { id?: number; name?: string; profile_path?: string; }) => ({
             id: actor.id,
