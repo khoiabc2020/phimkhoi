@@ -205,7 +205,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                                         priority
                                     />
                                 ) : (
-                                    <h2 className="text-3xl sm:text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white/90 to-white/40 drop-shadow-2xl font-outfit uppercase italic tracking-tighter line-clamp-2 pb-2">
+                                    <h2 className="text-3xl sm:text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white/90 to-white/40 drop-shadow-2xl font-outfit uppercase tracking-tighter line-clamp-2 pb-2">
                                         {currentMovie.displayTitle}
                                     </h2>
                                 )}

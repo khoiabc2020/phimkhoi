@@ -128,7 +128,7 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
                             <p className="text-[#8FA7C5] text-[11px] font-bold uppercase tracking-[0.2em] opacity-80 pl-1">
                                 Danh sách / {typeName}
                             </p>
-                            <h1 className="text-[30px] md:text-[40px] font-outfit font-extrabold text-white tracking-tighter leading-tight italic uppercase drop-shadow-lg">
+                            <h1 className="text-[30px] md:text-[40px] font-outfit font-extrabold text-white tracking-tighter leading-tight uppercase drop-shadow-lg">
                                 {typeName}
                             </h1>
                         </div>

@@ -128,7 +128,7 @@ export default async function GenresIndexPage() {
                         <div className="w-12 h-12 rounded-[14px] bg-gradient-to-br from-[#8FA7C5]/20 to-transparent border border-[#8FA7C5]/20 flex items-center justify-center shadow-[0_0_30px_rgba(143,167,197,0.15)] backdrop-blur-md">
                             <LayoutGrid className="w-6 h-6 text-[#8FA7C5]" />
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-outfit font-black text-white tracking-tighter uppercase italic drop-shadow-xl flex items-center gap-4">
+                        <h1 className="text-4xl md:text-5xl font-outfit font-black text-white tracking-tighter uppercase drop-shadow-xl flex items-center gap-4">
                             CHỦ ĐỀ <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8FA7C5] to-white/50">& TUYỂN TẬP</span>
                         </h1>
                     </div>

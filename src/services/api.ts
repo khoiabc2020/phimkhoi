@@ -62,6 +62,18 @@ const getItems = (data: PaginatedData): Movie[] => {
     return [];
 };
 
+/** Decode HTML entities like &#039; => ' that come from the upstream API */
+const decodeHtmlEntities = (str: string): string => {
+    if (!str || !str.includes('&')) return str;
+    return str
+        .replace(/&#039;/g, "'")
+        .replace(/&apos;/g, "'")
+        .replace(/&amp;/g, "&")
+        .replace(/&quot;/g, '"')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>');
+};
+
 /** Chuẩn hóa item từ NguonC về đúng kiểu Movie để card và link hoạt động đầy đủ */
 function normalizeNguoncItem(item: Record<string, unknown>): Movie {
     const name = (item.name as string) || "";
@@ -71,7 +83,7 @@ function normalizeNguoncItem(item: Record<string, unknown>): Movie {
         _id: id,
         name,
         slug,
-        origin_name: (item.original_name as string) || name,
+        origin_name: decodeHtmlEntities((item.original_name as string) || name),
         content: "",
         type: (item.type as string) || "single",
         status: "",
@@ -125,17 +137,30 @@ export const isTrailer = (movie: Movie): boolean => {
     const current = String(movie.episode_current || "").toLowerCase();
     const name = String(movie.name || "").toLowerCase();
     const notify = String(movie.notify || "").toLowerCase();
-    
-    // 1. Check common trailer markers
+    const quality = String(movie.quality || "").toLowerCase();
+
+    // 1. Check common trailer markers in episode/name/notify
     if (current.includes("trailer") || current.includes("teaser") || current.includes("preview")) return true;
     if (name.includes("trailer") || name.includes("teaser") || name.includes("nhá hàng")) return true;
     if (notify.includes("trailer") || notify.includes("sắp có")) return true;
-    
-    // 2. Check for empty episode data (optional, but safe for browse lists)
-    // if (!movie.episode_current && movie.status === "trailer") return true;
+    if (quality === "trailer") return true;
+
+    // 2. Check category array — most reliable signal (e.g. movie tagged with category 'Trailer')
+    if (Array.isArray(movie.category)) {
+        for (const cat of movie.category) {
+            const catSlug = String(cat?.slug || "").toLowerCase();
+            const catName = String(cat?.name || "").toLowerCase();
+            if (catSlug === "trailer" || catName === "trailer") return true;
+        }
+    }
+
+    // 3. chieurap + no episode data = cinema release not yet available
+    // (Keep commented — too agressive for phim-sap-chieu)
+    // if (movie.chieurap && !movie.episode_current) return true;
 
     return false;
 };
+
 
 // --- Utilities ---
 export const parseServerLabel = (

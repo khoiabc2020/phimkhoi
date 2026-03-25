@@ -149,7 +149,7 @@ export default async function WatchPage({ params }: PageProps) {
                             {/* Movie description */}
                             <div className="relative z-30 rounded-[10px] border border-white/[0.06] overflow-hidden bg-[#07070b]/82 shadow-[0_10px_24px_#00000066] mx-3 sm:mx-0">
                                 <div className="px-5 sm:px-6 pt-4 pb-3 border-b border-white/[0.06] bg-[#09090d]">
-                                    <h3 className="text-white font-outfit font-extrabold text-[14px] sm:text-[15px] flex items-center gap-2 tracking-wider uppercase italic">
+                                    <h3 className="text-white font-outfit font-extrabold text-[14px] sm:text-[15px] flex items-center gap-2 tracking-wider uppercase">
                                         <Info className="w-4 h-4" style={{ color: theme.primary }} /> Nội dung
                                     </h3>
                                 </div>
@@ -207,7 +207,7 @@ export default async function WatchPage({ params }: PageProps) {
                             {movie.category && movie.category.length > 0 && (
                                 <div className="relative z-30 rounded-[10px] border border-white/[0.06] overflow-hidden bg-[#07070b]/82 shadow-[0_10px_24px_#00000066]">
                                     <div className="px-5 pt-5 pb-4 border-b border-white/[0.06] bg-[#09090d]">
-                                        <h3 className="text-white font-outfit font-extrabold text-[15px] tracking-wider uppercase italic">Thể loại</h3>
+                                        <h3 className="text-white font-outfit font-extrabold text-[15px] tracking-wider uppercase">Thể loại</h3>
                                     </div>
                                     <div className="p-5 flex flex-wrap gap-2">
                                         {movie.category.map((c: { id: React.Key | null | undefined; slug: string; name: string }) => (
@@ -226,7 +226,7 @@ export default async function WatchPage({ params }: PageProps) {
                                 <div className="relative z-30 rounded-[10px] border border-white/[0.06] overflow-hidden bg-[#07070b]/82 shadow-[0_10px_24px_#00000066]">
                                     <div className="px-5 pt-5 pb-4 border-b border-white/[0.06] flex items-center gap-2 bg-[#09090d]">
                                         <div className="w-1.5 h-4 rounded-full" style={{ backgroundColor: theme.primary }} />
-                                        <h3 className="text-white font-outfit font-extrabold text-[15px] tracking-wider uppercase italic">Phim đề xuất</h3>
+                                        <h3 className="text-white font-outfit font-extrabold text-[15px] tracking-wider uppercase">Phim đề xuất</h3>
                                     </div>
                                     <div className="p-4">
                                         <RelatedMovies categorySlug={movie.category[0].slug} currentMovieId={movie._id} mode="vertical" />

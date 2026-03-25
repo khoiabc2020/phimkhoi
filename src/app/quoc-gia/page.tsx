@@ -27,7 +27,7 @@ export default async function CountriesIndexPage() {
                     
                     <div className="flex items-center gap-3 mb-2">
                         <Globe className="w-6 h-6 text-[#8FA7C5]" />
-                        <h1 className="text-3xl md:text-4xl font-outfit font-extrabold text-white tracking-tighter uppercase italic">
+                        <h1 className="text-3xl md:text-4xl font-outfit font-extrabold text-white tracking-tighter uppercase">
                             Phim theo Quốc gia
                         </h1>
                     </div>

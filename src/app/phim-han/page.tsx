@@ -225,7 +225,7 @@ export default async function PhimHanPage({ searchParams }: { searchParams: Prom
                                 </Link>
                                 
                                 <div className="space-y-1">
-                                    <h1 className="text-[32px] md:text-[40px] lg:text-[48px] font-outfit font-extrabold text-white tracking-tighter leading-tight italic uppercase drop-shadow-lg">
+                                    <h1 className="text-[32px] md:text-[40px] lg:text-[48px] font-outfit font-extrabold text-white tracking-tighter leading-tight uppercase drop-shadow-lg">
                                         {countryName} <span className="text-primary/50 mx-2">/</span> Trang {currentPage}
                                     </h1>
                                 </div>

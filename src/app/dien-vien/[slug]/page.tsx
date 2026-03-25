@@ -19,42 +19,51 @@ export default async function PersonPage({ params, searchParams }: PersonPagePro
     const view = sParams?.view === 'local' ? 'local' : 'global';
     const name = slug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 
-    // 1. Search for the person to get ID
-    const searchResults = await searchTMDBPerson(name);
-    const person = searchResults[0];
+    try {
+        // 1. Search for the person to get ID
+        const searchResults = await searchTMDBPerson(name).catch((): any[] => []);
+        const person = searchResults?.[0];
 
-    if (!person) {
-        return (
+        if (!person) {
+            return (
+                <div className="min-h-screen bg-[#080b12] text-white flex items-center justify-center pt-20">
+                    <div className="text-center">
+                        <h1 className="text-2xl font-bold mb-4">Không tìm thấy diễn viên</h1>
+                        <Link href="/" className="text-primary hover:underline">Quay lại trang chủ</Link>
+                    </div>
+                </div>
+            );
+        }
+
+        // 2. Fetch TMDB details first to get the official name
+        const detailsData = await getTMDBPersonDetails(person.id).catch((): null => null);
+        const details = detailsData as any;
+
+        if (!details) return (
             <div className="min-h-screen bg-[#080b12] text-white flex items-center justify-center pt-20">
                 <div className="text-center">
-                    <h1 className="text-2xl font-bold mb-4">Không tìm thấy diễn viên</h1>
+                    <h1 className="text-2xl font-bold mb-4">Không thể tải thông tin diễn viên</h1>
                     <Link href="/" className="text-primary hover:underline">Quay lại trang chủ</Link>
                 </div>
             </div>
         );
-    }
 
-    // 2. Fetch TMDB details first to get the official name
-    const detailsData = await getTMDBPersonDetails(person.id);
-    const details = detailsData as any;
+        // 3. Fetch credits, local movies, and favorite status in parallel — each with individual catch
+        const [creditsData, localData, favResult] = await Promise.all([
+            getTMDBPersonCredits(person.id).catch((): null => null),
+            getMoviesByActor(details.name, 1, 50).catch((): { items: any[] } => ({ items: [] })),
+            checkFavoriteActor(details.name).catch((): { isFavorite: boolean } => ({ isFavorite: false })),
+        ]);
+        const credits = creditsData as any;
 
-    if (!details) return null;
+        // 4. Filter and sort credits
+        const globalFilmography = (credits?.cast || [])
+            .filter((m: any) => m.poster_path || m.backdrop_path)
+            .slice(0, 50);
 
-    // 3. Fetch credits, local movies, and favorite status in parallel
-    const [creditsData, localData, favResult] = await Promise.all([
-        getTMDBPersonCredits(person.id),
-        getMoviesByActor(details.name, 1, 50),
-        checkFavoriteActor(details.name)
-    ]);
-    const credits = creditsData as any;
+        const localFilmography = (localData as any)?.items || [];
+        const isFavorite = (favResult as any)?.isFavorite;
 
-    // 4. Filter and sort credits
-    const globalFilmography = (credits?.cast || [])
-        .filter((m: any) => m.poster_path || m.backdrop_path)
-        .slice(0, 50);
-
-    const localFilmography = localData?.items || [];
-    const isFavorite = favResult?.isFavorite;
 
     return (
         <main className="min-h-screen bg-[#080b12] text-white overflow-hidden" 
@@ -222,4 +231,15 @@ export default async function PersonPage({ params, searchParams }: PersonPagePro
             <Footer />
         </main>
     );
+    } catch (err) {
+        console.error('[ActorPage] Error:', err);
+        return (
+            <div className="min-h-screen bg-[#080b12] text-white flex items-center justify-center pt-20">
+                <div className="text-center">
+                    <h1 className="text-2xl font-bold mb-4">Không thể tải trang diễn viên</h1>
+                    <Link href="/" className="text-primary hover:underline">Quay lại trang chủ</Link>
+                </div>
+            </div>
+        );
+    }
 }

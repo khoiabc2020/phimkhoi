@@ -155,7 +155,7 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                                         priority
                                     />
                                 ) : (
-                                    <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white drop-shadow-xl font-display uppercase italic tracking-tighter line-clamp-2">
+                                    <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white drop-shadow-xl font-display uppercase tracking-tighter line-clamp-2">
                                         {currentMovie.displayTitle}
                                     </h2>
                                 )}
