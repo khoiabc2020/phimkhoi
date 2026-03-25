@@ -3,7 +3,7 @@ import dbConnect from '@/lib/db';
 import { AppVersion } from '@/models/AppVersion';
 
 export const dynamic = 'force-dynamic';
-const API_DOWNLOAD_BASE = "https://khoiphim.io.vn/api/download/apk";
+const API_DOWNLOAD_BASE = "https://khoiphim.org/api/download/apk";
 const toVersionTag = (version: string) => {
     const v = String(version || "").trim();
     if (!v) return "";

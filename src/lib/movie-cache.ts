@@ -101,6 +101,11 @@ export const getMovieDetailFromCache = async (slug: string): Promise<any | null>
             movie,
             episodes: movie.episodes
         };
+    } catch (error) {
+        console.error("Cache retrieval error:", error);
+        return null;
+    }
+};
 /**
  * [Elite Persistence] Save movie details to MongoDB on-demand (JIT)
  */

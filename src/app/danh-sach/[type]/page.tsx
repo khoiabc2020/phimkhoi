@@ -56,7 +56,7 @@ const TYPE_NAMES: Record<string, string> = {
 export async function generateMetadata({ params }: { params: Promise<{ type: string }> }): Promise<Metadata> {
     const { type } = await params;
     const typeName = TYPE_NAMES[type] || "Danh Sách Phim";
-    const canonical = `https://khoiphim.io.vn/danh-sach/${type}`;
+    const canonical = `https://khoiphim.org/danh-sach/${type}`;
     return {
         title: `${typeName} - KHOIPHIM`,
         description: `Xem ${typeName} chất lượng cao tại KHOIPHIM.`,

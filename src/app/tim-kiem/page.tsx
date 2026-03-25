@@ -19,12 +19,16 @@ export const metadata: Metadata = {
     },
 };
 
-/** Stream component for search results */
-    year?: string;
-    limit?: number;
+export default async function SearchPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ q?: string; page?: string; year?: string; limit?: number }>;
 }) {
+    const sParams = await searchParams;
+    const keyword = sParams.q || "";
+    const currentPage = parseInt(sParams.page || "1");
     // Phase 1: Deep scan of local and external sources
-    const moviesCount = limit || 49;
+    const moviesCount = sParams.limit || 49;
     const [movies, actors] = await Promise.all([
         searchMovies(keyword, { enrichTMDB: false, limit: moviesCount * 2 }),
         keyword.length >= 3 ? searchTMDBPerson(keyword) : Promise.resolve([])

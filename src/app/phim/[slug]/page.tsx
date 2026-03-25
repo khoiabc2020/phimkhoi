@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const plainContent = movie.content ? movie.content.replace(/<[^>]+>/g, '').trim() : "";
     const desc = plainContent ? plainContent.substring(0, 160) + '...' : `Xem phim ${movie.name} chất lượng cao tại KHOIPHIM.`;
     const poster = getImageUrl(movie.poster_url || movie.thumb_url || "");
-    const url = `https://khoiphim.io.vn/phim/${slug}`;
+    const url = `https://khoiphim.org/phim/${slug}`;
     
     // Tạo keywords từ thể loại và tên phim
     const categories = Array.isArray(movie.category) ? movie.category.map((c: any) => c.name).join(", ") : "";
@@ -291,7 +291,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
             "@type": "WatchAction",
             "target": {
                 "@type": "EntryPoint",
-                "urlTemplate": `https://khoiphim.io.vn/xem-phim/${movie?.slug}/${serverData?.[0]?.slug || 'tap-1'}`,
+                "urlTemplate": `https://khoiphim.org/xem-phim/${movie?.slug}/${serverData?.[0]?.slug || 'tap-1'}`,
                 "actionPlatform": [
                     "http://schema.org/DesktopWebPlatform",
                     "http://schema.org/MobileWebPlatform",

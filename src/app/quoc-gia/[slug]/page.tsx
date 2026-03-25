@@ -107,4 +107,4 @@ export default async function CountryPage({
         </main>
     );
 }
-```
+

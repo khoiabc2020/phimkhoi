@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         title: `Xem phim ${movie.name} - Tập ${currentEpisode?.name || episode} | KHOIPHIM`,
         description: `Xem phim ${movie.name} tập ${currentEpisode?.name || episode} vietsub.`,
         alternates: {
-            canonical: `https://khoiphim.io.vn/phim/${slug}`,
+            canonical: `https://khoiphim.org/phim/${slug}`,
         },
         robots: {
             index: false,

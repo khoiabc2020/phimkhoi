@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/admin", "/api", "/login", "/register", "/forgot-password", "/reset-password"],
       },
     ],
-    sitemap: "https://khoiphim.io.vn/sitemap.xml",
-    host: "https://khoiphim.io.vn",
+    sitemap: "https://khoiphim.org/sitemap.xml",
+    host: "https://khoiphim.org",
   };
 }

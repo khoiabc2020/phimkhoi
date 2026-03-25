@@ -40,7 +40,7 @@ export default function Footer() {
                             Xem hàng ngàn bộ phim chất lượng cao, vietsub chuẩn, miễn phí — cập nhật hàng ngày.
                         </p>
                         <div className="flex items-center gap-3">
-                            <a href="https://khoiphim.io.vn/api/download/apk"
+                            <a href="https://khoiphim.org/api/download/apk"
                                 className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-primary/40 text-primary text-[11px] font-bold hover:bg-primary/10 transition-all duration-200">
                                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3">
                                     <path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm0 18a8 8 0 110-16 8 8 0 010 16zm-1-5h2v2h-2zm0-8h2v6h-2z" />
@@ -90,7 +90,7 @@ export default function Footer() {
                             { href: "#", label: "Chính sách bảo mật" },
                             { href: "#", label: "Điều khoản sử dụng" },
                             { href: "#", label: "Liên hệ quảng cáo" },
-                            { href: "mailto:support@khoiphim.io.vn", label: "support@khoiphim.io.vn" },
+                            { href: "mailto:support@khoiphim.org", label: "support@khoiphim.org" },
                         ].map(({ href, label }) => (
                             <a key={label} href={href}
                                 className="text-[13px] text-gray-500 hover:text-white transition-colors">

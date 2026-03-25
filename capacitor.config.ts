@@ -6,7 +6,7 @@ const config: CapacitorConfig = {
   webDir: 'public',
   backgroundColor: '#0a0a0a',
   server: {
-    url: 'https://khoiphim.io.vn/?v=3',
+    url: 'https://khoiphim.org/?v=3',
     cleartext: true
   },
   android: {

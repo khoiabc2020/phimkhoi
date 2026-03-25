@@ -36,7 +36,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://khoiphim.io.vn"),
+  metadataBase: new URL("https://khoiphim.org"),
   title: {
     default: "KHOIPHIM - Xem Phim Online Chất Lượng Cao",
     template: "%s | KHOIPHIM"
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     title: "KHOIPHIM - Xem Phim Online Chất Lượng Cao",
     description: "Xem phim online chất lượng cao vietsub, lồng tiếng, thuyết minh. Phim mới cập nhật hàng ngày, hoàn toàn miễn phí.",
     type: "website",
-    url: "https://khoiphim.io.vn",
+    url: "https://khoiphim.org",
     locale: "vi_VN",
     siteName: "KHOIPHIM",
     images: [

@@ -3,7 +3,7 @@ import { getMoviesList } from "@/services/api";
 import connectDB from "@/lib/db";
 import MovieModel from "@/models/Movie";
 
-const BASE_URL = "https://khoiphim.io.vn";
+const BASE_URL = "https://khoiphim.org";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
