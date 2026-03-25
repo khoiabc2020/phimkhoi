@@ -42,26 +42,30 @@ const FEATURED_ACTORS = [
 ];
 
 async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'default', minHeight = 380, priorityFirst = false }: { title: string; categorySlug: string; countrySlug: string; variant?: 'default' | 'sidebar'; minHeight?: number; priorityFirst?: boolean }) {
-    // [Elite Performance] Try regional cache first
-    const cachedData = await getMoviesFromCache(countrySlug, 1, 60);
-    let filteredMovies: Movie[] = [];
-    
-    if (cachedData) {
-        filteredMovies = cachedData.items.filter(m => 
-            categorySlug === 'all' || m.category?.some(c => c.slug === categorySlug)
-        ).slice(0, 32);
-    }
+    try {
+        // [Cache-First] Fetch up to 300 to have enough for category filtering
+        const cachedData = await getMoviesFromCache(countrySlug, 1, 300).catch(() => null);
+        let filteredMovies: Movie[] = [];
 
-    if (filteredMovies.length < 12) {
-        const data = await getMoviesByCountryAndCategory(countrySlug, categorySlug, 32);
-        filteredMovies = data.items;
+        if (cachedData && cachedData.items.length > 0) {
+            filteredMovies = cachedData.items.filter((m: Movie) =>
+                categorySlug === 'all' || m.category?.some((c: any) => c.slug === categorySlug)
+            ).slice(0, 32);
+        }
+
+        if (filteredMovies.length < 8) {
+            const data = await getMoviesByCountryAndCategory(countrySlug, categorySlug, 32).catch(() => ({ items: [] as Movie[] }));
+            filteredMovies = data.items;
+        }
+
+        return (
+            <LazySection minHeight={minHeight} className={variant === 'sidebar' ? "movie-row-sidebar" : "movie-row-standard"}>
+                <MovieRow title={title} movies={filteredMovies} slug={`/the-loai/${categorySlug}`} variant={variant} priorityFirst={priorityFirst} />
+            </LazySection>
+        );
+    } catch {
+        return null;
     }
-    
-    return (
-        <LazySection minHeight={minHeight} className={variant === 'sidebar' ? "movie-row-sidebar" : "movie-row-standard"}>
-            <MovieRow title={title} movies={filteredMovies} slug={`/the-loai/${categorySlug}`} variant={variant} priorityFirst={priorityFirst} />
-        </LazySection>
-    );
 }
 
 async function PhimHanHome() {
@@ -135,28 +139,34 @@ async function CountryGridStream({ slug, page, limit = 49 }: { slug: string; pag
 }
 
 async function KoreaHeroWithData() {
-    const HERO_SLUGS = [
-        "nghe-thuat-lua-doi-cua-sarah",
-        "khi-cuoc-doi-cho-ban-qua-quyt",
-        "tieng-yeu-nay-anh-dich-duoc-khong",
-    ];
-    const movieDetails = await Promise.all(
-        HERO_SLUGS.map(async (slug) => {
-            const data = await getMovieDetail(slug);
-            return data?.movie || null;
-        })
-    );
+    try {
+        // [Hardening] Always prefer cache — fast, reliable, 0 external calls
+        const cached = await getMoviesFromCache("han-quoc", 1, 20).catch(() => null);
+        if (cached && cached.items.length >= 4) {
+            return <KoreaHero initialMovies={cached.items.slice(0, 8)} />;
+        }
 
-    let filteredMovies = movieDetails.filter(Boolean);
+        // Fallback: fetch individual slugs safely (each slug has its own catch)
+        const HERO_SLUGS = [
+            "nghe-thuat-lua-doi-cua-sarah",
+            "khi-cuoc-doi-cho-ban-qua-quyt",
+            "tieng-yeu-nay-anh-dich-duoc-khong",
+        ];
+        const movieDetails = await Promise.all(
+            HERO_SLUGS.map(slug =>
+                getMovieDetail(slug).then(d => d?.movie || null).catch(() => null)
+            )
+        );
+        let filteredMovies = movieDetails.filter(Boolean);
 
-    // [Hardening] Fallback to latest movies if featured slugs are missing
-    if (filteredMovies.length === 0) {
-        const cached = await getMoviesFromCache("han-quoc", 1, 20);
-        const fallback = !cached ? await getMoviesByCountry("han-quoc", 1, 8) : null;
-        filteredMovies = cached ? cached.items.slice(0, 8) : (fallback?.items || []);
+        if (filteredMovies.length === 0) {
+            const fallback = await getMoviesByCountry("han-quoc", 1, 8).catch(() => ({ items: [] }));
+            filteredMovies = fallback.items.slice(0, 8);
+        }
+        return <KoreaHero initialMovies={filteredMovies} />;
+    } catch {
+        return <KoreaHero initialMovies={[]} />;
     }
-
-    return <KoreaHero initialMovies={filteredMovies} />;
 }
 
 export default async function PhimHanPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {

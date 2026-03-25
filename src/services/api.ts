@@ -1165,63 +1165,46 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
 
 export const getMoviesByCountryAndCategory = async (countrySlug: string, categorySlug: string, limit: number = 24) => {
     try {
-        // --- ELITE REGIONAL ENFORCEMENT ---
+        const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
+        if (isBuildPhase) return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
+
         // Slugs to merge for "Cổ Trang" row depth
-        const categorySlugs = categorySlug === "co-trang" 
-            ? ["co-trang", "co-dai", "than-thoai", "vo-thuat", "lich-su", "kiem-hiep"] 
+        const categorySlugs = categorySlug === "co-trang"
+            ? ["co-trang", "co-dai", "than-thoai", "vo-thuat", "lich-su", "kiem-hiep"]
             : [categorySlug];
 
-        // Step 1: Deep scan of the Country list (Pages 1-5)
-        // This is safe because these are parallel fetches (thanks to Promise.all internally)
-        const pagesToScan = [1, 2, 3, 4, 5];
-        const countryPageResults = await Promise.all(
-            pagesToScan.map((p: number) => getMoviesByCountry(countrySlug, p, 40))
-        );
-        
-        const allCountryMovies = countryPageResults.flatMap(res => res.items || []);
-        
-        // Filter by the target categories (OR logic for merged slugs)
-        const matchedMovies = allCountryMovies.filter((movie: Movie) => 
-            movie.category?.some((cat: any) => categorySlugs.includes(cat.slug))
+        // ── STEP 1: Lightweight 2-page country scan (fast, ~0.5s) ──
+        const [page1, page2] = await Promise.all([
+            getMoviesByCountry(countrySlug, 1, 49).catch(() => ({ items: [] as Movie[] })),
+            getMoviesByCountry(countrySlug, 2, 49).catch(() => ({ items: [] as Movie[] })),
+        ]);
+        const allMovies = [...(page1.items || []), ...(page2.items || [])];
+
+        let matched = allMovies.filter((m: Movie) =>
+            categorySlug === 'all' ||
+            m.category?.some((cat: any) => categorySlugs.includes(cat.slug))
         );
 
-        // Step 2: Hybrid Fallback from Category lists
-        let finalItems = [...matchedMovies];
-        
-        if (finalItems.length < limit) {
-             const categoryScan = await Promise.all(
-                categorySlugs.map((slug: string) => getMoviesByCategory(slug, 1, 128))
-             );
-             const fromCategories = categoryScan.flatMap(res => res.items || []);
-             
-             const seenSlugs = new Set(finalItems.map(m => m.slug));
-             for (const movie of fromCategories) {
-                 if (!seenSlugs.has(movie.slug)) {
-                     // HARD ENFORCEMENT: Strictly check country slug for regional rows
-                     if (movie.country?.some((c: any) => c.slug === countrySlug)) {
-                         finalItems.push(movie);
-                         seenSlugs.add(movie.slug);
-                     }
-                 }
-                 if (finalItems.length >= limit * 2) break; 
-             }
+        // ── STEP 2: If still < 8, pull from category API (single fetch) ──
+        if (matched.length < 8) {
+            const catFetch = await getMoviesByCategory(categorySlug, 1, limit * 2).catch(() => ({ items: [] as Movie[] }));
+            const fromCat = (catFetch.items || []).filter((m: Movie) =>
+                !matched.find(x => x.slug === m.slug) &&
+                (m.country?.some((c: any) => c.slug === countrySlug) ?? true)
+            );
+            matched = [...matched, ...fromCat];
         }
 
-        // --- GLOBAL TRAILER & QUALITY CLEANSE ---
-        const filtered = finalItems.filter((item: Movie) => !isTrailer(item));
+        const filtered = matched.filter((m: Movie) => !isTrailer(m)).slice(0, limit);
+        const normalized = filtered.map(normalizeMovieImageRoles);
 
-        const normalized = filtered.slice(0, limit).map(normalizeMovieImageRoles);
-        const enriched = await enrichMoviesWithTMDB(normalized, limit + 8);
-
-        return {
-            items: enriched,
-            pagination: { currentPage: 1, totalPages: 1 } // Row pagination is simplified
-        };
+        return { items: normalized, pagination: { currentPage: 1, totalPages: 1 } };
     } catch (error) {
         console.error(`Error filtering country [${countrySlug}] by category [${categorySlug}]:`, error);
         return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
     }
 };
+
 
 // ... existing code ...
 import { getTMDBTrending, searchTMDBMovie } from "./tmdb";

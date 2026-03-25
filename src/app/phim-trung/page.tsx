@@ -45,26 +45,30 @@ const FEATURED_ACTORS = [
 ];
 
 async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'default', minHeight = 380 }: { title: string; categorySlug: string; countrySlug: string; variant?: 'default' | 'sidebar'; minHeight?: number }) {
-    // [Elite Performance] Try regional cache first
-    const cachedData = await getMoviesFromCache(countrySlug, 1, 60);
-    let filteredMovies: Movie[] = [];
-    
-    if (cachedData) {
-        filteredMovies = cachedData.items.filter(m => 
-            categorySlug === 'all' || m.category?.some(c => c.slug === categorySlug)
-        ).slice(0, 32);
-    }
+    try {
+        // [Cache-First] Fetch up to 300 to have enough for category filtering
+        const cachedData = await getMoviesFromCache(countrySlug, 1, 300).catch(() => null);
+        let filteredMovies: Movie[] = [];
 
-    if (filteredMovies.length < 12) {
-        const data = await getMoviesByCountryAndCategory(countrySlug, categorySlug, 32);
-        filteredMovies = data.items;
+        if (cachedData && cachedData.items.length > 0) {
+            filteredMovies = cachedData.items.filter((m: Movie) =>
+                categorySlug === 'all' || m.category?.some((c: any) => c.slug === categorySlug)
+            ).slice(0, 32);
+        }
+
+        if (filteredMovies.length < 8) {
+            const data = await getMoviesByCountryAndCategory(countrySlug, categorySlug, 32).catch(() => ({ items: [] as Movie[] }));
+            filteredMovies = data.items;
+        }
+
+        return (
+            <LazySection minHeight={minHeight} className={variant === 'sidebar' ? "movie-row-sidebar" : "movie-row-standard"}>
+                <MovieRow title={title} movies={filteredMovies} slug={`/the-loai/${categorySlug}`} variant={variant} />
+            </LazySection>
+        );
+    } catch {
+        return null; // Silent fail — row just won't appear
     }
-    
-    return (
-        <LazySection minHeight={minHeight} className={variant === 'sidebar' ? "movie-row-sidebar" : "movie-row-standard"}>
-            <MovieRow title={title} movies={filteredMovies} slug={`/the-loai/${categorySlug}`} variant={variant} />
-        </LazySection>
-    );
 }
 
 async function PhimTrungHome() {
@@ -139,32 +143,37 @@ async function CountryGridStream({ slug, page, limit = 49 }: { slug: string; pag
 }
 
 async function ChinaHeroWithData() {
-    const HERO_SLUGS = [
-        "bach-nguyet-phan-tinh",
-        "bui-hoa-hong",
-        "dai-mong-quy-ly",
-        "giang-ho-da-vu-thap-nien-dang",
-        "mac-nhan-tang-kieu",
-        "ngoc-minh-tra-cot"
-    ];
+    try {
+        // [Hardening] Always prefer cache — fast, reliable, 0 external calls
+        const cached = await getMoviesFromCache("trung-quoc", 1, 20).catch(() => null);
+        if (cached && cached.items.length >= 4) {
+            return <ChinaHero initialMovies={cached.items.slice(0, 8)} />;
+        }
 
-    const movieDetails = await Promise.all(
-        HERO_SLUGS.map(async (slug) => {
-            const data = await getMovieDetail(slug);
-            return data?.movie || null;
-        })
-    );
+        // Fallback: fetch individual slugs safely (each slug has its own catch)
+        const HERO_SLUGS = [
+            "bach-nguyet-phan-tinh",
+            "bui-hoa-hong",
+            "dai-mong-quy-ly",
+            "giang-ho-da-vu-thap-nien-dang",
+            "mac-nhan-tang-kieu",
+            "ngoc-minh-tra-cot"
+        ];
+        const movieDetails = await Promise.all(
+            HERO_SLUGS.map(slug =>
+                getMovieDetail(slug).then(d => d?.movie || null).catch(() => null)
+            )
+        );
+        let filteredMovies = movieDetails.filter(Boolean);
 
-    let filteredMovies = movieDetails.filter(Boolean);
-
-    // [Hardening] Fallback to latest movies if featured slugs are missing
-    if (filteredMovies.length === 0) {
-        const cached = await getMoviesFromCache("trung-quoc", 1, 20);
-        const fallback = !cached ? await getMoviesByCountry("trung-quoc", 1, 8) : null;
-        filteredMovies = cached ? cached.items.slice(0, 8) : (fallback?.items || []);
+        if (filteredMovies.length === 0) {
+            const fallback = await getMoviesByCountry("trung-quoc", 1, 8).catch(() => ({ items: [] }));
+            filteredMovies = fallback.items.slice(0, 8);
+        }
+        return <ChinaHero initialMovies={filteredMovies} />;
+    } catch {
+        return <ChinaHero initialMovies={[]} />;
     }
-
-    return <ChinaHero initialMovies={filteredMovies} />;
 }
 
 export default async function PhimTrungPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
