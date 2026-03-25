@@ -1,5 +1,17 @@
 export const API_URL = "https://phimapi.com";
 
+export interface Category {
+    id?: string;
+    name: string;
+    slug: string;
+}
+
+export interface Country {
+    id?: string;
+    name: string;
+    slug: string;
+}
+
 export interface Movie {
     _id: string;
     name: string;
