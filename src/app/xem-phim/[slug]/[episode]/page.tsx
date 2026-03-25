@@ -76,8 +76,8 @@ export default async function WatchPage({ params }: PageProps) {
 
     // [Elite Matching] 2. Fallback for common mismatches like 'full' vs 'tap-1'
     if (!currentEpisode && servers.length > 0) {
-        const firstServer = servers[0];
-        const firstEp = firstServer.server_data?.[0];
+        const firstServer = servers?.[0];
+        const firstEp = firstServer?.server_data?.[0];
         if (firstEp) {
             // Use it as fallback but keep requested slug for URL consistency
             currentEpisode = firstEp;

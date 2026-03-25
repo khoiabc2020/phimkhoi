@@ -152,7 +152,8 @@ async function KoreaHeroWithData() {
     // [Hardening] Fallback to latest movies if featured slugs are missing
     if (filteredMovies.length === 0) {
         const cached = await getMoviesFromCache("han-quoc", 1, 20);
-        filteredMovies = cached ? cached.items.slice(0, 8) : (await getMoviesByCountry("han-quoc", 1, 8)).items;
+        const fallback = !cached ? await getMoviesByCountry("han-quoc", 1, 8) : null;
+        filteredMovies = cached ? cached.items.slice(0, 8) : (fallback?.items || []);
     }
 
     return <KoreaHero initialMovies={filteredMovies} />;

@@ -91,7 +91,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                     displayDesc: movie.content 
                         ? stripHtml(movie.content)
                         : "Đang cập nhật nội dung...",
-                    displayTags: movie.category?.slice(0, 3).map((c: any) => c.name) || ["Phim Trung"],
+                    displayTags: movie.category?.slice(0, 3).map((c: any) => c?.name).filter(Boolean) || ["Phim Trung"],
                     displayEpisodes: movie.episode_current || "Full"
                 };
             });

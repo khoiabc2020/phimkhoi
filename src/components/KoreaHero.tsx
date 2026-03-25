@@ -59,7 +59,7 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                     displayDesc: movie.content 
                         ? stripHtml(movie.content)
                         : "Đang cập nhật nội dung...",
-                    displayTags: movie.category?.slice(0, 3).map((c: any) => c.name) || ["Phim Hàn"],
+                    displayTags: movie.category?.slice(0, 3).map((c: any) => c?.name).filter(Boolean) || ["Phim Hàn"],
                     displayEpisodes: movie.episode_current || "Full"
                 };
             });

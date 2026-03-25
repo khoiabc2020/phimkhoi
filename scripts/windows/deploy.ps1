@@ -36,7 +36,7 @@ npm run build
 # Standalone setup
 echo "Setting up standalone directory..."
 mkdir -p .next/standalone/public
-cp -a public/. .next/standalone/public/
+cp -rf public/* .next/standalone/public/ 2>/dev/null || true
 cp -a .next/static/. .next/standalone/.next/static/
 if [ -f .env.local ]; then
     cp .env.local .next/standalone/.env.local
