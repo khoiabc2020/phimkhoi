@@ -47,7 +47,7 @@ const FEATURED_ACTORS = [
 async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'default', minHeight = 380 }: { title: string; categorySlug: string; countrySlug: string; variant?: 'default' | 'sidebar'; minHeight?: number }) {
     try {
         // [Cache-First] Fetch up to 300 to have enough for category filtering
-        const cachedData = await getMoviesFromCache(countrySlug, 1, 300).catch(() => null);
+        const cachedData = await getMoviesFromCache(countrySlug, 1, 300).catch((): null => null);
         let filteredMovies: Movie[] = [];
 
         if (cachedData && cachedData.items.length > 0) {
@@ -57,7 +57,7 @@ async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'de
         }
 
         if (filteredMovies.length < 8) {
-            const data = await getMoviesByCountryAndCategory(countrySlug, categorySlug, 32).catch(() => ({ items: [] as Movie[] }));
+            const data = await getMoviesByCountryAndCategory(countrySlug, categorySlug, 32).catch((): { items: Movie[] } => ({ items: [] as Movie[] }));
             filteredMovies = data.items;
         }
 
@@ -145,7 +145,7 @@ async function CountryGridStream({ slug, page, limit = 49 }: { slug: string; pag
 async function ChinaHeroWithData() {
     try {
         // [Hardening] Always prefer cache — fast, reliable, 0 external calls
-        const cached = await getMoviesFromCache("trung-quoc", 1, 20).catch(() => null);
+        const cached = await getMoviesFromCache("trung-quoc", 1, 20).catch((): null => null);
         if (cached && cached.items.length >= 4) {
             return <ChinaHero initialMovies={cached.items.slice(0, 8)} />;
         }
@@ -161,13 +161,13 @@ async function ChinaHeroWithData() {
         ];
         const movieDetails = await Promise.all(
             HERO_SLUGS.map(slug =>
-                getMovieDetail(slug).then(d => d?.movie || null).catch(() => null)
+                getMovieDetail(slug).then(d => d?.movie || null).catch((): null => null)
             )
         );
         let filteredMovies = movieDetails.filter(Boolean);
 
         if (filteredMovies.length === 0) {
-            const fallback = await getMoviesByCountry("trung-quoc", 1, 8).catch(() => ({ items: [] }));
+            const fallback = await getMoviesByCountry("trung-quoc", 1, 8).catch((): { items: never[] } => ({ items: [] }));
             filteredMovies = fallback.items.slice(0, 8);
         }
         return <ChinaHero initialMovies={filteredMovies} />;
