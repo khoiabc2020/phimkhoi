@@ -92,6 +92,11 @@ export default async function WatchPage({ params }: PageProps) {
     const theme = getThemeBySlug(firstCategory);
     const displayEpisodeName = (name: string) => name?.startsWith("Tập") ? name : `Tập ${name}`;
 
+    // [Elite Performance] placeholders for now (non-blocking)
+    let cast: any[] = [];
+    let episodeThumbnails: Record<string, string> = {};
+    let episodeMetadata: Record<string, any> = {};
+
     const movieData = {
         movieId: movie._id,
         movieSlug: movie.slug,
@@ -129,6 +134,8 @@ export default async function WatchPage({ params }: PageProps) {
                                 currentEpisode={currentEpisode}
                                 episodes={usedEpisodes.length > 0 ? usedEpisodes : servers[0]?.server_data || []}
                                 servers={servers}
+                                episodeThumbnails={episodeThumbnails}
+                                episodeMetadata={episodeMetadata}
                                 movieData={movieData}
                                 initialServerName={usedServerName || servers[0]?.server_name || ""}
                             />
