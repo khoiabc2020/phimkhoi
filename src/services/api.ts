@@ -1220,7 +1220,7 @@ export const getMoviesByCountryAndCategory = async (countrySlug: string, categor
             const countryIdentifier = countrySlug.toLowerCase().replace(/-/g, ' ');
 
             const fromCat = (catFetch.items || []).filter((m: Movie) => {
-                const isAlreadyInMatched = matched.find(x => x.slug === m.slug);
+                const isAlreadyInMatched = matched.find((x: Movie) => x.slug === m.slug);
                 if (isAlreadyInMatched) return false;
 
                 const matchesCountry = !m.country || m.country.length === 0 || 
