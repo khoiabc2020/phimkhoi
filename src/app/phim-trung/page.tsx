@@ -151,17 +151,22 @@ async function ChinaHeroWithData() {
         }
 
         // Fallback: fetch individual slugs safely (each slug has its own catch)
+        // Full list of slugs that have custom assets in ASSETS_MAP
         const HERO_SLUGS = [
+            "duong-cung-ky-an-thanh-vu-phong-minh",
+            "xin-chao-1983",
+            "con-ra-the-thong-gi-nua",
             "bach-nguyet-phan-tinh",
             "bui-hoa-hong",
             "dai-mong-quy-ly",
             "giang-ho-da-vu-thap-nien-dang",
             "mac-nhan-tang-kieu",
-            "ngoc-minh-tra-cot"
+            "ngoc-minh-tra-cot",
+            "truc-ngoc"
         ];
         const movieDetails = await Promise.all(
             HERO_SLUGS.map(slug =>
-                getMovieDetail(slug).then(d => d?.movie || null).catch((): null => null)
+                getMovieDetail(slug).then(d => d?.movie || { slug, name: slug.replace(/-/g, ' ') }).catch((): null => null)
             )
         );
         let filteredMovies = movieDetails.filter(Boolean);
