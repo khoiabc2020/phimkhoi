@@ -1,3 +1,8 @@
+import dotenv from "dotenv";
+import path from "path";
+
+dotenv.config({ path: path.join(process.cwd(), ".env.local") });
+
 export const API_URL = "https://phimapi.com";
 
 export interface Category {
@@ -1248,9 +1253,24 @@ export const getTrendMovies = async (
     try {
         const trendList = await getTMDBTrending(type, timeWindow);
 
+        if (!trendList || trendList.length === 0) {
+            // Fallback: Tải từ Database TrendingCache nếu TMDB API lỗi
+             try {
+                const { default: connectDB } = await import("@/lib/db");
+                const { default: TrendingCache } = await import("@/models/TrendingCache");
+                await connectDB();
+                const cacheType = type === 'all' ? `tmdb-trending-${timeWindow}` : type;
+                const cache = await TrendingCache.findOne({ type: cacheType }).lean();
+                if (cache?.movies?.length > 0) return cache.movies;
+            } catch (dbErr) {
+                console.error("Trending DB Fallback error:", dbErr);
+            }
+            return [];
+        }
+
         const movies = await Promise.all(trendList.slice(0, 15).map(async (tmdbItem: any) => {
             const query = tmdbItem.original_name || tmdbItem.original_title || tmdbItem.name || tmdbItem.title;
-            const searchResults = await searchMovies(query);
+            const searchResults = await searchMovies(query, { enrichTMDB: false }); // Skip sub-enrichment to save time
 
             if (searchResults && searchResults.length > 0) {
                 const movie = searchResults[0];
@@ -1267,22 +1287,46 @@ export const getTrendMovies = async (
                     thumb_url: useTmdbImages && tmdbItem.backdrop_path
                         ? `https://image.tmdb.org/t/p/original${tmdbItem.backdrop_path}`
                         : (movie.thumb_url || movie.poster_url || ""),
+                    tmdbData: {
+                        vote_average: tmdbItem.vote_average,
+                        poster_path: tmdbItem.poster_path,
+                        backdrop_path: tmdbItem.backdrop_path
+                    }
                 };
             }
             return null;
         }));
 
-        // Filter out nulls and movies that only have a trailer (not yet released)
-        return movies.filter((m: any) => {
+        const filtered = movies.filter((m: any) => {
             if (!m) return false;
-
-            // Lọc bỏ phim chưa ra mắt (chỉ có trailer)
             const status = String(m.status || "").toLowerCase();
             const epCurrent = String(m.episode_current || "").toLowerCase();
             if (status.includes("trailer") || epCurrent.includes("trailer")) return false;
-
             return true;
         });
+
+        // Nếu quá ít kết quả sau khi filter (do không tìm thấy phim pirate), dùng database bù đắp
+        if (filtered.length < 5) {
+             try {
+                const { default: connectDB } = await import("@/lib/db");
+                const { default: TrendingCache } = await import("@/models/TrendingCache");
+                await connectDB();
+                const cacheType = type === 'all' ? `tmdb-trending-${timeWindow}` : type;
+                const cache = await TrendingCache.findOne({ type: cacheType }).lean();
+                if (cache?.movies?.length > 0) {
+                    const seenIds = new Set(filtered.map(m => m._id));
+                    for (const m of cache.movies) {
+                        if (!seenIds.has(m._id)) {
+                            filtered.push(m);
+                            seenIds.add(m._id);
+                        }
+                        if (filtered.length >= 12) break;
+                    }
+                }
+            } catch (dbErr) { /* ignore */ }
+        }
+
+        return filtered;
     } catch (error) {
         console.error("Error fetching trend movies:", error);
         return [];
