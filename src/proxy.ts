@@ -9,7 +9,7 @@ import type { NextRequest } from "next/server";
  * 2. Session Hardening (Cache-Control)
  * 3. Route Protection (Admin/Profile)
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const host = request.headers.get("host") || "";
 
