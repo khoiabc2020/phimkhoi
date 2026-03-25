@@ -2,6 +2,8 @@
 
 import { searchTMDBMovie, getTMDBDetails, getTMDBPersonDetails, getTMDBSeasonDetails } from "@/services/tmdb";
 
+const isBuildPhase = () => process.env.NEXT_PHASE === 'phase-production-build';
+
 export type TMDBEpisodeMeta = {
     image?: string;
     title?: string;
@@ -17,6 +19,7 @@ export async function getTMDBDataForCard(
     type: 'movie' | 'tv' = 'movie',
     verification?: { originalName?: string; localName?: string; countrySlug?: string }
 ) {
+    if (isBuildPhase()) return null;
     try {
         const movie = await searchTMDBMovie(query, year, type, verification);
         if (movie) {
@@ -39,6 +42,7 @@ export async function getMovieTrailer(
     type: 'movie' | 'tv' = 'movie',
     verification?: { originalName?: string; localName?: string; countrySlug?: string }
 ) {
+    if (isBuildPhase()) return null;
     try {
         const movie = await searchTMDBMovie(query, year, type, verification);
         if (movie) {
@@ -66,6 +70,7 @@ export async function getMovieCast(
     localizedActors?: string[],
     verification?: { originalName?: string; localName?: string; countrySlug?: string }
 ) {
+    if (isBuildPhase()) return [];
     try {
         const movie = await searchTMDBMovie(query, year, type, verification);
         if (movie) {
@@ -110,6 +115,7 @@ export async function getTMDBEpisodeImages(
     year?: number,
     verification?: { originalName?: string; localName?: string; countrySlug?: string }
 ) {
+    if (isBuildPhase()) return {};
     try {
         const toNumberOrUndefined = (value: unknown): number | undefined => {
             const parsed = Number(value);
