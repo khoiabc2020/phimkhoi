@@ -12,7 +12,7 @@ module.exports = {
         HOSTNAME: "0.0.0.0",
         NODE_OPTIONS: "--max_old_space_size=2048",
       },
-      max_memory_restart: "1.5G",
+      max_memory_restart: "1500M",
     },
   ],
 };
