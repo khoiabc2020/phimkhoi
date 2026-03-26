@@ -10,7 +10,6 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import MovieRow from "@/components/MovieRow";
 import ActorRow from "@/components/ActorRow";
-import LazySection from "@/components/LazySection";
 import { detectOrientation, cn } from "@/lib/utils";
 import { getThemeBySlug } from "@/lib/theme";
 import { headers } from "next/headers";
@@ -52,7 +51,7 @@ function getSafeFallbackWindow(movies: Movie[], fallbackOffset: number, size: nu
     return movies.slice(start, start + size);
 }
 
-async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'default', minHeight = 380, priorityFirst = false, fallbackOffset = 0 }: { title: string; categorySlug: string; countrySlug: string; variant?: 'default' | 'sidebar'; minHeight?: number; priorityFirst?: boolean; fallbackOffset?: number }) {
+async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'default', priorityFirst = false, fallbackOffset = 0 }: { title: string; categorySlug: string; countrySlug: string; variant?: 'default' | 'sidebar'; priorityFirst?: boolean; fallbackOffset?: number }) {
     try {
         const countryPool = await getCountryPool(countrySlug);
         const countryMovies = countryPool?.items || [];
@@ -86,15 +85,13 @@ async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'de
         if (!filteredMovies || filteredMovies.length === 0) return null;
 
         return (
-            <LazySection minHeight={minHeight} className={variant === 'sidebar' ? "movie-row-sidebar" : "movie-row-standard"}>
-                <MovieRow 
-                    title={title} 
-                    movies={filteredMovies} 
-                    slug={categorySlug !== 'all' ? `/the-loai/${categorySlug}` : `/quoc-gia/${countrySlug}`}
-                    variant={variant} 
-                    priorityFirst={priorityFirst} 
-                />
-            </LazySection>
+            <MovieRow 
+                title={title} 
+                movies={filteredMovies} 
+                slug={categorySlug !== 'all' ? `/the-loai/${categorySlug}` : `/quoc-gia/${countrySlug}`}
+                variant={variant} 
+                priorityFirst={priorityFirst} 
+            />
         );
     } catch (e) {
         console.error(`Error in CountryMovieRow [${title}]:`, e);
@@ -109,9 +106,7 @@ async function PhimHanHome() {
 
     return (
         <div className="space-y-12 md:space-y-16 pb-12">
-            <LazySection minHeight={380} className="movie-row-standard">
-                <MovieRow title="Phim Mới Cập Nhật" movies={movies} slug="/quoc-gia/han-quoc" priorityFirst />
-            </LazySection>
+            <MovieRow title="Phim Mới Cập Nhật" movies={movies} slug="/quoc-gia/han-quoc" priorityFirst />
             
             <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
                 <CountryMovieRow title="Phim Tình Cảm" categorySlug="tinh-cam" countrySlug="han-quoc" priorityFirst={true} fallbackOffset={14} />
@@ -125,9 +120,7 @@ async function PhimHanHome() {
                 <CountryMovieRow title="Phim Cổ Trang" categorySlug="co-trang" countrySlug="han-quoc" fallbackOffset={78} />
             </Suspense>
 
-            <LazySection minHeight={200} className="movie-row-landscape">
-                <ActorRow title="Diễn viên nổi bật" actors={FEATURED_ACTORS} />
-            </LazySection>
+            <ActorRow title="Diễn viên nổi bật" actors={FEATURED_ACTORS} />
 
             <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
                 <CountryMovieRow title="Phim Hài Hước" categorySlug="hai-huoc" countrySlug="han-quoc" fallbackOffset={110} />
