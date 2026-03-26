@@ -19,13 +19,31 @@ export function getImageUrl(url: string, proxy = false): string {
             normalized.startsWith("/upload/") ||
             normalized.startsWith("uploads/") ||
             normalized.startsWith("/uploads/") ||
-            normalized.startsWith("vod/")
+            normalized.startsWith("vod/") ||
+            normalized.startsWith("/vod/")
         ) {
             const cleanPath = normalized.startsWith("/") ? normalized : `/${normalized}`;
             finalUrl = `https://img.phimapi.com${cleanPath}`;
         } else {
             // For ophim, normally paths without http are relative to phimimg.com
             finalUrl = normalized.startsWith("/") ? `https://phimimg.com${normalized}` : `https://phimimg.com/${normalized}`;
+        }
+    }
+
+    if (finalUrl.startsWith("http")) {
+        try {
+            const parsed = new URL(finalUrl);
+            const isLegacyPhimImgUpload =
+                parsed.hostname === "phimimg.com" &&
+                (parsed.pathname.startsWith("/upload/") ||
+                    parsed.pathname.startsWith("/uploads/") ||
+                    parsed.pathname.startsWith("/vod/"));
+
+            if (isLegacyPhimImgUpload) {
+                finalUrl = `https://img.phimapi.com${parsed.pathname}${parsed.search}`;
+            }
+        } catch {
+            // ignore URL parse error
         }
     }
 
@@ -115,7 +133,11 @@ export function detectOrientation(url?: string | null): "portrait" | "landscape"
     
     // OPhim, NguonC often use "thumb" for portrait and "poster" for landscape (reverse of standard)
     const isNguonc = u.includes("nguonc.com") || u.includes("streamc.xyz") || u.includes("phimmoi.net") || u.includes("1080.com.vn");
-    const isOphim = u.includes("img.ophim.live") || u.includes("phimimg.com") || u.includes("img.ophim1.com");
+    const isOphim =
+        u.includes("img.ophim.live") ||
+        u.includes("phimimg.com") ||
+        u.includes("img.ophim1.com") ||
+        u.includes("img.phimapi.com");
 
     if (isOphim || isNguonc) {
         if (u.includes("-thumb.") || u.includes("/thumb-") || u.endsWith("/thumb.jpg") || u.endsWith("/thumb.png")) return "portrait";

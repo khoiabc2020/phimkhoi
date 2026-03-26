@@ -1,6 +1,8 @@
 import { cache } from "react";
 import type { Movie } from "@/services/api";
-import { getMoviesByFilterFromCache, getMoviesFromCache } from "@/lib/movie-cache";
+import { getMoviesByCountry } from "@/services/api";
+import { getMoviesByFilterFromCache } from "@/lib/movie-cache";
+import { sanitizeMovieList } from "@/lib/movie-list";
 
 export interface CountryHomeSectionConfig {
     title: string;
@@ -10,19 +12,11 @@ export interface CountryHomeSectionConfig {
 }
 
 const EMPTY_ITEMS: Movie[] = [];
+const COUNTRY_POOL_PAGE_LIMIT = 120;
+const COUNTRY_POOL_PAGES = [1, 2, 3];
 
 const dedupeMoviesBySlug = (movies: Movie[] = []): Movie[] => {
-    const seen = new Set<string>();
-    const merged: Movie[] = [];
-
-    for (const movie of movies) {
-        const slug = String(movie?.slug || "").trim();
-        if (!slug || seen.has(slug)) continue;
-        seen.add(slug);
-        merged.push(movie);
-    }
-
-    return merged;
+    return sanitizeMovieList(movies, { limit: movies.length || 1 });
 };
 
 const filterByCategory = (movies: Movie[], categorySlug: string) => {
@@ -40,27 +34,27 @@ const safeSliceWindow = (movies: Movie[], offset: number, size: number): Movie[]
 };
 
 export const getCountryPagePool = cache(async (countrySlug: string) => {
-    const [localCountry, cachedTrending, globalLatest] = await Promise.all([
-        getMoviesByFilterFromCache("country", countrySlug, 1, 360).catch((): null => null),
-        getMoviesFromCache(countrySlug, 1, 180).catch((): null => null),
-        getMoviesFromCache("phim-moi-cap-nhat", 1, 120).catch((): null => null),
+    const [localPages, livePages] = await Promise.all([
+        Promise.all(
+            COUNTRY_POOL_PAGES.map((page) =>
+                getMoviesByFilterFromCache("country", countrySlug, page, COUNTRY_POOL_PAGE_LIMIT).catch((): null => null)
+            )
+        ),
+        Promise.all(
+            COUNTRY_POOL_PAGES.map((page) =>
+                getMoviesByCountry(countrySlug, page, COUNTRY_POOL_PAGE_LIMIT).catch((): null => null)
+            )
+        ),
     ]);
 
     const countryItems = dedupeMoviesBySlug([
-        ...(localCountry?.items || EMPTY_ITEMS),
-        ...(cachedTrending?.items || EMPTY_ITEMS),
+        ...localPages.flatMap((entry) => entry?.items || EMPTY_ITEMS),
+        ...livePages.flatMap((entry) => entry?.items || EMPTY_ITEMS),
     ]);
-
-    const globalItems = dedupeMoviesBySlug([
-        ...(globalLatest?.items || EMPTY_ITEMS),
-        ...(cachedTrending?.items || EMPTY_ITEMS),
-    ]);
-    const fallbackItems = dedupeMoviesBySlug([...countryItems, ...globalItems]);
 
     return {
         countryItems,
-        globalItems,
-        fallbackItems,
+        fallbackItems: countryItems,
     };
 });
 
@@ -92,7 +86,6 @@ export const buildCountryHeroMovies = (
 
 export const buildCountrySectionMovies = (
     countryItems: Movie[],
-    globalItems: Movie[],
     categorySlug: string,
     fallbackOffset: number = 0,
     size: number = 24
@@ -107,13 +100,11 @@ export const buildCountrySectionMovies = (
         return dedupeMoviesBySlug([...countryCategory, ...fallbackWindow]).slice(0, size);
     }
 
-    const globalCategory = filterByCategory(globalItems, categorySlug);
-    return dedupeMoviesBySlug([...countryCategory, ...fallbackWindow, ...globalCategory, ...globalItems]).slice(0, size);
+    return dedupeMoviesBySlug([...countryCategory, ...fallbackWindow, ...countryItems]).slice(0, size);
 };
 
 export const buildCountryHomeSections = (
     countryItems: Movie[],
-    globalItems: Movie[],
     sections: CountryHomeSectionConfig[]
 ) => {
     return sections
@@ -121,7 +112,6 @@ export const buildCountryHomeSections = (
             ...section,
             movies: buildCountrySectionMovies(
                 countryItems,
-                globalItems,
                 section.categorySlug,
                 section.fallbackOffset || 0,
                 24

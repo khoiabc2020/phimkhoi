@@ -3,6 +3,7 @@ import "server-only";
 import dbConnect from "@/lib/db";
 import MovieModel from "@/models/Movie";
 import { getMoviesByCategory, getMoviesByCountry, getMoviesList, type Movie } from "@/services/api";
+import { isAdultMovie, sanitizeMovieList } from "@/lib/movie-list";
 
 const CATEGORY_SLUGS = new Set([
     "hanh-dong", "tinh-cam", "hai-huoc", "co-trang", "tam-ly", "hinh-su",
@@ -28,15 +29,10 @@ const isTrailerLike = (movie: Partial<Movie> | null | undefined) => {
 };
 
 const dedupeMovies = (movies: Movie[], limit: number) => {
-    const merged = new Map<string, Movie>();
-
-    for (const movie of movies) {
-        if (!movie?.slug || merged.has(movie.slug) || isTrailerLike(movie)) continue;
-        merged.set(movie.slug, movie);
-        if (merged.size >= limit) break;
-    }
-
-    return Array.from(merged.values()).slice(0, limit);
+    return sanitizeMovieList(
+        movies.filter((movie) => !isTrailerLike(movie) && !isAdultMovie(movie)),
+        { limit }
+    );
 };
 
 async function getRecentMoviesFromDb(query: Record<string, unknown>, limit: number) {

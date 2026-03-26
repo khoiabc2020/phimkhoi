@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getMoviesByFilterFromCache, getMoviesFromCache } from '@/lib/movie-cache';
 import { getFallbackDisplayMovies, syncMoviesToLocalCache } from '@/services/server-movies';
 import { getMoviesByCategory, getMoviesByCountry, getMoviesList } from '@/services/api';
+import { sanitizeMovieList } from '@/lib/movie-list';
 
 /**
  * [Elite Retrieval API]
@@ -17,6 +18,8 @@ export async function GET(req: Request) {
         const limit = Math.max(1, Number(searchParams.get('limit')) || 28);
         const year = searchParams.get('year') || 'all';
         const category = searchParams.get('category') || 'all';
+        const allowAdult = slug === 'phim-18' || category === 'phim-18';
+        const finalize = (items: any[]) => sanitizeMovieList(items, { limit, allowAdult });
 
         // 1. Handle Categorical/Country filters
         if (type === 'category' || type === 'country') {
@@ -24,7 +27,10 @@ export async function GET(req: Request) {
             
             const data = await getMoviesByFilterFromCache(type, slug, page, limit, { year, category });
             if (data) {
-                return NextResponse.json(data, {
+                return NextResponse.json({
+                    ...data,
+                    items: finalize(data.items || [])
+                }, {
                     headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' }
                 });
             }
@@ -34,7 +40,10 @@ export async function GET(req: Request) {
         if (type === 'list' && slug) {
             const data = await getMoviesFromCache(slug, page, limit);
             if (data) {
-                return NextResponse.json(data, {
+                return NextResponse.json({
+                    ...data,
+                    items: finalize(data.items || [])
+                }, {
                     headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' }
                 });
             }
@@ -64,7 +73,10 @@ export async function GET(req: Request) {
 
             if (externalData?.items?.length) {
                 syncMoviesToLocalCache(externalData.items).catch(() => {});
-                return NextResponse.json(externalData, {
+                return NextResponse.json({
+                    ...externalData,
+                    items: finalize(externalData.items || [])
+                }, {
                     headers: { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300' }
                 });
             }
@@ -81,7 +93,7 @@ export async function GET(req: Request) {
 
             if (fallbackItems.length) {
                 return NextResponse.json({
-                    items: fallbackItems,
+                    items: finalize(fallbackItems),
                     pagination: { currentPage: page, totalPages: 1 },
                     fallback: true
                 }, {

@@ -3,7 +3,7 @@ import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
 import { getMenuData, getMoviesByCountry } from "@/services/api";
-import { getMoviesByFilterFromCache, getMoviesFromCache } from "@/lib/movie-cache";
+import { getMoviesByFilterFromCache } from "@/lib/movie-cache";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
@@ -61,9 +61,9 @@ const SECTION_CONFIG: CountryHomeSectionConfig[] = [
 ];
 
 async function PhimTrungHome() {
-    const { countryItems, globalItems, fallbackItems } = await getCountryPagePool("trung-quoc");
+    const { countryItems, fallbackItems } = await getCountryPagePool("trung-quoc");
     const latestMovies = fallbackItems.slice(0, 14);
-    const sections = buildCountryHomeSections(countryItems, globalItems, SECTION_CONFIG);
+    const sections = buildCountryHomeSections(countryItems, SECTION_CONFIG);
 
     return (
         <div className="space-y-12 md:space-y-16 pb-12">
@@ -96,8 +96,7 @@ async function PhimTrungHome() {
 
 async function CountryGridStream({ slug, page, limit = 49 }: { slug: string; page: number; limit?: number }) {
     const local = await getMoviesByFilterFromCache("country", slug, page, limit).catch((): null => null);
-    const cached = page <= 3 ? await getMoviesFromCache(slug, page, limit).catch((): null => null) : null;
-    const data = local || cached || await getMoviesByCountry(slug, page, limit);
+    const data = local || await getMoviesByCountry(slug, page, limit);
 
     if (!data.items || data.items.length === 0) {
         return <div className="py-20 text-center text-white/40">Không tìm thấy phim nào.</div>;

@@ -8,6 +8,7 @@ import {
     getMovieDetail,
 } from "@/services/api";
 import { getFallbackDisplayMovies, syncMoviesToLocalCache } from "@/services/server-movies";
+import { sanitizeMovieList } from "@/lib/movie-list";
 import { 
     getMoviesFromCache, 
     getMoviesByFilterFromCache, 
@@ -26,6 +27,9 @@ export async function getResilientMoviesList(
     options: { category?: string; country?: string; year?: string | number } = {}
 ) {
     try {
+        const allowAdult = options.category === "phim-18" || type === "phim-18";
+        const finalize = (items: Movie[]) => sanitizeMovieList(items, { limit, allowAdult });
+
         // 1. Try DB first for maximum speed (sub-50ms)
         let data = null;
         if (options.category || options.country) {
@@ -37,7 +41,10 @@ export async function getResilientMoviesList(
         }
 
         if (data && data.items && data.items.length > 0) {
-            return data;
+            return {
+                ...data,
+                items: finalize(data.items),
+            };
         }
 
         // 2. Fallback to External API (Higher latency but fresh)
@@ -73,18 +80,25 @@ export async function getResilientMoviesList(
 
         if (apiData && apiData.items && apiData.items.length > 0) {
             syncMoviesToLocalCache(apiData.items).catch(() => {});
-            return apiData;
+            return {
+                ...apiData,
+                items: finalize(apiData.items),
+            };
         }
 
         const fallbackItems = await getFallbackDisplayMovies({ type, limit, options });
         return {
-            items: fallbackItems,
+            items: finalize(fallbackItems),
             pagination: { currentPage: page, totalPages: Math.max(1, fallbackItems.length ? page : 1) }
         };
     } catch (error) {
         console.error(`[ResilientAction] getResilientMoviesList Error:`, error);
         const fallbackItems = await getFallbackDisplayMovies({ type, limit, options }).catch((): Movie[] => []);
-        return { items: fallbackItems, pagination: { currentPage: page, totalPages: 1 } };
+        const allowAdult = options.category === "phim-18" || type === "phim-18";
+        return {
+            items: sanitizeMovieList(fallbackItems, { limit, allowAdult }),
+            pagination: { currentPage: page, totalPages: 1 }
+        };
     }
 }
 

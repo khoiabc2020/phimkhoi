@@ -11,6 +11,7 @@ import LazySection from "@/components/LazySection";
 import { getMoviesList, getTrendMovies, isTrailer } from "@/services/api";
 import { getTMDBDataForCard } from "@/app/actions/tmdb";
 import { cn } from "@/lib/utils";
+import { isAdultMovie, sanitizeMovieList } from "@/lib/movie-list";
 import connectDB from "@/lib/db";
 import CustomHero from "@/models/CustomHero";
 import TrendingCache from "@/models/TrendingCache";
@@ -50,7 +51,7 @@ async function buildTopList(
   const seenMedia = new Set<string>();
 
   data = data.filter((item) => {
-    if (!item || isTrailer(item)) return false;
+    if (!item || isTrailer(item) || isAdultMovie(item)) return false;
     const mediaUrl = item.poster_url || item.thumb_url;
     if (!mediaUrl) return true;
     if (seenMedia.has(mediaUrl)) return false;
@@ -104,20 +105,11 @@ async function buildTopList(
     }
   }
 
-  return data.slice(0, 10);
+  return sanitizeMovieList(data, { limit: 10 });
 }
 
 function mergeTopPools(...pools: any[][]) {
-  const bySlug = new Map<string, any>();
-  for (const pool of pools) {
-    for (const item of pool || []) {
-      if (!item?.slug) continue;
-      if (!bySlug.has(item.slug)) bySlug.set(item.slug, item);
-      if (bySlug.size >= 12) break;
-    }
-    if (bySlug.size >= 12) break;
-  }
-  return [...bySlug.values()].slice(0, 10);
+  return sanitizeMovieList(pools.flat().filter((item) => item && !isAdultMovie(item)), { limit: 10 });
 }
 
 // Expose quick-switch top tabs on all screens (Top ngày / Top tuần / Top tháng / Top bộ / Top lẻ)
@@ -241,11 +233,11 @@ async function HeroStream() {
       // 2. Không có Custom Hero -> Fallback tải dữ liệu top trending từ Database trực tiếp
       const cache = await TrendingCache.findOne({ type: 'tmdb-trending-day' }).lean();
       // Ensure we filter out any trailers that might be in the cache
-      finalHeroData = (cache?.movies || []).filter((m: any) => !isTrailer(m)).slice(0, 10);
+      finalHeroData = sanitizeMovieList((cache?.movies || []).filter((m: any) => !isTrailer(m) && !isAdultMovie(m)), { limit: 10 });
       
       if (finalHeroData.length < 3) {
         const backupCache = await TrendingCache.findOne({ type: 'phim-bo' }).lean();
-        finalHeroData = (backupCache?.movies || []).filter((m: any) => !isTrailer(m)).slice(0, 10);
+        finalHeroData = sanitizeMovieList((backupCache?.movies || []).filter((m: any) => !isTrailer(m) && !isAdultMovie(m)), { limit: 10 });
       }
     }
   } catch (error) {
@@ -255,7 +247,7 @@ async function HeroStream() {
   if (finalHeroData.length === 0) {
     try {
       const fallback = await getMoviesList("phim-moi-cap-nhat", { limit: 10 });
-      finalHeroData = (fallback.items || []).filter((m: any) => !isTrailer(m)).slice(0, 10);
+      finalHeroData = sanitizeMovieList((fallback.items || []).filter((m: any) => !isTrailer(m) && !isAdultMovie(m)), { limit: 10 });
     } catch (error) {
       console.error("HeroStream external fallback error:", error);
     }
