@@ -1,10 +1,10 @@
-import { Suspense } from "react";
+import { Suspense, cache } from "react";
 import ChinaHero from "@/components/ChinaHero";
 import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
 import { getMoviesByCategory, getMenuData, getMoviesByCountry, Movie, getMovieDetail, getMoviesList, getMoviesByCountryAndCategory } from "@/services/api";
-import { getMoviesFromCache } from "@/lib/movie-cache";
+import { getMoviesByFilterFromCache, getMoviesFromCache } from "@/lib/movie-cache";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
@@ -44,14 +44,26 @@ const FEATURED_ACTORS = [
     { name: "Vương Tử Kỳ", role: "Tình Yêu Thôi Mà", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/uS80R3jOnm9Fm8k6P9uT8H6zF7x.jpg" }
 ];
 
+const getCountryPool = cache(async (countrySlug: string, limit: number = 320) => {
+    return getMoviesByFilterFromCache("country", countrySlug, 1, limit).catch((): null => null);
+});
+
+function getSafeFallbackWindow(movies: Movie[], fallbackOffset: number, size: number = 32): Movie[] {
+    if (!Array.isArray(movies) || movies.length === 0) return [];
+    const maxStart = Math.max(0, movies.length - Math.min(size, movies.length));
+    const start = Math.min(Math.max(0, fallbackOffset), maxStart);
+    return movies.slice(start, start + size);
+}
+
 async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'default', minHeight = 380, fallbackOffset = 0 }: { title: string; categorySlug: string; countrySlug: string; variant?: 'default' | 'sidebar'; minHeight?: number; fallbackOffset?: number }) {
     try {
-        const cachedData = await getMoviesFromCache(countrySlug, 1, 300).catch((): null => null);
+        const countryPool = await getCountryPool(countrySlug);
+        const countryMovies = countryPool?.items || [];
         let filteredMovies: Movie[] = [];
 
-        // Tier 1: Category filter from cache
-        if (cachedData && cachedData.items.length > 0) {
-            filteredMovies = cachedData.items.filter((m: Movie) =>
+        // Tier 1: Category filter from the full local country pool
+        if (countryMovies.length > 0) {
+            filteredMovies = countryMovies.filter((m: Movie) =>
                 categorySlug === 'all' || m.category?.some((c: any) => c.slug === categorySlug)
             ).slice(0, 32);
         }
@@ -65,8 +77,13 @@ async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'de
         }
 
         // Tier 3: Paginated country offset — always show something
-        if (filteredMovies.length < 4 && cachedData && cachedData.items.length > 0) {
-            filteredMovies = cachedData.items.slice(fallbackOffset, fallbackOffset + 32);
+        if (filteredMovies.length < 4 && countryMovies.length > 0) {
+            filteredMovies = getSafeFallbackWindow(countryMovies, fallbackOffset, 32);
+        }
+
+        if (filteredMovies.length === 0) {
+            const broad = await getMoviesByCountry(countrySlug, 1, 32).catch((): { items: Movie[] } => ({ items: [] as Movie[] }));
+            filteredMovies = broad.items || [];
         }
 
         if (!filteredMovies || filteredMovies.length === 0) return null;
@@ -88,8 +105,8 @@ async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'de
 }
 
 async function PhimTrungHome() {
-    const cached = await getMoviesFromCache("trung-quoc", 1, 14).catch((): null => null);
-    const latest = cached || await getMoviesByCountry("trung-quoc", 1, 14).catch((): { items: Movie[] } => ({ items: [] as Movie[] }));
+    const local = await getCountryPool("trung-quoc", 14);
+    const latest = local || await getMoviesByCountry("trung-quoc", 1, 14).catch((): { items: Movie[] } => ({ items: [] as Movie[] }));
     const movies = latest?.items || [];
 
     return (
@@ -143,8 +160,9 @@ async function PhimTrungHome() {
 
 /** Legacy Grid Stream for Pagination pages */
 async function CountryGridStream({ slug, page, limit = 49 }: { slug: string; page: number; limit?: number }) {
-    const cached = page <= 3 ? await getMoviesFromCache(slug, page, limit) : null;
-    const data = cached || await getMoviesByCountry(slug, page, limit);
+    const local = await getMoviesByFilterFromCache('country', slug, page, limit).catch((): null => null);
+    const cached = page <= 3 ? await getMoviesFromCache(slug, page, limit).catch((): null => null) : null;
+    const data = local || cached || await getMoviesByCountry(slug, page, limit);
     
     if (!data.items || data.items.length === 0) {
         return <div className="py-20 text-center text-white/40">Không tìm thấy phim nào.</div>;
@@ -192,7 +210,7 @@ async function ChinaHeroWithData() {
 
         // [Priority 2] If custom slides are missing/empty, fallback to top trending from cache or API
         if (filteredMovies.length < 3) {
-            const cached = await getMoviesFromCache("trung-quoc", 1, 12).catch((): null => null);
+            const cached = await getCountryPool("trung-quoc", 12) || await getMoviesFromCache("trung-quoc", 1, 12).catch((): null => null);
             if (cached && (cached.items?.length || 0) > 0) {
                 const existingSlugs = new Set(filteredMovies.map(m => (m as any).slug));
                 const trending = (cached.items || []).filter((m: any) => !existingSlugs.has(m.slug));
