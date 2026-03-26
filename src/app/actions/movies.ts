@@ -1,6 +1,12 @@
 "use server";
 
-import { getMoviesList, Movie, getMovieDetail } from "@/services/api";
+import {
+    getMoviesList,
+    getMoviesByCategory,
+    getMoviesByCountry,
+    Movie,
+    getMovieDetail,
+} from "@/services/api";
 import { getFallbackDisplayMovies, syncMoviesToLocalCache } from "@/services/server-movies";
 import { 
     getMoviesFromCache, 
@@ -46,13 +52,24 @@ export async function getResilientMoviesList(
             ? undefined
             : yearParam;
 
-        const apiData = await getMoviesList(type, { 
-            page, 
-            limit, 
-            category: options.category, 
-            country: options.country,
-            year: normalizedYearParam
-        });
+        const apiData =
+            options.country
+                ? await getMoviesByCountry(options.country, page, limit, {
+                    category: options.category,
+                    year: normalizedYearParam,
+                })
+                : options.category
+                    ? await getMoviesByCategory(options.category, page, limit, {
+                        country: options.country,
+                        year: normalizedYearParam,
+                    })
+                    : await getMoviesList(type, {
+                        page,
+                        limit,
+                        category: options.category,
+                        country: options.country,
+                        year: normalizedYearParam,
+                    });
 
         if (apiData && apiData.items && apiData.items.length > 0) {
             syncMoviesToLocalCache(apiData.items).catch(() => {});

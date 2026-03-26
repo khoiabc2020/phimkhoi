@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getMoviesByFilterFromCache, getMoviesFromCache } from '@/lib/movie-cache';
 import { getFallbackDisplayMovies, syncMoviesToLocalCache } from '@/services/server-movies';
-import { getMoviesList } from '@/services/api';
+import { getMoviesByCategory, getMoviesByCountry, getMoviesList } from '@/services/api';
 
 /**
  * [Elite Retrieval API]
@@ -42,13 +42,25 @@ export async function GET(req: Request) {
 
         // 3. Cache miss -> try upstream immediately and sync local cache in background
         if (slug) {
-            const externalData = await getMoviesList(slug, {
-                page,
-                limit,
-                category: type === 'category' ? slug : category !== 'all' ? category : undefined,
-                country: type === 'country' ? slug : undefined,
-                year: year !== 'all' ? Number(year) : undefined,
-            }).catch((): null => null);
+            const externalData = await (
+                type === 'country'
+                    ? getMoviesByCountry(slug, page, limit, {
+                        category: category !== 'all' ? category : undefined,
+                        year: year !== 'all' ? Number(year) : undefined,
+                    })
+                    : type === 'category'
+                        ? getMoviesByCategory(slug, page, limit, {
+                            country: undefined,
+                            year: year !== 'all' ? Number(year) : undefined,
+                        })
+                        : getMoviesList(slug, {
+                            page,
+                            limit,
+                            category: category !== 'all' ? category : undefined,
+                            country: type === 'country' ? slug : undefined,
+                            year: year !== 'all' ? Number(year) : undefined,
+                        })
+            ).catch((): null => null);
 
             if (externalData?.items?.length) {
                 syncMoviesToLocalCache(externalData.items).catch(() => {});

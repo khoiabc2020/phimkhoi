@@ -17,7 +17,11 @@ export default function CategoryGridClient({
     limit?: number;
 }) {
     const fetcher = async () => {
-        return await getResilientMoviesList(slug, page, limit, { country, year });
+        return await getResilientMoviesList("category", page, limit, {
+            category: slug,
+            country,
+            year,
+        });
     };
 
     const cacheKey = `category_${slug}_p${page}_c${country || 'all'}_y${year || 'all'}`;

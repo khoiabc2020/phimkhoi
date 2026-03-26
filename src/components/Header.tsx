@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { Search, User, LogOut, ChevronDown, Filter, Shield, Loader2, X } from "lucide-react";
+import { Search, User, LogOut, ChevronDown, Shield, Loader2, X } from "lucide-react";
 import { getImageUrl, cn } from "@/lib/utils";
 import { signOut, useSession } from "next-auth/react";
 import MobileMenu from "./MobileMenu";
@@ -38,6 +38,7 @@ export default function Header({ categories, countries }: HeaderProps) {
 
     const navRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
+    const activeSearchRequestRef = useRef(0);
 
     useEffect(() => {
         setMounted(true);
@@ -63,17 +64,30 @@ export default function Header({ categories, countries }: HeaderProps) {
     // Perform real-time search
     useEffect(() => {
         const timer = setTimeout(async () => {
-            if (searchQuery.trim().length >= 2) {
+            const cleanQuery = searchQuery.trim();
+
+            if (cleanQuery.length >= 2) {
+                const requestId = activeSearchRequestRef.current + 1;
+                activeSearchRequestRef.current = requestId;
                 setIsSearching(true);
                 try {
-                    const results = await getRealtimeSearch(searchQuery);
-                    setSearchResults(results);
+                    const results = await getRealtimeSearch(cleanQuery);
+                    if (activeSearchRequestRef.current === requestId) {
+                        setSearchResults(results || { movies: [], actors: [] });
+                    }
                 } catch (error) {
                     console.error("Search error:", error);
+                    if (activeSearchRequestRef.current === requestId) {
+                        setSearchResults({ movies: [], actors: [] });
+                    }
                 } finally {
-                    setIsSearching(false);
+                    if (activeSearchRequestRef.current === requestId) {
+                        setIsSearching(false);
+                    }
                 }
             } else {
+                activeSearchRequestRef.current += 1;
+                setIsSearching(false);
                 setSearchResults(null);
             }
         }, 150);
@@ -122,6 +136,15 @@ export default function Header({ categories, countries }: HeaderProps) {
         }
     }, [isSearchOpen]);
 
+    useEffect(() => {
+        setIsSearchOpen(false);
+        setShowHistory(false);
+        setSearchQuery("");
+        setSearchResults(null);
+        setIsSearching(false);
+        setIsSearchNavigating(false);
+    }, [pathname]);
+
     const handleKeyDown = (e: React.KeyboardEvent) => {
         const results = searchResults?.movies?.slice(0, 5) || [];
         const maxIndex = results.length - 1;
@@ -166,6 +189,12 @@ export default function Header({ categories, countries }: HeaderProps) {
         { name: "Nhật Bản", slug: "nhat-ban" },
         { name: "Mỹ", slug: "my" },
     ];
+
+    const trimmedSearchQuery = searchQuery.trim();
+    const hasTypedQuery = trimmedSearchQuery.length > 0;
+    const movieResults = searchResults?.movies?.slice(0, 5) || [];
+    const actorResults = searchResults?.actors?.slice(0, 3) || [];
+    const hasSearchResults = movieResults.length > 0 || actorResults.length > 0;
 
     return (
         <>
@@ -294,7 +323,7 @@ export default function Header({ categories, countries }: HeaderProps) {
                                 onSubmit={handleSearch}
                                 className={cn(
                                     "flex relative items-center transition-all duration-500 linear h-10",
-                                    isSearchOpen ? "w-[calc(100vw-3rem)] md:w-[420px] lg:w-[480px] absolute right-0 lg:relative z-[60]" : "w-10"
+                                    isSearchOpen ? "w-[calc(100vw-1rem)] max-w-[560px] sm:w-[420px] lg:w-[520px] absolute right-0 lg:relative z-[60]" : "w-10"
                                 )}
                             >
                                 <button
@@ -323,9 +352,9 @@ export default function Header({ categories, countries }: HeaderProps) {
                                     />
                                     {isSearchOpen && (
                                         <button
-                                            type={searchQuery ? "submit" : "button"}
+                                            type={hasTypedQuery ? "submit" : "button"}
                                             onClick={(e) => {
-                                                if (!searchQuery) {
+                                                if (!hasTypedQuery) {
                                                     setIsSearchOpen(false);
                                                     setShowHistory(false);
                                                     e.preventDefault();
@@ -333,28 +362,32 @@ export default function Header({ categories, countries }: HeaderProps) {
                                             }}
                                             className="absolute right-0 top-0 w-10 h-10 flex items-center justify-center z-30 text-white/50 hover:text-white"
                                         >
-                                            {isSearchNavigating ? <Loader2 className="w-4 h-4 animate-spin" /> : searchQuery ? <Search className="w-4 h-4" /> : <X className="w-4 h-4" />}
+                                            {isSearchNavigating ? <Loader2 className="w-4 h-4 animate-spin" /> : hasTypedQuery ? <Search className="w-4 h-4" /> : <X className="w-4 h-4" />}
                                         </button>
                                     )}
 
                                     {/* Real-time Search Dropdown */}
-                                    {isSearchOpen && (showHistory || searchQuery.length >= 0) && (
+                                    {isSearchOpen && (hasTypedQuery || (showHistory && movieSearchHistory.length > 0)) && (
                                         <div className="absolute top-full left-0 right-0 mt-3 bg-[#0c0c14] border border-white/[0.08] rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-3 max-w-[100vw]">
-                                            <div className="flex flex-col max-h-[500px] overflow-y-auto no-scrollbar p-4">
-                                                {searchQuery.length > 0 ? (
+                                            <div className="flex flex-col max-h-[70vh] lg:max-h-[500px] overflow-y-auto no-scrollbar p-4">
+                                                {hasTypedQuery ? (
                                                     <>
                                                         <div className="flex items-center justify-between mb-3 px-1">
                                                             <span className="text-[11px] font-bold text-white/30 uppercase tracking-widest">Kết quả</span>
                                                             {isSearching && <Loader2 className="w-3 h-3 text-primary animate-spin" />}
                                                         </div>
                                                         <div className="space-y-1">
-                                                            {isSearching && !searchResults ? <SearchSkeleton /> : (
+                                                            {isSearching && !hasSearchResults ? <SearchSkeleton /> : (
                                                                 <>
-                                                                    {searchResults?.movies?.slice(0, 5).map((movie: any, idx: number) => (
+                                                                    {movieResults.map((movie: any, idx: number) => (
                                                                         <Link
                                                                             href={`/phim/${movie.slug}`}
                                                                             key={movie._id}
-                                                                            onClick={() => { setIsSearchOpen(false); setSearchQuery(""); }}
+                                                                            onClick={() => {
+                                                                                saveHistoryItem("movies", movie.name || trimmedSearchQuery);
+                                                                                setIsSearchOpen(false);
+                                                                                setSearchQuery("");
+                                                                            }}
                                                                             onMouseEnter={() => {
                                                                                 router.prefetch(`/phim/${movie.slug}`);
                                                                                 setSelectedIndex(idx);
@@ -373,6 +406,33 @@ export default function Header({ categories, countries }: HeaderProps) {
                                                                             </div>
                                                                         </Link>
                                                                     ))}
+                                                                    {actorResults.length > 0 && (
+                                                                        <div className="pt-2 mt-2 border-t border-white/5">
+                                                                            <div className="px-2 pb-2 text-[10px] font-bold text-white/25 uppercase tracking-[0.2em]">Diá»…n viÃªn</div>
+                                                                            <div className="flex flex-wrap gap-2 px-1">
+                                                                                {actorResults.map((actor: any) => (
+                                                                                    <Link
+                                                                                        key={actor.id || actor.name}
+                                                                                        href={`/tim-kiem?keyword=${encodeURIComponent(actor.name || "")}`}
+                                                                                        onClick={() => {
+                                                                                            saveHistoryItem("movies", actor.name || trimmedSearchQuery);
+                                                                                            setIsSearchOpen(false);
+                                                                                            setSearchQuery("");
+                                                                                        }}
+                                                                                        className="px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-full text-[12px] text-white/70 transition-all"
+                                                                                    >
+                                                                                        {actor.name}
+                                                                                    </Link>
+                                                                                ))}
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+                                                                    {!isSearching && !hasSearchResults && (
+                                                                        <div className="px-2 py-8 text-center">
+                                                                            <div className="text-sm font-semibold text-white/70">KhÃ´ng tÃ¬m tháº¥y phim phÃ¹ há»£p</div>
+                                                                            <div className="text-xs text-white/35 mt-1">Há»‡ thá»‘ng Ä‘Ã£ kiá»ƒm tra DB vÃ  nguá»“n ngoÃ i cho "{trimmedSearchQuery}".</div>
+                                                                        </div>
+                                                                    )}
                                                                 </>
                                                             )}
                                                         </div>
@@ -393,11 +453,11 @@ export default function Header({ categories, countries }: HeaderProps) {
                                                     </div>
                                                 )}
                                             </div>
-                                            {searchQuery.length > 0 && (
+                                            {hasTypedQuery && (
                                                 <Link 
-                                                    href={`/tim-kiem?keyword=${encodeURIComponent(searchQuery.trim())}`}
+                                                    href={`/tim-kiem?keyword=${encodeURIComponent(trimmedSearchQuery)}`}
                                                     onClick={() => {
-                                                        saveHistoryItem("movies", searchQuery.trim());
+                                                        saveHistoryItem("movies", trimmedSearchQuery);
                                                         setIsSearchOpen(false);
                                                         setSearchQuery("");
                                                     }}

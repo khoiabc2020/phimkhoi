@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, Film, LayoutDashboard, LogOut, MessageSquare, Settings, Users } from "lucide-react";
+import { Bell, Captions, Film, LayoutDashboard, LogOut, MessageSquare, Settings, Users } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
 const sidebarItems = [
     { label: "Tong Quan", href: "/admin", icon: LayoutDashboard },
     { label: "Phim", href: "/admin/movies", icon: Film },
+    { label: "Subtitles", href: "/admin/subtitles", icon: Captions },
     { label: "Thanh Vien", href: "/admin/users", icon: Users },
     { label: "Custom Hero", href: "/admin/hero", icon: Film },
     { label: "Binh Luan", href: "/admin/comments", icon: MessageSquare },

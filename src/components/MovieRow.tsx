@@ -93,10 +93,7 @@ function MovieRowInner({ title, movies, slug, variant = 'default', priorityFirst
 
     // Default Layout
     return (
-        <section
-            className="py-2.5 movie-row-section"
-            style={{ contentVisibility: "auto", containIntrinsicSize: "420px" }}
-        >
+        <section className="py-2.5 movie-row-section">
             <div className="w-full max-w-[1920px] mx-auto">
                 <div className="space-y-2.5 rounded-[10px] bg-transparent overflow-hidden">
                     <div className="flex items-center justify-between px-3 sm:px-4 pt-2.5">

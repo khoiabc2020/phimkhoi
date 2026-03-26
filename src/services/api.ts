@@ -130,6 +130,43 @@ const toValidYear = (value: unknown): number | undefined => {
     return parsed;
 };
 
+const normalizeFilterText = (value: unknown) =>
+    String(value || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+
+const buildCountryTokens = (slug: string) => {
+    const normalizedSlug = normalizeFilterText(slug).replace(/\s+/g, " ");
+    const slugWithSpaces = normalizedSlug.replace(/-/g, " ");
+    return new Set(
+        [normalizedSlug, slugWithSpaces]
+            .map((value) => value.trim())
+            .filter(Boolean)
+    );
+};
+
+const matchesCountryMovie = (movie: Movie, slug: string) => {
+    const tokens = buildCountryTokens(slug);
+    if (tokens.size === 0) return true;
+    if (!Array.isArray(movie.country) || movie.country.length === 0) return false;
+
+    return movie.country.some((country) => {
+        const countrySlug = normalizeFilterText(country?.slug || "");
+        const countryName = normalizeFilterText(country?.name || "");
+
+        return Array.from(tokens).some(
+            (token) =>
+                token === countrySlug ||
+                token === countryName ||
+                countrySlug.includes(token) ||
+                countryName.includes(token)
+        );
+    });
+};
+
 /** 
  * Elite Content Purity Engine: Detects if a movie is just a trailer/teaser 
  * based on episode labels and status.
@@ -986,6 +1023,9 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
             }
         }
         let uniqueItems = Array.from(bySlug.values()).map(normalizeMovieImageRoles);
+        if (country) {
+            uniqueItems = uniqueItems.filter((item) => matchesCountryMovie(item, country));
+        }
 
         if (type !== 'phim-sap-chieu') {
             uniqueItems = uniqueItems.filter(item => !isTrailer(item));
@@ -1179,7 +1219,13 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
                 bySlug.set(item.slug, mergeMovieImages(existing, item));
             }
         }
-        const uniqueItems = Array.from(bySlug.values()).map(normalizeMovieImageRoles);
+        let uniqueItems = Array.from(bySlug.values()).map(normalizeMovieImageRoles);
+        uniqueItems = uniqueItems.filter((item) => matchesCountryMovie(item, slug));
+        if (category) {
+            uniqueItems = uniqueItems.filter((item) =>
+                Array.isArray(item.category) && item.category.some((cat: any) => cat?.slug === category)
+            );
+        }
         // Enrich with TMDB images (Tăng lên 24 phim để đảm bảo cả Hero và Row đều nét)
         const enrichedItems = await enrichMoviesWithTMDB(uniqueItems, 24);
 

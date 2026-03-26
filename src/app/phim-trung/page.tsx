@@ -47,6 +47,12 @@ const getCountryPool = cache(async (countrySlug: string, limit: number = 320) =>
     return getMoviesByFilterFromCache("country", countrySlug, 1, limit).catch((): null => null);
 });
 
+const getGlobalMoviePool = cache(async (limit: number = 64) => {
+    return getMoviesList("phim-moi-cap-nhat", { limit }).catch(
+        (): { items: Movie[] } => ({ items: [] as Movie[] })
+    );
+});
+
 function getSafeFallbackWindow(movies: Movie[], fallbackOffset: number, size: number = 32): Movie[] {
     if (!Array.isArray(movies) || movies.length === 0) return [];
     const maxStart = Math.max(0, movies.length - Math.min(size, movies.length));
@@ -85,6 +91,11 @@ async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'de
             filteredMovies = broad.items || [];
         }
 
+        if (filteredMovies.length === 0) {
+            const globalPool = await getGlobalMoviePool(32);
+            filteredMovies = globalPool.items || [];
+        }
+
         if (!filteredMovies || filteredMovies.length === 0) return null;
 
         return (
@@ -103,50 +114,36 @@ async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'de
 
 async function PhimTrungHome() {
     const local = await getCountryPool("trung-quoc", 14);
-    const latest = local || await getMoviesByCountry("trung-quoc", 1, 14).catch((): { items: Movie[] } => ({ items: [] as Movie[] }));
+    const countryLatest = await getMoviesByCountry("trung-quoc", 1, 14).catch(
+        (): { items: Movie[] } => ({ items: [] as Movie[] })
+    );
+    const globalLatest = await getGlobalMoviePool(14);
+    const latest = local || countryLatest || globalLatest;
     const movies = latest?.items || [];
 
     return (
         <div className="space-y-12 md:space-y-16 pb-12">
             <MovieRow title="Phim Đang Chiếu" movies={movies} slug="/quoc-gia/trung-quoc" priorityFirst />
             
-            <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
-                <CountryMovieRow title="Phim Tình Cảm" categorySlug="tinh-cam" countrySlug="trung-quoc" fallbackOffset={14} />
-            </Suspense>
+            <CountryMovieRow title="Phim Tình Cảm" categorySlug="tinh-cam" countrySlug="trung-quoc" fallbackOffset={14} />
 
-            <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
-                <CountryMovieRow title="Phim Hành Động" categorySlug="hanh-dong" countrySlug="trung-quoc" fallbackOffset={46} />
-            </Suspense>
+            <CountryMovieRow title="Phim Hành Động" categorySlug="hanh-dong" countrySlug="trung-quoc" fallbackOffset={46} />
             
             <ActorRow title="Diễn viên nổi bật" actors={FEATURED_ACTORS} />
 
-            <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
-                <CountryMovieRow title="Phim Cổ Trang" categorySlug="co-trang" countrySlug="trung-quoc" fallbackOffset={78} />
-            </Suspense>
+            <CountryMovieRow title="Phim Cổ Trang" categorySlug="co-trang" countrySlug="trung-quoc" fallbackOffset={78} />
 
-            <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
-                <CountryMovieRow title="Phim Hài Hước" categorySlug="hai-huoc" countrySlug="trung-quoc" fallbackOffset={110} />
-            </Suspense>
+            <CountryMovieRow title="Phim Hài Hước" categorySlug="hai-huoc" countrySlug="trung-quoc" fallbackOffset={110} />
 
-            <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
-                <CountryMovieRow title="Phim Kinh Dị" categorySlug="kinh-di" countrySlug="trung-quoc" fallbackOffset={142} />
-            </Suspense>
+            <CountryMovieRow title="Phim Kinh Dị" categorySlug="kinh-di" countrySlug="trung-quoc" fallbackOffset={142} />
 
-            <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
-                <CountryMovieRow title="Phim Hoạt Hình" categorySlug="hoat-hinh" countrySlug="trung-quoc" fallbackOffset={174} />
-            </Suspense>
+            <CountryMovieRow title="Phim Hoạt Hình" categorySlug="hoat-hinh" countrySlug="trung-quoc" fallbackOffset={174} />
             
-            <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
-                <CountryMovieRow title="Phim Hình Sự" categorySlug="hinh-su" countrySlug="trung-quoc" fallbackOffset={206} />
-            </Suspense>
+            <CountryMovieRow title="Phim Hình Sự" categorySlug="hinh-su" countrySlug="trung-quoc" fallbackOffset={206} />
 
-            <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
-                <CountryMovieRow title="Phim Võ Thuật" categorySlug="vo-thuat" countrySlug="trung-quoc" fallbackOffset={238} />
-            </Suspense>
+            <CountryMovieRow title="Phim Võ Thuật" categorySlug="vo-thuat" countrySlug="trung-quoc" fallbackOffset={238} />
 
-            <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
-                <CountryMovieRow title="Phim Tâm Lý" categorySlug="tam-ly" countrySlug="trung-quoc" fallbackOffset={14} />
-            </Suspense>
+            <CountryMovieRow title="Phim Tâm Lý" categorySlug="tam-ly" countrySlug="trung-quoc" fallbackOffset={14} />
         </div>
     );
 }
