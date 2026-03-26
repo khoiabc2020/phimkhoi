@@ -5,7 +5,13 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { getMovieDetail, Movie } from "@/services/api";
 import { getMovieDetailFromCache, saveMovieToCache } from "@/lib/movie-cache";
-import { getPosterImageUrl, getBackdropImageUrl, cn } from "@/lib/utils";
+import {
+    buildEpisodeKeyCandidates,
+    extractEpisodeNumber,
+    getPosterImageUrl,
+    getBackdropImageUrl,
+    cn,
+} from "@/lib/utils";
 import CommentSection from "@/components/CommentSection";
 import WatchEngagementBar from "@/components/WatchEngagementBar";
 import WatchContainer from "@/components/WatchContainer";
@@ -16,6 +22,45 @@ import { getThemeBySlug } from "@/lib/theme";
 import MovieCastSection from "@/components/MovieCastSection";
 
 export const revalidate = 300;
+
+const hasPlayableLink = (episode: any) => Boolean(episode?.link_m3u8 || episode?.link_embed);
+
+const resolveEpisodeFromServers = (servers: any[] = [], requestedEpisode: string) => {
+    const requested = String(requestedEpisode || "").trim();
+    const requestedNumber = extractEpisodeNumber(requested);
+
+    for (const srv of servers) {
+        const exact = srv.server_data?.find((ep: { slug?: string }) => ep.slug === requested);
+        if (exact && hasPlayableLink(exact)) {
+            return { episode: exact, serverName: srv.server_name, episodes: srv.server_data || [] };
+        }
+    }
+
+    for (const srv of servers) {
+        const matched = (srv.server_data || []).find((ep: any, index: number) => {
+            if (!hasPlayableLink(ep)) return false;
+            const candidates = new Set<string>([
+                String(ep?.slug || "").trim(),
+                ...buildEpisodeKeyCandidates(ep?.name || "", ep?.slug || "", index),
+            ]);
+            if (requested && candidates.has(requested)) return true;
+            return Boolean(requestedNumber && candidates.has(requestedNumber));
+        });
+
+        if (matched) {
+            return { episode: matched, serverName: srv.server_name, episodes: srv.server_data || [] };
+        }
+    }
+
+    for (const srv of servers) {
+        const firstPlayable = (srv.server_data || []).find((ep: any) => hasPlayableLink(ep));
+        if (firstPlayable) {
+            return { episode: firstPlayable, serverName: srv.server_name, episodes: srv.server_data || [] };
+        }
+    }
+
+    return { episode: null, serverName: "", episodes: [] as any[] };
+};
 
 interface PageProps {
     params: Promise<{ slug: string; episode: string }>;
@@ -28,14 +73,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const data = cached || await getMovieDetail(slug);
     const movie = data?.movie as any;
     const servers = data?.episodes || [];
-    let currentEpisode = null;
-    for (const srv of servers) {
-        const found = srv.server_data?.find((ep: { slug: string }) => ep.slug === episode);
-        if (found) {
-            currentEpisode = found;
-            break;
-        }
-    }
+    const { episode: currentEpisode } = resolveEpisodeFromServers(servers, episode);
     if (!movie) return { title: "Không tìm thấy phim" };
     return {
         title: `Xem phim ${movie.name} - Tập ${currentEpisode?.name || episode} | KHOIPHIM`,
@@ -65,32 +103,11 @@ export default async function WatchPage({ params }: PageProps) {
 
     const movie = data.movie as Movie;
     const servers = data.episodes || [];
-    let currentEpisode: any = null;
-    let usedServerName = "";
-    let usedEpisodes: any[] = [];
-    
-    // [Elite Matching] 1. Exact slug match
-    for (const srv of servers) {
-        const found = srv.server_data?.find((ep: { slug: string }) => ep.slug === episode);
-        if (found) {
-            currentEpisode = found;
-            usedServerName = srv.server_name;
-            usedEpisodes = srv.server_data || [];
-            break;
-        }
-    }
-
-    // [Elite Matching] 2. Fallback for common mismatches like 'full' vs 'tap-1'
-    if (!currentEpisode && servers.length > 0) {
-        const firstServer = servers?.[0];
-        const firstEp = firstServer?.server_data?.[0];
-        if (firstEp) {
-            // Use it as fallback but keep requested slug for URL consistency
-            currentEpisode = firstEp;
-            usedServerName = firstServer.server_name;
-            usedEpisodes = firstServer.server_data;
-        }
-    }
+    const {
+        episode: currentEpisode,
+        serverName: usedServerName,
+        episodes: usedEpisodes,
+    } = resolveEpisodeFromServers(servers, episode);
 
     // [Elite Performance] Moving heavy TMDB/Cast lookups to their own components or async blocks
     // This allows the shell and core player to render immediately.

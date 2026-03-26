@@ -9,6 +9,14 @@ import MovieModel from "@/models/Movie";
 import type { Movie } from "@/services/api";
 import { cache } from "react";
 
+const hasPlayableEpisodes = (episodes: any[] = []) =>
+    Array.isArray(episodes) &&
+    episodes.some(
+        (server) =>
+            Array.isArray(server?.server_data) &&
+            server.server_data.some((episode: any) => episode?.link_m3u8 || episode?.link_embed)
+    );
+
 export const getMoviesFromCache = async (
     type: string,
     page: number = 1,
@@ -96,11 +104,13 @@ export const getMovieDetailFromCache = cache(async (slug: string): Promise<any |
         await dbConnect();
         const movie = await MovieModel.findOne({ slug }).lean();
         if (!movie) return null;
+        const episodes = Array.isArray((movie as any).episodes) ? (movie as any).episodes : [];
+        if (!hasPlayableEpisodes(episodes)) return null;
         
         // Match the format expected by the frontend
         return {
             movie,
-            episodes: movie.episodes || []
+            episodes
         };
     } catch (error) {
         console.error("Cache retrieval error:", error);
@@ -115,8 +125,13 @@ export const saveMovieToCache = async (slug: string, data: any) => {
         await dbConnect();
         // Normalize different API response structures
         const movie = data.movie || data.data?.item;
-        const episodes = data.episodes || data.data?.episodes || [];
+        const incomingEpisodes = data.episodes || data.data?.episodes || [];
         if (!movie) return;
+
+        const existingMovie = await MovieModel.findOne({ slug }).select("episodes thumb_url poster_url").lean();
+        const episodes = hasPlayableEpisodes(incomingEpisodes)
+            ? incomingEpisodes
+            : (existingMovie?.episodes || []);
 
         const pathImage = data.pathImage || data.data?.pathImage || "";
         
@@ -130,6 +145,9 @@ export const saveMovieToCache = async (slug: string, data: any) => {
              thumb_url = poster_url;
              poster_url = temp;
         }
+
+        thumb_url = thumb_url || existingMovie?.thumb_url || "";
+        poster_url = poster_url || existingMovie?.poster_url || "";
 
         const { _id, id: movie_id, ...rest } = movie;
         const finalId = _id || movie_id || movie.slug;
