@@ -48,7 +48,7 @@ export async function GET(req: Request) {
                 category: type === 'category' ? slug : category !== 'all' ? category : undefined,
                 country: type === 'country' ? slug : undefined,
                 year: year !== 'all' ? Number(year) : undefined,
-            }).catch(() => null);
+            }).catch((): null => null);
 
             if (externalData?.items?.length) {
                 syncMoviesToLocalCache(externalData.items).catch(() => {});
