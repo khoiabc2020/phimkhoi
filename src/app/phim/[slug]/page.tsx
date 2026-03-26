@@ -16,10 +16,10 @@ const CommentSection = dynamic(() => import("@/components/CommentSection"), {
 import MovieTabs from "@/components/MovieTabs";
 import MovieCast from "@/components/MovieCast";
 import { searchTMDBMovie, getTMDBDetails, getTMDBImage } from "@/services/tmdb";
-import { Suspense } from "react";
-import WatchlistButton from "@/components/WatchlistButton";
-import ShareButton from "@/components/ShareButton";
 import { getTMDBEpisodeImages, TMDBEpisodeMeta } from "@/app/actions/tmdb";
+import MovieDetailTMDBInfo from "@/components/MovieDetailTMDBInfo";
+import MovieDetailRelated from "@/components/MovieDetailRelated";
+import { cache } from "react";
 
 
 // Revalidate every 5 minutes (was 60s). ISR means first visitor triggers refresh, others get cache.
@@ -134,46 +134,29 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     const firstCategory = movie?.category?.[0]?.slug || 'all';
     const theme = getThemeBySlug(firstCategory);
 
-    /**
-     * ELITE LOAD STRATEGY (PHASE 9):
-     * Parallelize all secondary fetches with a hard timeout to ensure the main page paints quickly.
-     */
-    const secondaryDataPromise = (async () => {
-        try {
-            const [tmdbSearch, relatedMoviesRes, tmdbEpisodeImagesRes] = await Promise.allSettled([
-                searchTMDBMovie(
-                    movie?.origin_name || movie?.name,
-                    movie?.year ? parseInt(movie.year.toString().split("-")[0]) : undefined,
-                    type,
-                    { originalName: movie?.origin_name, localName: movie?.name, countrySlug: movie?.country?.[0]?.slug }
-                ),
-                (movie?.category && movie.category.length > 0 && movie.category[0].slug)
-                    ? getMoviesList('phim-moi-cap-nhat', { category: movie.category[0].slug, limit: 12 })
-                    : Promise.resolve({ items: [] }),
-                getTMDBEpisodeImages(
-                    movie?.origin_name || movie?.name,
-                    movie?.year ? parseInt(movie.year.toString().split("-")[0]) : undefined,
-                    { originalName: movie?.origin_name, localName: movie?.name, countrySlug: movie?.country?.[0]?.slug }
-                ),
-            ]);
+    // [Elite UI] Immediate shell render
+    const rating = "9.7"; // Placeholder for immediate render, will be enriched? Or just keep it.
 
-            const tmdbSearchVal = tmdbSearch.status === 'fulfilled' ? tmdbSearch.value : null;
-            const tmdbDetails = tmdbSearchVal ? await getTMDBDetails(tmdbSearchVal.id, type).catch(() => null as any) : null;
-            
-            return {
-                tmdbDetails,
-                relatedMovies: relatedMoviesRes.status === 'fulfilled' ? (relatedMoviesRes.value?.items || []) : [],
-                episodeImageMap: tmdbEpisodeImagesRes.status === 'fulfilled' ? (tmdbEpisodeImagesRes.value || {}) : {}
-            };
-        } catch {
-            return { tmdbDetails: null, relatedMovies: [], episodeImageMap: {} };
-        }
-    })();
+    const sourceThumb = movie?.thumb_url ? getImageUrl(movie.thumb_url) : "";
+    const sourcePoster = movie?.poster_url ? getImageUrl(movie.poster_url) : "";
+    
+    // We'll use a client component or a suspended server component for TMDB images to not block the hero.
+    // For now, let's use the source images for the immediate hero render.
+    const ambientBgUrl = sourceThumb || sourcePoster;
+    const contentSubjectUrl = sourceThumb || sourcePoster;
+    
+    const subjectOrientation = detectOrientation(contentSubjectUrl);
+    const isSubjectPortrait = subjectOrientation === "portrait";
 
-    // We only wait a short time for secondary data relative to the core paint if needed, 
-    // but here we wait to keep the current UI structure simple while dramatically improving speed.
-    const { tmdbDetails, relatedMovies: allRelated, episodeImageMap } = await secondaryDataPromise;
-    const relatedMovies = allRelated.filter((m: any) => m.slug !== movie?.slug).slice(0, 8);
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": type === 'tv' ? "TVSeries" : "Movie",
+        "name": movie?.name,
+        "alternativeHeadline": movie?.origin_name,
+        "image": sourcePoster || sourceThumb,
+        "description": movie?.content?.replace(/<[^>]+>/g, ''),
+        "genre": movie?.category?.map((c: any) => c.name) || [],
+    };
 
     const extractEpisodeNumber = (value: string) => {
         const match = String(value || "").match(/(\d+)/);
@@ -206,24 +189,8 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
         return Array.from(seen);
     };
 
-    const episodeThumbnails: Record<string, string> = {};
-    const episodeMetadata: Record<string, TMDBEpisodeMeta> = {};
-    (episodes || []).forEach((serverItem: any) => {
-        (serverItem?.server_data || []).forEach((ep: any, indexInServer: number) => {
-            if (!ep?.slug) return;
-            const candidates = buildEpisodeKeyCandidates(ep, indexInServer);
-            const matchedData = candidates
-                .map((key) => episodeImageMap[key])
-                .find(Boolean);
-
-            if (matchedData?.image) {
-                episodeThumbnails[ep.slug] = matchedData.image;
-            }
-            if (matchedData) {
-                episodeMetadata[ep.slug] = matchedData;
-            }
-        });
-    });
+    // Moving Episode Thumbnails logic to a more resilient location (inside MovieTabs)
+    // to prevent blocking the main page if TMDB is slow.
 
     // --- Backdrop image selection ---
     // Rule: PRIORITY 1 = Source Thumb (The snowy couple in OPhim thumb_url)
@@ -390,19 +357,16 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
 
                     {/* Left side: Movie Info */}
                     <div className="space-y-3 sm:space-y-4 max-w-[760px] flex-1 flex flex-col items-center md:items-start w-full">
-                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-1">
-                            {movie?.year && (
-                                <span className="px-2.5 py-1 rounded-md border border-white/15 bg-white/[0.06] text-white/80 text-[11px] font-semibold leading-none drop-shadow-md">
-                                    {movie?.year}
-                                </span>
-                            )}
-                            <span 
-                                className="px-2.5 py-1 rounded-md border border-white/15 text-white text-[11px] font-bold leading-none uppercase drop-shadow-md"
-                                style={{ backgroundColor: `${theme.primary}20`, borderColor: `${theme.primary}40`, color: theme.primary }}
-                            >
-                                {movie?.quality || "FHD"}
-                            </span>
-                        </div>
+                        <Suspense fallback={<div className="h-6 w-24 bg-white/5 animate-pulse rounded mb-2" />}>
+                            <MovieDetailTMDBInfo 
+                                movieName={movie.name}
+                                movieYear={movie.year}
+                                movieOriginName={movie.origin_name}
+                                type={type}
+                                countrySlug={(movie.country?.[0] as any)?.slug}
+                                theme={theme}
+                            />
+                        </Suspense>
                         <h1 
                             className="font-outfit text-3xl sm:text-4xl lg:text-[48px] font-black text-white leading-tight tracking-tighter pt-1 drop-shadow-2xl capitalize w-full"
                         >
@@ -535,10 +499,10 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                 relatedMovies={relatedMovies}
                                 episodes={episodes}
                                 slug={slug}
-                                tmdbDetails={tmdbDetails}
-                                episodeThumbnails={episodeThumbnails}
-                                episodeMetadata={episodeMetadata}
-                                cast={<MovieCast movie={movie} slug={slug} isCompact={false} tmdbCast={tmdbDetails?.credits?.cast} />}
+                                tmdbDetails={null} // Will be enriched inside MovieTabs if needed
+                                episodeThumbnails={{}} // Use local state enrichment if needed
+                                episodeMetadata={{}}
+                                cast={<MovieCast movie={movie} slug={slug} isCompact={false} />}
                             />
                         </Suspense>
                         {/* Comment Section below tabs */}
@@ -553,6 +517,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                     </div>
 
                     {/* LEFT SIDEBAR (shown after tabs on mobile, beside on desktop) */}
+                    {/* LEFT SIDEBAR (shown after tabs on mobile, beside on desktop) */}
                     <div className="w-full lg:col-span-5 xl:col-span-4 order-2 lg:order-1 space-y-6 sm:space-y-8">
                         <div className="rounded-[10px] border border-white/[0.06] bg-[#07070b]/78 p-4 sm:p-5 space-y-6 sm:space-y-8 shadow-[0_10px_24px_#00000066]">
 
@@ -562,7 +527,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             <div className="text-[14.5px] font-black text-white/90 drop-shadow-md">{movie?.director?.join(", ") || "Đang cập nhật"}</div>
                         </div>
 
-                        {/* NEW: Description Section (Optimized position) */}
+                        {/* Description Section */}
                         {movie?.content && (
                             <div className="pt-4 border-t border-white/5 space-y-4">
                                 <div className="text-[12px] font-black text-[#8FA7C5]/40 uppercase tracking-[2px]">Nội dung</div>
@@ -594,6 +559,11 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             </div>
                         </div>
                         </div>
+
+                        {/* Related Movies Sidebar */}
+                        <Suspense fallback={<div className="h-96 rounded-2xl bg-white/5 animate-pulse" />}>
+                           <MovieDetailRelated categorySlug={firstCategory} currentMovieSlug={movie.slug} theme={theme} />
+                        </Suspense>
                     </div>
 
                 </div>

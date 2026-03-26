@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 export const API_URL = "https://phimapi.com";
 
 export interface Category {
@@ -628,7 +630,9 @@ export const getHomeData = async () => {
     }
 };
 
-export const getMovieDetail = async (slug: string) => {
+import { getMovieDetailFromCache } from "@/lib/movie-cache";
+
+export const getMovieDetail = cache(async (slug: string) => {
     try {
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
             fetchWithFastTimeout(`${API_URL}/phim/${slug}`, 3000, { next: { revalidate: 180 } }),
@@ -740,7 +744,9 @@ export const getMovieDetail = async (slug: string) => {
             };
         }
 
-        return null;
+        // [Elite Recovery] If all APIs failed, try the database one last time 
+        // without any strict multi-source requirements.
+        return await getMovieDetailFromCache(slug);
     } catch (error) {
         console.error(`Error fetching movie detail [${slug}]:`, error);
         return null;
@@ -999,8 +1005,48 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
             items: enrichedItems,
             pagination: kkPagination
         };
+        // 3. [Elite Recovery] Final Local Cache Fallback if everything else is empty
+        if (!hasData || items.length === 0) {
+            try {
+                await connectDB();
+                const findQuery: any = {};
+                if (kkType === 'phim-sap-chieu') findQuery.status = 'sap-chieu';
+                else if (kkType === 'phim-bo') findQuery.type = 'series';
+                else if (kkType === 'phim-le') findQuery.type = 'single';
+                
+                if (category) findQuery['category.slug'] = category;
+                if (country) findQuery['country.slug'] = country;
+                if (year) findQuery.year = year;
+
+                const dbMovies = await MovieModel.find(findQuery)
+                    .sort({ updatedAt: -1 })
+                    .limit(limit)
+                    .lean();
+
+                if (dbMovies.length > 0) {
+                    return {
+                        items: dbMovies as any,
+                        pagination: { currentPage: page, totalPages: Math.ceil(dbMovies.length / limit) || 1 }
+                    };
+                }
+            } catch (e) {
+                console.error("getMoviesList DB Recovery Error:", e);
+            }
+        }
+
+        return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
     } catch (error) {
         console.error(`Error fetching movies list [${type}]:`, error);
+        
+        // One last try in catch block
+        try {
+            await connectDB();
+            const dbMovies = await MovieModel.find({}).sort({ updatedAt: -1 }).limit(20).lean();
+            if (dbMovies.length > 0) {
+                return { items: dbMovies as any, pagination: { currentPage: 1, totalPages: 1 } };
+            }
+        } catch {}
+
         return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
     }
 };
@@ -1098,6 +1144,31 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
             items: playable,
             pagination: kkPagination
         };
+        // 3. [Elite Recovery] Final Local Cache Fallback
+        if (items.length === 0) {
+            try {
+                await connectDB();
+                const findQuery: any = { 'category.slug': slug };
+                if (country) findQuery['country.slug'] = country;
+                if (year) findQuery.year = year;
+
+                const dbMovies = await MovieModel.find(findQuery)
+                    .sort({ updatedAt: -1 })
+                    .limit(limit)
+                    .lean();
+
+                if (dbMovies.length > 0) {
+                    return {
+                        items: dbMovies as any,
+                        pagination: { currentPage: page, totalPages: Math.ceil(dbMovies.length / limit) || 1 }
+                    };
+                }
+            } catch (e) {
+                console.error("getMoviesByCategory DB Recovery Error:", e);
+            }
+        }
+
+        return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
     } catch (error) {
         console.error(`Error fetching category [${slug}]:`, error);
         return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
@@ -1186,6 +1257,31 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
             items: playable,
             pagination: kkPagination
         };
+        // 3. [Elite Recovery] Final Local Cache Fallback
+        if (items.length === 0) {
+            try {
+                await connectDB();
+                const findQuery: any = { 'country.slug': slug };
+                if (category) findQuery['category.slug'] = category;
+                if (year) findQuery.year = year;
+
+                const dbMovies = await MovieModel.find(findQuery)
+                    .sort({ updatedAt: -1 })
+                    .limit(limit)
+                    .lean();
+
+                if (dbMovies.length > 0) {
+                    return {
+                        items: dbMovies as any,
+                        pagination: { currentPage: page, totalPages: Math.ceil(dbMovies.length / limit) || 1 }
+                    };
+                }
+            } catch (e) {
+                console.error("getMoviesByCountry DB Recovery Error:", e);
+            }
+        }
+
+        return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
     } catch (error) {
         console.error(`Error fetching country [${slug}]:`, error);
         return { items: [], pagination: { currentPage: 1, totalPages: 1 } };

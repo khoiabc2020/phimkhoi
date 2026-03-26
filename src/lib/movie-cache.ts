@@ -7,6 +7,7 @@ import dbConnect from "@/lib/db";
 import TrendingCache from "@/models/TrendingCache";
 import MovieModel from "@/models/Movie";
 import type { Movie } from "@/services/api";
+import { cache } from "react";
 
 export const getMoviesFromCache = async (
     type: string,
@@ -90,16 +91,16 @@ export const getMoviesByFilterFromCache = async (
  * [Elite Persistence] Retrieve full movie details from MongoDB
  * Eliminates external API latency for 99% of requests.
  */
-export const getMovieDetailFromCache = async (slug: string): Promise<any | null> => {
+export const getMovieDetailFromCache = cache(async (slug: string): Promise<any | null> => {
     try {
         await dbConnect();
         const movie = await MovieModel.findOne({ slug }).lean();
-        if (!movie || !movie.episodes || movie.episodes.length === 0) return null;
+        if (!movie) return null;
         
         // Match the format expected by the frontend
         return {
             movie,
-            episodes: movie.episodes
+            episodes: movie.episodes || []
         };
     } catch (error) {
         console.error("Cache retrieval error:", error);

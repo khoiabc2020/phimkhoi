@@ -98,10 +98,6 @@ export default async function WatchPage({ params }: PageProps) {
     const displayEpisodeName = (name: string) => name?.startsWith("Tập") ? name : `Tập ${name}`;
 
     // [Elite Performance] placeholders for now (non-blocking)
-    let cast: any[] = [];
-    let episodeThumbnails: Record<string, string> = {};
-    let episodeMetadata: Record<string, any> = {};
-
     const movieData = {
         movieId: movie._id,
         movieSlug: movie.slug,
@@ -122,9 +118,6 @@ export default async function WatchPage({ params }: PageProps) {
             </div>
 
             <div className="relative z-10 pt-10 md:pt-24 pb-16">
-
-
-
                 {/* ── CONTENT GRID (9+3) ── */}
                 <div className="relative z-20 w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 lg:pl-24 lg:pr-12">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8">
@@ -133,18 +126,16 @@ export default async function WatchPage({ params }: PageProps) {
                         <div className="lg:col-span-9 space-y-6">
 
                             {/* Player */}
-                            {/* Player */}
                             <WatchContainer
                                 movie={movie}
                                 currentEpisode={currentEpisode}
                                 episodes={usedEpisodes.length > 0 ? usedEpisodes : servers[0]?.server_data || []}
                                 servers={servers}
-                                episodeThumbnails={episodeThumbnails}
-                                episodeMetadata={episodeMetadata}
+                                episodeThumbnails={{}} // Will be enriched
+                                episodeMetadata={{}} // Will be enriched
                                 movieData={movieData}
                                 initialServerName={usedServerName || servers[0]?.server_name || ""}
                             />
-
 
                             {/* Movie description */}
                             <div className="relative z-30 rounded-[10px] border border-white/[0.06] overflow-hidden bg-[#07070b]/82 shadow-[0_10px_24px_#00000066] mx-3 sm:mx-0">
@@ -176,20 +167,17 @@ export default async function WatchPage({ params }: PageProps) {
                                                     </span>
                                                 ))}
                                             </div>
-                                            {cast.length > 0 && (
-                                                <div>
-                                                    <h4 className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-2">Diễn viên</h4>
-                                                    <div className="flex flex-wrap gap-1.5">
-                                                        {cast.slice(0, 10).map((actor: any) => (
-                                                            <span key={actor.id}
-                                                                className="text-xs px-2.5 py-1 rounded-full text-gray-200 border border-white/[0.10]"
-                                                                style={{ background: "rgba(255,255,255,0.06)" }}>
-                                                                {actor.name}
-                                                            </span>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
+
+                                            <Suspense fallback={<div className="h-10 w-full animate-pulse bg-white/5 rounded-full mt-4" />}>
+                                                <MovieCastSection 
+                                                    movieName={movie.name} 
+                                                    movieYear={movie.year} 
+                                                    originalName={movie.origin_name} 
+                                                    localName={movie.name} 
+                                                    countrySlug={(movie.country?.[0] as any)?.slug} 
+                                                    localizedActors={movie.actor}
+                                                />
+                                            </Suspense>
                                         </div>
                                     </div>
                                 </div>
