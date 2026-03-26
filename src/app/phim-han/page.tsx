@@ -2,7 +2,7 @@ import KoreaHero from "@/components/KoreaHero";
 import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
-import { getMenuData, getMoviesByCountry } from "@/services/api";
+import { getMenuData, getMovieDetail, getMoviesByCountry } from "@/services/api";
 import { getMoviesByFilterFromCache } from "@/lib/movie-cache";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -65,6 +65,49 @@ const HERO_SLUGS = [
     "trao-em-ca-vu-tru",
 ];
 
+const HERO_FALLBACK_META: Record<string, { name: string; year?: number }> = {
+    "nghe-thuat-lua-doi-cua-sarah": { name: "Nghệ Thuật Lừa Dối Của Sarah", year: 2026 },
+    "khi-cuoc-doi-cho-ban-qua-quyt": { name: "Khi Cuộc Đời Cho Bạn Quả Quýt", year: 2025 },
+    "tieng-yeu-nay-anh-dich-duoc-khong": { name: "Tiếng Yêu Này Anh Dịch Được Không?", year: 2025 },
+    "ban-trai-theo-yeu-cau": { name: "Bạn Trai Theo Yêu Cầu", year: 2025 },
+    "trao-em-ca-vu-tru": { name: "Trao Em Cả Vũ Trụ", year: 2025 },
+};
+
+async function resolveHeroMovies(slugs: string[], fallbackItems: any[], countryName: string) {
+    const bySlug = new Map(fallbackItems.map((movie) => [movie.slug, movie]));
+
+    const resolved = await Promise.all(
+        slugs.map(async (slug) => {
+            const cached = bySlug.get(slug);
+            if (cached) return cached;
+
+            try {
+                const detail = await getMovieDetail(slug);
+                if (detail?.movie) {
+                    return detail.movie;
+                }
+            } catch {}
+
+            const fallback = HERO_FALLBACK_META[slug];
+            if (!fallback) return null;
+
+            return {
+                _id: slug,
+                slug,
+                name: fallback.name,
+                origin_name: fallback.name,
+                content: "",
+                category: [],
+                country: [{ name: countryName, slug: "han-quoc" }],
+                year: fallback.year || 2025,
+                episode_current: "Full",
+            };
+        })
+    );
+
+    return resolved.filter(Boolean);
+}
+
 async function PhimHanHome() {
     const { countryItems, fallbackItems } = await getCountryPagePool("han-quoc");
     const latestMovies = fallbackItems.slice(0, 14);
@@ -121,9 +164,7 @@ async function CountryGridStream({ slug, page, limit = 49 }: { slug: string; pag
 
 async function KoreaHeroWithData() {
     const { fallbackItems } = await getCountryPagePool("han-quoc");
-    const heroMovies = HERO_SLUGS
-        .map((slug) => fallbackItems.find((movie) => movie.slug === slug))
-        .filter(Boolean);
+    const heroMovies = await resolveHeroMovies(HERO_SLUGS, fallbackItems, "Hàn Quốc");
 
     return <KoreaHero initialMovies={heroMovies} />;
 }

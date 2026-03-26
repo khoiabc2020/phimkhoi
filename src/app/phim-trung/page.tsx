@@ -2,7 +2,7 @@ import ChinaHero from "@/components/ChinaHero";
 import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
-import { getMenuData, getMoviesByCountry } from "@/services/api";
+import { getMenuData, getMovieDetail, getMoviesByCountry } from "@/services/api";
 import { getMoviesByFilterFromCache } from "@/lib/movie-cache";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -72,6 +72,54 @@ const HERO_SLUGS = [
     "truc-ngoc",
 ];
 
+const HERO_FALLBACK_META: Record<string, { name: string; year?: number }> = {
+    "duong-cung-ky-an-thanh-vu-phong-minh": { name: "Đường Cùng Kỳ Án Thành Vụ Phong Minh", year: 2025 },
+    "xin-chao-1983": { name: "Xin Chào 1983", year: 2026 },
+    "con-ra-the-thong-gi-nua": { name: "Còn Ra Thể Thống Gì Nữa?", year: 2026 },
+    "bach-nguyet-phan-tinh": { name: "Bạch Nguyệt Phạn Tinh", year: 2025 },
+    "bui-hoa-hong": { name: "Bụi Hoa Hồng", year: 2025 },
+    "dai-mong-quy-ly": { name: "Đại Mộng Quy Ly", year: 2025 },
+    "giang-ho-da-vu-thap-nien-dang": { name: "Giang Hồ Dạ Vũ Thập Niên Đăng", year: 2025 },
+    "mac-nhan-tang-kieu": { name: "Mạc Nhan Tàng Kiều", year: 2025 },
+    "ngoc-minh-tra-cot": { name: "Ngọc Minh Trà Cốt", year: 2025 },
+    "truc-ngoc": { name: "Trục Ngọc", year: 2025 },
+};
+
+async function resolveHeroMovies(slugs: string[], fallbackItems: any[], countryName: string) {
+    const bySlug = new Map(fallbackItems.map((movie) => [movie.slug, movie]));
+
+    const resolved = await Promise.all(
+        slugs.map(async (slug) => {
+            const cached = bySlug.get(slug);
+            if (cached) return cached;
+
+            try {
+                const detail = await getMovieDetail(slug);
+                if (detail?.movie) {
+                    return detail.movie;
+                }
+            } catch {}
+
+            const fallback = HERO_FALLBACK_META[slug];
+            if (!fallback) return null;
+
+            return {
+                _id: slug,
+                slug,
+                name: fallback.name,
+                origin_name: fallback.name,
+                content: "",
+                category: [],
+                country: [{ name: countryName, slug: "trung-quoc" }],
+                year: fallback.year || 2025,
+                episode_current: "Full",
+            };
+        })
+    );
+
+    return resolved.filter(Boolean);
+}
+
 async function PhimTrungHome() {
     const { countryItems, fallbackItems } = await getCountryPagePool("trung-quoc");
     const latestMovies = fallbackItems.slice(0, 14);
@@ -128,9 +176,7 @@ async function CountryGridStream({ slug, page, limit = 49 }: { slug: string; pag
 
 async function ChinaHeroWithData() {
     const { fallbackItems } = await getCountryPagePool("trung-quoc");
-    const heroMovies = HERO_SLUGS
-        .map((slug) => fallbackItems.find((movie) => movie.slug === slug))
-        .filter(Boolean);
+    const heroMovies = await resolveHeroMovies(HERO_SLUGS, fallbackItems, "Trung Quốc");
 
     return <ChinaHero initialMovies={heroMovies} />;
 }

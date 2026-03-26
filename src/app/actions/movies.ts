@@ -16,6 +16,20 @@ import {
     saveMovieToCache 
 } from "@/lib/movie-cache";
 
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> {
+    let timer: NodeJS.Timeout | null = null;
+    try {
+        return await Promise.race([
+            promise,
+            new Promise<T>((resolve) => {
+                timer = setTimeout(() => resolve(fallback), timeoutMs);
+            }),
+        ]);
+    } finally {
+        if (timer) clearTimeout(timer);
+    }
+}
+
 /**
  * [Elite Resilience] Resilient Movie List Loader
  * Pattern: DB Cache -> External API -> JIT Update
@@ -64,24 +78,27 @@ export async function getResilientMoviesList(
             ? undefined
             : yearParam;
 
-        const apiData =
+        const apiData = await withTimeout(
             options.country
-                ? await getMoviesByCountry(options.country, page, limit, {
+                ? getMoviesByCountry(options.country, page, limit, {
                     category: options.category,
                     year: normalizedYearParam,
                 })
                 : options.category
-                    ? await getMoviesByCategory(options.category, page, limit, {
+                    ? getMoviesByCategory(options.category, page, limit, {
                         country: options.country,
                         year: normalizedYearParam,
                     })
-                    : await getMoviesList(type, {
+                    : getMoviesList(type, {
                         page,
                         limit,
                         category: options.category,
                         country: options.country,
                         year: normalizedYearParam,
-                    });
+                    }),
+            3500,
+            { items: [], pagination: { currentPage: page, totalPages: 1 } } as any
+        );
 
         if (apiData && apiData.items && apiData.items.length > 0) {
             syncMoviesToLocalCache(apiData.items).catch(() => {});

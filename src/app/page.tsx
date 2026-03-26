@@ -8,7 +8,6 @@ import TopTrendingTabs from "@/components/TopTrendingTabs";
 import QuickNav from "@/components/QuickNav";
 import ContinueWatchingRow from "@/components/ContinueWatchingRow";
 
-import LazySection from "@/components/LazySection";
 import { getMoviesList, getTrendMovies, isTrailer } from "@/services/api";
 import { getResilientMoviesList } from "@/app/actions/movies";
 import { getTMDBDataForCard } from "@/app/actions/tmdb";
@@ -167,7 +166,7 @@ async function AsyncHeroSection({ initialMovies }: { initialMovies: any[] }) {
   return <HeroSection movies={enhancedHeroData} />;
 }
 
-/** Hàng phim tự tải dữ liệu (Self-fetching Row) để hỗ trợ Streaming */
+/** Hàng phim tự tải dữ liệu nhanh và fail-fast */
 async function HomeRowSection({
   title,
   slug,
@@ -199,14 +198,12 @@ async function HomeRowSection({
   if (!movies.length) return null;
 
   return (
-    <LazySection minHeight={minHeight} className="movie-row-standard">
-      <MovieRow
-        title={title}
-        movies={movies}
-        slug={viewAllHref || slug}
-        priorityFirst={priorityFirst}
-      />
-    </LazySection>
+    <MovieRow
+      title={title}
+      movies={movies}
+      slug={viewAllHref || slug}
+      priorityFirst={priorityFirst}
+    />
   );
 }
 
@@ -276,17 +273,13 @@ export default function Home() {
         </div>
 
         {/* Top Trending - Tải độc lập */}
-        <LazySection minHeight={280} className="movie-row-landscape">
-          <Suspense fallback={<div className="h-[280px] bg-white/5 rounded-lg animate-pulse mx-4" />}>
-            <AsyncTopTrendingHub />
-          </Suspense>
-        </LazySection>
+        <Suspense fallback={<div className="h-[280px] bg-white/5 rounded-lg animate-pulse mx-4" />}>
+          <AsyncTopTrendingHub />
+        </Suspense>
 
         <div className="space-y-4 md:space-y-8">
-          {/* Hàng phim tiếp diễn - Client Side nhẹ nhàng */}
-          <LazySection minHeight={200} className="movie-row-landscape">
-            <ContinueWatchingRow />
-          </LazySection>
+          {/* Hàng phim tiếp diễn */}
+          <ContinueWatchingRow />
 
           {/* Group: Phim Mới */}
           <Suspense fallback={contentSkeleton}>
