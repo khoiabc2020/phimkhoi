@@ -167,11 +167,10 @@ async function resolveCountrySections(
 }
 
 async function PhimHanHome() {
-    const { countryItems, fallbackItems } = await withTimeout(
-        getCountryPagePool("han-quoc"),
-        2200,
-        { countryItems: [] as any[], fallbackItems: [] as any[] }
-    );
+    const { countryItems, fallbackItems } = await getCountryPagePool("han-quoc").catch(() => ({
+        countryItems: [] as any[],
+        fallbackItems: [] as any[],
+    }));
     const latestMovies = fallbackItems.length > 0
         ? fallbackItems.slice(0, 14)
         : (await getResilientMoviesList("han-quoc", 1, 14, { country: "han-quoc" })).items || [];
@@ -227,11 +226,10 @@ async function CountryGridStream({ slug, page, limit = 49 }: { slug: string; pag
 }
 
 async function KoreaHeroWithData() {
-    const { fallbackItems } = await withTimeout(
-        getCountryPagePool("han-quoc"),
-        1800,
-        { countryItems: [] as any[], fallbackItems: [] as any[] }
-    );
+    const { fallbackItems } = await getCountryPagePool("han-quoc").catch(() => ({
+        countryItems: [] as any[],
+        fallbackItems: [] as any[],
+    }));
     const heroMovies = await resolveHeroMovies(HERO_SLUGS, fallbackItems, "Hàn Quốc");
 
     return <KoreaHero initialMovies={heroMovies} />;

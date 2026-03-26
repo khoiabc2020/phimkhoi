@@ -103,7 +103,9 @@ export function getBackdropImageUrl(movie?: MovieImageLike | null, proxy = false
 
     const landscapeThumb = thumb && detectOrientation(thumb) === "landscape" ? thumb : "";
     const landscapePoster = poster && detectOrientation(poster) === "landscape" ? poster : "";
-    const fallback = landscapeThumb || landscapePoster || thumb || poster;
+    const unknownThumb = thumb && detectOrientation(thumb) === "unknown" ? thumb : "";
+    const unknownPoster = poster && detectOrientation(poster) === "unknown" ? poster : "";
+    const fallback = landscapeThumb || landscapePoster || unknownThumb || unknownPoster;
 
     return fallback ? getImageUrl(fallback, proxy) : "";
 }

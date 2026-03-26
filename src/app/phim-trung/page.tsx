@@ -179,11 +179,10 @@ async function resolveCountrySections(
 }
 
 async function PhimTrungHome() {
-    const { countryItems, fallbackItems } = await withTimeout(
-        getCountryPagePool("trung-quoc"),
-        2200,
-        { countryItems: [] as any[], fallbackItems: [] as any[] }
-    );
+    const { countryItems, fallbackItems } = await getCountryPagePool("trung-quoc").catch(() => ({
+        countryItems: [] as any[],
+        fallbackItems: [] as any[],
+    }));
     const latestMovies = fallbackItems.length > 0
         ? fallbackItems.slice(0, 14)
         : (await getResilientMoviesList("trung-quoc", 1, 14, { country: "trung-quoc" })).items || [];
@@ -239,11 +238,10 @@ async function CountryGridStream({ slug, page, limit = 49 }: { slug: string; pag
 }
 
 async function ChinaHeroWithData() {
-    const { fallbackItems } = await withTimeout(
-        getCountryPagePool("trung-quoc"),
-        1800,
-        { countryItems: [] as any[], fallbackItems: [] as any[] }
-    );
+    const { fallbackItems } = await getCountryPagePool("trung-quoc").catch(() => ({
+        countryItems: [] as any[],
+        fallbackItems: [] as any[],
+    }));
     const heroMovies = await resolveHeroMovies(HERO_SLUGS, fallbackItems, "Trung Quốc");
 
     return <ChinaHero initialMovies={heroMovies} />;
