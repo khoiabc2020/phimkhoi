@@ -6,6 +6,7 @@ import { Play, ChevronLeft, ChevronRight } from "lucide-react";
 import { Movie } from "@/services/api";
 import { getImageUrl, getPosterImageUrl, getBackdropImageUrl, decodeHtml, cn, detectOrientation } from "@/lib/utils";
 import { shouldUseTmdbMedia } from "@/lib/movie-list";
+import { hasLandscapeImage } from "@/lib/movie-media";
 import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import WatchlistButton from "./WatchlistButton";
@@ -86,6 +87,19 @@ function getHeroImage(movie: any, type: "poster" | "backdrop" | "character" | "l
 
     const poster = getPosterImageUrl(movie, true);
     return poster || getBackdropImageUrl(movie, true) || "/placeholder.jpg";
+}
+
+function hasDesktopHeroBackdrop(movie: any) {
+    if (!movie) return false;
+    if (movie.isCustomHero) return Boolean(movie.layer_bg);
+
+    const tmdb = shouldUseTmdbMedia(movie, movie?.tmdbData) ? movie.tmdbData : null;
+    if (tmdb?.backdrop_path) return true;
+
+    return hasLandscapeImage({
+        poster_url: movie?.poster_url,
+        thumb_url: movie?.thumb_url,
+    });
 }
 
 // ─── Autoplay hook ────────────────────────────────────────────────────────────
@@ -433,9 +447,9 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                 )}
                             >
                                 <Image
-                                    src={getHeroImage(m, "backdrop", "mobile").startsWith('http') 
-                                        ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(m, "backdrop", "mobile"))}&w=300&q=60`
-                                        : getHeroImage(m, "backdrop", "mobile")
+                                    src={getHeroImage(m, "backdrop", "desktop").startsWith('http') 
+                                        ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(m, "backdrop", "desktop"))}&w=300&q=60`
+                                        : getHeroImage(m, "backdrop", "desktop")
                                     }
                                     alt={decodeHtml(m.name)}
                                     fill
@@ -456,17 +470,17 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
             <div className="absolute top-[35%] md:top-[40%] -translate-y-1/2 left-0 right-0 z-[35] pointer-events-none flex items-center justify-between px-2 md:px-8 lg:pl-32 lg:pr-10 xl:pl-40 xl:pr-16">
                 <button 
                     onClick={prev}
-                    className="w-7 h-7 md:w-9 md:h-9 lg:w-10 lg:h-10 rounded-full bg-black/0 hover:bg-black/10 backdrop-blur-sm border border-white/0 hover:border-white/10 flex items-center justify-center text-white/10 hover:text-white/45 hover:scale-105 active:scale-95 transition-all duration-300 group pointer-events-auto shadow-none"
+                    className="h-8 w-8 md:h-9 md:w-9 lg:h-10 lg:w-10 rounded-full bg-transparent border border-transparent flex items-center justify-center text-white/15 hover:text-white/45 hover:bg-white/[0.04] active:scale-95 transition-all duration-300 pointer-events-auto shadow-none"
                     aria-label="Previous slide"
                 >
-                    <ChevronLeft className="w-5 h-5 md:w-7 md:h-7 lg:w-8 lg:h-8" />
+                    <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7" />
                 </button>
                 <button 
                     onClick={next}
-                    className="w-7 h-7 md:w-9 md:h-9 lg:w-10 lg:h-10 rounded-full bg-black/0 hover:bg-black/10 backdrop-blur-sm border border-white/0 hover:border-white/10 flex items-center justify-center text-white/10 hover:text-white/45 hover:scale-105 active:scale-95 transition-all duration-300 group pointer-events-auto shadow-none"
+                    className="h-8 w-8 md:h-9 md:w-9 lg:h-10 lg:w-10 rounded-full bg-transparent border border-transparent flex items-center justify-center text-white/15 hover:text-white/45 hover:bg-white/[0.04] active:scale-95 transition-all duration-300 pointer-events-auto shadow-none"
                     aria-label="Next slide"
                 >
-                    <ChevronRight className="w-5 h-5 md:w-7 md:h-7 lg:w-8 lg:h-8" />
+                    <ChevronRight className="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7" />
                 </button>
             </div>
         </div>
@@ -476,19 +490,21 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
 // ─── Export ───────────────────────────────────────────────────────────────────
 
 export default function HeroSection({ movies }: { movies: Movie[] }) {
-    const isDesktop = useMediaQuery("(min-width: 768px)");
-    
     if (!movies || movies.length === 0) return null;
-    const heroMovies = movies.slice(0, 10);
+    const desktopMovies = movies.filter(hasDesktopHeroBackdrop).slice(0, 10);
+    const mobileMovies = movies.slice(0, 10);
+    if (mobileMovies.length === 0) return null;
 
     return (
         <div className="relative w-full bg-[#0a0a0a] font-sans" style={{ minHeight: '400px', contain: "layout transition", willChange: "transform" }}>
             <div className="md:hidden">
-                <MobileHero movies={heroMovies} active={true} />
+                <MobileHero movies={mobileMovies} active={true} />
             </div>
-            <div className="hidden md:block">
-                <DesktopHero movies={heroMovies} active={true} />
-            </div>
+            {desktopMovies.length > 0 && (
+                <div className="hidden md:block">
+                    <DesktopHero movies={desktopMovies} active={true} />
+                </div>
+            )}
         </div>
     );
 }

@@ -3,8 +3,9 @@
 import Link from "next/link";
 import MovieCard from "./MovieCard";
 import { Movie } from "@/services/api";
-import { useRef, memo } from "react";
+import { useRef, memo, useMemo } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { sanitizeMovieList } from "@/lib/movie-list";
 
 interface MovieRowProps {
     title: string;
@@ -16,6 +17,10 @@ interface MovieRowProps {
 
 function MovieRowInner({ title, movies, slug, variant = 'default', priorityFirst = false }: MovieRowProps) {
     const rowRef = useRef<HTMLDivElement>(null);
+    const safeMovies = useMemo(
+        () => sanitizeMovieList(movies || [], { limit: Math.max(1, (movies || []).length || 1) }),
+        [movies]
+    );
 
     const scroll = (direction: "left" | "right") => {
         if (rowRef.current) {
@@ -28,7 +33,7 @@ function MovieRowInner({ title, movies, slug, variant = 'default', priorityFirst
         }
     };
 
-    if (!movies || movies.length === 0) return null;
+    if (!safeMovies || safeMovies.length === 0) return null;
 
     if (variant === 'sidebar') {
         return (
@@ -66,7 +71,7 @@ function MovieRowInner({ title, movies, slug, variant = 'default', priorityFirst
                             className="flex gap-4 overflow-x-auto overflow-y-hidden pb-4 pt-2 no-scrollbar snap-x scroll-smooth"
                             style={{ scrollbarWidth: "none", msOverflowStyle: "none", scrollBehavior: "smooth", contain: "layout paint" }}
                         >
-                            {movies.map((movie, idx) => (
+                            {safeMovies.map((movie, idx) => (
                                 <div key={movie._id} className="min-w-[200px] md:min-w-[280px] snap-start">
                                     <MovieCard 
                                         movie={movie} 
@@ -126,7 +131,7 @@ function MovieRowInner({ title, movies, slug, variant = 'default', priorityFirst
                             className="flex gap-2.5 overflow-x-auto overflow-y-hidden px-1.5 sm:px-2.5 pb-2.5 pt-1 no-scrollbar snap-x scroll-smooth"
                             style={{ scrollbarWidth: "none", msOverflowStyle: "none", scrollBehavior: "smooth", contain: "layout paint" }}
                         >
-                            {movies.map((movie, idx) => (
+                            {safeMovies.map((movie, idx) => (
                                 <div key={movie._id} className="min-w-[156px] sm:min-w-[176px] md:min-w-[196px] xl:min-w-[226px] snap-center">
                                     <MovieCard 
                                         movie={movie} 

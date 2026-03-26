@@ -8,6 +8,11 @@ import TrendingCache from "@/models/TrendingCache";
 import MovieModel from "@/models/Movie";
 import type { Movie } from "@/services/api";
 import { cache } from "react";
+import { normalizeMovieImages } from "@/lib/movie-media";
+import { sanitizeMovieList } from "@/lib/movie-list";
+import { matchesCountryStrict } from "@/lib/movie-country";
+
+const COUNTRY_CACHE_TYPES = new Set(["han-quoc", "trung-quoc", "nhat-ban", "thai-lan", "viet-nam", "dai-loan"]);
 
 const hasPlayableEpisodes = (episodes: any[] = []) =>
     Array.isArray(episodes) &&
@@ -28,11 +33,15 @@ export const getMoviesFromCache = async (
         if (!trendingCache || !trendingCache.movies || trendingCache.movies.length === 0) return null;
 
         const allMovies = trendingCache.movies as Movie[];
-        const totalItems = allMovies.length;
+        const normalizedItems = allMovies.map((movie) => normalizeMovieImages(movie));
+        const filteredItems = COUNTRY_CACHE_TYPES.has(type)
+            ? normalizedItems.filter((movie) => matchesCountryStrict(movie, type))
+            : normalizedItems;
+        const cleanItems = sanitizeMovieList(filteredItems, { limit: filteredItems.length || 1 });
+        const totalItems = cleanItems.length;
         const totalPages = Math.ceil(totalItems / limit);
         const startIndex = (page - 1) * limit;
-        const paginatedItems = allMovies.slice(startIndex, startIndex + limit);
-
+        const paginatedItems = cleanItems.slice(startIndex, startIndex + limit);
         if (paginatedItems.length === 0) return null;
 
         return {
@@ -69,19 +78,26 @@ export const getMoviesByFilterFromCache = async (
         if (options.category && options.category !== 'all') query["category.slug"] = options.category;
 
         // Perform count and find in parallel
-        const [totalItems, movies] = await Promise.all([
+        const [totalDocCount, movies] = await Promise.all([
             MovieModel.countDocuments(query),
             MovieModel.find(query)
                 .sort({ updatedAt: -1, lastSynced: -1 })
                 .skip(skip)
                 .limit(limit)
-                .lean()
+                .lean(),
         ]);
 
         if (movies.length === 0) return null;
 
+        const normalizedMovies = (movies as unknown as Movie[]).map((movie) => normalizeMovieImages(movie));
+        const filteredMovies = filterType === "country"
+            ? normalizedMovies.filter((movie) => matchesCountryStrict(movie, slug))
+            : normalizedMovies;
+        const cleanMovies = sanitizeMovieList(filteredMovies, { limit });
+        const totalItems = Math.max(cleanMovies.length, totalDocCount);
+
         return {
-            items: movies as unknown as Movie[],
+            items: cleanMovies,
             pagination: {
                 totalItems,
                 totalPages: Math.ceil(totalItems / limit),
@@ -134,20 +150,19 @@ export const saveMovieToCache = async (slug: string, data: any) => {
             : (existingMovie?.episodes || []);
 
         const pathImage = data.pathImage || data.data?.pathImage || "";
-        
-        // Basic normalization
-        let thumb_url = movie.thumb_url?.startsWith('http') ? movie.thumb_url : (pathImage + movie.thumb_url);
-        let poster_url = movie.poster_url?.startsWith('http') ? movie.poster_url : (pathImage + movie.poster_url);
 
-        // NguonC Swap logic (NguonC specific signature)
-        if (data.status === 'success' && data.movie && !data.data) {
-             const temp = thumb_url;
-             thumb_url = poster_url;
-             poster_url = temp;
-        }
+        const rawMovieMedia = normalizeMovieImages({
+            poster_url: movie.poster_url?.startsWith("http") ? movie.poster_url : `${pathImage || ""}${movie.poster_url || ""}`,
+            thumb_url: movie.thumb_url?.startsWith("http") ? movie.thumb_url : `${pathImage || ""}${movie.thumb_url || ""}`,
+        });
 
-        thumb_url = thumb_url || existingMovie?.thumb_url || "";
-        poster_url = poster_url || existingMovie?.poster_url || "";
+        const existingMedia = normalizeMovieImages({
+            poster_url: existingMovie?.poster_url || "",
+            thumb_url: existingMovie?.thumb_url || "",
+        });
+
+        const poster_url = rawMovieMedia.poster_url || existingMedia.poster_url || "";
+        const thumb_url = rawMovieMedia.thumb_url || existingMedia.thumb_url || "";
 
         const { _id, id: movie_id, ...rest } = movie;
         const finalId = _id || movie_id || movie.slug;

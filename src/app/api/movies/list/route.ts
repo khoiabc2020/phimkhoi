@@ -3,6 +3,7 @@ import { getMoviesByFilterFromCache, getMoviesFromCache } from '@/lib/movie-cach
 import { getFallbackDisplayMovies, syncMoviesToLocalCache } from '@/services/server-movies';
 import { getMoviesByCategory, getMoviesByCountry, getMoviesList } from '@/services/api';
 import { sanitizeMovieList } from '@/lib/movie-list';
+import { matchesCountryStrict } from '@/lib/movie-country';
 
 /**
  * [Elite Retrieval API]
@@ -19,7 +20,13 @@ export async function GET(req: Request) {
         const year = searchParams.get('year') || 'all';
         const category = searchParams.get('category') || 'all';
         const allowAdult = slug === 'phim-18' || category === 'phim-18';
-        const finalize = (items: any[]) => sanitizeMovieList(items, { limit, allowAdult });
+        const finalize = (items: any[]) => {
+            const countryScopedItems =
+                type === 'country' && slug
+                    ? items.filter((item) => matchesCountryStrict(item, slug))
+                    : items;
+            return sanitizeMovieList(countryScopedItems, { limit, allowAdult });
+        };
 
         // 1. Handle Categorical/Country filters
         if (type === 'category' || type === 'country') {

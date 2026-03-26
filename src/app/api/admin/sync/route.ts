@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Movie from "@/models/Movie";
-import { detectOrientation, getImageUrl } from "@/lib/utils";
-import { sanitizeTmdbDataForMovie } from "@/lib/movie-list";
+import { isTrailerMovie, sanitizeTmdbDataForMovie } from "@/lib/movie-list";
+import { normalizeMovieImages } from "@/lib/movie-media";
 
 const API_URL = "https://phimapi.com";
 
@@ -52,41 +52,12 @@ const pickNonEmptyArray = (nextValue: unknown, currentValue: unknown) => {
     return nextArray.length >= currentArray.length ? nextArray : currentArray;
 };
 
-const normalizeImageFields = (posterUrl: unknown, thumbUrl: unknown) => {
-    const poster = String(posterUrl || "").trim();
-    const thumb = String(thumbUrl || "").trim();
-
-    const normalizedPoster = poster ? getImageUrl(poster) : "";
-    const normalizedThumb = thumb ? getImageUrl(thumb) : "";
-
-    const candidates = [
-        { value: normalizedPoster, orientation: detectOrientation(normalizedPoster) },
-        { value: normalizedThumb, orientation: detectOrientation(normalizedThumb) },
-    ].filter((entry) => entry.value);
-
-    const portrait =
-        candidates.find((entry) => entry.orientation === "portrait")?.value ||
-        candidates.find((entry) => entry.orientation === "unknown")?.value ||
-        normalizedPoster ||
-        normalizedThumb ||
-        "";
-
-    const landscape =
-        candidates.find((entry) => entry.orientation === "landscape")?.value ||
-        candidates.find((entry) => entry.orientation === "unknown")?.value ||
-        normalizedThumb ||
-        normalizedPoster ||
-        "";
-
-    return {
-        poster_url: portrait,
-        thumb_url: landscape,
-    };
-};
-
 // Helper to normalize movie data from API to our schema
 const normalizeMovieData = (item: any, existingMovie?: any) => {
-    const images = normalizeImageFields(item.poster_url, item.thumb_url);
+    const images = normalizeMovieImages({
+        poster_url: item.poster_url,
+        thumb_url: item.thumb_url,
+    });
     const sanitized = sanitizeTmdbDataForMovie({
         ...existingMovie,
         ...item,
@@ -175,6 +146,10 @@ export async function GET(req: Request) {
                             if (detailData.movie) {
                                 movieData = { ...item, ...detailData.movie }; // Merge list info with detail info
                             }
+                        }
+
+                        if (isTrailerMovie(movieData)) {
+                            continue;
                         }
 
                         const existingMovie = await Movie.findOne({ slug: movieData.slug }).lean();

@@ -4,6 +4,7 @@ import dbConnect from "@/lib/db";
 import MovieModel from "@/models/Movie";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getMovieDetail } from "@/services/api";
+import { normalizeMovieImages } from "@/lib/movie-media";
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 20;
@@ -59,6 +60,10 @@ function normalizeMoviePayload(payload: any, existingMovie?: any) {
     const name = String(payload?.name || existingMovie?.name || "").trim();
     const slug = String(payload?.slug || existingMovie?.slug || slugifyText(name)).trim();
     const now = new Date();
+    const images = normalizeMovieImages({
+        poster_url: payload?.poster_url || existingMovie?.poster_url || "",
+        thumb_url: payload?.thumb_url || existingMovie?.thumb_url || "",
+    });
 
     return {
         _id: String(payload?._id || existingMovie?._id || slug),
@@ -68,8 +73,8 @@ function normalizeMoviePayload(payload: any, existingMovie?: any) {
         content: String(payload?.content || existingMovie?.content || "").trim(),
         type: String(payload?.type || existingMovie?.type || "series").trim(),
         status: String(payload?.status || existingMovie?.status || "").trim(),
-        thumb_url: String(payload?.thumb_url || existingMovie?.thumb_url || "").trim(),
-        poster_url: String(payload?.poster_url || existingMovie?.poster_url || "").trim(),
+        thumb_url: images.thumb_url,
+        poster_url: images.poster_url,
         is_copyright: Boolean(payload?.is_copyright ?? existingMovie?.is_copyright ?? false),
         sub_docquyen: Boolean(payload?.sub_docquyen ?? existingMovie?.sub_docquyen ?? false),
         chieurap: Boolean(payload?.chieurap ?? existingMovie?.chieurap ?? false),

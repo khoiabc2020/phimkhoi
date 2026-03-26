@@ -7,43 +7,43 @@ const NAV_ITEMS = [
         label: "Hàn Quốc",
         sub: "Xem chủ đề",
         href: "/quoc-gia/han-quoc",
-        from: "rgba(116, 142, 192, 0.18)",
-        to: "rgba(143, 167, 197, 0.08)",
+        from: "rgba(22, 28, 44, 0.96)",
+        to: "rgba(11, 14, 24, 0.96)",
     },
     {
         label: "Trung Quốc",
         sub: "Xem chủ đề",
         href: "/quoc-gia/trung-quoc",
-        from: "rgba(102, 135, 120, 0.18)",
-        to: "rgba(143, 167, 197, 0.08)",
+        from: "rgba(18, 28, 26, 0.96)",
+        to: "rgba(10, 16, 18, 0.96)",
     },
     {
         label: "Phim Ngắn",
         sub: "Xem chủ đề",
         href: "/the-loai/phim-ngan",
-        from: "rgba(149, 113, 88, 0.18)",
-        to: "rgba(143, 167, 197, 0.07)",
+        from: "rgba(31, 22, 20, 0.96)",
+        to: "rgba(17, 12, 12, 0.96)",
     },
     {
         label: "Thuyết Minh",
         sub: "Xem chủ đề",
         href: "/danh-sach/thuyet-minh",
-        from: "rgba(111, 103, 143, 0.18)",
-        to: "rgba(143, 167, 197, 0.07)",
+        from: "rgba(25, 20, 36, 0.96)",
+        to: "rgba(14, 12, 22, 0.96)",
     },
     {
         label: "Phim Mỹ",
         sub: "Xem chủ đề",
         href: "/quoc-gia/my",
-        from: "rgba(131, 88, 88, 0.18)",
-        to: "rgba(143, 167, 197, 0.07)",
+        from: "rgba(34, 20, 20, 0.96)",
+        to: "rgba(18, 11, 11, 0.96)",
     },
     {
         label: "Thái Lan",
         sub: "Xem chủ đề",
         href: "/quoc-gia/thai-lan",
-        from: "rgba(107, 114, 136, 0.18)",
-        to: "rgba(143, 167, 197, 0.08)",
+        from: "rgba(22, 24, 34, 0.96)",
+        to: "rgba(12, 13, 20, 0.96)",
     },
 ];
 
@@ -62,11 +62,11 @@ export default function QuickNav() {
                             key={item.href}
                             href={item.href}
                             aria-label={`Xem ${item.label}`}
-                            className="group quick-nav-card relative aspect-[1.8/1] w-[160px] flex-shrink-0 snap-start overflow-hidden rounded-[12px] border border-white/[0.06] bg-[#0b0b10] shadow-[0_8px_24px_rgba(0,0,0,0.28)] transition-all duration-300 hover:scale-[1.02] hover:border-[#8FA7C5]/25 hover:shadow-[0_12px_32px_rgba(0,0,0,0.42)] sm:w-[220px] lg:w-auto"
-                            style={{ background: `linear-gradient(135deg, ${item.from}, ${item.to}), #0b0b10` }}
+                            className="group quick-nav-card relative aspect-[1.8/1] w-[160px] flex-shrink-0 snap-start overflow-hidden rounded-[12px] border border-white/[0.05] bg-[#0b0b10] shadow-[0_8px_24px_rgba(0,0,0,0.32)] transition-all duration-300 hover:scale-[1.02] hover:border-[#8FA7C5]/20 hover:shadow-[0_12px_32px_rgba(0,0,0,0.5)] sm:w-[220px] lg:w-auto"
+                            style={{ background: `linear-gradient(135deg, ${item.from}, ${item.to})` }}
                         >
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.06),transparent_40%)]" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(143,167,197,0.12),transparent_42%)]" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/15 to-transparent" />
 
                             <div className="absolute inset-x-0 bottom-0 flex h-full flex-col justify-end p-3 sm:p-4">
                                 <h3 className="mb-1 text-[16px] font-bold leading-tight text-white sm:text-[20px]">

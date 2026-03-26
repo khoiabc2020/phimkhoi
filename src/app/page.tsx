@@ -13,6 +13,7 @@ import { getResilientMoviesList } from "@/app/actions/movies";
 import { getTMDBDataForCard } from "@/app/actions/tmdb";
 import { cn } from "@/lib/utils";
 import { isAdultMovie, sanitizeMovieList } from "@/lib/movie-list";
+import { hasLandscapeImage } from "@/lib/movie-media";
 import connectDB from "@/lib/db";
 import CustomHero from "@/models/CustomHero";
 import TrendingCache from "@/models/TrendingCache";
@@ -163,7 +164,20 @@ async function AsyncHeroSection({ initialMovies }: { initialMovies: any[] }) {
     })
   );
 
-  return <HeroSection movies={enhancedHeroData} />;
+  const hasHeroBackdrop = (movie: any) =>
+    Boolean(
+      movie?.isCustomHero ||
+      movie?.tmdbData?.backdrop_path ||
+      hasLandscapeImage({
+        poster_url: movie?.poster_url,
+        thumb_url: movie?.thumb_url,
+      })
+    );
+
+  const backdropReady = enhancedHeroData.filter(hasHeroBackdrop);
+  const heroMovies = (backdropReady.length > 0 ? backdropReady : enhancedHeroData).slice(0, 10);
+
+  return <HeroSection movies={heroMovies} />;
 }
 
 /** Hàng phim tự tải dữ liệu nhanh và fail-fast */

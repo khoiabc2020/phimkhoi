@@ -1,51 +1,14 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { detectImageOrientation, normalizeImageUrl, resolveMovieImages } from "@/lib/movie-media";
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
 export function getImageUrl(url: string, proxy = false): string {
-    if (!url) return "";
-
-    let finalUrl = url;
-    if (!url.startsWith("http")) {
-        const normalized = url.trim();
-        // Skip prefixing for local assets or special paths
-        if (normalized.startsWith("/images") || normalized.startsWith("/icons") || normalized.startsWith("/favicon") || normalized.startsWith("/_next")) {
-            finalUrl = normalized;
-        } else if (
-            normalized.startsWith("upload/") ||
-            normalized.startsWith("/upload/") ||
-            normalized.startsWith("uploads/") ||
-            normalized.startsWith("/uploads/") ||
-            normalized.startsWith("vod/") ||
-            normalized.startsWith("/vod/")
-        ) {
-            const cleanPath = normalized.startsWith("/") ? normalized : `/${normalized}`;
-            finalUrl = `https://img.phimapi.com${cleanPath}`;
-        } else {
-            // For ophim, normally paths without http are relative to phimimg.com
-            finalUrl = normalized.startsWith("/") ? `https://phimimg.com${normalized}` : `https://phimimg.com/${normalized}`;
-        }
-    }
-
-    if (finalUrl.startsWith("http")) {
-        try {
-            const parsed = new URL(finalUrl);
-            const isLegacyPhimImgUpload =
-                parsed.hostname === "phimimg.com" &&
-                (parsed.pathname.startsWith("/upload/") ||
-                    parsed.pathname.startsWith("/uploads/") ||
-                    parsed.pathname.startsWith("/vod/"));
-
-            if (isLegacyPhimImgUpload) {
-                finalUrl = `https://img.phimapi.com${parsed.pathname}${parsed.search}`;
-            }
-        } catch {
-            // ignore URL parse error
-        }
-    }
+    const finalUrl = normalizeImageUrl(url);
+    if (!finalUrl) return "";
 
     // Trường hợp ép proxy (cho các component không dùng Next Image)
     if (proxy && finalUrl.startsWith("http")) {
@@ -86,26 +49,14 @@ type MovieImageLike = {
 
 export function getPosterImageUrl(movie?: MovieImageLike | null, proxy = false): string {
     if (!movie) return "";
-    const poster = String(movie.poster_url || "").trim();
-    const thumb = String(movie.thumb_url || "").trim();
-
-    const portraitPoster = poster && detectOrientation(poster) === "portrait" ? poster : "";
-    const portraitThumb = thumb && detectOrientation(thumb) === "portrait" ? thumb : "";
-    const fallback = portraitPoster || portraitThumb || poster || thumb;
+    const fallback = resolveMovieImages(movie).poster_url;
 
     return fallback ? getImageUrl(fallback, proxy) : "";
 }
 
 export function getBackdropImageUrl(movie?: MovieImageLike | null, proxy = false): string {
     if (!movie) return "";
-    const poster = String(movie.poster_url || "").trim();
-    const thumb = String(movie.thumb_url || "").trim();
-
-    const landscapeThumb = thumb && detectOrientation(thumb) === "landscape" ? thumb : "";
-    const landscapePoster = poster && detectOrientation(poster) === "landscape" ? poster : "";
-    const unknownThumb = thumb && detectOrientation(thumb) === "unknown" ? thumb : "";
-    const unknownPoster = poster && detectOrientation(poster) === "unknown" ? poster : "";
-    const fallback = landscapeThumb || landscapePoster || unknownThumb || unknownPoster;
+    const fallback = resolveMovieImages(movie).thumb_url;
 
     return fallback ? getImageUrl(fallback, proxy) : "";
 }
@@ -130,40 +81,7 @@ export function stripHtml(html: string) {
 }
 
 export function detectOrientation(url?: string | null): "portrait" | "landscape" | "unknown" {
-    if (!url) return "unknown";
-    const u = url.toLowerCase();
-    
-    // OPhim, NguonC often use "thumb" for portrait and "poster" for landscape (reverse of standard)
-    const isNguonc = u.includes("nguonc.com") || u.includes("streamc.xyz") || u.includes("phimmoi.net") || u.includes("1080.com.vn");
-    const isOphim =
-        u.includes("img.ophim.live") ||
-        u.includes("phimimg.com") ||
-        u.includes("img.ophim1.com") ||
-        u.includes("img.phimapi.com");
-
-    if (isOphim || isNguonc) {
-        if (u.includes("-thumb.") || u.includes("/thumb-") || u.endsWith("/thumb.jpg") || u.endsWith("/thumb.png")) return "portrait";
-        if (u.includes("-poster.") || u.includes("/poster-") || u.endsWith("/poster.jpg") || u.endsWith("/poster.png")) return "landscape";
-    }
-
-    // Standard checks for other sources (KKPhim, TMDB, etc.)
-    if (u.includes("backdrop") || u.includes("banner") || u.includes("landscape") || u.includes("horizontal")) {
-        return "landscape";
-    }
-    if (u.includes("portrait") || u.includes("vertical") || u.includes("/poster") || u.includes("poster.")) {
-        return "portrait";
-    }
-
-    // Dimension heuristic for fallback
-    const dim = u.match(/(\d{2,4})x(\d{2,4})/);
-    if (dim) {
-        const w = parseInt(dim[1], 10);
-        const h = parseInt(dim[2], 10);
-        if (Number.isFinite(w) && Number.isFinite(h) && w !== h) {
-            return h > w ? "portrait" : "landscape";
-        }
-    }
-    return "unknown";
+    return detectImageOrientation(url);
 }
 
 export function extractEpisodeNumber(value: string): string | null {

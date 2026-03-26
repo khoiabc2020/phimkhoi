@@ -1,4 +1,5 @@
 import type { Movie } from "@/services/api";
+import { normalizeMovieImages } from "@/lib/movie-media";
 
 const ADULT_SLUGS = new Set([
     "phim-18",
@@ -20,6 +21,15 @@ const ADULT_MARKERS = [
     "ecchi",
     "jav",
     "uncensored",
+];
+
+const TRAILER_MARKERS = [
+    "trailer",
+    "teaser",
+    "preview",
+    "coming soon",
+    "sap chieu",
+    "nha hang",
 ];
 
 const normalizeText = (value: unknown) =>
@@ -202,6 +212,35 @@ export const isAdultMovie = (movie: Partial<Movie> | null | undefined) => {
     return ADULT_MARKERS.some((marker) => haystacks.some((text) => text.includes(normalizeText(marker))));
 };
 
+export const isTrailerMovie = (movie: Partial<Movie> | null | undefined) => {
+    if (!movie) return false;
+
+    const categories = Array.isArray(movie.category) ? movie.category : [];
+    if (
+        categories.some((category) => {
+            const slug = normalizeText(category?.slug || "");
+            const name = normalizeText(category?.name || "");
+            return slug.includes("trailer") || name.includes("trailer");
+        })
+    ) {
+        return true;
+    }
+
+    const haystacks = [
+        movie.name,
+        movie.origin_name,
+        movie.notify,
+        movie.quality,
+        movie.status,
+        movie.episode_current,
+        movie.episode_total,
+        (movie as any)?.current_episode,
+        (movie as any)?.type,
+    ].map(normalizeText);
+
+    return TRAILER_MARKERS.some((marker) => haystacks.some((text) => text.includes(normalizeText(marker))));
+};
+
 export const isLikelyDuplicateMovie = (left: Partial<Movie>, right: Partial<Movie>) => {
     const leftSlug = String(left?.slug || "").trim();
     const rightSlug = String(right?.slug || "").trim();
@@ -234,7 +273,8 @@ export function sanitizeMovieList(
 
     for (const rawMovie of movies) {
         if (!rawMovie?.slug) continue;
-        const movie = sanitizeTmdbDataForMovie(rawMovie);
+        const movie = sanitizeTmdbDataForMovie(normalizeMovieImages(rawMovie));
+        if (isTrailerMovie(movie)) continue;
         if (!allowAdult && isAdultMovie(movie)) continue;
 
         const duplicateIndex = sanitized.findIndex((existing) => isLikelyDuplicateMovie(existing, movie));

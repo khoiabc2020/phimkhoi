@@ -23,6 +23,7 @@ function formatQualityLabel(quality?: string) {
     if (!quality) return null;
     const q = quality.trim();
     const upper = q.toUpperCase();
+    if (isTrailerBadge(q) || /sap\s*chieu|nha\s*hang/i.test(q.normalize("NFD").replace(/[\u0300-\u036f]/g, ""))) return null;
     if (upper.includes("FULL") && upper.includes("HD")) return "FHD";
     if (upper === "FULLHD") return "FHD";
     if (upper.includes("BLURAY")) return "BR";
@@ -31,6 +32,22 @@ function formatQualityLabel(quality?: string) {
     if (upper === "FHD" || upper === "HD" || upper === "4K" || upper === "CAM") return upper;
     // Avoid long ugly strings on badge
     return q.length > 6 ? q.slice(0, 6) : q;
+}
+
+function isTrailerBadge(value?: string) {
+    const normalized = String(value || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim()
+        .toLowerCase();
+    if (!normalized) return false;
+    return (
+        normalized.includes("trailer") ||
+        normalized.includes("teaser") ||
+        normalized.includes("preview") ||
+        normalized.includes("sap chieu") ||
+        normalized.includes("nha hang")
+    );
 }
 
 function MovieCard({ 
@@ -111,14 +128,11 @@ function MovieCard({
             ? [
                 tmdbBackdropPath ? getTMDBImage(tmdbBackdropPath, "w780") : null,
                 getBackdropImageUrl(movie),
-                getPosterImageUrl(movie),
-                tmdbPoster,
             ]
             : [
                 tmdbPoster,
                 portraitPosterSource,
                 getPosterImageUrl(movie),
-                getBackdropImageUrl(movie),
             ];
         return Array.from(new Set(list.filter(Boolean))) as string[];
     }, [orientation, movie, portraitPosterSource, tmdbPoster, tmdbBackdropPath]);
@@ -136,10 +150,9 @@ function MovieCard({
     // Backdrop/overlay (ảnh ngang): TMDB backdrop first, then whichever source URL is truly landscape.
     const displayBackdrop = useMemo(() => {
         const tmdbBackdrop = tmdbBackdropPath ? getTMDBImage(tmdbBackdropPath, "w500") : "";
-        const tmdbPosterFallback = tmdbPosterPath ? getTMDBImage(tmdbPosterPath, "w500") : "";
         const sourceBackdrop = getBackdropImageUrl(movie);
-        return sourceBackdrop || tmdbBackdrop || tmdbPosterFallback || null;
-    }, [movie, tmdbBackdropPath, tmdbPosterPath]);
+        return sourceBackdrop || tmdbBackdrop || null;
+    }, [movie, tmdbBackdropPath]);
 
     // Reset fallback state when card movie changes
     useEffect(() => {
@@ -241,7 +254,7 @@ function MovieCard({
                             fill
                             className="transition-transform duration-500 ease-out lg:group-hover/static-card:scale-[1.1] object-cover z-10 anchor-top"
                             sizes={orientation === 'landscape' ? "(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 400px" : "(max-width: 768px) 33vw, (max-width: 1200px) 20vw, (max-width: 1920px) 15vw, 300px"}
-                            quality={100}
+                            quality={82}
                             loading={priority ? undefined : loading}
                             priority={priority}
                             decoding="async"
@@ -269,7 +282,7 @@ function MovieCard({
 
                     {/* Top-Right: Status Badge (Inside Poster) */}
                     <div className="absolute top-1.5 right-1.5 z-40 pointer-events-none flex flex-col items-end gap-1">
-                        {movie.episode_current && (
+                        {movie.episode_current && !isTrailerBadge(movie.episode_current) && (
                             <span className="bg-black/80 shadow-lg border border-white/10 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[4px] tracking-tight whitespace-nowrap uppercase">
                                 {movie.episode_current}
                             </span>
@@ -486,7 +499,7 @@ function OnflixHoverCard({
                                     {formatQualityLabel(movie.quality)}
                                 </span>
                             )}
-                            {movie.episode_current && movie.episode_current !== "0" && movie.episode_current.toLowerCase() !== "trailer" && (
+                            {movie.episode_current && movie.episode_current !== "0" && !isTrailerBadge(movie.episode_current) && (
                                 <span className="border border-white/30 text-white/80 px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider">
                                     {movie.episode_current}
                                 </span>

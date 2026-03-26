@@ -272,17 +272,17 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
             <div className="absolute top-[38%] md:top-[42%] -translate-y-1/2 left-0 right-0 z-40 pointer-events-none flex items-center justify-between px-2 md:px-8 lg:pl-32 lg:pr-10 xl:pl-40 xl:pr-16">
                 <button 
                     onClick={prev}
-                    className="w-9 h-9 md:w-11 md:h-11 lg:w-12 lg:h-12 rounded-full bg-black/5 hover:bg-black/15 backdrop-blur-sm border border-white/5 flex items-center justify-center text-white/15 hover:text-white/55 hover:scale-105 active:scale-95 transition-all duration-300 group pointer-events-auto shadow-none"
+                    className="h-8 w-8 md:h-9 md:w-9 lg:h-10 lg:w-10 rounded-full bg-transparent border border-transparent flex items-center justify-center text-white/15 hover:text-white/45 hover:bg-white/[0.04] active:scale-95 transition-all duration-300 pointer-events-auto shadow-none"
                     aria-label="Previous slide"
                 >
-                    <ChevronLeft className="w-5 h-5 md:w-7 md:h-7 lg:w-8 lg:h-8" />
+                    <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7" />
                 </button>
                 <button 
                     onClick={next}
-                    className="w-9 h-9 md:w-11 md:h-11 lg:w-12 lg:h-12 rounded-full bg-black/5 hover:bg-black/15 backdrop-blur-sm border border-white/5 flex items-center justify-center text-white/15 hover:text-white/55 hover:scale-105 active:scale-95 transition-all duration-300 group pointer-events-auto shadow-none"
+                    className="h-8 w-8 md:h-9 md:w-9 lg:h-10 lg:w-10 rounded-full bg-transparent border border-transparent flex items-center justify-center text-white/15 hover:text-white/45 hover:bg-white/[0.04] active:scale-95 transition-all duration-300 pointer-events-auto shadow-none"
                     aria-label="Next slide"
                 >
-                    <ChevronRight className="w-5 h-5 md:w-7 md:h-7 lg:w-8 lg:h-8" />
+                    <ChevronRight className="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7" />
                 </button>
             </div>
         </section>

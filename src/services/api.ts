@@ -1,5 +1,7 @@
 import { cache } from "react";
-import { shouldUseTmdbMedia } from "@/lib/movie-list";
+import { isTrailerMovie, shouldUseTmdbMedia } from "@/lib/movie-list";
+import { normalizeMovieImages } from "@/lib/movie-media";
+import { matchesCountryStrict } from "@/lib/movie-country";
 
 export const API_URL = "https://phimapi.com";
 
@@ -82,7 +84,7 @@ function normalizeNguoncItem(item: Record<string, unknown>): Movie {
     const name = (item.name as string) || "";
     const slug = (item.slug as string) || "";
     const id = (item.id || item.slug || slug) as string;
-    return {
+    return normalizeMovieImages({
         _id: id,
         name,
         slug,
@@ -112,7 +114,7 @@ function normalizeNguoncItem(item: Record<string, unknown>): Movie {
         category: Array.isArray(item.category) ? item.category as { id: string; name: string; slug: string }[] : [],
         country: Array.isArray(item.country) ? item.country as { id: string; name: string; slug: string }[] : [],
         episodes: [],
-    };
+    });
 }
 
 // Safe URI concatenation
@@ -131,80 +133,13 @@ const toValidYear = (value: unknown): number | undefined => {
     return parsed;
 };
 
-const normalizeFilterText = (value: unknown) =>
-    String(value || "")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, " ")
-        .trim();
-
-const buildCountryTokens = (slug: string) => {
-    const normalizedSlug = normalizeFilterText(slug).replace(/\s+/g, " ");
-    const slugWithSpaces = normalizedSlug.replace(/-/g, " ");
-    return new Set(
-        [normalizedSlug, slugWithSpaces]
-            .map((value) => value.trim())
-            .filter(Boolean)
-    );
-};
-
-const matchesCountryMovie = (movie: Movie, slug: string) => {
-    const tokens = buildCountryTokens(slug);
-    if (tokens.size === 0) return true;
-    if (!Array.isArray(movie.country) || movie.country.length === 0) return false;
-
-    return movie.country.some((country) => {
-        const countrySlug = normalizeFilterText(country?.slug || "");
-        const countryName = normalizeFilterText(country?.name || "");
-
-        return Array.from(tokens).some(
-            (token) =>
-                token === countrySlug ||
-                token === countryName ||
-                countrySlug.includes(token) ||
-                countryName.includes(token)
-        );
-    });
-};
+const matchesCountryMovie = (movie: Movie, slug: string) => matchesCountryStrict(movie, slug);
 
 /** 
  * Elite Content Purity Engine: Detects if a movie is just a trailer/teaser 
  * based on episode labels and status.
  */
-export const isTrailer = (movie: Movie): boolean => {
-    if (!movie) return true;
-    const current = String(movie.episode_current || "").toLowerCase();
-    const name = String(movie.name || "").toLowerCase();
-    const originName = String(movie.origin_name || "").toLowerCase();
-    const notify = String(movie.notify || "").toLowerCase();
-    const quality = String(movie.quality || "").toLowerCase();
-    const status = String(movie.status || "").toLowerCase();
-
-    // 1. Common trailer markers in major fields
-    const trailerMarkers = ["trailer", "teaser", "preview", "nhá hàng", "sắp chiếu", "coming soon"];
-    
-    if (trailerMarkers.some(m => current.includes(m))) return true;
-    if (trailerMarkers.some(m => name.includes(m))) return true;
-    if (trailerMarkers.some(m => originName.includes(m))) return true;
-    if (trailerMarkers.some(m => notify.includes(m))) return true;
-    if (trailerMarkers.some(m => quality.includes(m))) return true;
-    if (trailerMarkers.some(m => status.includes(m))) return true;
-
-    // 2. Check category array — highly reliable
-    if (Array.isArray(movie.category)) {
-        for (const cat of movie.category) {
-            const catSlug = String(cat?.slug || "").toLowerCase();
-            const catName = String(cat?.name || "").toLowerCase();
-            if (catSlug.includes("trailer") || catName.includes("trailer")) return true;
-        }
-    }
-
-    // 3. Special case: if episode_current is just a number but status is specifically "trailer"
-    if (status === "trailer") return true;
-
-    return false;
-};
+export const isTrailer = (movie: Movie): boolean => isTrailerMovie(movie);
 
 
 // --- Utilities ---
@@ -263,147 +198,16 @@ export const parseServerLabel = (
 // thì lấy bù từ các nguồn sau (OPhim, NguonC, ...), sau đó mới tới TMDB ở các bước khác.
 const mergeMovieImages = (primary: Movie, candidate: Movie): Movie => {
     if (!candidate) return primary;
-    const merged: Movie = { ...primary };
-
-    const isEmpty = (v?: string) => !v || String(v).trim() === "";
-    const toLower = (v?: string) => String(v || "").toLowerCase();
-    const isOphimAsset = (v?: string) => toLower(v).includes("img.ophim.live");
-    const detectByDimensionToken = (v?: string): "portrait" | "landscape" | "unknown" => {
-        const u = toLower(v);
-        const m = u.match(/(\d{2,4})x(\d{2,4})/);
-        if (!m) return "unknown";
-        const w = parseInt(m[1], 10);
-        const h = parseInt(m[2], 10);
-        if (!Number.isFinite(w) || !Number.isFinite(h)) return "unknown";
-        if (w === h) return "unknown";
-        return h > w ? "portrait" : "landscape";
-    };
-    const detectOrientation = (v?: string): "portrait" | "landscape" | "unknown" => {
-        const u = toLower(v);
-        if (!u) return "unknown";
-        
-        const isNguonc = u.includes("nguonc.com") || u.includes("streamc.xyz") || u.includes("phimmoi.net") || u.includes("1080.com.vn") || u.includes("nguonc.top");
-        const isOphim = u.includes("img.ophim.live") || u.includes("phimimg.com") || u.includes("img.ophim1.com");
-        const isStandard = u.includes("tmdb.org") || u.includes("phimapi.com") || u.includes("cloudinary") || u.includes("img.phimapi.com");
-
-        if (isOphim || isNguonc) {
-            // OPhim/NguonC "thumb" is portrait, "poster" is landscape.
-            if (u.includes("-thumb.") || u.includes("/thumb-") || u.endsWith("/thumb.jpg") || u.endsWith("/thumb.png")) return "portrait";
-            if (u.includes("-poster.") || u.includes("/poster-") || u.endsWith("/poster.jpg") || u.endsWith("/poster.png")) return "landscape";
-            // NguonC specific horizontal suffixes
-            if (isNguonc && (u.includes("-1.") || u.includes("-2.") || u.includes("-backdrop") || u.includes("-banner"))) return "landscape";
-        } else if (isStandard) {
-            // Standard (TMDB/KKPhim): poster is portrait, backdrop/thumb is landscape
-            if (u.includes("poster") || u.includes("w500") || u.includes("w780") || u.includes("w300")) return "portrait";
-            if (u.includes("backdrop") || u.includes("thumb") || u.includes("w1280") || u.includes("original")) return "landscape";
-        }
-
-        // Generic patterns
-        if (u.includes("backdrop") || u.includes("banner") || u.includes("landscape") || u.includes("horizontal") || u.includes("/thumb/")) return "landscape";
-        if (u.includes("poster-vertical") || u.includes("portrait") || u.includes("vertical") || u.includes("/poster/")) return "portrait";
-        if (u.includes("/poster") || u.includes("poster.")) return "portrait";
-        return detectByDimensionToken(v);
-    };
-    const looksPortrait = (v?: string) => detectOrientation(v) === "portrait";
-    const looksLandscape = (v?: string) => detectOrientation(v) === "landscape";
-    const pickFirstNonEmpty = (arr: (string | undefined)[]) => arr.find(v => !isEmpty(v)) || "";
-    const pickPortrait = (arr: (string | undefined)[]) => {
-        for (const v of arr) if (!isEmpty(v) && looksPortrait(v)) return v as string;
-        for (const v of arr) if (!isEmpty(v) && detectOrientation(v) === "unknown") return v as string;
-        return "";
-    };
-    const pickLandscape = (arr: (string | undefined)[]) => {
-        for (const v of arr) if (!isEmpty(v) && looksLandscape(v)) return v as string;
-        for (const v of arr) if (!isEmpty(v) && detectOrientation(v) === "unknown") return v as string;
-        return "";
-    };
-
-    // Enforce semantics strictly:
-    // - poster_url: MUST be portrait if possible
-    // - thumb_url: MUST be landscape if possible
-
-    let portrait = pickPortrait([merged.poster_url, candidate.poster_url, merged.thumb_url, candidate.thumb_url]);
-    let landscape = pickLandscape([merged.thumb_url, candidate.thumb_url, merged.poster_url, candidate.poster_url]);
-
-    // If we have a portrait image but it's empty, or vice versa, fallback to first non-empty
-    if (!portrait) portrait = pickFirstNonEmpty([merged.poster_url, candidate.poster_url, merged.thumb_url, candidate.thumb_url]);
-    if (!landscape) landscape = pickFirstNonEmpty([merged.thumb_url, candidate.thumb_url, merged.poster_url, candidate.poster_url]);
-
-    // Final Force-Swap: If poster looks like landscape and thumb looks like portrait, SWAP THEM.
-    if (looksLandscape(portrait) && looksPortrait(landscape)) {
-        const tmp = portrait;
-        portrait = landscape;
-        landscape = tmp;
-    }
-
-    merged.poster_url = portrait || merged.poster_url || candidate.poster_url || "";
-    merged.thumb_url =
-        landscape ||
-        merged.thumb_url ||
-        candidate.thumb_url ||
-        pickFirstNonEmpty([merged.poster_url, candidate.poster_url]);
-
-    return merged;
+    return normalizeMovieImages({
+        ...primary,
+        ...candidate,
+        poster_url: primary.poster_url || candidate.poster_url || primary.thumb_url || candidate.thumb_url || "",
+        thumb_url: primary.thumb_url || candidate.thumb_url || primary.poster_url || candidate.poster_url || "",
+    });
 };
 
 const normalizeMovieImageRoles = (movie: Movie): Movie => {
-    const isEmpty = (v?: string) => !v || String(v).trim() === "";
-    const toLower = (v?: string) => String(v || "").toLowerCase();
-    
-    const detectOrientation = (v?: string): "portrait" | "landscape" | "unknown" => {
-        const u = toLower(v);
-        if (!u) return "unknown";
-        
-        // 1. Check for explicit vertical/horizontal tokens
-        if (u.includes("poster-vertical") || u.includes("portrait") || u.includes("vertical") || u.includes("/poster/")) return "portrait";
-        if (u.includes("backdrop") || u.includes("banner") || u.includes("landscape") || u.includes("horizontal") || u.includes("/thumb/")) return "landscape";
-        
-        // 2. Ophim/NguonC/PhimImg specific logic (very common in this project)
-        // - "thumb" in Ophim/NguonC is usually vertical (portrait)
-        // - "poster" in Ophim/NguonC is usually horizontal (landscape)
-        const isCommonSource = u.includes("img.ophim") || u.includes("phimimg.com") || u.includes("nguonc.com") || u.includes("streamc.xyz");
-        if (isCommonSource) {
-            if (u.includes("-thumb.") || u.includes("/thumb-") || u.endsWith("/thumb.jpg") || u.endsWith("/thumb.png")) return "portrait";
-            if (u.includes("-poster.") || u.includes("/poster-") || u.endsWith("/poster.jpg") || u.endsWith("/poster.png")) return "landscape";
-            // NguonC numbered backdrop patterns
-            if (u.includes("-1.") || u.includes("-2.") || u.includes("-backdrop") || u.includes("-banner")) return "landscape";
-        }
-
-        // 3. TMDB patterns
-        if (u.includes("tmdb.org")) {
-            if (u.includes("/p/original/") || u.includes("backdrop")) return "landscape";
-            return "portrait"; // default TMDB images are posters
-        }
-
-        // 4. Dimension check from URL (e.g., ..._300x450.jpg)
-        const m = u.match(/(\d{2,4})x(\d{2,4})/);
-        if (m) {
-            const w = parseInt(m[1], 10);
-            const h = parseInt(m[2], 10);
-            if (h > w * 1.2) return "portrait";
-            if (w > h * 1.2) return "landscape";
-        }
-
-        return "unknown";
-    };
-
-    const p = movie.poster_url;
-    const t = movie.thumb_url;
-    
-    const pOrient = detectOrientation(p);
-    const tOrient = detectOrientation(t);
-
-    // DANGEROUS CASE: Poster is landscape and Thumb is portrait -> MUST SWAP
-    if (pOrient === "landscape" && tOrient === "portrait") {
-        return { ...movie, poster_url: t, thumb_url: p };
-    }
-    
-    // CASE: Poster is landscape but Thumb is unknown -> Swap if Thumb exists
-    if (pOrient === "landscape" && !isEmpty(t) && tOrient === "unknown") {
-        return { ...movie, poster_url: t, thumb_url: p };
-    }
-
-    return movie;
+    return normalizeMovieImages(movie);
 };
 
 const inferTmdbType = (movie: Movie): "movie" | "tv" => {
@@ -627,7 +431,7 @@ export const getHomeData = async () => {
             if (kkRes.status === 'fulfilled' && kkRes.value?.data?.items) {
                 const data = kkRes.value;
                 const pathImage = data.pathImage || data.data?.pathImage || "";
-                items = [...items, ...getItems(data).map(item => ({
+                items = [...items, ...getItems(data).map(item => normalizeMovieImages({
                     ...item,
                     thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : combineUrl(pathImage, item.thumb_url),
                     poster_url: item.poster_url?.startsWith('http') ? item.poster_url : combineUrl(pathImage, item.poster_url)
@@ -834,7 +638,7 @@ export const searchMovies = async (keyword: string, options: { enrichTMDB?: bool
             const data = kkRes.value;
             const pathImage = data.pathImage || data.data?.pathImage || "";
             // Ensure we construct full URL if strictly needed, though search endpoint sometimes gives full url
-            const items = (data.data?.items || []).map((item: Record<string, unknown>) => ({
+            const items = (data.data?.items || []).map((item: Record<string, unknown>) => normalizeMovieImages({
                 ...item,
                 thumb_url: (typeof item.thumb_url === 'string' && item.thumb_url.startsWith('http')) ? item.thumb_url : combineUrl(pathImage, item.thumb_url as string),
                 poster_url: (typeof item.poster_url === 'string' && item.poster_url.startsWith('http')) ? item.poster_url : combineUrl(pathImage, item.poster_url as string)
@@ -853,12 +657,11 @@ export const searchMovies = async (keyword: string, options: { enrichTMDB?: bool
         }
 
         if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
-            const items = (nguoncRes.value.items || []).map((item: Record<string, unknown>) => ({
+            const items = (nguoncRes.value.items || []).map((item: Record<string, unknown>) => normalizeMovieImages({
                 _id: (item.id || item.slug) as string,
                 name: item.name as string,
                 slug: item.slug as string,
                 origin_name: (item.original_name || item.name) as string,
-                // NguonC: thumb is vertical, poster is horizontal
                 poster_url: item.thumb_url as string,
                 thumb_url: (item.poster_url as string) || "",
                 year: toValidYear(item.year as string) || 0,
@@ -904,17 +707,14 @@ const normalizeOphimItem = (item: any, pathImage: string): Movie => {
     // Chuẩn hóa về semantics nội bộ:
     // - poster_url => ảnh dọc cho card portrait
     // - thumb_url  => ảnh ngang cho overlay/backdrop
-    const normalizedPoster = rawThumb || rawPoster;
-    const normalizedThumb = rawPoster || rawThumb;
-
-    return {
+    return normalizeMovieImages({
         ...item,
         _id: item._id as string,
         name: decodeHtmlEntities(item.name as string || ""),
         slug: item.slug as string,
         origin_name: decodeHtmlEntities(item.origin_name as string || ""),
-        thumb_url: normalizedThumb,
-        poster_url: normalizedPoster,
+        thumb_url: rawPoster || rawThumb,
+        poster_url: rawThumb || rawPoster,
         type: (item.type as string) || 'unknown',
         sub_docquyen: !!item.sub_docquyen,
         chieurap: !!item.chieurap,
@@ -925,7 +725,7 @@ const normalizeOphimItem = (item: any, pathImage: string): Movie => {
         year: toValidYear(item.year as number) || 0,
         category: (item.category as { id: string, name: string, slug: string }[]) || [],
         country: (item.country as { id: string, name: string, slug: string }[]) || [],
-    } as Movie;
+    } as Movie);
 };
 
 export const getMoviesList = async (type: string, params: { page?: number; year?: number; category?: string; country?: string; limit?: number; quality?: string } = {}) => {
@@ -985,7 +785,7 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
         if (kkRes.status === 'fulfilled' && kkRes.value?.data?.items) {
             const data = kkRes.value;
             const pathImage = data.pathImage || data.data?.pathImage || "";
-            const kkItems = getItems(data).map(item => ({
+            const kkItems = getItems(data).map(item => normalizeMovieImages({
                 ...item,
                 thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : combineUrl(pathImage, item.thumb_url),
                 poster_url: item.poster_url?.startsWith('http') ? item.poster_url : combineUrl(pathImage, item.poster_url)
@@ -1008,7 +808,7 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
         }
 
         if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
-            const nguoncItems = (nguoncRes.value.items || []).map((item: Record<string, unknown>) => ({
+            const nguoncItems = (nguoncRes.value.items || []).map((item: Record<string, unknown>) => normalizeMovieImages({
                 _id: (item.id || item.slug) as string,
                 name: decodeHtmlEntities(item.name as string || ""),
                 slug: item.slug as string,
@@ -1042,13 +842,8 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
             }
         }
         let uniqueItems = Array.from(bySlug.values()).map(normalizeMovieImageRoles);
-        if (country) {
-            uniqueItems = uniqueItems.filter((item) => matchesCountryMovie(item, country));
-        }
 
-        if (type !== 'phim-sap-chieu') {
-            uniqueItems = uniqueItems.filter(item => !isTrailer(item));
-        }
+        uniqueItems = uniqueItems.filter(item => !isTrailer(item));
 
         if (quality) {
             const q = String(quality).toUpperCase();
@@ -1058,7 +853,10 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
         }
 
         // Enrich images quality for better UX (skips automatically during build phase)
-        const enrichedItems = await enrichMoviesWithTMDB(uniqueItems, 24);
+        let enrichedItems = await enrichMoviesWithTMDB(uniqueItems, 24);
+        if (country) {
+            enrichedItems = enrichedItems.filter((item) => matchesCountryMovie(item, country));
+        }
 
         return {
             items: enrichedItems,
@@ -1105,7 +903,7 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
         if (kkRes.status === 'fulfilled') {
             const data = kkRes.value;
             const pathImage = data.pathImage || data.data?.pathImage || "";
-            const kkItems = getItems(data).map(item => ({
+            const kkItems = getItems(data).map(item => normalizeMovieImages({
                 ...item,
                 thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : combineUrl(pathImage, item.thumb_url),
                 poster_url: item.poster_url?.startsWith('http') ? item.poster_url : combineUrl(pathImage, item.poster_url)
@@ -1125,7 +923,7 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
         }
 
         if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
-            const nguoncItems = (nguoncRes.value.items || []).map((item: Record<string, unknown>) => ({
+            const nguoncItems = (nguoncRes.value.items || []).map((item: Record<string, unknown>) => normalizeMovieImages({
                 _id: (item.id || item.slug) as string,
                 name: item.name as string,
                 slug: item.slug as string,
@@ -1152,10 +950,15 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
 
         let uniqueItems = Array.from(bySlug.values()).map(normalizeMovieImageRoles);
         // Enrich with TMDB images (Tăng lên 24 phim để đảm bảo cả Hero và Row đều nét)
+        if (country) {
+            uniqueItems = uniqueItems.filter((item) => matchesCountryMovie(item, country));
+        }
         const enrichedItems = await enrichMoviesWithTMDB(uniqueItems, 24);
 
         // Global Trailer Cleanse for categories
-        const playable = enrichedItems.filter(item => !isTrailer(item));
+        const playable = enrichedItems
+            .filter((item) => !country || matchesCountryMovie(item, country))
+            .filter((item) => !isTrailer(item));
 
         return {
             items: playable,
@@ -1203,7 +1006,7 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
         if (kkRes.status === 'fulfilled') {
             const data = kkRes.value;
             const pathImage = data.pathImage || data.data?.pathImage || "";
-            const kkItems = getItems(data).map(item => ({
+            const kkItems = getItems(data).map(item => normalizeMovieImages({
                 ...item,
                 thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : combineUrl(pathImage, item.thumb_url),
                 poster_url: item.poster_url?.startsWith('http') ? item.poster_url : combineUrl(pathImage, item.poster_url)
@@ -1239,7 +1042,6 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
             }
         }
         let uniqueItems = Array.from(bySlug.values()).map(normalizeMovieImageRoles);
-        uniqueItems = uniqueItems.filter((item) => matchesCountryMovie(item, slug));
         if (category) {
             uniqueItems = uniqueItems.filter((item) =>
                 Array.isArray(item.category) && item.category.some((cat: any) => cat?.slug === category)
@@ -1249,7 +1051,9 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
         const enrichedItems = await enrichMoviesWithTMDB(uniqueItems, 24);
 
         // Global Trailer Cleanse for countries
-        const playable = enrichedItems.filter(item => !isTrailer(item));
+        const playable = enrichedItems
+            .filter((item) => matchesCountryMovie(item, slug))
+            .filter((item) => !isTrailer(item));
 
         return {
             items: playable,
@@ -1282,18 +1086,11 @@ export const getMoviesByCountryAndCategory = async (countrySlug: string, categor
         if (matched.length < 8 && categorySlug !== 'all') {
             const catFetch = await getMoviesByCategory(categorySlug, 1, 100).catch(() => ({ items: [] as Movie[] }));
             
-            const countryIdentifier = countrySlug.toLowerCase().replace(/-/g, ' ');
-
             const fromCat = (catFetch?.items || []).filter((m: Movie) => {
                 const isAlreadyInMatched = matched.find((x: Movie) => x.slug === m.slug);
                 if (isAlreadyInMatched) return false;
 
-                const matchesCountry = !m.country || m.country.length === 0 || 
-                    m.country.some((c: any) => 
-                        String(c.slug || "").toLowerCase() === countrySlug || 
-                        String(c.name || "").toLowerCase().includes(countryIdentifier)
-                    );
-                return matchesCountry;
+                return matchesCountryMovie(m, countrySlug);
             });
             matched = [...matched, ...fromCat];
         }
@@ -1310,7 +1107,9 @@ export const getMoviesByCountryAndCategory = async (countrySlug: string, categor
             matched = broad.items || [];
         }
 
-        const filtered = matched.filter((m: Movie) => m && !isTrailer(m)).slice(0, limit);
+        const filtered = matched
+            .filter((m: Movie) => m && matchesCountryMovie(m, countrySlug) && !isTrailer(m))
+            .slice(0, limit);
         const normalized = filtered.map(normalizeMovieImageRoles);
 
         return { items: normalized, pagination: { currentPage: 1, totalPages: 1 } };
@@ -1356,7 +1155,7 @@ export const getTrendMovies = async (
                 const movie = searchResults[0];
                 const useTmdbImages = isSameMovieByYear(tmdbItem, movie);
 
-                return {
+                return normalizeMovieImages({
                     ...movie,
                     vote_average: tmdbItem.vote_average,
                     tmdb_id: tmdbItem.id,
@@ -1371,7 +1170,7 @@ export const getTrendMovies = async (
                         poster_path: tmdbItem.poster_path,
                         backdrop_path: tmdbItem.backdrop_path
                     }
-                };
+                });
             }
             return null;
         }));
@@ -1532,6 +1331,11 @@ export const getMoviesByActor = async (actorName: string, page: number = 1, limi
                         item.poster_url = combineUrl(pathImage, item.poster_url);
                     }
                 }
+
+                Object.assign(item, normalizeMovieImages({
+                    poster_url: item.poster_url,
+                    thumb_url: item.thumb_url,
+                }));
 
                 // For name-searches: check actor list for match
                 // For title-searches: movie itself may not have actor list, include it

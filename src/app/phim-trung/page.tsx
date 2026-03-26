@@ -2,8 +2,7 @@ import ChinaHero from "@/components/ChinaHero";
 import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
-import { getMenuData, getMovieDetail, getMoviesByCountry } from "@/services/api";
-import { getMoviesByFilterFromCache } from "@/lib/movie-cache";
+import { getMenuData, getMovieDetail } from "@/services/api";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
@@ -16,9 +15,9 @@ import {
     buildCountryHomeSections,
     filterByCategory,
     getCountryPagePool,
-    matchesCountryStrict,
     type CountryHomeSectionConfig,
 } from "@/services/country-page";
+import { matchesCountryStrict } from "@/lib/movie-country";
 
 export const revalidate = 300;
 
@@ -208,17 +207,17 @@ async function PhimTrungHome() {
 }
 
 async function CountryGridStream({ slug, page, limit = 49 }: { slug: string; page: number; limit?: number }) {
-    const local = await getMoviesByFilterFromCache("country", slug, page, limit).catch((): null => null);
-    const data = local || await getMoviesByCountry(slug, page, limit);
+    const data = await getResilientMoviesList("country", page, limit, { country: slug });
+    const movies = (data.items || []).filter((movie: any) => matchesCountryStrict(movie, slug));
 
-    if (!data.items || data.items.length === 0) {
+    if (movies.length === 0) {
         return <div className="py-20 text-center text-white/40">Không tìm thấy phim nào.</div>;
     }
 
     return (
         <div className="px-2 sm:px-6 md:px-12 lg:pl-24 lg:pr-12">
             <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3 sm:gap-4 mb-12">
-                {data.items.map((movie: any) => (
+                {movies.map((movie: any) => (
                     <MovieCard key={movie._id || movie.slug} movie={movie} />
                 ))}
             </div>

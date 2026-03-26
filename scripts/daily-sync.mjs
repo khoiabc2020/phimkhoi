@@ -8,6 +8,8 @@ import https from 'https';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { normalizeMovieImages } from './shared/movie-media.mjs';
+import { ASIAN_COUNTRY_RULES, matchesCountryStrict } from './shared/movie-country.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, '../.env.local') });
@@ -18,6 +20,7 @@ const NGUONC_API = 'https://phim.nguonc.com';
 const TMDB_API_URL = 'https://api.themoviedb.org/3';
 const MONGODB_URI = process.env.MONGODB_URI;
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
+const COUNTRY_SYNC_SLUGS = new Set(['trung-quoc', 'han-quoc', 'nhat-ban', 'thai-lan', 'viet-nam', 'dai-loan']);
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const normalizeText = (value) =>
@@ -27,15 +30,6 @@ const normalizeText = (value) =>
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, " ")
         .trim();
-
-const ASIAN_COUNTRY_RULES = {
-    'trung-quoc': { langs: ['zh', 'cn'], countries: ['CN', 'HK', 'TW'] },
-    'han-quoc': { langs: ['ko'], countries: ['KR'] },
-    'nhat-ban': { langs: ['ja'], countries: ['JP'] },
-    'thai-lan': { langs: ['th'], countries: ['TH'] },
-    'viet-nam': { langs: ['vi'], countries: ['VN'] },
-    'dai-loan': { langs: ['zh', 'cn'], countries: ['TW'] },
-};
 
 if (!MONGODB_URI) {
     console.error('Error: MONGODB_URI not found in .env.local');
@@ -116,91 +110,6 @@ function getItems(data) {
     return [];
 }
 
-function getImageUrl(url) {
-    if (!url) return '';
-    const normalized = String(url).trim();
-    if (!normalized) return '';
-    if (normalized.startsWith('http')) {
-        try {
-            const parsed = new URL(normalized);
-            if (parsed.hostname === 'phimimg.com' && (
-                parsed.pathname.startsWith('/upload/') ||
-                parsed.pathname.startsWith('/uploads/') ||
-                parsed.pathname.startsWith('/vod/')
-            )) {
-                return `https://img.phimapi.com${parsed.pathname}${parsed.search}`;
-            }
-        } catch {
-            return normalized;
-        }
-        return normalized;
-    }
-
-    if (
-        normalized.startsWith('upload/') ||
-        normalized.startsWith('/upload/') ||
-        normalized.startsWith('uploads/') ||
-        normalized.startsWith('/uploads/') ||
-        normalized.startsWith('vod/') ||
-        normalized.startsWith('/vod/')
-    ) {
-        return `https://img.phimapi.com${normalized.startsWith('/') ? normalized : `/${normalized}`}`;
-    }
-
-    return normalized.startsWith('/') ? `https://phimimg.com${normalized}` : `https://phimimg.com/${normalized}`;
-}
-
-function detectOrientation(url) {
-    if (!url) return 'unknown';
-    const u = String(url).toLowerCase();
-    const isNguonc = u.includes('nguonc.com') || u.includes('streamc.xyz') || u.includes('phimmoi.net') || u.includes('1080.com.vn');
-    const isOphim = u.includes('img.ophim.live') || u.includes('phimimg.com') || u.includes('img.ophim1.com') || u.includes('img.phimapi.com');
-
-    if (isOphim || isNguonc) {
-        if (u.includes('-thumb.') || u.includes('/thumb-') || u.endsWith('/thumb.jpg') || u.endsWith('/thumb.png')) return 'portrait';
-        if (u.includes('-poster.') || u.includes('/poster-') || u.endsWith('/poster.jpg') || u.endsWith('/poster.png')) return 'landscape';
-    }
-
-    if (u.includes('backdrop') || u.includes('banner') || u.includes('landscape') || u.includes('horizontal')) return 'landscape';
-    if (u.includes('portrait') || u.includes('vertical') || u.includes('/poster') || u.includes('poster.')) return 'portrait';
-
-    const dim = u.match(/(\d{2,4})x(\d{2,4})/);
-    if (dim) {
-        const w = parseInt(dim[1], 10);
-        const h = parseInt(dim[2], 10);
-        if (Number.isFinite(w) && Number.isFinite(h) && w !== h) {
-            return h > w ? 'portrait' : 'landscape';
-        }
-    }
-
-    return 'unknown';
-}
-
-function normalizeImageFields(posterUrl, thumbUrl) {
-    const poster = getImageUrl(posterUrl);
-    const thumb = getImageUrl(thumbUrl);
-    const candidates = [
-        { value: poster, orientation: detectOrientation(poster) },
-        { value: thumb, orientation: detectOrientation(thumb) },
-    ].filter(entry => entry.value);
-
-    const portrait =
-        candidates.find(entry => entry.orientation === 'portrait')?.value ||
-        candidates.find(entry => entry.orientation === 'unknown')?.value ||
-        poster ||
-        thumb ||
-        '';
-
-    const landscape =
-        candidates.find(entry => entry.orientation === 'landscape')?.value ||
-        candidates.find(entry => entry.orientation === 'unknown')?.value ||
-        thumb ||
-        poster ||
-        '';
-
-    return { poster_url: portrait, thumb_url: landscape };
-}
-
 function extractYear(movie) {
     const parsed = Number(String(movie?.year || '').slice(0, 4));
     return Number.isFinite(parsed) && parsed > 1900 ? parsed : 0;
@@ -269,7 +178,7 @@ function shouldUseTmdbMedia(movie, tmdbData) {
         : [];
 
     for (const countrySlug of countrySlugs) {
-        const rule = ASIAN_COUNTRY_RULES[countrySlug];
+        const rule = ASIAN_COUNTRY_RULES[countrySlug] || null;
         if (!rule) continue;
         const hasExpectedLanguage = rule.langs.some(lang => originalLanguage === lang);
         const hasExpectedCountry = rule.countries.some(country => originCountries.includes(country));
@@ -281,7 +190,10 @@ function shouldUseTmdbMedia(movie, tmdbData) {
 
 function sanitizeMovieRecord(movie) {
     if (!movie) return movie;
-    const images = normalizeImageFields(movie.poster_url, movie.thumb_url);
+    const images = normalizeMovieImages({
+        poster_url: movie.poster_url,
+        thumb_url: movie.thumb_url,
+    });
     const tmdbData = shouldUseTmdbMedia({ ...movie, ...images }, movie.tmdbData) ? movie.tmdbData : null;
     return {
         ...movie,
@@ -472,6 +384,7 @@ async function syncMovieList(slug, pages = 1) {
         const unique = allItems.filter(m => {
             if (!m.slug || seen.has(m.slug)) return false;
             if (isTrailer(m)) return false;
+            if (COUNTRY_SYNC_SLUGS.has(slug) && !matchesCountryStrict(m, slug)) return false;
             
             // Fix MongoDB "language override unsupported" error
             if (m.language) {
@@ -483,13 +396,18 @@ async function syncMovieList(slug, pages = 1) {
             return true;
         }).map(sanitizeMovieRecord);
 
+        const cleanCacheMovies = unique
+            .filter(movie => !isTrailer(movie))
+            .filter(movie => !COUNTRY_SYNC_SLUGS.has(slug) || matchesCountryStrict(movie, slug))
+            .map(sanitizeMovieRecord);
+
         await TrendingCache.findOneAndUpdate(
             { type: slug },
-            { type: slug, movies: unique.slice(0, 150).map(sanitizeMovieRecord), updatedAt: new Date() },
+            { type: slug, movies: cleanCacheMovies.slice(0, 150), updatedAt: new Date() },
             { upsert: true }
         );
 
-        for (const movie of unique) {
+        for (const movie of cleanCacheMovies) {
             const existing = await Movie.findOne({ slug: movie.slug }).lean();
             const { _id, ...updateData } = mergeMovieRecord(existing, movie);
             const result = await Movie.updateOne(

@@ -13,12 +13,15 @@ import {
     syncMoviesToLocalCache,
 } from "@/services/server-movies";
 import { sanitizeMovieList } from "@/lib/movie-list";
-import { 
+import {
     getMoviesFromCache, 
     getMoviesByFilterFromCache, 
     getMovieDetailFromCache, 
     saveMovieToCache 
 } from "@/lib/movie-cache";
+import { matchesCountryStrict } from "@/lib/movie-country";
+
+const COUNTRY_TYPES = new Set(["han-quoc", "trung-quoc", "nhat-ban", "thai-lan", "viet-nam", "dai-loan"]);
 
 async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> {
     let timer: NodeJS.Timeout | null = null;
@@ -46,7 +49,13 @@ export async function getResilientMoviesList(
 ) {
     try {
         const allowAdult = options.category === "phim-18" || type === "phim-18";
-        const finalize = (items: Movie[]) => sanitizeMovieList(items, { limit, allowAdult });
+        const activeCountry = options.country || (COUNTRY_TYPES.has(type) ? type : "");
+        const finalize = (items: Movie[]) => {
+            const countryScopedItems = activeCountry
+                ? items.filter((movie) => matchesCountryStrict(movie, activeCountry))
+                : items;
+            return sanitizeMovieList(countryScopedItems, { limit, allowAdult });
+        };
 
         // 1. Try DB first for maximum speed (sub-50ms)
         let data = null;

@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import { normalizeMovieImages } from '@/lib/movie-media';
+import { isTrailerMovie } from '@/lib/movie-list';
 
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
 const KKPHIM_API = 'https://phimapi.com';
@@ -35,7 +37,7 @@ async function findInVietnamese(query: string, year?: number) {
     if (kkRes.status === 'fulfilled' && kkRes.value) {
         const d = kkRes.value;
         const pathImage = d.pathImage || d.data?.pathImage || '';
-        const items = getItems(d).map((m: any) => ({
+        const items = getItems(d).map((m: any) => normalizeMovieImages({
             ...m,
             thumb_url: normalizeUrl(m.thumb_url, pathImage),
             poster_url: normalizeUrl(m.poster_url, pathImage),
@@ -46,7 +48,7 @@ async function findInVietnamese(query: string, year?: number) {
     if (ophimRes.status === 'fulfilled' && ophimRes.value) {
         const d = ophimRes.value;
         const pathImage = d.pathImage || 'https://img.ophim.live/uploads/movies/';
-        const items = getItems(d).map((m: any) => ({
+        const items = getItems(d).map((m: any) => normalizeMovieImages({
             ...m,
             thumb_url: normalizeUrl(m.thumb_url, pathImage),
             poster_url: normalizeUrl(m.poster_url, pathImage),
@@ -55,7 +57,7 @@ async function findInVietnamese(query: string, year?: number) {
     }
 
     if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
-        const items = (nguoncRes.value.items || []).map((m: any) => ({
+        const items = (nguoncRes.value.items || []).map((m: any) => normalizeMovieImages({
             _id: m.id || m.slug,
             name: m.name,
             slug: m.slug,
@@ -75,7 +77,7 @@ async function findInVietnamese(query: string, year?: number) {
         return !ep.includes('trailer') && !ep.includes('sắp chiếu') && !ep.includes('đang cập nhật');
     };
 
-    const validItems = allItems.filter(isValidStream);
+    const validItems = allItems.filter((movie) => !isTrailerMovie(movie) && isValidStream(movie));
 
     if (validItems.length === 0) return null;
 
@@ -130,7 +132,7 @@ export async function GET() {
             const match = await findInVietnamese(searchQuery, year);
 
             if (match) {
-                heroMovies.push({
+                heroMovies.push(normalizeMovieImages({
                     // Base: KKPHIM/OPhim movie data (has streaming links)
                     ...match,
                     // Override images with TMDB high-res (backdrop for hero)
@@ -149,7 +151,7 @@ export async function GET() {
                     poster_url: tmdb.poster_path
                         ? `https://image.tmdb.org/t/p/w500${tmdb.poster_path}`
                         : match.poster_url,
-                });
+                }));
 
                 if (heroMovies.length >= 12) break; // Max 12 for hero
             }
