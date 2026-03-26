@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import dbConnect from "@/lib/db";
-import Watchlist from "@/models/Watchlist";
 import jwt from "jsonwebtoken";
+import { getMergedWatchlist, mapWatchlistMovieToApi, setWatchlistMembership } from "@/lib/user-library";
 
 const verifyToken = (req: Request) => {
     const authHeader = req.headers.get("Authorization");
@@ -24,13 +23,8 @@ export async function GET(req: Request) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
-        await dbConnect();
-
-        const watchlist = await Watchlist.find({ userId: userPayload.id })
-            .sort({ addedAt: -1 })
-            .lean();
-
-        return NextResponse.json({ watchlist });
+        const watchlist = await getMergedWatchlist({ id: userPayload.id });
+        return NextResponse.json({ watchlist: watchlist.movies.map(mapWatchlistMovieToApi) });
     } catch (error) {
         console.error("Get Watchlist Error:", error);
         return NextResponse.json({ message: "Server Error" }, { status: 500 });
@@ -52,23 +46,26 @@ export async function POST(req: Request) {
             );
         }
 
-        await dbConnect();
+        const result = await setWatchlistMembership(
+            { id: userPayload.id },
+            movieData.movieSlug,
+            "add",
+            {
+                movieId: movieData.movieId,
+                name: movieData.movieName,
+                origin_name: movieData.movieOriginName,
+                poster: movieData.moviePoster,
+                year: movieData.movieYear,
+                quality: movieData.movieQuality,
+                categories: movieData.movieCategories,
+            }
+        );
 
-        try {
-            await Watchlist.create({
-                userId: userPayload.id,
-                ...movieData,
-            });
-        } catch (e: any) {
-            // Ignore duplicate key error (11000)
-            if (e.code !== 11000) throw e;
+        if (!result.success) {
+            return NextResponse.json({ message: result.error || "Failed to save watchlist" }, { status: 400 });
         }
 
-        const watchlist = await Watchlist.find({ userId: userPayload.id })
-            .sort({ addedAt: -1 })
-            .lean();
-
-        return NextResponse.json({ watchlist });
+        return NextResponse.json({ watchlist: (result.movies || []).map(mapWatchlistMovieToApi) });
     } catch (error) {
         console.error("Post Watchlist Error:", error);
         return NextResponse.json({ message: "Server Error" }, { status: 500 });
@@ -90,18 +87,12 @@ export async function DELETE(req: Request) {
             );
         }
 
-        await dbConnect();
+        const result = await setWatchlistMembership({ id: userPayload.id }, slug, "remove");
+        if (!result.success) {
+            return NextResponse.json({ message: result.error || "Failed to update watchlist" }, { status: 400 });
+        }
 
-        await Watchlist.findOneAndDelete({
-            userId: userPayload.id,
-            movieSlug: slug,
-        });
-
-        const watchlist = await Watchlist.find({ userId: userPayload.id })
-            .sort({ addedAt: -1 })
-            .lean();
-
-        return NextResponse.json({ watchlist });
+        return NextResponse.json({ watchlist: (result.movies || []).map(mapWatchlistMovieToApi) });
     } catch (error) {
         console.error("Delete Watchlist Error:", error);
         return NextResponse.json({ message: "Server Error" }, { status: 500 });

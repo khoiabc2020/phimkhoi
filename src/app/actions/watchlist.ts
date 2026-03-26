@@ -2,35 +2,8 @@
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import dbConnect from "@/lib/db";
-import User from "@/models/User";
 import { revalidatePath } from "next/cache";
-import mongoose from "mongoose";
-
-function isValidId(id: string | undefined | null): boolean {
-    return !!id && mongoose.isValidObjectId(id);
-}
-
-async function resolveSessionUser(session: any) {
-    if (!session?.user) return null;
-    await dbConnect();
-
-    const sessionId = session.user.id as string | undefined;
-    if (isValidId(sessionId)) {
-        const byId = await User.findById(sessionId);
-        if (byId) return byId;
-    }
-
-    // OAuth sessions can carry provider IDs instead of Mongo ObjectId.
-    // Fallback to email to keep watchlist/favorite actions working.
-    const email = session.user.email as string | undefined;
-    if (email) {
-        const byEmail = await User.findOne({ email });
-        if (byEmail) return byEmail;
-    }
-
-    return null;
-}
+import { getMergedWatchlist, setWatchlistMembership } from "@/lib/user-library";
 
 export async function addToWatchlist(slug: string) {
     try {
@@ -39,13 +12,8 @@ export async function addToWatchlist(slug: string) {
             return { success: false, error: "Unauthorized" };
         }
 
-        const user = await resolveSessionUser(session);
-        if (!user) return { success: false, error: "User not found" };
-
-        if (!user.watchlist.includes(slug)) {
-            user.watchlist.push(slug);
-            await user.save();
-        }
+        const result = await setWatchlistMembership(session.user, slug, "add");
+        if (!result.success) return result;
 
         revalidatePath(`/phim/${slug}`);
         revalidatePath("/xem-sau");
@@ -64,11 +32,8 @@ export async function removeFromWatchlist(slug: string) {
             return { success: false, error: "Unauthorized" };
         }
 
-        const user = await resolveSessionUser(session);
-        if (!user) return { success: false, error: "User not found" };
-
-        user.watchlist = user.watchlist.filter((s: string) => s !== slug);
-        await user.save();
+        const result = await setWatchlistMembership(session.user, slug, "remove");
+        if (!result.success) return result;
 
         revalidatePath(`/phim/${slug}`);
         revalidatePath("/xem-sau");
@@ -87,8 +52,8 @@ export async function isInWatchlist(slug: string) {
             return { success: true, isInWatchlist: false };
         }
 
-        const user = await resolveSessionUser(session);
-        const exists = user && user.watchlist ? user.watchlist.includes(slug) : false;
+        const watchlist = await getMergedWatchlist(session.user);
+        const exists = watchlist.slugs.includes(slug);
 
         return { success: true, isInWatchlist: exists };
     } catch (error) {

@@ -57,7 +57,7 @@ export default function ThuvienPage() {
         ]).then(([wl, hist, fav]) => {
             if (wl.status === "fulfilled") setWatchlist(wl.value.movies || []);
             if (hist.status === "fulfilled") setHistory(hist.value.history || []);
-            if (fav.status === "fulfilled") setFavorites(fav.value.movies || []);
+            if (fav.status === "fulfilled") setFavorites(fav.value.favorites || fav.value.movies || []);
             setLoading(false);
         });
     }, [session]);

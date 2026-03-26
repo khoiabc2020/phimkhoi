@@ -123,6 +123,42 @@ async function resolveHeroMovies(slugs: string[], fallbackItems: any[], countryN
     return resolved.filter(Boolean);
 }
 
+async function resolveCountrySections(
+    countrySlug: string,
+    countryItems: any[],
+    configs: CountryHomeSectionConfig[]
+) {
+    const baseSections = buildCountryHomeSections(countryItems, configs);
+    const baseBySlug = new Map(baseSections.map((section) => [section.categorySlug, section.movies]));
+
+    const resolvedSections = await Promise.all(
+        configs.map(async (config) => {
+            const localMovies = baseBySlug.get(config.categorySlug) || [];
+            if (localMovies.length >= 6) {
+                return { ...config, movies: localMovies.slice(0, 24) };
+            }
+
+            const fallback = await withTimeout(
+                getResilientMoviesList(countrySlug, 1, 24, {
+                    country: countrySlug,
+                    category: config.categorySlug,
+                }),
+                2200,
+                { items: [] as any[] }
+            );
+
+            const fallbackMovies = Array.isArray(fallback?.items) ? fallback.items : [];
+            const mergedMovies = [...localMovies, ...fallbackMovies].filter(
+                (movie, index, arr) => movie?.slug && arr.findIndex((item) => item?.slug === movie.slug) === index
+            );
+
+            return { ...config, movies: mergedMovies.slice(0, 24) };
+        })
+    );
+
+    return resolvedSections.filter((section) => section.movies.length > 0);
+}
+
 async function PhimHanHome() {
     const { countryItems, fallbackItems } = await withTimeout(
         getCountryPagePool("han-quoc"),
@@ -132,7 +168,7 @@ async function PhimHanHome() {
     const latestMovies = fallbackItems.length > 0
         ? fallbackItems.slice(0, 14)
         : (await getResilientMoviesList("han-quoc", 1, 14, { country: "han-quoc" })).items || [];
-    const sections = buildCountryHomeSections(countryItems, SECTION_CONFIG);
+    const sections = await resolveCountrySections("han-quoc", countryItems, SECTION_CONFIG);
 
     return (
         <div className="space-y-12 md:space-y-16 pb-12">

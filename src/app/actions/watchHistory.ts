@@ -2,9 +2,9 @@
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import dbConnect from "@/lib/db";
 import WatchHistory from "@/models/WatchHistory";
 import { revalidatePath } from "next/cache";
+import { resolveLibraryUser } from "@/lib/user-library";
 
 export async function addWatchHistory(movieData: {
     movieId: string;
@@ -20,11 +20,15 @@ export async function addWatchHistory(movieData: {
 }) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
+        if (!session?.user) {
             return { success: false, error: "Unauthorized" };
         }
 
-        await dbConnect();
+        const { userObjectId } = await resolveLibraryUser(session.user);
+        const historyUserId = userObjectId || String(session.user.id || "").trim();
+        if (!historyUserId) {
+            return { success: false, error: "User not found" };
+        }
 
         const progress = movieData.duration > 0
             ? Math.min(100, Math.round((movieData.currentTime / movieData.duration) * 100))
@@ -32,12 +36,13 @@ export async function addWatchHistory(movieData: {
 
         const watchHistory = await WatchHistory.findOneAndUpdate(
             {
-                userId: session.user.id,
+                userId: historyUserId,
                 movieId: movieData.movieId,
                 episodeSlug: movieData.episodeSlug,
             },
             {
                 $set: {
+                    userId: historyUserId,
                     ...movieData,
                     progress,
                     lastWatched: new Date(),
@@ -59,13 +64,16 @@ export async function addWatchHistory(movieData: {
 export async function getWatchHistory(limit: number = 50) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
+        if (!session?.user) {
             return { success: false, error: "Unauthorized" };
         }
 
-        await dbConnect();
+        const { userIdCandidates } = await resolveLibraryUser(session.user);
+        if (!userIdCandidates.length) {
+            return { success: false, error: "User not found" };
+        }
 
-        const history = await WatchHistory.find({ userId: session.user.id })
+        const history = await WatchHistory.find({ userId: { $in: userIdCandidates } })
             .sort({ lastWatched: -1 })
             .limit(limit)
             .lean();
@@ -80,18 +88,21 @@ export async function getWatchHistory(limit: number = 50) {
 export async function getContinueWatching() {
     try {
         const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
+        if (!session?.user) {
             return { success: false, error: "Unauthorized" };
         }
 
-        await dbConnect();
+        const { userIdCandidates } = await resolveLibraryUser(session.user);
+        if (!userIdCandidates.length) {
+            return { success: false, error: "User not found" };
+        }
 
         // Dùng aggregation để chỉ lấy TẬP MỚI NHẤT mỗi phim (group by movieId)
         // Không lọc progress < 99 nữa để đảm bảo hiển thị đúng tập xem gần nhất (kể cả khi đã xem gần hết/100%)
         const continueWatching = await WatchHistory.aggregate([
             {
                 $match: {
-                    userId: session.user.id,
+                    userId: { $in: userIdCandidates },
                 }
             },
             { $sort: { lastWatched: -1 } },
@@ -117,15 +128,18 @@ export async function getContinueWatching() {
 export async function removeWatchHistory(historyId: string) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
+        if (!session?.user) {
             return { success: false, error: "Unauthorized" };
         }
 
-        await dbConnect();
+        const { userIdCandidates } = await resolveLibraryUser(session.user);
+        if (!userIdCandidates.length) {
+            return { success: false, error: "User not found" };
+        }
 
         await WatchHistory.findOneAndDelete({
             _id: historyId,
-            userId: session.user.id,
+            userId: { $in: userIdCandidates },
         });
 
         revalidatePath("/lich-su-xem");
@@ -139,13 +153,16 @@ export async function removeWatchHistory(historyId: string) {
 export async function clearWatchHistory() {
     try {
         const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
+        if (!session?.user) {
             return { success: false, error: "Unauthorized" };
         }
 
-        await dbConnect();
+        const { userIdCandidates } = await resolveLibraryUser(session.user);
+        if (!userIdCandidates.length) {
+            return { success: false, error: "User not found" };
+        }
 
-        await WatchHistory.deleteMany({ userId: session.user.id });
+        await WatchHistory.deleteMany({ userId: { $in: userIdCandidates } });
 
         revalidatePath("/lich-su-xem");
         return { success: true };
@@ -159,14 +176,17 @@ export async function clearWatchHistory() {
 export async function getWatchHistoryForEpisode(movieId: string, episodeSlug: string) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
+        if (!session?.user) {
             return { success: false, error: "Unauthorized", data: null as any };
         }
 
-        await dbConnect();
+        const { userIdCandidates } = await resolveLibraryUser(session.user);
+        if (!userIdCandidates.length) {
+            return { success: false, error: "User not found", data: null };
+        }
 
         const history = await WatchHistory.findOne({
-            userId: session.user.id,
+            userId: { $in: userIdCandidates },
             movieId,
             episodeSlug,
         }).lean();

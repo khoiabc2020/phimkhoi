@@ -1,22 +1,25 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import dbConnect from "@/lib/db";
 import WatchHistory from "@/models/WatchHistory";
 import { authOptions } from "../../auth/[...nextauth]/route";
+import { resolveLibraryUser } from "@/lib/user-library";
 
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    await dbConnect();
+    const { userIdCandidates } = await resolveLibraryUser(session.user);
+    if (!userIdCandidates.length) {
+      return NextResponse.json({ success: true, data: [] });
+    }
 
     const continueWatching = await WatchHistory.aggregate([
       {
         $match: {
-          userId: session.user.id,
+          userId: { $in: userIdCandidates },
           progress: { $lt: 99 },
         },
       },

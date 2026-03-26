@@ -2,9 +2,9 @@
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import dbConnect from "@/lib/db";
 import Favorite from "@/models/Favorite";
 import { revalidatePath } from "next/cache";
+import { resolveLibraryUser } from "@/lib/user-library";
 
 export async function addFavorite(movieData: {
     movieId?: string;
@@ -19,14 +19,18 @@ export async function addFavorite(movieData: {
 }) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
+        if (!session?.user) {
             return { success: false, error: "Unauthorized" };
         }
 
-        await dbConnect();
+        const { userObjectId } = await resolveLibraryUser(session.user);
+        const favoriteUserId = userObjectId || String(session.user.id || "").trim();
+        if (!favoriteUserId) {
+            return { success: false, error: "User not found" };
+        }
 
         const favorite = await Favorite.create({
-            userId: session.user.id,
+            userId: favoriteUserId,
             ...movieData,
             lastEpisode: movieData.lastEpisode || "",
         });
@@ -47,14 +51,17 @@ export async function addFavorite(movieData: {
 export async function removeFavorite(movieSlug: string) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
+        if (!session?.user) {
             return { success: false, error: "Unauthorized" };
         }
 
-        await dbConnect();
+        const { userIdCandidates } = await resolveLibraryUser(session.user);
+        if (!userIdCandidates.length) {
+            return { success: false, error: "User not found" };
+        }
 
         const deleted = await Favorite.findOneAndDelete({
-            userId: session.user.id,
+            userId: { $in: userIdCandidates },
             movieSlug,
         });
 
@@ -73,13 +80,16 @@ export async function removeFavorite(movieSlug: string) {
 export async function getFavorites() {
     try {
         const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
+        if (!session?.user) {
             return { success: false, error: "Unauthorized" };
         }
 
-        await dbConnect();
+        const { userIdCandidates } = await resolveLibraryUser(session.user);
+        if (!userIdCandidates.length) {
+            return { success: false, error: "User not found" };
+        }
 
-        const favorites = await Favorite.find({ userId: session.user.id })
+        const favorites = await Favorite.find({ userId: { $in: userIdCandidates } })
             .sort({ addedAt: -1 })
             .lean();
 
@@ -93,14 +103,17 @@ export async function getFavorites() {
 export async function isFavorite(movieSlug: string) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
+        if (!session?.user) {
             return { success: true, isFavorite: false };
         }
 
-        await dbConnect();
+        const { userIdCandidates } = await resolveLibraryUser(session.user);
+        if (!userIdCandidates.length) {
+            return { success: true, isFavorite: false };
+        }
 
         const favorite = await Favorite.findOne({
-            userId: session.user.id,
+            userId: { $in: userIdCandidates },
             movieSlug,
         });
 
@@ -114,14 +127,17 @@ export async function isFavorite(movieSlug: string) {
 export async function getFavoritesByCategory(category: string) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
+        if (!session?.user) {
             return { success: false, error: "Unauthorized" };
         }
 
-        await dbConnect();
+        const { userIdCandidates } = await resolveLibraryUser(session.user);
+        if (!userIdCandidates.length) {
+            return { success: false, error: "User not found" };
+        }
 
         const favorites = await Favorite.find({
-            userId: session.user.id,
+            userId: { $in: userIdCandidates },
             movieCategories: category,
         })
             .sort({ addedAt: -1 })
