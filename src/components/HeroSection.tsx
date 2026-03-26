@@ -60,12 +60,19 @@ function getHeroImage(movie: any, type: "poster" | "backdrop" | "character" | "l
     const tmdb = shouldUseTmdbMedia(movie, movie?.tmdbData) ? movie.tmdbData : null;
     if (tmdb) {
         if (type === "poster" && tmdb.poster_path)
-        return getImageUrl(tmdbImage(tmdb.poster_path, variant === "desktop" ? "w500" : "w780"), true);
-    if (type === "backdrop" && tmdb.backdrop_path)
-        return getImageUrl(tmdbImage(tmdb.backdrop_path, variant === "desktop" ? "original" : "w780"), true);
-}
-const api = type === "backdrop" ? getBackdropImageUrl(movie, true) : getPosterImageUrl(movie, true);
-return api || "/placeholder.jpg";
+            return getImageUrl(tmdbImage(tmdb.poster_path, variant === "desktop" ? "w500" : "w780"), true);
+        if (type === "backdrop" && tmdb.backdrop_path)
+            return getImageUrl(tmdbImage(tmdb.backdrop_path, variant === "desktop" ? "original" : "w780"), true);
+    }
+
+    if (type === "backdrop") {
+        const backdrop = getBackdropImageUrl(movie, true);
+        if (backdrop) return backdrop;
+        return variant === "mobile" ? (getPosterImageUrl(movie, true) || "/placeholder.jpg") : "";
+    }
+
+    const poster = getPosterImageUrl(movie, true);
+    return poster || getBackdropImageUrl(movie, true) || "/placeholder.jpg";
 }
 
 // ─── Autoplay hook ────────────────────────────────────────────────────────────
@@ -231,6 +238,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
     const { index, go, next, prev } = useAutoplay(movies.length, 6000, paused || !active);
     const movie = movies[index] as any;
     const navRef = useRef<HTMLDivElement>(null);
+    const desktopBackdrop = getHeroImage(movie, "backdrop", "desktop");
 
     useEffect(() => {
         if (navRef.current) {
@@ -260,18 +268,22 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                     className="absolute inset-0"
                 >
                     <div className="absolute inset-0 z-0 overflow-hidden">
-                        <Image
-                            src={getHeroImage(movie, "backdrop", "desktop").startsWith('http')
-                                ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(movie, "backdrop", "desktop"))}&w=1920&q=85`
-                                : getHeroImage(movie, "backdrop", "desktop")
-                            }
-                            alt=""
-                            fill
-                            className="object-cover object-[center_20%]"
-                            priority={index === 0}
-                            sizes="100vw"
-                            decoding="async"
-                        />
+                        {desktopBackdrop ? (
+                            <Image
+                                src={desktopBackdrop.startsWith('http')
+                                    ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(desktopBackdrop)}&w=1920&q=85`
+                                    : desktopBackdrop
+                                }
+                                alt=""
+                                fill
+                                className="object-cover object-[center_20%]"
+                                priority={index === 0}
+                                sizes="100vw"
+                                decoding="async"
+                            />
+                        ) : (
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_20%,rgba(143,167,197,0.18),transparent_30%),linear-gradient(180deg,#121212_0%,#0a0a0a_55%,#050505_100%)]" />
+                        )}
                     </div>
 
                     {movie.isCustomHero && movie.layer_character && (
@@ -431,14 +443,14 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
             <div className="absolute top-[35%] md:top-[40%] -translate-y-1/2 left-0 right-0 z-[35] pointer-events-none flex items-center justify-between px-2 md:px-8 lg:pl-32 lg:pr-10 xl:pl-40 xl:pr-16">
                 <button 
                     onClick={prev}
-                    className="w-9 h-9 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-full bg-black/20 hover:bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/30 hover:text-white hover:scale-110 active:scale-95 transition-all duration-300 group pointer-events-auto shadow-2xl"
+                    className="w-8 h-8 md:w-10 md:h-10 lg:w-11 lg:h-11 rounded-full bg-black/5 hover:bg-black/15 backdrop-blur-sm border border-white/5 flex items-center justify-center text-white/15 hover:text-white/60 hover:scale-105 active:scale-95 transition-all duration-300 group pointer-events-auto shadow-none"
                     aria-label="Previous slide"
                 >
                     <ChevronLeft className="w-5 h-5 md:w-7 md:h-7 lg:w-8 lg:h-8" />
                 </button>
                 <button 
                     onClick={next}
-                    className="w-9 h-9 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-full bg-black/20 hover:bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/30 hover:text-white hover:scale-110 active:scale-95 transition-all duration-300 group pointer-events-auto shadow-2xl"
+                    className="w-8 h-8 md:w-10 md:h-10 lg:w-11 lg:h-11 rounded-full bg-black/5 hover:bg-black/15 backdrop-blur-sm border border-white/5 flex items-center justify-center text-white/15 hover:text-white/60 hover:scale-105 active:scale-95 transition-all duration-300 group pointer-events-auto shadow-none"
                     aria-label="Next slide"
                 >
                     <ChevronRight className="w-5 h-5 md:w-7 md:h-7 lg:w-8 lg:h-8" />
