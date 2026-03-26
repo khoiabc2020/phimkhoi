@@ -82,8 +82,9 @@ async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'de
 }
 
 async function PhimHanHome() {
-    const cached = await getMoviesFromCache("han-quoc", 1, 14).catch(() => null);
-    const latest = cached || await getMoviesByCountry("han-quoc", 1, 14).catch(() => ({ items: [] }));
+    const cached = await getMoviesFromCache("han-quoc", 1, 14).catch((): null => null);
+    const latest = cached || await getMoviesByCountry("han-quoc", 1, 14).catch((): { items: Movie[] } => ({ items: [] as Movie[] }));
+    const movies = latest?.items || [];
     const movies = latest?.items || [];
 
     return (
