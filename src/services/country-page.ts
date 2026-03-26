@@ -1,6 +1,5 @@
 import { cache } from "react";
 import type { Movie } from "@/services/api";
-import { getMoviesByCountry, getMoviesList } from "@/services/api";
 import { getMoviesByFilterFromCache, getMoviesFromCache } from "@/lib/movie-cache";
 
 export interface CountryHomeSectionConfig {
@@ -41,22 +40,21 @@ const safeSliceWindow = (movies: Movie[], offset: number, size: number): Movie[]
 };
 
 export const getCountryPagePool = cache(async (countrySlug: string) => {
-    const [localCountry, cachedTrending, externalCountry, globalLatest] = await Promise.all([
+    const [localCountry, cachedTrending, globalLatest] = await Promise.all([
         getMoviesByFilterFromCache("country", countrySlug, 1, 360).catch((): null => null),
         getMoviesFromCache(countrySlug, 1, 180).catch((): null => null),
-        getMoviesByCountry(countrySlug, 1, 180).catch((): { items: Movie[] } => ({ items: EMPTY_ITEMS })),
-        getMoviesList("phim-moi-cap-nhat", { limit: 120 }).catch(
-            (): { items: Movie[] } => ({ items: EMPTY_ITEMS })
-        ),
+        getMoviesFromCache("phim-moi-cap-nhat", 1, 120).catch((): null => null),
     ]);
 
     const countryItems = dedupeMoviesBySlug([
         ...(localCountry?.items || EMPTY_ITEMS),
         ...(cachedTrending?.items || EMPTY_ITEMS),
-        ...(externalCountry?.items || EMPTY_ITEMS),
     ]);
 
-    const globalItems = dedupeMoviesBySlug(globalLatest?.items || EMPTY_ITEMS);
+    const globalItems = dedupeMoviesBySlug([
+        ...(globalLatest?.items || EMPTY_ITEMS),
+        ...(cachedTrending?.items || EMPTY_ITEMS),
+    ]);
     const fallbackItems = dedupeMoviesBySlug([...countryItems, ...globalItems]);
 
     return {
