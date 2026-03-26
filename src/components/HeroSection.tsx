@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Play, ChevronLeft, ChevronRight } from "lucide-react";
 import { Movie } from "@/services/api";
-import { getImageUrl, getPosterImageUrl, getBackdropImageUrl, decodeHtml, cn } from "@/lib/utils";
+import { getImageUrl, getPosterImageUrl, getBackdropImageUrl, decodeHtml, cn, detectOrientation } from "@/lib/utils";
 import { shouldUseTmdbMedia } from "@/lib/movie-list";
 import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -66,9 +66,22 @@ function getHeroImage(movie: any, type: "poster" | "backdrop" | "character" | "l
     }
 
     if (type === "backdrop") {
-        const backdrop = getBackdropImageUrl(movie, true);
-        if (backdrop) return backdrop;
-        return variant === "mobile" ? (getPosterImageUrl(movie, true) || "/placeholder.jpg") : "";
+        const tmdbBackdrop = tmdb?.backdrop_path
+            ? getImageUrl(tmdbImage(tmdb.backdrop_path, variant === "desktop" ? "original" : "w780"), true)
+            : "";
+        if (tmdbBackdrop) return tmdbBackdrop;
+
+        const thumb = String(movie?.thumb_url || "").trim();
+        const thumbOrientation = detectOrientation(thumb);
+        if (thumb && (thumbOrientation === "landscape" || thumbOrientation === "unknown")) {
+            return getImageUrl(thumb, true);
+        }
+
+        if (variant === "mobile") {
+            return getPosterImageUrl(movie, true) || getBackdropImageUrl(movie, true) || "/placeholder.jpg";
+        }
+
+        return "";
     }
 
     const poster = getPosterImageUrl(movie, true);
@@ -443,14 +456,14 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
             <div className="absolute top-[35%] md:top-[40%] -translate-y-1/2 left-0 right-0 z-[35] pointer-events-none flex items-center justify-between px-2 md:px-8 lg:pl-32 lg:pr-10 xl:pl-40 xl:pr-16">
                 <button 
                     onClick={prev}
-                    className="w-8 h-8 md:w-10 md:h-10 lg:w-11 lg:h-11 rounded-full bg-black/5 hover:bg-black/15 backdrop-blur-sm border border-white/5 flex items-center justify-center text-white/15 hover:text-white/60 hover:scale-105 active:scale-95 transition-all duration-300 group pointer-events-auto shadow-none"
+                    className="w-7 h-7 md:w-9 md:h-9 lg:w-10 lg:h-10 rounded-full bg-black/0 hover:bg-black/10 backdrop-blur-sm border border-white/0 hover:border-white/10 flex items-center justify-center text-white/10 hover:text-white/45 hover:scale-105 active:scale-95 transition-all duration-300 group pointer-events-auto shadow-none"
                     aria-label="Previous slide"
                 >
                     <ChevronLeft className="w-5 h-5 md:w-7 md:h-7 lg:w-8 lg:h-8" />
                 </button>
                 <button 
                     onClick={next}
-                    className="w-8 h-8 md:w-10 md:h-10 lg:w-11 lg:h-11 rounded-full bg-black/5 hover:bg-black/15 backdrop-blur-sm border border-white/5 flex items-center justify-center text-white/15 hover:text-white/60 hover:scale-105 active:scale-95 transition-all duration-300 group pointer-events-auto shadow-none"
+                    className="w-7 h-7 md:w-9 md:h-9 lg:w-10 lg:h-10 rounded-full bg-black/0 hover:bg-black/10 backdrop-blur-sm border border-white/0 hover:border-white/10 flex items-center justify-center text-white/10 hover:text-white/45 hover:scale-105 active:scale-95 transition-all duration-300 group pointer-events-auto shadow-none"
                     aria-label="Next slide"
                 >
                     <ChevronRight className="w-5 h-5 md:w-7 md:h-7 lg:w-8 lg:h-8" />

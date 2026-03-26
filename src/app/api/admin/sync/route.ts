@@ -40,6 +40,18 @@ const normalizeNamedList = (value: unknown): { name: string; slug: string }[] =>
 
 const normalizeBoolean = (value: unknown) => value === true || value === "true" || value === 1 || value === "1";
 
+const pickLongerText = (nextValue: unknown, currentValue: unknown) => {
+    const nextText = String(nextValue || "").trim();
+    const currentText = String(currentValue || "").trim();
+    return nextText.length >= currentText.length ? nextText : currentText;
+};
+
+const pickNonEmptyArray = (nextValue: unknown, currentValue: unknown) => {
+    const nextArray = Array.isArray(nextValue) ? nextValue.filter(Boolean) : [];
+    const currentArray = Array.isArray(currentValue) ? currentValue.filter(Boolean) : [];
+    return nextArray.length >= currentArray.length ? nextArray : currentArray;
+};
+
 const normalizeImageFields = (posterUrl: unknown, thumbUrl: unknown) => {
     const poster = String(posterUrl || "").trim();
     const thumb = String(thumbUrl || "").trim();
@@ -82,33 +94,44 @@ const normalizeMovieData = (item: any, existingMovie?: any) => {
         tmdbData: item?.tmdbData ?? existingMovie?.tmdbData ?? null,
     });
 
+    const nextCategory = normalizeNamedList(item.category || []);
+    const nextCountry = normalizeNamedList(item.country || []);
+    const nextEpisodes = Array.isArray(item.episodes) ? item.episodes : [];
+    const existingEpisodes = Array.isArray(existingMovie?.episodes) ? existingMovie.episodes : [];
+    const existingCategory = Array.isArray(existingMovie?.category) ? existingMovie.category : [];
+    const existingCountry = Array.isArray(existingMovie?.country) ? existingMovie.country : [];
+    const existingActors = Array.isArray(existingMovie?.actor) ? existingMovie.actor : [];
+    const existingDirectors = Array.isArray(existingMovie?.director) ? existingMovie.director : [];
+    const resolvedPoster = sanitized.poster_url || images.poster_url || existingMovie?.poster_url || "";
+    const resolvedThumb = sanitized.thumb_url || images.thumb_url || existingMovie?.thumb_url || "";
+
     return {
-        name: item.name,
+        name: String(item.name || existingMovie?.name || "").trim(),
         slug: item.slug,
-        origin_name: item.origin_name || "",
-        content: item.content || "", // Content might be empty in list view, need detail fetch for full content usually
-        type: item.type,
-        status: item.status,
-        thumb_url: sanitized.thumb_url || images.thumb_url,
-        poster_url: sanitized.poster_url || images.poster_url,
+        origin_name: pickLongerText(item.origin_name, existingMovie?.origin_name),
+        content: pickLongerText(item.content, existingMovie?.content),
+        type: item.type || existingMovie?.type || "",
+        status: item.status || existingMovie?.status || "",
+        thumb_url: resolvedThumb,
+        poster_url: resolvedPoster,
         is_copyright: normalizeBoolean(item.is_copyright),
         sub_docquyen: normalizeBoolean(item.sub_docquyen),
         chieurap: normalizeBoolean(item.chieurap),
-        trailer_url: item.trailer_url || "",
-        time: item.time,
-        episode_current: item.episode_current,
-        episode_total: item.episode_total,
-        quality: item.quality,
-        lang: item.lang,
-        notify: item.notify || "",
-        showtimes: item.showtimes || "",
-        year: item.year,
-        view: item.view || 0,
-        actor: Array.isArray(item.actor) ? item.actor : [],
-        director: Array.isArray(item.director) ? item.director : [],
-        category: normalizeNamedList(item.category || []),
-        country: normalizeNamedList(item.country || []),
-        episodes: Array.isArray(item.episodes) ? item.episodes : existingMovie?.episodes || [],
+        trailer_url: item.trailer_url || existingMovie?.trailer_url || "",
+        time: item.time || existingMovie?.time || "",
+        episode_current: item.episode_current || existingMovie?.episode_current || "",
+        episode_total: item.episode_total || existingMovie?.episode_total || "",
+        quality: item.quality || existingMovie?.quality || "",
+        lang: item.lang || existingMovie?.lang || "",
+        notify: item.notify || existingMovie?.notify || "",
+        showtimes: item.showtimes || existingMovie?.showtimes || "",
+        year: item.year || existingMovie?.year || 0,
+        view: item.view || existingMovie?.view || 0,
+        actor: pickNonEmptyArray(item.actor, existingActors),
+        director: pickNonEmptyArray(item.director, existingDirectors),
+        category: nextCategory.length > 0 ? nextCategory : existingCategory,
+        country: nextCountry.length > 0 ? nextCountry : existingCountry,
+        episodes: nextEpisodes.length > 0 ? nextEpisodes : existingEpisodes,
         tmdbData: sanitized.tmdbData ?? null,
         updatedAt: new Date(item.modified?.time || Date.now()),
         lastSynced: new Date(),

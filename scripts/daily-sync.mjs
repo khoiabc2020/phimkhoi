@@ -290,6 +290,50 @@ function sanitizeMovieRecord(movie) {
     };
 }
 
+function pickLongerText(nextValue, currentValue) {
+    const nextText = String(nextValue || '').trim();
+    const currentText = String(currentValue || '').trim();
+    return nextText.length >= currentText.length ? nextText : currentText;
+}
+
+function pickNonEmptyArray(nextValue, currentValue) {
+    const nextArray = Array.isArray(nextValue) ? nextValue.filter(Boolean) : [];
+    const currentArray = Array.isArray(currentValue) ? currentValue.filter(Boolean) : [];
+    return nextArray.length >= currentArray.length ? nextArray : currentArray;
+}
+
+function mergeMovieRecord(existing, incoming) {
+    const current = existing || {};
+    const next = sanitizeMovieRecord({ ...current, ...incoming });
+    return sanitizeMovieRecord({
+        ...current,
+        ...next,
+        name: String(next.name || current.name || '').trim(),
+        origin_name: pickLongerText(next.origin_name, current.origin_name),
+        content: pickLongerText(next.content, current.content),
+        poster_url: next.poster_url || current.poster_url || '',
+        thumb_url: next.thumb_url || current.thumb_url || '',
+        trailer_url: next.trailer_url || current.trailer_url || '',
+        time: next.time || current.time || '',
+        episode_current: next.episode_current || current.episode_current || '',
+        episode_total: next.episode_total || current.episode_total || '',
+        quality: next.quality || current.quality || '',
+        lang: next.lang || current.lang || '',
+        notify: next.notify || current.notify || '',
+        showtimes: next.showtimes || current.showtimes || '',
+        type: next.type || current.type || '',
+        status: next.status || current.status || '',
+        year: next.year || current.year || 0,
+        view: next.view || current.view || 0,
+        actor: pickNonEmptyArray(next.actor, current.actor),
+        director: pickNonEmptyArray(next.director, current.director),
+        category: pickNonEmptyArray(next.category, current.category),
+        country: pickNonEmptyArray(next.country, current.country),
+        episodes: pickNonEmptyArray(next.episodes, current.episodes),
+        tmdbData: next.tmdbData || current.tmdbData || null,
+    });
+}
+
 function log(msg) {
     console.log(`[${new Date().toISOString()}] ${msg}`);
 }
@@ -446,7 +490,8 @@ async function syncMovieList(slug, pages = 1) {
         );
 
         for (const movie of unique) {
-            const { _id, ...updateData } = movie;
+            const existing = await Movie.findOne({ slug: movie.slug }).lean();
+            const { _id, ...updateData } = mergeMovieRecord(existing, movie);
             const result = await Movie.updateOne(
                 { slug: movie.slug },
                 { $set: { ...sanitizeMovieRecord(updateData), lastSynced: new Date() } },
@@ -518,7 +563,7 @@ async function syncFullMovieDetails() {
                         tmdbData = shouldUseTmdbMedia(itemData, tmdbCandidate) ? tmdbCandidate : null;
                     }
 
-                    const sanitizedItem = sanitizeMovieRecord({
+                    const mergedRecord = mergeMovieRecord(await Movie.findOne({ slug }).lean(), {
                         ...itemData,
                         episodes,
                         tmdbData,
@@ -526,7 +571,7 @@ async function syncFullMovieDetails() {
                     
                     await Movie.updateOne(
                         { slug },
-                        { $set: { ...sanitizedItem, lastSynced: new Date() } }
+                        { $set: { ...mergedRecord, lastSynced: new Date() } }
                     );
                     hydrated++;
                 }

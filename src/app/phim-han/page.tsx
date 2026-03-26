@@ -14,7 +14,9 @@ import { getThemeBySlug } from "@/lib/theme";
 import { getResilientMoviesList } from "@/app/actions/movies";
 import {
     buildCountryHomeSections,
+    filterByCategory,
     getCountryPagePool,
+    matchesCountryStrict,
     type CountryHomeSectionConfig,
 } from "@/services/country-page";
 
@@ -128,42 +130,27 @@ async function resolveCountrySections(
     countryItems: any[],
     configs: CountryHomeSectionConfig[]
 ) {
-    const baseSections = buildCountryHomeSections(countryItems, configs);
-    const baseBySlug = new Map(baseSections.map((section) => [section.categorySlug, section.movies]));
+    const filteredCountryItems = countryItems.filter((movie) => matchesCountryStrict(movie, countrySlug));
+    const baseSections = buildCountryHomeSections(filteredCountryItems, configs);
 
-    const resolvedSections = await Promise.all(
-        configs.map(async (config) => {
-            const localMovies = baseBySlug.get(config.categorySlug) || [];
-            if (localMovies.length >= 6) {
-                return { ...config, movies: localMovies.slice(0, 24) };
+    return configs
+        .map((config) => {
+            const baseSection = baseSections.find((section) => section.categorySlug === config.categorySlug);
+            if (baseSection && baseSection.movies.length > 0) {
+                return baseSection;
             }
 
-            const resilient = await getResilientMoviesList(config.categorySlug, 1, 24, {
-                country: countrySlug,
-                category: config.categorySlug,
-            });
-            const fallbackMovies = Array.isArray(resilient?.items) ? resilient.items : [];
-            const broadFallbackMovies = countryItems.slice(config.fallbackOffset || 0, (config.fallbackOffset || 0) + 24);
-            const mergedMovies = [...localMovies, ...fallbackMovies, ...broadFallbackMovies].filter(
-                (movie, index, arr) => movie?.slug && arr.findIndex((item) => item?.slug === movie.slug) === index
-            );
-
-            if (mergedMovies.length >= 6) {
-                return { ...config, movies: mergedMovies.slice(0, 24) };
+            const countryOnlyCategory = filterByCategory(filteredCountryItems, config.categorySlug);
+            if (countryOnlyCategory.length > 0) {
+                return { ...config, movies: countryOnlyCategory.slice(0, 24) };
             }
 
-            const countryFallback = await getResilientMoviesList(countrySlug, 1, 24, { country: countrySlug });
-
-            const countryFallbackMovies = Array.isArray(countryFallback?.items) ? countryFallback.items : [];
-            const finalMovies = [...mergedMovies, ...countryFallbackMovies].filter(
-                (movie, index, arr) => movie?.slug && arr.findIndex((item) => item?.slug === movie.slug) === index
-            );
-
-            return { ...config, movies: finalMovies.slice(0, 24) };
+            return {
+                ...config,
+                movies: filteredCountryItems.slice(config.fallbackOffset || 0, (config.fallbackOffset || 0) + 24),
+            };
         })
-    );
-
-    return resolvedSections.filter((section) => section.movies.length > 0);
+        .filter((section) => section.movies.length > 0);
 }
 
 async function PhimHanHome() {
@@ -171,10 +158,13 @@ async function PhimHanHome() {
         countryItems: [] as any[],
         fallbackItems: [] as any[],
     }));
+    const safeCountryItems = countryItems.filter((movie) => matchesCountryStrict(movie, "han-quoc"));
     const latestMovies = fallbackItems.length > 0
-        ? fallbackItems.slice(0, 14)
-        : (await getResilientMoviesList("han-quoc", 1, 14, { country: "han-quoc" })).items || [];
-    const sections = await resolveCountrySections("han-quoc", countryItems, SECTION_CONFIG);
+        ? fallbackItems.filter((movie: any) => matchesCountryStrict(movie, "han-quoc")).slice(0, 14)
+        : ((await getResilientMoviesList("han-quoc", 1, 14, { country: "han-quoc" })).items || []).filter((movie: any) =>
+            matchesCountryStrict(movie, "han-quoc")
+        );
+    const sections = await resolveCountrySections("han-quoc", safeCountryItems, SECTION_CONFIG);
 
     return (
         <div className="space-y-12 md:space-y-16 pb-12">

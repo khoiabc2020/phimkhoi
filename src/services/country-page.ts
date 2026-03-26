@@ -21,7 +21,7 @@ const dedupeMoviesBySlug = (movies: Movie[] = []): Movie[] => {
     return sanitizeMovieList(movies, { limit: movies.length || 1 });
 };
 
-const normalizeCountryToken = (value: unknown) =>
+export const normalizeCountryToken = (value: unknown) =>
     String(value || "")
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
@@ -29,7 +29,7 @@ const normalizeCountryToken = (value: unknown) =>
         .replace(/[^a-z0-9]+/g, " ")
         .trim();
 
-const matchesCountryStrict = (movie: Movie, countrySlug: string) => {
+export const matchesCountryStrict = (movie: Movie, countrySlug: string) => {
     const wanted = normalizeCountryToken(countrySlug).replace(/\s+/g, " ");
     if (!wanted || !Array.isArray(movie?.country) || movie.country.length === 0) return false;
 
@@ -54,7 +54,7 @@ const withTimeout = async <T>(promise: Promise<T>, timeoutMs: number, fallback: 
     }
 };
 
-const filterByCategory = (movies: Movie[], categorySlug: string) => {
+export const filterByCategory = (movies: Movie[], categorySlug: string) => {
     if (categorySlug === "all") return movies;
     return movies.filter((movie) =>
         Array.isArray(movie?.category) && movie.category.some((item: any) => item?.slug === categorySlug)
