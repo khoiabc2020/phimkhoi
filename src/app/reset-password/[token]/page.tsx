@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Lock, ArrowLeft, CheckCircle } from "lucide-react";
+import AuthBrand from "@/components/auth/AuthBrand";
 
 export default function ResetPasswordPage() {
     const { token } = useParams();
@@ -55,6 +56,10 @@ export default function ResetPasswordPage() {
             {/* Background Decor */}
             <div className="absolute inset-0 bg-[url('https://phimimg.com/upload/vod/20240801-1/5b35c0293375815615d1858564245598.jpg')] bg-cover bg-center opacity-15" />
             <div className="absolute inset-0 bg-black/60" />
+
+            <div className="absolute top-6 left-6 md:top-8 md:left-12 z-20">
+                <AuthBrand />
+            </div>
 
             <div className="relative z-10 w-full max-w-md p-8 bg-black/85 border border-white/10 rounded-lg shadow-2xl animate-in fade-in zoom-in duration-500">
                 {!success && (

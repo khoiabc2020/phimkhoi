@@ -41,10 +41,15 @@ export async function getResilientMoviesList(
         }
 
         if (data && data.items && data.items.length > 0) {
+            const sanitizedItems = finalize(data.items);
+            if (sanitizedItems.length === 0) {
+                data = null;
+            } else {
             return {
                 ...data,
-                items: finalize(data.items),
+                    items: sanitizedItems,
             };
+            }
         }
 
         // 2. Fallback to External API (Higher latency but fresh)
@@ -80,10 +85,13 @@ export async function getResilientMoviesList(
 
         if (apiData && apiData.items && apiData.items.length > 0) {
             syncMoviesToLocalCache(apiData.items).catch(() => {});
-            return {
-                ...apiData,
-                items: finalize(apiData.items),
-            };
+            const sanitizedItems = finalize(apiData.items);
+            if (sanitizedItems.length > 0) {
+                return {
+                    ...apiData,
+                    items: sanitizedItems,
+                };
+            }
         }
 
         const fallbackItems = await getFallbackDisplayMovies({ type, limit, options });

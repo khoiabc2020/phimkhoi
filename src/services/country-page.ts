@@ -12,8 +12,8 @@ export interface CountryHomeSectionConfig {
 }
 
 const EMPTY_ITEMS: Movie[] = [];
-const COUNTRY_POOL_PAGE_LIMIT = 120;
-const COUNTRY_POOL_PAGES = [1, 2, 3];
+const COUNTRY_POOL_LOCAL_LIMIT = 360;
+const COUNTRY_POOL_LIVE_LIMIT = 120;
 
 const dedupeMoviesBySlug = (movies: Movie[] = []): Movie[] => {
     return sanitizeMovieList(movies, { limit: movies.length || 1 });
@@ -34,23 +34,17 @@ const safeSliceWindow = (movies: Movie[], offset: number, size: number): Movie[]
 };
 
 export const getCountryPagePool = cache(async (countrySlug: string) => {
-    const [localPages, livePages] = await Promise.all([
-        Promise.all(
-            COUNTRY_POOL_PAGES.map((page) =>
-                getMoviesByFilterFromCache("country", countrySlug, page, COUNTRY_POOL_PAGE_LIMIT).catch((): null => null)
-            )
-        ),
-        Promise.all(
-            COUNTRY_POOL_PAGES.map((page) =>
-                getMoviesByCountry(countrySlug, page, COUNTRY_POOL_PAGE_LIMIT).catch((): null => null)
-            )
-        ),
-    ]);
+    const localCountry = await getMoviesByFilterFromCache("country", countrySlug, 1, COUNTRY_POOL_LOCAL_LIMIT).catch((): null => null);
+    let countryItems = dedupeMoviesBySlug(localCountry?.items || EMPTY_ITEMS);
 
-    const countryItems = dedupeMoviesBySlug([
-        ...localPages.flatMap((entry) => entry?.items || EMPTY_ITEMS),
-        ...livePages.flatMap((entry) => entry?.items || EMPTY_ITEMS),
-    ]);
+    // Only hit upstream when local cache is too thin; this keeps country pages fast and stable.
+    if (countryItems.length < 48) {
+        const liveCountry = await getMoviesByCountry(countrySlug, 1, COUNTRY_POOL_LIVE_LIMIT).catch((): null => null);
+        countryItems = dedupeMoviesBySlug([
+            ...countryItems,
+            ...(liveCountry?.items || EMPTY_ITEMS),
+        ]);
+    }
 
     return {
         countryItems,

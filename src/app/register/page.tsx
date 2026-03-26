@@ -6,6 +6,7 @@ import { Lock, User, Mail } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
+import AuthBrand from "@/components/auth/AuthBrand";
 
 function RegisterForm() {
     const [name, setName] = useState("");
@@ -130,11 +131,7 @@ export default function RegisterPage() {
     return (
         <main className="min-h-screen flex flex-col items-center justify-center pt-24 pb-8 bg-[#0a0a0a] relative overflow-hidden font-sans">
             <div className="absolute top-6 left-6 md:top-8 md:left-12 z-20">
-                <Link href="/" className="group shrink-0">
-                    <span className="inline-block font-logo text-3xl md:text-4xl lg:text-5xl font-semibold uppercase tracking-[0.012em] leading-none whitespace-nowrap">
-                        <span className="text-[#9CA3AF]">KHOI</span><span className="text-[#8FA7C5]">PHIM</span>
-                    </span>
-                </Link>
+                <AuthBrand />
             </div>
 
             <div className="fixed inset-0 z-0 h-full w-full">

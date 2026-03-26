@@ -2,10 +2,14 @@ import type { Movie } from "@/services/api";
 
 const ADULT_SLUGS = new Set([
     "phim-18",
+    "phim 18",
+    "phim18",
     "18",
     "18+",
+    "18 plus",
     "adult",
     "ecchi",
+    "sex",
 ]);
 
 const ADULT_MARKERS = [
@@ -69,6 +73,13 @@ const getMovieQualityScore = (movie: Partial<Movie>) => {
 
 export const isAdultMovie = (movie: Partial<Movie> | null | undefined) => {
     if (!movie) return false;
+
+    if ((movie as Movie).tmdbData && typeof (movie as Movie).tmdbData === "object") {
+        const tmdbAdult = (movie as Movie).tmdbData && "adult" in (movie as any).tmdbData
+            ? Boolean((movie as any).tmdbData.adult)
+            : false;
+        if (tmdbAdult) return true;
+    }
 
     const categories = Array.isArray(movie.category) ? movie.category : [];
     if (

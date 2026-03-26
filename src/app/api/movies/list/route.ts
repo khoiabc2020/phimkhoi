@@ -27,12 +27,15 @@ export async function GET(req: Request) {
             
             const data = await getMoviesByFilterFromCache(type, slug, page, limit, { year, category });
             if (data) {
-                return NextResponse.json({
+                const sanitizedItems = finalize(data.items || []);
+                if (sanitizedItems.length > 0) {
+                    return NextResponse.json({
                     ...data,
-                    items: finalize(data.items || [])
-                }, {
+                        items: sanitizedItems
+                    }, {
                     headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' }
-                });
+                    });
+                }
             }
         }
 
@@ -40,12 +43,15 @@ export async function GET(req: Request) {
         if (type === 'list' && slug) {
             const data = await getMoviesFromCache(slug, page, limit);
             if (data) {
-                return NextResponse.json({
+                const sanitizedItems = finalize(data.items || []);
+                if (sanitizedItems.length > 0) {
+                    return NextResponse.json({
                     ...data,
-                    items: finalize(data.items || [])
-                }, {
+                        items: sanitizedItems
+                    }, {
                     headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' }
-                });
+                    });
+                }
             }
         }
 
@@ -73,12 +79,15 @@ export async function GET(req: Request) {
 
             if (externalData?.items?.length) {
                 syncMoviesToLocalCache(externalData.items).catch(() => {});
-                return NextResponse.json({
+                const sanitizedItems = finalize(externalData.items || []);
+                if (sanitizedItems.length > 0) {
+                    return NextResponse.json({
                     ...externalData,
-                    items: finalize(externalData.items || [])
-                }, {
+                        items: sanitizedItems
+                    }, {
                     headers: { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300' }
-                });
+                    });
+                }
             }
 
             const fallbackItems = await getFallbackDisplayMovies({
