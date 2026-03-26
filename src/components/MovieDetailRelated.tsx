@@ -1,4 +1,4 @@
-import { getMoviesList } from "@/services/api";
+import { getRelatedMoviesForMovie } from "@/services/server-movies";
 import MovieCard from "./MovieCard";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
@@ -6,16 +6,22 @@ import { ChevronRight } from "lucide-react";
 interface MovieDetailRelatedProps {
     categorySlug: string;
     currentMovieSlug: string;
+    countrySlug?: string;
     theme: any;
 }
 
 export default async function MovieDetailRelated({
     categorySlug,
     currentMovieSlug,
+    countrySlug,
     theme
 }: MovieDetailRelatedProps) {
-    const res = await getMoviesList('phim-moi-cap-nhat', { category: categorySlug, limit: 12 });
-    const relatedMovies = (res?.items || []).filter((m: any) => m.slug !== currentMovieSlug).slice(0, 8);
+    const relatedMovies = await getRelatedMoviesForMovie({
+        categorySlug,
+        currentMovieSlug,
+        countrySlug,
+        limit: 8,
+    });
 
     if (relatedMovies.length === 0) return null;
 

@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic";
 import { getMovieDetail, getMoviesList } from "@/services/api";
+import { getRelatedMoviesForMovie } from "@/services/server-movies";
 import { getMovieDetailFromCache, saveMovieToCache } from "@/lib/movie-cache";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -20,7 +21,6 @@ import MovieCast from "@/components/MovieCast";
 import { searchTMDBMovie, getTMDBDetails, getTMDBImage } from "@/services/tmdb";
 import { getTMDBEpisodeImages, TMDBEpisodeMeta } from "@/app/actions/tmdb";
 import MovieDetailTMDBInfo from "@/components/MovieDetailTMDBInfo";
-import MovieDetailRelated from "@/components/MovieDetailRelated";
 import { cache, Suspense } from "react";
 
 
@@ -128,6 +128,12 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     let type: 'movie' | 'tv' = (movie?.type === 'phim-bo' || movie?.type === 'tv-shows' || movie?.type === 'hoat-hinh' || movie?.slug?.includes('tap')) ? 'tv' : 'movie';
     const firstCategory = movie?.category?.[0]?.slug || 'all';
     const theme = getThemeBySlug(firstCategory);
+    const relatedMovies = await getRelatedMoviesForMovie({
+        categorySlug: firstCategory !== 'all' ? firstCategory : undefined,
+        currentMovieSlug: movie?.slug || slug,
+        countrySlug: movie?.country?.[0]?.slug,
+        limit: 10,
+    });
 
     // [Elite Performance] Fetch TMDB data for enrichment
     let tmdbDetails: any = null;
@@ -463,7 +469,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         <Suspense fallback={<div className="h-96 rounded-2xl bg-white/5 animate-pulse flex items-center justify-center text-white/20 font-black uppercase tracking-[4px]">Loading Movie Data...</div>}>
                             <MovieTabs
                                 movie={movie}
-                                relatedMovies={[]} 
+                                relatedMovies={relatedMovies}
                                 episodes={episodes}
                                 slug={slug}
                                 tmdbDetails={tmdbDetails}
@@ -531,10 +537,6 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         </div>
                         </div>
 
-                        {/* Related Movies Sidebar */}
-                        <Suspense fallback={<div className="h-96 rounded-2xl bg-white/5 animate-pulse" />}>
-                           <MovieDetailRelated categorySlug={firstCategory} currentMovieSlug={movie.slug} theme={theme} />
-                        </Suspense>
                     </div>
 
                 </div>

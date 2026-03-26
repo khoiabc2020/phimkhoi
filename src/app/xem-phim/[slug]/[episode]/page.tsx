@@ -218,7 +218,13 @@ export default async function WatchPage({ params }: PageProps) {
                                         <h3 className="text-white font-outfit font-extrabold text-[15px] tracking-wider uppercase">Phim đề xuất</h3>
                                     </div>
                                     <div className="p-4">
-                                        <RelatedMovies categorySlug={movie.category[0].slug} currentMovieId={movie._id} mode="vertical" />
+                                        <RelatedMovies
+                                            categorySlug={movie.category[0].slug}
+                                            currentMovieId={movie._id}
+                                            currentMovieSlug={movie.slug}
+                                            countrySlug={(movie.country?.[0] as any)?.slug}
+                                            mode="vertical"
+                                        />
                                     </div>
                                 </div>
                             )}

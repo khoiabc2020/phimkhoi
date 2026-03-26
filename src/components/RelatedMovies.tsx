@@ -1,4 +1,4 @@
-import { getMoviesByCategory } from "@/services/api";
+import { getRelatedMoviesForMovie } from "@/services/server-movies";
 import MovieRow from "@/components/MovieRow";
 import Link from "next/link";
 import Image from "next/image";
@@ -6,15 +6,27 @@ import { getImageUrl } from "@/lib/utils";
 
 interface RelatedMoviesProps {
     categorySlug: string;
-    currentMovieId: string;
+    currentMovieId?: string;
+    currentMovieSlug?: string;
+    countrySlug?: string;
     mode?: 'row' | 'vertical';
 }
 
-export default async function RelatedMovies({ categorySlug, currentMovieId, mode = 'row' }: RelatedMoviesProps) {
+export default async function RelatedMovies({
+    categorySlug,
+    currentMovieId,
+    currentMovieSlug,
+    countrySlug,
+    mode = 'row',
+}: RelatedMoviesProps) {
     if (!categorySlug) return null;
 
-    const data = await getMoviesByCategory(categorySlug, 1, 12);
-    const movies = data.items?.filter((m: { _id?: string }) => m._id !== currentMovieId) || [];
+    const movies = await getRelatedMoviesForMovie({
+        categorySlug,
+        currentMovieSlug: currentMovieSlug || currentMovieId || "",
+        countrySlug,
+        limit: mode === 'vertical' ? 8 : 12,
+    });
 
     if (movies.length === 0) return null;
 
