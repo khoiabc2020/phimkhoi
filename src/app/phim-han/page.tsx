@@ -249,9 +249,7 @@ export default async function PhimHanPage({ searchParams }: { searchParams: Prom
 
                 {currentPage === 1 ? (
                     <div className="-mt-4 md:-mt-8 lg:-mt-10 xl:-mt-12 relative z-50 w-full">
-                        <Suspense fallback={<div className="h-96 flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" /></div>}>
-                            <PhimHanHome />
-                        </Suspense>
+                        <PhimHanHome />
                     </div>
                 ) : (
                     <div className="w-full max-w-[1920px] mx-auto">
