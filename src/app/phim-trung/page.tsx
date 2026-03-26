@@ -12,7 +12,6 @@ import ActorRow from "@/components/ActorRow";
 import { cn } from "@/lib/utils";
 import { getThemeBySlug } from "@/lib/theme";
 import {
-    buildCountryHeroMovies,
     buildCountryHomeSections,
     getCountryPagePool,
     type CountryHomeSectionConfig,
@@ -58,6 +57,19 @@ const SECTION_CONFIG: CountryHomeSectionConfig[] = [
     { title: "Phim Hình Sự", categorySlug: "hinh-su", fallbackOffset: 206 },
     { title: "Phim Võ Thuật", categorySlug: "vo-thuat", fallbackOffset: 238 },
     { title: "Phim Tâm Lý", categorySlug: "tam-ly", fallbackOffset: 14 },
+];
+
+const HERO_SLUGS = [
+    "duong-cung-ky-an-thanh-vu-phong-minh",
+    "xin-chao-1983",
+    "con-ra-the-thong-gi-nua",
+    "bach-nguyet-phan-tinh",
+    "bui-hoa-hong",
+    "dai-mong-quy-ly",
+    "giang-ho-da-vu-thap-nien-dang",
+    "mac-nhan-tang-kieu",
+    "ngoc-minh-tra-cot",
+    "truc-ngoc",
 ];
 
 async function PhimTrungHome() {
@@ -116,22 +128,9 @@ async function CountryGridStream({ slug, page, limit = 49 }: { slug: string; pag
 
 async function ChinaHeroWithData() {
     const { fallbackItems } = await getCountryPagePool("trung-quoc");
-    const heroMovies = buildCountryHeroMovies(
-        fallbackItems,
-        [
-            "duong-cung-ky-an-thanh-vu-phong-minh",
-            "xin-chao-1983",
-            "con-ra-the-thong-gi-nua",
-            "bach-nguyet-phan-tinh",
-            "bui-hoa-hong",
-            "dai-mong-quy-ly",
-            "giang-ho-da-vu-thap-nien-dang",
-            "mac-nhan-tang-kieu",
-            "ngoc-minh-tra-cot",
-            "truc-ngoc",
-        ],
-        10
-    );
+    const heroMovies = HERO_SLUGS
+        .map((slug) => fallbackItems.find((movie) => movie.slug === slug))
+        .filter(Boolean);
 
     return <ChinaHero initialMovies={heroMovies} />;
 }

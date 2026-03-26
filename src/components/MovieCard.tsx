@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Play, Info, Star, ChevronDown } from "lucide-react";
 import { getImageUrl, getPosterImageUrl, getBackdropImageUrl, decodeHtml, cn, detectOrientation } from "@/lib/utils";
+import { shouldUseTmdbMedia } from "@/lib/movie-list";
 import { Movie } from "@/services/api";
 import { getTMDBImage } from "@/services/tmdb";
 import { getTMDBDataForCard } from "@/app/actions/tmdb"; // Import Server Action
@@ -85,7 +86,10 @@ function MovieCard({
     const [posterIndex, setPosterIndex] = useState(0);
 
     // Safe access for tmdbData (either initial or lazy)
-    const tmdbData = (movie as any).tmdbData || lazyTmdbData;
+    const tmdbData = useMemo(() => {
+        const candidate = (movie as any).tmdbData || lazyTmdbData;
+        return shouldUseTmdbMedia(movie, candidate) ? candidate : null;
+    }, [movie, lazyTmdbData]);
     const tmdbPosterPath = tmdbData?.poster_path;
     const tmdbBackdropPath = tmdbData?.backdrop_path;
 

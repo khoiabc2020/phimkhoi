@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { shouldUseTmdbMedia } from "@/lib/movie-list";
 
 export const API_URL = "https://phimapi.com";
 
@@ -446,6 +447,13 @@ const enrichMoviesWithTMDB = async (movies: Movie[], maxItems = 18): Promise<Mov
                 clearTimeout(sid);
                 if (!tmdb) return movie;
 
+                if (!shouldUseTmdbMedia(movie, tmdb as any)) {
+                    return normalizeMovieImageRoles({
+                        ...movie,
+                        tmdbData: null,
+                    } as Movie);
+                }
+
                 const tmdbYear = toValidYear((tmdb as any).release_date || (tmdb as any).first_air_date);
                 const tmdbPoster = (tmdb as any).poster_path ? `https://image.tmdb.org/t/p/w780${(tmdb as any).poster_path}` : "";
                 const tmdbBackdrop = (tmdb as any).backdrop_path ? `https://image.tmdb.org/t/p/original${(tmdb as any).backdrop_path}` : "";
@@ -456,9 +464,18 @@ const enrichMoviesWithTMDB = async (movies: Movie[], maxItems = 18): Promise<Mov
                     poster_url: tmdbPoster || movie.poster_url,
                     thumb_url: tmdbBackdrop || movie.thumb_url,
                     tmdbData: {
+                        adult: (tmdb as any).adult,
                         vote_average: (tmdb as any).vote_average,
                         poster_path: (tmdb as any).poster_path,
                         backdrop_path: (tmdb as any).backdrop_path,
+                        original_language: (tmdb as any).original_language,
+                        original_title: (tmdb as any).original_title,
+                        original_name: (tmdb as any).original_name,
+                        title: (tmdb as any).title,
+                        name: (tmdb as any).name,
+                        origin_country: (tmdb as any).origin_country,
+                        release_date: (tmdb as any).release_date,
+                        first_air_date: (tmdb as any).first_air_date,
                     },
                 } as Movie);
             } catch {

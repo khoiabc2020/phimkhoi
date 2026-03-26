@@ -8,7 +8,7 @@ import VersionWatcher from "./VersionWatcher";
 
 export function Providers({ children }: { children: React.ReactNode }) {
     return (
-        <SessionProvider>
+        <SessionProvider refetchOnWindowFocus={false} refetchWhenOffline={false} refetchInterval={0}>
             <FavoritesProvider>
                 <WatchlistProvider>
                     <ToastProvider>

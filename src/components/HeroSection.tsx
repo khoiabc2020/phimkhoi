@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Play, ChevronLeft, ChevronRight } from "lucide-react";
 import { Movie } from "@/services/api";
 import { getImageUrl, getPosterImageUrl, getBackdropImageUrl, decodeHtml, cn } from "@/lib/utils";
+import { shouldUseTmdbMedia } from "@/lib/movie-list";
 import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import WatchlistButton from "./WatchlistButton";
@@ -56,7 +57,7 @@ function getHeroImage(movie: any, type: "poster" | "backdrop" | "character" | "l
         if (type === "poster") return movie.layer_character || movie.layer_bg;
     }
 
-    const tmdb = movie?.tmdbData;
+    const tmdb = shouldUseTmdbMedia(movie, movie?.tmdbData) ? movie.tmdbData : null;
     if (tmdb) {
         if (type === "poster" && tmdb.poster_path)
         return getImageUrl(tmdbImage(tmdb.poster_path, variant === "desktop" ? "w500" : "w780"), true);

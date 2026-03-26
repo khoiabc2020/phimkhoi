@@ -30,8 +30,23 @@ const normalizeText = (value: unknown) =>
         .replace(/[^a-z0-9]+/g, " ")
         .trim();
 
+const ASIAN_COUNTRY_RULES: Record<string, { langs: string[]; countries: string[] }> = {
+    "trung-quoc": { langs: ["zh", "cn"], countries: ["CN", "HK", "TW"] },
+    "han-quoc": { langs: ["ko"], countries: ["KR"] },
+    "nhat-ban": { langs: ["ja"], countries: ["JP"] },
+    "thai-lan": { langs: ["th"], countries: ["TH"] },
+    "viet-nam": { langs: ["vi"], countries: ["VN"] },
+    "dai-loan": { langs: ["zh", "cn"], countries: ["TW"] },
+};
+
 const extractYear = (movie: Partial<Movie>) => {
     const parsed = Number(String(movie?.year || "").slice(0, 4));
+    return Number.isFinite(parsed) && parsed > 1900 ? parsed : 0;
+};
+
+const extractTmdbYear = (tmdbData: Record<string, any>) => {
+    const value = tmdbData?.release_date || tmdbData?.first_air_date || tmdbData?.year;
+    const parsed = Number(String(value || "").slice(0, 4));
     return Number.isFinite(parsed) && parsed > 1900 ? parsed : 0;
 };
 
@@ -53,6 +68,91 @@ const buildTitleKeys = (movie: Partial<Movie>) => {
     }
 
     return keys;
+};
+
+const buildTmdbTitleKeys = (tmdbData: Record<string, any>) => {
+    return [
+        tmdbData?.title,
+        tmdbData?.name,
+        tmdbData?.original_title,
+        tmdbData?.original_name,
+    ]
+        .map(normalizeText)
+        .filter((value, index, arr) => value.length >= 3 && arr.indexOf(value) === index);
+};
+
+const hasTitleAffinity = (movie: Partial<Movie>, tmdbData: Record<string, any>) => {
+    const movieKeys = Array.from(buildTitleKeys(movie)).map((value) => String(value).split("|")[0]);
+    const tmdbKeys = buildTmdbTitleKeys(tmdbData);
+
+    if (movieKeys.length === 0 || tmdbKeys.length === 0) return false;
+
+    return movieKeys.some((movieKey) =>
+        tmdbKeys.some((tmdbKey) =>
+            movieKey === tmdbKey ||
+            movieKey.includes(tmdbKey) ||
+            tmdbKey.includes(movieKey)
+        )
+    );
+};
+
+const getCountrySlugs = (movie: Partial<Movie>) =>
+    Array.isArray(movie?.country)
+        ? movie.country.map((country) => String(country?.slug || "").trim()).filter(Boolean)
+        : [];
+
+export const shouldUseTmdbMedia = (
+    movie: Partial<Movie> | null | undefined,
+    tmdbData: Record<string, any> | null | undefined
+) => {
+    if (!movie || !tmdbData || typeof tmdbData !== "object") return false;
+
+    const hasMedia = Boolean(tmdbData.poster_path || tmdbData.backdrop_path);
+    if (!hasMedia) return false;
+
+    const movieYear = extractYear(movie);
+    const tmdbYear = extractTmdbYear(tmdbData);
+    if (movieYear && tmdbYear && Math.abs(movieYear - tmdbYear) > 2) {
+        return false;
+    }
+
+    const hasTmdbTitles = buildTmdbTitleKeys(tmdbData).length > 0;
+    if (hasTmdbTitles && !hasTitleAffinity(movie, tmdbData)) {
+        return false;
+    }
+
+    const countrySlugs = getCountrySlugs(movie);
+    const originalLanguage = normalizeText(tmdbData.original_language || "");
+    const originCountries = Array.isArray(tmdbData.origin_country)
+        ? tmdbData.origin_country.map((value: unknown) => String(value || "").toUpperCase())
+        : [];
+
+    for (const countrySlug of countrySlugs) {
+        const rule = ASIAN_COUNTRY_RULES[countrySlug];
+        if (!rule) continue;
+
+        const hasExpectedLanguage = rule.langs.some((lang) => originalLanguage === lang);
+        const hasExpectedCountry = rule.countries.some((country) => originCountries.includes(country));
+
+        if (!hasExpectedLanguage && !hasExpectedCountry) {
+            return false;
+        }
+    }
+
+    return true;
+};
+
+export const sanitizeTmdbDataForMovie = <T extends Partial<Movie>>(movie: T): T => {
+    if (!movie || !(movie as Movie).tmdbData) return movie;
+
+    if (!shouldUseTmdbMedia(movie, (movie as Movie).tmdbData as Record<string, any>)) {
+        return {
+            ...movie,
+            tmdbData: null,
+        };
+    }
+
+    return movie;
 };
 
 const getMovieQualityScore = (movie: Partial<Movie>) => {
@@ -132,8 +232,9 @@ export function sanitizeMovieList(
     const allowAdult = options.allowAdult === true;
     const sanitized: Movie[] = [];
 
-    for (const movie of movies) {
-        if (!movie?.slug) continue;
+    for (const rawMovie of movies) {
+        if (!rawMovie?.slug) continue;
+        const movie = sanitizeTmdbDataForMovie(rawMovie);
         if (!allowAdult && isAdultMovie(movie)) continue;
 
         const duplicateIndex = sanitized.findIndex((existing) => isLikelyDuplicateMovie(existing, movie));

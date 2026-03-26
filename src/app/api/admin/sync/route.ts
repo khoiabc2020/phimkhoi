@@ -1,23 +1,99 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Movie from "@/models/Movie";
+import { detectOrientation, getImageUrl } from "@/lib/utils";
+import { sanitizeTmdbDataForMovie } from "@/lib/movie-list";
 
 const API_URL = "https://phimapi.com";
 
-// Helper to normalized movie data from API to our Schema
-const normalizeMovieData = (item: any) => {
+const slugifyText = (value: string) =>
+    String(value || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+
+const normalizeNamedList = (value: unknown): { name: string; slug: string }[] => {
+    if (Array.isArray(value)) {
+        return value
+            .map((item) => {
+                if (!item) return null;
+                if (typeof item === "string") {
+                    const name = item.trim();
+                    return name ? { name, slug: slugifyText(name) } : null;
+                }
+
+                const name = String((item as any).name || "").trim();
+                const slug = String((item as any).slug || slugifyText(name)).trim();
+                return name ? { name, slug: slug || slugifyText(name) } : null;
+            })
+            .filter(Boolean) as { name: string; slug: string }[];
+    }
+
+    return String(value || "")
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean)
+        .map((name) => ({ name, slug: slugifyText(name) }));
+};
+
+const normalizeBoolean = (value: unknown) => value === true || value === "true" || value === 1 || value === "1";
+
+const normalizeImageFields = (posterUrl: unknown, thumbUrl: unknown) => {
+    const poster = String(posterUrl || "").trim();
+    const thumb = String(thumbUrl || "").trim();
+
+    const normalizedPoster = poster ? getImageUrl(poster) : "";
+    const normalizedThumb = thumb ? getImageUrl(thumb) : "";
+
+    const candidates = [
+        { value: normalizedPoster, orientation: detectOrientation(normalizedPoster) },
+        { value: normalizedThumb, orientation: detectOrientation(normalizedThumb) },
+    ].filter((entry) => entry.value);
+
+    const portrait =
+        candidates.find((entry) => entry.orientation === "portrait")?.value ||
+        candidates.find((entry) => entry.orientation === "unknown")?.value ||
+        normalizedPoster ||
+        normalizedThumb ||
+        "";
+
+    const landscape =
+        candidates.find((entry) => entry.orientation === "landscape")?.value ||
+        candidates.find((entry) => entry.orientation === "unknown")?.value ||
+        normalizedThumb ||
+        normalizedPoster ||
+        "";
+
+    return {
+        poster_url: portrait,
+        thumb_url: landscape,
+    };
+};
+
+// Helper to normalize movie data from API to our schema
+const normalizeMovieData = (item: any, existingMovie?: any) => {
+    const images = normalizeImageFields(item.poster_url, item.thumb_url);
+    const sanitized = sanitizeTmdbDataForMovie({
+        ...existingMovie,
+        ...item,
+        ...images,
+        tmdbData: item?.tmdbData ?? existingMovie?.tmdbData ?? null,
+    });
+
     return {
         name: item.name,
         slug: item.slug,
-        origin_name: item.origin_name,
+        origin_name: item.origin_name || "",
         content: item.content || "", // Content might be empty in list view, need detail fetch for full content usually
         type: item.type,
         status: item.status,
-        thumb_url: item.thumb_url,
-        poster_url: item.poster_url,
-        is_copyright: item.is_copyright === true || item.is_copyright === 'true',
-        sub_docquyen: item.sub_docquyen === true || item.sub_docquyen === 'true',
-        chieurap: item.chieurap === true || item.chieurap === 'true',
+        thumb_url: sanitized.thumb_url || images.thumb_url,
+        poster_url: sanitized.poster_url || images.poster_url,
+        is_copyright: normalizeBoolean(item.is_copyright),
+        sub_docquyen: normalizeBoolean(item.sub_docquyen),
+        chieurap: normalizeBoolean(item.chieurap),
         trailer_url: item.trailer_url || "",
         time: item.time,
         episode_current: item.episode_current,
@@ -28,11 +104,14 @@ const normalizeMovieData = (item: any) => {
         showtimes: item.showtimes || "",
         year: item.year,
         view: item.view || 0,
-        actor: item.actor || [],
-        director: item.director || [],
-        category: item.category || [],
-        country: item.country || [],
-        updatedAt: new Date(item.modified?.time || Date.now())
+        actor: Array.isArray(item.actor) ? item.actor : [],
+        director: Array.isArray(item.director) ? item.director : [],
+        category: normalizeNamedList(item.category || []),
+        country: normalizeNamedList(item.country || []),
+        episodes: Array.isArray(item.episodes) ? item.episodes : existingMovie?.episodes || [],
+        tmdbData: sanitized.tmdbData ?? null,
+        updatedAt: new Date(item.modified?.time || Date.now()),
+        lastSynced: new Date(),
     };
 };
 
@@ -75,7 +154,8 @@ export async function GET(req: Request) {
                             }
                         }
 
-                        const normalized = normalizeMovieData(movieData);
+                        const existingMovie = await Movie.findOne({ slug: movieData.slug }).lean();
+                        const normalized = normalizeMovieData(movieData, existingMovie);
 
                         // Upsert: Update if exists, Insert if new
                         await Movie.findOneAndUpdate(

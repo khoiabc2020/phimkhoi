@@ -19,7 +19,7 @@ interface HeaderProps {
 export default function Header({ categories, countries }: HeaderProps) {
     const pathname = usePathname();
     const router = useRouter();
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
@@ -34,6 +34,7 @@ export default function Header({ categories, countries }: HeaderProps) {
     const [movieSearchHistory, setMovieSearchHistory] = useState<string[]>([]);
     const [isSearchNavigating, setIsSearchNavigating] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1);
+    const [stableSession, setStableSession] = useState<any>(null);
 
     const navRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
@@ -60,6 +61,17 @@ export default function Header({ categories, countries }: HeaderProps) {
 
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    useEffect(() => {
+        if (session) {
+            setStableSession(session);
+            return;
+        }
+
+        if (status === "unauthenticated") {
+            setStableSession(null);
+        }
+    }, [session, status]);
 
     // Perform real-time search
     useEffect(() => {
@@ -224,6 +236,8 @@ export default function Header({ categories, countries }: HeaderProps) {
     const movieResults = searchResults?.movies?.slice(0, 5) || [];
     const actorResults = searchResults?.actors?.slice(0, 3) || [];
     const hasSearchResults = movieResults.length > 0 || actorResults.length > 0;
+    const authSession = session || (status === "loading" ? stableSession : null);
+    const isAuthLoading = !mounted || (status === "loading" && !stableSession);
 
     return (
         <>
@@ -437,7 +451,7 @@ export default function Header({ categories, countries }: HeaderProps) {
                                                                     ))}
                                                                     {actorResults.length > 0 && (
                                                                         <div className="pt-2 mt-2 border-t border-white/5">
-                                                                            <div className="px-2 pb-2 text-[10px] font-bold text-white/25 uppercase tracking-[0.2em]">Diá»…n viÃªn</div>
+                                                                            <div className="px-2 pb-2 text-[10px] font-bold text-white/25 uppercase tracking-[0.2em]">Di?n vi?n</div>
                                                                             <div className="flex flex-wrap gap-2 px-1">
                                                                                 {actorResults.map((actor: any) => (
                                                                                     <Link
@@ -458,8 +472,8 @@ export default function Header({ categories, countries }: HeaderProps) {
                                                                     )}
                                                                     {!isSearching && !hasSearchResults && (
                                                                         <div className="px-2 py-8 text-center">
-                                                                            <div className="text-sm font-semibold text-white/70">KhÃ´ng tÃ¬m tháº¥y phim phÃ¹ há»£p</div>
-                                                                            <div className="text-xs text-white/35 mt-1">Há»‡ thá»‘ng Ä‘Ã£ kiá»ƒm tra DB vÃ  nguá»“n ngoÃ i cho "{trimmedSearchQuery}".</div>
+                                                                            <div className="text-sm font-semibold text-white/70">Kh?ng t?m th?y phim ph? h?p</div>
+                                                                            <div className="text-xs text-white/35 mt-1">H? th?ng ?? ki?m tra DB v? ngu?n ngo?i cho "{trimmedSearchQuery}".</div>
                                                                         </div>
                                                                     )}
                                                                 </>
@@ -511,17 +525,17 @@ export default function Header({ categories, countries }: HeaderProps) {
                         <div className={cn("flex items-center gap-3 lg:gap-6", isSearchOpen ? "hidden lg:flex" : "flex")}>
                             <NotificationDropdown />
 
-                            {!mounted ? (
+                            {isAuthLoading ? (
                                 <div className="w-9 h-9 rounded-full bg-white/5 animate-pulse" />
-                            ) : session ? (
+                            ) : authSession ? (
                                 <div className="relative group">
                                     <button className="flex items-center gap-2 py-1 px-1 rounded-full hover:bg-white/5 group">
                                         <div className="w-9 h-9 rounded-full overflow-hidden border border-white/10 ring-2 ring-transparent group-hover:ring-primary/40 transition-all">
-                                            {session.user?.image ? (
-                                                <Image src={session.user.image} alt="" width={36} height={36} className="w-full h-full object-cover" />
+                                            {authSession.user?.image ? (
+                                                <Image src={authSession.user.image} alt="" width={36} height={36} className="w-full h-full object-cover" />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center bg-zinc-800 text-xs font-bold text-white uppercase">
-                                                    {session.user?.name?.[0]}
+                                                    {authSession.user?.name?.[0]}
                                                 </div>
                                             )}
                                         </div>
@@ -529,16 +543,16 @@ export default function Header({ categories, countries }: HeaderProps) {
                                     </button>
                                     <div className="absolute right-0 top-full mt-2 w-52 bg-[#0a0a0c]/98 border border-white/10 rounded-xl p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all shadow-2xl z-50">
                                         <Link href="/thong-tin-tai-khoan" className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 rounded-lg">
-                                            <User className="w-4 h-4" /> <span>Hồ sơ</span>
+                                            <User className="w-4 h-4" /> <span>H? s?</span>
                                         </Link>
-                                        {(session.user as any)?.role === "admin" && (
+                                        {(authSession.user as any)?.role === "admin" && (
                                             <Link href="/admin" className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 rounded-lg">
-                                                <Shield className="w-4 h-4" /> <span>Quản trị</span>
+                                                <Shield className="w-4 h-4" /> <span>Qu?n tr?</span>
                                             </Link>
                                         )}
                                         <div className="h-px bg-white/5 my-1" />
                                         <button onClick={() => signOut({ callbackUrl: "/login" })} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-400 hover:bg-red-500/5 rounded-lg text-left">
-                                            <LogOut className="w-4 h-4" /> <span>Đăng xuất</span>
+                                            <LogOut className="w-4 h-4" /> <span>??ng xu?t</span>
                                         </button>
                                     </div>
                                 </div>
@@ -547,7 +561,7 @@ export default function Header({ categories, countries }: HeaderProps) {
                                     href="/login"
                                     className="px-5 py-2 rounded-full text-sm font-bold bg-white text-black hover:bg-white/90 transition-all active:scale-95"
                                 >
-                                    Đăng nhập
+                                    ??ng nh?p
                                 </Link>
                             )}
                         </div>

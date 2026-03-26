@@ -12,7 +12,6 @@ import ActorRow from "@/components/ActorRow";
 import { cn } from "@/lib/utils";
 import { getThemeBySlug } from "@/lib/theme";
 import {
-    buildCountryHeroMovies,
     buildCountryHomeSections,
     getCountryPagePool,
     type CountryHomeSectionConfig,
@@ -56,6 +55,14 @@ const SECTION_CONFIG: CountryHomeSectionConfig[] = [
     { title: "Phim Hình Sự", categorySlug: "hinh-su", fallbackOffset: 206 },
     { title: "Phim Võ Thuật", categorySlug: "vo-thuat", fallbackOffset: 238 },
     { title: "Phim Tâm Lý", categorySlug: "tam-ly", fallbackOffset: 14 },
+];
+
+const HERO_SLUGS = [
+    "nghe-thuat-lua-doi-cua-sarah",
+    "khi-cuoc-doi-cho-ban-qua-quyt",
+    "tieng-yeu-nay-anh-dich-duoc-khong",
+    "ban-trai-theo-yeu-cau",
+    "trao-em-ca-vu-tru",
 ];
 
 async function PhimHanHome() {
@@ -114,17 +121,9 @@ async function CountryGridStream({ slug, page, limit = 49 }: { slug: string; pag
 
 async function KoreaHeroWithData() {
     const { fallbackItems } = await getCountryPagePool("han-quoc");
-    const heroMovies = buildCountryHeroMovies(
-        fallbackItems,
-        [
-            "nghe-thuat-lua-doi-cua-sarah",
-            "khi-cuoc-doi-cho-ban-qua-quyt",
-            "tieng-yeu-nay-anh-dich-duoc-khong",
-            "ban-trai-theo-yeu-cau",
-            "trao-em-ca-vu-tru",
-        ],
-        8
-    );
+    const heroMovies = HERO_SLUGS
+        .map((slug) => fallbackItems.find((movie) => movie.slug === slug))
+        .filter(Boolean);
 
     return <KoreaHero initialMovies={heroMovies} />;
 }

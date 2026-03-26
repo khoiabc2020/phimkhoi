@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import Link from "next/link";
-import { cn, getImageUrl, getBackdropImageUrl, stripHtml } from "@/lib/utils";
+import { cn, getImageUrl, stripHtml } from "@/lib/utils";
 import WatchlistButton from "./WatchlistButton";
 
 interface MovieSlideAssets {
@@ -77,12 +77,9 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
 
     const slides = useMemo((): (any & { bg: string; logo: string; actor?: string; displayTitle: string; displayDesc: string; displayTags: string[]; displayEpisodes: string })[] => {
         return (initialMovies || [])
+            .filter(movie => Boolean(movie?.slug && ASSETS_MAP[movie.slug]))
             .map(movie => {
-                const assets = ASSETS_MAP[movie.slug] || {
-                    bg: getBackdropImageUrl(movie) || movie.thumb_url || movie.poster_url,
-                    logo: "",
-                    actor: "",
-                };
+                const assets = ASSETS_MAP[movie.slug];
                 
                 return {
                     ...movie,

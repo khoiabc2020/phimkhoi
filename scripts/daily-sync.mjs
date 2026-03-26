@@ -20,6 +20,22 @@ const MONGODB_URI = process.env.MONGODB_URI;
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const normalizeText = (value) =>
+    String(value || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+
+const ASIAN_COUNTRY_RULES = {
+    'trung-quoc': { langs: ['zh', 'cn'], countries: ['CN', 'HK', 'TW'] },
+    'han-quoc': { langs: ['ko'], countries: ['KR'] },
+    'nhat-ban': { langs: ['ja'], countries: ['JP'] },
+    'thai-lan': { langs: ['th'], countries: ['TH'] },
+    'viet-nam': { langs: ['vi'], countries: ['VN'] },
+    'dai-loan': { langs: ['zh', 'cn'], countries: ['TW'] },
+};
 
 if (!MONGODB_URI) {
     console.error('Error: MONGODB_URI not found in .env.local');
@@ -98,6 +114,180 @@ function getItems(data) {
     if (Array.isArray(data.items)) return data.items;
     if (data.data?.items) return data.data.items;
     return [];
+}
+
+function getImageUrl(url) {
+    if (!url) return '';
+    const normalized = String(url).trim();
+    if (!normalized) return '';
+    if (normalized.startsWith('http')) {
+        try {
+            const parsed = new URL(normalized);
+            if (parsed.hostname === 'phimimg.com' && (
+                parsed.pathname.startsWith('/upload/') ||
+                parsed.pathname.startsWith('/uploads/') ||
+                parsed.pathname.startsWith('/vod/')
+            )) {
+                return `https://img.phimapi.com${parsed.pathname}${parsed.search}`;
+            }
+        } catch {
+            return normalized;
+        }
+        return normalized;
+    }
+
+    if (
+        normalized.startsWith('upload/') ||
+        normalized.startsWith('/upload/') ||
+        normalized.startsWith('uploads/') ||
+        normalized.startsWith('/uploads/') ||
+        normalized.startsWith('vod/') ||
+        normalized.startsWith('/vod/')
+    ) {
+        return `https://img.phimapi.com${normalized.startsWith('/') ? normalized : `/${normalized}`}`;
+    }
+
+    return normalized.startsWith('/') ? `https://phimimg.com${normalized}` : `https://phimimg.com/${normalized}`;
+}
+
+function detectOrientation(url) {
+    if (!url) return 'unknown';
+    const u = String(url).toLowerCase();
+    const isNguonc = u.includes('nguonc.com') || u.includes('streamc.xyz') || u.includes('phimmoi.net') || u.includes('1080.com.vn');
+    const isOphim = u.includes('img.ophim.live') || u.includes('phimimg.com') || u.includes('img.ophim1.com') || u.includes('img.phimapi.com');
+
+    if (isOphim || isNguonc) {
+        if (u.includes('-thumb.') || u.includes('/thumb-') || u.endsWith('/thumb.jpg') || u.endsWith('/thumb.png')) return 'portrait';
+        if (u.includes('-poster.') || u.includes('/poster-') || u.endsWith('/poster.jpg') || u.endsWith('/poster.png')) return 'landscape';
+    }
+
+    if (u.includes('backdrop') || u.includes('banner') || u.includes('landscape') || u.includes('horizontal')) return 'landscape';
+    if (u.includes('portrait') || u.includes('vertical') || u.includes('/poster') || u.includes('poster.')) return 'portrait';
+
+    const dim = u.match(/(\d{2,4})x(\d{2,4})/);
+    if (dim) {
+        const w = parseInt(dim[1], 10);
+        const h = parseInt(dim[2], 10);
+        if (Number.isFinite(w) && Number.isFinite(h) && w !== h) {
+            return h > w ? 'portrait' : 'landscape';
+        }
+    }
+
+    return 'unknown';
+}
+
+function normalizeImageFields(posterUrl, thumbUrl) {
+    const poster = getImageUrl(posterUrl);
+    const thumb = getImageUrl(thumbUrl);
+    const candidates = [
+        { value: poster, orientation: detectOrientation(poster) },
+        { value: thumb, orientation: detectOrientation(thumb) },
+    ].filter(entry => entry.value);
+
+    const portrait =
+        candidates.find(entry => entry.orientation === 'portrait')?.value ||
+        candidates.find(entry => entry.orientation === 'unknown')?.value ||
+        poster ||
+        thumb ||
+        '';
+
+    const landscape =
+        candidates.find(entry => entry.orientation === 'landscape')?.value ||
+        candidates.find(entry => entry.orientation === 'unknown')?.value ||
+        thumb ||
+        poster ||
+        '';
+
+    return { poster_url: portrait, thumb_url: landscape };
+}
+
+function extractYear(movie) {
+    const parsed = Number(String(movie?.year || '').slice(0, 4));
+    return Number.isFinite(parsed) && parsed > 1900 ? parsed : 0;
+}
+
+function extractTmdbYear(tmdbData) {
+    const value = tmdbData?.release_date || tmdbData?.first_air_date || tmdbData?.year;
+    const parsed = Number(String(value || '').slice(0, 4));
+    return Number.isFinite(parsed) && parsed > 1900 ? parsed : 0;
+}
+
+function buildMovieTitleKeys(movie) {
+    const values = [
+        movie?.origin_name,
+        movie?.name,
+        String(movie?.slug || '').replace(/-/g, ' '),
+    ]
+        .map(normalizeText)
+        .filter((value, index, arr) => value.length >= 3 && arr.indexOf(value) === index);
+
+    return new Set(values);
+}
+
+function buildTmdbTitleKeys(tmdbData) {
+    return [
+        tmdbData?.title,
+        tmdbData?.name,
+        tmdbData?.original_title,
+        tmdbData?.original_name,
+    ]
+        .map(normalizeText)
+        .filter((value, index, arr) => value.length >= 3 && arr.indexOf(value) === index);
+}
+
+function hasTitleAffinity(movie, tmdbData) {
+    const movieKeys = Array.from(buildMovieTitleKeys(movie));
+    const tmdbKeys = buildTmdbTitleKeys(tmdbData);
+    if (movieKeys.length === 0 || tmdbKeys.length === 0) return false;
+
+    return movieKeys.some(movieKey =>
+        tmdbKeys.some(tmdbKey =>
+            movieKey === tmdbKey ||
+            movieKey.includes(tmdbKey) ||
+            tmdbKey.includes(movieKey)
+        )
+    );
+}
+
+function shouldUseTmdbMedia(movie, tmdbData) {
+    if (!movie || !tmdbData || typeof tmdbData !== 'object') return false;
+    if (!tmdbData.poster_path && !tmdbData.backdrop_path) return false;
+
+    const movieYear = extractYear(movie);
+    const tmdbYear = extractTmdbYear(tmdbData);
+    if (movieYear && tmdbYear && Math.abs(movieYear - tmdbYear) > 2) return false;
+
+    const tmdbTitles = buildTmdbTitleKeys(tmdbData);
+    if (tmdbTitles.length > 0 && !hasTitleAffinity(movie, tmdbData)) return false;
+
+    const originalLanguage = normalizeText(tmdbData.original_language || '');
+    const originCountries = Array.isArray(tmdbData.origin_country)
+        ? tmdbData.origin_country.map(value => String(value || '').toUpperCase())
+        : [];
+    const countrySlugs = Array.isArray(movie?.country)
+        ? movie.country.map(country => String(country?.slug || '').trim()).filter(Boolean)
+        : [];
+
+    for (const countrySlug of countrySlugs) {
+        const rule = ASIAN_COUNTRY_RULES[countrySlug];
+        if (!rule) continue;
+        const hasExpectedLanguage = rule.langs.some(lang => originalLanguage === lang);
+        const hasExpectedCountry = rule.countries.some(country => originCountries.includes(country));
+        if (!hasExpectedLanguage && !hasExpectedCountry) return false;
+    }
+
+    return true;
+}
+
+function sanitizeMovieRecord(movie) {
+    if (!movie) return movie;
+    const images = normalizeImageFields(movie.poster_url, movie.thumb_url);
+    const tmdbData = shouldUseTmdbMedia({ ...movie, ...images }, movie.tmdbData) ? movie.tmdbData : null;
+    return {
+        ...movie,
+        ...images,
+        tmdbData,
+    };
 }
 
 function log(msg) {
@@ -192,19 +382,19 @@ async function syncMovieList(slug, pages = 1) {
             const kkPathImage = kkRes?.pathImage || kkRes?.data?.pathImage || "";
             const ophimPathImage = ophimRes?.pathImage || ophimRes?.data?.pathImage || "https://img.ophim.live/uploads/movies/";
 
-            const kkItems = getItems(kkRes).map(item => ({
+            const kkItems = getItems(kkRes).map(item => sanitizeMovieRecord({
                 ...item,
                 thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : (kkPathImage + item.thumb_url),
                 poster_url: item.poster_url?.startsWith('http') ? item.poster_url : (kkPathImage + item.poster_url)
             }));
             
-            const ophimItems = getItems(ophimRes).map(item => ({
+            const ophimItems = getItems(ophimRes).map(item => sanitizeMovieRecord({
                 ...item,
                 thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : (ophimPathImage + item.thumb_url),
                 poster_url: item.poster_url?.startsWith('http') ? item.poster_url : (ophimPathImage + item.poster_url)
             }));
 
-            const nguoncItems = (nguoncRes?.items || []).map(item => ({
+            const nguoncItems = (nguoncRes?.items || []).map(item => sanitizeMovieRecord({
                 ...item,
                 _id: item.id || item.slug,
                 thumb_url: item.thumb_url || item.poster_url,
@@ -247,11 +437,11 @@ async function syncMovieList(slug, pages = 1) {
             
             seen.add(m.slug);
             return true;
-        });
+        }).map(sanitizeMovieRecord);
 
         await TrendingCache.findOneAndUpdate(
             { type: slug },
-            { type: slug, movies: unique.slice(0, 150), updatedAt: new Date() },
+            { type: slug, movies: unique.slice(0, 150).map(sanitizeMovieRecord), updatedAt: new Date() },
             { upsert: true }
         );
 
@@ -259,7 +449,7 @@ async function syncMovieList(slug, pages = 1) {
             const { _id, ...updateData } = movie;
             const result = await Movie.updateOne(
                 { slug: movie.slug },
-                { $set: { ...updateData, lastSynced: new Date() } },
+                { $set: { ...sanitizeMovieRecord(updateData), lastSynced: new Date() } },
                 { upsert: true }
             );
             if (result.upsertedCount > 0) STATS.totalCreated++;
@@ -319,14 +509,24 @@ async function syncFullMovieDetails() {
                         delete itemData.language;
                     }
 
-                    let tmdbData = existing?.tmdbData;
-                    if (!tmdbData) {
-                        tmdbData = await searchTMDBMovie(itemData.origin_name || itemData.name, itemData.year);
+                    let tmdbData = existing?.tmdbData || null;
+                    if (tmdbData && !shouldUseTmdbMedia(itemData, tmdbData)) {
+                        tmdbData = null;
                     }
+                    if (!tmdbData) {
+                        const tmdbCandidate = await searchTMDBMovie(itemData.origin_name || itemData.name, itemData.year);
+                        tmdbData = shouldUseTmdbMedia(itemData, tmdbCandidate) ? tmdbCandidate : null;
+                    }
+
+                    const sanitizedItem = sanitizeMovieRecord({
+                        ...itemData,
+                        episodes,
+                        tmdbData,
+                    });
                     
                     await Movie.updateOne(
                         { slug },
-                        { $set: { ...itemData, episodes, tmdbData, lastSynced: new Date() } }
+                        { $set: { ...sanitizedItem, lastSynced: new Date() } }
                     );
                     hydrated++;
                 }
@@ -360,7 +560,7 @@ async function syncTMDBTrending(timeWindow = 'day') {
                 }).lean();
 
                 if (localMovie) {
-                    mappedMovies.push({
+                    const candidate = {
                         ...localMovie,
                         poster_url: item.poster_path ? `https://image.tmdb.org/t/p/original${item.poster_path}` : localMovie.poster_url,
                         thumb_url: item.backdrop_path ? `https://image.tmdb.org/t/p/original${item.backdrop_path}` : localMovie.thumb_url,
@@ -369,9 +569,18 @@ async function syncTMDBTrending(timeWindow = 'day') {
                             vote_average: item.vote_average,
                             poster_path: item.poster_path,
                             backdrop_path: item.backdrop_path,
+                            original_language: item.original_language,
+                            original_title: item.original_title,
+                            original_name: item.original_name,
+                            title: item.title,
+                            name: item.name,
+                            release_date: item.release_date,
+                            first_air_date: item.first_air_date,
+                            origin_country: item.origin_country || [],
                             media_type: item.media_type || 'movie'
                         }
-                    });
+                    };
+                    mappedMovies.push(sanitizeMovieRecord(candidate));
                 }
             }
             await TrendingCache.findOneAndUpdate({ type }, { type, movies: mappedMovies, updatedAt: new Date() }, { upsert: true });

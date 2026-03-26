@@ -9,6 +9,7 @@ import ContinueWatchingRow from "@/components/ContinueWatchingRow";
 
 import LazySection from "@/components/LazySection";
 import { getMoviesList, getTrendMovies, isTrailer } from "@/services/api";
+import { getResilientMoviesList } from "@/app/actions/movies";
 import { getTMDBDataForCard } from "@/app/actions/tmdb";
 import { cn } from "@/lib/utils";
 import { isAdultMovie, sanitizeMovieList } from "@/lib/movie-list";
@@ -184,10 +185,9 @@ async function HomeRowSection({
 }) {
   let movies: any[] = [];
   try {
-    const res = await getMoviesList(slug, { 
-      limit: ROW_LIMIT, 
-      category: endpoint === 'the-loai' ? slug : undefined, 
-      country: endpoint === 'quoc-gia' ? slug : undefined 
+    const res = await getResilientMoviesList(slug, 1, ROW_LIMIT, {
+      category: endpoint === 'the-loai' ? slug : undefined,
+      country: endpoint === 'quoc-gia' ? slug : undefined
     });
     
     movies = res?.items || [];
@@ -258,8 +258,6 @@ async function HeroStream() {
   return <AsyncHeroSection initialMovies={finalHeroData} />;
 }
 
-import HomeRowInstant from "@/components/HomeRowInstant";
-
 export default function Home() {
   return (
     <main className="min-h-screen pb-16 bg-[#0a0a0a]">
@@ -290,24 +288,40 @@ export default function Home() {
           </LazySection>
 
           {/* Group: Phim Mới */}
-          <HomeRowInstant title="Phim Chiếu Rạp Mới" slug="phim-chieu-rap" viewAllHref="/danh-sach/phim-chieu-rap" priorityFirst={true} />
+          <Suspense fallback={contentSkeleton}>
+            <HomeRowSection title="Phim Chiếu Rạp Mới" slug="phim-chieu-rap" viewAllHref="/danh-sach/phim-chieu-rap" priorityFirst={true} />
+          </Suspense>
 
-          <HomeRowInstant title="Phim Mới Cập Nhật" slug="phim-moi-cap-nhat" viewAllHref="/danh-sach/phim-moi" priorityFirst={true} />
+          <Suspense fallback={contentSkeleton}>
+            <HomeRowSection title="Phim Mới Cập Nhật" slug="phim-moi-cap-nhat" viewAllHref="/danh-sach/phim-moi" priorityFirst={true} />
+          </Suspense>
 
           {/* Group: Quốc gia */}
-          <HomeRowInstant title="Phim Hàn Quốc" slug="han-quoc" endpoint="quoc-gia" viewAllHref="/quoc-gia/han-quoc" />
+          <Suspense fallback={contentSkeleton}>
+            <HomeRowSection title="Phim Hàn Quốc" slug="han-quoc" endpoint="quoc-gia" viewAllHref="/quoc-gia/han-quoc" />
+          </Suspense>
 
-          <HomeRowInstant title="Phim Trung Quốc" slug="trung-quoc" endpoint="quoc-gia" viewAllHref="/quoc-gia/trung-quoc" />
+          <Suspense fallback={contentSkeleton}>
+            <HomeRowSection title="Phim Trung Quốc" slug="trung-quoc" endpoint="quoc-gia" viewAllHref="/quoc-gia/trung-quoc" />
+          </Suspense>
 
           {/* Group: Mới cập nhật khác */}
-          <HomeRowInstant title="Phim Lẻ Mới" slug="phim-le" viewAllHref="/danh-sach/phim-le" />
+          <Suspense fallback={contentSkeleton}>
+            <HomeRowSection title="Phim Lẻ Mới" slug="phim-le" viewAllHref="/danh-sach/phim-le" />
+          </Suspense>
 
-          <HomeRowInstant title="Phim Bộ Mới" slug="phim-bo" viewAllHref="/danh-sach/phim-bo" />
+          <Suspense fallback={contentSkeleton}>
+            <HomeRowSection title="Phim Bộ Mới" slug="phim-bo" viewAllHref="/danh-sach/phim-bo" />
+          </Suspense>
 
           {/* Group: Thể loại */}
-          <HomeRowInstant title="Phim Hành Động" slug="hanh-dong" endpoint="the-loai" viewAllHref="/the-loai/hanh-dong" />
+          <Suspense fallback={contentSkeleton}>
+            <HomeRowSection title="Phim Hành Động" slug="hanh-dong" endpoint="the-loai" viewAllHref="/the-loai/hanh-dong" />
+          </Suspense>
 
-          <HomeRowInstant title="Phim Hoạt Hình" slug="hoat-hinh" endpoint="the-loai" viewAllHref="/the-loai/hoat-hinh" />
+          <Suspense fallback={contentSkeleton}>
+            <HomeRowSection title="Phim Hoạt Hình" slug="hoat-hinh" endpoint="the-loai" viewAllHref="/the-loai/hoat-hinh" />
+          </Suspense>
         </div>
       </div>
     </main>

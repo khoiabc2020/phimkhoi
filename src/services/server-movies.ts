@@ -69,8 +69,10 @@ export async function syncMoviesToLocalCache(movies: Movie[]) {
                             slug: movie.slug,
                             type: movie.type || "",
                             status: movie.status || "",
+                            content: movie.content || "",
                             thumb_url: movie.thumb_url || "",
                             poster_url: movie.poster_url || "",
+                            chieurap: Boolean(movie.chieurap),
                             quality: movie.quality || "",
                             lang: movie.lang || "",
                             year: Number(movie.year) || 0,
@@ -172,6 +174,7 @@ export async function getFallbackDisplayMovies({
     const inferredCountry = !exactCountry && COUNTRY_SLUGS.has(type) ? type : undefined;
     const activeCategory = exactCategory || inferredCategory;
     const activeCountry = exactCountry || inferredCountry;
+    const isCinemaList = type === "phim-chieu-rap";
 
     if (activeCategory || activeCountry) {
         const dbQuery: Record<string, unknown> = {};
@@ -180,6 +183,11 @@ export async function getFallbackDisplayMovies({
 
         const exactDb = await getRecentMoviesFromDb(dbQuery, safeLimit * 3);
         if (exactDb.length > 0) pools.push(exactDb);
+    }
+
+    if (isCinemaList) {
+        const cinemaDb = await getRecentMoviesFromDb({ chieurap: true }, safeLimit * 4);
+        if (cinemaDb.length > 0) pools.push(cinemaDb);
     }
 
     if (activeCountry && pools.flat().length < safeLimit) {
@@ -209,7 +217,9 @@ export async function getFallbackDisplayMovies({
         pushRequest(getMoviesByCategory(activeCategory, 1, Math.max(24, safeLimit * 2), activeCountry ? { country: activeCountry } : undefined));
     }
 
-    const backupListTypes = ["phim-moi-cap-nhat", "phim-bo", "phim-le", "han-quoc", "trung-quoc"];
+    const backupListTypes = isCinemaList
+        ? ["phim-chieu-rap", "phim-moi-cap-nhat", "phim-le", "phim-bo"]
+        : ["phim-moi-cap-nhat", "phim-bo", "phim-le", "han-quoc", "trung-quoc"];
 
     for (const backupType of backupListTypes) {
         if (backupType === type && !activeCategory && !activeCountry) continue;

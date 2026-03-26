@@ -24,6 +24,15 @@ export async function getTMDBDataForCard(
         const movie = await searchTMDBMovie(query, year, type, verification);
         if (movie) {
             return {
+                adult: movie.adult,
+                original_language: movie.original_language,
+                original_title: movie.original_title,
+                original_name: movie.original_name,
+                title: movie.title,
+                name: movie.name,
+                origin_country: movie.origin_country,
+                release_date: movie.release_date,
+                first_air_date: movie.first_air_date,
                 poster_path: movie.poster_path,
                 vote_average: movie.vote_average,
                 backdrop_path: movie.backdrop_path,

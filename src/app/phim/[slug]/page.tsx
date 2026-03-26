@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Play, PlayCircle, Share2, Star, Clock, Film } from "lucide-react";
 import FavoriteButton from "@/components/FavoriteButton";
 import { getImageUrl, getPosterImageUrl, getBackdropImageUrl, detectOrientation, cn, buildEpisodeKeyCandidates } from "@/lib/utils";
+import { shouldUseTmdbMedia } from "@/lib/movie-list";
 import Image from "next/image";
 import { getThemeBySlug } from "@/lib/theme";
 import WatchlistButton from "@/components/WatchlistButton";
@@ -148,7 +149,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
             { originalName: movie.origin_name, localName: movie.name, countrySlug: movie.country?.[0]?.slug }
         );
         
-        if (tmdbSearch?.id) {
+        if (tmdbSearch?.id && shouldUseTmdbMedia(movie, tmdbSearch)) {
             const tmdbId = tmdbSearch.id;
             const [details, epImages] = await Promise.all([
                 getTMDBDetails(tmdbId, type),
@@ -185,8 +186,9 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     // --- VISUAL ENGINE SELECTION ---
     const sourceThumb = getBackdropImageUrl(movie);
     const sourcePoster = getPosterImageUrl(movie);
-    const tmdbBackdrop = tmdbDetails?.backdrop_path ? getTMDBImage(tmdbDetails.backdrop_path, "original") : "";
-    const tmdbPoster = tmdbDetails?.poster_path ? getTMDBImage(tmdbDetails.poster_path, "original") : "";
+    const trustedTmdbDetails = shouldUseTmdbMedia(movie, tmdbDetails) ? tmdbDetails : null;
+    const tmdbBackdrop = trustedTmdbDetails?.backdrop_path ? getTMDBImage(trustedTmdbDetails.backdrop_path, "original") : "";
+    const tmdbPoster = trustedTmdbDetails?.poster_path ? getTMDBImage(trustedTmdbDetails.poster_path, "original") : "";
 
     const isNguonC = movie?.episodes?.[0]?.server_name?.toLowerCase().includes('nguonc');
     
@@ -201,7 +203,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
 
     const subjectOrientation = detectOrientation(contentSubjectUrl);
     const isSubjectPortrait = subjectOrientation === "portrait";
-    const rating = tmdbDetails?.vote_average ? Number(tmdbDetails.vote_average).toFixed(1) : "9.7";
+    const rating = trustedTmdbDetails?.vote_average ? Number(trustedTmdbDetails.vote_average).toFixed(1) : "9.7";
 
     const jsonLd = {
         "@context": "https://schema.org",
@@ -219,7 +221,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
         })) || [],
         "director": {
             "@type": "Person",
-            "name": movie?.director?.[0] || tmdbDetails?.credits?.crew?.find((c: any) => c.job === "Director")?.name || "Đang cập nhật"
+            "name": movie?.director?.[0] || trustedTmdbDetails?.credits?.crew?.find((c: any) => c.job === "Director")?.name || "Đang cập nhật"
         },
         "aggregateRating": {
             "@type": "AggregateRating",
@@ -401,14 +403,14 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         </div>
 
                         <div className="text-xs sm:text-sm text-gray-300 flex flex-wrap items-center justify-center md:justify-start gap-2 sm:gap-4 py-2 drop-shadow-md">
-                            {(movie?.director && movie.director.length > 0 && !movie.director.includes("Đang cập nhật")) || tmdbDetails?.credits?.crew?.find((c: { job?: string; name?: string }) => c.job === "Director") ? (
-                                <span><span className="text-gray-500">Đạo diễn:</span> {movie?.director?.join(", ") || tmdbDetails?.credits?.crew?.find((c: { job?: string; name?: string }) => c.job === "Director")?.name}</span>
+                            {(movie?.director && movie.director.length > 0 && !movie.director.includes("Đang cập nhật")) || trustedTmdbDetails?.credits?.crew?.find((c: { job?: string; name?: string }) => c.job === "Director") ? (
+                                <span><span className="text-gray-500">Đạo diễn:</span> {movie?.director?.join(", ") || trustedTmdbDetails?.credits?.crew?.find((c: { job?: string; name?: string }) => c.job === "Director")?.name}</span>
                             ) : null}
                             <span className="w-1 h-1 bg-gray-600 rounded-full hidden sm:block" />
                             <span><span className="text-gray-500">Thời lượng:</span> {movie?.time || "N/A"}</span>
                         </div>
                         <div className="text-xs sm:text-sm text-gray-300 mb-4 sm:mb-6 line-clamp-2 max-w-3xl drop-shadow-md text-center md:text-left">
-                            <span className="text-gray-500">Diễn viên:</span> {movie?.actor?.join(", ") || tmdbDetails?.credits?.cast?.slice(0, 5).map((c: { name?: string }) => c.name).join(", ") || "Đang cập nhật"}
+                            <span className="text-gray-500">Diễn viên:</span> {movie?.actor?.join(", ") || trustedTmdbDetails?.credits?.cast?.slice(0, 5).map((c: { name?: string }) => c.name).join(", ") || "Đang cập nhật"}
                         </div>
 
                         {/* Action Buttons -- bigger touch targets on mobile, 2x2 grid */}
@@ -472,12 +474,12 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                 relatedMovies={relatedMovies}
                                 episodes={episodes}
                                 slug={slug}
-                                tmdbDetails={tmdbDetails}
+                                tmdbDetails={trustedTmdbDetails}
                                 episodeThumbnails={episodeThumbnails}
                                 episodeMetadata={episodeMetadata}
                                 cast={
                                     <div className="mt-4">
-                                        <MovieCast movie={movie} slug={movie.slug} tmdbCast={tmdbDetails?.credits?.cast} />
+                                        <MovieCast movie={movie} slug={movie.slug} tmdbCast={trustedTmdbDetails?.credits?.cast} />
                                     </div>
                                 }
                             />
