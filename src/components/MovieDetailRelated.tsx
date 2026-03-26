@@ -32,7 +32,7 @@ export default async function MovieDetailRelated({
             </div>
             <div className="grid grid-cols-2 gap-4">
                 {relatedMovies.map((movie: any) => (
-                    <MovieCard key={movie._id} movie={movie} variant="compact" />
+                    <MovieCard key={movie._id} movie={movie} />
                 ))}
             </div>
         </div>

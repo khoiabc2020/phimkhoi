@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import { getTMDBEpisodeImages } from "@/app/actions/tmdb";
 
 interface TMDBDataEnrichmentProps {
@@ -17,7 +18,7 @@ export default function TMDBDataEnrichment({
     originalName,
     countrySlug,
     onDataFetched
-}: TMDBDataEnrichmentProps) {
+}: TMDBDataEnrichmentProps): ReactNode {
     useEffect(() => {
         async function fetchData() {
             try {

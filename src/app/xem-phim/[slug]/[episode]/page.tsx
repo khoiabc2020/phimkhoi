@@ -13,6 +13,7 @@ import { Info } from "lucide-react";
 import { getMovieCast, getTMDBDataForCard, getTMDBEpisodeImages, TMDBEpisodeMeta } from "@/app/actions/tmdb";
 import RelatedMovies from "@/components/RelatedMovies";
 import { getThemeBySlug } from "@/lib/theme";
+import MovieCastSection from "@/components/MovieCastSection";
 
 export const revalidate = 300;
 

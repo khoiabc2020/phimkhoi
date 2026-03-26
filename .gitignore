@@ -75,7 +75,7 @@ build-apk.log
 
 # deployment artifacts
 vps.env.local
-deploy.zip
+
 
 # APK files (quá lớn cho GitHub)
 *.apk

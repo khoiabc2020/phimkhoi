@@ -34,12 +34,23 @@ export async function getResilientMoviesList(
         }
 
         // 2. Fallback to External API (Higher latency but fresh)
+        const yearParam =
+            options.year == null || options.year === 'all'
+                ? undefined
+                : typeof options.year === 'string'
+                    ? Number(options.year)
+                    : options.year;
+
+        const normalizedYearParam = typeof yearParam === 'number' && Number.isNaN(yearParam)
+            ? undefined
+            : yearParam;
+
         const apiData = await getMoviesList(type, { 
             page, 
             limit, 
             category: options.category, 
             country: options.country,
-            year: options.year
+            year: normalizedYearParam
         });
 
         if (apiData && apiData.items && apiData.items.length > 0) {

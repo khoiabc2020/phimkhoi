@@ -467,6 +467,10 @@ let homeCache: {
 } | null = null;
 let homeCacheTime = 0;
 
+let menuCache: { categories: Category[]; countries: Country[] } | null = null;
+let menuCacheTime = 0;
+const MENU_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+
 /** Cấu hình đề mục trang chủ — slug + endpoint chuẩn (PhimAPI/KKPhim + NguonC) */
 type HomeCacheKey = 'phimMoi' | 'phimLe' | 'phimBo' | 'hoatHinh' | 'tvShows' | 'phimChieuRap' | 'phimSapChieu' | 'hanQuoc' | 'trungQuoc' | 'hanhDong' | 'tinhCam';
 const HOME_CATEGORIES: { key: HomeCacheKey; slug: string; endpoint: 'danh-sach' | 'the-loai' | 'quoc-gia' }[] = [
@@ -869,8 +873,6 @@ const normalizeOphimItem = (item: any, pathImage: string): Movie => {
 };
 
 export const getMoviesList = async (type: string, params: { page?: number; year?: number; category?: string; country?: string; limit?: number; quality?: string } = {}) => {
-    const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
-    if (isBuildPhase) return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
     try {
         const { page = 1, year, category, country, limit = 49, quality } = params;
         let query = `?page=${page}&limit=${limit}`;
@@ -996,6 +998,9 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
             );
         }
 
+        // Enrich images quality for better UX (skips automatically during build phase)
+        const enrichedItems = await enrichMoviesWithTMDB(uniqueItems, 24);
+
         return {
             items: enrichedItems,
             pagination: kkPagination
@@ -1007,8 +1012,6 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
 };
 
 export const getMoviesByCategory = async (slug: string, page: number = 1, limit: number = 49, options?: { country?: string; year?: string | number }) => {
-    const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
-    if (isBuildPhase) return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
     try {
         const country = options?.country && options.country !== 'all' ? options.country : '';
         const year = options?.year && options.year !== 'all' ? options.year : '';
@@ -1099,31 +1102,6 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
             items: playable,
             pagination: kkPagination
         };
-        // 3. [Elite Recovery] Final Local Cache Fallback
-        if (items.length === 0) {
-            try {
-                await connectDB();
-                const findQuery: any = { 'category.slug': slug };
-                if (country) findQuery['country.slug'] = country;
-                if (year) findQuery.year = year;
-
-                const dbMovies = await MovieModel.find(findQuery)
-                    .sort({ updatedAt: -1 })
-                    .limit(limit)
-                    .lean();
-
-                if (dbMovies.length > 0) {
-                    return {
-                        items: dbMovies as any,
-                        pagination: { currentPage: page, totalPages: Math.ceil(dbMovies.length / limit) || 1 }
-                    };
-                }
-            } catch (e) {
-                console.error("getMoviesByCategory DB Recovery Error:", e);
-            }
-        }
-
-        return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
     } catch (error) {
         console.error(`Error fetching category [${slug}]:`, error);
         return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
@@ -1212,31 +1190,6 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
             items: playable,
             pagination: kkPagination
         };
-        // 3. [Elite Recovery] Final Local Cache Fallback
-        if (items.length === 0) {
-            try {
-                await connectDB();
-                const findQuery: any = { 'country.slug': slug };
-                if (category) findQuery['category.slug'] = category;
-                if (year) findQuery.year = year;
-
-                const dbMovies = await MovieModel.find(findQuery)
-                    .sort({ updatedAt: -1 })
-                    .limit(limit)
-                    .lean();
-
-                if (dbMovies.length > 0) {
-                    return {
-                        items: dbMovies as any,
-                        pagination: { currentPage: page, totalPages: Math.ceil(dbMovies.length / limit) || 1 }
-                    };
-                }
-            } catch (e) {
-                console.error("getMoviesByCountry DB Recovery Error:", e);
-            }
-        }
-
-        return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
     } catch (error) {
         console.error(`Error fetching country [${slug}]:`, error);
         return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
@@ -1246,9 +1199,6 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
 
 export const getMoviesByCountryAndCategory = async (countrySlug: string, categorySlug: string, limit: number = 24) => {
     try {
-        const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
-        if (isBuildPhase) return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
-
         // 1. Expand slugs for broad matching
         const categorySlugs = categorySlug === "co-trang"
             ? ["co-trang", "co-dai", "than-thoai", "vo-thuat", "lich-su", "kiem-hiep"]
@@ -1326,9 +1276,6 @@ export const getTrendMovies = async (
     type: 'movie' | 'tv' | 'all' = 'all',
     timeWindow: 'day' | 'week' = 'day'
 ) => {
-    const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
-    if (isBuildPhase) return [];
-
     try {
         const trendList = await getTMDBTrending(type, timeWindow);
 
@@ -1378,30 +1325,21 @@ export const getTrendMovies = async (
 };
 
 export const getMenuData = async (): Promise<{ categories: Category[], countries: Country[] }> => {
-    const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
-    if (isBuildPhase) {
-        return {
-            categories: [
-                { name: "Hành Động", slug: "hanh-dong" },
-                { name: "Tình Cảm", slug: "tinh-cam" }
-            ],
-            countries: [
-                { name: "Trung Quốc", slug: "trung-quoc" },
-                { name: "Hàn Quốc", slug: "han-quoc" }
-            ]
-        };
-    }
     try {
+        if (menuCache && Date.now() - menuCacheTime < MENU_CACHE_TTL_MS) {
+            return menuCache;
+        }
+
         // Fetch from both KKPhim and OPhim to maximize coverage
-        const [kkCatRes, kkCountRes, ophimCountRes] = await Promise.all([
-            fetch(`${API_URL}/the-loai`, { next: { revalidate: 86400 } }),
-            fetch(`${API_URL}/quoc-gia`, { next: { revalidate: 86400 } }),
-            fetch(`${OPHIM_API}/v1/api/quoc-gia`, { next: { revalidate: 86400 } })
+        const [kkCatRes, kkCountRes, ophimCountRes] = await Promise.allSettled([
+            fetchWithFastTimeout(`${API_URL}/the-loai`, 2500, { next: { revalidate: 86400 } }),
+            fetchWithFastTimeout(`${API_URL}/quoc-gia`, 2500, { next: { revalidate: 86400 } }),
+            fetchWithFastTimeout(`${OPHIM_API}/v1/api/quoc-gia`, 2500, { next: { revalidate: 86400 } }),
         ]);
 
-        const kkCategories = await kkCatRes.json().catch((): any[] => []);
-        const kkCountries = await kkCountRes.json().catch((): any[] => []);
-        const ophimCountriesData = await ophimCountRes.json().catch((): any => null);
+        const kkCategories = kkCatRes.status === "fulfilled" ? (kkCatRes.value as any[]) : [];
+        const kkCountries = kkCountRes.status === "fulfilled" ? (kkCountRes.value as any[]) : [];
+        const ophimCountriesData = ophimCountRes.status === "fulfilled" ? (ophimCountRes.value as any) : null;
         const ophimCountries = ophimCountriesData?.data?.items || [];
 
         // Deduplicate functions
@@ -1420,15 +1358,21 @@ export const getMenuData = async (): Promise<{ categories: Category[], countries
         // Clean up weird HTML entities from API (e.g. Cote D&#039;Ivoire)
         const cleanName = (name: string) => name.replace(/&#039;/g, "'").replace(/&amp;/g, "&");
 
-        return {
+        const result = {
             categories: (Array.isArray(kkCategories) ? kkCategories : [])
                 .filter(c => c.slug !== 'phim-18')
                 .map(c => ({ ...c, name: cleanName(c.name) })),
             countries: mergedCountries.map(c => ({ ...c, name: cleanName(c.name) }))
         };
+
+        menuCache = result;
+        menuCacheTime = Date.now();
+
+        return result;
     } catch (error) {
         console.error("Error fetching menu data:", error);
-        return { categories: [], countries: [] };
+        // Never block navigation/header if upstream is down.
+        return menuCache ?? { categories: [], countries: [] };
     }
 };
 

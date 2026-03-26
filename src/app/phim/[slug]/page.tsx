@@ -8,6 +8,8 @@ import FavoriteButton from "@/components/FavoriteButton";
 import { getImageUrl, detectOrientation, cn, buildEpisodeKeyCandidates } from "@/lib/utils";
 import Image from "next/image";
 import { getThemeBySlug } from "@/lib/theme";
+import WatchlistButton from "@/components/WatchlistButton";
+import ShareButton from "@/components/ShareButton";
 
 const CommentSection = dynamic(() => import("@/components/CommentSection"), {
     ssr: true,
@@ -19,7 +21,7 @@ import { searchTMDBMovie, getTMDBDetails, getTMDBImage } from "@/services/tmdb";
 import { getTMDBEpisodeImages, TMDBEpisodeMeta } from "@/app/actions/tmdb";
 import MovieDetailTMDBInfo from "@/components/MovieDetailTMDBInfo";
 import MovieDetailRelated from "@/components/MovieDetailRelated";
-import { cache } from "react";
+import { cache, Suspense } from "react";
 
 
 // Revalidate every 5 minutes (was 60s). ISR means first visitor triggers refresh, others get cache.

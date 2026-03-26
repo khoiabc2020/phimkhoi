@@ -25,9 +25,11 @@ export default async function MovieDetailTMDBInfo({
         movieYear ? parseInt(movieYear.toString().split("-")[0]) : undefined,
         type,
         { originalName: movieOriginName, localName: movieName, countrySlug }
-    ).catch(() => null);
+    ).catch((): null => null);
 
-    const tmdbDetails = tmdbSearch ? await getTMDBDetails(tmdbSearch.id, type).catch(() => null) : null;
+    const tmdbDetails = tmdbSearch
+        ? await getTMDBDetails(tmdbSearch.id, type).catch((): null => null)
+        : null;
     const rating = tmdbDetails?.vote_average ? Number(tmdbDetails.vote_average).toFixed(1) : "9.7";
     const tmdbBackdrop = tmdbDetails?.backdrop_path ? getTMDBImage(tmdbDetails.backdrop_path, "original") : null;
 
