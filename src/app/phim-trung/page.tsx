@@ -2,7 +2,7 @@ import ChinaHero from "@/components/ChinaHero";
 import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
-import { getMenuData, getMovieDetail, getMoviesByCountry, getMoviesByCountryAndCategory } from "@/services/api";
+import { getMenuData, getMovieDetail, getMoviesByCountry } from "@/services/api";
 import { getMoviesByFilterFromCache } from "@/lib/movie-cache";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -150,18 +150,36 @@ async function resolveCountrySections(
                 return { ...config, movies: localMovies.slice(0, 24) };
             }
 
-            const fallback = await withTimeout(
-                getMoviesByCountryAndCategory(countrySlug, config.categorySlug, 24),
+            const resilient = await withTimeout(
+                getResilientMoviesList(config.categorySlug, 1, 24, {
+                    country: countrySlug,
+                    category: config.categorySlug,
+                }),
+                2200,
+                { items: [] as any[], pagination: { currentPage: 1, totalPages: 1 } }
+            );
+            const fallbackMovies = Array.isArray(resilient?.items) ? resilient.items : [];
+            const broadFallbackMovies = countryItems.slice(config.fallbackOffset || 0, (config.fallbackOffset || 0) + 24);
+            const mergedMovies = [...localMovies, ...fallbackMovies, ...broadFallbackMovies].filter(
+                (movie, index, arr) => movie?.slug && arr.findIndex((item) => item?.slug === movie.slug) === index
+            );
+
+            if (mergedMovies.length >= 6) {
+                return { ...config, movies: mergedMovies.slice(0, 24) };
+            }
+
+            const countryFallback = await withTimeout(
+                getResilientMoviesList(countrySlug, 1, 24, { country: countrySlug }),
                 2200,
                 { items: [] as any[], pagination: { currentPage: 1, totalPages: 1 } }
             );
 
-            const fallbackMovies = Array.isArray(fallback?.items) ? fallback.items : [];
-            const mergedMovies = [...localMovies, ...fallbackMovies].filter(
+            const countryFallbackMovies = Array.isArray(countryFallback?.items) ? countryFallback.items : [];
+            const finalMovies = [...mergedMovies, ...countryFallbackMovies].filter(
                 (movie, index, arr) => movie?.slug && arr.findIndex((item) => item?.slug === movie.slug) === index
             );
 
-            return { ...config, movies: mergedMovies.slice(0, 24) };
+            return { ...config, movies: finalMovies.slice(0, 24) };
         })
     );
 
