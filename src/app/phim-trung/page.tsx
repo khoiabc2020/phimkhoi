@@ -44,35 +44,39 @@ const FEATURED_ACTORS = [
     { name: "Vương Tử Kỳ", role: "Tình Yêu Thôi Mà", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/uS80R3jOnm9Fm8k6P9uT8H6zF7x.jpg" }
 ];
 
-async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'default', minHeight = 380 }: { title: string; categorySlug: string; countrySlug: string; variant?: 'default' | 'sidebar'; minHeight?: number }) {
+async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'default', minHeight = 380, fallbackOffset = 0 }: { title: string; categorySlug: string; countrySlug: string; variant?: 'default' | 'sidebar'; minHeight?: number; fallbackOffset?: number }) {
     try {
-        // [Cache-First] Fetch up to 300 to have enough for category filtering
         const cachedData = await getMoviesFromCache(countrySlug, 1, 300).catch((): null => null);
         let filteredMovies: Movie[] = [];
 
+        // Tier 1: Category filter from cache
         if (cachedData && cachedData.items.length > 0) {
             filteredMovies = cachedData.items.filter((m: Movie) =>
                 categorySlug === 'all' || m.category?.some((c: any) => c.slug === categorySlug)
             ).slice(0, 32);
         }
 
-        if (filteredMovies.length < 8) {
-            const data = await getMoviesByCountryAndCategory(countrySlug, categorySlug, 32).catch(() => ({ items: [] as Movie[] }));
-            if (data?.items?.length > 0) {
+        // Tier 2: API fetch with country+category
+        if (filteredMovies.length < 4) {
+            const data = await getMoviesByCountryAndCategory(countrySlug, categorySlug, 32).catch((): { items: Movie[] } => ({ items: [] as Movie[] }));
+            if (data?.items && data.items.length > filteredMovies.length) {
                 filteredMovies = data.items;
             }
         }
 
-        if (!filteredMovies || filteredMovies.length === 0) {
-            return null; // Silent hide if truly no data
+        // Tier 3: Paginated country offset — always show something
+        if (filteredMovies.length < 4 && cachedData && cachedData.items.length > 0) {
+            filteredMovies = cachedData.items.slice(fallbackOffset, fallbackOffset + 32);
         }
+
+        if (!filteredMovies || filteredMovies.length === 0) return null;
 
         return (
             <LazySection minHeight={minHeight} className={variant === 'sidebar' ? "movie-row-sidebar" : "movie-row-standard"}>
                 <MovieRow 
                     title={title} 
                     movies={filteredMovies} 
-                    slug={`/the-loai/${categorySlug}`} 
+                    slug={categorySlug !== 'all' ? `/the-loai/${categorySlug}` : `/quoc-gia/${countrySlug}`}
                     variant={variant} 
                 />
             </LazySection>
@@ -95,11 +99,11 @@ async function PhimTrungHome() {
             </LazySection>
             
             <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
-                <CountryMovieRow title="Phim Tình Cảm" categorySlug="tinh-cam" countrySlug="trung-quoc" />
+                <CountryMovieRow title="Phim Tình Cảm" categorySlug="tinh-cam" countrySlug="trung-quoc" fallbackOffset={14} />
             </Suspense>
 
             <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
-                <CountryMovieRow title="Phim Hành Động" categorySlug="hanh-dong" countrySlug="trung-quoc" />
+                <CountryMovieRow title="Phim Hành Động" categorySlug="hanh-dong" countrySlug="trung-quoc" fallbackOffset={46} />
             </Suspense>
             
             <LazySection minHeight={200} className="movie-row-landscape">
@@ -107,31 +111,31 @@ async function PhimTrungHome() {
             </LazySection>
 
             <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
-                <CountryMovieRow title="Phim Cổ Trang" categorySlug="co-trang" countrySlug="trung-quoc" />
+                <CountryMovieRow title="Phim Cổ Trang" categorySlug="co-trang" countrySlug="trung-quoc" fallbackOffset={78} />
             </Suspense>
 
             <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
-                <CountryMovieRow title="Phim Hài Hước" categorySlug="hai-huoc" countrySlug="trung-quoc" />
+                <CountryMovieRow title="Phim Hài Hước" categorySlug="hai-huoc" countrySlug="trung-quoc" fallbackOffset={110} />
             </Suspense>
 
             <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
-                <CountryMovieRow title="Phim Kinh Dị" categorySlug="kinh-di" countrySlug="trung-quoc" />
+                <CountryMovieRow title="Phim Kinh Dị" categorySlug="kinh-di" countrySlug="trung-quoc" fallbackOffset={142} />
             </Suspense>
 
             <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
-                <CountryMovieRow title="Phim Hoạt Hình" categorySlug="hoat-hinh" countrySlug="trung-quoc" />
+                <CountryMovieRow title="Phim Hoạt Hình" categorySlug="hoat-hinh" countrySlug="trung-quoc" fallbackOffset={174} />
             </Suspense>
             
             <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
-                <CountryMovieRow title="Phim Hình Sự" categorySlug="hinh-su" countrySlug="trung-quoc" />
+                <CountryMovieRow title="Phim Hình Sự" categorySlug="hinh-su" countrySlug="trung-quoc" fallbackOffset={206} />
             </Suspense>
 
             <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
-                <CountryMovieRow title="Phim Thuyết Minh" categorySlug="thuyet-minh" countrySlug="trung-quoc" />
+                <CountryMovieRow title="Phim Võ Thuật" categorySlug="vo-thuat" countrySlug="trung-quoc" fallbackOffset={238} />
             </Suspense>
 
             <Suspense fallback={<div className="h-[380px] bg-white/5 animate-pulse mx-12 rounded-xl" />}>
-                <CountryMovieRow title="Phim Vietsub" categorySlug="vietsub" countrySlug="trung-quoc" />
+                <CountryMovieRow title="Phim Tâm Lý" categorySlug="tam-ly" countrySlug="trung-quoc" fallbackOffset={14} />
             </Suspense>
         </div>
     );

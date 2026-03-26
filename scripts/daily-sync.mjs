@@ -207,9 +207,10 @@ async function syncMovieList(slug, pages = 1) {
             const nguoncItems = (nguoncRes?.items || []).map(item => ({
                 ...item,
                 _id: item.id || item.slug,
-                thumb_url: item.poster_url, 
-                poster_url: item.thumb_url
+                thumb_url: item.thumb_url || item.poster_url,
+                poster_url: item.poster_url || item.thumb_url
             }));
+
 
             if (kkItems.length === 0 && ophimItems.length === 0 && nguoncItems.length === 0) break;
             
