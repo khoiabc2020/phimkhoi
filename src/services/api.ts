@@ -1204,7 +1204,7 @@ export const getMoviesByCountryAndCategory = async (countrySlug: string, categor
             : [categorySlug];
 
         // 2. [FAST SCAN] Check the first 100 movies in this country
-        const countryData = await getMoviesByCountry(countrySlug, 1, 100).catch(() => ({ items: [] }));
+        const countryData = await getMoviesByCountry(countrySlug, 1, 100).catch(() => ({ items: [] as Movie[] }));
         const allMovies = countryData?.items || [];
 
         let matched = allMovies.filter((m: Movie) =>
@@ -1214,7 +1214,7 @@ export const getMoviesByCountryAndCategory = async (countrySlug: string, categor
 
         // 3. [DEEP FETCH] If scan is shallow, fetch directly from category API and filter by country
         if (matched.length < 8 && categorySlug !== 'all') {
-            const catFetch = await getMoviesByCategory(categorySlug, 1, 100).catch(() => ({ items: [] }));
+            const catFetch = await getMoviesByCategory(categorySlug, 1, 100).catch(() => ({ items: [] as Movie[] }));
             
             const countryIdentifier = countrySlug.toLowerCase().replace(/-/g, ' ');
 

@@ -57,7 +57,7 @@ async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'de
         }
 
         if (filteredMovies.length < 8) {
-            const data = await getMoviesByCountryAndCategory(countrySlug, categorySlug, 32).catch(() => ({ items: [] }));
+            const data = await getMoviesByCountryAndCategory(countrySlug, categorySlug, 32).catch(() => ({ items: [] as Movie[] }));
             if (data?.items?.length > 0) {
                 filteredMovies = data.items;
             }
