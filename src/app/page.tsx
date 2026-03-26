@@ -265,8 +265,8 @@ export default function Home() {
       </Suspense>
 
       <div className="w-full max-w-[1920px] mx-auto px-1.5 sm:px-3 md:px-5 lg:pl-24 lg:pr-12 relative z-30 pb-16 -mt-0 md:-mt-2 lg:-mt-4 xl:-mt-6">
-        {/* Decorative background glow - Deep Indigo for Premium feel */}
-        <div className="absolute top-0 left-0 right-0 h-[800px] bg-indigo-500/10 via-transparent to-transparent pointer-events-none -z-10 blur-[150px]" />
+        {/* Decorative background glow - keep subtle and close to the black system palette */}
+        <div className="pointer-events-none absolute left-0 right-0 top-0 -z-10 h-[800px] bg-[radial-gradient(circle_at_top,rgba(143,167,197,0.08),transparent_55%)] blur-[160px]" />
         
         <div className="mb-6">
           <QuickNav />

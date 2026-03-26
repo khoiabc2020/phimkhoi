@@ -2,7 +2,7 @@ import ChinaHero from "@/components/ChinaHero";
 import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
-import { getMenuData, getMovieDetail, getMoviesByCountry } from "@/services/api";
+import { getMenuData, getMovieDetail, getMoviesByCountry, getMoviesByCountryAndCategory } from "@/services/api";
 import { getMoviesByFilterFromCache } from "@/lib/movie-cache";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -151,12 +151,9 @@ async function resolveCountrySections(
             }
 
             const fallback = await withTimeout(
-                getResilientMoviesList(countrySlug, 1, 24, {
-                    country: countrySlug,
-                    category: config.categorySlug,
-                }),
+                getMoviesByCountryAndCategory(countrySlug, config.categorySlug, 24),
                 2200,
-                { items: [] as any[] }
+                { items: [] as any[], pagination: { currentPage: 1, totalPages: 1 } }
             );
 
             const fallbackMovies = Array.isArray(fallback?.items) ? fallback.items : [];
