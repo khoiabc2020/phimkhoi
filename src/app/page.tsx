@@ -252,6 +252,15 @@ async function HeroStream() {
     console.error("HeroStream Error:", error);
   }
 
+  if (finalHeroData.length === 0) {
+    try {
+      const fallback = await getMoviesList("phim-moi-cap-nhat", { limit: 10 });
+      finalHeroData = (fallback.items || []).filter((m: any) => !isTrailer(m)).slice(0, 10);
+    } catch (error) {
+      console.error("HeroStream external fallback error:", error);
+    }
+  }
+
   if (finalHeroData.length === 0) return null;
   
   return <AsyncHeroSection initialMovies={finalHeroData} />;

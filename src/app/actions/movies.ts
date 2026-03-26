@@ -1,6 +1,7 @@
 "use server";
 
 import { getMoviesList, Movie, getMovieDetail } from "@/services/api";
+import { getFallbackDisplayMovies, syncMoviesToLocalCache } from "@/services/server-movies";
 import { 
     getMoviesFromCache, 
     getMoviesByFilterFromCache, 
@@ -54,13 +55,19 @@ export async function getResilientMoviesList(
         });
 
         if (apiData && apiData.items && apiData.items.length > 0) {
+            syncMoviesToLocalCache(apiData.items).catch(() => {});
             return apiData;
         }
 
-        return { items: [], pagination: { currentPage: page, totalPages: 1 } };
+        const fallbackItems = await getFallbackDisplayMovies({ type, limit, options });
+        return {
+            items: fallbackItems,
+            pagination: { currentPage: page, totalPages: Math.max(1, fallbackItems.length ? page : 1) }
+        };
     } catch (error) {
         console.error(`[ResilientAction] getResilientMoviesList Error:`, error);
-        return { items: [], pagination: { currentPage: page, totalPages: 1 } };
+        const fallbackItems = await getFallbackDisplayMovies({ type, limit, options }).catch((): Movie[] => []);
+        return { items: fallbackItems, pagination: { currentPage: page, totalPages: 1 } };
     }
 }
 

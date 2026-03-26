@@ -2,7 +2,56 @@ import "server-only";
 
 import dbConnect from "@/lib/db";
 import MovieModel from "@/models/Movie";
-import { getMoviesByCategory, getMoviesByCountry, type Movie } from "@/services/api";
+import { getMoviesByCategory, getMoviesByCountry, getMoviesList, type Movie } from "@/services/api";
+
+const CATEGORY_SLUGS = new Set([
+    "hanh-dong", "tinh-cam", "hai-huoc", "co-trang", "tam-ly", "hinh-su",
+    "kinh-di", "hoat-hinh", "vo-thuat", "than-thoai", "lich-su", "phieu-luu",
+    "vien-tuong", "bi-an", "gia-dinh", "am-nhac", "hoc-duong", "chien-tranh",
+]);
+
+const COUNTRY_SLUGS = new Set([
+    "han-quoc", "trung-quoc", "nhat-ban", "thai-lan", "au-my", "viet-nam", "dai-loan",
+]);
+
+const isTrailerLike = (movie: Partial<Movie> | null | undefined) => {
+    if (!movie) return true;
+    const markers = ["trailer", "teaser", "preview", "nhá hàng", "sắp chiếu", "coming soon"];
+    const haystacks = [
+        String(movie.name || "").toLowerCase(),
+        String(movie.status || "").toLowerCase(),
+        String(movie.episode_current || "").toLowerCase(),
+        String(movie.notify || "").toLowerCase(),
+        String(movie.quality || "").toLowerCase(),
+    ];
+    return markers.some((marker) => haystacks.some((text) => text.includes(marker)));
+};
+
+const dedupeMovies = (movies: Movie[], limit: number) => {
+    const merged = new Map<string, Movie>();
+
+    for (const movie of movies) {
+        if (!movie?.slug || merged.has(movie.slug) || isTrailerLike(movie)) continue;
+        merged.set(movie.slug, movie);
+        if (merged.size >= limit) break;
+    }
+
+    return Array.from(merged.values()).slice(0, limit);
+};
+
+async function getRecentMoviesFromDb(query: Record<string, unknown>, limit: number) {
+    try {
+        await dbConnect();
+        const movies = await MovieModel.find(query)
+            .sort({ updatedAt: -1, lastSynced: -1 })
+            .limit(limit)
+            .lean();
+        return movies as unknown as Movie[];
+    } catch (error) {
+        console.warn("[MovieFallback] Local DB fallback failed:", error);
+        return [];
+    }
+}
 
 export async function syncMoviesToLocalCache(movies: Movie[]) {
     if (!Array.isArray(movies) || movies.length === 0) return;
@@ -108,4 +157,78 @@ export async function getRelatedMoviesForMovie({
     }
 
     return Array.from(merged.values()).slice(0, safeLimit);
+}
+
+export async function getFallbackDisplayMovies({
+    type,
+    limit = 12,
+    options = {},
+}: {
+    type: string;
+    limit?: number;
+    options?: { category?: string; country?: string; year?: string | number };
+}): Promise<Movie[]> {
+    const safeLimit = Math.max(1, Math.min(limit, 24));
+    const pools: Movie[][] = [];
+    const exactCategory = options.category && options.category !== "all" ? options.category : undefined;
+    const exactCountry = options.country && options.country !== "all" ? options.country : undefined;
+    const inferredCategory = !exactCategory && CATEGORY_SLUGS.has(type) ? type : undefined;
+    const inferredCountry = !exactCountry && COUNTRY_SLUGS.has(type) ? type : undefined;
+    const activeCategory = exactCategory || inferredCategory;
+    const activeCountry = exactCountry || inferredCountry;
+
+    if (activeCategory || activeCountry) {
+        const dbQuery: Record<string, unknown> = {};
+        if (activeCategory) dbQuery["category.slug"] = activeCategory;
+        if (activeCountry) dbQuery["country.slug"] = activeCountry;
+
+        const exactDb = await getRecentMoviesFromDb(dbQuery, safeLimit * 3);
+        if (exactDb.length > 0) pools.push(exactDb);
+    }
+
+    if (activeCountry && pools.flat().length < safeLimit) {
+        const broadCountryDb = await getRecentMoviesFromDb({ "country.slug": activeCountry }, safeLimit * 3);
+        if (broadCountryDb.length > 0) pools.push(broadCountryDb);
+    }
+
+    if (activeCategory && pools.flat().length < safeLimit) {
+        const broadCategoryDb = await getRecentMoviesFromDb({ "category.slug": activeCategory }, safeLimit * 3);
+        if (broadCategoryDb.length > 0) pools.push(broadCategoryDb);
+    }
+
+    const externalRequests: Array<Promise<Movie[]>> = [];
+    const pushRequest = (request: Promise<{ items?: Movie[] } | null | undefined>) => {
+        externalRequests.push(
+            request
+                .then((res) => res?.items || [])
+                .catch((): Movie[] => [])
+        );
+    };
+
+    if (activeCountry) {
+        pushRequest(getMoviesByCountry(activeCountry, 1, Math.max(24, safeLimit * 2), activeCategory ? { category: activeCategory } : undefined));
+    }
+
+    if (activeCategory) {
+        pushRequest(getMoviesByCategory(activeCategory, 1, Math.max(24, safeLimit * 2), activeCountry ? { country: activeCountry } : undefined));
+    }
+
+    const backupListTypes = ["phim-moi-cap-nhat", "phim-bo", "phim-le", "han-quoc", "trung-quoc"];
+
+    for (const backupType of backupListTypes) {
+        if (backupType === type && !activeCategory && !activeCountry) continue;
+        pushRequest(getMoviesList(backupType, { limit: Math.max(24, safeLimit * 2) }));
+    }
+
+    if (externalRequests.length > 0) {
+        const externalPools = await Promise.all(externalRequests);
+        externalPools.forEach((pool) => {
+            if (pool.length > 0) {
+                pools.push(pool);
+                syncMoviesToLocalCache(pool).catch(() => {});
+            }
+        });
+    }
+
+    return dedupeMovies(pools.flat(), safeLimit);
 }

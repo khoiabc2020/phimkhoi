@@ -50,7 +50,18 @@ export default function HomeRowInstant({
         );
     }
 
-    if (movies.length === 0 && !isLoading) return null;
+    if (movies.length === 0 && !isLoading) {
+        return (
+            <LazySection minHeight={minHeight} className="movie-row-standard">
+                <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 lg:pl-24 lg:pr-12 py-4">
+                    <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] px-5 py-6 text-white/70">
+                        <div className="text-sm font-bold uppercase tracking-[0.2em] text-white/40">{title}</div>
+                        <div className="mt-2 text-sm">Đang đồng bộ dữ liệu mới nhất. Hệ thống sẽ tự làm đầy danh sách ngay khi nguồn trả dữ liệu.</div>
+                    </div>
+                </div>
+            </LazySection>
+        );
+    }
 
     return (
         <LazySection minHeight={minHeight} className="movie-row-standard">

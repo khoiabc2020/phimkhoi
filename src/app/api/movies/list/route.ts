@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getMoviesByFilterFromCache, getMoviesFromCache } from '@/lib/movie-cache';
+import { getFallbackDisplayMovies, syncMoviesToLocalCache } from '@/services/server-movies';
+import { getMoviesList } from '@/services/api';
 
 /**
  * [Elite Retrieval API]
@@ -38,7 +40,45 @@ export async function GET(req: Request) {
             }
         }
 
-        // 3. Not found in cache - trigger fallback to external API in the frontend
+        // 3. Cache miss -> try upstream immediately and sync local cache in background
+        if (slug) {
+            const externalData = await getMoviesList(slug, {
+                page,
+                limit,
+                category: type === 'category' ? slug : category !== 'all' ? category : undefined,
+                country: type === 'country' ? slug : undefined,
+                year: year !== 'all' ? Number(year) : undefined,
+            }).catch(() => null);
+
+            if (externalData?.items?.length) {
+                syncMoviesToLocalCache(externalData.items).catch(() => {});
+                return NextResponse.json(externalData, {
+                    headers: { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300' }
+                });
+            }
+
+            const fallbackItems = await getFallbackDisplayMovies({
+                type: slug,
+                limit,
+                options: {
+                    category: type === 'category' ? slug : category !== 'all' ? category : undefined,
+                    country: type === 'country' ? slug : undefined,
+                    year,
+                }
+            });
+
+            if (fallbackItems.length) {
+                return NextResponse.json({
+                    items: fallbackItems,
+                    pagination: { currentPage: page, totalPages: 1 },
+                    fallback: true
+                }, {
+                    headers: { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300' }
+                });
+            }
+        }
+
+        // 4. Absolute fallback
         return NextResponse.json({ items: [], pagination: { currentPage: 1, totalPages: 0 }, fallback: true });
 
     } catch (error) {
