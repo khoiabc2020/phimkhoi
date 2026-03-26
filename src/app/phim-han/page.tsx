@@ -85,7 +85,6 @@ async function PhimHanHome() {
     const cached = await getMoviesFromCache("han-quoc", 1, 14).catch((): null => null);
     const latest = cached || await getMoviesByCountry("han-quoc", 1, 14).catch((): { items: Movie[] } => ({ items: [] as Movie[] }));
     const movies = latest?.items || [];
-    const movies = latest?.items || [];
 
     return (
         <div className="space-y-12 md:space-y-16 pb-12">

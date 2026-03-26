@@ -1240,7 +1240,7 @@ export const getMoviesByCountryAndCategory = async (countrySlug: string, categor
 
         // If STILL empty, try a broad fetch from the country list
         if (matched.length === 0) {
-            const broad = await getMoviesByCountry(countrySlug, 1, 24).catch(() => ({ items: [] }));
+            const broad = await getMoviesByCountry(countrySlug, 1, 24).catch((): { items: Movie[] } => ({ items: [] as Movie[] }));
             matched = broad.items || [];
         }
 
