@@ -14,9 +14,25 @@ export interface CountryHomeSectionConfig {
 const EMPTY_ITEMS: Movie[] = [];
 const COUNTRY_POOL_LOCAL_LIMIT = 360;
 const COUNTRY_POOL_LIVE_LIMIT = 120;
+const COUNTRY_LOCAL_TIMEOUT_MS = 1500;
+const COUNTRY_LIVE_TIMEOUT_MS = 2200;
 
 const dedupeMoviesBySlug = (movies: Movie[] = []): Movie[] => {
     return sanitizeMovieList(movies, { limit: movies.length || 1 });
+};
+
+const withTimeout = async <T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> => {
+    let timer: NodeJS.Timeout | null = null;
+    try {
+        return await Promise.race([
+            promise,
+            new Promise<T>((resolve) => {
+                timer = setTimeout(() => resolve(fallback), timeoutMs);
+            }),
+        ]);
+    } finally {
+        if (timer) clearTimeout(timer);
+    }
 };
 
 const filterByCategory = (movies: Movie[], categorySlug: string) => {
@@ -34,12 +50,20 @@ const safeSliceWindow = (movies: Movie[], offset: number, size: number): Movie[]
 };
 
 export const getCountryPagePool = cache(async (countrySlug: string) => {
-    const localCountry = await getMoviesByFilterFromCache("country", countrySlug, 1, COUNTRY_POOL_LOCAL_LIMIT).catch((): null => null);
+    const localCountry = await withTimeout(
+        getMoviesByFilterFromCache("country", countrySlug, 1, COUNTRY_POOL_LOCAL_LIMIT).catch((): null => null),
+        COUNTRY_LOCAL_TIMEOUT_MS,
+        null
+    );
     let countryItems = dedupeMoviesBySlug(localCountry?.items || EMPTY_ITEMS);
 
     // Only hit upstream when local cache is too thin; this keeps country pages fast and stable.
     if (countryItems.length < 48) {
-        const liveCountry = await getMoviesByCountry(countrySlug, 1, COUNTRY_POOL_LIVE_LIMIT).catch((): null => null);
+        const liveCountry = await withTimeout(
+            getMoviesByCountry(countrySlug, 1, COUNTRY_POOL_LIVE_LIMIT).catch((): null => null),
+            COUNTRY_LIVE_TIMEOUT_MS,
+            null
+        );
         countryItems = dedupeMoviesBySlug([
             ...countryItems,
             ...(liveCountry?.items || EMPTY_ITEMS),

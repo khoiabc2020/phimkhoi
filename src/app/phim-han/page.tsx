@@ -11,6 +11,7 @@ import MovieRow from "@/components/MovieRow";
 import ActorRow from "@/components/ActorRow";
 import { cn } from "@/lib/utils";
 import { getThemeBySlug } from "@/lib/theme";
+import { getResilientMoviesList } from "@/app/actions/movies";
 import {
     buildCountryHomeSections,
     getCountryPagePool,
@@ -18,6 +19,20 @@ import {
 } from "@/services/country-page";
 
 export const revalidate = 300;
+
+const withTimeout = async <T,>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> => {
+    let timer: NodeJS.Timeout | null = null;
+    try {
+        return await Promise.race([
+            promise,
+            new Promise<T>((resolve) => {
+                timer = setTimeout(() => resolve(fallback), timeoutMs);
+            }),
+        ]);
+    } finally {
+        if (timer) clearTimeout(timer);
+    }
+};
 
 export async function generateMetadata(): Promise<Metadata> {
     const { countries } = await getMenuData();
@@ -109,8 +124,14 @@ async function resolveHeroMovies(slugs: string[], fallbackItems: any[], countryN
 }
 
 async function PhimHanHome() {
-    const { countryItems, fallbackItems } = await getCountryPagePool("han-quoc");
-    const latestMovies = fallbackItems.slice(0, 14);
+    const { countryItems, fallbackItems } = await withTimeout(
+        getCountryPagePool("han-quoc"),
+        2200,
+        { countryItems: [] as any[], fallbackItems: [] as any[] }
+    );
+    const latestMovies = fallbackItems.length > 0
+        ? fallbackItems.slice(0, 14)
+        : (await getResilientMoviesList("han-quoc", 1, 14, { country: "han-quoc" })).items || [];
     const sections = buildCountryHomeSections(countryItems, SECTION_CONFIG);
 
     return (
@@ -163,7 +184,11 @@ async function CountryGridStream({ slug, page, limit = 49 }: { slug: string; pag
 }
 
 async function KoreaHeroWithData() {
-    const { fallbackItems } = await getCountryPagePool("han-quoc");
+    const { fallbackItems } = await withTimeout(
+        getCountryPagePool("han-quoc"),
+        1800,
+        { countryItems: [] as any[], fallbackItems: [] as any[] }
+    );
     const heroMovies = await resolveHeroMovies(HERO_SLUGS, fallbackItems, "Hàn Quốc");
 
     return <KoreaHero initialMovies={heroMovies} />;
@@ -176,7 +201,7 @@ export default async function PhimHanPage({ searchParams }: { searchParams: Prom
     const slug = "han-quoc";
     const theme = getThemeBySlug(slug);
 
-    const menuData = await getMenuData();
+    const menuData = await withTimeout(getMenuData(), 1500, { categories: [], countries: [] });
     const categories = menuData?.categories || [];
     const countries = menuData?.countries || [];
     const country = countries.find((item) => item.slug === slug);

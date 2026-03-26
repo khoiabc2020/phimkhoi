@@ -35,6 +35,20 @@ const dedupeMovies = (movies: Movie[], limit: number) => {
     );
 };
 
+const withTimeout = async <T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> => {
+    let timer: NodeJS.Timeout | null = null;
+    try {
+        return await Promise.race([
+            promise,
+            new Promise<T>((resolve) => {
+                timer = setTimeout(() => resolve(fallback), timeoutMs);
+            }),
+        ]);
+    } finally {
+        if (timer) clearTimeout(timer);
+    }
+};
+
 async function getRecentMoviesFromDb(query: Record<string, unknown>, limit: number) {
     try {
         await dbConnect();
@@ -47,6 +61,52 @@ async function getRecentMoviesFromDb(query: Record<string, unknown>, limit: numb
         console.warn("[MovieFallback] Local DB fallback failed:", error);
         return [];
     }
+}
+
+export async function getLocalFallbackDisplayMovies({
+    type,
+    limit = 12,
+    options = {},
+}: {
+    type: string;
+    limit?: number;
+    options?: { category?: string; country?: string; year?: string | number };
+}): Promise<Movie[]> {
+    const safeLimit = Math.max(1, Math.min(limit, 24));
+    const pools: Movie[][] = [];
+    const exactCategory = options.category && options.category !== "all" ? options.category : undefined;
+    const exactCountry = options.country && options.country !== "all" ? options.country : undefined;
+    const inferredCategory = !exactCategory && CATEGORY_SLUGS.has(type) ? type : undefined;
+    const inferredCountry = !exactCountry && COUNTRY_SLUGS.has(type) ? type : undefined;
+    const activeCategory = exactCategory || inferredCategory;
+    const activeCountry = exactCountry || inferredCountry;
+    const isCinemaList = type === "phim-chieu-rap";
+
+    if (activeCategory || activeCountry) {
+        const dbQuery: Record<string, unknown> = {};
+        if (activeCategory) dbQuery["category.slug"] = activeCategory;
+        if (activeCountry) dbQuery["country.slug"] = activeCountry;
+
+        const exactDb = await getRecentMoviesFromDb(dbQuery, safeLimit * 3);
+        if (exactDb.length > 0) pools.push(exactDb);
+    }
+
+    if (isCinemaList) {
+        const cinemaDb = await getRecentMoviesFromDb({ chieurap: true }, safeLimit * 4);
+        if (cinemaDb.length > 0) pools.push(cinemaDb);
+    }
+
+    if (activeCountry && pools.flat().length < safeLimit) {
+        const broadCountryDb = await getRecentMoviesFromDb({ "country.slug": activeCountry }, safeLimit * 3);
+        if (broadCountryDb.length > 0) pools.push(broadCountryDb);
+    }
+
+    if (activeCategory && pools.flat().length < safeLimit) {
+        const broadCategoryDb = await getRecentMoviesFromDb({ "category.slug": activeCategory }, safeLimit * 3);
+        if (broadCategoryDb.length > 0) pools.push(broadCategoryDb);
+    }
+
+    return dedupeMovies(pools.flat(), safeLimit);
 }
 
 export async function syncMoviesToLocalCache(movies: Movie[]) {
@@ -63,7 +123,6 @@ export async function syncMoviesToLocalCache(movies: Movie[]) {
                     filter: { slug: movie.slug },
                     update: {
                         $set: {
-                            _id: String(movie._id || movie.slug),
                             name: movie.name || "",
                             origin_name: movie.origin_name || "",
                             slug: movie.slug,
@@ -83,7 +142,10 @@ export async function syncMoviesToLocalCache(movies: Movie[]) {
                             tmdbData: movie.tmdbData || null,
                             updatedAt: new Date(),
                         },
-                        $setOnInsert: { episodes: [] as Movie["episodes"] },
+                        $setOnInsert: {
+                            _id: String(movie._id || movie.slug),
+                            episodes: [] as Movie["episodes"],
+                        },
                     },
                     upsert: true,
                 },
@@ -167,7 +229,12 @@ export async function getFallbackDisplayMovies({
     options?: { category?: string; country?: string; year?: string | number };
 }): Promise<Movie[]> {
     const safeLimit = Math.max(1, Math.min(limit, 24));
-    const pools: Movie[][] = [];
+    const localItems = await getLocalFallbackDisplayMovies({ type, limit: safeLimit, options });
+    if (localItems.length >= safeLimit) {
+        return localItems;
+    }
+
+    const pools: Movie[][] = localItems.length > 0 ? [localItems] : [];
     const exactCategory = options.category && options.category !== "all" ? options.category : undefined;
     const exactCountry = options.country && options.country !== "all" ? options.country : undefined;
     const inferredCategory = !exactCategory && CATEGORY_SLUGS.has(type) ? type : undefined;
@@ -176,34 +243,10 @@ export async function getFallbackDisplayMovies({
     const activeCountry = exactCountry || inferredCountry;
     const isCinemaList = type === "phim-chieu-rap";
 
-    if (activeCategory || activeCountry) {
-        const dbQuery: Record<string, unknown> = {};
-        if (activeCategory) dbQuery["category.slug"] = activeCategory;
-        if (activeCountry) dbQuery["country.slug"] = activeCountry;
-
-        const exactDb = await getRecentMoviesFromDb(dbQuery, safeLimit * 3);
-        if (exactDb.length > 0) pools.push(exactDb);
-    }
-
-    if (isCinemaList) {
-        const cinemaDb = await getRecentMoviesFromDb({ chieurap: true }, safeLimit * 4);
-        if (cinemaDb.length > 0) pools.push(cinemaDb);
-    }
-
-    if (activeCountry && pools.flat().length < safeLimit) {
-        const broadCountryDb = await getRecentMoviesFromDb({ "country.slug": activeCountry }, safeLimit * 3);
-        if (broadCountryDb.length > 0) pools.push(broadCountryDb);
-    }
-
-    if (activeCategory && pools.flat().length < safeLimit) {
-        const broadCategoryDb = await getRecentMoviesFromDb({ "category.slug": activeCategory }, safeLimit * 3);
-        if (broadCategoryDb.length > 0) pools.push(broadCategoryDb);
-    }
-
     const externalRequests: Array<Promise<Movie[]>> = [];
     const pushRequest = (request: Promise<{ items?: Movie[] } | null | undefined>) => {
         externalRequests.push(
-            request
+            withTimeout(request, 2200, { items: [] as Movie[] } as { items?: Movie[] })
                 .then((res) => res?.items || [])
                 .catch((): Movie[] => [])
         );
@@ -218,8 +261,8 @@ export async function getFallbackDisplayMovies({
     }
 
     const backupListTypes = isCinemaList
-        ? ["phim-chieu-rap", "phim-moi-cap-nhat", "phim-le", "phim-bo"]
-        : ["phim-moi-cap-nhat", "phim-bo", "phim-le", "han-quoc", "trung-quoc"];
+        ? ["phim-chieu-rap", "phim-moi-cap-nhat"]
+        : ["phim-moi-cap-nhat", "phim-bo", "phim-le"];
 
     for (const backupType of backupListTypes) {
         if (backupType === type && !activeCategory && !activeCountry) continue;

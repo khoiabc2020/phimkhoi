@@ -7,7 +7,11 @@ import {
     Movie,
     getMovieDetail,
 } from "@/services/api";
-import { getFallbackDisplayMovies, syncMoviesToLocalCache } from "@/services/server-movies";
+import {
+    getFallbackDisplayMovies,
+    getLocalFallbackDisplayMovies,
+    syncMoviesToLocalCache,
+} from "@/services/server-movies";
 import { sanitizeMovieList } from "@/lib/movie-list";
 import { 
     getMoviesFromCache, 
@@ -64,6 +68,15 @@ export async function getResilientMoviesList(
                     items: sanitizedItems,
             };
             }
+        }
+
+        // 1.5. Return local DB fallback immediately when available.
+        const localFallbackItems = await getLocalFallbackDisplayMovies({ type, limit, options });
+        if (localFallbackItems.length > 0) {
+            return {
+                items: finalize(localFallbackItems),
+                pagination: { currentPage: page, totalPages: Math.max(1, page) },
+            };
         }
 
         // 2. Fallback to External API (Higher latency but fresh)

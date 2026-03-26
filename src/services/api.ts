@@ -560,35 +560,37 @@ const FETCH_TIMEOUT_MS = 12000;
 
 /** Fetch with tight timeout used for server components to guarantee fast loads */
 export const fetchWithFastTimeout = async (url: string, timeoutMs: number = 3000, options: RequestInit = {}) => {
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-        const response = await fetch(url, { ...options, signal: controller.signal });
-        clearTimeout(id);
-        return await response.json();
-    } catch (err) {
-        clearTimeout(id);
-        throw err;
-    }
+    return await Promise.race([
+        fetch(url, options).then(async (response) => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return await response.json();
+        }),
+        new Promise((_, reject) =>
+            setTimeout(() => reject(new Error(`Fetch timeout after ${timeoutMs}ms: ${url}`)), timeoutMs)
+        ),
+    ]);
 };
 
 /** Fetch with timeout and optional retry logic for external APIs (used by client caching) */
 async function fetchWithRetry(url: string, options: RequestInit = {}, retries = 1): Promise<any> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-    
     try {
-        const response = await fetch(url, { ...options, signal: controller.signal });
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        return await response.json();
+        return await Promise.race([
+            fetch(url, options).then(async (response) => {
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return await response.json();
+            }),
+            new Promise((_, reject) =>
+                setTimeout(() => reject(new Error(`Fetch timeout after ${FETCH_TIMEOUT_MS}ms: ${url}`)), FETCH_TIMEOUT_MS)
+            ),
+        ]);
     } catch (error: any) {
-        if (retries > 0 && error.name !== 'AbortError') {
+        if (retries > 0) {
             console.warn(`Retrying fetch for ${url} (${retries} left)`);
             return fetchWithRetry(url, options, retries - 1);
         }
         throw error;
-    } finally {
-        clearTimeout(timeoutId);
     }
 }
 
