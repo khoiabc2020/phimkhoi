@@ -32,6 +32,24 @@ const config = (phase: string): NextConfig => {
     async headers() {
       return [
         {
+          source: "/images/:path*",
+          headers: [
+            {
+              key: "Cache-Control",
+              value: "public, max-age=31536000, immutable",
+            },
+          ],
+        },
+        {
+          source: "/icons/:path*",
+          headers: [
+            {
+              key: "Cache-Control",
+              value: "public, max-age=31536000, immutable",
+            },
+          ],
+        },
+        {
           source: "/(.*\\.webp|.*\\.jpg|.*\\.png|.*\\.gif|.*\\.svg|.*\\.ico)",
           headers: [
             {

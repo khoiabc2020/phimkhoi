@@ -1,22 +1,28 @@
-import { Suspense, cache } from "react";
 import KoreaHero from "@/components/KoreaHero";
 import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
-import { getMoviesByCategory, getMenuData, getMoviesByCountry, Movie, getMovieDetail, getMoviesList, getMoviesByCountryAndCategory } from "@/services/api";
+import { getMenuData, getMoviesByCountry } from "@/services/api";
 import { getMoviesByFilterFromCache, getMoviesFromCache } from "@/lib/movie-cache";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import MovieRow from "@/components/MovieRow";
 import ActorRow from "@/components/ActorRow";
-import { detectOrientation, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { getThemeBySlug } from "@/lib/theme";
-import { headers } from "next/headers";
+import {
+    buildCountryHeroMovies,
+    buildCountryHomeSections,
+    getCountryPagePool,
+    type CountryHomeSectionConfig,
+} from "@/services/country-page";
+
+export const revalidate = 300;
 
 export async function generateMetadata(): Promise<Metadata> {
     const { countries } = await getMenuData();
-    const country = countries.find(c => c.slug === "han-quoc");
+    const country = countries.find((item) => item.slug === "han-quoc");
     const countryName = country?.name || "Hàn Quốc";
 
     return {
@@ -40,117 +46,57 @@ const FEATURED_ACTORS = [
     { name: "Park Shin-hye", role: "Người Thừa Kế", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/pumaPD2AtInYXXYsLirfFdYa4yc.jpg" },
 ];
 
-const getCountryPool = cache(async (countrySlug: string, limit: number = 320) => {
-    return getMoviesByFilterFromCache("country", countrySlug, 1, limit).catch((): null => null);
-});
-
-const getGlobalMoviePool = cache(async (limit: number = 64) => {
-    return getMoviesList("phim-moi-cap-nhat", { limit }).catch(
-        (): { items: Movie[] } => ({ items: [] as Movie[] })
-    );
-});
-
-function getSafeFallbackWindow(movies: Movie[], fallbackOffset: number, size: number = 32): Movie[] {
-    if (!Array.isArray(movies) || movies.length === 0) return [];
-    const maxStart = Math.max(0, movies.length - Math.min(size, movies.length));
-    const start = Math.min(Math.max(0, fallbackOffset), maxStart);
-    return movies.slice(start, start + size);
-}
-
-async function CountryMovieRow({ title, categorySlug, countrySlug, variant = 'default', priorityFirst = false, fallbackOffset = 0 }: { title: string; categorySlug: string; countrySlug: string; variant?: 'default' | 'sidebar'; priorityFirst?: boolean; fallbackOffset?: number }) {
-    try {
-        const countryPool = await getCountryPool(countrySlug);
-        const countryMovies = countryPool?.items || [];
-        let filteredMovies: Movie[] = [];
-
-        // Tier 1: Category filter from the full local country pool
-        if (countryMovies.length > 0) {
-            filteredMovies = countryMovies.filter((m: Movie) =>
-                categorySlug === 'all' || m.category?.some((c: any) => c.slug === categorySlug)
-            ).slice(0, 32);
-        }
-
-        // Tier 2: API fetch with country+category
-        if (filteredMovies.length < 4) {
-            const data = await getMoviesByCountryAndCategory(countrySlug, categorySlug, 32).catch((): { items: Movie[] } => ({ items: [] as Movie[] }));
-            if (data?.items && data.items.length > filteredMovies.length) {
-                filteredMovies = data.items;
-            }
-        }
-
-        // Tier 3: Paginated country offset — always show something
-        if (filteredMovies.length < 4 && countryMovies.length > 0) {
-            filteredMovies = getSafeFallbackWindow(countryMovies, fallbackOffset, 32);
-        }
-
-        if (filteredMovies.length === 0) {
-            const broad = await getMoviesByCountry(countrySlug, 1, 32).catch((): { items: Movie[] } => ({ items: [] as Movie[] }));
-            filteredMovies = broad.items || [];
-        }
-
-        if (filteredMovies.length === 0) {
-            const globalPool = await getGlobalMoviePool(32);
-            filteredMovies = globalPool.items || [];
-        }
-
-        if (!filteredMovies || filteredMovies.length === 0) return null;
-
-        return (
-            <MovieRow 
-                title={title} 
-                movies={filteredMovies} 
-                slug={categorySlug !== 'all' ? `/the-loai/${categorySlug}` : `/quoc-gia/${countrySlug}`}
-                variant={variant} 
-                priorityFirst={priorityFirst} 
-            />
-        );
-    } catch (e) {
-        console.error(`Error in CountryMovieRow [${title}]:`, e);
-        return null;
-    }
-}
+const SECTION_CONFIG: CountryHomeSectionConfig[] = [
+    { title: "Phim Tình Cảm", categorySlug: "tinh-cam", fallbackOffset: 14, priorityFirst: true },
+    { title: "Phim Hành Động", categorySlug: "hanh-dong", fallbackOffset: 46 },
+    { title: "Phim Cổ Trang", categorySlug: "co-trang", fallbackOffset: 78 },
+    { title: "Phim Hài Hước", categorySlug: "hai-huoc", fallbackOffset: 110 },
+    { title: "Phim Kinh Dị", categorySlug: "kinh-di", fallbackOffset: 142 },
+    { title: "Phim Hoạt Hình", categorySlug: "hoat-hinh", fallbackOffset: 174 },
+    { title: "Phim Hình Sự", categorySlug: "hinh-su", fallbackOffset: 206 },
+    { title: "Phim Võ Thuật", categorySlug: "vo-thuat", fallbackOffset: 238 },
+    { title: "Phim Tâm Lý", categorySlug: "tam-ly", fallbackOffset: 14 },
+];
 
 async function PhimHanHome() {
-    const local = await getCountryPool("han-quoc", 14);
-    const countryLatest = await getMoviesByCountry("han-quoc", 1, 14).catch(
-        (): { items: Movie[] } => ({ items: [] as Movie[] })
-    );
-    const globalLatest = await getGlobalMoviePool(14);
-    const latest = local || countryLatest || globalLatest;
-    const movies = latest?.items || [];
+    const { countryItems, globalItems, fallbackItems } = await getCountryPagePool("han-quoc");
+    const latestMovies = fallbackItems.slice(0, 14);
+    const sections = buildCountryHomeSections(countryItems, globalItems, SECTION_CONFIG);
 
     return (
         <div className="space-y-12 md:space-y-16 pb-12">
-            <MovieRow title="Phim Mới Cập Nhật" movies={movies} slug="/quoc-gia/han-quoc" priorityFirst />
-            
-            <CountryMovieRow title="Phim Tình Cảm" categorySlug="tinh-cam" countrySlug="han-quoc" priorityFirst={true} fallbackOffset={14} />
-            
-            <CountryMovieRow title="Phim Hành Động" categorySlug="hanh-dong" countrySlug="han-quoc" fallbackOffset={46} />
+            <MovieRow title="Phim Mới Cập Nhật" movies={latestMovies} slug="/quoc-gia/han-quoc" priorityFirst />
 
-            <CountryMovieRow title="Phim Cổ Trang" categorySlug="co-trang" countrySlug="han-quoc" fallbackOffset={78} />
+            {sections.slice(0, 3).map((section) => (
+                <MovieRow
+                    key={section.categorySlug}
+                    title={section.title}
+                    movies={section.movies}
+                    slug={`/the-loai/${section.categorySlug}`}
+                    priorityFirst={section.priorityFirst}
+                />
+            ))}
 
             <ActorRow title="Diễn viên nổi bật" actors={FEATURED_ACTORS} />
 
-            <CountryMovieRow title="Phim Hài Hước" categorySlug="hai-huoc" countrySlug="han-quoc" fallbackOffset={110} />
-
-            <CountryMovieRow title="Phim Kinh Dị" categorySlug="kinh-di" countrySlug="han-quoc" fallbackOffset={142} />
-
-            <CountryMovieRow title="Phim Hoạt Hình" categorySlug="hoat-hinh" countrySlug="han-quoc" fallbackOffset={174} />
-            
-            <CountryMovieRow title="Phim Hình Sự" categorySlug="hinh-su" countrySlug="han-quoc" fallbackOffset={206} />
-
-            <CountryMovieRow title="Phim Võ Thuật" categorySlug="vo-thuat" countrySlug="han-quoc" fallbackOffset={238} />
-
-            <CountryMovieRow title="Phim Tâm Lý" categorySlug="tam-ly" countrySlug="han-quoc" fallbackOffset={14} />
+            {sections.slice(3).map((section) => (
+                <MovieRow
+                    key={section.categorySlug}
+                    title={section.title}
+                    movies={section.movies}
+                    slug={`/the-loai/${section.categorySlug}`}
+                    priorityFirst={section.priorityFirst}
+                />
+            ))}
         </div>
     );
 }
 
 async function CountryGridStream({ slug, page, limit = 49 }: { slug: string; page: number; limit?: number }) {
-    const local = await getMoviesByFilterFromCache('country', slug, page, limit).catch((): null => null);
+    const local = await getMoviesByFilterFromCache("country", slug, page, limit).catch((): null => null);
     const cached = page <= 3 ? await getMoviesFromCache(slug, page, limit).catch((): null => null) : null;
     const data = local || cached || await getMoviesByCountry(slug, page, limit);
-    
+
     if (!data.items || data.items.length === 0) {
         return <div className="py-20 text-center text-white/40">Không tìm thấy phim nào.</div>;
     }
@@ -159,92 +105,49 @@ async function CountryGridStream({ slug, page, limit = 49 }: { slug: string; pag
         <div className="px-2 sm:px-6 md:px-12 lg:pl-24 lg:pr-12">
             <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3 sm:gap-4 mb-12">
                 {data.items.map((movie: any) => (
-                    <MovieCard key={movie._id} movie={movie} />
+                    <MovieCard key={movie._id || movie.slug} movie={movie} />
                 ))}
             </div>
-            <Suspense fallback={<div className="h-10 bg-white/5 rounded-lg animate-pulse" />}>
-                <Pagination
-                    currentPage={data.pagination.currentPage}
-                    totalPages={data.pagination.totalPages}
-                />
-            </Suspense>
+            <Pagination currentPage={data.pagination.currentPage} totalPages={data.pagination.totalPages} />
         </div>
     );
 }
 
 async function KoreaHeroWithData() {
-    try {
-        // [Priority 1] Always fetch the custom-designed slides first to respect the user's design
-        const HERO_SLUGS = [
+    const { fallbackItems } = await getCountryPagePool("han-quoc");
+    const heroMovies = buildCountryHeroMovies(
+        fallbackItems,
+        [
             "nghe-thuat-lua-doi-cua-sarah",
             "khi-cuoc-doi-cho-ban-qua-quyt",
             "tieng-yeu-nay-anh-dich-duoc-khong",
             "ban-trai-theo-yeu-cau",
-            "trao-em-ca-vu-tru"
-        ];
-        
-        const movieDetails = await Promise.all(
-            HERO_SLUGS.map(slug =>
-                getMovieDetail(slug).then(d => d?.movie || { slug, name: slug.replace(/-/g, ' ') } as any).catch((): null => null)
-            )
-        );
-        let filteredMovies = movieDetails.filter((m): m is any => !!m);
+            "trao-em-ca-vu-tru",
+        ],
+        8
+    );
 
-        // [Priority 2] If custom slides are missing/empty, fallback to top trending from cache or API
-        if (filteredMovies.length < 3) {
-            const cached = await getCountryPool("han-quoc", 12) || await getMoviesFromCache("han-quoc", 1, 12).catch((): null => null);
-            if (cached && (cached.items?.length || 0) > 0) {
-                const existingSlugs = new Set(filteredMovies.map(m => (m as any).slug));
-                const trending = (cached.items || []).filter((m: any) => !existingSlugs.has(m.slug));
-                filteredMovies = [...filteredMovies, ...trending];
-            }
-        }
-
-        if (filteredMovies.length === 0) {
-            const fallback = await getMoviesByCountry("han-quoc", 1, 8).catch((): { items: never[] } => ({ items: [] }));
-            filteredMovies = fallback.items.slice(0, 8);
-        }
-        return <KoreaHero initialMovies={filteredMovies.slice(0, 8)} />;
-    } catch {
-        return <KoreaHero initialMovies={[]} />;
-    }
+    return <KoreaHero initialMovies={heroMovies} />;
 }
 
 export default async function PhimHanPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
-    const userAgent = (await headers()).get('user-agent') || '';
-    const isMobile = /mobile|android|iphone|ipad/i.test(userAgent);
-    const limit = isMobile ? 28 : 49;
-
     const sParams = await searchParams;
     const currentPage = Number(sParams.page) || 1;
+    const limit = 49;
     const slug = "han-quoc";
     const theme = getThemeBySlug(slug);
 
     const menuData = await getMenuData();
     const categories = menuData?.categories || [];
     const countries = menuData?.countries || [];
-    const country = countries.find(c => c.slug === slug);
+    const country = countries.find((item) => item.slug === slug);
     const countryName = country?.name || "Phim Hàn Quốc";
 
     return (
         <main className="min-h-screen pb-20 bg-[#0a0a0a]">
-            {/* Immersive Hero Section - Flush to Top */}
-            {currentPage === 1 && (
-                <Suspense fallback={(
-                    <div className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] xl:h-[800px] bg-black">
-                        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#111] to-[#0a0a0a]" />
-                    </div>
-                )}>
-                    <KoreaHeroWithData />
-                </Suspense>
-            )}
+            {currentPage === 1 && <KoreaHeroWithData />}
 
-            <div className={cn(
-                "relative z-10", // Lowered z-index to stay below Header/Sidebar z-100
-                currentPage === 1 ? "" : "pt-24",
-                "lg:pl-20"
-            )}>
-                {/* Decorative background glow */}
+            <div className={cn("relative z-10", currentPage === 1 ? "" : "pt-24", "lg:pl-20")}>
                 <div className={cn("absolute top-0 left-0 right-0 h-[600px] via-transparent to-transparent pointer-events-none -z-10 blur-[150px] opacity-50", theme.glow)} />
 
                 {currentPage === 1 ? (
@@ -253,16 +156,16 @@ export default async function PhimHanPage({ searchParams }: { searchParams: Prom
                     </div>
                 ) : (
                     <div className="w-full max-w-[1920px] mx-auto">
-                         <div className="px-2 sm:px-6 md:px-12 lg:pl-24 lg:pr-12 mb-6 md:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                        <div className="px-2 sm:px-6 md:px-12 lg:pl-24 lg:pr-12 mb-6 md:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
                             <div className="max-w-4xl">
-                                <Link 
-                                    href="/phim-han" 
+                                <Link
+                                    href="/phim-han"
                                     className="inline-flex items-center gap-1.5 text-white/40 hover:text-white text-[13px] font-medium transition-colors mb-4 group"
                                 >
                                     <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
                                     Quay lại Phim Hàn
                                 </Link>
-                                
+
                                 <div className="space-y-1">
                                     <h1 className="text-[32px] md:text-[40px] lg:text-[48px] font-outfit font-extrabold text-white tracking-tighter leading-tight uppercase drop-shadow-lg">
                                         {countryName} <span className="text-primary/50 mx-2">/</span> Trang {currentPage}
@@ -271,15 +174,11 @@ export default async function PhimHanPage({ searchParams }: { searchParams: Prom
                             </div>
 
                             <div className="w-full md:w-auto bg-[#0a0a0a]/80 backdrop-blur-md rounded-[12px] p-1 border border-white/[0.05] shadow-xl">
-                                <Suspense fallback={<div className="w-32 h-8 bg-white/5 animate-pulse rounded" />}>
-                                    <FilterBar categories={categories} countries={countries} />
-                                </Suspense>
+                                <FilterBar categories={categories} countries={countries} />
                             </div>
                         </div>
 
-                        <Suspense key={`${slug}-${currentPage}`} fallback={<div className="px-2 sm:px-6 md:px-12 lg:pl-24 lg:pr-12 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3 sm:gap-4">{Array.from({length: limit}).map((_, i) => <div key={i} className="aspect-[2/3] bg-white/5 animate-pulse rounded-lg"/>)}</div>}>
-                            <CountryGridStream slug={slug} page={currentPage} limit={limit} />
-                        </Suspense>
+                        <CountryGridStream slug={slug} page={currentPage} limit={limit} />
                     </div>
                 )}
             </div>

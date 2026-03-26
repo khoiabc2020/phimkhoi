@@ -8,7 +8,6 @@ import { Search, User, LogOut, ChevronDown, Shield, Loader2, X } from "lucide-re
 import { getImageUrl, cn } from "@/lib/utils";
 import { signOut, useSession } from "next-auth/react";
 import MobileMenu from "./MobileMenu";
-import { getRealtimeSearch } from "@/app/actions/search";
 import SearchSkeleton from "./SearchSkeleton";
 import NotificationDropdown from "./NotificationDropdown";
 
@@ -39,6 +38,7 @@ export default function Header({ categories, countries }: HeaderProps) {
     const navRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
     const activeSearchRequestRef = useRef(0);
+    const searchCacheRef = useRef<Map<string, any>>(new Map());
 
     useEffect(() => {
         setMounted(true);
@@ -63,36 +63,65 @@ export default function Header({ categories, countries }: HeaderProps) {
 
     // Perform real-time search
     useEffect(() => {
+        const controller = new AbortController();
         const timer = setTimeout(async () => {
             const cleanQuery = searchQuery.trim();
 
-            if (cleanQuery.length >= 2) {
-                const requestId = activeSearchRequestRef.current + 1;
-                activeSearchRequestRef.current = requestId;
-                setIsSearching(true);
-                try {
-                    const results = await getRealtimeSearch(cleanQuery);
-                    if (activeSearchRequestRef.current === requestId) {
-                        setSearchResults(results || { movies: [], actors: [] });
-                    }
-                } catch (error) {
-                    console.error("Search error:", error);
-                    if (activeSearchRequestRef.current === requestId) {
-                        setSearchResults({ movies: [], actors: [] });
-                    }
-                } finally {
-                    if (activeSearchRequestRef.current === requestId) {
-                        setIsSearching(false);
-                    }
-                }
-            } else {
+            if (cleanQuery.length < 2) {
                 activeSearchRequestRef.current += 1;
                 setIsSearching(false);
                 setSearchResults(null);
+                return;
             }
-        }, 150);
 
-        return () => clearTimeout(timer);
+            const requestId = activeSearchRequestRef.current + 1;
+            activeSearchRequestRef.current = requestId;
+            const cacheKey = cleanQuery.toLowerCase();
+            const cached = searchCacheRef.current.get(cacheKey);
+
+            if (cached) {
+                setSearchResults(cached);
+                setIsSearching(false);
+                return;
+            }
+
+            setIsSearching(true);
+
+            try {
+                const response = await fetch(`/api/search/realtime?q=${encodeURIComponent(cleanQuery)}`, {
+                    method: "GET",
+                    cache: "force-cache",
+                    signal: controller.signal,
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Realtime search failed: ${response.status}`);
+                }
+
+                const results = await response.json();
+                searchCacheRef.current.set(cacheKey, results || { movies: [], actors: [] });
+
+                if (activeSearchRequestRef.current === requestId) {
+                    setSearchResults(results || { movies: [], actors: [] });
+                }
+            } catch (error: any) {
+                if (error?.name !== "AbortError") {
+                    console.error("Search error:", error);
+                }
+                if (activeSearchRequestRef.current === requestId) {
+                    setSearchResults({ movies: [], actors: [] });
+                }
+            } finally {
+                if (activeSearchRequestRef.current === requestId) {
+                    setIsSearching(false);
+                }
+            }
+        }, 120);
+
+        return () => {
+            controller.abort();
+            clearTimeout(timer);
+        };
     }, [searchQuery]);
 
     // Reset selection when results change
