@@ -49,16 +49,12 @@ if [ $? -eq 0 ]; then
         cp .env.local .next/standalone/.env.production
     fi
 
-    # 4. START APP
-    echo "Starting PM2 (TRIET DE FIX)..."
-    npx pm2 delete phimkhoi || true
-    
-    # Run from standalone directory for correct paths
-    cd .next/standalone
-    PORT=3000 HOSTNAME=0.0.0.0 npx pm2 start server.js --name phimkhoi -- --update-env
-    cd ../..
-    
-    npx pm2 save
+    # 4. START APP via ecosystem config
+    echo "Starting PM2 via ecosystem.config.cjs..."
+    cd "$APP_DIR"
+    pm2 delete phimkhoi 2>/dev/null || true
+    pm2 start ecosystem.config.cjs
+    pm2 save --force
     
     echo "Warming up trending cache in BACKGROUND..."
     NODE_OPTIONS="--max_old_space_size=512" nice -n 19 node scripts/daily-sync.mjs >> /home/bitnami/phimkhoi-sync.log 2>&1 &
