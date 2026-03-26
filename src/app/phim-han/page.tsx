@@ -138,14 +138,10 @@ async function resolveCountrySections(
                 return { ...config, movies: localMovies.slice(0, 24) };
             }
 
-            const resilient = await withTimeout(
-                getResilientMoviesList(config.categorySlug, 1, 24, {
-                    country: countrySlug,
-                    category: config.categorySlug,
-                }),
-                2200,
-                { items: [] as any[], pagination: { currentPage: 1, totalPages: 1 } }
-            );
+            const resilient = await getResilientMoviesList(config.categorySlug, 1, 24, {
+                country: countrySlug,
+                category: config.categorySlug,
+            });
             const fallbackMovies = Array.isArray(resilient?.items) ? resilient.items : [];
             const broadFallbackMovies = countryItems.slice(config.fallbackOffset || 0, (config.fallbackOffset || 0) + 24);
             const mergedMovies = [...localMovies, ...fallbackMovies, ...broadFallbackMovies].filter(
@@ -156,11 +152,7 @@ async function resolveCountrySections(
                 return { ...config, movies: mergedMovies.slice(0, 24) };
             }
 
-            const countryFallback = await withTimeout(
-                getResilientMoviesList(countrySlug, 1, 24, { country: countrySlug }),
-                2200,
-                { items: [] as any[], pagination: { currentPage: 1, totalPages: 1 } }
-            );
+            const countryFallback = await getResilientMoviesList(countrySlug, 1, 24, { country: countrySlug });
 
             const countryFallbackMovies = Array.isArray(countryFallback?.items) ? countryFallback.items : [];
             const finalMovies = [...mergedMovies, ...countryFallbackMovies].filter(
