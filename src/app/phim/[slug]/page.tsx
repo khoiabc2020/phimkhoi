@@ -5,7 +5,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Play, PlayCircle, Share2, Star, Clock, Film } from "lucide-react";
 import FavoriteButton from "@/components/FavoriteButton";
-import { getImageUrl, detectOrientation, cn } from "@/lib/utils";
+import { getImageUrl, detectOrientation, cn, buildEpisodeKeyCandidates } from "@/lib/utils";
 import Image from "next/image";
 import { getThemeBySlug } from "@/lib/theme";
 
@@ -104,9 +104,6 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     const serverData = episodes?.[0]?.server_data || [];
 
     // --- DATA NORMALIZATION TO PREVENT SERVER COMPONENT RENDER CRASHES ---
-    // External APIs occasionally return strings instead of arrays for actors/directors,
-    // which causes array methods (.join, .filter) to throw SSR exceptions.
-    // --- DATA NORMALIZATION TO PREVENT SERVER COMPONENT RENDER CRASHES ---
     if (movie) {
         if (typeof movie.actor === 'string') {
             movie.actor = movie.actor.split(',').map((s: string) => s.trim()).filter(Boolean);
@@ -126,108 +123,76 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     }
 
     // Determine type for TMDB
-    let type: 'movie' | 'tv' = 'movie';
-    if (movie?.type === 'phim-bo' || movie?.type === 'tv-shows' || movie?.type === 'hoat-hinh') {
-        type = 'tv';
-    }
-
+    let type: 'movie' | 'tv' = (movie?.type === 'phim-bo' || movie?.type === 'tv-shows' || movie?.type === 'hoat-hinh' || movie?.slug?.includes('tap')) ? 'tv' : 'movie';
     const firstCategory = movie?.category?.[0]?.slug || 'all';
     const theme = getThemeBySlug(firstCategory);
 
-    // [Elite UI] Immediate shell render
-    const rating = "9.7"; // Placeholder for immediate render, will be enriched? Or just keep it.
+    // [Elite Performance] Fetch TMDB data for enrichment
+    let tmdbDetails: any = null;
+    let episodeThumbnails: Record<string, string> = {};
+    let episodeMetadata: Record<string, any> = {};
 
-    const sourceThumb = movie?.thumb_url ? getImageUrl(movie.thumb_url) : "";
-    const sourcePoster = movie?.poster_url ? getImageUrl(movie.poster_url) : "";
-    
-    // We'll use a client component or a suspended server component for TMDB images to not block the hero.
-    // For now, let's use the source images for the immediate hero render.
-    const ambientBgUrl = sourceThumb || sourcePoster;
-    const contentSubjectUrl = sourceThumb || sourcePoster;
-    
-    const subjectOrientation = detectOrientation(contentSubjectUrl);
-    const isSubjectPortrait = subjectOrientation === "portrait";
+    try {
+        const tmdbSearch = await searchTMDBMovie(
+            movie.origin_name || movie.name,
+            movie.year,
+            type,
+            { originalName: movie.origin_name, localName: movie.name, countrySlug: movie.country?.[0]?.slug }
+        );
+        
+        if (tmdbSearch?.id) {
+            const tmdbId = tmdbSearch.id;
+            const [details, epImages] = await Promise.all([
+                getTMDBDetails(tmdbId, type),
+                type === 'tv' ? getTMDBEpisodeImages(tmdbId) : Promise.resolve(null)
+            ]);
+            
+            tmdbDetails = details;
 
-    const jsonLd = {
-        "@context": "https://schema.org",
-        "@type": type === 'tv' ? "TVSeries" : "Movie",
-        "name": movie?.name,
-        "alternativeHeadline": movie?.origin_name,
-        "image": sourcePoster || sourceThumb,
-        "description": movie?.content?.replace(/<[^>]+>/g, ''),
-        "genre": movie?.category?.map((c: any) => c.name) || [],
-    };
-
-    const extractEpisodeNumber = (value: string) => {
-        const match = String(value || "").match(/(\d+)/);
-        return match ? match[1] : null;
-    };
-    const buildEpisodeKeyCandidates = (ep: any, indexInServer: number): string[] => {
-        const seen = new Set<string>();
-        const pushKey = (raw: unknown) => {
-            const val = String(raw ?? "").trim();
-            if (!val || seen.has(val)) return;
-            seen.add(val);
-        };
-
-        const fromName = extractEpisodeNumber(ep?.name);
-        const fromSlug = extractEpisodeNumber(ep?.slug);
-        const parsed = Number(fromName || fromSlug);
-
-        if (fromName) pushKey(fromName);
-        if (fromSlug) pushKey(fromSlug);
-        if (Number.isFinite(parsed) && parsed > 0) {
-            pushKey(String(parsed));
-            pushKey(String(parsed).padStart(2, "0"));
-            pushKey(String(parsed).padStart(3, "0"));
+            // Map episode images using the Elite Mapping Engine
+            if (type === 'tv' && epImages && serverData.length > 0) {
+                serverData.forEach((ep: any, index: number) => {
+                    const candidates = buildEpisodeKeyCandidates(ep.name, ep.slug, index);
+                    for (const key of candidates) {
+                        const match = (epImages as any)[key];
+                        if (match) {
+                            episodeThumbnails[ep.slug] = match.still_path ? `https://image.tmdb.org/t/p/w500${match.still_path}` : "";
+                            episodeMetadata[ep.slug] = {
+                                title: match.name,
+                                overview: match.overview,
+                                airDate: match.air_date,
+                                runtime: match.runtime,
+                                voteAverage: match.vote_average
+                            };
+                            break;
+                        }
+                    }
+                });
+            }
         }
+    } catch (e) {
+        console.error("TMDB Enrichment Error:", e);
+    }
 
-        const byIndex = indexInServer + 1;
-        pushKey(String(byIndex));
-        pushKey(String(byIndex).padStart(2, "0"));
-
-        return Array.from(seen);
-    };
-
-    // Moving Episode Thumbnails logic to a more resilient location (inside MovieTabs)
-    // to prevent blocking the main page if TMDB is slow.
-
-    // --- Backdrop image selection ---
-    // Rule: PRIORITY 1 = Source Thumb (The snowy couple in OPhim thumb_url)
-    //       PRIORITY 2 = TMDB Backdrop (High quality fallback)
-    //       PRIORITY 3 = TMDB Poster
-    //       PRIORITY 4 = Source Poster (The Horse - least desired)
-
-    // --- BACKDROP & VISUAL ENGINE ---
-    // GOAL: Authentic "Source-First" thumbnails + High-Res TMDB ambient glow.
-    // This solves both "Blurry" source images and "Mismatch" with TMDB (wrong movies).
-    
-    // 1. Authenticity: The Source Thumb (usually what the user expects to see)
+    // --- VISUAL ENGINE SELECTION ---
     const sourceThumb = movie?.thumb_url ? getImageUrl(movie.thumb_url) : "";
     const sourcePoster = movie?.poster_url ? getImageUrl(movie.poster_url) : "";
-    
-    // 2. High-Fidelity: TMDB Backdrop (for the ambient atmosphere)
     const tmdbBackdrop = tmdbDetails?.backdrop_path ? getTMDBImage(tmdbDetails.backdrop_path, "original") : "";
     const tmdbPoster = tmdbDetails?.poster_path ? getTMDBImage(tmdbDetails.poster_path, "original") : "";
 
-    // 3. Selection Strategy:
-    // - Prefer TMDB for high-quality ambient glow and subject if source is poor.
-    // - Use source thumb as a secondary content layer if TMDB fails.
-    
-    // [Elite Selection] If it's a NguonC movie (often poor quality), prioritize TMDB images
     const isNguonC = movie?.episodes?.[0]?.server_name?.toLowerCase().includes('nguonc');
     
-    const ambientBgUrl = tmdbBackdrop || sourceThumb || tmdbPoster || sourcePoster;
-    let contentSubjectUrl = sourceThumb || sourcePoster || tmdbBackdrop || tmdbPoster;
+    // Ambient Background: Priority = TMDB Backdrop > Source Thumb
+    const ambientBgUrl = tmdbBackdrop || sourceThumb || tmdbPoster || sourcePoster || "/fallback.png";
     
+    // Subject Content: Priority = Source Thumb (Authentic) > TMDB Poster
+    let contentSubjectUrl = sourceThumb || sourcePoster || tmdbBackdrop || tmdbPoster || "/fallback.png";
     if (isNguonC && (tmdbPoster || tmdbBackdrop)) {
-        contentSubjectUrl = tmdbPoster || tmdbBackdrop || sourceThumb || sourcePoster;
+        contentSubjectUrl = tmdbPoster || tmdbBackdrop || sourceThumb || sourcePoster || "/fallback.png";
     }
-    
-    // Determine subject style
+
     const subjectOrientation = detectOrientation(contentSubjectUrl);
     const isSubjectPortrait = subjectOrientation === "portrait";
-
     const rating = tmdbDetails?.vote_average ? Number(tmdbDetails.vote_average).toFixed(1) : "9.7";
 
     const jsonLd = {
@@ -496,13 +461,17 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         <Suspense fallback={<div className="h-96 rounded-2xl bg-white/5 animate-pulse flex items-center justify-center text-white/20 font-black uppercase tracking-[4px]">Loading Movie Data...</div>}>
                             <MovieTabs
                                 movie={movie}
-                                relatedMovies={relatedMovies}
+                                relatedMovies={[]} 
                                 episodes={episodes}
                                 slug={slug}
-                                tmdbDetails={null} // Will be enriched inside MovieTabs if needed
-                                episodeThumbnails={{}} // Use local state enrichment if needed
-                                episodeMetadata={{}}
-                                cast={<MovieCast movie={movie} slug={slug} isCompact={false} />}
+                                tmdbDetails={tmdbDetails}
+                                episodeThumbnails={episodeThumbnails}
+                                episodeMetadata={episodeMetadata}
+                                cast={
+                                    <div className="mt-4">
+                                        <MovieCast movie={movie} slug={movie.slug} tmdbCast={tmdbDetails?.credits?.cast} />
+                                    </div>
+                                }
                             />
                         </Suspense>
                         {/* Comment Section below tabs */}

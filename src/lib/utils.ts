@@ -101,3 +101,35 @@ export function detectOrientation(url?: string | null): "portrait" | "landscape"
     }
     return "unknown";
 }
+
+export function extractEpisodeNumber(value: string): string | null {
+    const match = String(value || "").match(/(\d+)/);
+    return match ? match[1] : null;
+}
+
+export function buildEpisodeKeyCandidates(epName: string, epSlug: string, indexInServer: number): string[] {
+    const seen = new Set<string>();
+    const pushKey = (raw: unknown) => {
+        const val = String(raw ?? "").trim();
+        if (!val || seen.has(val)) return;
+        seen.add(val);
+    };
+
+    const fromName = extractEpisodeNumber(epName);
+    const fromSlug = extractEpisodeNumber(epSlug);
+    const parsed = Number(fromName || fromSlug);
+
+    if (fromName) pushKey(fromName);
+    if (fromSlug) pushKey(fromSlug);
+    if (Number.isFinite(parsed) && parsed > 0) {
+        pushKey(String(parsed));
+        pushKey(String(parsed).padStart(2, "0"));
+        pushKey(String(parsed).padStart(3, "0"));
+    }
+
+    const byIndex = indexInServer + 1;
+    pushKey(String(byIndex));
+    pushKey(String(byIndex).padStart(2, "0"));
+
+    return Array.from(seen);
+}
