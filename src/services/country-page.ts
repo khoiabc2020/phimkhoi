@@ -16,6 +16,14 @@ const COUNTRY_POOL_LOCAL_LIMIT = 360;
 const COUNTRY_POOL_LIVE_LIMIT = 120;
 const COUNTRY_LOCAL_TIMEOUT_MS = 1500;
 const COUNTRY_LIVE_TIMEOUT_MS = 2200;
+const ASIAN_COUNTRY_RULES: Record<string, { langs: string[]; countries: string[] }> = {
+    "trung-quoc": { langs: ["zh", "cn"], countries: ["CN", "HK", "TW"] },
+    "han-quoc": { langs: ["ko"], countries: ["KR"] },
+    "nhat-ban": { langs: ["ja"], countries: ["JP"] },
+    "thai-lan": { langs: ["th"], countries: ["TH"] },
+    "viet-nam": { langs: ["vi"], countries: ["VN"] },
+    "dai-loan": { langs: ["zh", "cn"], countries: ["TW"] },
+};
 
 const dedupeMoviesBySlug = (movies: Movie[] = []): Movie[] => {
     return sanitizeMovieList(movies, { limit: movies.length || 1 });
@@ -31,13 +39,37 @@ export const normalizeCountryToken = (value: unknown) =>
 
 export const matchesCountryStrict = (movie: Movie, countrySlug: string) => {
     const wanted = normalizeCountryToken(countrySlug).replace(/\s+/g, " ");
-    if (!wanted || !Array.isArray(movie?.country) || movie.country.length === 0) return false;
+    if (!wanted) return false;
 
-    return movie.country.some((country: any) => {
+    const sourceCountryMatch =
+        Array.isArray(movie?.country) &&
+        movie.country.some((country: any) => {
         const slug = normalizeCountryToken(country?.slug || "");
         const name = normalizeCountryToken(country?.name || "");
         return slug === wanted || name === wanted || slug.includes(wanted) || name.includes(wanted);
     });
+
+    if (!sourceCountryMatch) return false;
+
+    const tmdbData = (movie as any)?.tmdbData;
+    const rule = ASIAN_COUNTRY_RULES[countrySlug];
+    if (!rule || !tmdbData || typeof tmdbData !== "object") {
+        return true;
+    }
+
+    const originalLanguage = normalizeCountryToken(tmdbData.original_language || "");
+    const originCountries = Array.isArray(tmdbData.origin_country)
+        ? tmdbData.origin_country.map((value: unknown) => String(value || "").toUpperCase())
+        : [];
+
+    if (!originalLanguage && originCountries.length === 0) {
+        return true;
+    }
+
+    const hasExpectedLanguage = rule.langs.some((lang) => originalLanguage === normalizeCountryToken(lang));
+    const hasExpectedCountry = rule.countries.some((country) => originCountries.includes(country));
+
+    return hasExpectedLanguage || hasExpectedCountry;
 };
 
 const withTimeout = async <T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> => {

@@ -73,7 +73,7 @@ function getHeroImage(movie: any, type: "poster" | "backdrop" | "character" | "l
 
         const thumb = String(movie?.thumb_url || "").trim();
         const thumbOrientation = detectOrientation(thumb);
-        if (thumb && (thumbOrientation === "landscape" || thumbOrientation === "unknown")) {
+        if (thumb && thumbOrientation === "landscape") {
             return getImageUrl(thumb, true);
         }
 
