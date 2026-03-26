@@ -754,7 +754,7 @@ export const getMovieDetail = cache(async (slug: string) => {
         console.error(`Error fetching movie detail [${slug}]:`, error);
         return null;
     }
-};
+});
 
 export const OPHIM_API = "https://ophim1.com";
 export const NGUONC_API = "https://phim.nguonc.com";
