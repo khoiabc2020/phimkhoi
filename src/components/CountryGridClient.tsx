@@ -1,6 +1,6 @@
 "use client";
 
-import { getMoviesByCountry } from "@/services/api";
+import { getResilientMoviesList } from "@/app/actions/movies";
 import MovieGridInstant from "./MovieGridInstant";
 
 export default function CountryGridClient({ 
@@ -17,7 +17,7 @@ export default function CountryGridClient({
     limit?: number;
 }) {
     const fetcher = async () => {
-        return await getMoviesByCountry(slug, page, limit, { category, year });
+        return await getResilientMoviesList(slug, page, limit, { category, year });
     };
 
     const cacheKey = `country_${slug}_p${page}_c${category || 'all'}_y${year || 'all'}`;

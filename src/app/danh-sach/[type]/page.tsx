@@ -2,8 +2,8 @@ import { Suspense } from "react";
 import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
-import { getMoviesFromCache } from "@/lib/movie-cache";
-import { getMenuData, getMoviesList } from "@/services/api";
+import { getResilientMoviesList } from "@/app/actions/movies";
+import { getMenuData } from "@/services/api";
 import { Metadata } from "next";
 import { headers } from "next/headers";
 import { getThemeBySlug } from "@/lib/theme";
@@ -90,25 +90,11 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
     const { categories, countries } = await getMenuData();
     const typeName = TYPE_NAMES[type] || type;
 
-    // [Elite Performance] Try DB Cache on page 1-3 with no complex filters
+    // [Elite Performance] Unified Resilient Retrieval
     let data;
     try {
-        if (!year && !category && !country && !quality && page <= 3) {
-            const endpoint = type === 'tat-ca-the-loai' ? 'phim-moi-cap-nhat' : (type === 'phim-moi' ? 'phim-moi' : type);
-            const cached = await getMoviesFromCache(endpoint, page, limit);
-            if (cached) {
-                data = cached;
-            }
-        }
-
-        if (!data) {
-            if (type === 'phim-moi' || type === 'tat-ca-the-loai') {
-                const endpoint = type === 'tat-ca-the-loai' ? 'phim-moi-cap-nhat' : type;
-                data = await getMoviesList(endpoint, { page, year, category, country, quality, limit });
-            } else {
-                data = await getMoviesList(type, { page, year, category, country, quality, limit });
-            }
-        }
+        const endpoint = (type === 'tat-ca-the-loai' || type === 'phim-moi') ? 'phim-moi-cap-nhat' : type;
+        data = await getResilientMoviesList(endpoint, page, limit, { year, category, country });
     } catch (error) {
         console.error("Catalog Error", error);
         data = { items: [], pagination: { currentPage: 1, totalPages: 1 } };

@@ -1,7 +1,4 @@
 import { cache } from "react";
-import dbConnect from "@/lib/db";
-import MovieModel from "@/models/Movie";
-import { getMovieDetailFromCache } from "@/lib/movie-cache";
 
 export const API_URL = "https://phimapi.com";
 
@@ -633,8 +630,6 @@ export const getHomeData = async () => {
     }
 };
 
-import { getMovieDetailFromCache } from "@/lib/movie-cache";
-
 export const getMovieDetail = cache(async (slug: string) => {
     try {
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
@@ -747,9 +742,9 @@ export const getMovieDetail = cache(async (slug: string) => {
             };
         }
 
-        // [Elite Recovery] If all APIs failed, try the database one last time 
-        // without any strict multi-source requirements.
-        return await getMovieDetailFromCache(slug);
+        // Removed DB fallback from here to keep this file client-safe.
+        // Fallback is now handled in Server Components via getMovieDetailFromCache.
+        return null;
     } catch (error) {
         console.error(`Error fetching movie detail [${slug}]:`, error);
         return null;
@@ -1001,51 +996,12 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
             );
         }
 
-        // 3. [Elite Recovery] Final Local Cache Fallback if everything else is empty
-        if (enrichedItems.length === 0) {
-            try {
-                await dbConnect();
-                const findQuery: any = {};
-                if (kkType === 'phim-sap-chieu') findQuery.status = 'sap-chieu';
-                else if (kkType === 'phim-bo') findQuery.type = 'series';
-                else if (kkType === 'phim-le') findQuery.type = 'single';
-                
-                if (category) findQuery['category.slug'] = category;
-                if (country) findQuery['country.slug'] = country;
-                if (year) findQuery.year = year;
-
-                const dbMovies = await MovieModel.find(findQuery)
-                    .sort({ updatedAt: -1 })
-                    .limit(limit)
-                    .lean();
-
-                if (dbMovies.length > 0) {
-                    return {
-                        items: dbMovies as any,
-                        pagination: { currentPage: page, totalPages: Math.ceil(dbMovies.length / limit) || 1 }
-                    };
-                }
-            } catch (e) {
-                console.error("getMoviesList DB Recovery Error:", e);
-            }
-        }
-
         return {
             items: enrichedItems,
             pagination: kkPagination
         };
     } catch (error) {
         console.error(`Error fetching movies list [${type}]:`, error);
-        
-        // One last try in catch block
-        try {
-            await dbConnect();
-            const dbMovies = await MovieModel.find({}).sort({ updatedAt: -1 }).limit(20).lean();
-            if (dbMovies.length > 0) {
-                return { items: dbMovies as any, pagination: { currentPage: 1, totalPages: 1 } };
-            }
-        } catch {}
-
         return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
     }
 };

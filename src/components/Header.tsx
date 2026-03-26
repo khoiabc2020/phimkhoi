@@ -76,7 +76,7 @@ export default function Header({ categories, countries }: HeaderProps) {
             } else {
                 setSearchResults(null);
             }
-        }, 400);
+        }, 150);
 
         return () => clearTimeout(timer);
     }, [searchQuery]);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMoviesInstant } from "@/hooks/useMoviesInstant";
-import { getMoviesList } from "@/services/api";
+import { getResilientMoviesList } from "@/app/actions/movies";
 import MovieRow from "./MovieRow";
 import LazySection from "./LazySection";
 import { useCallback } from "react";
@@ -24,8 +24,7 @@ export default function HomeRowInstant({
     priorityFirst = false
 }: HomeRowInstantProps) {
     const fetcher = useCallback(async () => {
-        return await getMoviesList(slug, { 
-            limit: 12, 
+        return await getResilientMoviesList(slug, 1, 12, { 
             category: endpoint === 'the-loai' ? slug : undefined, 
             country: endpoint === 'quoc-gia' ? slug : undefined 
         });
