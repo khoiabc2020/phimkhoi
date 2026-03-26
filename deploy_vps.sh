@@ -1,13 +1,24 @@
 #!/bin/bash
+set -euo pipefail
+
+# Ensure Node/PM2 are available even when SSH runs a non-login shell.
+export PATH="/opt/bitnami/node/bin:/usr/local/bin:/usr/bin:/bin:${PATH:-}"
+
 # Configuration
 APP_DIR="/home/bitnami/phimkhoi"
 REPO_URL="https://github.com/khoiabc2020/phimkhoi.git"
+PM2_BIN="${PM2_BIN:-$(command -v pm2 || true)}"
+
+if [ -z "$PM2_BIN" ] || [ ! -x "$PM2_BIN" ]; then
+    echo "[ERROR] pm2 not found in PATH=$PATH"
+    exit 1
+fi
 
 echo "Deploying PhimKhoi (CLEAN BUILD) to VPS..."
 
 # 0. KILL ALL PROCESSES TO FREE RAM (Gratefully requested by USER)
 echo "Killing all node/next/pm2 processes..."
-npx pm2 delete all || true
+"$PM2_BIN" delete all || true
 sudo pkill -f next || true
 sudo pkill -f node || true
 
@@ -52,9 +63,9 @@ if [ $? -eq 0 ]; then
     # 4. START APP via ecosystem config
     echo "Starting PM2 via ecosystem.config.cjs..."
     cd "$APP_DIR"
-    pm2 delete phimkhoi 2>/dev/null || true
-    pm2 start ecosystem.config.cjs
-    pm2 save --force
+    "$PM2_BIN" delete phimkhoi 2>/dev/null || true
+    "$PM2_BIN" start ecosystem.config.cjs
+    "$PM2_BIN" save --force
     
     echo "Warming up trending cache in BACKGROUND..."
     NODE_OPTIONS="--max_old_space_size=512" nice -n 19 node scripts/daily-sync.mjs >> /home/bitnami/phimkhoi-sync.log 2>&1 &
