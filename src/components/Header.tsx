@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { Search, User, LogOut, ChevronDown, Shield, Loader2, X } from "lucide-react";
-import { getImageUrl, cn } from "@/lib/utils";
+import { getPosterImageUrl, cn } from "@/lib/utils";
 import { signOut, useSession } from "next-auth/react";
 import MobileMenu from "./MobileMenu";
 import SearchSkeleton from "./SearchSkeleton";
@@ -427,7 +427,7 @@ export default function Header({ categories, countries }: HeaderProps) {
                                                                             )}
                                                                         >
                                                                             <div className="w-9 h-12 relative rounded overflow-hidden">
-                                                                                <Image src={getImageUrl(movie.poster_url || movie.thumb_url)} alt="" fill className="object-cover" unoptimized />
+                                                                                <Image src={getPosterImageUrl(movie) || "/placeholder.svg"} alt="" fill className="object-cover" unoptimized />
                                                                             </div>
                                                                             <div className="flex-1 min-w-0">
                                                                                 <div className={cn("text-sm font-semibold truncate group-hover:text-primary", selectedIndex === idx ? "text-primary" : "text-white")}>{movie.name}</div>

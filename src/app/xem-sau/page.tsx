@@ -18,6 +18,12 @@ function getImageUrl(url: string) {
     return `https://phimimg.com/${url}`;
 }
 
+function getPosterImageUrl(movie: { poster_url?: string; thumb_url?: string }) {
+    const poster = String(movie?.poster_url || "").trim();
+    const thumb = String(movie?.thumb_url || "").trim();
+    return getImageUrl(poster || thumb);
+}
+
 async function RemoveWatchlistButton({ slug }: { slug: string }) {
     async function handleRemove() {
         "use server";
@@ -118,7 +124,7 @@ export default async function WatchlistPage() {
                                 <Link href={`/phim/${movie.slug}`}>
                                     <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-white/5 shadow-md">
                                         <Image
-                                            src={getImageUrl(movie.poster_url || movie.thumb_url)}
+                                            src={getPosterImageUrl(movie) || "/placeholder.svg"}
                                             alt={movie.name}
                                             fill
                                             className="object-cover group-hover:scale-105 transition-transform duration-500"

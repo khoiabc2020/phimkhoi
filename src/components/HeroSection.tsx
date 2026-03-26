@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Play, ChevronLeft, ChevronRight } from "lucide-react";
 import { Movie } from "@/services/api";
-import { getImageUrl, decodeHtml, cn } from "@/lib/utils";
+import { getImageUrl, getPosterImageUrl, getBackdropImageUrl, decodeHtml, cn } from "@/lib/utils";
 import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import WatchlistButton from "./WatchlistButton";
@@ -63,8 +63,8 @@ function getHeroImage(movie: any, type: "poster" | "backdrop" | "character" | "l
     if (type === "backdrop" && tmdb.backdrop_path)
         return getImageUrl(tmdbImage(tmdb.backdrop_path, variant === "desktop" ? "original" : "w780"), true);
 }
-const api = type === "backdrop" ? movie.thumb_url : movie.poster_url || movie.thumb_url;
-return api ? getImageUrl(api, true) : "/placeholder.jpg";
+const api = type === "backdrop" ? getBackdropImageUrl(movie, true) : getPosterImageUrl(movie, true);
+return api || "/placeholder.jpg";
 }
 
 // ─── Autoplay hook ────────────────────────────────────────────────────────────

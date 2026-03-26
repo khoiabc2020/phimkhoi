@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Film, Loader2, Pencil, Plus, RefreshCcw, Save, Search, Trash2, UploadCloud, X } from "lucide-react";
+import { getPosterImageUrl } from "@/lib/utils";
 
 interface AdminMovieItem {
     _id: string;
@@ -382,7 +383,7 @@ export default function AdminMoviesPage() {
                                                 <div className="relative w-14 h-20 rounded-lg overflow-hidden border border-white/10 bg-black/40 shrink-0">
                                                     {movie.poster_url || movie.thumb_url ? (
                                                         <Image
-                                                            src={movie.poster_url || movie.thumb_url || ""}
+                                                            src={getPosterImageUrl(movie) || ""}
                                                             alt={movie.name}
                                                             fill
                                                             className="object-cover"

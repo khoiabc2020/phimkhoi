@@ -2,7 +2,7 @@ import { getRelatedMoviesForMovie } from "@/services/server-movies";
 import MovieRow from "@/components/MovieRow";
 import Link from "next/link";
 import Image from "next/image";
-import { getImageUrl } from "@/lib/utils";
+import { getPosterImageUrl } from "@/lib/utils";
 
 interface RelatedMoviesProps {
     categorySlug: string;
@@ -39,7 +39,7 @@ export default async function RelatedMovies({
                         {/* Poster */}
                         <div className="relative w-16 aspect-[2/3] rounded-lg overflow-hidden shrink-0 ring-1 ring-white/[0.08] group-hover:ring-[#8FA7C5]/50 transition-all duration-200 shadow-md">
                             <Image
-                                src={getImageUrl(movie.poster_url || movie.thumb_url)}
+                                src={getPosterImageUrl(movie) || "/placeholder.svg"}
                                 alt={movie.name}
                                 fill
                                 loading="lazy"

@@ -9,7 +9,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Play, Info, Star, ChevronDown } from "lucide-react";
-import { getImageUrl, decodeHtml, cn, detectOrientation } from "@/lib/utils";
+import { getImageUrl, getPosterImageUrl, getBackdropImageUrl, decodeHtml, cn, detectOrientation } from "@/lib/utils";
 import { Movie } from "@/services/api";
 import { getTMDBImage } from "@/services/tmdb";
 import { getTMDBDataForCard } from "@/app/actions/tmdb"; // Import Server Action
@@ -96,35 +96,28 @@ function MovieCard({
             : null
     , [tmdbPosterPath]);
 
-    const portraitPosterSource = useMemo(() => {
-        const sourcePoster = movie.poster_url && detectOrientation(movie.poster_url) === "portrait"
-            ? movie.poster_url
-            : null;
-        const thumbAsPoster = movie.thumb_url && detectOrientation(movie.thumb_url) === "portrait"
-            ? movie.thumb_url
-            : null;
-        const relaxedPosterSource = tmdbPoster || movie.poster_url || movie.thumb_url || "";
-        
-        return tmdbPoster || sourcePoster || thumbAsPoster || relaxedPosterSource;
-    }, [movie.poster_url, movie.thumb_url, tmdbPoster]);
+    const portraitPosterSource = useMemo(
+        () => tmdbPoster || getPosterImageUrl(movie) || "",
+        [movie, tmdbPoster]
+    );
 
     // Build robust fallback candidates to avoid blank placeholder cards.
     const posterCandidates = useMemo(() => {
         const list = orientation === "landscape"
             ? [
                 tmdbBackdropPath ? getTMDBImage(tmdbBackdropPath, "w780") : null,
-                movie.thumb_url,
-                movie.poster_url,
+                getBackdropImageUrl(movie),
+                getPosterImageUrl(movie),
                 tmdbPoster,
             ]
             : [
                 tmdbPoster,
                 portraitPosterSource,
-                movie.thumb_url,
-                movie.poster_url,
+                getPosterImageUrl(movie),
+                getBackdropImageUrl(movie),
             ];
         return Array.from(new Set(list.filter(Boolean))) as string[];
-    }, [orientation, movie.thumb_url, movie.poster_url, portraitPosterSource, tmdbPoster, tmdbBackdropPath]);
+    }, [orientation, movie, portraitPosterSource, tmdbPoster, tmdbBackdropPath]);
 
     const activePosterSrc = useMemo(() => {
         const raw = posterCandidates[posterIndex] || "";
@@ -140,9 +133,9 @@ function MovieCard({
     const displayBackdrop = useMemo(() => {
         const tmdbBackdrop = tmdbBackdropPath ? getTMDBImage(tmdbBackdropPath, "w500") : "";
         const tmdbPosterFallback = tmdbPosterPath ? getTMDBImage(tmdbPosterPath, "w500") : "";
-        const sourceBackdrop = movie.thumb_url ? getImageUrl(movie.thumb_url) : (movie.poster_url ? getImageUrl(movie.poster_url) : "");
+        const sourceBackdrop = getBackdropImageUrl(movie);
         return sourceBackdrop || tmdbBackdrop || tmdbPosterFallback || null;
-    }, [movie.thumb_url, movie.poster_url, tmdbBackdropPath, tmdbPosterPath]);
+    }, [movie, tmdbBackdropPath, tmdbPosterPath]);
 
     // Reset fallback state when card movie changes
     useEffect(() => {
@@ -448,7 +441,7 @@ function OnflixHoverCard({
                                 <WatchlistInlineButton
                                     slug={movie.slug}
                                     movieName={movie.name}
-                                    moviePoster={movie.poster_url || movie.thumb_url}
+                                    moviePoster={getPosterImageUrl(movie)}
                                     size="md"
                                     className="!w-9 !h-9 shrink-0 rounded-full text-white/80 hover:text-white bg-white/5 hover:bg-white/15 border border-white/20 hover:border-white transition-all hover:scale-105 flex items-center justify-center"
                                 />
@@ -459,7 +452,7 @@ function OnflixHoverCard({
                                             movieSlug: movie.slug,
                                             movieName: movie.name,
                                             movieOriginName: movie.origin_name,
-                                            moviePoster: movie.poster_url || movie.thumb_url,
+                                            moviePoster: getPosterImageUrl(movie),
                                             movieYear: Number(movie.year),
                                             movieQuality: movie.quality,
                                             movieCategories: movie.category?.map((c) => c.name) || [],

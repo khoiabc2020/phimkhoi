@@ -10,12 +10,22 @@ export function getImageUrl(url: string, proxy = false): string {
 
     let finalUrl = url;
     if (!url.startsWith("http")) {
+        const normalized = url.trim();
         // Skip prefixing for local assets or special paths
-        if (url.startsWith("/images") || url.startsWith("/icons") || url.startsWith("/favicon") || url.startsWith("/_next")) {
-            finalUrl = url;
+        if (normalized.startsWith("/images") || normalized.startsWith("/icons") || normalized.startsWith("/favicon") || normalized.startsWith("/_next")) {
+            finalUrl = normalized;
+        } else if (
+            normalized.startsWith("upload/") ||
+            normalized.startsWith("/upload/") ||
+            normalized.startsWith("uploads/") ||
+            normalized.startsWith("/uploads/") ||
+            normalized.startsWith("vod/")
+        ) {
+            const cleanPath = normalized.startsWith("/") ? normalized : `/${normalized}`;
+            finalUrl = `https://img.phimapi.com${cleanPath}`;
         } else {
             // For ophim, normally paths without http are relative to phimimg.com
-            finalUrl = url.startsWith("/") ? `https://phimimg.com${url}` : `https://phimimg.com/${url}`;
+            finalUrl = normalized.startsWith("/") ? `https://phimimg.com${normalized}` : `https://phimimg.com/${normalized}`;
         }
     }
 
@@ -32,6 +42,7 @@ export function getImageUrl(url: string, proxy = false): string {
                 "phimimg.com",
                 "img.ophim.live",
                 "img.ophim1.com",
+                "img.phimapi.com",
                 "image.tmdb.org",
                 "ui-avatars.com",
                 "assets.nflxext.com",
@@ -48,6 +59,35 @@ export function getImageUrl(url: string, proxy = false): string {
     }
 
     return finalUrl;
+}
+
+type MovieImageLike = {
+    poster_url?: string | null;
+    thumb_url?: string | null;
+};
+
+export function getPosterImageUrl(movie?: MovieImageLike | null, proxy = false): string {
+    if (!movie) return "";
+    const poster = String(movie.poster_url || "").trim();
+    const thumb = String(movie.thumb_url || "").trim();
+
+    const portraitPoster = poster && detectOrientation(poster) === "portrait" ? poster : "";
+    const portraitThumb = thumb && detectOrientation(thumb) === "portrait" ? thumb : "";
+    const fallback = portraitPoster || portraitThumb || poster || thumb;
+
+    return fallback ? getImageUrl(fallback, proxy) : "";
+}
+
+export function getBackdropImageUrl(movie?: MovieImageLike | null, proxy = false): string {
+    if (!movie) return "";
+    const poster = String(movie.poster_url || "").trim();
+    const thumb = String(movie.thumb_url || "").trim();
+
+    const landscapeThumb = thumb && detectOrientation(thumb) === "landscape" ? thumb : "";
+    const landscapePoster = poster && detectOrientation(poster) === "landscape" ? poster : "";
+    const fallback = landscapeThumb || landscapePoster || thumb || poster;
+
+    return fallback ? getImageUrl(fallback, proxy) : "";
 }
 
 

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Movie } from "@/services/api";
-import { getImageUrl, decodeHtml, cn } from "@/lib/utils";
+import { getPosterImageUrl, decodeHtml, cn } from "@/lib/utils";
 import { memo } from "react";
 
 interface TopTrendingProps {
@@ -44,7 +44,7 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
                         {/* Poster Container */}
                         <div className="relative w-full aspect-[2/3] rounded-[10px] overflow-hidden flex-shrink-0 shadow-md bg-[#0B0B10]">
                             <Image
-                                src={getImageUrl(movie.poster_url || movie.thumb_url)}
+                                src={getPosterImageUrl(movie) || "/placeholder.svg"}
                                 alt={movie.name}
                                 fill
                                 loading="lazy"

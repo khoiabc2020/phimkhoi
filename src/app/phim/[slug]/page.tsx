@@ -6,7 +6,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Play, PlayCircle, Share2, Star, Clock, Film } from "lucide-react";
 import FavoriteButton from "@/components/FavoriteButton";
-import { getImageUrl, detectOrientation, cn, buildEpisodeKeyCandidates } from "@/lib/utils";
+import { getImageUrl, getPosterImageUrl, getBackdropImageUrl, detectOrientation, cn, buildEpisodeKeyCandidates } from "@/lib/utils";
 import Image from "next/image";
 import { getThemeBySlug } from "@/lib/theme";
 import WatchlistButton from "@/components/WatchlistButton";
@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     // Giới hạn description để SEO tốt hơn
     const plainContent = movie.content ? movie.content.replace(/<[^>]+>/g, '').trim() : "";
     const desc = plainContent ? plainContent.substring(0, 160) + '...' : `Xem phim ${movie.name} chất lượng cao tại KHOIPHIM.`;
-    const poster = getImageUrl(movie.poster_url || movie.thumb_url || "");
+    const poster = getPosterImageUrl(movie) || getBackdropImageUrl(movie) || "";
     const url = `https://khoiphim.org/phim/${slug}`;
     
     // Tạo keywords từ thể loại và tên phim
@@ -183,8 +183,8 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     }
 
     // --- VISUAL ENGINE SELECTION ---
-    const sourceThumb = movie?.thumb_url ? getImageUrl(movie.thumb_url) : "";
-    const sourcePoster = movie?.poster_url ? getImageUrl(movie.poster_url) : "";
+    const sourceThumb = getBackdropImageUrl(movie);
+    const sourcePoster = getPosterImageUrl(movie);
     const tmdbBackdrop = tmdbDetails?.backdrop_path ? getTMDBImage(tmdbDetails.backdrop_path, "original") : "";
     const tmdbPoster = tmdbDetails?.poster_path ? getTMDBImage(tmdbDetails.poster_path, "original") : "";
 
@@ -303,7 +303,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                     : "object-cover object-[70%_30%] sm:object-right"
                             )}
                             sizes="100vw"
-                            quality={100}
+                            quality={72}
                         />
                     </div>
                 )}

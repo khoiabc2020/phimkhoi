@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { getMovieDetail, Movie } from "@/services/api";
 import { getMovieDetailFromCache, saveMovieToCache } from "@/lib/movie-cache";
-import { getImageUrl, cn } from "@/lib/utils";
+import { getPosterImageUrl, getBackdropImageUrl, cn } from "@/lib/utils";
 import CommentSection from "@/components/CommentSection";
 import WatchEngagementBar from "@/components/WatchEngagementBar";
 import WatchContainer from "@/components/WatchContainer";
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
             index: false,
             follow: true,
         },
-        openGraph: { images: [getImageUrl(movie.poster_url || movie.thumb_url)] },
+        openGraph: { images: [getPosterImageUrl(movie) || getBackdropImageUrl(movie)] },
     };
 }
 
@@ -104,8 +104,8 @@ export default async function WatchPage({ params }: PageProps) {
         movieSlug: movie.slug,
         movieName: movie.name,
         movieOriginName: movie.origin_name || "",
-        moviePoster: movie.poster_url || movie.thumb_url,
-        movieThumb: movie.thumb_url || movie.poster_url,
+        moviePoster: getPosterImageUrl(movie),
+        movieThumb: getBackdropImageUrl(movie),
         episodeSlug: episode,
         episodeName: displayEpisodeName(currentEpisode?.name || episode),
         duration: movie.time ? parseInt(movie.time) || 90 : 90,
@@ -146,9 +146,18 @@ export default async function WatchPage({ params }: PageProps) {
                                     </h3>
                                 </div>
                                 <div className="p-5 sm:p-6">
-                                    <div className="flex flex-col md:flex-row gap-6">
-                                        <div className="shrink-0 w-24 md:w-32 aspect-[2/3] relative rounded-lg overflow-hidden shadow-xl ring-1 ring-white/10 hidden md:block">
-                                            <Image src={getImageUrl(movieData.moviePoster)} alt={movie.name} fill className="object-cover" />
+                                    <div className="flex flex-col md:flex-row items-start gap-6">
+                                        <div className="hidden md:block shrink-0 self-start">
+                                            <div className="relative w-24 md:w-32 aspect-[2/3] rounded-lg overflow-hidden shadow-xl ring-1 ring-white/10 bg-[#0b101a]">
+                                                <Image
+                                                    src={movieData.moviePoster || "/placeholder.svg"}
+                                                    alt={movie.name}
+                                                    fill
+                                                    className="object-cover"
+                                                    sizes="(max-width: 768px) 0px, 128px"
+                                                    quality={68}
+                                                />
+                                            </div>
                                         </div>
                                         <div className="flex-1">
                                             <p className="text-gray-300 text-sm leading-relaxed mb-4" style={{ lineHeight: 1.75 }}>

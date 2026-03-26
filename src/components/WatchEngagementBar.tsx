@@ -4,7 +4,7 @@ import { Heart, Share2, Monitor, Moon, Flag } from "lucide-react";
 import FavoriteButton from "./FavoriteButton";
 import WatchlistInlineButton from "./WatchlistInlineButton";
 import Image from "next/image";
-import { getImageUrl } from "@/lib/utils";
+import { getPosterImageUrl } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/context/ToastContext";
 
@@ -39,7 +39,7 @@ export default function WatchEngagementBar({
         movieSlug: movie.slug,
         movieName: movie.name,
         movieOriginName: movie.origin_name || "",
-        moviePoster: movie.poster_url || movie.thumb_url || "",
+        moviePoster: getPosterImageUrl(movie) || "",
         movieYear: Number(movie.year) || new Date().getFullYear(),
         movieQuality: movie.quality || "HD",
         movieVoteAverage: movie.vote_average || 0,
@@ -96,7 +96,7 @@ export default function WatchEngagementBar({
                     <WatchlistInlineButton
                         slug={movie.slug}
                         movieName={movie.name}
-                        moviePoster={movie.poster_url || movie.thumb_url}
+                        moviePoster={getPosterImageUrl(movie)}
                         showLabel={true}
                         size="sm"
                         className="!bg-transparent !border-0 !rounded-none !w-auto text-gray-200 hover:text-primary gap-1.5 px-0 text-xs font-semibold uppercase tracking-wide"
@@ -180,10 +180,12 @@ export default function WatchEngagementBar({
                 <div className="flex-shrink-0">
                     <div className="relative w-20 h-[112px] md:w-24 md:h-[134px] rounded-lg overflow-hidden shadow-xl ring-1 ring-white/20">
                         <Image
-                            src={getImageUrl(movie.poster_url || movie.thumb_url)}
+                            src={getPosterImageUrl(movie) || "/placeholder.svg"}
                             alt={movie.name}
                             fill
                             className="object-cover"
+                            sizes="96px"
+                            quality={68}
                         />
                     </div>
                 </div>

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Video, LayoutGrid, ChevronDown, Database, Subtitles, Mic, Volume2, Play } from "lucide-react";
 import { Movie } from "@/services/api";
 import MovieCard from "./MovieCard";
-import { cn, getImageUrl } from "@/lib/utils";
+import { cn, getImageUrl, getBackdropImageUrl, getPosterImageUrl } from "@/lib/utils";
 import MovieCast from "./MovieCast";
 
 interface Server {
@@ -321,7 +321,7 @@ export default function MovieTabs({
                                             const meta = episodeMetadata?.[ep.slug];
                                             const fallbackBackdrop = backdropFallbacks.length > 0
                                                 ? backdropFallbacks[(currentChunk * EPISODES_PER_CHUNK + index) % backdropFallbacks.length]
-                                                : getImageUrl(movie?.thumb_url || movie?.poster_url || "");
+                                                : getBackdropImageUrl(movie) || getPosterImageUrl(movie) || "";
                                             const thumb = episodeThumbnails?.[ep.slug] || fallbackBackdrop;
                                             const episodeOverview = meta?.overview?.trim() || "Nội dung tập đang được cập nhật.";
                                             const dateText = meta?.airDate ? new Date(meta.airDate).toLocaleDateString("vi-VN") : "";
