@@ -16,10 +16,10 @@ export const getMoviesFromCache = async (
 ): Promise<{ items: Movie[]; pagination: any } | null> => {
     try {
         await dbConnect();
-        const cache = await TrendingCache.findOne({ type }).lean();
-        if (!cache || !cache.movies || cache.movies.length === 0) return null;
+        const trendingCache = await TrendingCache.findOne({ type }).lean();
+        if (!trendingCache || !trendingCache.movies || trendingCache.movies.length === 0) return null;
 
-        const allMovies = cache.movies as Movie[];
+        const allMovies = trendingCache.movies as Movie[];
         const totalItems = allMovies.length;
         const totalPages = Math.ceil(totalItems / limit);
         const startIndex = (page - 1) * limit;

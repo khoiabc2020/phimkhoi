@@ -1,4 +1,7 @@
 import { cache } from "react";
+import dbConnect from "@/lib/db";
+import MovieModel from "@/models/Movie";
+import { getMovieDetailFromCache } from "@/lib/movie-cache";
 
 export const API_URL = "https://phimapi.com";
 
@@ -998,17 +1001,10 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
             );
         }
 
-        // Lift limit to support full list view breadth
-        const enrichedItems = await enrichMoviesWithTMDB(uniqueItems, limit);
-
-        return {
-            items: enrichedItems,
-            pagination: kkPagination
-        };
         // 3. [Elite Recovery] Final Local Cache Fallback if everything else is empty
-        if (!hasData || items.length === 0) {
+        if (enrichedItems.length === 0) {
             try {
-                await connectDB();
+                await dbConnect();
                 const findQuery: any = {};
                 if (kkType === 'phim-sap-chieu') findQuery.status = 'sap-chieu';
                 else if (kkType === 'phim-bo') findQuery.type = 'series';
@@ -1034,13 +1030,16 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
             }
         }
 
-        return { items: [], pagination: { currentPage: 1, totalPages: 1 } };
+        return {
+            items: enrichedItems,
+            pagination: kkPagination
+        };
     } catch (error) {
         console.error(`Error fetching movies list [${type}]:`, error);
         
         // One last try in catch block
         try {
-            await connectDB();
+            await dbConnect();
             const dbMovies = await MovieModel.find({}).sort({ updatedAt: -1 }).limit(20).lean();
             if (dbMovies.length > 0) {
                 return { items: dbMovies as any, pagination: { currentPage: 1, totalPages: 1 } };
