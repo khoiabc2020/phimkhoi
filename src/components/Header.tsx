@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
@@ -451,7 +451,7 @@ export default function Header({ categories, countries }: HeaderProps) {
                                                                     ))}
                                                                     {actorResults.length > 0 && (
                                                                         <div className="pt-2 mt-2 border-t border-white/5">
-                                                                            <div className="px-2 pb-2 text-[10px] font-bold text-white/25 uppercase tracking-[0.2em]">Di?n vi?n</div>
+                                                                            <div className="px-2 pb-2 text-[10px] font-bold text-white/25 uppercase tracking-[0.2em]">Dien vien</div>
                                                                             <div className="flex flex-wrap gap-2 px-1">
                                                                                 {actorResults.map((actor: any) => (
                                                                                     <Link
@@ -472,8 +472,8 @@ export default function Header({ categories, countries }: HeaderProps) {
                                                                     )}
                                                                     {!isSearching && !hasSearchResults && (
                                                                         <div className="px-2 py-8 text-center">
-                                                                            <div className="text-sm font-semibold text-white/70">Kh?ng t?m th?y phim ph? h?p</div>
-                                                                            <div className="text-xs text-white/35 mt-1">H? th?ng ?? ki?m tra DB v? ngu?n ngo?i cho "{trimmedSearchQuery}".</div>
+                                                                            <div className="text-sm font-semibold text-white/70">Khong tim thay phim phu hop</div>
+                                                                            <div className="text-xs text-white/35 mt-1">He thong da kiem tra DB va nguon ngoai cho "{trimmedSearchQuery}".</div>
                                                                         </div>
                                                                     )}
                                                                 </>
@@ -543,16 +543,16 @@ export default function Header({ categories, countries }: HeaderProps) {
                                     </button>
                                     <div className="absolute right-0 top-full mt-2 w-52 bg-[#0a0a0c]/98 border border-white/10 rounded-xl p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all shadow-2xl z-50">
                                         <Link href="/thong-tin-tai-khoan" className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 rounded-lg">
-                                            <User className="w-4 h-4" /> <span>H? s?</span>
+                                            <User className="w-4 h-4" /> <span>Ho so</span>
                                         </Link>
                                         {(authSession.user as any)?.role === "admin" && (
                                             <Link href="/admin" className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 rounded-lg">
-                                                <Shield className="w-4 h-4" /> <span>Qu?n tr?</span>
+                                                <Shield className="w-4 h-4" /> <span>Quan tri</span>
                                             </Link>
                                         )}
                                         <div className="h-px bg-white/5 my-1" />
                                         <button onClick={() => signOut({ callbackUrl: "/login" })} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-400 hover:bg-red-500/5 rounded-lg text-left">
-                                            <LogOut className="w-4 h-4" /> <span>??ng xu?t</span>
+                                            <LogOut className="w-4 h-4" /> <span>Dang xuat</span>
                                         </button>
                                     </div>
                                 </div>
@@ -561,7 +561,7 @@ export default function Header({ categories, countries }: HeaderProps) {
                                     href="/login"
                                     className="px-5 py-2 rounded-full text-sm font-bold bg-white text-black hover:bg-white/90 transition-all active:scale-95"
                                 >
-                                    ??ng nh?p
+                                    Dang nhap
                                 </Link>
                             )}
                         </div>
@@ -578,3 +578,4 @@ export default function Header({ categories, countries }: HeaderProps) {
         </>
     );
 }
+
