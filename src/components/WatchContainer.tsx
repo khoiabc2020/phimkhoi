@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import VideoPlayer from "@/components/VideoPlayer";
@@ -51,7 +51,7 @@ export default function WatchContainer({
         initialServerName || servers?.[0]?.server_name || ""
     );
     const [progress, setProgress] = useState(0);
-    const [progressLoaded, setProgressLoaded] = useState(false);
+    const [progressLoaded] = useState(true);
 
     const activeServer = servers?.find((s) => s.server_name === activeServerName) || servers?.[0];
     const currentServerEpisodes = activeServer?.server_data || initialEpisodes || [];
@@ -68,6 +68,7 @@ export default function WatchContainer({
     // If it's NguonC, we try M3U8 first but allow quick fallback
     const effectiveM3u8 = activeEpisode?.link_m3u8;
     const canUseCustom = !!effectiveM3u8 && !useIframe && !playerError;
+    const playbackKey = `${activeServerName}:${activeEpisode?.slug || currentEpisodeSlug || ""}:${effectiveM3u8 || activeEpisode?.link_embed || ""}`;
 
     // Compute prev/next episode index
     const currentIdx = currentServerEpisodes.findIndex((ep: { slug?: string }) => ep.slug === currentEpisodeSlug);
@@ -92,10 +93,6 @@ export default function WatchContainer({
     // Fetch initial progress on client side - Non-blocking for the player
     useEffect(() => {
         let isMounted = true;
-        // DO NOT reset progressLoaded here, we want the player to render immediately
-        // Just set it to true so the player renders while history is being fetched
-        setProgressLoaded(true);
-
         if (movie._id && currentEpisodeSlug) {
             getWatchHistoryForEpisode(movie._id, currentEpisodeSlug)
                 .then((res) => {
@@ -201,6 +198,7 @@ export default function WatchContainer({
                                 </div>
                             ) : activeEpisode && canUseCustom ? (
                                 <VideoPlayer
+                                    key={playbackKey}
                                     url={activeEpisode.link_embed}
                                     m3u8={effectiveM3u8}
                                     slug={movie.slug}
@@ -218,6 +216,7 @@ export default function WatchContainer({
                                 />
                             ) : activeEpisode ? (
                                 <div className="w-full h-full relative">
+                                    <div key={playbackKey} className="w-full h-full relative">
                                     <iframe
                                         src={activeEpisode.link_embed}
                                         className="w-full h-full border-0 overflow-hidden"
@@ -232,6 +231,7 @@ export default function WatchContainer({
                                             </div>
                                         </div>
                                     )}
+                                    </div>
                                 </div>
                             ) : (
                                 <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-white gap-3">
@@ -361,7 +361,11 @@ export default function WatchContainer({
                             episodeMetadata={episodeMetadata}
                             currentEpisodeSlug={currentEpisodeSlug}
                             activeServerName={activeServerName}
-                            onServerChange={setActiveServerName}
+                            onServerChange={(serverName) => {
+                                setUseIframe(false);
+                                setPlayerError(false);
+                                setActiveServerName(serverName);
+                            }}
                         />
                     </div>
                 )}

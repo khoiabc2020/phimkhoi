@@ -109,6 +109,11 @@ export default function VideoPlayer({
     const [showSkipAd, setShowSkipAd] = useState(false);
     const [useProxy, setUseProxy] = useState(false); // New state to trigger proxy
 
+    useEffect(() => {
+        setFallbackIframe(false);
+        setUseProxy(false);
+        setShowSkipAd(false);
+    }, [streamUrl, serverName]);
     // Logic to determine the final stream URL (potentially proxied)
     const finalStreamUrl = useProxy 
         ? `/api/hls-proxy?url=${encodeURIComponent(streamUrl)}`
@@ -514,7 +519,7 @@ export default function VideoPlayer({
             }
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [streamUrl]);
+    }, [finalStreamUrl, handleVideoEnd, initialProgress, movieData, onPlayerError, saveHistory, serverName, session, shouldUseArtPlayer, streamUrl, useProxy]);
 
     // Khi bật/tắt chế độ rạp phim, container đổi kích thước — gọi resize để player vẽ lại đúng, tránh màn đen
     useEffect(() => {

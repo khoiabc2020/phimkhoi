@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -77,6 +77,14 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
     const [isAutoPlay, setIsAutoPlay] = useState(true);
     const router = useRouter();
 
+    const normalizeHeroDescription = (movie: any) => {
+        const raw = stripHtml(movie?.content || movie?.description || movie?.tmdbData?.overview || "").trim();
+        if (!raw || /dang cap nhat noi dung|đang cập nhật nội dung/i.test(raw)) {
+            return "Một câu chuyện mới đang chờ bạn khám phá.";
+        }
+        return raw;
+    };
+
     const slides = useMemo((): (any & { bg: string; logo: string; actor?: string; displayTitle: string; displayDesc: string; displayTags: string[]; displayEpisodes: string })[] => {
         return (initialMovies || [])
             .filter(movie => Boolean(movie?.slug && ASSETS_MAP[movie.slug]))
@@ -87,9 +95,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                     ...movie,
                     ...assets,
                     displayTitle: movie.name,
-                    displayDesc: movie.content 
-                        ? stripHtml(movie.content)
-                        : "Đang cập nhật nội dung...",
+                    displayDesc: normalizeHeroDescription(movie),
                     displayTags: movie.category?.slice(0, 3).map((c: any) => c?.name).filter(Boolean) || ["Phim Trung"],
                     displayEpisodes: movie.episode_current || "Full"
                 };
@@ -114,9 +120,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
         setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
     };
 
-    if (slides.length === 0) return null;
-
-    const currentMovie = slides[current];
+    const currentMovie = slides[current] || null;
     const isFirstSlide = current === 0;
 
     useEffect(() => {
@@ -124,6 +128,8 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
             router.prefetch(`/phim/${currentMovie.slug}`);
         }
     }, [currentMovie?.slug, router]);
+
+    if (slides.length === 0 || !currentMovie) return null;
 
     return (
         <section 

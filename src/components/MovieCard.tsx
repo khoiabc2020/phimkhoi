@@ -68,6 +68,7 @@ function MovieCard({
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [isTouchDevice, setIsTouchDevice] = useState(false);
+    const tmdbFetchStartedRef = useRef(false);
 
     useEffect(() => {
         setIsTouchDevice(window.matchMedia("(pointer: coarse)").matches);
@@ -77,28 +78,22 @@ function MovieCard({
     const [lazyTmdbData, setLazyTmdbData] = useState<any>(null);
     const hasInitialTmdb = !!(movie as any).tmdbData;
 
-    useEffect(() => {
-        // [Elite Predictive] Prefetch early
-        const prefetchTimer = setTimeout(() => {
-            router.prefetch(`/phim/${movie.slug}`);
-        }, 800);
-        return () => clearTimeout(prefetchTimer);
-    }, [movie.slug, router]);
+    const hydrateTmdbOnDemand = useCallback(async () => {
+        if (hasInitialTmdb || lazyTmdbData || tmdbFetchStartedRef.current) return;
+        tmdbFetchStartedRef.current = true;
 
-    useEffect(() => {
-        if (hasInitialTmdb || lazyTmdbData) return;
-
-        // Lazy fetch when in view or on slight delay to avoid initial load blocking
-        const timer = setTimeout(async () => {
+        try {
             const data = await getTMDBDataForCard(movie.name, Number(movie.year), 'movie', {
                 originalName: movie.origin_name,
                 localName: movie.name
             });
-            if (data) setLazyTmdbData(data);
-        }, 2000); // 2s delay to prioritize critical path
-
-        return () => clearTimeout(timer);
-    }, [movie.slug, hasInitialTmdb, movie.name, movie.year, movie.origin_name, lazyTmdbData]);
+            if (data) {
+                setLazyTmdbData(data);
+            }
+        } catch {
+            // Non-blocking enhancement only.
+        }
+    }, [hasInitialTmdb, lazyTmdbData, movie.name, movie.origin_name, movie.year]);
 
     const [posterIndex, setPosterIndex] = useState(0);
 
@@ -184,10 +179,8 @@ function MovieCard({
     const handleMouseEnter = () => {
         if (isTouchDevice) return;
         
-        // --- PREDICTIVE PREFETCHING ---
-        // Begin loading the detail page as soon as the user hovers.
-        // This reduces perceived latency to near-zero when they finally click.
         router.prefetch(`/phim/${movie.slug}`);
+        void hydrateTmdbOnDemand();
 
         if (leaveTimeoutRef.current) {
             clearTimeout(leaveTimeoutRef.current);
@@ -226,6 +219,8 @@ function MovieCard({
             clearTimeout(leaveTimeoutRef.current);
             leaveTimeoutRef.current = null;
         }
+        router.prefetch(`/phim/${movie.slug}`);
+        void hydrateTmdbOnDemand();
     };
 
     const handlePortalMouseLeave = () => {

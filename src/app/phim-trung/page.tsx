@@ -121,7 +121,16 @@ async function resolveHeroMovies(slugs: string[], fallbackItems: any[], countryN
     const resolved = await Promise.all(
         slugs.map(async (slug) => {
             const cached = bySlug.get(slug);
-            if (cached) return cached;
+            if (cached) {
+                return {
+                    ...cached,
+                    content: String(cached?.content || "").trim() || HERO_FALLBACK_DESC[slug] || "",
+                    year: cached?.year || HERO_FALLBACK_META[slug]?.year || 2025,
+                    country: Array.isArray(cached?.country) && cached.country.length > 0
+                        ? cached.country
+                        : [{ name: countryName, slug: "trung-quoc" }],
+                };
+            }
 
             const fallback = HERO_FALLBACK_META[slug];
             if (!fallback) return null;
@@ -159,13 +168,13 @@ async function resolveCountrySections(
                 { limit: 24 }
             );
 
-            if (baseMovies.length >= 8) {
+            if (baseMovies.length >= 6) {
                 return { ...config, movies: baseMovies };
             }
 
             const remote = await withTimeout(
                 getMoviesByCountryAndCategory(countrySlug, config.categorySlug, 72),
-                5200,
+                1800,
                 { items: [] as any[], pagination: { currentPage: 1, totalPages: 1 } }
             );
 
@@ -174,7 +183,7 @@ async function resolveCountrySections(
                 { limit: 24 }
             );
 
-            return merged.length >= 4 ? { ...config, movies: merged } : null;
+            return merged.length >= 4 ? { ...config, movies: merged } : (baseMovies.length > 0 ? { ...config, movies: baseMovies } : null);
         })
     );
 

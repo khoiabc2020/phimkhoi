@@ -61,6 +61,17 @@ function getHeroEpisodeLabel(movie: any) {
     return "Full";
 }
 
+function getHeroDescription(movie: any) {
+    return decodeHtml(
+        stripHtml(
+            movie?.content ||
+            movie?.description ||
+            movie?.tmdbData?.overview ||
+            ""
+        )
+    ).trim();
+}
+
 function tmdbImage(path: string, size: string) {
     if (!path) return "";
     if (path.startsWith("http")) return path;
@@ -474,9 +485,9 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                     )}
                                 </div>
 
-                                {movie.content && (
+                                {getHeroDescription(movie) && (
                                     <p className="text-white/80 text-[14px] lg:text-[15px] xl:text-[16px] leading-[1.6] line-clamp-2 md:line-clamp-3 lg:line-clamp-2 xl:line-clamp-3 max-w-2xl drop-shadow-md font-medium">
-                                        {decodeHtml(stripHtml(movie.content))}
+                                        {getHeroDescription(movie)}
                                     </p>
                                 )}
 

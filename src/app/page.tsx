@@ -1,6 +1,5 @@
 import { Suspense } from 'react';
 export const revalidate = 3600;
-export const dynamic = "force-dynamic";
 import { cache } from "react";
 import HeroSection from "@/components/HeroSection";
 import MovieRow from "@/components/MovieRow";
@@ -10,7 +9,6 @@ import ContinueWatchingRow from "@/components/ContinueWatchingRow";
 
 import { getMovieDetail, getMoviesList, getTrendMovies, isTrailer } from "@/services/api";
 import { getResilientMoviesList } from "@/app/actions/movies";
-import { getTMDBDataForCard } from "@/app/actions/tmdb";
 import { cn } from "@/lib/utils";
 import { isAdultMovie, sanitizeMovieList } from "@/lib/movie-list";
 import { hasLandscapeImage } from "@/lib/movie-media";
@@ -161,19 +159,23 @@ async function AsyncHeroSection({ initialMovies }: { initialMovies: any[] }) {
       if (movie.isCustomHero) return movie;
 
       const shouldHydrateDetail =
-        idx < 12 &&
+        idx < 3 &&
         (
           !movie?.year ||
           !Array.isArray(movie?.country) ||
           movie.country.length === 0 ||
           !Array.isArray(movie?.category) ||
           movie.category.length === 0 ||
-          !hasLandscapeImage(movie)
+          (!hasLandscapeImage(movie) && !movie?.tmdbData?.backdrop_path)
         );
 
       let baseMovie = movie;
       if (shouldHydrateDetail && movie?.slug) {
-        const detail = await getMovieDetail(movie.slug).catch((): null => null);
+        const detail = await withTimeout(
+          getMovieDetail(movie.slug).catch((): null => null),
+          1200,
+          null
+        );
         if (detail?.movie) {
           const detailMovie: any = detail.movie as any;
           baseMovie = {
@@ -185,19 +187,7 @@ async function AsyncHeroSection({ initialMovies }: { initialMovies: any[] }) {
 
       // Chỉ enrich TMDB cho các slide đầu để giảm thời gian render trang chủ
       // Skip hoàn toàn trong lúc build để tránh treo build (TMDB hay bị timeout)
-      if (idx > 7 || process.env.NEXT_PHASE === 'phase-production-build') return { ...baseMovie, tmdbData: baseMovie.tmdbData || null };
-      const year = baseMovie.year ? parseInt(baseMovie.year.toString().split("-")[0]) : undefined;
-      let type: 'movie' | 'tv' = 'movie';
-      if (baseMovie.type === 'phim-bo' || baseMovie.type === 'tv-shows' || baseMovie.type === 'hoat-hinh') type = 'tv';
-
-      const tmdbData = await getTMDBDataForCard(
-        baseMovie.origin_name || baseMovie.name,
-        isNaN(year!) ? undefined : year,
-        type,
-        { originalName: baseMovie.origin_name, countrySlug: baseMovie.country?.[0]?.slug }
-      ).catch((): any => null);
-
-      return { ...baseMovie, tmdbData: tmdbData || baseMovie.tmdbData || null };
+      return { ...baseMovie, tmdbData: baseMovie.tmdbData || null };
     })
   );
 
