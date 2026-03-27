@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
@@ -28,6 +29,7 @@ export default function MobileMenu({
     countries = []
 }: MobileMenuProps) {
     const { data: session } = useSession();
+    const router = useRouter();
     const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
     const [isCountriesOpen, setIsCountriesOpen] = useState(false);
 
@@ -154,6 +156,8 @@ export default function MobileMenu({
                             <Link
                                 key={href}
                                 href={href}
+                                onMouseEnter={() => router.prefetch(href)}
+                                onFocus={() => router.prefetch(href)}
                                 onClick={onClose}
                                 className="flex items-center gap-3 px-3 py-2.5 rounded-[12px] text-[15px] font-semibold text-white/80 hover:text-white hover:bg-white/[0.05] transition-all group"
                             >
@@ -187,13 +191,19 @@ export default function MobileMenu({
                                         <Link
                                             key={cat.slug}
                                             href={`/the-loai/${cat.slug}`}
+                                            onMouseEnter={() => router.prefetch(`/the-loai/${cat.slug}`)}
+                                            onFocus={() => router.prefetch(`/the-loai/${cat.slug}`)}
                                             onClick={onClose}
                                             className="text-white/55 text-[12px] hover:text-white px-2 py-2 rounded-[10px] text-center transition-colors hover:bg-white/[0.06]"
                                         >
                                             {cat.name}
                                         </Link>
                                     ))}
-                                    <Link href="/the-loai" onClick={onClose}
+                                    <Link
+                                        href="/the-loai"
+                                        onMouseEnter={() => router.prefetch("/the-loai")}
+                                        onFocus={() => router.prefetch("/the-loai")}
+                                        onClick={onClose}
                                         className="text-[#8FA7C5]/80 text-[12px] hover:text-[#8FA7C5] px-3 py-2 rounded-[10px] text-center transition-colors col-span-3 font-medium"
                                     >
                                         Xem tất cả thể loại →
@@ -224,6 +234,8 @@ export default function MobileMenu({
                                         <Link
                                             key={c.slug}
                                             href={`/quoc-gia/${c.slug}`}
+                                            onMouseEnter={() => router.prefetch(`/quoc-gia/${c.slug}`)}
+                                            onFocus={() => router.prefetch(`/quoc-gia/${c.slug}`)}
                                             onClick={onClose}
                                             className="text-white/55 text-[12px] hover:text-white px-2 py-2 rounded-[10px] text-center transition-colors hover:bg-white/[0.06]"
                                         >

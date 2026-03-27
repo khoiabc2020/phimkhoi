@@ -36,6 +36,11 @@ export default function Header({ categories, countries }: HeaderProps) {
     const [selectedIndex, setSelectedIndex] = useState(-1);
     const [stableSession, setStableSession] = useState<any>(null);
 
+    const prefetchPath = (path: string) => {
+        if (!path) return;
+        router.prefetch(path);
+    };
+
     const navRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
     const activeSearchRequestRef = useRef(0);
@@ -284,7 +289,12 @@ export default function Header({ categories, countries }: HeaderProps) {
 
                     {/* Desktop Section */}
                     <div className="hidden lg:flex items-center gap-4 xl:gap-8 flex-1">
-                        <Link href="/" className="flex items-center shrink-0 -ml-1 group">
+                        <Link
+                            href="/"
+                            onMouseEnter={() => prefetchPath("/")}
+                            onFocus={() => prefetchPath("/")}
+                            className="flex items-center shrink-0 -ml-1 group"
+                        >
                             <span className="font-display text-[20px] xl:text-[23px] font-black uppercase tracking-tighter text-white group-hover:text-primary transition-colors">
                                 KHOIPHIM<span className="text-primary ml-0.5">.</span>
                             </span>
@@ -311,6 +321,8 @@ export default function Header({ categories, countries }: HeaderProps) {
                                                 <Link
                                                     key={cat.slug}
                                                     href={`/the-loai/${cat.slug}`}
+                                                    onMouseEnter={() => prefetchPath(`/the-loai/${cat.slug}`)}
+                                                    onFocus={() => prefetchPath(`/the-loai/${cat.slug}`)}
                                                     onClick={closeDropdown}
                                                     className="px-3 py-2 rounded-xl text-[13px] font-semibold text-white/50 hover:text-white hover:bg-white/5 transition-all whitespace-nowrap truncate"
                                                 >
@@ -342,6 +354,8 @@ export default function Header({ categories, countries }: HeaderProps) {
                                                 <Link
                                                     key={c.slug}
                                                     href={`/quoc-gia/${c.slug}`}
+                                                    onMouseEnter={() => prefetchPath(`/quoc-gia/${c.slug}`)}
+                                                    onFocus={() => prefetchPath(`/quoc-gia/${c.slug}`)}
                                                     onClick={closeDropdown}
                                                     className="px-3 py-2 rounded-xl text-[13px] font-semibold text-white/50 hover:text-white hover:bg-white/5 transition-all whitespace-nowrap truncate"
                                                 >
@@ -353,9 +367,30 @@ export default function Header({ categories, countries }: HeaderProps) {
                                 )}
                             </div>
 
-                            <Link href="/danh-sach/phim-moi-cap-nhat" className="hidden xl:block px-3 py-1.5 rounded-full text-[13px] font-medium text-white/70 hover:text-white">Phim mới</Link>
-                            <Link href="/danh-sach/phim-bo" className="hidden 2xl:block px-3 py-1.5 rounded-full text-[13px] font-medium text-white/70 hover:text-white">Phim Bộ</Link>
-                            <Link href="/danh-sach/phim-le" className="hidden 2xl:block px-3 py-1.5 rounded-full text-[13px] font-medium text-white/70 hover:text-white">Phim Lẻ</Link>
+                            <Link
+                                href="/danh-sach/phim-moi-cap-nhat"
+                                onMouseEnter={() => prefetchPath("/danh-sach/phim-moi-cap-nhat")}
+                                onFocus={() => prefetchPath("/danh-sach/phim-moi-cap-nhat")}
+                                className="hidden xl:block px-3 py-1.5 rounded-full text-[13px] font-medium text-white/70 hover:text-white"
+                            >
+                                Phim mới
+                            </Link>
+                            <Link
+                                href="/danh-sach/phim-bo"
+                                onMouseEnter={() => prefetchPath("/danh-sach/phim-bo")}
+                                onFocus={() => prefetchPath("/danh-sach/phim-bo")}
+                                className="hidden 2xl:block px-3 py-1.5 rounded-full text-[13px] font-medium text-white/70 hover:text-white"
+                            >
+                                Phim Bộ
+                            </Link>
+                            <Link
+                                href="/danh-sach/phim-le"
+                                onMouseEnter={() => prefetchPath("/danh-sach/phim-le")}
+                                onFocus={() => prefetchPath("/danh-sach/phim-le")}
+                                className="hidden 2xl:block px-3 py-1.5 rounded-full text-[13px] font-medium text-white/70 hover:text-white"
+                            >
+                                Phim Lẻ
+                            </Link>
                         </nav>
                     </div>
 

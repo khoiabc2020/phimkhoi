@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { cn, getImageUrl, stripHtml } from "@/lib/utils";
 import WatchlistButton from "./WatchlistButton";
 
@@ -43,6 +44,7 @@ interface KoreaHeroProps {
 export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
     const [current, setCurrent] = useState(0);
     const [isAutoPlay, setIsAutoPlay] = useState(true);
+    const router = useRouter();
 
     const slides = useMemo((): (any & { bg: string; logo: string; actor?: string; displayTitle: string; displayDesc: string; displayTags: string[]; displayEpisodes: string })[] => {
         return (initialMovies || [])
@@ -84,6 +86,13 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
     if (slides.length === 0) return null;
 
     const currentMovie = slides[current];
+    const isFirstSlide = current === 0;
+
+    useEffect(() => {
+        if (currentMovie?.slug) {
+            router.prefetch(`/phim/${currentMovie.slug}`);
+        }
+    }, [currentMovie?.slug, router]);
 
     return (
         <section 
@@ -107,9 +116,10 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                                 alt={currentMovie.displayTitle}
                                 fill
                                 className="object-cover brightness-[0.45] contrast-[1.15]"
-                                priority
+                                priority={isFirstSlide}
+                                loading={isFirstSlide ? "eager" : "lazy"}
                                 decoding="async"
-                                quality={85}
+                                quality={75}
                                 sizes="100vw"
                             />
                         </div>
@@ -120,9 +130,10 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                                 alt={currentMovie.displayTitle}
                                 fill
                                 className="object-cover brightness-[0.45] contrast-[1.15]"
-                                priority
+                                priority={isFirstSlide}
+                                loading={isFirstSlide ? "eager" : "lazy"}
                                 decoding="async"
-                                quality={85}
+                                quality={75}
                                 sizes="100vw"
                             />
                         </div>
@@ -150,7 +161,8 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                                         alt={currentMovie.displayTitle}
                                         fill
                                         className="object-contain object-left drop-shadow-[0_10px_25px_rgba(0,0,0,0.9)]"
-                                        priority
+                                        priority={isFirstSlide}
+                                        loading={isFirstSlide ? "eager" : "lazy"}
                                     />
                                 ) : (
                                     <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white drop-shadow-xl font-display uppercase tracking-tighter line-clamp-2">

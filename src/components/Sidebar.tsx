@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { 
     Home, 
     Tv, 
@@ -27,6 +27,7 @@ const navItems = [
 
 export default function Sidebar() {
     const pathname = usePathname();
+    const router = useRouter();
 
     // Hide sidebar on Auth and Admin routes
     if (pathname === "/login" || pathname === "/register" || pathname?.startsWith("/admin")) {
@@ -47,6 +48,8 @@ export default function Sidebar() {
                         <Link
                             key={item.href}
                             href={item.href}
+                            onMouseEnter={() => router.prefetch(item.href)}
+                            onFocus={() => router.prefetch(item.href)}
                             className={cn(
                                 "relative flex flex-col items-center justify-center gap-1.5 py-3 transition-all duration-200 group",
                                 isActive 

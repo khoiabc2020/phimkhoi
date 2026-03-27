@@ -103,16 +103,16 @@ const HERO_FALLBACK_META: Record<string, { name: string; year?: number }> = {
 };
 
 const HERO_FALLBACK_DESC: Record<string, string> = {
-    "duong-cung-ky-an-thanh-vu-phong-minh": "Court mystery, power games, and hidden vows.",
-    "xin-chao-1983": "Life stories and choices that change destiny.",
-    "con-ra-the-thong-gi-nua": "Rom-com with sharp twists and warm moments.",
-    "bach-nguyet-phan-tinh": "Fated love under moonlight.",
-    "bui-hoa-hong": "Fame, love, and secrets buried in time.",
-    "dai-mong-quy-ly": "Heroes rise in a world of chaos.",
-    "giang-ho-da-vu-thap-nien-dang": "Old grudges return on a rainy night.",
-    "mac-nhan-tang-kieu": "A hidden past and a quest for justice.",
-    "ngoc-minh-tra-cot": "Revenge, family, and the final truth.",
-    "truc-ngoc": "Classic romance in a period world.",
+    "duong-cung-ky-an-thanh-vu-phong-minh": "Vụ án cung đình bí ẩn, quyền lực và những lời thề bị che giấu.",
+    "xin-chao-1983": "Chuyện đời, chuyện người và những lựa chọn đổi thay số phận.",
+    "con-ra-the-thong-gi-nua": "Hài hước, lãng mạn và những cú twist bất ngờ.",
+    "bach-nguyet-phan-tinh": "Mối duyên định mệnh dưới ánh trăng.",
+    "bui-hoa-hong": "Danh vọng, tình yêu và bí mật bị vùi lấp.",
+    "dai-mong-quy-ly": "Giang hồ dậy sóng, anh hùng trỗi dậy giữa mộng và thực.",
+    "giang-ho-da-vu-thap-nien-dang": "Ân oán tái hiện trong đêm mưa dài.",
+    "mac-nhan-tang-kieu": "Bí mật chôn vùi và hành trình tìm lại công bằng.",
+    "ngoc-minh-tra-cot": "Báo thù, tình thân và sự thật cuối cùng.",
+    "truc-ngoc": "Một mối tình cổ trang đầy định mệnh.",
 };
 
 async function resolveHeroMovies(slugs: string[], fallbackItems: any[], countryName: string) {

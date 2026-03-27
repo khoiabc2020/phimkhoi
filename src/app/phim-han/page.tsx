@@ -91,11 +91,11 @@ const HERO_FALLBACK_META: Record<string, { name: string; year?: number }> = {
 };
 
 const HERO_FALLBACK_DESC: Record<string, string> = {
-    "nghe-thuat-lua-doi-cua-sarah": "A dark comedy about fame, scams, and second chances.",
-    "khi-cuoc-doi-cho-ban-qua-quyt": "Warm healing moments and unexpected bonds.",
-    "tieng-yeu-nay-anh-dich-duoc-khong": "Romance, misunderstandings, and heartfelt growth.",
-    "ban-trai-theo-yeu-cau": "A contract love story with real feelings.",
-    "trao-em-ca-vu-tru": "Family, love, and a new start under one roof.",
+    "nghe-thuat-lua-doi-cua-sarah": "Một câu chuyện trào phúng về danh vọng, lừa dối và cơ hội làm lại.",
+    "khi-cuoc-doi-cho-ban-qua-quyt": "Những khoảnh khắc chữa lành và mối liên kết bất ngờ.",
+    "tieng-yeu-nay-anh-dich-duoc-khong": "Tình yêu, hiểu lầm và hành trình trưởng thành.",
+    "ban-trai-theo-yeu-cau": "Tình yêu hợp đồng nhưng cảm xúc là thật.",
+    "trao-em-ca-vu-tru": "Gia đình, tình yêu và một khởi đầu mới dưới cùng mái nhà.",
 };
 
 async function resolveHeroMovies(slugs: string[], fallbackItems: any[], countryName: string) {
