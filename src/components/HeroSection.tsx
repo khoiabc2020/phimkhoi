@@ -4,8 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { Play, ChevronLeft, ChevronRight } from "lucide-react";
 import { Movie } from "@/services/api";
-import { getImageUrl, decodeHtml, cn, detectOrientation } from "@/lib/utils";
+import { getImageUrl, decodeHtml, cn } from "@/lib/utils";
 import { shouldUseTmdbMedia } from "@/lib/movie-list";
+import { resolveMovieImages } from "@/lib/movie-media";
 import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import WatchlistButton from "./WatchlistButton";
@@ -58,6 +59,10 @@ function getHeroImage(movie: any, type: "poster" | "backdrop" | "character" | "l
     }
 
     const tmdb = shouldUseTmdbMedia(movie, movie?.tmdbData) ? movie.tmdbData : null;
+    const normalized = resolveMovieImages(movie);
+    const poster = String(normalized.poster_url || "").trim();
+    const backdrop = String(normalized.thumb_url || "").trim();
+
     if (tmdb) {
         if (type === "poster" && tmdb.poster_path)
             return tmdbImage(tmdb.poster_path, variant === "desktop" ? "w500" : "w780");
@@ -66,32 +71,15 @@ function getHeroImage(movie: any, type: "poster" | "backdrop" | "character" | "l
     }
 
     if (type === "backdrop") {
-        const thumb = String(movie?.thumb_url || "").trim();
-        const thumbOrientation = detectOrientation(thumb);
-        if (thumb && thumbOrientation === "landscape") {
-            return thumb;
-        }
-
-        if (variant === "mobile") {
-            const poster = String(movie?.poster_url || "").trim();
-            const posterOrientation = detectOrientation(poster);
-            if (poster && posterOrientation !== "landscape") {
-                return poster;
-            }
-        }
-
-        return "";
+        return backdrop;
     }
 
-    const poster = String(movie?.poster_url || "").trim();
-    const posterOrientation = detectOrientation(poster);
-    if (poster && posterOrientation !== "landscape") {
+    if (poster) {
         return poster;
     }
 
     if (variant === "mobile") {
-        const backdrop = String(movie?.thumb_url || "").trim();
-        if (backdrop && detectOrientation(backdrop) === "landscape") {
+        if (backdrop) {
             return backdrop;
         }
     }
@@ -106,7 +94,7 @@ function hasDesktopHeroBackdrop(movie: any) {
     const tmdb = shouldUseTmdbMedia(movie, movie?.tmdbData) ? movie.tmdbData : null;
     if (tmdb?.backdrop_path) return true;
 
-    return Boolean(getHeroImage(movie, "backdrop", "desktop"));
+    return Boolean(resolveMovieImages(movie).thumb_url);
 }
 
 function HeroBackdropFrame({

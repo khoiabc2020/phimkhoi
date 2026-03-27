@@ -8,6 +8,7 @@ import { Play, PlayCircle, Share2, Star, Clock, Film } from "lucide-react";
 import FavoriteButton from "@/components/FavoriteButton";
 import { decodeHtml, getImageUrl, getPosterImageUrl, getBackdropImageUrl, detectOrientation, cn, buildEpisodeKeyCandidates } from "@/lib/utils";
 import { shouldUseTmdbMedia } from "@/lib/movie-list";
+import { resolveMovieImages } from "@/lib/movie-media";
 import Image from "next/image";
 import { getThemeBySlug } from "@/lib/theme";
 import WatchlistButton from "@/components/WatchlistButton";
@@ -191,8 +192,9 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     }
 
     // --- VISUAL ENGINE SELECTION ---
-    const rawThumb = String(movie?.thumb_url || "").trim();
-    const rawPoster = String(movie?.poster_url || "").trim();
+    const normalizedMedia = resolveMovieImages(movie);
+    const rawThumb = String(normalizedMedia.thumb_url || movie?.thumb_url || "").trim();
+    const rawPoster = String(normalizedMedia.poster_url || movie?.poster_url || "").trim();
     const sourceThumb =
         rawThumb && detectOrientation(rawThumb) === "landscape"
             ? getImageUrl(rawThumb)
@@ -238,6 +240,22 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
         TH: "Thái Lan",
         VN: "Việt Nam",
     };
+    const normalizedCountries = Array.isArray(movie?.country)
+        ? movie.country
+              .map((item: any) => {
+                  if (!item) return "";
+                  if (typeof item === "string") return decodeHtml(item.trim());
+                  return decodeHtml(String(item.name || item.slug || "").trim());
+              })
+              .filter(Boolean)
+        : [];
+    const movieYearValue = Number(String(movie?.year || "").replace(/[^\d]/g, "").slice(0, 4));
+    const tmdbYearValue = Number(String(trustedTmdbDetails?.release_date || trustedTmdbDetails?.first_air_date || "").slice(0, 4));
+    const runtimeLabel = decodeHtml(String(movie?.time || "").trim());
+    const normalizedLanguage = decodeHtml(String(movie?.lang || "").trim());
+    const episodeTotalValue =
+        Number(String(movie?.episode_total || "").replace(/[^\d]/g, "")) ||
+        (Array.isArray(serverData) ? serverData.length : 0);
     const displayDirector =
         movie?.director?.join(", ") ||
         trustedTmdbDetails?.credits?.crew?.find((c: any) => c.job === "Director")?.name ||
@@ -247,17 +265,26 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
         trustedTmdbDetails?.credits?.cast?.slice(0, 8).map((c: { name?: string }) => decodeHtml(String(c.name || ""))).join(", ") ||
         "Đang cập nhật";
     const displayCountry =
-        movie?.country?.[0]?.name ||
+        normalizedCountries.join(", ") ||
         trustedTmdbDetails?.origin_country?.map((code: string) => countryMap[code] || code).filter(Boolean).join(", ") ||
         "Đang cập nhật";
     const displayYear =
-        movie?.year ||
-        Number(String(trustedTmdbDetails?.release_date || trustedTmdbDetails?.first_air_date || "").slice(0, 4)) ||
+        (Number.isFinite(movieYearValue) && movieYearValue > 1900 ? movieYearValue : "") ||
+        (Number.isFinite(tmdbYearValue) && tmdbYearValue > 1900 ? tmdbYearValue : "") ||
         "Đang cập nhật";
     const displayLanguage =
-        movie?.lang ||
+        normalizedLanguage ||
         languageMap[String(trustedTmdbDetails?.original_language || "").toLowerCase()] ||
         "Đang cập nhật";
+    const displayDuration =
+        runtimeLabel && !runtimeLabel.includes("?")
+            ? runtimeLabel
+            : trustedTmdbDetails?.runtime
+                ? `${trustedTmdbDetails.runtime} phút`
+                : type === "tv" && trustedTmdbDetails?.episode_run_time?.[0]
+                    ? `${trustedTmdbDetails.episode_run_time[0]} phút/tập`
+                    : "Đang cập nhật";
+    const displayEpisodeTotal = episodeTotalValue > 0 ? episodeTotalValue : "?";
 
     const jsonLd = {
         "@context": "https://schema.org",
@@ -409,7 +436,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             const epCurrent = movie?.episode_current || "";
                             const normalizedEpisodeCurrent = epCurrent.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
                             const isCompleted = normalizedEpisodeCurrent.includes("hoan tat") || normalizedEpisodeCurrent.includes("full");
-                            const total = movie?.episode_total || "?";
+                            const total = displayEpisodeTotal;
                             const epNum = epCurrent.replace(/hoàn tất/gi, "").replace(/\(.*?\)/g, "").replace(/tập\s*/gi, "").trim() || "1";
                             return (
                                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 font-bold text-sm mt-3 drop-shadow-md">
@@ -461,7 +488,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                 <span><span className="text-gray-500">Đạo diễn:</span> {displayDirector}</span>
                             ) : null}
                             <span className="w-1 h-1 bg-gray-600 rounded-full hidden sm:block" />
-                            <span><span className="text-gray-500">Thời lượng:</span> {movie?.time || "N/A"}</span>
+                            <span><span className="text-gray-500">Thời lượng:</span> {displayDuration}</span>
                         </div>
                         <div className="text-xs sm:text-sm text-gray-300 mb-4 sm:mb-6 line-clamp-2 max-w-3xl drop-shadow-md text-center md:text-left">
                             <span className="text-gray-500">Diễn viên:</span> {displayActors}

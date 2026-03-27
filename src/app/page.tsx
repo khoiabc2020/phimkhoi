@@ -11,8 +11,9 @@ import ContinueWatchingRow from "@/components/ContinueWatchingRow";
 import { getMoviesList, getTrendMovies, isTrailer } from "@/services/api";
 import { getResilientMoviesList } from "@/app/actions/movies";
 import { getTMDBDataForCard } from "@/app/actions/tmdb";
-import { cn, detectOrientation } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { isAdultMovie, sanitizeMovieList } from "@/lib/movie-list";
+import { hasLandscapeImage } from "@/lib/movie-media";
 import connectDB from "@/lib/db";
 import CustomHero from "@/models/CustomHero";
 import TrendingCache from "@/models/TrendingCache";
@@ -166,8 +167,7 @@ async function AsyncHeroSection({ initialMovies }: { initialMovies: any[] }) {
   const hasHeroBackdrop = (movie: any) => {
     if (movie?.isCustomHero) return true;
     if (movie?.tmdbData?.backdrop_path) return true;
-    const rawThumb = String(movie?.thumb_url || "").trim();
-    return Boolean(rawThumb && detectOrientation(rawThumb) === "landscape");
+    return hasLandscapeImage(movie);
   };
 
   const backdropReady = enhancedHeroData.filter(hasHeroBackdrop);
@@ -276,7 +276,7 @@ export default function Home() {
 
       <div className="w-full max-w-[1920px] mx-auto px-1.5 sm:px-3 md:px-5 lg:pl-24 lg:pr-12 relative z-30 pb-16 -mt-0 md:-mt-2 lg:-mt-4 xl:-mt-6">
         {/* Decorative background glow - keep subtle and close to the black system palette */}
-        <div className="pointer-events-none absolute left-0 right-0 top-0 -z-10 h-[800px] bg-[radial-gradient(circle_at_top,rgba(143,167,197,0.08),transparent_55%)] blur-[160px]" />
+        <div className="pointer-events-none absolute left-0 right-0 top-0 -z-10 h-[800px] bg-[radial-gradient(circle_at_top,rgba(143,167,197,0.04),transparent_55%)] blur-[160px]" />
         
         <div className="mb-6">
           <QuickNav />
