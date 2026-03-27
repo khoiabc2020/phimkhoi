@@ -43,6 +43,24 @@ function formatQualityLabel(quality?: string) {
     return orig.length > 6 ? orig.slice(0, 6) : orig;
 }
 
+function getHeroYear(movie: any) {
+    const rawYear = Number.parseInt(String(movie?.year || "").match(/\d{4}/)?.[0] || "", 10);
+    return Number.isFinite(rawYear) && rawYear > 1900 ? String(rawYear) : "";
+}
+
+function getHeroCountry(movie: any) {
+    const name = String(movie?.country?.[0]?.name || "").trim();
+    return name && name !== "0" ? decodeHtml(name) : "";
+}
+
+function getHeroEpisodeLabel(movie: any) {
+    const current = String(movie?.episode_current || "").trim();
+    if (current && current !== "0") return current;
+    const total = Number.parseInt(String(movie?.episode_total || "").replace(/[^\d]/g, ""), 10);
+    if (Number.isFinite(total) && total > 1) return `${total} tập`;
+    return "Full";
+}
+
 function tmdbImage(path: string, size: string) {
     if (!path) return "";
     if (path.startsWith("http")) return path;
@@ -283,11 +301,11 @@ return (
                                 TOP 10
                             </div>
                             <div className="flex items-center gap-2">
-                                <span>{movie.year}</span>
+                                {getHeroYear(movie) && <span>{getHeroYear(movie)}</span>}
+                                {getHeroYear(movie) && getHeroCountry(movie) && <span className="text-white/30 font-light">|</span>}
+                                <span>{getHeroCountry(movie) || "Phim"}</span>
                                 <span className="text-white/30 font-light">|</span>
-                                <span>{movie.country?.[0]?.name || "Phim"}</span>
-                                <span className="text-white/30 font-light">|</span>
-                                <span className="text-[#8FA7C5]">{movie.episode_current || "Full"}</span>
+                                <span className="text-[#8FA7C5]">{getHeroEpisodeLabel(movie)}</span>
                             </div>
                         </div>
 
@@ -425,11 +443,11 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                         TOP 10
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        {movie.year && <span>{movie.year}</span>}
-                                        {movie.country?.[0] && <span className="text-white/20 font-light">|</span>}
-                                        {movie.country?.[0] && <span>{movie.country[0].name}</span>}
-                                        {movie.episode_current && <span className="text-white/20 font-light">|</span>}
-                                        <span className="text-[#8FA7C5]">{movie.episode_current || "Full"}</span>
+                                        {getHeroYear(movie) && <span>{getHeroYear(movie)}</span>}
+                                        {getHeroYear(movie) && getHeroCountry(movie) && <span className="text-white/20 font-light">|</span>}
+                                        {getHeroCountry(movie) && <span>{getHeroCountry(movie)}</span>}
+                                        {getHeroCountry(movie) && <span className="text-white/20 font-light">|</span>}
+                                        <span className="text-[#8FA7C5]">{getHeroEpisodeLabel(movie)}</span>
                                     </div>
                                 </div>
 

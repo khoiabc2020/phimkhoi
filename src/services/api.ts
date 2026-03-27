@@ -1087,16 +1087,19 @@ export const getMoviesByCountryAndCategory = async (countrySlug: string, categor
         }
 
         const categorySlugs = COUNTRY_CATEGORY_ALIASES[categorySlug] || [categorySlug];
-        const pagesToScan = [1, 2, 3];
+        const countryPagesToScan = [1, 2, 3, 4, 5, 6];
+        const categoryPagesToScan = [1, 2, 3, 4];
         const [countryPages, categoryPages] = await Promise.all([
             Promise.all(
-                pagesToScan.map((page) =>
-                    getMoviesByCountry(countrySlug, page, 60).catch((): { items: Movie[] } => ({ items: [] as Movie[] }))
+                countryPagesToScan.map((page) =>
+                    getMoviesByCountry(countrySlug, page, 80).catch((): { items: Movie[] } => ({ items: [] as Movie[] }))
                 )
             ),
             Promise.all(
-                categorySlugs.map((slug) =>
-                    getMoviesByCategory(slug, 1, 80).catch((): { items: Movie[] } => ({ items: [] as Movie[] }))
+                categorySlugs.flatMap((slug) =>
+                    categoryPagesToScan.map((page) =>
+                        getMoviesByCategory(slug, page, 120).catch((): { items: Movie[] } => ({ items: [] as Movie[] }))
+                    )
                 )
             ),
         ]);

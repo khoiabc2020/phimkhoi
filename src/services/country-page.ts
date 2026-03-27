@@ -13,10 +13,10 @@ export interface CountryHomeSectionConfig {
 }
 
 const EMPTY_ITEMS: Movie[] = [];
-const COUNTRY_POOL_LOCAL_LIMIT = 360;
-const COUNTRY_POOL_LIVE_LIMIT = 120;
+const COUNTRY_POOL_LOCAL_LIMIT = 480;
+const COUNTRY_POOL_LIVE_LIMIT = 180;
 const COUNTRY_LOCAL_TIMEOUT_MS = 1500;
-const COUNTRY_LIVE_TIMEOUT_MS = 2200;
+const COUNTRY_LIVE_TIMEOUT_MS = 4200;
 const dedupeMoviesBySlug = (movies: Movie[] = []): Movie[] => {
     return sanitizeMovieList(movies, { limit: movies.length || 1 });
 };
@@ -61,15 +61,19 @@ export const getCountryPagePool = cache(async (countrySlug: string) => {
     let countryItems = filterCountryMovies(localCountry?.items || EMPTY_ITEMS);
 
     // Only hit upstream when local cache is too thin; this keeps country pages fast and stable.
-    if (countryItems.length < 48) {
-        const liveCountry = await withTimeout(
-            getMoviesByCountry(countrySlug, 1, COUNTRY_POOL_LIVE_LIMIT).catch((): null => null),
+    if (countryItems.length < 96) {
+        const liveCountryPages = await withTimeout<[({ items?: Movie[] } | null), ({ items?: Movie[] } | null), ({ items?: Movie[] } | null)]>(
+            Promise.all([
+                getMoviesByCountry(countrySlug, 1, COUNTRY_POOL_LIVE_LIMIT).catch((): null => null),
+                getMoviesByCountry(countrySlug, 2, COUNTRY_POOL_LIVE_LIMIT).catch((): null => null),
+                getMoviesByCountry(countrySlug, 3, COUNTRY_POOL_LIVE_LIMIT).catch((): null => null),
+            ]),
             COUNTRY_LIVE_TIMEOUT_MS,
-            null
+            [null, null, null]
         );
         countryItems = filterCountryMovies([
             ...countryItems,
-            ...(liveCountry?.items || EMPTY_ITEMS),
+            ...liveCountryPages.flatMap((page) => page?.items || EMPTY_ITEMS),
         ]);
     }
 

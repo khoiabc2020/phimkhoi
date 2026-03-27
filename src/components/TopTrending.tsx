@@ -3,9 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
-import { Movie } from "@/services/api";
-import { getPosterImageUrl, decodeHtml, cn } from "@/lib/utils";
 import { memo } from "react";
+import { Movie } from "@/services/api";
+import { cn, decodeHtml, getPosterImageUrl } from "@/lib/utils";
 
 interface TopTrendingProps {
     title: string;
@@ -14,71 +14,82 @@ interface TopTrendingProps {
     className?: string;
 }
 
+function getYearLabel(movie: Movie) {
+    const year = Number.parseInt(String(movie?.year || "").match(/\d{4}/)?.[0] || "", 10);
+    return Number.isFinite(year) && year > 1900 ? String(year) : "";
+}
+
+function getQualityLabel(movie: Movie) {
+    const raw = String(movie?.quality || "").trim();
+    return raw && raw !== "0" ? raw : "";
+}
+
 function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) {
-    // Top 10 only
     const topMovies = movies.slice(0, 10);
 
     return (
         <div className={cn("w-full relative py-2", className)}>
-            {/* Header */}
-            <div className="flex items-center justify-between mb-4">
-                <h2 className="text-[20px] md:text-[24px] font-extrabold text-white capitalize flex items-center gap-2.5 tracking-tight">
-                    <span className="w-1 h-6 bg-[#8FA7C5] rounded-full"></span>
+            <div className="mb-4 flex items-center justify-between">
+                <h2 className="flex items-center gap-2.5 text-[20px] font-extrabold capitalize tracking-tight text-white md:text-[24px]">
+                    <span className="h-6 w-1 rounded-full bg-[#8FA7C5]" />
                     <span className="leading-tight">{title}</span>
                 </h2>
                 {slug && (
-                    <Link href={slug} className="text-sm md:text-base font-semibold text-[#a8bad3] hover:text-white flex items-center gap-1 transition-colors group">
-                        Xem tất cả <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    <Link href={slug} className="group flex items-center gap-1 text-sm font-semibold text-[#a8bad3] transition-colors hover:text-white md:text-base">
+                        Xem tất cả <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </Link>
                 )}
             </div>
 
-            {/* List Container */}
-            <div className="flex gap-3 overflow-x-auto no-scrollbar pb-3 snap-x [contain:layout_paint]">
+            <div className="no-scrollbar flex gap-3 overflow-x-auto pb-3 snap-x [contain:layout_paint]">
                 {topMovies.map((movie, index) => (
                     <Link
                         key={movie._id}
                         href={`/phim/${movie.slug}`}
-                        className="group flex flex-col gap-2.5 p-2.5 rounded-[10px] transition-colors border border-white/[0.06] hover:border-white/[0.12] hover:bg-white/[0.03] w-[156px] sm:w-[176px] md:w-[192px] lg:w-[210px] xl:w-[228px] shrink-0 snap-start bg-[#07070b]/82 shadow-[0_8px_18px_#00000055]"
+                        className="group flex w-[156px] shrink-0 snap-start flex-col gap-2.5 rounded-[10px] border border-white/[0.06] bg-[#07070b]/82 p-2.5 shadow-[0_8px_18px_#00000055] transition-colors hover:border-white/[0.12] hover:bg-white/[0.03] sm:w-[176px] md:w-[192px] lg:w-[210px] xl:w-[228px]"
                     >
-                        {/* Poster Container */}
-                        <div className="relative w-full aspect-[2/3] rounded-[10px] overflow-hidden flex-shrink-0 shadow-md bg-[#0B0B10]">
+                        <div className="relative aspect-[2/3] w-full flex-shrink-0 overflow-hidden rounded-[10px] bg-[#0B0B10] shadow-md">
                             <Image
                                 src={getPosterImageUrl(movie) || "/placeholder.svg"}
-                                alt={movie.name}
+                                alt={decodeHtml(movie.name)}
                                 fill
                                 loading="lazy"
-                                className="object-cover bg-[#0a0f1a] transition-transform duration-300 group-hover:scale-105"
+                                className="bg-[#0a0f1a] object-cover transition-transform duration-300 group-hover:scale-105"
                                 sizes="(max-width: 768px) 48vw, (max-width: 1280px) 220px, 240px"
                             />
-                            {/* Rank Number (Inside Image) */}
-                            <div className="absolute top-0 left-0 w-8 h-8 md:w-9 md:h-9 flex items-center justify-center bg-black/75 backdrop-blur-md rounded-br-lg z-20">
-                                <span className={cn(
-                                    "font-black text-lg md:text-xl",
-                                    index === 0 ? "text-[#c6d6ea]" :
-                                        index === 1 ? "text-gray-200" :
-                                            index === 2 ? "text-[#8FA7C5]" : "text-white"
-                                )} style={{ fontFamily: 'var(--font-outfit)' }}>
+                            <div className="absolute left-0 top-0 z-20 flex h-8 w-8 items-center justify-center rounded-br-lg bg-black/75 backdrop-blur-md md:h-9 md:w-9">
+                                <span
+                                    className={cn(
+                                        "text-lg font-black md:text-xl",
+                                        index === 0 ? "text-[#c6d6ea]" :
+                                            index === 1 ? "text-gray-200" :
+                                                index === 2 ? "text-[#8FA7C5]" : "text-white"
+                                    )}
+                                    style={{ fontFamily: "var(--font-outfit)" }}
+                                >
                                     {index + 1}
                                 </span>
                             </div>
                         </div>
 
-                        {/* Metadata Container */}
-                        <div className="flex-1 min-w-0 flex flex-col gap-1">
-                            <h3 className="text-white text-[13px] sm:text-sm font-bold line-clamp-2 group-hover:text-[#c6d6ea] transition-colors leading-snug">
+                        <div className="flex min-w-0 flex-1 flex-col gap-1">
+                            <h3 className="line-clamp-2 text-[13px] font-bold leading-snug text-white transition-colors group-hover:text-[#c6d6ea] sm:text-sm">
                                 {decodeHtml(movie.name)}
                             </h3>
-                            <p className="text-white/50 text-xs truncate">
+                            <p className="truncate text-xs text-white/50">
                                 {decodeHtml(movie.origin_name)}
                             </p>
-                            <div className="flex items-center lg:flex-wrap gap-2 mt-auto lg:mt-1 pt-1 lg:pt-0">
-                                <span className="text-[10px] items-center px-1.5 py-0.5 rounded-sm bg-white/10 text-white/70 border border-white/5 whitespace-nowrap">
-                                    {movie.year}
-                                </span>
-                                <span className="text-[10px] items-center px-1.5 py-0.5 rounded-sm bg-[#253143] text-[#c7d7ea] border border-[#33455f] font-bold whitespace-nowrap">
-                                    {movie.quality}
-                                </span>
+                            <div className="mt-auto flex items-center gap-2 pt-1 lg:mt-1 lg:flex-wrap lg:pt-0">
+                                {getYearLabel(movie) && (
+                                    <span className="whitespace-nowrap rounded-sm border border-white/5 bg-white/10 px-1.5 py-0.5 text-[10px] text-white/70">
+                                        {getYearLabel(movie)}
+                                    </span>
+                                )}
+                                {getQualityLabel(movie) && (
+                                    <span className="whitespace-nowrap rounded-sm border border-[#33455f] bg-[#253143] px-1.5 py-0.5 text-[10px] font-bold text-[#c7d7ea]">
+                                        {getQualityLabel(movie)}
+                                    </span>
+                                )}
                             </div>
                         </div>
                     </Link>

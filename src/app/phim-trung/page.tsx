@@ -154,13 +154,13 @@ async function resolveCountrySections(
                 { limit: 24 }
             );
 
-            if (baseMovies.length >= 12) {
+            if (baseMovies.length >= 10) {
                 return { ...config, movies: baseMovies };
             }
 
             const remote = await withTimeout(
-                getMoviesByCountryAndCategory(countrySlug, config.categorySlug, 36),
-                3200,
+                getMoviesByCountryAndCategory(countrySlug, config.categorySlug, 72),
+                5200,
                 { items: [] as any[], pagination: { currentPage: 1, totalPages: 1 } }
             );
 
@@ -169,7 +169,7 @@ async function resolveCountrySections(
                 { limit: 24 }
             );
 
-            return merged.length > 0 ? { ...config, movies: merged } : null;
+            return merged.length >= 6 ? { ...config, movies: merged } : null;
         })
     );
 

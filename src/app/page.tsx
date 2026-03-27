@@ -8,7 +8,7 @@ import TopTrendingTabs from "@/components/TopTrendingTabs";
 import QuickNav from "@/components/QuickNav";
 import ContinueWatchingRow from "@/components/ContinueWatchingRow";
 
-import { getMoviesList, getTrendMovies, isTrailer } from "@/services/api";
+import { getMovieDetail, getMoviesList, getTrendMovies, isTrailer } from "@/services/api";
 import { getResilientMoviesList } from "@/app/actions/movies";
 import { getTMDBDataForCard } from "@/app/actions/tmdb";
 import { cn } from "@/lib/utils";
@@ -146,21 +146,44 @@ async function AsyncHeroSection({ initialMovies }: { initialMovies: any[] }) {
       // If it's a Custom Hero from DB, pass it right through as it already has layers
       if (movie.isCustomHero) return movie;
 
+      const shouldHydrateDetail =
+        idx < 8 &&
+        (
+          !movie?.year ||
+          !Array.isArray(movie?.country) ||
+          movie.country.length === 0 ||
+          !Array.isArray(movie?.category) ||
+          movie.category.length === 0 ||
+          !hasLandscapeImage(movie)
+        );
+
+      let baseMovie = movie;
+      if (shouldHydrateDetail && movie?.slug) {
+        const detail = await getMovieDetail(movie.slug).catch((): null => null);
+        if (detail?.movie) {
+          const detailMovie: any = detail.movie as any;
+          baseMovie = {
+            ...detailMovie,
+            tmdbData: movie.tmdbData || detailMovie.tmdbData || null,
+          };
+        }
+      }
+
       // Chỉ enrich TMDB cho các slide đầu để giảm thời gian render trang chủ
       // Skip hoàn toàn trong lúc build để tránh treo build (TMDB hay bị timeout)
-      if (idx > 7 || process.env.NEXT_PHASE === 'phase-production-build') return { ...movie, tmdbData: null };
-      const year = movie.year ? parseInt(movie.year.toString().split("-")[0]) : undefined;
+      if (idx > 7 || process.env.NEXT_PHASE === 'phase-production-build') return { ...baseMovie, tmdbData: baseMovie.tmdbData || null };
+      const year = baseMovie.year ? parseInt(baseMovie.year.toString().split("-")[0]) : undefined;
       let type: 'movie' | 'tv' = 'movie';
-      if (movie.type === 'phim-bo' || movie.type === 'tv-shows' || movie.type === 'hoat-hinh') type = 'tv';
+      if (baseMovie.type === 'phim-bo' || baseMovie.type === 'tv-shows' || baseMovie.type === 'hoat-hinh') type = 'tv';
 
       const tmdbData = await getTMDBDataForCard(
-        movie.origin_name || movie.name,
+        baseMovie.origin_name || baseMovie.name,
         isNaN(year!) ? undefined : year,
         type,
-        { originalName: movie.origin_name, countrySlug: movie.country?.[0]?.slug }
+        { originalName: baseMovie.origin_name, countrySlug: baseMovie.country?.[0]?.slug }
       ).catch((): any => null);
 
-      return { ...movie, tmdbData: tmdbData || null };
+      return { ...baseMovie, tmdbData: tmdbData || baseMovie.tmdbData || null };
     })
   );
 
@@ -170,7 +193,12 @@ async function AsyncHeroSection({ initialMovies }: { initialMovies: any[] }) {
     return hasLandscapeImage(movie);
   };
 
-  const backdropReady = enhancedHeroData.filter(hasHeroBackdrop);
+  const backdropReady = enhancedHeroData.filter((movie) => {
+    const hasYear = Number.parseInt(String(movie?.year || "").match(/\d{4}/)?.[0] || "", 10) > 1900;
+    const hasCountry = Array.isArray(movie?.country) && movie.country.length > 0;
+    const hasCategory = Array.isArray(movie?.category) && movie.category.length > 0;
+    return hasHeroBackdrop(movie) && (hasYear || hasCountry || hasCategory);
+  });
   const heroMovies = sanitizeMovieList((backdropReady.length > 0 ? backdropReady : enhancedHeroData), { limit: 8 });
 
   return <HeroSection movies={heroMovies} />;
