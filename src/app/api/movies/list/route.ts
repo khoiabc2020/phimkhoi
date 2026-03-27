@@ -27,6 +27,8 @@ export async function GET(req: Request) {
                     : items;
             return sanitizeMovieList(countryScopedItems, { limit, allowAdult });
         };
+        const minFill = Math.min(limit, 12);
+        const fillThreshold = Math.max(8, Math.floor(minFill * 0.6));
 
         // 1. Handle Categorical/Country filters
         if (type === 'category' || type === 'country') {
@@ -35,7 +37,7 @@ export async function GET(req: Request) {
             const data = await getMoviesByFilterFromCache(type, slug, page, limit, { year, category });
             if (data) {
                 const sanitizedItems = finalize(data.items || []);
-                if (sanitizedItems.length > 0) {
+                if (sanitizedItems.length >= fillThreshold) {
                     return NextResponse.json({
                     ...data,
                         items: sanitizedItems
@@ -69,6 +71,7 @@ export async function GET(req: Request) {
                     ? getMoviesByCountry(slug, page, limit, {
                         category: category !== 'all' ? category : undefined,
                         year: year !== 'all' ? Number(year) : undefined,
+                        skipLocal: true,
                     })
                     : type === 'category'
                         ? getMoviesByCategory(slug, page, limit, {

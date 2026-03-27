@@ -970,7 +970,12 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
     }
 };
 
-export const getMoviesByCountry = async (slug: string, page: number = 1, limit: number = 49, options?: { category?: string; year?: string | number }) => {
+export const getMoviesByCountry = async (
+    slug: string,
+    page: number = 1,
+    limit: number = 49,
+    options?: { category?: string; year?: string | number; skipLocal?: boolean }
+) => {
     try {
         const category = options?.category && options.category !== 'all' ? options.category : '';
         const year = options?.year && options.year !== 'all' ? options.year : '';
@@ -980,17 +985,19 @@ export const getMoviesByCountry = async (slug: string, page: number = 1, limit: 
         if (category) queryStr += `&category=${category}`;
         if (year) queryStr += `&year=${year}`;
 
-        // 1. [Elite Choice] Try local Database-First API
-        try {
-            const localUrl = `/api/movies/list?type=country&slug=${slug}&${queryStr}`;
-            const localRes = await fetch(localUrl, { next: { revalidate: 300 } });
-            if (localRes.ok) {
-                const localData = await localRes.json();
-                if (localData.items?.length > 0 && !localData.fallback) {
-                    return localData;
+        // 1. [Elite Choice] Try local Database-First API (skip when already inside API)
+        if (!options?.skipLocal) {
+            try {
+                const localUrl = `/api/movies/list?type=country&slug=${slug}&${queryStr}`;
+                const localRes = await fetch(localUrl, { next: { revalidate: 300 } });
+                if (localRes.ok) {
+                    const localData = await localRes.json();
+                    if (localData.items?.length > 0 && !localData.fallback) {
+                        return localData;
+                    }
                 }
-            }
-        } catch (e) { /* Fallback to external */ }
+            } catch (e) { /* Fallback to external */ }
+        }
 
         // 2. Fallback: External APIs
         const [kkRes, ophimRes, nguoncRes] = await Promise.allSettled([
