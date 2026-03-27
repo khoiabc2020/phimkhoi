@@ -157,10 +157,21 @@ async function resolveCountrySections(
 }
 
 async function PhimHanHome() {
-    const { countryItems, fallbackItems } = await getCountryPagePool("han-quoc").catch(() => ({
+    const pool = await getCountryPagePool("han-quoc").catch(() => ({
         countryItems: [] as any[],
         fallbackItems: [] as any[],
     }));
+    let countryItems = pool.countryItems || [];
+    let fallbackItems = pool.fallbackItems || [];
+
+    if (countryItems.length < 16) {
+        const resilient = await getResilientMoviesList("country", 1, 120, { country: "han-quoc" });
+        if (resilient.items?.length) {
+            countryItems = resilient.items;
+            fallbackItems = resilient.items;
+        }
+    }
+
     const latestMovies = fallbackItems.length > 0
         ? fallbackItems.slice(0, 14)
         : (await getResilientMoviesList("han-quoc", 1, 14, { country: "han-quoc" })).items || [];

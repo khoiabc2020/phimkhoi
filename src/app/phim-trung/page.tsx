@@ -169,10 +169,21 @@ async function resolveCountrySections(
 }
 
 async function PhimTrungHome() {
-    const { countryItems, fallbackItems } = await getCountryPagePool("trung-quoc").catch(() => ({
+    const pool = await getCountryPagePool("trung-quoc").catch(() => ({
         countryItems: [] as any[],
         fallbackItems: [] as any[],
     }));
+    let countryItems = pool.countryItems || [];
+    let fallbackItems = pool.fallbackItems || [];
+
+    if (countryItems.length < 16) {
+        const resilient = await getResilientMoviesList("country", 1, 120, { country: "trung-quoc" });
+        if (resilient.items?.length) {
+            countryItems = resilient.items;
+            fallbackItems = resilient.items;
+        }
+    }
+
     const latestMovies = fallbackItems.length > 0
         ? fallbackItems.slice(0, 14)
         : (await getResilientMoviesList("trung-quoc", 1, 14, { country: "trung-quoc" })).items || [];
