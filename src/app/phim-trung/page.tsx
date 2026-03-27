@@ -18,7 +18,7 @@ import {
     getCountryPagePool,
     type CountryHomeSectionConfig,
 } from "@/services/country-page";
-import { matchesCountryStrict } from "@/lib/movie-country";
+import { matchesCountryForDisplay } from "@/lib/movie-country";
 
 export const revalidate = 300;
 
@@ -142,7 +142,7 @@ async function resolveCountrySections(
     countryItems: any[],
     configs: CountryHomeSectionConfig[]
 ) {
-    const filteredCountryItems = countryItems.filter((movie) => matchesCountryStrict(movie, countrySlug));
+    const filteredCountryItems = countryItems.filter((movie) => matchesCountryForDisplay(movie, countrySlug));
     const baseSections = buildCountryHomeSections(filteredCountryItems, configs);
 
     const sections = await Promise.all(
@@ -165,7 +165,7 @@ async function resolveCountrySections(
             );
 
             const merged = sanitizeMovieList(
-                [...baseMovies, ...(remote.items || [])].filter((movie: any) => matchesCountryStrict(movie, countrySlug)),
+                [...baseMovies, ...(remote.items || [])].filter((movie: any) => matchesCountryForDisplay(movie, countrySlug)),
                 { limit: 24 }
             );
 
@@ -181,11 +181,11 @@ async function PhimTrungHome() {
         countryItems: [] as any[],
         fallbackItems: [] as any[],
     }));
-    const safeCountryItems = countryItems.filter((movie) => matchesCountryStrict(movie, "trung-quoc"));
+    const safeCountryItems = countryItems.filter((movie) => matchesCountryForDisplay(movie, "trung-quoc"));
     const latestMovies = fallbackItems.length > 0
-        ? fallbackItems.filter((movie: any) => matchesCountryStrict(movie, "trung-quoc")).slice(0, 14)
+        ? fallbackItems.filter((movie: any) => matchesCountryForDisplay(movie, "trung-quoc")).slice(0, 14)
         : ((await getResilientMoviesList("trung-quoc", 1, 14, { country: "trung-quoc" })).items || []).filter((movie: any) =>
-            matchesCountryStrict(movie, "trung-quoc")
+            matchesCountryForDisplay(movie, "trung-quoc")
         );
     const sections = await resolveCountrySections("trung-quoc", safeCountryItems, SECTION_CONFIG);
 
@@ -220,7 +220,7 @@ async function PhimTrungHome() {
 
 async function CountryGridStream({ slug, page, limit = 49 }: { slug: string; page: number; limit?: number }) {
     const data = await getResilientMoviesList("country", page, limit, { country: slug });
-    const movies = (data.items || []).filter((movie: any) => matchesCountryStrict(movie, slug));
+    const movies = (data.items || []).filter((movie: any) => matchesCountryForDisplay(movie, slug));
 
     if (movies.length === 0) {
         return <div className="py-20 text-center text-white/40">Không tìm thấy phim nào.</div>;

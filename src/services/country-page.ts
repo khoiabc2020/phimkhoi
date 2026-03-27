@@ -3,7 +3,7 @@ import type { Movie } from "@/services/api";
 import { getMoviesByCountry } from "@/services/api";
 import { getMoviesByFilterFromCache } from "@/lib/movie-cache";
 import { sanitizeMovieList } from "@/lib/movie-list";
-import { matchesCountryStrict } from "@/lib/movie-country";
+import { matchesCountryForDisplay } from "@/lib/movie-country";
 
 export interface CountryHomeSectionConfig {
     title: string;
@@ -51,7 +51,7 @@ const safeSliceWindow = (movies: Movie[], offset: number, size: number): Movie[]
 
 export const getCountryPagePool = cache(async (countrySlug: string) => {
     const filterCountryMovies = (items: Movie[] = []) =>
-        dedupeMoviesBySlug(items.filter((movie) => matchesCountryStrict(movie, countrySlug)));
+        dedupeMoviesBySlug(items.filter((movie) => matchesCountryForDisplay(movie, countrySlug)));
 
     const localCountry = await withTimeout(
         getMoviesByFilterFromCache("country", countrySlug, 1, COUNTRY_POOL_LOCAL_LIMIT).catch((): null => null),

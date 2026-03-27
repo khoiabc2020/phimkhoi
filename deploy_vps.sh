@@ -67,8 +67,8 @@ if [ $? -eq 0 ]; then
     "$PM2_BIN" start ecosystem.config.cjs
     "$PM2_BIN" save --force
     
-    echo "Warming up trending cache in BACKGROUND..."
-    NODE_OPTIONS="--max_old_space_size=512" nice -n 19 node scripts/daily-sync.mjs >> /home/bitnami/phimkhoi-sync.log 2>&1 &
+    echo "Running fast repair + sync suite in BACKGROUND..."
+    NODE_OPTIONS="--max_old_space_size=512" nice -n 19 node scripts/sync-suite.mjs --mode=fast >> /home/bitnami/phimkhoi-sync.log 2>&1 &
 
     echo "Deployment complete and successful!"
 else

@@ -151,7 +151,7 @@ function HeroThumbTile({
     onClick: () => void;
 }) {
     const [failed, setFailed] = useState(false);
-    const thumbSrc = getHeroImage(movie, "backdrop", "desktop");
+    const thumbSrc = getHeroImage(movie, "backdrop", "desktop") || getHeroImage(movie, "poster", "desktop");
     const displayTitle = decodeHtml(movie?.name || movie?.origin_name || "Phim");
 
     return (

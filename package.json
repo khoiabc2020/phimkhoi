@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "sync:fast": "node scripts/sync-suite.mjs --mode=fast",
+    "sync:full": "node scripts/sync-suite.mjs --mode=full",
+    "sync:repair": "node scripts/sync-suite.mjs --mode=repair",
+    "sync:audit": "node scripts/sync-suite.mjs --mode=audit"
   },
   "dependencies": {
     "@capacitor/android": "^8.1.0",
