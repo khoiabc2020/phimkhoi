@@ -6,7 +6,7 @@ import { Play, ChevronLeft, ChevronRight } from "lucide-react";
 import { Movie } from "@/services/api";
 import { getImageUrl, decodeHtml, cn } from "@/lib/utils";
 import { shouldUseTmdbMedia } from "@/lib/movie-list";
-import { resolveMovieImages } from "@/lib/movie-media";
+import { detectImageOrientation, resolveMovieImages } from "@/lib/movie-media";
 import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import WatchlistButton from "./WatchlistButton";
@@ -68,6 +68,12 @@ function tmdbImage(path: string, size: string) {
     return `https://image.tmdb.org/t/p/${size}${p}`;
 }
 
+function getStrictLandscapeFromMovie(movie: any) {
+    const normalized = resolveMovieImages(movie);
+    const thumb = String(normalized.thumb_url || "").trim();
+    return thumb && detectImageOrientation(thumb) === "landscape" ? thumb : "";
+}
+
 function getHeroImage(movie: any, type: "poster" | "backdrop" | "character" | "logo", variant: "mobile" | "desktop") {
     if (movie.isCustomHero) {
         if (type === "backdrop") return movie.layer_bg;
@@ -89,7 +95,7 @@ function getHeroImage(movie: any, type: "poster" | "backdrop" | "character" | "l
     }
 
     if (type === "backdrop") {
-        return backdrop;
+        return getStrictLandscapeFromMovie(movie);
     }
 
     if (poster) {
@@ -112,7 +118,7 @@ function hasDesktopHeroBackdrop(movie: any) {
     const tmdb = shouldUseTmdbMedia(movie, movie?.tmdbData) ? movie.tmdbData : null;
     if (tmdb?.backdrop_path) return true;
 
-    return Boolean(resolveMovieImages(movie).thumb_url);
+    return Boolean(getStrictLandscapeFromMovie(movie));
 }
 
 function HeroBackdropFrame({

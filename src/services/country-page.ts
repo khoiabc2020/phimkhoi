@@ -17,6 +17,7 @@ const COUNTRY_POOL_LOCAL_LIMIT = 480;
 const COUNTRY_POOL_LIVE_LIMIT = 180;
 const COUNTRY_LOCAL_TIMEOUT_MS = 1500;
 const COUNTRY_LIVE_TIMEOUT_MS = 4200;
+
 const dedupeMoviesBySlug = (movies: Movie[] = []): Movie[] => {
     return sanitizeMovieList(movies, { limit: movies.length || 1 });
 };
@@ -49,6 +50,21 @@ const safeSliceWindow = (movies: Movie[], offset: number, size: number): Movie[]
     return movies.slice(start, start + size);
 };
 
+const appendUniqueMovies = (
+    target: Movie[],
+    incoming: Movie[],
+    usedSlugs: Set<string>,
+    limit: number
+) => {
+    for (const movie of incoming) {
+        const slug = String(movie?.slug || "").trim();
+        if (!slug || usedSlugs.has(slug)) continue;
+        target.push(movie);
+        usedSlugs.add(slug);
+        if (target.length >= limit) break;
+    }
+};
+
 export const getCountryPagePool = cache(async (countrySlug: string) => {
     const filterCountryMovies = (items: Movie[] = []) =>
         dedupeMoviesBySlug(items.filter((movie) => matchesCountryForDisplay(movie, countrySlug)));
@@ -60,7 +76,6 @@ export const getCountryPagePool = cache(async (countrySlug: string) => {
     );
     let countryItems = filterCountryMovies(localCountry?.items || EMPTY_ITEMS);
 
-    // Only hit upstream when local cache is too thin; this keeps country pages fast and stable.
     if (countryItems.length < 96) {
         const liveCountryPages = await withTimeout<[({ items?: Movie[] } | null), ({ items?: Movie[] } | null), ({ items?: Movie[] } | null)]>(
             Promise.all([
@@ -71,6 +86,7 @@ export const getCountryPagePool = cache(async (countrySlug: string) => {
             COUNTRY_LIVE_TIMEOUT_MS,
             [null, null, null]
         );
+
         countryItems = filterCountryMovies([
             ...countryItems,
             ...liveCountryPages.flatMap((page) => page?.items || EMPTY_ITEMS),
@@ -113,32 +129,53 @@ export const buildCountrySectionMovies = (
     countryItems: Movie[],
     categorySlug: string,
     fallbackOffset: number = 0,
-    size: number = 24
+    size: number = 24,
+    usedSlugs: Set<string> = new Set()
 ): Movie[] => {
+    const picked: Movie[] = [];
+    const localUsed = new Set<string>(usedSlugs);
     const countryCategory = filterByCategory(countryItems, categorySlug);
-    if (countryCategory.length > 0) {
-        return countryCategory.slice(0, size);
+
+    appendUniqueMovies(picked, countryCategory, localUsed, size);
+    if (picked.length >= size) {
+        return picked;
     }
 
-    // Do not pad a country/category row with arbitrary country titles.
-    // Remote category fetch will complement thin rows later; keeping rows pure
-    // prevents “list nào cũng có” and wrong-category contamination.
-    return [];
+    const paddedWindow = safeSliceWindow(countryItems, fallbackOffset, size * 3);
+    appendUniqueMovies(picked, paddedWindow, localUsed, size);
+
+    if (picked.length < size) {
+        appendUniqueMovies(picked, countryItems, localUsed, size);
+    }
+
+    return picked;
 };
 
 export const buildCountryHomeSections = (
     countryItems: Movie[],
     sections: CountryHomeSectionConfig[]
 ) => {
+    const usedSlugs = new Set<string>();
+
     return sections
-        .map((section) => ({
-            ...section,
-            movies: buildCountrySectionMovies(
+        .map((section) => {
+            const movies = buildCountrySectionMovies(
                 countryItems,
                 section.categorySlug,
                 section.fallbackOffset || 0,
-                24
-            ),
-        }))
+                24,
+                usedSlugs
+            );
+
+            for (const movie of movies) {
+                const slug = String(movie?.slug || "").trim();
+                if (slug) usedSlugs.add(slug);
+            }
+
+            return {
+                ...section,
+                movies,
+            };
+        })
         .filter((section) => section.movies.length > 0);
 };

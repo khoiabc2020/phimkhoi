@@ -21,6 +21,20 @@ import TrendingCache from "@/models/TrendingCache";
 
 const ROW_LIMIT = 12;
 
+const hasHeroMetadata = (movie: any) => {
+  const hasYear = Number.parseInt(String(movie?.year || "").match(/\d{4}/)?.[0] || "", 10) > 1900;
+  const hasCountry = Array.isArray(movie?.country) && movie.country.length > 0;
+  const hasCategory = Array.isArray(movie?.category) && movie.category.length > 0;
+  const hasContent = String(movie?.content || "").replace(/<[^>]+>/g, "").trim().length >= 24;
+  return hasYear || hasCountry || hasCategory || hasContent;
+};
+
+const hasHeroBackdropCandidate = (movie: any) => {
+  if (movie?.isCustomHero) return true;
+  if (movie?.tmdbData?.backdrop_path) return true;
+  return hasLandscapeImage(movie);
+};
+
 const heroSkeleton = (
   <div className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] xl:h-[800px] bg-[#0a0a0a] overflow-hidden">
     <div className="absolute inset-0 shimmer" />
@@ -147,7 +161,7 @@ async function AsyncHeroSection({ initialMovies }: { initialMovies: any[] }) {
       if (movie.isCustomHero) return movie;
 
       const shouldHydrateDetail =
-        idx < 8 &&
+        idx < 12 &&
         (
           !movie?.year ||
           !Array.isArray(movie?.country) ||
@@ -187,17 +201,8 @@ async function AsyncHeroSection({ initialMovies }: { initialMovies: any[] }) {
     })
   );
 
-  const hasHeroBackdrop = (movie: any) => {
-    if (movie?.isCustomHero) return true;
-    if (movie?.tmdbData?.backdrop_path) return true;
-    return hasLandscapeImage(movie);
-  };
-
   const backdropReady = enhancedHeroData.filter((movie) => {
-    const hasYear = Number.parseInt(String(movie?.year || "").match(/\d{4}/)?.[0] || "", 10) > 1900;
-    const hasCountry = Array.isArray(movie?.country) && movie.country.length > 0;
-    const hasCategory = Array.isArray(movie?.category) && movie.category.length > 0;
-    return hasHeroBackdrop(movie) && (hasYear || hasCountry || hasCategory);
+    return hasHeroBackdropCandidate(movie) && hasHeroMetadata(movie);
   });
   const heroMovies = sanitizeMovieList((backdropReady.length > 0 ? backdropReady : enhancedHeroData), { limit: 8 });
 
@@ -269,21 +274,30 @@ async function HeroStream() {
       // 2. Không có Custom Hero -> Fallback tải dữ liệu top trending từ Database trực tiếp
       const cache = await TrendingCache.findOne({ type: 'tmdb-trending-day' }).lean();
       // Ensure we filter out any trailers that might be in the cache
-      finalHeroData = sanitizeMovieList((cache?.movies || []).filter((m: any) => !isTrailer(m) && !isAdultMovie(m)), { limit: 12 });
+      finalHeroData = sanitizeMovieList(
+        (cache?.movies || []).filter((m: any) => !isTrailer(m) && !isAdultMovie(m)),
+        { limit: 16 }
+      );
       
-      if (finalHeroData.length < 3) {
+      if (finalHeroData.filter((movie) => hasHeroBackdropCandidate(movie) && hasHeroMetadata(movie)).length < 6) {
         const backupCache = await TrendingCache.findOne({ type: 'phim-bo' }).lean();
-        finalHeroData = sanitizeMovieList((backupCache?.movies || []).filter((m: any) => !isTrailer(m) && !isAdultMovie(m)), { limit: 12 });
+        finalHeroData = sanitizeMovieList(
+          [...finalHeroData, ...((backupCache?.movies || []).filter((m: any) => !isTrailer(m) && !isAdultMovie(m)))],
+          { limit: 16 }
+        );
       }
     }
   } catch (error) {
     console.error("HeroStream Error:", error);
   }
 
-  if (finalHeroData.length === 0) {
+  if (finalHeroData.filter((movie) => hasHeroBackdropCandidate(movie) && hasHeroMetadata(movie)).length < 6) {
     try {
       const fallback = await getMoviesList("phim-moi-cap-nhat", { limit: 10 });
-      finalHeroData = sanitizeMovieList((fallback.items || []).filter((m: any) => !isTrailer(m) && !isAdultMovie(m)), { limit: 12 });
+      finalHeroData = sanitizeMovieList(
+        [...finalHeroData, ...((fallback.items || []).filter((m: any) => !isTrailer(m) && !isAdultMovie(m)))],
+        { limit: 16 }
+      );
     } catch (error) {
       console.error("HeroStream external fallback error:", error);
     }
