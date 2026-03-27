@@ -3,7 +3,7 @@ import { getMoviesByFilterFromCache, getMoviesFromCache } from '@/lib/movie-cach
 import { getFallbackDisplayMovies, syncMoviesToLocalCache } from '@/services/server-movies';
 import { getMoviesByCategory, getMoviesByCountry, getMoviesList } from '@/services/api';
 import { sanitizeMovieList } from '@/lib/movie-list';
-import { matchesCountryStrict } from '@/lib/movie-country';
+import { matchesCountryForDisplay } from '@/lib/movie-country';
 
 /**
  * [Elite Retrieval API]
@@ -23,7 +23,7 @@ export async function GET(req: Request) {
         const finalize = (items: any[]) => {
             const countryScopedItems =
                 type === 'country' && slug
-                    ? items.filter((item) => matchesCountryStrict(item, slug))
+                    ? items.filter((item) => matchesCountryForDisplay(item, slug))
                     : items;
             return sanitizeMovieList(countryScopedItems, { limit, allowAdult });
         };

@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { isTrailerMovie, sanitizeMovieList, shouldUseTmdbMedia } from "@/lib/movie-list";
 import { normalizeMovieImages } from "@/lib/movie-media";
-import { matchesCountryStrict } from "@/lib/movie-country";
+import { matchesCountryForDisplay } from "@/lib/movie-country";
 
 export const API_URL = "https://phimapi.com";
 
@@ -133,7 +133,7 @@ const toValidYear = (value: unknown): number | undefined => {
     return parsed;
 };
 
-const matchesCountryMovie = (movie: Movie, slug: string) => matchesCountryStrict(movie, slug);
+const matchesCountryMovie = (movie: Movie, slug: string) => matchesCountryForDisplay(movie, slug);
 
 /** 
  * Elite Content Purity Engine: Detects if a movie is just a trailer/teaser 

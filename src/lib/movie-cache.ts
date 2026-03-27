@@ -10,7 +10,7 @@ import type { Movie } from "@/services/api";
 import { cache } from "react";
 import { normalizeMovieImages } from "@/lib/movie-media";
 import { sanitizeMovieList } from "@/lib/movie-list";
-import { matchesCountryStrict } from "@/lib/movie-country";
+import { matchesCountryForDisplay } from "@/lib/movie-country";
 
 const COUNTRY_CACHE_TYPES = new Set(["han-quoc", "trung-quoc", "nhat-ban", "thai-lan", "viet-nam", "dai-loan"]);
 
@@ -35,7 +35,7 @@ export const getMoviesFromCache = async (
         const allMovies = trendingCache.movies as Movie[];
         const normalizedItems = allMovies.map((movie) => normalizeMovieImages(movie));
         const filteredItems = COUNTRY_CACHE_TYPES.has(type)
-            ? normalizedItems.filter((movie) => matchesCountryStrict(movie, type))
+            ? normalizedItems.filter((movie) => matchesCountryForDisplay(movie, type))
             : normalizedItems;
         const cleanItems = sanitizeMovieList(filteredItems, { limit: filteredItems.length || 1 });
         const totalItems = cleanItems.length;
@@ -91,7 +91,7 @@ export const getMoviesByFilterFromCache = async (
 
         const normalizedMovies = (movies as unknown as Movie[]).map((movie) => normalizeMovieImages(movie));
         const filteredMovies = filterType === "country"
-            ? normalizedMovies.filter((movie) => matchesCountryStrict(movie, slug))
+            ? normalizedMovies.filter((movie) => matchesCountryForDisplay(movie, slug))
             : normalizedMovies;
         const cleanMovies = sanitizeMovieList(filteredMovies, { limit });
         const totalItems = Math.max(cleanMovies.length, totalDocCount);

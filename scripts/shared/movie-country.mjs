@@ -86,3 +86,21 @@ export const contradictsCountryMetadata = (movie, countrySlug) => {
     if (!movie || !hasAuthoritativeCountryMetadata(movie)) return false;
     return !matchesCountryStrict(movie, countrySlug);
 };
+
+export const matchesCountryForDisplay = (movie, countrySlug) => {
+    if (!movie) return false;
+    if (matchesCountryStrict(movie, countrySlug)) return true;
+    if (contradictsCountryMetadata(movie, countrySlug)) return false;
+
+    const wanted = normalizeCountryToken(countrySlug).replace(/\s+/g, " ");
+    if (!wanted) return false;
+
+    return (
+        Array.isArray(movie?.country) &&
+        movie.country.some((country) => {
+            const slug = normalizeCountryToken(country?.slug || "");
+            const name = normalizeCountryToken(country?.name || "");
+            return slug === wanted || name === wanted || slug.includes(wanted) || name.includes(wanted);
+        })
+    );
+};

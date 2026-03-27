@@ -9,7 +9,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { normalizeMovieImages } from './shared/movie-media.mjs';
-import { ASIAN_COUNTRY_RULES, matchesCountryStrict } from './shared/movie-country.mjs';
+import { ASIAN_COUNTRY_RULES, matchesCountryForDisplay, matchesCountryStrict } from './shared/movie-country.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, '../.env.local') });
@@ -384,7 +384,7 @@ async function syncMovieList(slug, pages = 1) {
         const unique = allItems.filter(m => {
             if (!m.slug || seen.has(m.slug)) return false;
             if (isTrailer(m)) return false;
-            if (COUNTRY_SYNC_SLUGS.has(slug) && !matchesCountryStrict(m, slug)) return false;
+            if (COUNTRY_SYNC_SLUGS.has(slug) && !matchesCountryForDisplay(m, slug)) return false;
             
             // Fix MongoDB "language override unsupported" error
             if (m.language) {
@@ -398,7 +398,7 @@ async function syncMovieList(slug, pages = 1) {
 
         const cleanCacheMovies = unique
             .filter(movie => !isTrailer(movie))
-            .filter(movie => !COUNTRY_SYNC_SLUGS.has(slug) || matchesCountryStrict(movie, slug))
+            .filter(movie => !COUNTRY_SYNC_SLUGS.has(slug) || matchesCountryForDisplay(movie, slug))
             .map(sanitizeMovieRecord);
 
         await TrendingCache.findOneAndUpdate(

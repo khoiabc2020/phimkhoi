@@ -4,7 +4,7 @@ import dbConnect from "@/lib/db";
 import MovieModel from "@/models/Movie";
 import { getMoviesByCategory, getMoviesByCountry, getMoviesList, type Movie } from "@/services/api";
 import { isAdultMovie, sanitizeMovieList } from "@/lib/movie-list";
-import { matchesCountryStrict } from "@/lib/movie-country";
+import { matchesCountryForDisplay } from "@/lib/movie-country";
 
 const CATEGORY_SLUGS = new Set([
     "hanh-dong", "tinh-cam", "hai-huoc", "co-trang", "tam-ly", "hinh-su",
@@ -36,8 +36,8 @@ const dedupeMovies = (movies: Movie[], limit: number) => {
     );
 };
 
-const filterStrictCountryMovies = (movies: Movie[], countrySlug?: string) =>
-    countrySlug ? movies.filter((movie) => matchesCountryStrict(movie, countrySlug)) : movies;
+const filterDisplayCountryMovies = (movies: Movie[], countrySlug?: string) =>
+    countrySlug ? movies.filter((movie) => matchesCountryForDisplay(movie, countrySlug)) : movies;
 
 const withTimeout = async <T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> => {
     let timer: NodeJS.Timeout | null = null;
@@ -110,7 +110,7 @@ export async function getLocalFallbackDisplayMovies({
         if (broadCategoryDb.length > 0) pools.push(broadCategoryDb);
     }
 
-    return dedupeMovies(filterStrictCountryMovies(pools.flat(), activeCountry), safeLimit);
+    return dedupeMovies(filterDisplayCountryMovies(pools.flat(), activeCountry), safeLimit);
 }
 
 export async function syncMoviesToLocalCache(movies: Movie[]) {
@@ -283,5 +283,5 @@ export async function getFallbackDisplayMovies({
         });
     }
 
-    return dedupeMovies(filterStrictCountryMovies(pools.flat(), activeCountry), safeLimit);
+    return dedupeMovies(filterDisplayCountryMovies(pools.flat(), activeCountry), safeLimit);
 }

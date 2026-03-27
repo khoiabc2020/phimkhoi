@@ -19,7 +19,7 @@ import {
     getMovieDetailFromCache, 
     saveMovieToCache 
 } from "@/lib/movie-cache";
-import { matchesCountryStrict } from "@/lib/movie-country";
+import { matchesCountryForDisplay } from "@/lib/movie-country";
 
 const COUNTRY_TYPES = new Set(["han-quoc", "trung-quoc", "nhat-ban", "thai-lan", "viet-nam", "dai-loan"]);
 
@@ -52,7 +52,7 @@ export async function getResilientMoviesList(
         const activeCountry = options.country || (COUNTRY_TYPES.has(type) ? type : "");
         const finalize = (items: Movie[]) => {
             const countryScopedItems = activeCountry
-                ? items.filter((movie) => matchesCountryStrict(movie, activeCountry))
+                ? items.filter((movie) => matchesCountryForDisplay(movie, activeCountry))
                 : items;
             return sanitizeMovieList(countryScopedItems, { limit, allowAdult });
         };

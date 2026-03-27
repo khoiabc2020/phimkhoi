@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import { normalizeMovieImages } from "./shared/movie-media.mjs";
-import { ASIAN_COUNTRY_RULES, contradictsCountryMetadata, matchesCountryStrict, normalizeCountryToken } from "./shared/movie-country.mjs";
+import { ASIAN_COUNTRY_RULES, contradictsCountryMetadata, matchesCountryForDisplay, normalizeCountryToken } from "./shared/movie-country.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, "../.env.local") });
@@ -127,7 +127,7 @@ async function repairTrendingCaches() {
         const movies = Array.isArray(doc.movies) ? doc.movies : [];
         const nextMovies = movies
             .filter((movie) => !isTrailerMovie(movie))
-            .filter((movie) => !COUNTRY_CACHE_TYPES.has(String(doc.type || "")) || matchesCountryStrict(movie, String(doc.type || "")))
+            .filter((movie) => !COUNTRY_CACHE_TYPES.has(String(doc.type || "")) || matchesCountryForDisplay(movie, String(doc.type || "")))
             .map((movie) => normalizeMovieImages(movie));
 
         const changed = JSON.stringify(movies) !== JSON.stringify(nextMovies);
