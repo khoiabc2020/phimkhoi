@@ -62,7 +62,7 @@ export default async function CountryPage({
     const displayTitle = countryName;
 
     return (
-        <main className="min-h-screen pb-20 bg-[#0a0a0a] relative overflow-hidden">
+        <main className="min-h-screen pb-20 bg-[#0a0a0a] relative overflow-x-hidden overflow-y-visible">
             <div className="pt-24 w-full max-w-[1920px] mx-auto px-4 sm:px-6 md:px-12 lg:pl-24 lg:pr-12 relative">
                 {/* Decorative background glow */}
                 <div className={cn("absolute top-0 left-0 right-0 h-[500px] via-transparent to-transparent pointer-events-none -z-10 blur-[130px] opacity-60", theme.glow)} />
@@ -87,7 +87,7 @@ export default async function CountryPage({
                         </div>
                     </div>
 
-                    <div className="w-full md:w-auto bg-[#07070b]/78 backdrop-blur-md rounded-[12px] p-1 border border-white/[0.06] shadow-xl">
+                    <div className="w-full md:w-auto bg-[#07070b]/78 backdrop-blur-md rounded-[12px] p-1 border border-white/[0.06] shadow-xl overflow-visible relative z-20">
                         <Suspense fallback={<div className="w-32 h-8 bg-white/5 animate-pulse rounded" />}>
                             <FilterBar categories={categories} countries={countries} hideCountry={true} />
                         </Suspense>
@@ -107,4 +107,3 @@ export default async function CountryPage({
         </main>
     );
 }
-

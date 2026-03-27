@@ -249,7 +249,7 @@ export default async function SearchPage({
     ];
 
     return (
-        <main className="min-h-screen pb-20 bg-[#0a0a0a] relative overflow-hidden">
+        <main className="min-h-screen pb-20 bg-[#0a0a0a] relative overflow-x-hidden overflow-y-visible">
             <div
                 className={cn(
                     "absolute top-0 left-0 right-0 h-[600px] via-transparent to-transparent pointer-events-none -z-10 blur-[150px] opacity-50",
@@ -277,7 +277,7 @@ export default async function SearchPage({
                         )}
                     </div>
 
-                    <div className="w-full md:w-auto">
+                    <div className="w-full md:w-auto overflow-visible relative z-20">
                         <FilterBar categories={categories} countries={countries} years={years} />
                     </div>
                 </div>

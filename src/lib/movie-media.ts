@@ -13,7 +13,7 @@ type Candidate = {
     orientation: ImageOrientation;
 };
 
-const TRUSTED_LOCAL_PREFIXES = ["/images", "/icons", "/favicon", "/_next"];
+const TRUSTED_LOCAL_PREFIXES = ["/images", "/icons", "/favicon", "/_next", "/api", "/placeholder"];
 
 const PHIMIMG_UPLOAD_PREFIXES = [
     "upload/",

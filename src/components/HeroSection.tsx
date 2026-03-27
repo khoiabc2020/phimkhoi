@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Play, ChevronLeft, ChevronRight } from "lucide-react";
 import { Movie } from "@/services/api";
-import { getImageUrl, getPosterImageUrl, getBackdropImageUrl, decodeHtml, cn, detectOrientation } from "@/lib/utils";
+import { getImageUrl, decodeHtml, cn, detectOrientation } from "@/lib/utils";
 import { shouldUseTmdbMedia } from "@/lib/movie-list";
 import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -60,32 +60,43 @@ function getHeroImage(movie: any, type: "poster" | "backdrop" | "character" | "l
     const tmdb = shouldUseTmdbMedia(movie, movie?.tmdbData) ? movie.tmdbData : null;
     if (tmdb) {
         if (type === "poster" && tmdb.poster_path)
-            return getImageUrl(tmdbImage(tmdb.poster_path, variant === "desktop" ? "w500" : "w780"), true);
+            return tmdbImage(tmdb.poster_path, variant === "desktop" ? "w500" : "w780");
         if (type === "backdrop" && tmdb.backdrop_path)
-            return getImageUrl(tmdbImage(tmdb.backdrop_path, variant === "desktop" ? "original" : "w780"), true);
+            return tmdbImage(tmdb.backdrop_path, variant === "desktop" ? "original" : "w780");
     }
 
     if (type === "backdrop") {
-        const tmdbBackdrop = tmdb?.backdrop_path
-            ? getImageUrl(tmdbImage(tmdb.backdrop_path, variant === "desktop" ? "original" : "w780"), true)
-            : "";
-        if (tmdbBackdrop) return tmdbBackdrop;
-
         const thumb = String(movie?.thumb_url || "").trim();
         const thumbOrientation = detectOrientation(thumb);
         if (thumb && thumbOrientation === "landscape") {
-            return getImageUrl(thumb, true);
+            return thumb;
         }
 
         if (variant === "mobile") {
-            return getPosterImageUrl(movie, true) || getBackdropImageUrl(movie, true) || "/placeholder.jpg";
+            const poster = String(movie?.poster_url || "").trim();
+            const posterOrientation = detectOrientation(poster);
+            if (poster && posterOrientation !== "landscape") {
+                return poster;
+            }
         }
 
         return "";
     }
 
-    const poster = getPosterImageUrl(movie, true);
-    return poster || getBackdropImageUrl(movie, true) || "/placeholder.jpg";
+    const poster = String(movie?.poster_url || "").trim();
+    const posterOrientation = detectOrientation(poster);
+    if (poster && posterOrientation !== "landscape") {
+        return poster;
+    }
+
+    if (variant === "mobile") {
+        const backdrop = String(movie?.thumb_url || "").trim();
+        if (backdrop && detectOrientation(backdrop) === "landscape") {
+            return backdrop;
+        }
+    }
+
+    return "/placeholder.jpg";
 }
 
 function hasDesktopHeroBackdrop(movie: any) {
@@ -374,10 +385,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                         <div className="absolute inset-0 z-[1] pointer-events-none">
                             <div className="relative w-full h-full">
                                 <Image
-                                    src={movie.layer_character.startsWith('http')
-                                        ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(movie.layer_character)}&w=1200&q=85`
-                                        : movie.layer_character
-                                    }
+                                    src={getImageUrl(movie.layer_character)}
                                     alt=""
                                     fill
                                     className="object-cover object-[center_bottom]"
@@ -402,14 +410,10 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                                     {movie.isCustomHero && movie.layer_logo ? (
                                         <div className="relative w-full max-w-[400px] md:max-w-[500px] lg:max-w-[600px] h-[100px] md:h-[130px] lg:h-[160px] mb-4">
                                             <Image
-                                                src={movie.layer_logo.startsWith('http')
-                                                    ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(movie.layer_logo)}&w=800&q=85`
-                                                    : movie.layer_logo
-                                                }
+                                                src={getImageUrl(movie.layer_logo)}
                                                 alt={decodeHtml(movie.name)}
                                                 fill
                                                 className="object-contain object-left-bottom drop-shadow-[0_8px_16px_rgba(0,0,0,0.8)]"
-                                                unoptimized={!movie.layer_logo.startsWith('http')}
                                                 priority
                                             />
                                         </div>

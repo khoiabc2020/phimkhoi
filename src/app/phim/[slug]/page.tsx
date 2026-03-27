@@ -191,8 +191,16 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     }
 
     // --- VISUAL ENGINE SELECTION ---
-    const sourceThumb = getBackdropImageUrl(movie);
-    const sourcePoster = getPosterImageUrl(movie);
+    const rawThumb = String(movie?.thumb_url || "").trim();
+    const rawPoster = String(movie?.poster_url || "").trim();
+    const sourceThumb =
+        rawThumb && detectOrientation(rawThumb) === "landscape"
+            ? getImageUrl(rawThumb)
+            : "";
+    const sourcePoster =
+        rawPoster && detectOrientation(rawPoster) !== "landscape"
+            ? getImageUrl(rawPoster)
+            : "";
     const trustedTmdbDetails = shouldUseTmdbMedia(movie, tmdbDetails) ? tmdbDetails : null;
     const tmdbBackdrop = trustedTmdbDetails?.backdrop_path ? getTMDBImage(trustedTmdbDetails.backdrop_path, "original") : "";
     const tmdbPoster = trustedTmdbDetails?.poster_path ? getTMDBImage(trustedTmdbDetails.poster_path, "original") : "";
@@ -200,10 +208,10 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     const isNguonC = movie?.episodes?.[0]?.server_name?.toLowerCase().includes('nguonc');
     
     // Ambient Background: Priority = TMDB Backdrop > Source Thumb
-    const ambientBgUrl = tmdbBackdrop || sourceThumb || tmdbPoster || sourcePoster || "/fallback.png";
+    const ambientBgUrl = tmdbBackdrop || sourceThumb || "";
     
     // Subject Content: Priority = Source Thumb (Authentic) > TMDB Poster
-    let contentSubjectUrl = sourceThumb || sourcePoster || tmdbBackdrop || tmdbPoster || "/fallback.png";
+    let contentSubjectUrl = sourcePoster || tmdbPoster || sourceThumb || tmdbBackdrop || "/fallback.png";
     if (isNguonC && (tmdbPoster || tmdbBackdrop)) {
         contentSubjectUrl = tmdbPoster || tmdbBackdrop || sourceThumb || sourcePoster || "/fallback.png";
     }
