@@ -130,13 +130,12 @@ async function resolveCountrySections(
     countryItems: any[],
     configs: CountryHomeSectionConfig[]
 ) {
-    const filteredCountryItems = countryItems.filter((movie) => matchesCountryForDisplay(movie, countrySlug));
-    const baseSections = buildCountryHomeSections(filteredCountryItems, configs);
+    const baseSections = buildCountryHomeSections(countryItems, configs);
 
     const sections = await Promise.all(
         configs.map(async (config) => {
             const baseSection = baseSections.find((section) => section.categorySlug === config.categorySlug);
-            const localCategory = filterByCategory(filteredCountryItems, config.categorySlug);
+            const localCategory = filterByCategory(countryItems, config.categorySlug);
             const baseMovies = sanitizeMovieList(
                 [...(baseSection?.movies || []), ...localCategory],
                 { limit: 24 }
@@ -153,7 +152,7 @@ async function resolveCountrySections(
             );
 
             const merged = sanitizeMovieList(
-                [...baseMovies, ...(remote.items || [])].filter((movie: any) => matchesCountryForDisplay(movie, countrySlug)),
+                [...baseMovies, ...(remote.items || [])],
                 { limit: 24 }
             );
 
@@ -169,13 +168,10 @@ async function PhimHanHome() {
         countryItems: [] as any[],
         fallbackItems: [] as any[],
     }));
-    const safeCountryItems = countryItems.filter((movie) => matchesCountryForDisplay(movie, "han-quoc"));
     const latestMovies = fallbackItems.length > 0
-        ? fallbackItems.filter((movie: any) => matchesCountryForDisplay(movie, "han-quoc")).slice(0, 14)
-        : ((await getResilientMoviesList("han-quoc", 1, 14, { country: "han-quoc" })).items || []).filter((movie: any) =>
-            matchesCountryForDisplay(movie, "han-quoc")
-        );
-    const sections = await resolveCountrySections("han-quoc", safeCountryItems, SECTION_CONFIG);
+        ? fallbackItems.slice(0, 14)
+        : (await getResilientMoviesList("han-quoc", 1, 14, { country: "han-quoc" })).items || [];
+    const sections = await resolveCountrySections("han-quoc", countryItems, SECTION_CONFIG);
 
     return (
         <div className="space-y-12 md:space-y-16 pb-12">
