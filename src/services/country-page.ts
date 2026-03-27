@@ -3,7 +3,7 @@ import type { Movie } from "@/services/api";
 import { getMoviesByCountry } from "@/services/api";
 import { getMoviesByFilterFromCache } from "@/lib/movie-cache";
 import { sanitizeMovieList } from "@/lib/movie-list";
-import { matchesCountryForDisplay } from "@/lib/movie-country";
+import { matchesCountryForDisplay, normalizeCountryToken } from "@/lib/movie-country";
 
 export interface CountryHomeSectionConfig {
     title: string;
@@ -66,6 +66,21 @@ const appendUniqueMovies = (
 };
 
 export const getCountryPagePool = cache(async (countrySlug: string) => {
+    const matchesCountryLoose = (movie: Movie | null | undefined) => {
+        if (!movie) return false;
+        const wanted = normalizeCountryToken(countrySlug).replace(/\s+/g, " ");
+        if (!wanted) return false;
+
+        return (
+            Array.isArray(movie?.country) &&
+            movie.country.some((country: any) => {
+                const slug = normalizeCountryToken(country?.slug || "");
+                const name = normalizeCountryToken(country?.name || "");
+                return slug === wanted || name === wanted || slug.includes(wanted) || name.includes(wanted);
+            })
+        );
+    };
+
     const filterCountryMovies = (items: Movie[] = []) =>
         dedupeMoviesBySlug(items.filter((movie) => matchesCountryForDisplay(movie, countrySlug)));
 
@@ -74,7 +89,9 @@ export const getCountryPagePool = cache(async (countrySlug: string) => {
         COUNTRY_LOCAL_TIMEOUT_MS,
         null
     );
-    let countryItems = filterCountryMovies(localCountry?.items || EMPTY_ITEMS);
+    const rawLocalItems = localCountry?.items || EMPTY_ITEMS;
+    let countryItems = filterCountryMovies(rawLocalItems);
+    let rawCombined = rawLocalItems;
 
     if (countryItems.length < 96) {
         const liveCountryPages = await withTimeout<[({ items?: Movie[] } | null), ({ items?: Movie[] } | null), ({ items?: Movie[] } | null)]>(
@@ -86,11 +103,17 @@ export const getCountryPagePool = cache(async (countrySlug: string) => {
             COUNTRY_LIVE_TIMEOUT_MS,
             [null, null, null]
         );
-
+        const liveItems = liveCountryPages.flatMap((page) => page?.items || EMPTY_ITEMS);
+        rawCombined = [...rawCombined, ...liveItems];
         countryItems = filterCountryMovies([
             ...countryItems,
-            ...liveCountryPages.flatMap((page) => page?.items || EMPTY_ITEMS),
+            ...liveItems,
         ]);
+    }
+
+    if (countryItems.length < 120 && rawCombined.length > 0) {
+        const looseItems = dedupeMoviesBySlug(rawCombined.filter((movie) => matchesCountryLoose(movie)));
+        countryItems = dedupeMoviesBySlug([...countryItems, ...looseItems]);
     }
 
     return {

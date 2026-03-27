@@ -134,7 +134,18 @@ function MovieCard({
                 portraitPosterSource,
                 getPosterImageUrl(movie),
             ];
-        return Array.from(new Set(list.filter(Boolean))) as string[];
+
+        const filtered = list.filter((item) => {
+            if (!item) return false;
+            const orientationHint = detectOrientation(item);
+            if (orientation === "landscape") {
+                return orientationHint === "landscape" || orientationHint === "unknown";
+            }
+            return orientationHint === "portrait" || orientationHint === "unknown";
+        });
+
+        const source = filtered.length > 0 ? filtered : list;
+        return Array.from(new Set(source.filter(Boolean))) as string[];
     }, [orientation, movie, portraitPosterSource, tmdbPoster, tmdbBackdropPath]);
 
     const activePosterSrc = useMemo(() => {

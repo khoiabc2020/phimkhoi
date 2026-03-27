@@ -154,7 +154,7 @@ async function resolveCountrySections(
                 { limit: 24 }
             );
 
-            if (baseMovies.length >= 10) {
+            if (baseMovies.length >= 8) {
                 return { ...config, movies: baseMovies };
             }
 
@@ -169,7 +169,7 @@ async function resolveCountrySections(
                 { limit: 24 }
             );
 
-            return merged.length >= 6 ? { ...config, movies: merged } : null;
+            return merged.length >= 4 ? { ...config, movies: merged } : null;
         })
     );
 
