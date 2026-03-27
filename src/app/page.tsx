@@ -18,6 +18,19 @@ import TrendingCache from "@/models/TrendingCache";
 
 
 const ROW_LIMIT = 12;
+const withTimeout = async <T,>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> => {
+  let timer: NodeJS.Timeout | null = null;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<T>((resolve) => {
+        timer = setTimeout(() => resolve(fallback), timeoutMs);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+};
 
 const hasHeroMetadata = (movie: any) => {
   const hasYear = Number.parseInt(String(movie?.year || "").match(/\d{4}/)?.[0] || "", 10) > 1900;
