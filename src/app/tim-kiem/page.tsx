@@ -1,14 +1,15 @@
 import { Suspense } from "react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { headers } from "next/headers";
+import { SearchX, User } from "lucide-react";
+
 import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
-import { searchMovies } from "@/services/api";
-import { searchTMDBPerson } from "@/services/tmdb";
-import { SearchX, User } from "lucide-react";
-import Link from "next/link";
-import type { Metadata } from "next";
-import { headers } from "next/headers";
 import { getThemeBySlug } from "@/lib/theme";
 import { cn } from "@/lib/utils";
+import { getMenuData, searchMovies } from "@/services/api";
+import { searchTMDBPerson } from "@/services/tmdb";
 
 export const metadata: Metadata = {
     title: "Tìm kiếm phim",
@@ -18,6 +19,7 @@ export const metadata: Metadata = {
         follow: true,
     },
 };
+
 async function SearchResultsStream({
     keyword,
     category,
@@ -31,11 +33,10 @@ async function SearchResultsStream({
     year?: string;
     limit: number;
 }) {
-    // Phase 1: Deep scan of local and external sources
     const moviesCount = limit || 49;
     const [movies, actors] = await Promise.all([
         searchMovies(keyword, { enrichTMDB: false, limit: moviesCount * 2 }),
-        keyword.length >= 3 ? searchTMDBPerson(keyword) : Promise.resolve([])
+        keyword.length >= 3 ? searchTMDBPerson(keyword) : Promise.resolve([]),
     ]);
 
     const normalizeText = (value: string | undefined | null) =>
@@ -45,14 +46,6 @@ async function SearchResultsStream({
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, " ")
             .trim();
-
-    const imageSignature = (value: string | undefined | null) => {
-        const raw = String(value || "").trim().toLowerCase();
-        if (!raw) return "";
-        const noQuery = raw.split("?")[0];
-        const file = noQuery.split("/").pop() || "";
-        return file.replace(/\.(jpg|jpeg|png|webp|avif)$/i, "");
-    };
 
     const qualityRank = (quality: string | undefined | null) => {
         const q = normalizeText(quality);
@@ -92,7 +85,6 @@ async function SearchResultsStream({
         country: mergeArraysBySlug(preferred?.country, other?.country),
     });
 
-    // Deduplicate
     const dedupedMap = (movies || []).reduce((acc: Map<string, any>, movie: any) => {
         const titleYearKey = `${normalizeText(movie.name)}|${normalizeText(movie.origin_name)}|${movie.year || ""}`.replace(/\|+/g, "|");
         const current = acc.get(titleYearKey);
@@ -100,17 +92,30 @@ async function SearchResultsStream({
             acc.set(titleYearKey, movie);
             return acc;
         }
+
         const currentScore = metadataScore(current);
         const candidateScore = metadataScore(movie);
-        acc.set(titleYearKey, mergeMovieData(candidateScore >= currentScore ? movie : current, candidateScore >= currentScore ? current : movie));
+        acc.set(
+            titleYearKey,
+            mergeMovieData(
+                candidateScore >= currentScore ? movie : current,
+                candidateScore >= currentScore ? current : movie
+            )
+        );
         return acc;
     }, new Map<string, any>());
 
     const uniqueMovies = Array.from(dedupedMap.values());
     const filteredMovies = uniqueMovies.filter((movie: any) => {
-        if (category && category !== "all" && !movie.category?.some((c: { slug: string }) => c.slug === category)) return false;
-        if (country && country !== "all" && !movie.country?.some((c: { slug: string }) => c.slug === country)) return false;
-        if (year && year !== "all" && Number(movie.year) !== parseInt(year, 10)) return false;
+        if (category && category !== "all" && !movie.category?.some((c: { slug: string }) => c.slug === category)) {
+            return false;
+        }
+        if (country && country !== "all" && !movie.country?.some((c: { slug: string }) => c.slug === country)) {
+            return false;
+        }
+        if (year && year !== "all" && Number(movie.year) !== parseInt(year, 10)) {
+            return false;
+        }
         return true;
     });
 
@@ -140,21 +145,33 @@ async function SearchResultsStream({
             {hasActors && (
                 <div className="mb-10">
                     <div className="flex items-center gap-2 mb-4">
-                        <span className="w-1 h-5 bg-[#8FA7C5] rounded-full"></span>
+                        <span className="w-1 h-5 bg-[#8FA7C5] rounded-full" />
                         <h2 className="text-base font-bold text-white">Diễn viên / Đạo diễn</h2>
                     </div>
                     <div className="flex gap-4 overflow-x-auto pb-3 scrollbar-none">
                         {visibleActors.map((actor: any) => (
-                            <Link key={actor.id} href={`/dien-vien/${actor.name.toLowerCase().replace(/ /g, '-')}`} className="flex-shrink-0 flex flex-col items-center gap-2 group">
+                            <Link
+                                key={actor.id}
+                                href={`/dien-vien/${actor.name.toLowerCase().replace(/ /g, "-")}`}
+                                className="flex-shrink-0 flex flex-col items-center gap-2 group"
+                            >
                                 <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-[#8FA7C5] transition-colors bg-white/5">
                                     {actor.profile_path ? (
-                                        <img src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`} alt={actor.name} className="w-full h-full object-cover" />
+                                        <img
+                                            src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`}
+                                            alt={actor.name}
+                                            className="w-full h-full object-cover"
+                                        />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center"><User className="w-8 h-8 text-gray-500" /></div>
+                                        <div className="w-full h-full flex items-center justify-center">
+                                            <User className="w-8 h-8 text-gray-500" />
+                                        </div>
                                     )}
                                 </div>
                                 <div className="text-center max-w-[88px]">
-                                    <p className="text-xs font-semibold text-white group-hover:text-[#c7d7ea] transition-colors truncate">{actor.name}</p>
+                                    <p className="text-xs font-semibold text-white group-hover:text-[#c7d7ea] transition-colors truncate">
+                                        {actor.name}
+                                    </p>
                                 </div>
                             </Link>
                         ))}
@@ -165,14 +182,14 @@ async function SearchResultsStream({
             {hasMovies ? (
                 <>
                     <div className="flex items-center gap-2 mb-4">
-                        <span className="w-1 h-5 bg-[#8FA7C5] rounded-full"></span>
+                        <span className="w-1 h-5 bg-[#8FA7C5] rounded-full" />
                         <h2 className="text-base font-bold text-white">Phim kết quả</h2>
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 [contain-intrinsic-size:0_500px] [content-visibility:auto]">
                         {visibleMovies.map((movie: any, idx: number) => (
-                            <MovieCard 
-                                key={movie._id || movie.slug} 
-                                movie={movie} 
+                            <MovieCard
+                                key={movie._id || movie.slug}
+                                movie={movie}
                                 priority={idx < 7}
                                 loading={idx < 14 ? "eager" : "lazy"}
                             />
@@ -185,7 +202,9 @@ async function SearchResultsStream({
                         <SearchX className="w-10 h-10 text-gray-500" />
                     </div>
                     <h2 className="text-xl md:text-2xl font-bold text-white mb-2">Không tìm thấy kết quả nào</h2>
-                    <p className="text-gray-400 max-w-md mx-auto">Hãy thử với từ khóa khác hoặc điều chỉnh bộ lọc.</p>
+                    <p className="text-gray-400 max-w-md mx-auto">
+                        Hãy thử với từ khóa khác hoặc điều chỉnh bộ lọc.
+                    </p>
                 </div>
             ) : null}
         </div>
@@ -203,8 +222,12 @@ const SearchSkeleton = ({ limit = 49 }: { limit?: number }) => (
     </div>
 );
 
-export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string; keyword?: string; category?: string; country?: string; year?: string }> }) {
-    const userAgent = (await headers()).get('user-agent') || '';
+export default async function SearchPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ q?: string; keyword?: string; category?: string; country?: string; year?: string }>;
+}) {
+    const userAgent = (await headers()).get("user-agent") || "";
     const isMobile = /mobile|android|iphone|ipad/i.test(userAgent);
     const limit = isMobile ? 28 : 49;
     const theme = getThemeBySlug("tim-kiem");
@@ -213,11 +236,27 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     const { q, keyword: k, category, country, year } = sParams;
     const keyword = (k || q || "").trim();
 
+    const { categories, countries } = await getMenuData();
+    const currentYear = new Date().getFullYear();
+    const years = [
+        ...Array.from({ length: 30 }, (_, i) => ({
+            name: `${currentYear - i}`,
+            slug: `${currentYear - i}`,
+        })),
+        { name: "2010s", slug: "2010" },
+        { name: "2000s", slug: "2000" },
+        { name: "1990s", slug: "1990" },
+    ];
+
     return (
         <main className="min-h-screen pb-20 bg-[#0a0a0a] relative overflow-hidden">
-            {/* Decorative background glow */}
-            <div className={cn("absolute top-0 left-0 right-0 h-[600px] via-transparent to-transparent pointer-events-none -z-10 blur-[150px] opacity-50", theme.glow)} />
-            
+            <div
+                className={cn(
+                    "absolute top-0 left-0 right-0 h-[600px] via-transparent to-transparent pointer-events-none -z-10 blur-[150px] opacity-50",
+                    theme.glow
+                )}
+            />
+
             <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 lg:pl-24 lg:pr-12 pt-24">
                 <div className="mb-6 rounded-[12px] border border-white/[0.06] bg-[#07070b]/78 backdrop-blur-md p-4 md:p-5 shadow-xl transition-all flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <div className="space-y-1">
@@ -225,15 +264,21 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                             {keyword ? (
                                 <>
                                     <span className="text-white/60 font-medium mr-2">Kết quả:</span>
-                                    <span className="text-[#c7d7ea] truncate max-w-[200px] md:max-w-md">"{keyword}"</span>
+                                    <span className="text-[#c7d7ea] truncate max-w-[200px] md:max-w-md">
+                                        "{keyword}"
+                                    </span>
                                 </>
-                            ) : "Tìm kiếm"}
+                            ) : (
+                                "Tìm kiếm"
+                            )}
                         </h1>
-                        {!keyword && <p className="text-gray-400 text-sm">Nhập từ khóa để bắt đầu tìm phim.</p>}
+                        {!keyword && (
+                            <p className="text-gray-400 text-sm">Nhập từ khóa để bắt đầu tìm phim.</p>
+                        )}
                     </div>
-                    
+
                     <div className="w-full md:w-auto">
-                        <FilterBar />
+                        <FilterBar categories={categories} countries={countries} years={years} />
                     </div>
                 </div>
 
@@ -246,12 +291,15 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                         <p className="text-gray-500 mt-2">Tìm theo tên phim, diễn viên hoặc đạo diễn</p>
                     </div>
                 ) : (
-                    <Suspense key={`${keyword}-${category}-${country}-${year}`} fallback={<SearchSkeleton limit={limit} />}>
-                        <SearchResultsStream 
-                            keyword={keyword} 
-                            category={category} 
-                            country={country} 
-                            year={year} 
+                    <Suspense
+                        key={`${keyword}-${category}-${country}-${year}`}
+                        fallback={<SearchSkeleton limit={limit} />}
+                    >
+                        <SearchResultsStream
+                            keyword={keyword}
+                            category={category}
+                            country={country}
+                            year={year}
                             limit={limit}
                         />
                     </Suspense>

@@ -1,4 +1,4 @@
-import dynamic from "next/dynamic";
+﻿import dynamic from "next/dynamic";
 import { getMovieDetail, getMoviesList } from "@/services/api";
 import { getRelatedMoviesForMovie } from "@/services/server-movies";
 import { getMovieDetailFromCache, saveMovieToCache } from "@/lib/movie-cache";
@@ -6,7 +6,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Play, PlayCircle, Share2, Star, Clock, Film } from "lucide-react";
 import FavoriteButton from "@/components/FavoriteButton";
-import { getImageUrl, getPosterImageUrl, getBackdropImageUrl, detectOrientation, cn, buildEpisodeKeyCandidates } from "@/lib/utils";
+import { decodeHtml, getImageUrl, getPosterImageUrl, getBackdropImageUrl, detectOrientation, cn, buildEpisodeKeyCandidates } from "@/lib/utils";
 import { shouldUseTmdbMedia } from "@/lib/movie-list";
 import Image from "next/image";
 import { getThemeBySlug } from "@/lib/theme";
@@ -109,20 +109,27 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     // --- DATA NORMALIZATION TO PREVENT SERVER COMPONENT RENDER CRASHES ---
     if (movie) {
         if (typeof movie.actor === 'string') {
-            movie.actor = movie.actor.split(',').map((s: string) => s.trim()).filter(Boolean);
+            movie.actor = movie.actor.split(',').map((s: string) => decodeHtml(s.trim())).filter(Boolean);
         } else if (!Array.isArray(movie.actor)) {
             movie.actor = [];
+        } else {
+            movie.actor = movie.actor.map((s: string) => decodeHtml(String(s || "").trim())).filter(Boolean);
         }
         
         if (typeof movie.director === 'string') {
-            movie.director = movie.director.split(',').map((s: string) => s.trim()).filter(Boolean);
+            movie.director = movie.director.split(',').map((s: string) => decodeHtml(s.trim())).filter(Boolean);
         } else if (!Array.isArray(movie.director)) {
             movie.director = [];
+        } else {
+            movie.director = movie.director.map((s: string) => decodeHtml(String(s || "").trim())).filter(Boolean);
         }
         
         if (!Array.isArray(movie.category)) movie.category = [];
         if (!Array.isArray(movie.country)) movie.country = [];
         if (typeof movie.content !== 'string') movie.content = String(movie.content || "");
+        movie.name = decodeHtml(String(movie.name || ""));
+        movie.origin_name = decodeHtml(String(movie.origin_name || ""));
+        movie.content = decodeHtml(movie.content);
     }
 
     // Determine type for TMDB
@@ -204,6 +211,45 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     const subjectOrientation = detectOrientation(contentSubjectUrl);
     const isSubjectPortrait = subjectOrientation === "portrait";
     const rating = trustedTmdbDetails?.vote_average ? Number(trustedTmdbDetails.vote_average).toFixed(1) : "9.7";
+    const languageMap: Record<string, string> = {
+        en: "Tiếng Anh",
+        ko: "Tiếng Hàn",
+        zh: "Tiếng Trung",
+        ja: "Tiếng Nhật",
+        th: "Tiếng Thái",
+        vi: "Tiếng Việt",
+    };
+    const countryMap: Record<string, string> = {
+        KR: "Hàn Quốc",
+        CN: "Trung Quốc",
+        TW: "Đài Loan",
+        HK: "Hồng Kông",
+        JP: "Nhật Bản",
+        US: "Âu Mỹ",
+        GB: "Anh",
+        TH: "Thái Lan",
+        VN: "Việt Nam",
+    };
+    const displayDirector =
+        movie?.director?.join(", ") ||
+        trustedTmdbDetails?.credits?.crew?.find((c: any) => c.job === "Director")?.name ||
+        "Đang cập nhật";
+    const displayActors =
+        (Array.isArray(movie?.actor) ? movie.actor.filter(Boolean) : []).join(", ") ||
+        trustedTmdbDetails?.credits?.cast?.slice(0, 8).map((c: { name?: string }) => decodeHtml(String(c.name || ""))).join(", ") ||
+        "Đang cập nhật";
+    const displayCountry =
+        movie?.country?.[0]?.name ||
+        trustedTmdbDetails?.origin_country?.map((code: string) => countryMap[code] || code).filter(Boolean).join(", ") ||
+        "Đang cập nhật";
+    const displayYear =
+        movie?.year ||
+        Number(String(trustedTmdbDetails?.release_date || trustedTmdbDetails?.first_air_date || "").slice(0, 4)) ||
+        "Đang cập nhật";
+    const displayLanguage =
+        movie?.lang ||
+        languageMap[String(trustedTmdbDetails?.original_language || "").toLowerCase()] ||
+        "Đang cập nhật";
 
     const jsonLd = {
         "@context": "https://schema.org",
@@ -353,9 +399,9 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
 
                         {(() => {
                             const epCurrent = movie?.episode_current || "";
-                            const isCompleted = epCurrent.toLowerCase().includes("hoàn tất") || epCurrent.toLowerCase().includes("full");
+                            const normalizedEpisodeCurrent = epCurrent.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+                            const isCompleted = normalizedEpisodeCurrent.includes("hoan tat") || normalizedEpisodeCurrent.includes("full");
                             const total = movie?.episode_total || "?";
-                            // Extract episode number, removing "Tập " strings to avoid duplication
                             const epNum = epCurrent.replace(/hoàn tất/gi, "").replace(/\(.*?\)/g, "").replace(/tập\s*/gi, "").trim() || "1";
                             return (
                                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 font-bold text-sm mt-3 drop-shadow-md">
@@ -363,9 +409,9 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                         <>
                                             <span className="inline-flex items-center gap-1.5 bg-[#8FA7C5]/15 text-[#8FA7C5] border border-[#8FA7C5]/30 px-3 py-1 rounded-full text-xs font-bold">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-[#8FA7C5] inline-block" />
-                                                Hoàn Tất
+                                                Hoàn tất
                                             </span>
-                                            <span className="text-gray-300 text-xs font-medium bg-white/5 border border-white/10 px-3 py-1 rounded-full">{total} Tập</span>
+                                            <span className="text-gray-300 text-xs font-medium bg-white/5 border border-white/10 px-3 py-1 rounded-full">{total} tập</span>
                                         </>
                                     ) : (
                                         <>
@@ -404,13 +450,13 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
 
                         <div className="text-xs sm:text-sm text-gray-300 flex flex-wrap items-center justify-center md:justify-start gap-2 sm:gap-4 py-2 drop-shadow-md">
                             {(movie?.director && movie.director.length > 0 && !movie.director.includes("Đang cập nhật")) || trustedTmdbDetails?.credits?.crew?.find((c: { job?: string; name?: string }) => c.job === "Director") ? (
-                                <span><span className="text-gray-500">Đạo diễn:</span> {movie?.director?.join(", ") || trustedTmdbDetails?.credits?.crew?.find((c: { job?: string; name?: string }) => c.job === "Director")?.name}</span>
+                                <span><span className="text-gray-500">Đạo diễn:</span> {displayDirector}</span>
                             ) : null}
                             <span className="w-1 h-1 bg-gray-600 rounded-full hidden sm:block" />
                             <span><span className="text-gray-500">Thời lượng:</span> {movie?.time || "N/A"}</span>
                         </div>
                         <div className="text-xs sm:text-sm text-gray-300 mb-4 sm:mb-6 line-clamp-2 max-w-3xl drop-shadow-md text-center md:text-left">
-                            <span className="text-gray-500">Diễn viên:</span> {movie?.actor?.join(", ") || trustedTmdbDetails?.credits?.cast?.slice(0, 5).map((c: { name?: string }) => c.name).join(", ") || "Đang cập nhật"}
+                            <span className="text-gray-500">Diễn viên:</span> {displayActors}
                         </div>
 
                         {/* Action Buttons -- bigger touch targets on mobile, 2x2 grid */}
@@ -460,7 +506,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 </div>
             </div>
 
-            {/* Bottom Content: responsive — stacked on mobile, 2-col on desktop */}
+            {/* Bottom Content: responsive â€” stacked on mobile, 2-col on desktop */}
             <div className="max-w-[1920px] mx-auto px-4 md:px-8 lg:pl-24 lg:pr-12 mt-2 lg:mt-4 relative z-10">
                 
                 {/* On mobile/tablet: RIGHT column (tabs) first, then sidebar info below */}
@@ -503,7 +549,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         {/* Đạo diễn */}
                         <div className="pt-2">
                             <div className="text-[12px] font-black text-[#8FA7C5]/40 uppercase tracking-[2px] mb-2.5">Đạo diễn</div>
-                            <div className="text-[14.5px] font-black text-white/90 drop-shadow-md">{movie?.director?.join(", ") || "Đang cập nhật"}</div>
+                            <div className="text-[14.5px] font-black text-white/90 drop-shadow-md">{displayDirector}</div>
                         </div>
 
                         {/* Description Section */}
@@ -531,10 +577,10 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         <div>
                             <div className="text-[11px] font-medium text-gray-400 uppercase tracking-widest mb-3">Thông tin thêm</div>
                             <div className="space-y-2 text-[13px]">
-                                <div className="flex justify-between border-b border-white/[0.08] pb-2"><span className="text-gray-400">Quốc gia:</span><span className="text-gray-200 font-medium">{movie?.country?.[0]?.name || "Đang cập nhật"}</span></div>
-                                <div className="flex justify-between border-b border-white/[0.08] pb-2"><span className="text-gray-400">Năm:</span><span className="text-gray-200 font-medium">{movie?.year || "Đang cập nhật"}</span></div>
+                                <div className="flex justify-between border-b border-white/[0.08] pb-2"><span className="text-gray-400">Quốc gia:</span><span className="text-gray-200 font-medium">{displayCountry}</span></div>
+                                <div className="flex justify-between border-b border-white/[0.08] pb-2"><span className="text-gray-400">Năm:</span><span className="text-gray-200 font-medium">{displayYear}</span></div>
                                 <div className="flex justify-between border-b border-white/[0.08] pb-2"><span className="text-gray-400">Chất lượng:</span><span className="text-gray-200 font-medium">{movie?.quality || "HD"}</span></div>
-                                <div className="flex justify-between"><span className="text-gray-400">Ngôn ngữ:</span><span className="text-gray-200 font-medium">{movie?.lang || "Đang cập nhật"}</span></div>
+                                <div className="flex justify-between"><span className="text-gray-400">Ngôn ngữ:</span><span className="text-gray-200 font-medium">{displayLanguage}</span></div>
                             </div>
                         </div>
                         </div>
@@ -546,3 +592,4 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
         </main >
     );
 }
+

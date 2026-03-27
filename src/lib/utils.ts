@@ -72,7 +72,11 @@ export function decodeHtml(html: string) {
         .replace(/&#039;/g, "'")
         .replace(/&#39;/g, "'")
         .replace(/&apos;/g, "'")
-        .replace(/&nbsp;/g, " ");
+        .replace(/&nbsp;/g, " ")
+        .replace(/&#(\d+);/g, (_, code) => {
+            const value = Number(code);
+            return Number.isFinite(value) ? String.fromCharCode(value) : "";
+        });
 }
 
 export function stripHtml(html: string) {

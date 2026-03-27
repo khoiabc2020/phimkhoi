@@ -2,7 +2,7 @@ import KoreaHero from "@/components/KoreaHero";
 import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
-import { getMenuData, getMovieDetail } from "@/services/api";
+import { getMenuData, getMovieDetail, getMoviesByCountryAndCategory } from "@/services/api";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
@@ -11,6 +11,7 @@ import ActorRow from "@/components/ActorRow";
 import { cn } from "@/lib/utils";
 import { getThemeBySlug } from "@/lib/theme";
 import { getResilientMoviesList } from "@/app/actions/movies";
+import { sanitizeMovieList } from "@/lib/movie-list";
 import {
     buildCountryHomeSections,
     filterByCategory,
@@ -132,24 +133,35 @@ async function resolveCountrySections(
     const filteredCountryItems = countryItems.filter((movie) => matchesCountryStrict(movie, countrySlug));
     const baseSections = buildCountryHomeSections(filteredCountryItems, configs);
 
-    return configs
-        .map((config) => {
+    const sections = await Promise.all(
+        configs.map(async (config) => {
             const baseSection = baseSections.find((section) => section.categorySlug === config.categorySlug);
-            if (baseSection && baseSection.movies.length > 0) {
-                return baseSection;
+            const localCategory = filterByCategory(filteredCountryItems, config.categorySlug);
+            const baseMovies = sanitizeMovieList(
+                [...(baseSection?.movies || []), ...localCategory],
+                { limit: 24 }
+            );
+
+            if (baseMovies.length >= 12) {
+                return { ...config, movies: baseMovies };
             }
 
-            const countryOnlyCategory = filterByCategory(filteredCountryItems, config.categorySlug);
-            if (countryOnlyCategory.length > 0) {
-                return { ...config, movies: countryOnlyCategory.slice(0, 24) };
-            }
+            const remote = await withTimeout(
+                getMoviesByCountryAndCategory(countrySlug, config.categorySlug, 36),
+                3200,
+                { items: [] as any[], pagination: { currentPage: 1, totalPages: 1 } }
+            );
 
-            return {
-                ...config,
-                movies: filteredCountryItems.slice(config.fallbackOffset || 0, (config.fallbackOffset || 0) + 24),
-            };
+            const merged = sanitizeMovieList(
+                [...baseMovies, ...(remote.items || [])].filter((movie: any) => matchesCountryStrict(movie, countrySlug)),
+                { limit: 24 }
+            );
+
+            return merged.length > 0 ? { ...config, movies: merged } : null;
         })
-        .filter((section) => section.movies.length > 0);
+    );
+
+    return sections.filter(Boolean);
 }
 
 async function PhimHanHome() {

@@ -11,9 +11,8 @@ import ContinueWatchingRow from "@/components/ContinueWatchingRow";
 import { getMoviesList, getTrendMovies, isTrailer } from "@/services/api";
 import { getResilientMoviesList } from "@/app/actions/movies";
 import { getTMDBDataForCard } from "@/app/actions/tmdb";
-import { cn } from "@/lib/utils";
+import { cn, getBackdropImageUrl } from "@/lib/utils";
 import { isAdultMovie, sanitizeMovieList } from "@/lib/movie-list";
-import { hasLandscapeImage } from "@/lib/movie-media";
 import connectDB from "@/lib/db";
 import CustomHero from "@/models/CustomHero";
 import TrendingCache from "@/models/TrendingCache";
@@ -148,7 +147,7 @@ async function AsyncHeroSection({ initialMovies }: { initialMovies: any[] }) {
 
       // Chỉ enrich TMDB cho các slide đầu để giảm thời gian render trang chủ
       // Skip hoàn toàn trong lúc build để tránh treo build (TMDB hay bị timeout)
-      if (idx > 2 || process.env.NEXT_PHASE === 'phase-production-build') return { ...movie, tmdbData: null };
+      if (idx > 7 || process.env.NEXT_PHASE === 'phase-production-build') return { ...movie, tmdbData: null };
       const year = movie.year ? parseInt(movie.year.toString().split("-")[0]) : undefined;
       let type: 'movie' | 'tv' = 'movie';
       if (movie.type === 'phim-bo' || movie.type === 'tv-shows' || movie.type === 'hoat-hinh') type = 'tv';
@@ -168,14 +167,11 @@ async function AsyncHeroSection({ initialMovies }: { initialMovies: any[] }) {
     Boolean(
       movie?.isCustomHero ||
       movie?.tmdbData?.backdrop_path ||
-      hasLandscapeImage({
-        poster_url: movie?.poster_url,
-        thumb_url: movie?.thumb_url,
-      })
+      getBackdropImageUrl(movie)
     );
 
   const backdropReady = enhancedHeroData.filter(hasHeroBackdrop);
-  const heroMovies = (backdropReady.length > 0 ? backdropReady : enhancedHeroData).slice(0, 10);
+  const heroMovies = sanitizeMovieList((backdropReady.length > 0 ? backdropReady : enhancedHeroData), { limit: 10 });
 
   return <HeroSection movies={heroMovies} />;
 }

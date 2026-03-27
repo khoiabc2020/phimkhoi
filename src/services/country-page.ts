@@ -112,16 +112,14 @@ export const buildCountrySectionMovies = (
     size: number = 24
 ): Movie[] => {
     const countryCategory = filterByCategory(countryItems, categorySlug);
-    if (countryCategory.length >= 6) {
+    if (countryCategory.length > 0) {
         return countryCategory.slice(0, size);
     }
 
-    const fallbackWindow = safeSliceWindow(countryItems, fallbackOffset, size);
-    if (fallbackWindow.length >= 6) {
-        return dedupeMoviesBySlug([...countryCategory, ...fallbackWindow]).slice(0, size);
-    }
-
-    return dedupeMoviesBySlug([...countryCategory, ...fallbackWindow, ...countryItems]).slice(0, size);
+    // Do not pad a country/category row with arbitrary country titles.
+    // Remote category fetch will complement thin rows later; keeping rows pure
+    // prevents “list nào cũng có” and wrong-category contamination.
+    return [];
 };
 
 export const buildCountryHomeSections = (

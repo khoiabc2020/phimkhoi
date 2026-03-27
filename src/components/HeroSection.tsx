@@ -6,7 +6,6 @@ import { Play, ChevronLeft, ChevronRight } from "lucide-react";
 import { Movie } from "@/services/api";
 import { getImageUrl, getPosterImageUrl, getBackdropImageUrl, decodeHtml, cn, detectOrientation } from "@/lib/utils";
 import { shouldUseTmdbMedia } from "@/lib/movie-list";
-import { hasLandscapeImage } from "@/lib/movie-media";
 import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import WatchlistButton from "./WatchlistButton";
@@ -96,10 +95,88 @@ function hasDesktopHeroBackdrop(movie: any) {
     const tmdb = shouldUseTmdbMedia(movie, movie?.tmdbData) ? movie.tmdbData : null;
     if (tmdb?.backdrop_path) return true;
 
-    return hasLandscapeImage({
-        poster_url: movie?.poster_url,
-        thumb_url: movie?.thumb_url,
-    });
+    return Boolean(getHeroImage(movie, "backdrop", "desktop"));
+}
+
+function HeroBackdropFrame({
+    src,
+    alt,
+    priority = false,
+}: {
+    src: string;
+    alt: string;
+    priority?: boolean;
+}) {
+    const [failed, setFailed] = useState(false);
+    const finalSrc = !failed && src ? src : "";
+
+    return (
+        <>
+            {finalSrc ? (
+                <Image
+                    src={getImageUrl(finalSrc)}
+                    alt={alt}
+                    fill
+                    className="object-cover object-[center_20%]"
+                    priority={priority}
+                    sizes="100vw"
+                    decoding="async"
+                    onError={() => setFailed(true)}
+                />
+            ) : (
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_20%,rgba(143,167,197,0.18),transparent_30%),linear-gradient(180deg,#121212_0%,#0a0a0a_55%,#050505_100%)]" />
+            )}
+        </>
+    );
+}
+
+function HeroThumbTile({
+    movie,
+    active,
+    onClick,
+}: {
+    movie: any;
+    active: boolean;
+    onClick: () => void;
+}) {
+    const [failed, setFailed] = useState(false);
+    const thumbSrc = getHeroImage(movie, "backdrop", "desktop");
+    const displayTitle = decodeHtml(movie?.name || movie?.origin_name || "Phim");
+
+    return (
+        <div
+            onClick={onClick}
+            className={cn(
+                "relative w-[90px] md:w-[110px] lg:w-[130px] xl:w-[140px] aspect-[16/9] rounded-lg overflow-hidden cursor-pointer flex-shrink-0 transition-all duration-300 box-border group snap-center",
+                active
+                    ? "ring-[2.5px] ring-primary scale-105 opacity-100 shadow-[0_0_25px_rgba(143,167,197,0.5)] z-10"
+                    : "ring-1 ring-white/10 scale-95 opacity-50 hover:opacity-100 hover:scale-100 z-0 bg-black/40"
+            )}
+        >
+            {thumbSrc && !failed ? (
+                <Image
+                    src={getImageUrl(thumbSrc)}
+                    alt={displayTitle}
+                    fill
+                    className="object-cover"
+                    sizes="200px"
+                    placeholder="blur"
+                    blurDataURL={blurData}
+                    onError={() => setFailed(true)}
+                />
+            ) : (
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(22,22,28,0.96),rgba(10,10,10,0.98))]">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(143,167,197,0.18),transparent_55%)]" />
+                    <div className="absolute inset-x-3 bottom-2 text-[10px] font-bold text-white/65 line-clamp-2 leading-tight">
+                        {displayTitle}
+                    </div>
+                </div>
+            )}
+            {active && (
+                <div className="absolute inset-0 bg-primary/10 animate-pulse pointer-events-none" />
+            )}
+        </div>
+    );
 }
 
 // ─── Autoplay hook ────────────────────────────────────────────────────────────
@@ -161,11 +238,8 @@ return (
             >
                 <div className="absolute inset-0">
                     <div className="absolute inset-0 opacity-40 blur-3xl scale-110 pointer-events-none">
-                         <Image
-                            src={getHeroImage(movie, "backdrop", "mobile").startsWith('http')
-                                ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(movie, "backdrop", "mobile"))}&w=500&q=40`
-                                : getHeroImage(movie, "backdrop", "mobile")
-                            }
+                        <Image
+                            src={getImageUrl(getHeroImage(movie, "backdrop", "mobile"))}
                             alt=""
                             fill
                             className="object-cover"
@@ -173,11 +247,8 @@ return (
                         />
                     </div>
 
-                    <Image
-                        src={getHeroImage(movie, "poster", "mobile").startsWith('http')
-                            ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(movie, "poster", "mobile"))}&w=780&q=90`
-                            : getHeroImage(movie, "poster", "mobile")
-                        }
+                        <Image
+                            src={getImageUrl(getHeroImage(movie, "poster", "mobile"))}
                             alt=""
                             fill
                             className="object-cover"
@@ -194,10 +265,7 @@ return (
                             {movie.isCustomHero && movie.layer_logo ? (
                                 <div className="relative w-[180px] h-[54px] mb-2 mx-auto">
                                     <Image
-                                        src={movie.layer_logo.startsWith('http')
-                                            ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(movie.layer_logo)}&w=400&q=80`
-                                            : movie.layer_logo
-                                        }
+                                        src={getImageUrl(movie.layer_logo)}
                                         alt={decodeHtml(movie.name)}
                                         fill
                                         className="object-contain"
@@ -295,22 +363,11 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                     className="absolute inset-0"
                 >
                     <div className="absolute inset-0 z-0 overflow-hidden">
-                        {desktopBackdrop ? (
-                            <Image
-                                src={desktopBackdrop.startsWith('http')
-                                    ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(desktopBackdrop)}&w=1920&q=85`
-                                    : desktopBackdrop
-                                }
-                                alt=""
-                                fill
-                                className="object-cover object-[center_20%]"
-                                priority={index === 0}
-                                sizes="100vw"
-                                decoding="async"
-                            />
-                        ) : (
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_20%,rgba(143,167,197,0.18),transparent_30%),linear-gradient(180deg,#121212_0%,#0a0a0a_55%,#050505_100%)]" />
-                        )}
+                        <HeroBackdropFrame
+                            src={desktopBackdrop}
+                            alt={decodeHtml(movie.name)}
+                            priority={index === 0}
+                        />
                     </div>
 
                     {movie.isCustomHero && movie.layer_character && (
@@ -436,32 +493,12 @@ function DesktopHero({ movies, active = true }: { movies: Movie[], active?: bool
                     {movies.map((m: any, idx) => {
                         const isActive = idx === index;
                         return (
-                            <div
+                            <HeroThumbTile
                                 key={`thumb-${m._id || idx}`}
+                                movie={m}
+                                active={isActive}
                                 onClick={() => go(idx)}
-                                className={cn(
-                                    "relative w-[90px] md:w-[110px] lg:w-[130px] xl:w-[140px] aspect-[16/9] rounded-lg overflow-hidden cursor-pointer flex-shrink-0 transition-all duration-300 box-border group snap-center",
-                                    isActive 
-                                        ? "ring-[2.5px] ring-primary scale-105 opacity-100 shadow-[0_0_25px_rgba(143,167,197,0.5)] z-10" 
-                                        : "ring-1 ring-white/10 scale-95 opacity-40 hover:opacity-100 hover:scale-100 z-0 bg-black/40"
-                                )}
-                            >
-                                <Image
-                                    src={getHeroImage(m, "backdrop", "desktop").startsWith('http') 
-                                        ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/img-proxy?url=${encodeURIComponent(getHeroImage(m, "backdrop", "desktop"))}&w=300&q=60`
-                                        : getHeroImage(m, "backdrop", "desktop")
-                                    }
-                                    alt={decodeHtml(m.name)}
-                                    fill
-                                    className="object-cover"
-                                    sizes="200px"
-                                    placeholder="blur"
-                                    blurDataURL={blurData}
-                                />
-                                {isActive && (
-                                    <div className="absolute inset-0 bg-primary/10 animate-pulse pointer-events-none" />
-                                )}
-                            </div>
+                            />
                         );
                     })}
                 </div>

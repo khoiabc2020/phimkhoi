@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import { normalizeMovieImages } from "./shared/movie-media.mjs";
-import { matchesCountryStrict } from "./shared/movie-country.mjs";
+import { ASIAN_COUNTRY_RULES, contradictsCountryMetadata, matchesCountryStrict, normalizeCountryToken } from "./shared/movie-country.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, "../.env.local") });
@@ -63,6 +63,7 @@ async function repairMovies({ purgeTrailers = true } = {}) {
     let checked = 0;
     let updated = 0;
     let deleted = 0;
+    let repairedCountries = 0;
 
     const cursor = Movie.find({}).cursor();
     for await (const doc of cursor) {
@@ -80,13 +81,31 @@ async function repairMovies({ purgeTrailers = true } = {}) {
             thumb_url: plain.thumb_url,
         });
 
-        if (normalized.poster_url !== (plain.poster_url || "") || normalized.thumb_url !== (plain.thumb_url || "")) {
+        let nextCountries = Array.isArray(plain.country) ? [...plain.country] : [];
+        if (nextCountries.length > 0) {
+            const beforeLength = nextCountries.length;
+            nextCountries = nextCountries.filter((country) => {
+                const slug = normalizeCountryToken(country?.slug || "").replace(/\s+/g, "-");
+                if (!slug || !ASIAN_COUNTRY_RULES[slug]) return true;
+                return !contradictsCountryMetadata(plain, slug);
+            });
+            if (nextCountries.length !== beforeLength) {
+                repairedCountries += 1;
+            }
+        }
+
+        if (
+            normalized.poster_url !== (plain.poster_url || "") ||
+            normalized.thumb_url !== (plain.thumb_url || "") ||
+            JSON.stringify(nextCountries) !== JSON.stringify(Array.isArray(plain.country) ? plain.country : [])
+        ) {
             await Movie.updateOne(
                 { _id: plain._id },
                 {
                     $set: {
                         poster_url: normalized.poster_url,
                         thumb_url: normalized.thumb_url,
+                        country: nextCountries,
                         updatedAt: new Date(),
                     },
                 }
@@ -95,7 +114,7 @@ async function repairMovies({ purgeTrailers = true } = {}) {
         }
     }
 
-    return { checked, updated, deleted };
+    return { checked, updated, deleted, repairedCountries };
 }
 
 async function repairTrendingCaches() {

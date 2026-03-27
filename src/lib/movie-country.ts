@@ -40,6 +40,16 @@ const hasCountryScriptSignature = (movie: Partial<Movie>, countrySlug: string) =
     return false;
 };
 
+export const hasAuthoritativeCountryMetadata = (movie: Partial<Movie> | null | undefined) => {
+    const tmdbData = (movie as Movie | null | undefined)?.tmdbData as any;
+    const originalLanguage = normalizeCountryToken(tmdbData?.original_language || "");
+    const originCountries = Array.isArray(tmdbData?.origin_country)
+        ? tmdbData.origin_country.map((value: unknown) => String(value || "").toUpperCase()).filter(Boolean)
+        : [];
+
+    return Boolean(originalLanguage || originCountries.length > 0);
+};
+
 export const matchesCountryStrict = (movie: Partial<Movie> | null | undefined, countrySlug: string) => {
     if (!movie) return false;
 
@@ -72,4 +82,9 @@ export const matchesCountryStrict = (movie: Partial<Movie> | null | undefined, c
     }
 
     return hasCountryScriptSignature(movie, countrySlug);
+};
+
+export const contradictsCountryMetadata = (movie: Partial<Movie> | null | undefined, countrySlug: string) => {
+    if (!movie || !hasAuthoritativeCountryMetadata(movie)) return false;
+    return !matchesCountryStrict(movie, countrySlug);
 };

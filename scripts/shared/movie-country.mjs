@@ -38,6 +38,16 @@ const hasCountryScriptSignature = (movie, countrySlug) => {
     return false;
 };
 
+export const hasAuthoritativeCountryMetadata = (movie) => {
+    const tmdbData = movie?.tmdbData;
+    const originalLanguage = normalizeCountryToken(tmdbData?.original_language || "");
+    const originCountries = Array.isArray(tmdbData?.origin_country)
+        ? tmdbData.origin_country.map((value) => String(value || "").toUpperCase()).filter(Boolean)
+        : [];
+
+    return Boolean(originalLanguage || originCountries.length > 0);
+};
+
 export const matchesCountryStrict = (movie, countrySlug) => {
     if (!movie) return false;
 
@@ -70,4 +80,9 @@ export const matchesCountryStrict = (movie, countrySlug) => {
     }
 
     return hasCountryScriptSignature(movie, countrySlug);
+};
+
+export const contradictsCountryMetadata = (movie, countrySlug) => {
+    if (!movie || !hasAuthoritativeCountryMetadata(movie)) return false;
+    return !matchesCountryStrict(movie, countrySlug);
 };
