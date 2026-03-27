@@ -2,7 +2,7 @@ import KoreaHero from "@/components/KoreaHero";
 import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
-import { getMenuData, getMovieDetail, getMoviesByCountryAndCategory } from "@/services/api";
+import { getMenuData, getMoviesByCountryAndCategory } from "@/services/api";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
@@ -97,13 +97,6 @@ async function resolveHeroMovies(slugs: string[], fallbackItems: any[], countryN
         slugs.map(async (slug) => {
             const cached = bySlug.get(slug);
             if (cached) return cached;
-
-            try {
-                const detail = await getMovieDetail(slug);
-                if (detail?.movie) {
-                    return detail.movie;
-                }
-            } catch {}
 
             const fallback = HERO_FALLBACK_META[slug];
             if (!fallback) return null;
