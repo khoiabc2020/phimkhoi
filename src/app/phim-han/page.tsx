@@ -90,6 +90,14 @@ const HERO_FALLBACK_META: Record<string, { name: string; year?: number }> = {
     "trao-em-ca-vu-tru": { name: "Trao Em Cả Vũ Trụ", year: 2025 },
 };
 
+const HERO_FALLBACK_DESC: Record<string, string> = {
+    "nghe-thuat-lua-doi-cua-sarah": "A dark comedy about fame, scams, and second chances.",
+    "khi-cuoc-doi-cho-ban-qua-quyt": "Warm healing moments and unexpected bonds.",
+    "tieng-yeu-nay-anh-dich-duoc-khong": "Romance, misunderstandings, and heartfelt growth.",
+    "ban-trai-theo-yeu-cau": "A contract love story with real feelings.",
+    "trao-em-ca-vu-tru": "Family, love, and a new start under one roof.",
+};
+
 async function resolveHeroMovies(slugs: string[], fallbackItems: any[], countryName: string) {
     const bySlug = new Map(fallbackItems.map((movie) => [movie.slug, movie]));
 
@@ -106,7 +114,7 @@ async function resolveHeroMovies(slugs: string[], fallbackItems: any[], countryN
                 slug,
                 name: fallback.name,
                 origin_name: fallback.name,
-                content: "",
+                content: HERO_FALLBACK_DESC[slug] || "",
                 category: [],
                 country: [{ name: countryName, slug: "han-quoc" }],
                 year: fallback.year || 2025,

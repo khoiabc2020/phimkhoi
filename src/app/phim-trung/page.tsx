@@ -102,6 +102,19 @@ const HERO_FALLBACK_META: Record<string, { name: string; year?: number }> = {
     "truc-ngoc": { name: "Trục Ngọc", year: 2025 },
 };
 
+const HERO_FALLBACK_DESC: Record<string, string> = {
+    "duong-cung-ky-an-thanh-vu-phong-minh": "Court mystery, power games, and hidden vows.",
+    "xin-chao-1983": "Life stories and choices that change destiny.",
+    "con-ra-the-thong-gi-nua": "Rom-com with sharp twists and warm moments.",
+    "bach-nguyet-phan-tinh": "Fated love under moonlight.",
+    "bui-hoa-hong": "Fame, love, and secrets buried in time.",
+    "dai-mong-quy-ly": "Heroes rise in a world of chaos.",
+    "giang-ho-da-vu-thap-nien-dang": "Old grudges return on a rainy night.",
+    "mac-nhan-tang-kieu": "A hidden past and a quest for justice.",
+    "ngoc-minh-tra-cot": "Revenge, family, and the final truth.",
+    "truc-ngoc": "Classic romance in a period world.",
+};
+
 async function resolveHeroMovies(slugs: string[], fallbackItems: any[], countryName: string) {
     const bySlug = new Map(fallbackItems.map((movie) => [movie.slug, movie]));
 
@@ -118,7 +131,7 @@ async function resolveHeroMovies(slugs: string[], fallbackItems: any[], countryN
                 slug,
                 name: fallback.name,
                 origin_name: fallback.name,
-                content: "",
+                content: HERO_FALLBACK_DESC[slug] || "",
                 category: [],
                 country: [{ name: countryName, slug: "trung-quoc" }],
                 year: fallback.year || 2025,
