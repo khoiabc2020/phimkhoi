@@ -9,21 +9,29 @@ export default function CategoryGridClient({
     page,
     country,
     year,
-    limit = 49
+    limit = 49,
+    isTypeFallback = false
 }: { 
     slug: string; 
     page: number;
     country?: string;
     year?: string;
     limit?: number;
+    isTypeFallback?: boolean;
 }) {
     const fetcher = useCallback(async () => {
+        if (isTypeFallback) {
+            return await getResilientMoviesList(slug, page, limit, {
+                country,
+                year,
+            });
+        }
         return await getResilientMoviesList("category", page, limit, {
             category: slug,
             country,
             year,
         });
-    }, [page, limit, slug, country, year]);
+    }, [page, limit, slug, country, year, isTypeFallback]);
 
     const cacheKey = `category_${slug}_p${page}_c${country || 'all'}_y${year || 'all'}`;
 

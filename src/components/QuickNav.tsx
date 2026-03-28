@@ -13,15 +13,15 @@ const NAV_ITEMS = [
         to: "#c16b92",
     },
     {
-        label: "Sitcom",
+        label: "Hành Động",
         sub: "Xem chủ đề",
-        href: "/the-loai/sitcom",
-        from: "#4f9d81",
-        to: "#a46358",
+        href: "/the-loai/hanh-dong",
+        from: "#1e3c72",
+        to: "#2a5298",
     },
     {
         label: "Chiếu Rạp",
-        sub: "Xem chủ đề",
+        sub: "Danh sách",
         href: "/the-loai/phim-chieu-rap",
         from: "#8f76b9",
         to: "#cc7781",
@@ -44,8 +44,8 @@ const NAV_ITEMS = [
         label: "Thuyết Minh",
         sub: "Xem chủ đề",
         href: "/danh-sach/thuyet-minh",
-        from: "#5d6d84",
-        to: "#434b5a",
+        from: "#00c6ff", // Vibrant Cyan
+        to: "#0072ff",   // Bright Navy Blue
     },
 ];
 

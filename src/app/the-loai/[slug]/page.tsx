@@ -58,8 +58,10 @@ export default async function CategoryPage({
     const categoryName = category?.name || (slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, " "));
 
     const theme = getThemeBySlug(slug);
-    const displayLabel = "Thể loại";
-    const displayTitle = categoryName;
+    // Special handling for phim-chieu-rap which is sometimes a category and sometimes a list
+    const isSpecialType = slug === 'phim-chieu-rap';
+    const displayLabel = isSpecialType ? "Danh sách" : "Thể loại";
+    const displayTitle = isSpecialType ? "Phim Chiếu Rạp" : categoryName;
 
     const currentYear = new Date().getFullYear();
     const years = [
@@ -112,6 +114,7 @@ export default async function CategoryPage({
                         country={sParams.country}
                         year={sParams.year}
                         limit={limit}
+                        isTypeFallback={isSpecialType}
                     />
                 </Suspense>
             </div>
