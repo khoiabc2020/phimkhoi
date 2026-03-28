@@ -90,13 +90,6 @@ export const contradictsCountryMetadata = (movie: Partial<Movie> | null | undefi
         return !matchesCountryStrict(movie, countrySlug);
     }
     
-    // If no TMDB data, strictly enforce Asian script signatures to reject NguonC's fake tags
-    const rule = ASIAN_COUNTRY_RULES[countrySlug];
-    if (rule?.script) {
-        // If it's tagged with this Asian country but lacks the script entirely, it contradicts.
-        return !hasCountryScriptSignature(movie, countrySlug);
-    }
-
     return false;
 };
 
