@@ -96,16 +96,16 @@ function MovieRowInner({ title, movies, slug, variant = "default", priorityFirst
     return (
         <section className="movie-row-section py-2.5">
             <div className="mx-auto w-full max-w-[1920px]">
-                <div className="space-y-2.5 overflow-hidden rounded-[10px] bg-transparent">
-                    <div className="flex items-center justify-between px-3 pt-2.5 sm:px-4">
-                        <h2 className="flex items-center gap-2 text-[16px] font-bold tracking-tight text-white sm:text-[18px] md:text-[20px]">
-                            <span className="h-4 w-1 rounded-sm bg-[#8FA7C5] sm:h-5" />
-                            <span>{title}</span>
+                <div className="space-y-2.5 rounded-[10px] bg-transparent">
+                    <div className="flex items-center justify-between gap-3 px-3 pt-2.5 sm:px-4">
+                        <h2 className="flex flex-1 items-center gap-2 text-[16px] font-bold tracking-tight text-white sm:text-[18px] md:text-[20px] min-w-0">
+                            <span className="h-4 w-1 flex-shrink-0 rounded-sm bg-[#8FA7C5] sm:h-5" />
+                            <span className="truncate">{title}</span>
                         </h2>
                         {slug && (
                             <Link
                                 href={slug.startsWith("/") ? slug : `/danh-sach/${slug}`}
-                                className="group/link flex items-center gap-1 text-xs font-semibold text-[#8FA7C5] transition-colors hover:text-white sm:text-sm"
+                                className="group/link flex flex-shrink-0 whitespace-nowrap items-center gap-1 text-xs font-semibold text-[#8FA7C5] transition-colors hover:text-white sm:text-sm"
                             >
                                 Xem tất cả
                                 <ChevronRight className="h-4 w-4 transition-transform group-hover/link:translate-x-1" />

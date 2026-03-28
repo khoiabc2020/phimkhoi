@@ -192,8 +192,8 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                             transition={{ duration: 0.45, delay: 0.08, ease: "easeOut" }}
                             className="max-w-[90%] sm:max-w-xl md:max-w-2xl flex flex-col items-start gap-2.5 md:gap-5"
                         >
-                            <div className="relative w-full max-w-[200px] sm:max-w-[280px] md:max-w-[420px] lg:max-w-[480px] aspect-[4/1.5]">
-                                {currentMovie.logo ? (
+                            {currentMovie.logo ? (
+                                <div className="relative w-full max-w-[200px] sm:max-w-[280px] md:max-w-[420px] lg:max-w-[480px] aspect-[4/1.5]">
                                     <Image
                                         src={currentMovie.logo}
                                         alt={currentMovie.displayTitle}
@@ -202,12 +202,12 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                                         priority={isFirstSlide}
                                         loading={isFirstSlide ? "eager" : "lazy"}
                                     />
-                                ) : (
-                                    <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white drop-shadow-xl font-display uppercase tracking-tighter line-clamp-2">
-                                        {currentMovie.displayTitle}
-                                    </h2>
-                                )}
-                            </div>
+                                </div>
+                            ) : (
+                                <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white drop-shadow-xl font-display uppercase tracking-tighter line-clamp-3 break-words">
+                                    {currentMovie.displayTitle}
+                                </h2>
+                            )}
 
                             <div className="flex flex-wrap items-center gap-3 text-[13px] md:text-[15px] font-bold text-white/90">
                                 <div className="bg-[#8FA7C5] text-[#0a0a0a] px-2 py-0.5 rounded-sm text-[10px] md:text-[11px] font-black tracking-tighter uppercase">

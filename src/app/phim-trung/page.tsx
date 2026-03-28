@@ -253,7 +253,7 @@ export default async function PhimTrungPage({ searchParams }: { searchParams: Pr
                 <div className={cn("absolute top-0 left-0 right-0 h-[600px] via-transparent to-transparent pointer-events-none -z-10 blur-[150px] opacity-50", theme.glow)} />
 
                 {currentPage === 1 ? (
-                    <div className="-mt-10 md:-mt-16 lg:-mt-20 xl:-mt-24 relative z-50 w-full">
+                    <div className="-mt-2 sm:-mt-6 md:-mt-12 lg:-mt-16 relative z-50 w-full">
                         <PhimTrungHome />
                     </div>
                 ) : (
