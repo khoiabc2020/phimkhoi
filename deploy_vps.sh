@@ -6,6 +6,7 @@ export PATH="/opt/bitnami/node/bin:/usr/local/bin:/usr/bin:/bin:${PATH:-}"
 
 # Configuration
 APP_DIR="/home/bitnami/phimkhoi"
+BUILD_DIR="/home/bitnami/phimkhoi_build"
 REPO_URL="https://github.com/khoiabc2020/phimkhoi.git"
 PM2_BIN="${PM2_BIN:-$(command -v pm2 || true)}"
 
@@ -14,42 +15,32 @@ if [ -z "$PM2_BIN" ] || [ ! -x "$PM2_BIN" ]; then
     exit 1
 fi
 
-echo "Deploying PhimKhoi (CLEAN BUILD) to VPS..."
+echo "=========================================="
+echo " PhimKhoi: ZERO-DOWNTIME DEPLOYMENT"
+echo "=========================================="
+echo "Note: The live site continues spinning..."
 
-# 0. KILL ALL PROCESSES TO FREE RAM (Gratefully requested by USER)
-echo "Killing all node/next/pm2 processes..."
-"$PM2_BIN" delete all || true
-sudo pkill -f next || true
-sudo pkill -f node || true
+# 1. SETUP SHADOW ENVIRONMENT
+echo "Initializing shadow build directory..."
+mkdir -p "$BUILD_DIR"
+# Fast synchronization: exclude heavy paths to make copy instant
+rsync -a --delete --exclude='node_modules' --exclude='.next' --exclude='.git' "$APP_DIR/" "$BUILD_DIR/"
 
-# 1. UPDATE SOURCE
-if [ -d "$APP_DIR" ]; then
-    echo "Updating web..."
-    cd "$APP_DIR"
-    git fetch --all
-    git reset --hard origin/main
-    git clean -fd
-else
-    echo "Cloning repository..."
-    git clone "$REPO_URL" "$APP_DIR"
-    cd "$APP_DIR"
-fi
-
-# 2. DEEP CLEAN
-echo "Cleaning build and dependencies..."
-rm -rf .next node_modules 2>/dev/null || true
-
-# 3. INSTALL & BUILD
-echo "Installing dependencies..."
+# 2. BUILD IN ISOLATION
+echo "Preparing isolated build..."
+cd "$BUILD_DIR"
 npm install --legacy-peer-deps
 
-echo "Building application (Limit: 3072MB for 4GB RAM VPS)..."
-export NODE_OPTIONS="--max_old_space_size=3072"
-npm run build
+echo "Building application (Bounded RAM Limit: 2500MB)..."
+# Using 2.5GB Limit prevents VPS from throwing Out-Of-Memory while Live Server is running
+export NODE_OPTIONS="--max_old_space_size=2500"
 
-if [ $? -eq 0 ]; then
-    echo "Build successful! Preparing standalone..."
+if npm run build; then
+    echo "=========================================="
+    echo " BUILD SUCCESS! Executing Hot-Swap...     "
+    echo "=========================================="
     
+    # Pack standalone assets
     mkdir -p .next/standalone/public
     cp -a public/. .next/standalone/public/
     cp -a .next/static/. .next/standalone/.next/static/
@@ -59,21 +50,28 @@ if [ $? -eq 0 ]; then
         cp .env.local .next/standalone/.env
         cp .env.local .next/standalone/.env.production
     fi
-
-    # 4. START APP via ecosystem config
-    echo "Starting PM2 via ecosystem.config.cjs..."
+    
+    # Rsync the validated shadow artifact to Live Environment (Keeps .git pristine)
+    rsync -al --delete --exclude='.git' "$BUILD_DIR/" "$APP_DIR/"
+    
+    # Reload PM2 (0 Downtime instead of 'restart' or 'delete')
     cd "$APP_DIR"
-    "$PM2_BIN" delete phimkhoi 2>/dev/null || true
-    "$PM2_BIN" start ecosystem.config.cjs
+    echo "Reloading Live Node Worker..."
+    # Start it if it doesn't exist, Reload it gracefully if it does
+    "$PM2_BIN" reload phimkhoi --update-env 2>/dev/null || "$PM2_BIN" start ecosystem.config.cjs
     "$PM2_BIN" save --force
     
-    echo "Running fast repair + sync suite in BACKGROUND..."
+    echo "Triggering Background Node Sync Daemon..."
     NODE_OPTIONS="--max_old_space_size=512" nice -n 19 node scripts/sync-suite.mjs --mode=fast >> /home/bitnami/phimkhoi-sync.log 2>&1 &
-
-    echo "Deployment complete and successful!"
+    
+    echo "=========================================="
+    echo " ZERO-DOWNTIME DEPLOYMENT SUCCESSFUL!      "
+    echo "=========================================="
 else
     echo "=========================================="
-    echo "   [ERROR] CLEAN BUILD FAILED!           "
+    echo " [ERROR] BUILD FAILED!                    "
+    echo " Your live site continues running safely. "
+    echo " Check the logs above to debug the issue. "
     echo "=========================================="
     exit 1
 fi

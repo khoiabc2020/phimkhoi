@@ -6,46 +6,60 @@ import { useRouter } from "next/navigation";
 
 const NAV_ITEMS = [
     {
-        label: "Thái Lan",
-        sub: "Xem chủ đề",
-        href: "/quoc-gia/thai-lan",
-        from: "#557bc4",
-        to: "#c16b92",
+        label: "Hàn Quốc",
+        sub: "Phim Bộ",
+        href: "/quoc-gia/han-quoc",
+        from: "#ff416c", // Vibrant Pink
+        to: "#ff4b2b",   // Bright Orange
     },
     {
-        label: "Hành Động",
-        sub: "Xem chủ đề",
-        href: "/the-loai/hanh-dong",
-        from: "#1e3c72",
-        to: "#2a5298",
+        label: "Trung Quốc",
+        sub: "Hoa Ngữ",
+        href: "/quoc-gia/trung-quoc",
+        from: "#8A2387", // Deep Purple
+        to: "#E94057",   // Vibrant Red
+    },
+    {
+        label: "Thái Lan",
+        sub: "Cực Hay",
+        href: "/quoc-gia/thai-lan",
+        from: "#4facfe", // Bright Cyan
+        to: "#00f2fe",   // Ocean Blue
+    },
+    {
+        label: "Sitcom",
+        sub: "Game Shows",
+        href: "/danh-sach/tv-shows",
+        from: "#00b09b", // Mint Green
+        to: "#96c93d",   // Lime Green
     },
     {
         label: "Chiếu Rạp",
-        sub: "Danh sách",
+        sub: "Mới Nhất",
         href: "/the-loai/phim-chieu-rap",
-        from: "#8f76b9",
-        to: "#cc7781",
+        from: "#4776E6", // Royal Blue
+        to: "#8E54E9",   // Amethyst Purple
     },
     {
         label: "Kinh Dị",
-        sub: "Xem chủ đề",
+        sub: "Thót Tim",
         href: "/the-loai/kinh-di",
-        from: "#ca876a",
-        to: "#b8565a",
+        from: "#Cb2d3e", // Blood Red
+        to: "#ef473a",   // Bright Red
     },
     {
         label: "Cổ Trang",
-        sub: "Xem chủ đề",
+        sub: "Huyền Huyễn",
         href: "/the-loai/co-trang",
-        from: "#b15f58",
-        to: "#b54452",
+        from: "#FDC830", // Golden Yellow
+        to: "#F37335",   // Bright Sunset
     },
     {
         label: "Thuyết Minh",
-        sub: "Xem chủ đề",
+        sub: "VietDub",
         href: "/danh-sach/thuyet-minh",
-        from: "#00c6ff", // Vibrant Cyan
-        to: "#0072ff",   // Bright Navy Blue
+        from: "#00c6ff", // Pure Cyan
+        to: "#0072ff",   // Bright Navy
     },
 ];
 
@@ -64,7 +78,7 @@ export default function QuickNav() {
                     Bạn đang quan tâm gì?
                 </h2>
 
-                <div className="no-scrollbar flex snap-x gap-3 overflow-x-auto py-1 lg:grid lg:grid-cols-6 md:gap-4">
+                <div className="no-scrollbar flex snap-x gap-3 overflow-x-auto py-1 lg:grid lg:grid-cols-4 2xl:grid-cols-8 md:gap-4">
                     {NAV_ITEMS.map((item) => (
                         <Link
                             key={item.href}
