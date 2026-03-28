@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import VideoPlayer from "@/components/VideoPlayer";
 import WatchEngagementBar from "@/components/WatchEngagementBar";
@@ -44,6 +45,7 @@ export default function WatchContainer({
     movieData,
     initialServerName,
 }: WatchContainerProps) {
+    const router = useRouter();
     const [isTheaterMode, setIsTheaterMode] = useState(false);
     const [isLightOff, setIsLightOff] = useState(false);
     const [autoNext, setAutoNext] = useState(true);
@@ -131,6 +133,12 @@ export default function WatchContainer({
             }).catch(() => {});
         }
     }, [movie, activeEpisode]);
+
+    useEffect(() => {
+        router.prefetch(`/phim/${movie.slug}`);
+        if (prevEpisodeUrl) router.prefetch(prevEpisodeUrl);
+        if (nextEpisodeUrl) router.prefetch(nextEpisodeUrl);
+    }, [movie.slug, nextEpisodeUrl, prevEpisodeUrl, router]);
 
     return (
         <div className={cn("relative w-full", isTheaterMode ? "z-[50]" : (isLightOff ? "z-[60]" : "z-10"))}>

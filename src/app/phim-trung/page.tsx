@@ -2,7 +2,7 @@ import ChinaHero from "@/components/ChinaHero";
 import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
-import { getMenuData, getMoviesByCountryAndCategory } from "@/services/api";
+import { getMenuData } from "@/services/api";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
@@ -14,7 +14,6 @@ import { getResilientMoviesList } from "@/app/actions/movies";
 import { sanitizeMovieList } from "@/lib/movie-list";
 import {
     buildCountryHomeSections,
-    filterByCategory,
     getCountryPagePool,
     type CountryHomeSectionConfig,
 } from "@/services/country-page";
@@ -97,7 +96,7 @@ const HERO_FALLBACK_META: Record<string, { name: string; year?: number }> = {
     "bui-hoa-hong": { name: "Bụi Hoa Hồng", year: 2025 },
     "dai-mong-quy-ly": { name: "Đại Mộng Quy Ly", year: 2025 },
     "giang-ho-da-vu-thap-nien-dang": { name: "Giang Hồ Dạ Vũ Thập Niên Đăng", year: 2025 },
-    "mac-nhan-tang-kieu": { name: "Mạc Nhan Tàng Kiều", year: 2025 },
+    "mac-nhan-tang-kieu": { name: "Mặc Nhan Tàng Kiều", year: 2025 },
     "ngoc-minh-tra-cot": { name: "Ngọc Minh Trà Cốt", year: 2025 },
     "truc-ngoc": { name: "Trục Ngọc", year: 2025 },
 };
@@ -115,6 +114,20 @@ const HERO_FALLBACK_DESC: Record<string, string> = {
     "truc-ngoc": "Một mối tình cổ trang đầy định mệnh.",
 };
 
+function hasRealDescription(value: string) {
+    const normalized = value
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim();
+
+    return Boolean(
+        normalized &&
+        !normalized.includes("dang cap nhat noi dung") &&
+        !normalized.includes("dang cap nhat")
+    );
+}
+
 async function resolveHeroMovies(slugs: string[], fallbackItems: any[], countryName: string) {
     const bySlug = new Map(fallbackItems.map((movie) => [movie.slug, movie]));
 
@@ -122,9 +135,10 @@ async function resolveHeroMovies(slugs: string[], fallbackItems: any[], countryN
         slugs.map(async (slug) => {
             const cached = bySlug.get(slug);
             if (cached) {
+                const resolvedContent = String(cached?.content || "").trim();
                 return {
                     ...cached,
-                    content: String(cached?.content || "").trim() || HERO_FALLBACK_DESC[slug] || "",
+                    content: hasRealDescription(resolvedContent) ? resolvedContent : HERO_FALLBACK_DESC[slug] || "",
                     year: cached?.year || HERO_FALLBACK_META[slug]?.year || 2025,
                     country: Array.isArray(cached?.country) && cached.country.length > 0
                         ? cached.country
@@ -152,64 +166,17 @@ async function resolveHeroMovies(slugs: string[], fallbackItems: any[], countryN
     return resolved.filter(Boolean);
 }
 
-async function resolveCountrySections(
-    countrySlug: string,
-    countryItems: any[],
-    configs: CountryHomeSectionConfig[]
-) {
-    const baseSections = buildCountryHomeSections(countryItems, configs);
-
-    const sections = await Promise.all(
-        configs.map(async (config) => {
-            const baseSection = baseSections.find((section) => section.categorySlug === config.categorySlug);
-            const localCategory = filterByCategory(countryItems, config.categorySlug);
-            const baseMovies = sanitizeMovieList(
-                [...(baseSection?.movies || []), ...localCategory],
-                { limit: 24 }
-            );
-
-            if (baseMovies.length >= 6) {
-                return { ...config, movies: baseMovies };
-            }
-
-            const remote = await withTimeout(
-                getMoviesByCountryAndCategory(countrySlug, config.categorySlug, 72),
-                1800,
-                { items: [] as any[], pagination: { currentPage: 1, totalPages: 1 } }
-            );
-
-            const merged = sanitizeMovieList(
-                [...baseMovies, ...(remote.items || [])],
-                { limit: 24 }
-            );
-
-            return merged.length >= 4 ? { ...config, movies: merged } : (baseMovies.length > 0 ? { ...config, movies: baseMovies } : null);
-        })
-    );
-
-    return sections.filter(Boolean);
-}
-
 async function PhimTrungHome() {
     const pool = await getCountryPagePool("trung-quoc").catch(() => ({
         countryItems: [] as any[],
         fallbackItems: [] as any[],
     }));
-    let countryItems = pool.countryItems || [];
-    let fallbackItems = pool.fallbackItems || [];
+    const countryItems = pool.countryItems || [];
+    const fallbackItems = pool.fallbackItems || [];
+    const sourcePool = countryItems.length >= 48 ? countryItems : fallbackItems;
 
-    if (countryItems.length < 16) {
-        const resilient = await getResilientMoviesList("country", 1, 120, { country: "trung-quoc" });
-        if (resilient.items?.length) {
-            countryItems = resilient.items;
-            fallbackItems = resilient.items;
-        }
-    }
-
-    const latestMovies = fallbackItems.length > 0
-        ? fallbackItems.slice(0, 14)
-        : (await getResilientMoviesList("trung-quoc", 1, 14, { country: "trung-quoc" })).items || [];
-    const sections = await resolveCountrySections("trung-quoc", countryItems, SECTION_CONFIG);
+    const latestMovies = sourcePool.slice(0, 14);
+    const sections = buildCountryHomeSections(sourcePool, SECTION_CONFIG);
 
     return (
         <div className="space-y-12 md:space-y-16 pb-12">

@@ -409,7 +409,7 @@ export const getHomeData = async () => {
         };
     }
     // Cache tạm thời ngắn để USER thấy rõ thay đổi
-    const CACHE_TTL_MS = 10 * 1000; 
+    const CACHE_TTL_MS = 5 * 60 * 1000;
     if (homeCache && Date.now() - homeCacheTime < CACHE_TTL_MS) {
         return homeCache;
     }

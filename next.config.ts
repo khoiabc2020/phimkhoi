@@ -20,8 +20,8 @@ const config = (phase: string): NextConfig => {
     },
     experimental: {
       staleTimes: {
-        dynamic: 30,    // 30s router cache for dynamic pages (better UX on navigation)
-        static: 180,   // 3min for static pages
+        dynamic: 900,
+        static: 1800,
       },
     },
     staticPageGenerationTimeout: 300, // 5 minutes to allow slow TMDB fetches

@@ -49,19 +49,26 @@ export async function proxy(request: NextRequest) {
     const response = NextResponse.next();
     
     // Detect active session cookies
-    const hasSession = request.cookies.has("next-auth.session-token") || 
+    const hasSession = request.cookies.has("next-auth.session-token") ||
                        request.cookies.has("__Secure-next-auth.session-token") ||
                        !!token;
-    
-    const isAuthApi = pathname.startsWith("/api/auth");
-    const isAccountPage = pathname.startsWith("/thong-tin-tai-khoan");
 
-    if (hasSession || isAuthApi || isAccountPage) {
-        // Force no-cache across all layers (Browser, Cloudflare, Nginx)
+    const isAuthApi = pathname.startsWith("/api/auth");
+    const isUserApi = pathname.startsWith("/api/user");
+    const isAdminApi = pathname.startsWith("/api/admin");
+    const isPrivateApi = isAuthApi || isUserApi || isAdminApi;
+    const isAccountPage = pathname.startsWith("/thong-tin-tai-khoan");
+    const isPrivatePage = isProtected || isAccountPage || pathname.startsWith("/login") || pathname.startsWith("/register");
+
+    // Important:
+    // Do NOT force `no-store` for all public pages just because the user is logged in.
+    // That disables the App Router/client cache and makes navigating back to public pages
+    // feel like a full reload every time.
+    if ((hasSession && isPrivatePage) || isPrivateApi) {
+        // Force no-cache only for private/account/auth surfaces.
         response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0");
         response.headers.set("Pragma", "no-cache");
         response.headers.set("Expires", "0");
-        // Ensure Cloudflare/Proxies distinguish between user sessions
         response.headers.set("Vary", "Cookie");
     }
 

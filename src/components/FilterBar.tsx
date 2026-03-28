@@ -70,7 +70,7 @@ export default function FilterBar({
 
     return (
         <div>
-            <div className="flex flex-nowrap items-center gap-2 sm:gap-3 py-2 overflow-x-auto no-scrollbar">
+            <div className="no-scrollbar flex flex-nowrap items-center gap-2 overflow-x-auto py-2 sm:gap-3">
                 {!hideCategory && (
                     <EliteSelect
                         options={displayCategories}
@@ -101,11 +101,11 @@ export default function FilterBar({
             </div>
 
             {isPending && (
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 sm:gap-2.5 md:gap-3 pt-1 [contain:layout_paint]">
+                <div className="grid grid-cols-3 gap-2 pt-1 sm:grid-cols-4 sm:gap-2.5 md:grid-cols-5 md:gap-3 lg:grid-cols-6 [contain:layout_paint]">
                     {Array.from({ length: 12 }).map((_, i) => (
                         <div
                             key={i}
-                            className="aspect-[2/3] rounded-lg bg-white/[0.06] border border-white/[0.06] animate-pulse"
+                            className="aspect-[2/3] animate-pulse rounded-lg border border-white/[0.06] bg-white/[0.06]"
                         />
                     ))}
                 </div>

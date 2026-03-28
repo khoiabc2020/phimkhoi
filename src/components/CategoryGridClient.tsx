@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { getResilientMoviesList } from "@/app/actions/movies";
 import MovieGridInstant from "./MovieGridInstant";
 
@@ -16,13 +17,13 @@ export default function CategoryGridClient({
     year?: string;
     limit?: number;
 }) {
-    const fetcher = async () => {
+    const fetcher = useCallback(async () => {
         return await getResilientMoviesList("category", page, limit, {
             category: slug,
             country,
             year,
         });
-    };
+    }, [page, limit, slug, country, year]);
 
     const cacheKey = `category_${slug}_p${page}_c${country || 'all'}_y${year || 'all'}`;
 

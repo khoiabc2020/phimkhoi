@@ -16,6 +16,21 @@ interface HeaderProps {
     countries: any[];
 }
 
+function formatSearchMeta(movie: any) {
+    const year = Number(movie?.year);
+    const quality = String(movie?.quality || "").trim().toUpperCase();
+    const parts: string[] = [];
+
+    if (year > 1900) parts.push(String(year));
+    if (quality && quality !== "0" && quality !== "FULLHD") {
+        parts.push(quality);
+    } else if (quality === "FULLHD") {
+        parts.push("FHD");
+    }
+
+    return parts.join(" • ");
+}
+
 export default function Header({ categories, countries }: HeaderProps) {
     const pathname = usePathname();
     const router = useRouter();
@@ -66,6 +81,11 @@ export default function Header({ categories, countries }: HeaderProps) {
 
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    useEffect(() => {
+        ["/", "/phim-han", "/phim-trung", "/danh-sach/phim-moi-cap-nhat", "/danh-sach/phim-bo", "/danh-sach/phim-le"]
+            .forEach((path) => router.prefetch(path));
+    }, [router]);
 
     useEffect(() => {
         if (session) {
@@ -480,7 +500,9 @@ export default function Header({ categories, countries }: HeaderProps) {
                                                                             </div>
                                                                             <div className="flex-1 min-w-0">
                                                                                 <div className={cn("text-sm font-semibold truncate group-hover:text-primary", selectedIndex === idx ? "text-primary" : "text-white")}>{movie.name}</div>
-                                                                                <div className="text-[11px] text-white/40">{movie.year} • {movie.quality}</div>
+                                                                                {formatSearchMeta(movie) ? (
+                                                                                    <div className="text-[11px] text-white/40">{formatSearchMeta(movie)}</div>
+                                                                                ) : null}
                                                                             </div>
                                                                         </Link>
                                                                     ))}

@@ -175,21 +175,21 @@ export default function VideoPlayer({
                 countdownEl.style.fontSize = '14px';
                 countdownEl.innerHTML = `Tập tiếp theo sau <b>${countdown}s</b> <span style="margin-left:8px; cursor:pointer; color:#8FA7C5;" id="cancel-next">✖</span>`;
                 container.appendChild(countdownEl);
+                const cancelBtn = countdownEl.querySelector('#cancel-next');
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', () => {
+                        if (nextIntervalRef.current) clearInterval(nextIntervalRef.current);
+                        if (countdownEl && countdownEl.parentNode) {
+                            countdownEl.parentNode.removeChild(countdownEl);
+                        }
+                    }, { once: true });
+                }
             }
 
             const interval = setInterval(() => {
                 countdown--;
                 if (countdownEl) {
                     countdownEl.innerHTML = `Tập tiếp theo sau <b>${countdown}s</b> <span style="margin-left:8px; cursor:pointer; color:#8FA7C5;" id="cancel-next">✖</span>`;
-                    const cancelBtn = countdownEl.querySelector('#cancel-next');
-                    if (cancelBtn) {
-                        cancelBtn.addEventListener('click', () => {
-                            if (nextIntervalRef.current) clearInterval(nextIntervalRef.current);
-                            if (countdownEl && countdownEl.parentNode) {
-                                countdownEl.parentNode.removeChild(countdownEl);
-                            }
-                        });
-                    }
                 }
 
                 if (countdown === 0) {

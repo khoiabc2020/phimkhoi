@@ -28,20 +28,23 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
     const topMovies = movies.slice(0, 10);
 
     return (
-        <div className={cn("w-full relative py-2", className)}>
+        <div className={cn("relative w-full py-2", className)}>
             <div className="mb-4 flex items-center justify-between">
                 <h2 className="flex items-center gap-2.5 text-[20px] font-extrabold capitalize tracking-tight text-white md:text-[24px]">
                     <span className="h-6 w-1 rounded-full bg-[#8FA7C5]" />
                     <span className="leading-tight">{title}</span>
                 </h2>
                 {slug && (
-                    <Link href={slug} className="group flex items-center gap-1 text-sm font-semibold text-[#a8bad3] transition-colors hover:text-white md:text-base">
+                    <Link
+                        href={slug}
+                        className="group flex items-center gap-1 text-sm font-semibold text-[#a8bad3] transition-colors hover:text-white md:text-base"
+                    >
                         Xem tất cả <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </Link>
                 )}
             </div>
 
-            <div className="no-scrollbar flex gap-3 overflow-x-auto pb-3 snap-x [contain:layout_paint]">
+            <div className="no-scrollbar flex snap-x gap-3 overflow-x-auto pb-3 [contain:layout_paint]">
                 {topMovies.map((movie, index) => (
                     <Link
                         key={movie._id}
@@ -61,9 +64,13 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
                                 <span
                                     className={cn(
                                         "text-lg font-black md:text-xl",
-                                        index === 0 ? "text-[#c6d6ea]" :
-                                            index === 1 ? "text-gray-200" :
-                                                index === 2 ? "text-[#8FA7C5]" : "text-white"
+                                        index === 0
+                                            ? "text-[#c6d6ea]"
+                                            : index === 1
+                                              ? "text-gray-200"
+                                              : index === 2
+                                                ? "text-[#8FA7C5]"
+                                                : "text-white"
                                     )}
                                     style={{ fontFamily: "var(--font-outfit)" }}
                                 >
@@ -76,9 +83,7 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
                             <h3 className="line-clamp-2 text-[13px] font-bold leading-snug text-white transition-colors group-hover:text-[#c6d6ea] sm:text-sm">
                                 {decodeHtml(movie.name)}
                             </h3>
-                            <p className="truncate text-xs text-white/50">
-                                {decodeHtml(movie.origin_name)}
-                            </p>
+                            <p className="truncate text-xs text-white/50">{decodeHtml(movie.origin_name)}</p>
                             <div className="mt-auto flex items-center gap-2 pt-1 lg:mt-1 lg:flex-wrap lg:pt-0">
                                 {getYearLabel(movie) && (
                                     <span className="whitespace-nowrap rounded-sm border border-white/5 bg-white/10 px-1.5 py-0.5 text-[10px] text-white/70">

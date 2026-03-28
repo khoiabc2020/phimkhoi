@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
@@ -19,57 +19,90 @@ const ASSETS_MAP: Record<string, MovieSlideAssets> = {
     "bach-nguyet-phan-tinh": {
         bg: "/images/china-hero/bach-nguyet-bg.webp",
         logo: "/images/china-hero/bach-nguyet-logo.webp",
-        actor: "/images/china-hero/bach-nguyet-actor.webp"
+        actor: "/images/china-hero/bach-nguyet-actor.webp",
     },
     "bui-hoa-hong": {
         bg: "/images/china-hero/bui-hoa-hong-bg.webp",
         logo: "/images/china-hero/bui-hoa-hong-logo.webp",
-        actor: "/images/china-hero/bui-hoa-hong-actor.webp"
+        actor: "/images/china-hero/bui-hoa-hong-actor.webp",
     },
     "dai-mong-quy-ly": {
         bg: "/images/china-hero/dai-mong-bg.webp",
         logo: "/images/china-hero/dai-mong-logo.webp",
-        actor: "/images/china-hero/dai-mong-actor.webp"
+        actor: "/images/china-hero/dai-mong-actor.webp",
     },
     "giang-ho-da-vu-thap-nien-dang": {
         bg: "/images/china-hero/giang-ho-bg.webp",
         logo: "/images/china-hero/giang-ho-logo.png",
-        actor: "/images/china-hero/giang-ho-actor.webp"
+        actor: "/images/china-hero/giang-ho-actor.webp",
     },
     "mac-nhan-tang-kieu": {
         bg: "/images/china-hero/mac-nhan-bg.webp",
         logo: "/images/china-hero/mac-nhan-logo.webp",
-        actor: "/images/china-hero/mac-nhan-actor.webp"
+        actor: "/images/china-hero/mac-nhan-actor.webp",
     },
     "ngoc-minh-tra-cot": {
         bg: "/images/china-hero/ngoc-minh-bg.webp",
         logo: "/images/china-hero/ngoc-minh-logo.webp",
-        actor: "/images/china-hero/ngoc-minh-actor.webp"
+        actor: "/images/china-hero/ngoc-minh-actor.webp",
     },
     "con-ra-the-thong-gi-nua": {
         bg: "/images/china-hero/the-thong-bg.webp",
         logo: "/images/china-hero/the-thong-logo.webp",
-        actor: "/images/china-hero/the-thong-actor.webp"
+        actor: "/images/china-hero/the-thong-actor.webp",
     },
     "truc-ngoc": {
         bg: "/images/china-hero/truc-ngoc-bg.webp",
         logo: "/images/china-hero/truc-ngoc-logo.webp",
-        actor: "/images/china-hero/truc-ngoc-actor.webp"
+        actor: "/images/china-hero/truc-ngoc-actor.webp",
     },
     "xin-chao-1983": {
         bg: "/images/china-hero/xin-chao-bg.webp",
         logo: "/images/china-hero/xin-chao-logo.webp",
-        actor: "/images/china-hero/xin-chao-actor.webp"
+        actor: "/images/china-hero/xin-chao-actor.webp",
     },
     "duong-cung-ky-an-thanh-vu-phong-minh": {
         bg: "/images/china-hero/tang-cung-bg.png",
         logo: "/images/china-hero/tang-cung-logo.png",
-        actor: "/images/china-hero/tang-cung-actor.png"
-    }
+        actor: "/images/china-hero/tang-cung-actor.png",
+    },
 };
 
 interface ChinaHeroProps {
     initialMovies?: any[];
+}
+
+function isWeakHeroText(value: string) {
+    const normalized = value
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim();
+
+    return (
+        !normalized ||
+        normalized.length < 28 ||
+        normalized.includes("dang cap nhat noi dung") ||
+        normalized.includes("dang cap nhat")
+    );
+}
+
+function buildChinaFallbackDescription(movie: any) {
+    const tags = Array.isArray(movie?.category)
+        ? movie.category.map((item: any) => item?.name).filter(Boolean).slice(0, 3)
+        : [];
+    const title = movie?.name || movie?.origin_name || "Bộ phim";
+
+    if (tags.length > 0) {
+        return `${title} mang màu sắc ${tags.join(", ").toLowerCase()}, kết hợp thế giới nhân vật đậm chất cổ trang hoặc hiện đại với nhịp kể giàu cảm xúc và nhiều nút thắt.`;
+    }
+
+    return `${title} là một bộ phim Trung Quốc nổi bật với bối cảnh giàu màu sắc, quan hệ nhân vật phức tạp và hành trình cuốn người xem đi qua nhiều lớp bí mật, cảm xúc hoặc tranh đấu.`;
+}
+
+function normalizeHeroDescription(movie: any) {
+    const raw = stripHtml(movie?.content || movie?.description || movie?.tmdbData?.overview || "").trim();
+    return isWeakHeroText(raw) ? buildChinaFallbackDescription(movie) : raw;
 }
 
 export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
@@ -77,30 +110,33 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
     const [isAutoPlay, setIsAutoPlay] = useState(true);
     const router = useRouter();
 
-    const normalizeHeroDescription = (movie: any) => {
-        const raw = stripHtml(movie?.content || movie?.description || movie?.tmdbData?.overview || "").trim();
-        if (!raw || /dang cap nhat noi dung|đang cập nhật nội dung/i.test(raw)) {
-            return "Một câu chuyện mới đang chờ bạn khám phá.";
-        }
-        return raw;
-    };
+    const slides = useMemo(
+        (): (any & {
+            bg: string;
+            logo: string;
+            actor?: string;
+            displayTitle: string;
+            displayDesc: string;
+            displayTags: string[];
+            displayEpisodes: string;
+        })[] =>
+            (initialMovies || [])
+                .filter((movie) => Boolean(movie?.slug && ASSETS_MAP[movie.slug]))
+                .map((movie) => {
+                    const assets = ASSETS_MAP[movie.slug];
 
-    const slides = useMemo((): (any & { bg: string; logo: string; actor?: string; displayTitle: string; displayDesc: string; displayTags: string[]; displayEpisodes: string })[] => {
-        return (initialMovies || [])
-            .filter(movie => Boolean(movie?.slug && ASSETS_MAP[movie.slug]))
-            .map(movie => {
-                const assets = ASSETS_MAP[movie.slug];
-                
-                return {
-                    ...movie,
-                    ...assets,
-                    displayTitle: movie.name,
-                    displayDesc: normalizeHeroDescription(movie),
-                    displayTags: movie.category?.slice(0, 3).map((c: any) => c?.name).filter(Boolean) || ["Phim Trung"],
-                    displayEpisodes: movie.episode_current || "Full"
-                };
-            });
-    }, [initialMovies]);
+                    return {
+                        ...movie,
+                        ...assets,
+                        displayTitle: movie.name,
+                        displayDesc: normalizeHeroDescription(movie),
+                        displayTags:
+                            movie.category?.slice(0, 3).map((c: any) => c?.name).filter(Boolean) || ["Phim Trung"],
+                        displayEpisodes: movie.episode_current || "Full",
+                    };
+                }),
+        [initialMovies]
+    );
 
     useEffect(() => {
         if (!isAutoPlay || slides.length === 0) return;
@@ -132,86 +168,84 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
     if (slides.length === 0 || !currentMovie) return null;
 
     return (
-        <section 
+        <section
             className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] xl:h-[800px] overflow-hidden bg-black"
             style={{ contain: "layout style paint" }}
         >
             <AnimatePresence mode="popLayout" initial={false}>
-                <motion.div 
+                <motion.div
                     key={current}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.5 }}
+                    transition={{ duration: 0.35 }}
                     className="absolute inset-0"
                 >
-                    {/* Background Layer (Main Crossfade) */}
                     <div className="absolute inset-0 z-0 optimize-gpu">
                         <div className="md:hidden absolute inset-0 overflow-hidden">
-                            <Image 
+                            <Image
                                 src={getImageUrl(currentMovie.bg || currentMovie.poster_url || "")}
                                 alt={currentMovie.displayTitle}
                                 fill
-                                className="object-cover brightness-[0.45] contrast-[1.15]"
+                                className="object-cover brightness-[0.45] contrast-[1.1]"
                                 priority={isFirstSlide}
                                 loading={isFirstSlide ? "eager" : "lazy"}
                                 decoding="async"
-                                quality={75}
+                                quality={58}
                                 sizes="100vw"
                             />
                         </div>
 
                         <div className="hidden md:block absolute inset-0 overflow-hidden">
-                            <Image 
+                            <Image
                                 src={getImageUrl(currentMovie.bg || "")}
                                 alt={currentMovie.displayTitle}
                                 fill
-                                className="object-cover brightness-[0.45] contrast-[1.15]"
+                                className="object-cover brightness-[0.45] contrast-[1.1]"
                                 priority={isFirstSlide}
                                 loading={isFirstSlide ? "eager" : "lazy"}
                                 decoding="async"
-                                quality={75}
+                                quality={60}
                                 sizes="100vw"
                             />
                         </div>
 
-                        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/20 to-transparent z-10" />
-                        <div className="absolute inset-y-0 left-0 w-[50%] bg-gradient-to-r from-black via-black/60 to-transparent z-10" />
-                        
+                        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/25 to-transparent z-10" />
+                        <div className="absolute inset-y-0 left-0 w-[50%] bg-gradient-to-r from-black via-black/65 to-transparent z-10" />
                         <div className="absolute inset-x-0 bottom-0 h-96 bg-gradient-to-t from-black via-transparent to-transparent z-10 opacity-60" />
                         <div className="absolute inset-x-0 bottom-0 z-30 pt-40 pb-12 md:pb-20 lg:pb-32 px-4 md:px-8 lg:pl-26 xl:pl-34 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
                         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent z-20" />
                     </div>
 
-                    {/* Actor Layer (Independent Slide/Fade) */}
                     {currentMovie.actor && (
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0, x: 50 }}
                             animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+                            transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
                             className="absolute inset-0 z-[15] pointer-events-none"
                         >
                             <Image
-                                src={getImageUrl(currentMovie.actor || "")}
+                                src={getImageUrl(currentMovie.actor)}
                                 alt=""
                                 fill
                                 className="object-contain object-right-bottom scale-[0.65] md:scale-[0.8] lg:scale-[0.85] origin-right-bottom"
-                                priority
+                                priority={isFirstSlide}
+                                loading={isFirstSlide ? "eager" : "lazy"}
+                                quality={60}
                             />
                         </motion.div>
                     )}
 
-                    {/* Info Layer (Slide-up) */}
                     <div className="absolute inset-0 z-30 flex items-end lg:items-center px-6 pb-20 md:pb-0 md:pl-24 md:pr-14 lg:pl-32 xl:pl-[140px] max-w-[1920px] mx-auto">
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
+                            transition={{ duration: 0.45, delay: 0.08, ease: "easeOut" }}
                             className="max-w-[90%] sm:max-w-xl md:max-w-2xl flex flex-col items-start gap-2.5 md:gap-5"
                         >
                             <div className="relative w-full max-w-[200px] sm:max-w-[280px] md:max-w-[420px] lg:max-w-[480px] aspect-[4/1.5]">
                                 {currentMovie.logo ? (
-                                    <Image 
+                                    <Image
                                         src={currentMovie.logo}
                                         alt={currentMovie.displayTitle}
                                         fill
@@ -241,7 +275,10 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
 
                             <div className="hidden sm:flex flex-wrap gap-2">
                                 {currentMovie.displayTags.map((tag: string) => (
-                                    <span key={tag} className="px-3 py-1 bg-white/10 border border-white/10 rounded-full text-[11px] md:text-[12px] font-bold text-white/80 cursor-default shadow-sm backdrop-blur-md transition-all duration-300 hover:bg-white/20">
+                                    <span
+                                        key={tag}
+                                        className="px-3 py-1 bg-white/10 border border-white/10 rounded-full text-[11px] md:text-[12px] font-bold text-white/80 cursor-default shadow-sm backdrop-blur-md transition-all duration-300 hover:bg-white/20"
+                                    >
                                         {tag}
                                     </span>
                                 ))}
@@ -252,14 +289,14 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                             </p>
 
                             <div className="flex items-center gap-3 md:gap-4 pt-2 pointer-events-auto">
-                                <Link 
+                                <Link
                                     href={`/phim/${currentMovie.slug}`}
                                     className="flex items-center gap-2 md:gap-3 px-6 md:px-10 h-11 md:h-14 bg-[#8FA7C5] text-[#0a0a0a] rounded-full font-black text-[14px] md:text-[16px] active:scale-95 shadow-2xl shadow-[#8FA7C5]/20 uppercase tracking-wider transition-all duration-300 hover:bg-white hover:scale-105"
                                 >
                                     <Play className="w-4 h-4 md:w-5 md:h-5 fill-current" />
-                                    Xem Ngay
+                                    Xem ngay
                                 </Link>
-                                
+
                                 <WatchlistButton
                                     slug={currentMovie.slug}
                                     className="h-11 w-11 md:h-14 md:w-14 rounded-full bg-white/10 border border-white/20 text-white active:scale-95 backdrop-blur-md shadow-xl flex items-center justify-center transition-all duration-300 hover:bg-white/20 hover:scale-110"
@@ -275,30 +312,33 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                 {slides.map((_, idx) => (
                     <button
                         key={idx}
-                        onClick={() => { setIsAutoPlay(false); setCurrent(idx); }}
+                        onClick={() => {
+                            setIsAutoPlay(false);
+                            setCurrent(idx);
+                        }}
                         className={cn(
                             "rounded-full transition-all duration-300",
-                            current === idx 
-                                ? "w-8 md:w-10 h-1.5 md:h-2 bg-[#8FA7C5] shadow-[0_0_12px_#8FA7C5]" 
+                            current === idx
+                                ? "w-8 md:w-10 h-1.5 md:h-2 bg-[#8FA7C5] shadow-[0_0_12px_#8FA7C5]"
                                 : "w-1.5 md:w-2 h-1.5 md:h-2 bg-white/20 hover:bg-white/40 hover:scale-110"
                         )}
-                        aria-label={`Go to slide ${idx + 1}`}
+                        aria-label={`Chuyển đến slide ${idx + 1}`}
                     />
                 ))}
             </div>
 
             <div className="absolute top-[38%] md:top-[42%] -translate-y-1/2 left-0 right-0 z-40 pointer-events-none flex items-center justify-between px-2 md:px-8 lg:pl-32 lg:pr-10 xl:pl-40 xl:pr-16">
-                <button 
+                <button
                     onClick={prev}
                     className="h-8 w-8 md:h-9 md:w-9 lg:h-10 lg:w-10 rounded-full bg-transparent border border-transparent flex items-center justify-center text-white/15 hover:text-white/45 hover:bg-white/[0.04] active:scale-95 transition-all duration-300 pointer-events-auto shadow-none"
-                    aria-label="Previous slide"
+                    aria-label="Slide trước"
                 >
                     <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7" />
                 </button>
-                <button 
+                <button
                     onClick={next}
                     className="h-8 w-8 md:h-9 md:w-9 lg:h-10 lg:w-10 rounded-full bg-transparent border border-transparent flex items-center justify-center text-white/15 hover:text-white/45 hover:bg-white/[0.04] active:scale-95 transition-all duration-300 pointer-events-auto shadow-none"
-                    aria-label="Next slide"
+                    aria-label="Slide sau"
                 >
                     <ChevronRight className="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7" />
                 </button>

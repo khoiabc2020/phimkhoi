@@ -41,12 +41,37 @@ interface KoreaHeroProps {
     initialMovies?: any[];
 }
 
+function isWeakHeroText(value: string) {
+    const normalized = value
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim();
+
+    return (
+        !normalized ||
+        normalized.length < 28 ||
+        normalized.includes("dang cap nhat noi dung") ||
+        normalized.includes("dang cap nhat")
+    );
+}
+
+function buildKoreaFallbackDescription(movie: any) {
+    const tags = Array.isArray(movie?.category)
+        ? movie.category.map((item: any) => item?.name).filter(Boolean).slice(0, 3)
+        : [];
+    const title = movie?.name || movie?.origin_name || "Bộ phim";
+
+    if (tags.length > 0) {
+        return `${title} mang màu sắc ${tags.join(", ").toLowerCase()}, với nhịp kể cảm xúc, quan hệ nhân vật nhiều biến chuyển và chất liệu rất đặc trưng của phim Hàn Quốc hiện đại.`;
+    }
+
+    return `${title} là một bộ phim Hàn Quốc nổi bật với nhịp kể cảm xúc, nhân vật giàu xung đột và hành trình chữa lành, trưởng thành hoặc đối đầu với những lựa chọn lớn trong cuộc sống.`;
+}
+
 function normalizeHeroDescription(movie: any) {
     const raw = stripHtml(movie?.content || movie?.description || movie?.tmdbData?.overview || "").trim();
-    if (!raw || /dang cap nhat noi dung|đang cập nhật nội dung/i.test(raw)) {
-        return "Một câu chuyện mới đang chờ bạn khám phá.";
-    }
-    return raw;
+    return isWeakHeroText(raw) ? buildKoreaFallbackDescription(movie) : raw;
 }
 
 export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
@@ -121,7 +146,7 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.5 }}
+                    transition={{ duration: 0.35 }}
                     className="absolute inset-0"
                 >
                     <div className="absolute inset-0 z-0 optimize-gpu">
@@ -130,11 +155,11 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                                 src={getImageUrl(currentMovie.bg || currentMovie.poster_url || "")}
                                 alt={currentMovie.displayTitle}
                                 fill
-                                className="object-cover brightness-[0.45] contrast-[1.15]"
+                                className="object-cover brightness-[0.45] contrast-[1.1]"
                                 priority={isFirstSlide}
                                 loading={isFirstSlide ? "eager" : "lazy"}
                                 decoding="async"
-                                quality={75}
+                                quality={58}
                                 sizes="100vw"
                             />
                         </div>
@@ -144,17 +169,17 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                                 src={getImageUrl(currentMovie.bg || "")}
                                 alt={currentMovie.displayTitle}
                                 fill
-                                className="object-cover brightness-[0.45] contrast-[1.15]"
+                                className="object-cover brightness-[0.45] contrast-[1.1]"
                                 priority={isFirstSlide}
                                 loading={isFirstSlide ? "eager" : "lazy"}
                                 decoding="async"
-                                quality={75}
+                                quality={60}
                                 sizes="100vw"
                             />
                         </div>
 
-                        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/20 to-transparent z-10" />
-                        <div className="absolute inset-y-0 left-0 w-[50%] bg-gradient-to-r from-black via-black/60 to-transparent z-10" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/30 to-transparent z-10" />
+                        <div className="absolute inset-y-0 left-0 w-[50%] bg-gradient-to-r from-black via-black/65 to-transparent z-10" />
                         <div className="absolute inset-x-0 bottom-0 h-96 bg-gradient-to-t from-black via-transparent to-transparent z-10 opacity-60" />
                         <div className="absolute inset-x-0 bottom-0 z-30 pt-40 pb-12 md:pb-20 lg:pb-32 px-4 md:px-8 lg:pl-26 xl:pl-34 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
                         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent z-20" />
@@ -164,7 +189,7 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
+                            transition={{ duration: 0.45, delay: 0.08, ease: "easeOut" }}
                             className="max-w-[90%] sm:max-w-xl md:max-w-2xl flex flex-col items-start gap-2.5 md:gap-5"
                         >
                             <div className="relative w-full max-w-[200px] sm:max-w-[280px] md:max-w-[420px] lg:max-w-[480px] aspect-[4/1.5]">
@@ -218,7 +243,7 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                                     className="flex items-center gap-2 md:gap-3 px-6 md:px-10 h-11 md:h-14 bg-[#8FA7C5] text-[#0a0a0a] rounded-full font-black text-[14px] md:text-[16px] active:scale-95 shadow-2xl shadow-[#8FA7C5]/20 uppercase tracking-wider transition-all duration-300 hover:bg-white hover:scale-105"
                                 >
                                     <Play className="w-4 h-4 md:w-5 md:h-5 fill-current" />
-                                    Xem Ngay
+                                    Xem ngay
                                 </Link>
 
                                 <WatchlistButton

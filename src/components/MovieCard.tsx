@@ -260,7 +260,7 @@ function MovieCard({
                             fill
                             className="transition-transform duration-500 ease-out lg:group-hover/static-card:scale-[1.1] object-cover z-10 anchor-top"
                             sizes={orientation === 'landscape' ? "(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 400px" : "(max-width: 768px) 33vw, (max-width: 1200px) 20vw, (max-width: 1920px) 15vw, 300px"}
-                            quality={82}
+                            quality={76}
                             loading={priority ? undefined : loading}
                             priority={priority}
                             decoding="async"
@@ -508,11 +508,6 @@ function OnflixHoverCard({
                             {movie.episode_current && movie.episode_current !== "0" && !isTrailerBadge(movie.episode_current) && (
                                 <span className="border border-white/30 text-white/80 px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider">
                                     {movie.episode_current}
-                                </span>
-                            )}
-                            {movie.view && Number(movie.view) > 0 && (
-                                <span className="text-white/40 text-[11px] ml-auto">
-                                    {movie.view.toLocaleString()} lượt xem
                                 </span>
                             )}
                         </div>

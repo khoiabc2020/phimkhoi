@@ -94,6 +94,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Sidebar from "@/components/Sidebar";
 import LoadingBar from "@/components/LoadingBar";
+import RouteWarmup from "@/components/RouteWarmup";
 import { getMenuData } from "@/services/api";
 
 export default async function RootLayout({
@@ -150,6 +151,7 @@ export default async function RootLayout({
           <Suspense fallback={null}>
             <LoadingBar />
           </Suspense>
+          <RouteWarmup />
           <div className="flex flex-col min-h-screen">
             <Suspense fallback={<div className="h-16 bg-black/50" />}>
               <Header categories={categories} countries={countries} />
