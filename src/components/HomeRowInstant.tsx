@@ -18,26 +18,22 @@ interface HomeRowInstantProps {
     cacheKeyPrefix?: string;
 }
 
-export default function HomeRowInstant({
+function HomeRowFetcher({
     title,
     slug,
-    endpoint = 'danh-sach',
     viewAllHref,
-    minHeight = 350,
-    priorityFirst = false,
-    country,
-    category,
-    cacheKeyPrefix
-}: HomeRowInstantProps) {
-    const fetcher = useCallback(async () => {
-        return await getResilientMoviesList(slug, 1, 12, { 
-            category: category || (endpoint === 'the-loai' ? slug : undefined), 
-            country: country || (endpoint === 'quoc-gia' ? slug : undefined) 
-        });
-    }, [slug, endpoint, category, country]);
-
-    const finalCacheKey = cacheKeyPrefix || `home_row_${slug}`;
-    const { movies, isLoading } = useMoviesInstant(finalCacheKey, fetcher);
+    priorityFirst,
+    cacheKeyPrefix,
+    fetcher
+}: {
+    title: string;
+    slug: string;
+    viewAllHref?: string;
+    priorityFirst?: boolean;
+    cacheKeyPrefix: string;
+    fetcher: () => Promise<{ items: any[]; pagination?: any }>;
+}) {
+    const { movies, isLoading } = useMoviesInstant(cacheKeyPrefix, fetcher);
 
     if (isLoading && movies.length === 0) {
         return (
@@ -59,24 +55,54 @@ export default function HomeRowInstant({
 
     if (movies.length === 0 && !isLoading) {
         return (
-            <LazySection minHeight={minHeight} className="movie-row-standard">
-                <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 lg:pl-24 lg:pr-12 py-4">
-                    <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] px-5 py-6 text-white/70">
-                        <div className="text-sm font-bold uppercase tracking-[0.2em] text-white/40">{title}</div>
-                        <div className="mt-2 text-sm">Đang đồng bộ dữ liệu mới nhất. Hệ thống sẽ tự làm đầy danh sách ngay khi nguồn trả dữ liệu.</div>
-                    </div>
+            <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 lg:pl-24 lg:pr-12 py-4">
+                <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] px-5 py-6 text-white/70">
+                    <div className="text-sm font-bold uppercase tracking-[0.2em] text-white/40">{title}</div>
+                    <div className="mt-2 text-sm">Đang đồng bộ dữ liệu mới nhất. Hệ thống sẽ tự làm đầy danh sách ngay khi nguồn trả dữ liệu.</div>
                 </div>
-            </LazySection>
+            </div>
         );
     }
 
     return (
+        <MovieRow
+            title={title}
+            movies={movies}
+            slug={viewAllHref || slug}
+            priorityFirst={priorityFirst}
+        />
+    );
+}
+
+export default function HomeRowInstant({
+    title,
+    slug,
+    endpoint = 'danh-sach',
+    viewAllHref,
+    minHeight = 350,
+    priorityFirst = false,
+    country,
+    category,
+    cacheKeyPrefix
+}: HomeRowInstantProps) {
+    const fetcher = useCallback(async () => {
+        return await getResilientMoviesList(slug, 1, 12, { 
+            category: category || (endpoint === 'the-loai' ? slug : undefined), 
+            country: country || (endpoint === 'quoc-gia' ? slug : undefined) 
+        });
+    }, [slug, endpoint, category, country]);
+
+    const finalCacheKey = cacheKeyPrefix || `home_row_${slug}`;
+
+    return (
         <LazySection minHeight={minHeight} className="movie-row-standard">
-            <MovieRow
+            <HomeRowFetcher
                 title={title}
-                movies={movies}
-                slug={viewAllHref || slug}
+                slug={slug}
+                viewAllHref={viewAllHref}
                 priorityFirst={priorityFirst}
+                cacheKeyPrefix={finalCacheKey}
+                fetcher={fetcher}
             />
         </LazySection>
     );

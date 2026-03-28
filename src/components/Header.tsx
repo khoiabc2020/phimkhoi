@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
@@ -153,7 +153,7 @@ export default function Header({ categories, countries }: HeaderProps) {
                     setIsSearching(false);
                 }
             }
-        }, 120);
+        }, 500);
 
         return () => {
             controller.abort();
