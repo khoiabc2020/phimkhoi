@@ -9,57 +9,57 @@ const NAV_ITEMS = [
         label: "Hàn Quốc",
         sub: "Phim Bộ",
         href: "/quoc-gia/han-quoc",
-        from: "#ff416c", // Vibrant Pink
-        to: "#ff4b2b",   // Bright Orange
+        from: "#7182d9",
+        to: "#d9a7c7",
     },
     {
         label: "Trung Quốc",
         sub: "Hoa Ngữ",
         href: "/quoc-gia/trung-quoc",
-        from: "#8A2387", // Deep Purple
-        to: "#E94057",   // Vibrant Red
+        from: "#d9a7c7",
+        to: "#e8809e",
     },
     {
         label: "Thái Lan",
         sub: "Cực Hay",
         href: "/quoc-gia/thai-lan",
-        from: "#4facfe", // Bright Cyan
-        to: "#00f2fe",   // Ocean Blue
+        from: "#557bc4",
+        to: "#c16b92",
     },
     {
         label: "Sitcom",
         sub: "Game Shows",
         href: "/danh-sach/tv-shows",
-        from: "#00b09b", // Mint Green
-        to: "#96c93d",   // Lime Green
+        from: "#4f9d81",
+        to: "#a46358",
     },
     {
         label: "Chiếu Rạp",
         sub: "Mới Nhất",
         href: "/the-loai/phim-chieu-rap",
-        from: "#4776E6", // Royal Blue
-        to: "#8E54E9",   // Amethyst Purple
+        from: "#8f76b9",
+        to: "#cc7781",
     },
     {
         label: "Kinh Dị",
         sub: "Thót Tim",
         href: "/the-loai/kinh-di",
-        from: "#Cb2d3e", // Blood Red
-        to: "#ef473a",   // Bright Red
+        from: "#ca876a",
+        to: "#b8565a",
     },
     {
         label: "Cổ Trang",
         sub: "Huyền Huyễn",
         href: "/the-loai/co-trang",
-        from: "#FDC830", // Golden Yellow
-        to: "#F37335",   // Bright Sunset
+        from: "#b15f58",
+        to: "#b54452",
     },
     {
         label: "Thuyết Minh",
         sub: "VietDub",
         href: "/danh-sach/thuyet-minh",
-        from: "#00c6ff", // Pure Cyan
-        to: "#0072ff",   // Bright Navy
+        from: "#5d6d84",
+        to: "#434b5a",
     },
 ];
 
