@@ -1,30 +1,25 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Geist_Mono, Be_Vietnam_Pro, Roboto_Condensed, Lexend } from "next/font/google";
+import { Be_Vietnam_Pro, Lexend } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
 import Script from "next/script";
 
-const interSans = Inter({
-  variable: "--font-inter",
-  subsets: ["latin", "vietnamese"],
-});
-
+// Font chính cho heading — preload, chỉ 2 weight cần thiết
 const beVietnamPro = Be_Vietnam_Pro({
   variable: "--font-display",
   subsets: ["latin", "vietnamese"],
-  weight: ["700", "800", "900"],
+  weight: ["700", "900"],
+  display: "swap",
+  preload: true,
 });
 
-const logoFont = Roboto_Condensed({
-  variable: "--font-logo",
-  subsets: ["latin", "vietnamese"],
-  weight: ["500", "600", "700"],
-});
-
+// Font body — preload, giới hạn weight
 const outfitFont = Lexend({
   variable: "--font-outfit",
   subsets: ["latin", "vietnamese"],
-  weight: ["400", "500", "600", "700", "800", "900"],
+  weight: ["400", "600", "700"],
+  display: "swap",
+  preload: true,
 });
 
 export const viewport: Viewport = {
@@ -172,7 +167,7 @@ export default async function RootLayout({
         }) }} />
       </head>
       <body
-        className={`${interSans.variable} ${beVietnamPro.variable} ${logoFont.variable} ${outfitFont.variable} antialiased pb-20 lg:pb-0 font-sans`}
+        className={`${beVietnamPro.variable} ${outfitFont.variable} antialiased pb-20 lg:pb-0 font-sans`}
       >
         <Providers>
           <Suspense fallback={null}>
