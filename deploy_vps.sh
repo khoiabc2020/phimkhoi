@@ -31,9 +31,9 @@ echo "Preparing isolated build..."
 cd "$BUILD_DIR"
 npm install --legacy-peer-deps
 
-echo "Building application (Bounded RAM Limit: 2500MB)..."
-# Using 2.5GB Limit prevents VPS from throwing Out-Of-Memory while Live Server is running
-export NODE_OPTIONS="--max_old_space_size=2500"
+echo "Building application (Bounded RAM Limit: 1024MB)..."
+# Using 1024MB Limit prevents VPS from throwing Out-Of-Memory while Live Server is running
+export NODE_OPTIONS="--max_old_space_size=1024"
 
 if npm run build; then
     echo "=========================================="

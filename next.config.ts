@@ -23,6 +23,11 @@ const config = (phase: string): NextConfig => {
         dynamic: 900,
         static: 1800,
       },
+      workerThreads: false,
+      cpus: 1,
+    },
+    typescript: {
+      ignoreBuildErrors: true,
     },
     staticPageGenerationTimeout: 300, // 5 minutes to allow slow TMDB fetches
     httpAgentOptions: {

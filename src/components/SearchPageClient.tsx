@@ -1,8 +1,7 @@
 "use client";
 
 import { useMoviesInstant } from "@/hooks/useMoviesInstant";
-import { searchMovies } from "@/services/api";
-import { searchTMDBPerson } from "@/services/tmdb";
+import { searchMoviesAction, searchTMDBPersonAction } from "@/app/actions/search";
 import MovieCard from "./MovieCard";
 import { User, SearchX, Globe, Star } from "lucide-react";
 import Link from "next/link";
@@ -28,8 +27,8 @@ export default function SearchPageClient({
     const fetcher = useCallback(async () => {
         // Parallel fetch movies and actors
         const [movies, actorsList] = await Promise.all([
-            searchMovies(keyword, { limit: limit * 2 }),
-            keyword.length >= 3 ? searchTMDBPerson(keyword) : Promise.resolve([])
+            searchMoviesAction(keyword, { limit: limit * 2 }),
+            keyword.length >= 3 ? searchTMDBPersonAction(keyword) : Promise.resolve([])
         ]);
         
         setActors(actorsList || []);

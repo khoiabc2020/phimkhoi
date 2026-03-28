@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-import { getMoviesList } from "@/services/api";
+import { getResilientMoviesList } from "@/app/actions/movies";
 import MovieGridInstant from "./MovieGridInstant";
 
 export default function FilterGridClient({ 
@@ -20,12 +20,10 @@ export default function FilterGridClient({
     limit?: number;
 }) {
     const fetcher = useCallback(async () => {
-        const data = await getMoviesList(type || "phim-moi-cap-nhat", {
+        const data = await getResilientMoviesList(type || "phim-moi-cap-nhat", page ? parseInt(page) : 1, limit, {
             category,
             country,
             year: year ? parseInt(year) : undefined,
-            page: page ? parseInt(page) : 1,
-            limit
         });
         return { 
             items: data.items || [], 
