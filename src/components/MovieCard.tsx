@@ -357,12 +357,22 @@ function MovieCard({
             </div>
 
             {isHovered && !isTouchDevice && typeof document !== 'undefined' && createPortal(
-                <div 
+                (() => {
+                    const SIDEBAR_W = 64;
+                    const TOPBAR_H = 68;
+                    const CARD_W = 320;
+                    const CARD_H = 360;
+                    const rawCenterX = position.left + (position.width / 2);
+                    const rawCenterY = position.top + ((position.rectHeight || 0) / 2);
+                    const clampedLeft = Math.max(rawCenterX, SIDEBAR_W + CARD_W / 2 + 8);
+                    const clampedTop = Math.max(rawCenterY, TOPBAR_H + CARD_H / 2 + 8);
+                    return (
+                <div
                     className="fixed z-[9999] pointer-events-auto"
                     style={{
-                        top: position.top + ((position.rectHeight || 0) / 2),
-                        left: position.left + (position.width / 2),
-                        width: 0, // Container is a point for centering
+                        top: clampedTop,
+                        left: clampedLeft,
+                        width: 0,
                         height: 0
                     }}
                 >
@@ -379,7 +389,9 @@ function MovieCard({
                             />
                         </AnimatePresence>
                     </div>
-                </div>,
+                </div>
+                    );
+                })(),
                 document.body
             )}
         </>
