@@ -63,7 +63,7 @@ export const getMoviesByFilterFromCache = async (
     slug: string,
     page: number = 1,
     limit: number = 49,
-    options: { year?: string | number; category?: string } = {}
+    options: { year?: string | number; category?: string; country?: string } = {}
 ): Promise<{ items: Movie[]; pagination: any } | null> => {
     try {
         await dbConnect();

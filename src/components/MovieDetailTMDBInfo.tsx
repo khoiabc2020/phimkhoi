@@ -54,7 +54,7 @@ export default async function MovieDetailTMDBInfo({
                    <Star className="w-3.5 h-3.5 fill-current" />
                    {rating}
                 </div>
-                {tmdbDetails?.runtime && (
+                {(tmdbDetails?.runtime ?? 0) > 0 && (
                     <span className="text-[11px] font-bold text-white/50 tracking-wider">
                         • {tmdbDetails.runtime} phút
                     </span>

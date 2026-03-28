@@ -1,4 +1,4 @@
-﻿import dynamic from "next/dynamic";
+import dynamic from "next/dynamic";
 import { getMovieDetail, getMoviesList } from "@/services/api";
 import { getRelatedMoviesForMovie } from "@/services/server-movies";
 import { getMovieDetailFromCache, saveMovieToCache } from "@/lib/movie-cache";
@@ -219,7 +219,8 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     }
 
     const subjectOrientation = detectOrientation(contentSubjectUrl);
-    const isSubjectPortrait = subjectOrientation === "portrait";
+    // Force object-contain if we fall back to a low-res cropped thumb from NguonC
+    const isSubjectPortrait = subjectOrientation === "portrait" || contentSubjectUrl === sourceThumb;
     const rating = trustedTmdbDetails?.vote_average ? Number(trustedTmdbDetails.vote_average).toFixed(1) : "9.7";
     const languageMap: Record<string, string> = {
         en: "Tiếng Anh",
