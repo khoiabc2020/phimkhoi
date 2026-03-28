@@ -12,8 +12,8 @@ import { useEffect, useState } from 'react';
 import { CONFIG } from '@/constants/config';
 import ModernAlert, { AlertButton } from '@/components/ModernAlert';
 
-const APP_VERSION = '1.0.7'; // Đồng bộ với /api/mobile/version
-const APP_BUILD = 8;
+const APP_VERSION = '1.1.0'; // Đồng bộ với /api/mobile/version
+const APP_BUILD = 11;
 
 interface UpdateInfo {
   version: string;
@@ -182,11 +182,11 @@ export default function ProfileScreen() {
   // ── Not logged in ──────────────────────────────────────────────────────────
   if (!user) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#05060a' }}>
+      <View style={{ flex: 1, backgroundColor: '#05060A' }}>
         <StatusBar style="light" />
         {/* Background gradient */}
         <View style={{ position: 'absolute', inset: 0 }} pointerEvents="none">
-          <LinearGradient colors={['#0d0a1f', '#05060a']} style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '55%' }} />
+          <LinearGradient colors={['#0d0a1f', '#05060A']} style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '55%' }} />
           <View style={{ position: 'absolute', top: -60, right: -80, width: 240, height: 240, borderRadius: 120, backgroundColor: 'rgba(143,167,197,0.08)' }} />
         </View>
         <SafeAreaView style={{ flex: 1 }}>
@@ -271,11 +271,11 @@ export default function ProfileScreen() {
   const initials = user.name?.slice(0, 2).toUpperCase() || 'U';
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#05060a' }}>
+    <View style={{ flex: 1, backgroundColor: '#05060A' }}>
       <StatusBar style="light" />
       {/* Background */}
       <View style={{ position: 'absolute', inset: 0 }} pointerEvents="none">
-        <LinearGradient colors={['#0d0a1f', '#05060a']} style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '40%' }} />
+        <LinearGradient colors={['#0d0a1f', '#05060A']} style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '40%' }} />
         <View style={{ position: 'absolute', top: -40, right: -60, width: 200, height: 200, borderRadius: 100, backgroundColor: 'rgba(143,167,197,0.08)' }} />
       </View>
 

@@ -17,11 +17,11 @@ const buildDownloadUrl = (version: string, explicitUrl?: string) => {
 };
 
 const FALLBACK_VERSION = {
-    version: "1.0.9",
-    build: 10,
+    version: "1.1.0",
+    build: 11,
     force_update: false,
-    download_url: buildDownloadUrl("1.0.9"),
-    change_log: "Sửa crash đăng ký/đăng nhập và tối ưu HeroSection vuốt mượt hơn",
+    download_url: buildDownloadUrl("1.1.0"),
+    change_log: "Sửa bug đăng nhập, đồng bộ màu web, HeroSection gọn hơn, logo tinh tế hơn, nguồn C phát được trên app",
 };
 
 export async function GET() {

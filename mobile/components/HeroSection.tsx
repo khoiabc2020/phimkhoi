@@ -20,7 +20,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 const { width, height: screenHeight } = Dimensions.get('window');
-const CAROUSEL_HEIGHT = width * 1.15;
+const CAROUSEL_HEIGHT = Math.min(width * 0.82, 360); // Compact hero — max 360dp, ~0.82 aspect ratio
 const isTablet = width >= 768;
 
 interface HeroSectionProps {
@@ -217,16 +217,17 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                         transition={80}
                     />
                 </Animated.View>
-                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(11,13,24,0.72)' }]} />
+                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(5,6,10,0.65)' }]} />
                 <LinearGradient
-                    colors={['transparent', '#0B0D18']}
-                    style={[StyleSheet.absoluteFill, { top: '30%' }]}
+                    colors={['transparent', 'rgba(5,6,10,0.85)', '#05060A']}
+                    locations={[0, 0.65, 1]}
+                    style={[StyleSheet.absoluteFill, { top: '25%' }]}
                     pointerEvents="none"
                 />
             </View>
 
             {/* Push content down below safe area/header, but leave background full bleed */}
-            <View style={{ paddingTop: 110 }}>
+            <View style={{ paddingTop: 90 }}>
                 <Carousel
                     width={width}
                     height={CAROUSEL_HEIGHT}
@@ -412,11 +413,11 @@ const styles = StyleSheet.create({
     posterWrapper: {
         width: '100%',
         height: '100%',
-        borderRadius: 30,
+        borderRadius: 24,
         overflow: 'hidden',
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.12)',
-        backgroundColor: '#11131A',
+        borderColor: 'rgba(255,255,255,0.08)',
+        backgroundColor: '#0B0D18',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 12 },
         shadowOpacity: 0.32,

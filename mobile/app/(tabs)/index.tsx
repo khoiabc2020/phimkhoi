@@ -273,7 +273,7 @@ export default function HomeScreen() {
       <View style={styles.headerWrapper}>
         <Animated.View style={[StyleSheet.absoluteFill, headerBgStyle]}>
           <LinearGradient
-            colors={['rgba(11,13,18,0.95)', 'rgba(11,13,18,0.7)', 'transparent']}
+            colors={['rgba(5,6,10,0.95)', 'rgba(5,6,10,0.7)', 'transparent']}
             locations={[0.2, 0.7, 1]}
             style={StyleSheet.absoluteFill}
           />
@@ -282,12 +282,9 @@ export default function HomeScreen() {
         <SafeAreaView edges={['top']} style={styles.headerContent}>
           <View style={styles.headerRow}>
             <View style={[styles.logoRow, { paddingLeft: 8 }]}>
-              <View style={{ transform: [{ scaleX: 0.88 }, { scaleY: 1.18 }] }}>
-                <Text style={styles.logoText}>
-                  <Text style={styles.logoTextBase}>KHOI</Text>
-                  <Text style={styles.logoTextHot}>PHIM</Text>
-                </Text>
-              </View>
+              <Text style={styles.logoText}>
+                <Text style={styles.logoTextBase}>KHOI</Text><Text style={styles.logoTextHot}>PHIM</Text>
+              </Text>
             </View>
 
             <View style={styles.headerActions}>
@@ -517,9 +514,9 @@ const styles = StyleSheet.create({
   headerContent: { paddingBottom: 10 },
   headerRow: { height: 50, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20 },
   logoRow: { flexDirection: 'row', alignItems: 'center' },
-  logoText: { color: COLORS.textPrimary, fontSize: 32, fontWeight: '800', letterSpacing: 0.8, textTransform: 'uppercase' },
-  logoTextBase: { color: '#9CA3AF' },
-  logoTextHot: { color: '#E50914' },
+  logoText: { fontSize: 28, fontWeight: '900', letterSpacing: 2, textTransform: 'uppercase' },
+  logoTextBase: { color: '#8FA7C5' },  // Steel-blue (matches web)
+  logoTextHot: { color: '#E50914' },   // Red accent
   headerActions: { flexDirection: 'row', gap: 12, alignItems: 'center' },
   iconBtn: {
     width: 36, height: 36, borderRadius: 18,

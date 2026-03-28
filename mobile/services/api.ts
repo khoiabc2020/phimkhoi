@@ -843,5 +843,76 @@ export const getOphimImages = async (slug: string) => {
     }
 };
 
+// ── Ratings (DB) ─────────────────────────────────────────────────────────────
+
+export const getRating = async (slug: string, token?: string): Promise<{ average: number; count: number; userRating: number | null }> => {
+    try {
+        const headers: Record<string, string> = {};
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        const res = await fetchWithTimeout(
+            `${CONFIG.BACKEND_URL}/api/mobile/ratings/${slug}`,
+            { headers },
+            5000
+        );
+        if (!res.ok) return { average: 0, count: 0, userRating: null };
+        return await res.json();
+    } catch {
+        return { average: 0, count: 0, userRating: null };
+    }
+};
+
+export const postRating = async (slug: string, value: number, token: string): Promise<{ average: number; count: number; userRating: number } | null> => {
+    try {
+        const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/ratings/${slug}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ value }),
+        });
+        if (!res.ok) return null;
+        return await res.json();
+    } catch {
+        return null;
+    }
+};
+
+// ── Notifications (DB) ────────────────────────────────────────────────────────
+
+export interface AppNotification {
+    id: string;
+    title: string;
+    movieName: string;
+    movieSlug: string;
+    moviePoster: string;
+    newEpisode: string;
+    message: string;
+    isRead: boolean;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export const getNotifications = async (token: string): Promise<AppNotification[]> => {
+    try {
+        const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/notifications`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) return [];
+        const data = await res.json();
+        return data.notifications || [];
+    } catch {
+        return [];
+    }
+};
+
+export const markNotificationsRead = async (token: string): Promise<void> => {
+    try {
+        await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/notifications`, {
+            method: 'PATCH',
+            headers: { Authorization: `Bearer ${token}` },
+        });
+    } catch {
+        // best-effort
+    }
+};
+
 
 

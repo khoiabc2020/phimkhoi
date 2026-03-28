@@ -12,7 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { getMovieDetail, getImageUrl, getRelatedMovies, Movie, getTMDBRating, getOphimCast, toggleFavorite as apiToggleFavorite, getHistory, parseServerLabel } from '@/services/api';
+import { getMovieDetail, getImageUrl, getRelatedMovies, Movie, getTMDBRating, getOphimCast, toggleFavorite as apiToggleFavorite, getHistory, parseServerLabel, getRating, postRating } from '@/services/api';
 import { addFavorite, removeFavorite, isFavorite } from '@/lib/favorites';
 import { addToWatchList, removeFromWatchList, isInWatchList } from '@/lib/watchList';
 import { useAuth } from '@/context/auth';
@@ -78,6 +78,7 @@ export default function MovieDetailScreen() {
     const [selectedServer, setSelectedServer] = useState(0); // global index into `episodes`
     const [activeLangTab, setActiveLangTab] = useState('');
     const [rating, setRating] = useState<number | null>(null);
+    const [dbRating, setDbRating] = useState<{ average: number; count: number; userRating: number | null }>({ average: 0, count: 0, userRating: null });
     const [cast, setCast] = useState<any[]>([]);
     const [selectedEpRange, setSelectedEpRange] = useState(0);
     const [showDownloadSheet, setShowDownloadSheet] = useState(false);
@@ -194,10 +195,12 @@ export default function MovieDetailScreen() {
                     getRelatedMovies(data.movie.category?.[0]?.slug || ''),
                     getTMDBRating(data.movie.name, data.movie.year),
                     getOphimCast(data.movie.slug, data.movie.origin_name || data.movie.name, data.movie.year, data.movie),
-                ]).then(([relatedResult, ratingResult, castResult]) => {
+                    getRating(data.movie.slug, token || undefined),
+                ]).then(([relatedResult, ratingResult, castResult, dbRatingResult]) => {
                     if (relatedResult.status === 'fulfilled') setRelatedMovies(relatedResult.value);
                     if (ratingResult.status === 'fulfilled' && ratingResult.value) setRating(ratingResult.value);
                     if (castResult.status === 'fulfilled' && castResult.value) setCast(castResult.value.slice(0, 15));
+                    if (dbRatingResult.status === 'fulfilled' && dbRatingResult.value.count > 0) setDbRating(dbRatingResult.value);
                 });
             }
         } catch (error) {
@@ -430,6 +433,12 @@ export default function MovieDetailScreen() {
                             {typeof rating === 'number' && !isNaN(rating) && (
                                 <View style={[styles.glassChip, { backgroundColor: COLORS.accent, borderColor: COLORS.accent }]}>
                                     <Text style={[styles.chipText, { color: 'black', fontWeight: 'bold' }]}>IMDb {rating.toFixed(1)}</Text>
+                                </View>
+                            )}
+                            {dbRating.count > 0 && (
+                                <View style={[styles.glassChip, { backgroundColor: 'rgba(255,180,0,0.15)', borderColor: 'rgba(255,180,0,0.5)' }]}>
+                                    <Ionicons name="star" size={11} color="#FFB400" />
+                                    <Text style={[styles.chipText, { color: '#FFB400', fontWeight: 'bold' }]}>{dbRating.average.toFixed(1)} ({dbRating.count})</Text>
                                 </View>
                             )}
                         </View>
