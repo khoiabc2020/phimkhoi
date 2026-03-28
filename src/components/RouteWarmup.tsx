@@ -26,12 +26,12 @@ export default function RouteWarmup(): null {
             HOT_ROUTES.forEach((route) => router.prefetch(route));
         };
 
-        const firstTimer = window.setTimeout(warm, 150);
+        const firstTimer = setTimeout(warm, 150);
         const idleWarm =
-            "requestIdleCallback" in window
+            typeof (window as any).requestIdleCallback === "function"
                 ? (window as any).requestIdleCallback(warm, { timeout: 1200 })
-                : window.setTimeout(warm, 800);
-        const interval = window.setInterval(warm, 30000);
+                : setTimeout(warm, 800);
+        const interval = setInterval(warm, 30000);
 
         const onVisible = () => {
             if (document.visibilityState === "visible") {
@@ -43,12 +43,12 @@ export default function RouteWarmup(): null {
 
         return () => {
             cancelled = true;
-            window.clearTimeout(firstTimer);
-            window.clearInterval(interval);
-            if ("cancelIdleCallback" in window) {
+            clearTimeout(firstTimer);
+            clearInterval(interval);
+            if (typeof (window as any).cancelIdleCallback === "function") {
                 (window as any).cancelIdleCallback(idleWarm);
             } else {
-                window.clearTimeout(idleWarm);
+                clearTimeout(idleWarm as any);
             }
             document.removeEventListener("visibilitychange", onVisible);
         };
