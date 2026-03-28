@@ -90,6 +90,18 @@ export const contradictsCountryMetadata = (movie: Partial<Movie> | null | undefi
         return !matchesCountryStrict(movie, countrySlug);
     }
     
+    // NEGATIVE SCRIPT FILTER: Drop NguonC's lazy tag mismatches (e.g. Chinese movie tagged as Korean)
+    const originalContent = `${movie.origin_name || ""} ${movie.name || ""}`;
+    const hasChinese = /[\u4e00-\u9fa5]/.test(originalContent);
+    const hasKorean = /[\uac00-\ud7a3]/.test(originalContent);
+    const hasJapanese = /[\u3040-\u309f\u30a0-\u30ff]/.test(originalContent);
+
+    // If we're looking for Korean, but the title has exclusively Chinese text and ZERO Korean text -> It contradicts
+    if (countrySlug === 'han-quoc' && hasChinese && !hasKorean) return true;
+    
+    // If we're looking for Chinese, but it has exclusively Korean/Japanese text and ZERO Chinese -> It contradicts
+    if (countrySlug === 'trung-quoc' && (hasKorean || hasJapanese) && !hasChinese) return true;
+
     return false;
 };
 

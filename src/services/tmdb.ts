@@ -27,6 +27,7 @@ const ELITE_TITLE_MAPPINGS: Record<string, string> = {
     "bong ma anh quoc nguoi bat tu": "Peaky Blinders: The Immortal Man", // Specific movie title
     "thanh guomu": "Demon Slayer",
     "ke san mat trang": "Moon Knight",
+    "biet doi linh cuu hoa": "Fire Force",
 };
 
 export const getTMDBConfig = async () => {
@@ -129,10 +130,18 @@ export const searchTMDBMovie = async (query: string, year?: number, type: 'movie
                             original_name?: string; 
                             origin_country?: string[];
                             original_language?: string;
+                            genre_ids?: number[];
                         }) => {
                             const itemYear = endpoint === 'movie'
                                 ? (item.release_date ? parseInt(item.release_date.substring(0, 4)) : null)
                                 : (item.first_air_date ? parseInt(item.first_air_date.substring(0, 4)) : null);
+
+                            // Anime Check: Prevent Live Action matches for Anime
+                            const isAnimeSearch = type === 'tv' && (verification?.countrySlug === 'hoat-hinh' || query.toLowerCase().includes('hoat hinh') || query.toLowerCase().includes('anime'));
+                            const hasAnimationGenre = item.genre_ids?.includes(16);
+                            if (isAnimeSearch && !hasAnimationGenre) {
+                                return false; // Reject non-animated results if we are specifically looking for an anime
+                            }
 
                             // Country Check: Prevent Western movies from matching Asian dramas
                             const isAsianDramaSource = ["trung-quoc", "han-quoc", "nhat-ban", "thai-lan"].includes(verification?.countrySlug || "");

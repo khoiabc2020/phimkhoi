@@ -202,7 +202,7 @@ const mergeMovieImages = (primary: Movie, candidate: Movie): Movie => {
         ...primary,
         ...candidate,
         poster_url: primary.poster_url || candidate.poster_url || primary.thumb_url || candidate.thumb_url || "",
-        thumb_url: primary.thumb_url || candidate.thumb_url || primary.poster_url || candidate.poster_url || "",
+        thumb_url: primary.thumb_url || candidate.thumb_url || "",
     });
 };
 
