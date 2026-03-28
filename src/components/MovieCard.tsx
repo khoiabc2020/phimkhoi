@@ -165,11 +165,11 @@ function MovieCard({
         return getImageUrl(raw);
     }, [posterCandidates, posterIndex]);
 
-    // Backdrop/overlay (ảnh ngang): TMDB backdrop first, then whichever source URL is truly landscape.
+    // Backdrop/overlay (ảnh ngang): ưu tiên TMDB (qua CDN, nhanh hơn) → mới dùng source ngoài
     const displayBackdrop = useMemo(() => {
-        const tmdbBackdrop = tmdbBackdropPath ? getTMDBImage(tmdbBackdropPath, "w500") : "";
+        const tmdbBackdrop = tmdbBackdropPath ? getTMDBImage(tmdbBackdropPath, "w300") : "";
         const sourceBackdrop = getBackdropImageUrl(movie);
-        return sourceBackdrop || tmdbBackdrop || null;
+        return tmdbBackdrop || sourceBackdrop || null;
     }, [movie, tmdbBackdropPath]);
 
     // Reset fallback state when card movie changes
@@ -190,9 +190,15 @@ function MovieCard({
 
     const handleMouseEnter = () => {
         if (isTouchDevice) return;
-        
+
         router.prefetch(`/phim/${movie.slug}`);
         void hydrateTmdbOnDemand();
+
+        // Preload backdrop ngay khi hover để ảnh sẵn sàng khi card hiện ra
+        if (displayBackdrop) {
+            const img = new window.Image();
+            img.src = displayBackdrop;
+        }
 
         if (leaveTimeoutRef.current) {
             clearTimeout(leaveTimeoutRef.current);
@@ -448,8 +454,8 @@ function OnflixHoverCard({
                                 src={displayBackdrop}
                                 alt={decodeHtml(movie.name) || movie.slug || "Phim"}
                                 fill
-                                sizes="350px"
-                                quality={75}
+                                sizes="320px"
+                                quality={55}
                                 className={`object-cover object-top transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
                                 priority
                                 onLoad={() => setImgLoaded(true)}
