@@ -494,17 +494,18 @@ export default function Header({ categories, countries }: HeaderProps) {
                                                                                 setSelectedIndex(idx);
                                                                             }}
                                                                             className={cn(
-                                                                                "flex items-center gap-3 p-2 rounded-lg transition-all group",
-                                                                                selectedIndex === idx ? "bg-white/10 ring-1 ring-white/10" : "hover:bg-white/5"
+                                                                                "flex items-center gap-3 px-2 py-2.5 rounded-xl transition-all group",
+                                                                                selectedIndex === idx ? "bg-white/10 ring-1 ring-white/10" : "hover:bg-white/[0.06]"
                                                                             )}
                                                                         >
-                                                                            <div className="w-9 h-12 relative rounded overflow-hidden">
-                                                                                <Image src={getPosterImageUrl(movie) || "/placeholder.svg"} alt="" fill className="object-cover" unoptimized />
+                                                                            {/* Poster lớn hơn: w-12 h-[68px] (~2:3 ratio) */}
+                                                                            <div className="w-12 h-[68px] relative rounded-lg overflow-hidden shrink-0 shadow-md">
+                                                                                <Image src={getPosterImageUrl(movie) || "/placeholder.svg"} alt="" fill className="object-cover" sizes="48px" unoptimized />
                                                                             </div>
                                                                             <div className="flex-1 min-w-0">
-                                                                                <div className={cn("text-sm font-semibold truncate group-hover:text-primary", selectedIndex === idx ? "text-primary" : "text-white")}>{movie.name}</div>
+                                                                                <div className={cn("text-[13px] font-semibold leading-tight line-clamp-2 group-hover:text-primary transition-colors", selectedIndex === idx ? "text-primary" : "text-white")}>{movie.name}</div>
                                                                                 {formatSearchMeta(movie) ? (
-                                                                                    <div className="text-[11px] text-white/40">{formatSearchMeta(movie)}</div>
+                                                                                    <div className="text-[11px] text-white/40 mt-1">{formatSearchMeta(movie)}</div>
                                                                                 ) : null}
                                                                             </div>
                                                                         </Link>

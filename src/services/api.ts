@@ -681,6 +681,7 @@ export const searchMovies = async (keyword: string, options: { enrichTMDB?: bool
             if(i<ophimItemsArr.length) results.push(ophimItemsArr[i]);
             if(i<nguoncItemsArr.length) results.push(nguoncItemsArr[i]);
         }
+        // Pass 1: dedup by exact slug
         const bySlug = new Map<string, Movie>();
         for (const item of results as Movie[]) {
             if (!item?.slug) continue;
@@ -691,7 +692,12 @@ export const searchMovies = async (keyword: string, options: { enrichTMDB?: bool
                 bySlug.set(item.slug, mergeMovieImages(existing, item));
             }
         }
-        const normalized = Array.from(bySlug.values()).map(normalizeMovieImageRoles).filter(m => !isTrailer(m));
+        // Pass 2: title+year dedup — catches same movie with different slugs across sources
+        // (e.g. "tam-tan-ky" from KKPhim vs "back-to-the-past" from NguonC)
+        const normalized = sanitizeMovieList(
+            Array.from(bySlug.values()).map(normalizeMovieImageRoles).filter(m => !isTrailer(m)),
+            { limit: limit * 3 }
+        );
         if (!enrichTMDB) {
             return normalized;
         }
