@@ -119,7 +119,7 @@ export async function getResilientMoviesList(
                         year: normalizedYearParam,
                     }),
             5500,
-            { items: [], pagination: { currentPage: page, totalPages: Math.max(200, page) } } as any
+            { items: [], pagination: { currentPage: page, totalPages: Math.max(50, page) } } as any
         );
 
         if (apiData && apiData.items && apiData.items.length > 0) {
@@ -136,7 +136,7 @@ export async function getResilientMoviesList(
         const fallbackItems = await getFallbackDisplayMovies({ type, limit, options });
         return {
             items: finalize(fallbackItems),
-            pagination: { currentPage: page, totalPages: Math.max(200, page) }
+            pagination: { currentPage: page, totalPages: Math.max(50, page) }
         };
     } catch (error) {
         console.error(`[ResilientAction] getResilientMoviesList Error:`, error);
@@ -144,7 +144,7 @@ export async function getResilientMoviesList(
         const allowAdult = options.category === "phim-18" || type === "phim-18";
         return {
             items: sanitizeMovieList(fallbackItems, { limit, allowAdult }),
-            pagination: { currentPage: page, totalPages: Math.max(200, page) }
+            pagination: { currentPage: page, totalPages: Math.max(50, page) }
         };
     }
 }

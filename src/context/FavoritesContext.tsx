@@ -26,21 +26,24 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
             return;
         }
 
+        let cancelled = false;
+
         const fetchFavorites = async () => {
             try {
                 const res = await getFavorites();
-                if (res.success && res.data) {
+                if (!cancelled && res.success && res.data) {
                     const slugs = new Set(res.data.map((item: { movieSlug: string }) => item.movieSlug));
                     setFavorites(slugs);
                 }
             } catch (error) {
-                console.error("Failed to fetch favorites:", error);
+                if (!cancelled) console.error("Failed to fetch favorites:", error);
             } finally {
-                setIsLoading(false);
+                if (!cancelled) setIsLoading(false);
             }
         };
 
         fetchFavorites();
+        return () => { cancelled = true; };
     }, [session]);
 
     const isFavorite = (movieSlug: string) => favorites.has(movieSlug);

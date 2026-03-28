@@ -18,8 +18,19 @@ async function ensureCacheDir() {
 }
 
 // Memory fallback to avoid hitting disk too often for the same session
+// Uses insertion-order LRU: Map preserves insertion order, delete oldest key on overflow
 const memoryCache = new Map<string, { contentType: string; buffer: Buffer }>();
 const MAX_MEM_CACHE = 150; // Balanced limit for 2GB RAM VPS
+
+function setMemCache(key: string, value: { contentType: string; buffer: Buffer }) {
+    if (memoryCache.has(key)) memoryCache.delete(key); // refresh position
+    else if (memoryCache.size >= MAX_MEM_CACHE) {
+        // Evict oldest entry (first key in Map iteration order)
+        const oldestKey = memoryCache.keys().next().value;
+        if (oldestKey !== undefined) memoryCache.delete(oldestKey);
+    }
+    memoryCache.set(key, value);
+}
 
 const ALLOWED_DOMAINS = [
     'phimimg.com', 'ophim17.cc', 'ophim1.com', 'kkphim.vip',
@@ -70,8 +81,7 @@ export async function GET(req: NextRequest) {
             const buffer = await fs.readFile(cachePath);
             const contentType = 'image/webp';
             
-            if (memoryCache.size >= MAX_MEM_CACHE) memoryCache.clear();
-            memoryCache.set(memKey, { contentType, buffer });
+            setMemCache(memKey, { contentType, buffer });
             return new Response(new Uint8Array(buffer), {
                 headers: {
                     'Content-Type': contentType,
@@ -115,8 +125,7 @@ export async function GET(req: NextRequest) {
         // 6. Save to Disk & Memory
         try {
             await fs.writeFile(cachePath, buffer);
-            if (memoryCache.size >= MAX_MEM_CACHE) memoryCache.clear();
-            memoryCache.set(memKey, { contentType, buffer });
+            setMemCache(memKey, { contentType, buffer });
         } catch (e) {
             console.error("Failed to write image cache:", e);
         }

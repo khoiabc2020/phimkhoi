@@ -40,8 +40,8 @@ export const getMoviesFromCache = async (
         const cleanItems = sanitizeMovieList(filteredItems, { limit: filteredItems.length || 1 });
         const totalItems = cleanItems.length;
         
-        // VIRTUAL PAGINATION: Force UI to display a large number of pages so fallback can trigger
-        const minimumVirtualPages = 200;
+        // VIRTUAL PAGINATION: Ensure UI always shows extra pages so fallback API can serve them
+        const minimumVirtualPages = 50; // reduced from 200 — avoids showing ~190 phantom pages
         const totalPages = Math.max(Math.ceil(totalItems / limit), minimumVirtualPages);
         const startIndex = (page - 1) * limit;
         const paginatedItems = cleanItems.slice(startIndex, startIndex + limit);
