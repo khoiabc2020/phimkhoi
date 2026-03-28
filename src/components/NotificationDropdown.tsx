@@ -25,25 +25,28 @@ export default function NotificationDropdown() {
     const [hasUnread, setHasUnread] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
+    // Tải số unread nhẹ khi mount — badge hiện ngay mà không cần load full list
     useEffect(() => {
-        if (session) {
-            fetchNotifications();
-        }
-        
+        if (!session) return;
+        fetch("/api/user/notifications/count")
+            .then(r => r.json())
+            .then(d => { if (d.count > 0) setHasUnread(true); })
+            .catch(() => {});
+    }, [session]);
+
+    useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
                 setIsOpen(false);
             }
         };
-
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [session]);
+    }, []);
 
     const fetchNotifications = async () => {
         setLoading(true);
         try {
-            // In a real app, this would be an API call to fetch updates for user's favorites
             const res = await fetch("/api/user/notifications/updates");
             const data = await res.json();
             if (data.notifications) {
@@ -57,9 +60,11 @@ export default function NotificationDropdown() {
         }
     };
 
-    const markAsRead = () => {
+    const markAsRead = async () => {
         setHasUnread(false);
-        // Add API call here to mark all as read
+        setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+        // Persist mark-as-read to DB
+        fetch("/api/user/notifications/updates", { method: "PATCH" }).catch(() => {});
     };
 
     return (
@@ -92,11 +97,8 @@ export default function NotificationDropdown() {
                             <h3 className="text-[14px] font-bold text-white">Thông báo mới</h3>
                         </div>
                         {notifications.length > 0 && (
-                            <button 
-                                onClick={() => {
-                                    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
-                                    setHasUnread(false);
-                                }}
+                            <button
+                                onClick={markAsRead}
                                 className="text-[11px] text-white/40 hover:text-primary font-bold transition-colors"
                             >
                                 Đánh dấu đã đọc

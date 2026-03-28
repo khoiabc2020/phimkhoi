@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { getMoviesList } from "@/services/api";
+import dbConnect from "@/lib/db";
 
 export async function GET(req: NextRequest) {
     const session = await getServerSession(authOptions);
@@ -10,51 +10,62 @@ export async function GET(req: NextRequest) {
     }
 
     try {
-        // 1. Fetch user's favorites from DB directly
-        const Favorite = (await import("@/models/Favorite")).default;
-        const favorites = await Favorite.find({ userId: session.user.id }).lean();
+        await dbConnect();
+        const Notification = (await import("@/models/Notification")).Notification;
+        const { resolveLibraryUser } = await import("@/lib/user-library");
 
-        if (!favorites || favorites.length === 0) {
-            return NextResponse.json({ notifications: [] });
-        }
+        const { userObjectId } = await resolveLibraryUser(session.user);
+        const userId = String(userObjectId || session.user.id || "").trim();
 
-        // 2. Fetch the latest updated movies using our ELITE service layer
-        // This handles merging from KKPhim, OPhim, and NguonC automatically
-        const latestData = await getMoviesList("phim-moi-cap-nhat", { limit: 120 });
-        const latestMovies = latestData.items || [];
+        // Đọc từ DB — được tạo bởi scripts/notify-favorites.mjs
+        const notifications = await (Notification as any).find({
+            isGlobal: false,
+            userId,
+        })
+            .sort({ createdAt: -1 })
+            .limit(20)
+            .lean();
 
-        // 3. Find matches: favorites that have a NEWER episode than what's stored in DB
-        const updates = [];
-        for (const fav of favorites) {
-            const update = latestMovies.find((m: any) => m.slug === fav.movieSlug);
-            if (update) {
-                // If current episode from API is different from last recorded episode in DB
-                const currentEp = update.episode_current || "";
-                if (currentEp && currentEp !== fav.lastEpisode) {
-                    updates.push({
-                        id: update._id || update.slug,
-                        movieName: update.name || fav.movieName,
-                        movieSlug: update.slug,
-                        moviePoster: update.thumb_url || update.poster_url || fav.moviePoster,
-                        newEpisode: currentEp,
-                        updatedAt: "Vừa mới xong",
-                        isRead: false
-                    });
-                }
-            }
-        }
+        const formatted = notifications.map((n: any) => ({
+            id: String(n._id),
+            movieName: n.title?.replace(" có tập mới!", "") || "",
+            movieSlug: n.movieSlug || n.link?.replace("/phim/", "") || "",
+            moviePoster: n.moviePoster || "",
+            newEpisode: n.newEpisode || "",
+            updatedAt: n.createdAt ? new Date(n.createdAt).toLocaleDateString("vi-VN", {
+                hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit"
+            }) : "",
+            isRead: n.isRead || false,
+        }));
 
-        return NextResponse.json({ 
-            success: true, 
-            notifications: updates.slice(0, 15) 
-        });
+        return NextResponse.json({ success: true, notifications: formatted });
 
     } catch (error) {
         console.error("Notification API Error:", error);
-        return NextResponse.json({ 
-            success: false, 
-            notifications: [],
-            error: "Failed to sync updates" 
-        }, { status: 500 });
+        return NextResponse.json({ success: false, notifications: [] }, { status: 500 });
+    }
+}
+
+// PATCH — đánh dấu tất cả đã đọc
+export async function PATCH(req: NextRequest) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    try {
+        await dbConnect();
+        const Notification = (await import("@/models/Notification")).Notification;
+        const { resolveLibraryUser } = await import("@/lib/user-library");
+
+        const { userObjectId } = await resolveLibraryUser(session.user);
+        const userId = String(userObjectId || session.user.id || "").trim();
+
+        await (Notification as any).updateMany(
+            { isGlobal: false, userId, isRead: false },
+            { $set: { isRead: true } }
+        );
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        return NextResponse.json({ error: "Failed" }, { status: 500 });
     }
 }

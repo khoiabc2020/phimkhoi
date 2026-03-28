@@ -29,10 +29,21 @@ export async function addFavorite(movieData: {
             return { success: false, error: "User not found" };
         }
 
+        // Lấy episode_current hiện tại từ Movie DB để làm baseline
+        // → tránh notify ngay lần đầu (phim đã có sẵn tập X)
+        let currentEpisode = movieData.lastEpisode || "";
+        if (!currentEpisode) {
+            try {
+                const MovieModel = (await import("@/models/Movie")).default;
+                const movieDoc = await MovieModel.findOne({ slug: movieData.movieSlug }, "episode_current").lean() as any;
+                currentEpisode = String(movieDoc?.episode_current || "").trim();
+            } catch { /* ignore */ }
+        }
+
         const favorite = await Favorite.create({
             userId: favoriteUserId,
             ...movieData,
-            lastEpisode: movieData.lastEpisode || "",
+            lastEpisode: currentEpisode,
         });
 
         revalidatePath("/phim-yeu-thich");

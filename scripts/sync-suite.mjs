@@ -16,12 +16,14 @@ const stepsByMode = {
         { label: "repair-media", file: "scripts/repair-media-integrity.mjs" },
         { label: "daily-sync", file: "scripts/daily-sync.mjs" },
         { label: "force-sync-slugs", file: "scripts/force-sync-slugs.mjs" },
+        { label: "notify-favorites", file: "scripts/notify-favorites.mjs" },
         { label: "check-counts", file: "scripts/check-counts.mjs" },
     ],
     full: [
         { label: "repair-media", file: "scripts/repair-media-integrity.mjs" },
         { label: "daily-sync-full", file: "scripts/daily-sync.mjs", args: ["--full"] },
         { label: "force-sync-slugs", file: "scripts/force-sync-slugs.mjs" },
+        { label: "notify-favorites", file: "scripts/notify-favorites.mjs" },
         { label: "check-counts", file: "scripts/check-counts.mjs" },
     ],
     repair: [
