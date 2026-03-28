@@ -13,6 +13,9 @@ interface HomeRowInstantProps {
     viewAllHref?: string;
     minHeight?: number;
     priorityFirst?: boolean;
+    country?: string;
+    category?: string;
+    cacheKeyPrefix?: string;
 }
 
 export default function HomeRowInstant({
@@ -21,16 +24,20 @@ export default function HomeRowInstant({
     endpoint = 'danh-sach',
     viewAllHref,
     minHeight = 350,
-    priorityFirst = false
+    priorityFirst = false,
+    country,
+    category,
+    cacheKeyPrefix
 }: HomeRowInstantProps) {
     const fetcher = useCallback(async () => {
         return await getResilientMoviesList(slug, 1, 12, { 
-            category: endpoint === 'the-loai' ? slug : undefined, 
-            country: endpoint === 'quoc-gia' ? slug : undefined 
+            category: category || (endpoint === 'the-loai' ? slug : undefined), 
+            country: country || (endpoint === 'quoc-gia' ? slug : undefined) 
         });
-    }, [slug, endpoint]);
+    }, [slug, endpoint, category, country]);
 
-    const { movies, isLoading } = useMoviesInstant(`home_row_${slug}`, fetcher);
+    const finalCacheKey = cacheKeyPrefix || `home_row_${slug}`;
+    const { movies, isLoading } = useMoviesInstant(finalCacheKey, fetcher);
 
     if (isLoading && movies.length === 0) {
         return (

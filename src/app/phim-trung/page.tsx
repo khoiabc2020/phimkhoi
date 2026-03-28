@@ -6,7 +6,7 @@ import { getMenuData } from "@/services/api";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
-import MovieRow from "@/components/MovieRow";
+import HomeRowInstant from "@/components/HomeRowInstant";
 import ActorRow from "@/components/ActorRow";
 import { cn } from "@/lib/utils";
 import { getThemeBySlug } from "@/lib/theme";
@@ -167,39 +167,34 @@ async function resolveHeroMovies(slugs: string[], fallbackItems: any[], countryN
 }
 
 async function PhimTrungHome() {
-    const pool = await getCountryPagePool("trung-quoc").catch(() => ({
-        countryItems: [] as any[],
-        fallbackItems: [] as any[],
-    }));
-    const countryItems = pool.countryItems || [];
-    const fallbackItems = pool.fallbackItems || [];
-    const sourcePool = countryItems.length >= 48 ? countryItems : fallbackItems;
-
-    const latestMovies = sourcePool.slice(0, 14);
-    const sections = buildCountryHomeSections(sourcePool, SECTION_CONFIG);
-
     return (
         <div className="space-y-12 md:space-y-16 pb-12">
-            <MovieRow title="Phim Đang Chiếu" movies={latestMovies} slug="/quoc-gia/trung-quoc" priorityFirst />
+            <HomeRowInstant title="Phim Mới Cập Nhật" slug="trung-quoc" endpoint="quoc-gia" viewAllHref="/quoc-gia/trung-quoc" priorityFirst />
 
-            {sections.slice(0, 2).map((section) => (
-                <MovieRow
+            {SECTION_CONFIG.slice(0, 2).map((section) => (
+                <HomeRowInstant
                     key={section.categorySlug}
                     title={section.title}
-                    movies={section.movies}
-                    slug={`/the-loai/${section.categorySlug}`}
+                    slug="category"
+                    viewAllHref={`/the-loai/${section.categorySlug}`}
+                    category={section.categorySlug}
+                    country="trung-quoc"
+                    cacheKeyPrefix={`trung-quoc_${section.categorySlug}`}
                     priorityFirst={section.priorityFirst}
                 />
             ))}
 
             <ActorRow title="Diễn viên nổi bật" actors={FEATURED_ACTORS} />
 
-            {sections.slice(2).map((section) => (
-                <MovieRow
+            {SECTION_CONFIG.slice(2).map((section) => (
+                <HomeRowInstant
                     key={section.categorySlug}
                     title={section.title}
-                    movies={section.movies}
-                    slug={`/the-loai/${section.categorySlug}`}
+                    slug="category"
+                    viewAllHref={`/the-loai/${section.categorySlug}`}
+                    category={section.categorySlug}
+                    country="trung-quoc"
+                    cacheKeyPrefix={`trung-quoc_${section.categorySlug}`}
                     priorityFirst={section.priorityFirst}
                 />
             ))}
