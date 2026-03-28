@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { Filter, SlidersHorizontal, ChevronRight } from "lucide-react";
 import FilterToolbar from "@/components/FilterToolbar";
+import Pagination from "@/components/Pagination";
 import { headers } from "next/headers";
 import { getThemeBySlug } from "@/lib/theme";
 import { cn } from "@/lib/utils";
@@ -51,12 +52,22 @@ async function MovieGrid({ category, country, year, type, page, limit = 49 }: an
     }
 
     return (
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4">
-            {movies.map((movie: any) => (
-                <div key={movie._id || movie.slug} className="animate-in fade-in duration-500">
-                    <MovieCard movie={movie} />
+        <div className="flex flex-col gap-12 w-full">
+            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4">
+                {movies.map((movie: any) => (
+                    <div key={movie._id || movie.slug} className="animate-in fade-in duration-500">
+                        <MovieCard movie={movie} />
+                    </div>
+                ))}
+            </div>
+            {data.pagination && data.pagination.totalPages > 1 && (
+                <div className="w-full">
+                    <Pagination 
+                        currentPage={data.pagination.currentPage || parseInt(page || "1")} 
+                        totalPages={Math.min(data.pagination.totalPages, 200)} 
+                    />
                 </div>
-            ))}
+            )}
         </div>
     );
 }
@@ -131,24 +142,6 @@ export default async function AdvancedFilterPage({ searchParams }: FilterPagePro
                 <Suspense key={JSON.stringify(sParams)} fallback={<LoadingSkeleton limit={limit} />}>
                     <MovieGrid {...sParams} limit={limit} />
                 </Suspense>
-
-                {/* Pagination */}
-                <div className="mt-16 flex justify-center gap-4">
-                    {parseInt(page || "1") > 1 && (
-                        <Link 
-                            href={buildUrl({ page: (parseInt(page || "1") - 1).toString() })}
-                            className="px-8 py-3 rounded-full bg-white/5 border border-white/10 font-bold hover:bg-primary hover:text-black transition-all"
-                        >
-                            Trang trước
-                        </Link>
-                    )}
-                    <Link 
-                        href={buildUrl({ page: (parseInt(page || "1") + 1).toString() })}
-                        className="px-8 py-3 rounded-full bg-primary text-black font-extrabold shadow-[0_4px_20px_rgba(143,167,197,0.3)] hover:scale-105 transition-all"
-                    >
-                        Trang tiếp theo
-                    </Link>
-                </div>
             </div>
         </main>
     );

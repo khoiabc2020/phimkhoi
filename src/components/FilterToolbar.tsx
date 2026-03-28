@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { SlidersHorizontal } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface FilterToolbarProps {
     searchParams: {
@@ -18,6 +19,7 @@ interface FilterToolbarProps {
 }
 
 export default function FilterToolbar({ searchParams, categories, countries, years, types }: FilterToolbarProps) {
+    const router = useRouter();
     const { category, country, year, type } = searchParams;
 
     const buildUrl = (updates: Record<string, string | null>) => {
@@ -39,7 +41,7 @@ export default function FilterToolbar({ searchParams, categories, countries, yea
 
     const handleFilterChange = (key: string, value: string) => {
         const url = buildUrl({ [key]: value || null, page: "1" });
-        window.location.href = url;
+        router.push(url, { scroll: false });
     };
 
     return (

@@ -428,6 +428,9 @@ export const getHomeData = async () => {
             ]);
 
             let items: Movie[] = [];
+        let kkItems: Movie[] = [];
+        let ophimItems: Movie[] = [];
+        let nguoncItems: Movie[] = [];
             // Source 1: KKPhim
             if (kkRes.status === 'fulfilled' && kkRes.value?.data?.items) {
                 const data = kkRes.value;
@@ -446,14 +449,14 @@ export const getHomeData = async () => {
                 if (pathImage === "https://img.ophim.live" || pathImage === "https://img.ophim.live/") {
                     pathImage = "https://img.ophim.live/uploads/movies/";
                 }
-                const ophimItems = getItems(data).map(item => normalizeOphimItem(item, pathImage));
-                items = [...items, ...ophimItems];
+                ophimItems = getItems(data).map(item => normalizeOphimItem(item, pathImage));
+                
             }
 
             // Source 3: NguonC
             if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
-                const nguoncItems = ((nguoncRes.value.items || []) as Record<string, unknown>[]).map(normalizeNguoncItem);
-                items = [...items, ...nguoncItems];
+                nguoncItems = ((nguoncRes.value.items || []) as Record<string, unknown>[]).map(normalizeNguoncItem);
+                
             }
 
             // Merge by slug: giữ thứ tự nguồn, lấy bổ sung poster/thumb từ nguồn sau nếu thiếu
@@ -633,18 +636,20 @@ export const searchMovies = async (keyword: string, options: { enrichTMDB?: bool
             fetchWithFastTimeout(`${NGUONC_API}/api/films/search?keyword=${encoded}`, 2000)
         ]);
 
-        let results: Movie[] = [];
+        let kkItemsArr: Movie[] = [];
+        let ophimItemsArr: Movie[] = [];
+        let nguoncItemsArr: Movie[] = [];
 
         if (kkRes.status === 'fulfilled') {
             const data = kkRes.value;
             const pathImage = data.pathImage || data.data?.pathImage || "";
             // Ensure we construct full URL if strictly needed, though search endpoint sometimes gives full url
-            const items = (data.data?.items || []).map((item: Record<string, unknown>) => normalizeMovieImages({
+            kkItemsArr = (data.data?.items || []).map((item: Record<string, unknown>) => normalizeMovieImages({
                 ...item,
                 thumb_url: (typeof item.thumb_url === 'string' && item.thumb_url.startsWith('http')) ? item.thumb_url : combineUrl(pathImage, item.thumb_url as string),
                 poster_url: (typeof item.poster_url === 'string' && item.poster_url.startsWith('http')) ? item.poster_url : combineUrl(pathImage, item.poster_url as string)
             }));
-            results = [...results, ...items as Movie[]];
+            
         }
 
         if (ophimRes.status === 'fulfilled') {
@@ -653,12 +658,12 @@ export const searchMovies = async (keyword: string, options: { enrichTMDB?: bool
             if (pathImage === "https://img.ophim.live" || pathImage === "https://img.ophim.live/") {
                 pathImage = "https://img.ophim.live/uploads/movies/";
             }
-            const items = (data.data?.items || []).map((item: Record<string, unknown>) => normalizeOphimItem(item, pathImage));
-            results = [...results, ...items];
+            ophimItemsArr = (data.data?.items || []).map((item: Record<string, unknown>) => normalizeOphimItem(item, pathImage));
+            
         }
 
         if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
-            const items = (nguoncRes.value.items || []).map((item: Record<string, unknown>) => normalizeMovieImages({
+            nguoncItemsArr = (nguoncRes.value.items || []).map((item: Record<string, unknown>) => normalizeMovieImages({
                 _id: (item.id || item.slug) as string,
                 name: item.name as string,
                 slug: item.slug as string,
@@ -668,7 +673,7 @@ export const searchMovies = async (keyword: string, options: { enrichTMDB?: bool
                 year: toValidYear(item.year as string) || 0,
                 quality: (item.quality as string) || 'FHD',
             })) as Movie[];
-            results = [...results, ...items];
+            
         }
 
         // Deduplicate + merge images across KKPhim, OPhim, NguonC (ưu tiên thứ tự fetch)
@@ -779,6 +784,9 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
         ]);
 
         let items: Movie[] = [];
+        let kkItems: Movie[] = [];
+        let ophimItems: Movie[] = [];
+        let nguoncItems: Movie[] = [];
         let kkPagination = { currentPage: 1, totalPages: 1 };
         let hasData = false;
 
@@ -786,12 +794,12 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
         if (kkRes.status === 'fulfilled' && kkRes.value?.data?.items) {
             const data = kkRes.value;
             const pathImage = data.pathImage || data.data?.pathImage || "";
-            const kkItems = getItems(data).map(item => normalizeMovieImages({
+            kkItems = getItems(data).map(item => normalizeMovieImages({
                 ...item,
                 thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : combineUrl(pathImage, item.thumb_url),
                 poster_url: item.poster_url?.startsWith('http') ? item.poster_url : combineUrl(pathImage, item.poster_url)
             }));
-            items = [...items, ...kkItems];
+            
             kkPagination = data.data?.params?.pagination || kkPagination;
             hasData = true;
         }
@@ -803,13 +811,13 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
             if (pathImage === "https://img.ophim.live" || pathImage === "https://img.ophim.live/") {
                 pathImage = "https://img.ophim.live/uploads/movies/";
             }
-            const ophimItems = getItems(data).map(item => normalizeOphimItem(item, pathImage));
-            items = [...items, ...ophimItems];
+            ophimItems = getItems(data).map(item => normalizeOphimItem(item, pathImage));
+            
             hasData = true;
         }
 
         if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
-            const nguoncItems = (nguoncRes.value.items || []).map((item: Record<string, unknown>) => normalizeMovieImages({
+            nguoncItems = (nguoncRes.value.items || []).map((item: Record<string, unknown>) => normalizeMovieImages({
                 _id: (item.id || item.slug) as string,
                 name: decodeHtmlEntities(item.name as string || ""),
                 slug: item.slug as string,
@@ -819,7 +827,7 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
                 year: toValidYear(item.year as string) || 0,
                 quality: (item.quality as string) || 'FHD',
             })) as Movie[];
-            items = [...items, ...nguoncItems];
+            
             
             // If KKPhim is empty, use NguonC pagination
             if (!hasData && nguoncRes.value.paginate) {
@@ -829,6 +837,13 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
                 };
             }
             hasData = true;
+        }
+
+        const maxLen = Math.max(kkItems.length, ophimItems.length, nguoncItems.length);
+        for (let i = 0; i < maxLen; i++) {
+            if (i < kkItems.length) items.push(kkItems[i]);
+            if (i < ophimItems.length) items.push(ophimItems[i]);
+            if (i < nguoncItems.length) items.push(nguoncItems[i]);
         }
 
         // Deduplicate and filter...
@@ -899,17 +914,20 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
         ]);
 
         let items: Movie[] = [];
+        let kkItems: Movie[] = [];
+        let ophimItems: Movie[] = [];
+        let nguoncItems: Movie[] = [];
         let kkPagination = { currentPage: 1, totalPages: 1 };
 
         if (kkRes.status === 'fulfilled') {
             const data = kkRes.value;
             const pathImage = data.pathImage || data.data?.pathImage || "";
-            const kkItems = getItems(data).map(item => normalizeMovieImages({
+            kkItems = getItems(data).map(item => normalizeMovieImages({
                 ...item,
                 thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : combineUrl(pathImage, item.thumb_url),
                 poster_url: item.poster_url?.startsWith('http') ? item.poster_url : combineUrl(pathImage, item.poster_url)
             }));
-            items = [...items, ...kkItems];
+            
             kkPagination = data.data?.params?.pagination || kkPagination;
         }
 
@@ -919,12 +937,12 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
             if (pathImage === "https://img.ophim.live" || pathImage === "https://img.ophim.live/") {
                 pathImage = "https://img.ophim.live/uploads/movies/";
             }
-            const ophimItems = getItems(data).map(item => normalizeOphimItem(item, pathImage));
-            items = [...items, ...ophimItems];
+            ophimItems = getItems(data).map(item => normalizeOphimItem(item, pathImage));
+            
         }
 
         if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
-            const nguoncItems = (nguoncRes.value.items || []).map((item: Record<string, unknown>) => normalizeMovieImages({
+            nguoncItems = (nguoncRes.value.items || []).map((item: Record<string, unknown>) => normalizeMovieImages({
                 _id: (item.id || item.slug) as string,
                 name: item.name as string,
                 slug: item.slug as string,
@@ -934,7 +952,7 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
                 year: toValidYear(item.year as string) || 0,
                 quality: (item.quality as string) || 'FHD',
             })) as Movie[];
-            items = [...items, ...nguoncItems];
+            
         }
 
         // Deduplicate + merge images
@@ -1009,17 +1027,20 @@ export const getMoviesByCountry = async (
 
 
         let items: Movie[] = [];
+        let kkItems: Movie[] = [];
+        let ophimItems: Movie[] = [];
+        let nguoncItems: Movie[] = [];
         let kkPagination = { currentPage: 1, totalPages: 1 };
 
         if (kkRes.status === 'fulfilled') {
             const data = kkRes.value;
             const pathImage = data.pathImage || data.data?.pathImage || "";
-            const kkItems = getItems(data).map(item => normalizeMovieImages({
+            kkItems = getItems(data).map(item => normalizeMovieImages({
                 ...item,
                 thumb_url: item.thumb_url?.startsWith('http') ? item.thumb_url : combineUrl(pathImage, item.thumb_url),
                 poster_url: item.poster_url?.startsWith('http') ? item.poster_url : combineUrl(pathImage, item.poster_url)
             }));
-            items = [...items, ...kkItems];
+            
             kkPagination = data.data?.params?.pagination || kkPagination;
         }
 
@@ -1029,13 +1050,13 @@ export const getMoviesByCountry = async (
             if (pathImage === "https://img.ophim.live" || pathImage === "https://img.ophim.live/") {
                 pathImage = "https://img.ophim.live/uploads/movies/";
             }
-            const ophimItems = getItems(data).map(item => normalizeOphimItem(item, pathImage));
-            items = [...items, ...ophimItems];
+            ophimItems = getItems(data).map(item => normalizeOphimItem(item, pathImage));
+            
         }
 
         if (nguoncRes.status === 'fulfilled' && nguoncRes.value?.status === 'success') {
-            const nguoncItems = (nguoncRes.value.items || []).map((item: Record<string, unknown>) => normalizeNguoncItem(item));
-            items = [...items, ...nguoncItems];
+            nguoncItems = (nguoncRes.value.items || []).map((item: Record<string, unknown>) => normalizeNguoncItem(item));
+            
         }
 
         // Deduplicate + merge images theo thứ tự nguồn (KKPhim -> OPhim -> NguonC)
@@ -1463,3 +1484,6 @@ export const getMoviesByActor = async (actorName: string, page: number = 1, limi
 
     }
 };
+
+
+

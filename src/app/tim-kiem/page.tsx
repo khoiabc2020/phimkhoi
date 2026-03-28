@@ -25,12 +25,14 @@ async function SearchResultsStream({
     category,
     country,
     year,
+    type,
     limit,
 }: {
     keyword: string;
     category?: string;
     country?: string;
     year?: string;
+    type?: string;
     limit: number;
 }) {
     const moviesCount = limit || 49;
@@ -115,6 +117,14 @@ async function SearchResultsStream({
         }
         if (year && year !== "all" && Number(movie.year) !== parseInt(year, 10)) {
             return false;
+        }
+        if (type && type !== "all") {
+            // "type" parameter mappings: "phim-le" -> "single", "phim-bo" -> "series", "hoat-hinh" -> hoathoanh/anime
+            const movieType = String(movie.type || "").toLowerCase();
+            if (type === "phim-le" && movieType !== "single") return false;
+            if (type === "phim-bo" && movieType !== "series") return false;
+            if (type === "hoat-hinh" && !movieType.includes("hoathoanh") && !movie.category?.some((c: any) => c.slug === "hoat-hinh")) return false;
+            if (type === "tv-shows" && !movieType.includes("tvshows") && !movie.category?.some((c: any) => c.slug === "tv-shows")) return false;
         }
         return true;
     });
@@ -225,7 +235,7 @@ const SearchSkeleton = ({ limit = 49 }: { limit?: number }) => (
 export default async function SearchPage({
     searchParams,
 }: {
-    searchParams: Promise<{ q?: string; keyword?: string; category?: string; country?: string; year?: string }>;
+    searchParams: Promise<{ q?: string; keyword?: string; category?: string; country?: string; year?: string; type?: string }>;
 }) {
     const userAgent = (await headers()).get("user-agent") || "";
     const isMobile = /mobile|android|iphone|ipad/i.test(userAgent);
@@ -233,7 +243,7 @@ export default async function SearchPage({
     const theme = getThemeBySlug("tim-kiem");
 
     const sParams = await searchParams;
-    const { q, keyword: k, category, country, year } = sParams;
+    const { q, keyword: k, category, country, year, type } = sParams;
     const keyword = (k || q || "").trim();
 
     const { categories, countries } = await getMenuData();
@@ -246,6 +256,13 @@ export default async function SearchPage({
         { name: "2010s", slug: "2010" },
         { name: "2000s", slug: "2000" },
         { name: "1990s", slug: "1990" },
+    ];
+    
+    const types = [
+        { name: "Phim lẻ", slug: "phim-le" },
+        { name: "Phim bộ", slug: "phim-bo" },
+        { name: "Hoạt hình", slug: "hoat-hinh" },
+        { name: "TV Shows", slug: "tv-shows" },
     ];
 
     return (
@@ -278,7 +295,7 @@ export default async function SearchPage({
                     </div>
 
                     <div className="w-full md:w-auto overflow-visible relative z-20">
-                        <FilterBar categories={categories} countries={countries} years={years} />
+                        <FilterBar categories={categories} countries={countries} years={years} types={types} hideType={false} />
                     </div>
                 </div>
 
@@ -292,7 +309,7 @@ export default async function SearchPage({
                     </div>
                 ) : (
                     <Suspense
-                        key={`${keyword}-${category}-${country}-${year}`}
+                        key={`${keyword}-${category}-${country}-${year}-${type}`}
                         fallback={<SearchSkeleton limit={limit} />}
                     >
                         <SearchResultsStream
@@ -300,6 +317,7 @@ export default async function SearchPage({
                             category={category}
                             country={country}
                             year={year}
+                            type={type}
                             limit={limit}
                         />
                     </Suspense>

@@ -11,13 +11,17 @@ export default function FilterBar({
     countries = [],
     hideCategory = false,
     hideCountry = false,
+    hideType = true,
     years = [],
+    types = [],
 }: {
     categories?: FilterOption[];
     countries?: FilterOption[];
     years?: FilterOption[];
+    types?: FilterOption[];
     hideCategory?: boolean;
     hideCountry?: boolean;
+    hideType?: boolean;
 }) {
     const router = useRouter();
     const pathname = usePathname();
@@ -67,10 +71,21 @@ export default function FilterBar({
     const displayCategories = [{ name: "Tất cả thể loại", slug: "all" }, ...categories];
     const displayCountries = [{ name: "Tất cả quốc gia", slug: "all" }, ...countries];
     const displayYears = [{ name: "Tất cả năm", slug: "all" }, ...(years.length > 0 ? years : defaultYears)];
+    const displayTypes = [{ name: "Loại phim", slug: "all" }, ...types];
 
     return (
         <div>
             <div className="no-scrollbar flex flex-nowrap items-center gap-2 overflow-x-auto py-2 sm:gap-3">
+                {!hideType && displayTypes.length > 1 && (
+                    <EliteSelect
+                        options={displayTypes}
+                        value={searchParams.get("type") || "all"}
+                        onChange={(value) => handleFilterChange("type", value)}
+                        placeholder="Định dạng"
+                        disabled={isPending}
+                    />
+                )}
+                
                 {!hideCategory && (
                     <EliteSelect
                         options={displayCategories}
