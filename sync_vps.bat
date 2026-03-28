@@ -16,7 +16,7 @@ set "HOST=bitnami@13.250.33.6"
 set "DIR=/home/bitnami/phimkhoi"
 :: ============================================================
 
-cd /d "%~dp0..\.."
+cd /d "%~dp0"
 echo.
 echo ==========================================
 echo    DONG BO CODE LEN VPS (13.250.33.6)
@@ -47,8 +47,8 @@ if errorlevel 1 (
 
 :do_deploy
 echo.
-echo [4/4] SSH -^> VPS: git pull + deploy_vps.sh (cho phep timeout 10 phut)
-ssh -i "%PEM%" -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -o ServerAliveCountMax=20 -o ConnectTimeout=15 %HOST% "cd %DIR% && git pull origin main && bash deploy_vps.sh"
+echo [4/4] SSH -^> VPS: git fetch + git reset + deploy_vps.sh (cho phep timeout 10 phut)
+ssh -i "%PEM%" -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -o ServerAliveCountMax=20 -o ConnectTimeout=15 %HOST% "cd %DIR% && git fetch --all && git reset --hard origin/main && bash deploy_vps.sh"
 
 if errorlevel 1 (
     echo.
