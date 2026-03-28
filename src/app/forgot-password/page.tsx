@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Mail, ArrowLeft } from "lucide-react";
-import AuthBrand from "@/components/auth/AuthBrand";
 
 export default function ForgotPasswordPage() {
     const [email, setEmail] = useState("");
@@ -39,14 +38,9 @@ export default function ForgotPasswordPage() {
     };
 
     return (
-        <main className="min-h-screen flex items-center justify-center bg-[#0a0a0a] relative overflow-hidden">
+        <main className="min-h-screen flex items-center justify-center bg-[#0a0a0a] relative overflow-hidden pt-20 pb-8">
             {/* Background Decor */}
-            <div className="absolute inset-0 bg-[url('https://phimimg.com/upload/vod/20240801-1/5b35c0293375815615d1858564245598.jpg')] bg-cover bg-center opacity-20 blur-sm" />
-            <div className="absolute inset-0 bg-black/60" />
-
-            <div className="absolute top-6 left-6 md:top-8 md:left-12 z-20">
-                <AuthBrand />
-            </div>
+            <div className="absolute inset-0 bg-black/80" />
 
             <div className="relative z-10 w-full max-w-md p-8 bg-black/85 border border-white/10 rounded-lg shadow-2xl animate-in fade-in zoom-in duration-500">
                 <Link href="/login" className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors">
