@@ -112,14 +112,15 @@ function getHeroImage(movie: any, type: "poster" | "backdrop" | "character" | "l
 
     if (type === "backdrop") {
         if (tmdb?.backdrop_path) {
-            return tmdbImage(tmdb.backdrop_path, "original");
+            // desktop: original cho màn hình lớn, w1280 cho tablet
+            return tmdbImage(tmdb.backdrop_path, variant === "desktop" ? "original" : "w1280");
         }
         return getStrictLandscapeFromMovie(movie);
     }
 
     if (type === "poster") {
         if (tmdb?.poster_path) {
-            return tmdbImage(tmdb.poster_path, variant === "desktop" ? "w780" : "w500");
+            return tmdbImage(tmdb.poster_path, variant === "desktop" ? "w780" : "w780");
         }
         if (poster) return poster;
         if (variant === "mobile" && backdrop) return backdrop;
@@ -172,8 +173,8 @@ function HeroBackdropFrame({ src, alt, priority = false }: { src: string; alt: s
             fill
             className="object-cover object-[center_20%]"
             priority={priority}
-            sizes="100vw"
-            quality={60}
+            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 100vw, 100vw"
+            quality={88}
             decoding="async"
             onError={() => setFailed(true)}
         />
@@ -291,7 +292,8 @@ function MobileHero({ movies, active = true }: { movies: Movie[]; active?: boole
                             fill
                             className="object-cover"
                             priority={index === 0}
-                            quality={58}
+                            sizes="(max-width: 640px) 100vw, 768px"
+                            quality={82}
                             decoding="async"
                         />
                         <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />

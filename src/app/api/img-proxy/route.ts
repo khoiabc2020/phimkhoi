@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
     }
 
     const hostname = (() => { try { return new URL(url).hostname; } catch { return ''; } })();
-    if (!ALLOWED_DOMAINS.some(d => hostname.includes(d))) {
+    if (!ALLOWED_DOMAINS.some(d => hostname === d || hostname.endsWith(`.${d}`))) {
         return NextResponse.redirect(url, 302);
     }
 

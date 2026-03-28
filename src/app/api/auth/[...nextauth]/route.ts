@@ -33,15 +33,10 @@ export const authOptions: NextAuthOptions = {
                 password: { label: "Password", type: "password" },
             },
             async authorize(credentials) {
-                if (!credentials?.username || !credentials?.password) {
-                    console.log("NextAuth: Missing credentials");
-                    return null;
-                }
+                if (!credentials?.username || !credentials?.password) return null;
 
                 try {
-                    console.log("NextAuth: Connecting to DB...");
                     await dbConnect();
-                    console.log("NextAuth: DB Connected. Searching user:", credentials.username);
 
                     const user = await User.findOne({
                         $or: [
@@ -50,37 +45,11 @@ export const authOptions: NextAuthOptions = {
                         ]
                     });
 
-                    // Tạo admin mặc định nếu DB trống
-                    if (!user && credentials.username === "admin" && credentials.password === "admin123") {
-                        console.log("NextAuth: Creating default admin");
-                        const hashed = await bcrypt.hash("admin123", 10);
-                        const newAdmin = await User.create({
-                            name: "Admin User",
-                            email: "admin@khoiphim.com",
-                            password: hashed,
-                            role: "admin",
-                        });
-                        return {
-                            id: newAdmin._id.toString(),
-                            name: newAdmin.name || "Admin",
-                            email: newAdmin.email || "admin@khoiphim.com",
-                            role: newAdmin.role,
-                        } as NextAuthUser;
-                    }
+                    if (!user) return null;
 
-                    if (!user) {
-                        console.log("NextAuth: User not found for username:", credentials.username);
-                        return null;
-                    }
-
-                    console.log("NextAuth: User found. Comparing passwords...");
                     const isValid = await bcrypt.compare(credentials.password, user.password || "");
-                    if (!isValid) {
-                        console.log("NextAuth: Invalid password for user:", credentials.username);
-                        return null;
-                    }
+                    if (!isValid) return null;
 
-                    console.log("NextAuth: Login successful for:", credentials.username);
                     return {
                         id: user._id.toString(),
                         name: user.name || "User",
@@ -145,7 +114,7 @@ export const authOptions: NextAuthOptions = {
         error: "/login"
     },
     secret: process.env.NEXTAUTH_SECRET,
-    debug: true,
+    debug: process.env.NODE_ENV === "development",
 };
 
 const handler = NextAuth(authOptions);

@@ -48,6 +48,10 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
         if (!content || !content.trim()) {
             return NextResponse.json({ error: "Content is required" }, { status: 400 });
         }
+        const sanitized = content.replace(/<[^>]*>/g, "").trim().slice(0, 2000);
+        if (!sanitized) {
+            return NextResponse.json({ error: "Content is required" }, { status: 400 });
+        }
 
         await dbConnect();
         const comment = await Comment.create({
@@ -55,7 +59,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
             userName: user.name,
             userImage: user.image,
             movieSlug: slug,
-            content,
+            content: sanitized,
         });
 
         return NextResponse.json({ comment });
