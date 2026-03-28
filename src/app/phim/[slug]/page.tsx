@@ -291,7 +291,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     const movieImageUrl = sourcePoster || sourceThumb || tmdbBackdrop;
     const watchUrl = `https://khoiphim.org/xem-phim/${movie?.slug}/${serverData?.[0]?.slug || 'tap-1'}`;
     const ratingCount = trustedTmdbDetails?.vote_count || 100;
-    const firstCategory = movie?.category?.[0];
+    const firstCategoryObj = movie?.category?.[0];
 
     const jsonLd = {
         "@context": "https://schema.org",
@@ -351,8 +351,8 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
         "@type": "BreadcrumbList",
         "itemListElement": [
             { "@type": "ListItem", "position": 1, "name": "Trang chủ", "item": "https://khoiphim.org" },
-            ...(firstCategory ? [{ "@type": "ListItem", "position": 2, "name": `Phim ${firstCategory.name}`, "item": `https://khoiphim.org/the-loai/${firstCategory.slug}` }] : []),
-            { "@type": "ListItem", "position": firstCategory ? 3 : 2, "name": movie?.name, "item": `https://khoiphim.org/phim/${movie?.slug}` },
+            ...(firstCategoryObj ? [{ "@type": "ListItem", "position": 2, "name": `Phim ${firstCategoryObj.name}`, "item": `https://khoiphim.org/the-loai/${firstCategoryObj.slug}` }] : []),
+            { "@type": "ListItem", "position": firstCategoryObj ? 3 : 2, "name": movie?.name, "item": `https://khoiphim.org/phim/${movie?.slug}` },
         ]
     };
 
