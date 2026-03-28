@@ -159,7 +159,7 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                                 priority={isFirstSlide}
                                 loading={isFirstSlide ? "eager" : "lazy"}
                                 decoding="async"
-                                quality={58}
+                                quality={70}
                                 sizes="100vw"
                             />
                         </div>
@@ -173,7 +173,7 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                                 priority={isFirstSlide}
                                 loading={isFirstSlide ? "eager" : "lazy"}
                                 decoding="async"
-                                quality={60}
+                                quality={70}
                                 sizes="100vw"
                             />
                         </div>
@@ -198,6 +198,7 @@ export default function KoreaHero({ initialMovies = [] }: KoreaHeroProps) {
                                         src={currentMovie.logo}
                                         alt={currentMovie.displayTitle}
                                         fill
+                                        sizes="(max-width: 768px) 300px, 500px"
                                         className="object-contain object-left drop-shadow-[0_10px_25px_rgba(0,0,0,0.9)]"
                                         priority={isFirstSlide}
                                         loading={isFirstSlide ? "eager" : "lazy"}

@@ -162,12 +162,8 @@ function MovieCard({
     const activePosterSrc = useMemo(() => {
         const raw = posterCandidates[posterIndex] || "";
         if (!raw) return "/placeholder.svg";
-        const base = getImageUrl(raw);
-        // [Elite Performance] Balanced resolution/quality for high-speed WebP delivery.
-        // w=800/q=75 (Landscape) and w=500/q=75 (Portrait) is optimal for mobile/web bandwidth.
-        const suffix = orientation === 'landscape' ? '&w=800&q=75' : '&w=500&q=75';
-        return base.includes('?') ? `${base}${suffix}` : `${base}?${suffix.replace('&', '')}`;
-    }, [posterCandidates, posterIndex, orientation]);
+        return getImageUrl(raw);
+    }, [posterCandidates, posterIndex]);
 
     // Backdrop/overlay (ảnh ngang): TMDB backdrop first, then whichever source URL is truly landscape.
     const displayBackdrop = useMemo(() => {
@@ -275,8 +271,8 @@ function MovieCard({
                             alt={decodeHtml(movie.name) || movie.slug || "Phim"}
                             fill
                             className="transition-transform duration-500 ease-out lg:group-hover/static-card:scale-[1.1] object-cover z-10 anchor-top"
-                            sizes={orientation === 'landscape' ? "(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 400px" : "(max-width: 768px) 33vw, (max-width: 1200px) 20vw, (max-width: 1920px) 15vw, 300px"}
-                            quality={76}
+                            sizes={orientation === 'landscape' ? "(max-width: 768px) 200px, 300px" : "(max-width: 640px) 160px, (max-width: 768px) 180px, (max-width: 1280px) 200px, 250px"}
+                            quality={85}
                             loading={priority ? undefined : loading}
                             priority={priority}
                             decoding="async"
@@ -440,6 +436,8 @@ function OnflixHoverCard({
                                 src={displayBackdrop}
                                 alt={decodeHtml(movie.name) || movie.slug || "Phim"}
                                 fill
+                                sizes="350px"
+                                quality={75}
                                 className={`object-cover object-top transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
                                 priority
                                 onLoad={() => setImgLoaded(true)}

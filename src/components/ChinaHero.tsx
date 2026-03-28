@@ -191,7 +191,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                                 priority={isFirstSlide}
                                 loading={isFirstSlide ? "eager" : "lazy"}
                                 decoding="async"
-                                quality={58}
+                                quality={70}
                                 sizes="100vw"
                             />
                         </div>
@@ -205,7 +205,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                                 priority={isFirstSlide}
                                 loading={isFirstSlide ? "eager" : "lazy"}
                                 decoding="async"
-                                quality={60}
+                                quality={70}
                                 sizes="100vw"
                             />
                         </div>
@@ -231,7 +231,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                                 className="object-contain object-right-bottom scale-[0.65] md:scale-[0.8] lg:scale-[0.85] origin-right-bottom"
                                 priority={isFirstSlide}
                                 loading={isFirstSlide ? "eager" : "lazy"}
-                                quality={60}
+                                quality={70}
                             />
                         </motion.div>
                     )}
@@ -249,6 +249,7 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                                         src={currentMovie.logo}
                                         alt={currentMovie.displayTitle}
                                         fill
+                                        sizes="(max-width: 768px) 300px, 500px"
                                         className="object-contain object-left drop-shadow-[0_10px_25px_rgba(0,0,0,0.9)]"
                                         priority={isFirstSlide}
                                         loading={isFirstSlide ? "eager" : "lazy"}
