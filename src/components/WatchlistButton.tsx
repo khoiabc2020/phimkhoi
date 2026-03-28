@@ -1,6 +1,8 @@
 "use client";
 
 import { BookmarkPlus, BookmarkCheck, Loader2 } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useWatchlist } from "@/context/WatchlistContext";
 import { useToast } from "@/context/ToastContext";
 
@@ -16,11 +18,18 @@ interface WatchlistButtonProps {
 export default function WatchlistButton({ slug, movieName, poster, className = "", showLabel = false, label = "Xem sau" }: WatchlistButtonProps) {
     const { isInWatchlist, addToWatchlist, removeFromWatchlist, isLoaded } = useWatchlist();
     const { showToast } = useToast();
+    const { data: session } = useSession();
+    const router = useRouter();
     const inWatchlist = isInWatchlist(slug);
 
     const handleToggle = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
+
+        if (!session) {
+            router.push("/login");
+            return;
+        }
 
         if (inWatchlist) {
             await removeFromWatchlist(slug);

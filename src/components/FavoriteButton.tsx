@@ -3,6 +3,7 @@
 import { Heart } from "lucide-react";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useFavorites } from "@/context/FavoritesContext";
 import { useToast } from "@/context/ToastContext";
 
@@ -27,6 +28,7 @@ interface FavoriteButtonProps {
 export default function FavoriteButton({ movieData, size = "md", className = "", showLabel = false, label = "Thích" }: FavoriteButtonProps) {
     const { isFavorite, toggleFavorite, isLoading } = useFavorites();
     const { showToast } = useToast();
+    const { data: session } = useSession();
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
 
@@ -47,6 +49,11 @@ export default function FavoriteButton({ movieData, size = "md", className = "",
     const handleToggle = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
+
+        if (!session) {
+            router.push("/login");
+            return;
+        }
 
         startTransition(async () => {
             await toggleFavorite(movieData);
