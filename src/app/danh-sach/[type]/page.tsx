@@ -113,7 +113,7 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
                         
                         <div className="flex flex-col items-end gap-3 flex-1">
                             <p className="text-white/40 text-xs font-medium bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
-                                Trang <span className="text-white font-bold">{pagination?.currentPage}</span> / <span className="text-white/60">{pagination?.totalPages}</span>
+                                Trang <span className="text-white font-bold">{page}</span>
                             </p>
                             <div className="w-full md:w-auto">
                                 <Suspense fallback={<div className="w-32 h-8 bg-white/5 animate-pulse rounded" />}>

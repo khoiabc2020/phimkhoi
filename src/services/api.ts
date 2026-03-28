@@ -401,7 +401,6 @@ async function fetchWithRetry(url: string, options: RequestInit = {}, retries = 
 
 export const getHomeData = async () => {
     const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
-    console.log(`[getHomeData] NEXT_PHASE: ${process.env.NEXT_PHASE}, isBuildPhase: ${isBuildPhase}`);
     if (isBuildPhase) {
         return {
             phimMoi: [], phimLe: [], phimBo: [], hoatHinh: [],
@@ -417,7 +416,6 @@ export const getHomeData = async () => {
 
     try {
         const fetchCategory = async (slug: string, endpoint: 'danh-sach' | 'the-loai' | 'quoc-gia' = 'danh-sach') => {
-            console.log(`[BuildDiag] fetchCategory start: ${slug} (${endpoint})`);
             let nguoncUrl = `${NGUONC_API}/api/films/${endpoint}/${slug}?page=1`;
             if (slug === 'phim-moi-cap-nhat') nguoncUrl = `${NGUONC_API}/api/films/phim-moi-cap-nhat?page=1`;
 
@@ -623,7 +621,6 @@ export const OPHIM_API = "https://ophim1.com";
 export const NGUONC_API = "https://phim.nguonc.com";
 
 export const searchMovies = async (keyword: string, options: { enrichTMDB?: boolean; limit?: number } = {}) => {
-    console.log(`[BuildDiag] searchMovies start: ${keyword}`);
     try {
         const q = String(keyword || "").trim();
         if (q.length < 2) return [];

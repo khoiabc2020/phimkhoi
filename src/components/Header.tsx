@@ -136,6 +136,9 @@ export default function Header({ categories, countries }: HeaderProps) {
                 }
 
                 const results = await response.json();
+                if (searchCacheRef.current.size >= 100) {
+                    searchCacheRef.current.delete(searchCacheRef.current.keys().next().value);
+                }
                 searchCacheRef.current.set(cacheKey, results || { movies: [], actors: [] });
 
                 if (activeSearchRequestRef.current === requestId) {

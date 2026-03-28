@@ -112,14 +112,14 @@ function getHeroImage(movie: any, type: "poster" | "backdrop" | "character" | "l
 
     if (type === "backdrop") {
         if (tmdb?.backdrop_path) {
-            return tmdbImage(tmdb.backdrop_path, variant === "desktop" ? "original" : "w780");
+            return tmdbImage(tmdb.backdrop_path, variant === "desktop" ? "w1280" : "w780");
         }
         return getStrictLandscapeFromMovie(movie);
     }
 
     if (type === "poster") {
         if (tmdb?.poster_path) {
-            return tmdbImage(tmdb.poster_path, variant === "desktop" ? "w500" : "w780");
+            return tmdbImage(tmdb.poster_path, variant === "desktop" ? "w500" : "w342");
         }
         if (poster) return poster;
         if (variant === "mobile" && backdrop) return backdrop;

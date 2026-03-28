@@ -122,9 +122,9 @@ function MovieCard({
     const tmdbBackdropPath = tmdbData?.backdrop_path;
 
     // Poster (ảnh dọc) – ưu tiên poster thật, tránh nhầm thumb/backdrop vào slot dọc
-    const tmdbPoster = useMemo(() => 
+    const tmdbPoster = useMemo(() =>
         tmdbPosterPath
-            ? getTMDBImage(tmdbPosterPath, "w780")
+            ? getTMDBImage(tmdbPosterPath, "w342")
             : null
     , [tmdbPosterPath]);
 
@@ -137,7 +137,7 @@ function MovieCard({
     const posterCandidates = useMemo(() => {
         const list = orientation === "landscape"
             ? [
-                tmdbBackdropPath ? getTMDBImage(tmdbBackdropPath, "w780") : null,
+                tmdbBackdropPath ? getTMDBImage(tmdbBackdropPath, "w500") : null,
                 getBackdropImageUrl(movie),
             ]
             : [
@@ -272,7 +272,7 @@ function MovieCard({
                             fill
                             className="transition-transform duration-500 ease-out lg:group-hover/static-card:scale-[1.1] object-cover z-10 anchor-top"
                             sizes={orientation === 'landscape' ? "(max-width: 768px) 200px, 300px" : "(max-width: 640px) 160px, (max-width: 768px) 180px, (max-width: 1280px) 200px, 250px"}
-                            quality={85}
+                            quality={65}
                             loading={priority ? undefined : loading}
                             priority={priority}
                             decoding="async"

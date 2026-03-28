@@ -331,7 +331,7 @@ export async function getAllComments(filter: {
 }) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session?.user?.email || session.user.email !== "admin@example.com") {
+        if (!session?.user?.id || session.user.role !== "admin") {
             return { success: false, error: "Unauthorized", data: [] as any[], total: 0 };
         }
 
@@ -360,7 +360,7 @@ export async function getAllComments(filter: {
 export async function approveComment(commentId: string) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session?.user?.email || session.user.email !== "admin@example.com") {
+        if (!session?.user?.id || session.user.role !== "admin") {
             return { success: false, error: "Unauthorized" };
         }
 
@@ -381,7 +381,7 @@ export async function approveComment(commentId: string) {
 export async function deleteCommentAdmin(commentId: string) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session?.user?.email || session.user.email !== "admin@example.com") {
+        if (!session?.user?.id || session.user.role !== "admin") {
             return { success: false, error: "Unauthorized" };
         }
 
