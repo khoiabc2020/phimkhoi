@@ -76,6 +76,7 @@ export const getMoviesByFilterFromCache = async (
         
         if (options.year && options.year !== 'all') query.year = Number(options.year);
         if (options.category && options.category !== 'all') query["category.slug"] = options.category;
+        if (options.country && options.country !== 'all') query["country.slug"] = options.country;
 
         // Perform count and find in parallel
         const [totalDocCount, movies] = await Promise.all([
