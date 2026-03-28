@@ -61,8 +61,9 @@ export default function FavoriteButton({ movieData, size = "md", className = "",
             } else {
                 showToast({
                     type: "success",
-                    title: "Đã xóa khỏi yêu thích",
-                    description: movieData.movieName,
+                    title: movieData.movieName || "Phim đã bị xóa",
+                    description: "Đã xóa khỏi danh sách yêu thích",
+                    poster: movieData.moviePoster,
                 });
             }
         });

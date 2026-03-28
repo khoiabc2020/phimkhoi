@@ -26,8 +26,8 @@ export default function WatchlistButton({ slug, movieName, poster, className = "
             await removeFromWatchlist(slug);
             showToast({
                 type: "success",
-                title: "Đã xóa khỏi Xem Sau",
-                description: movieName || "Danh sách của bạn đã được cập nhật.",
+                title: movieName || "Phim đã bị xóa",
+                description: "Đã xóa khỏi Danh Sách Xem Sau",
                 poster: poster,
             });
         } else {

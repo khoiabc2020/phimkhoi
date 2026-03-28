@@ -287,5 +287,10 @@ export function sanitizeMovieList(
         if (sanitized.length >= limit) break;
     }
 
-    return sanitized.slice(0, limit);
+    const finalSanitized = sanitized.slice(0, limit);
+    return finalSanitized.sort((a, b) => {
+        const yearA = extractYear(a) || 0;
+        const yearB = extractYear(b) || 0;
+        return yearB - yearA; // Descending by year
+    });
 }

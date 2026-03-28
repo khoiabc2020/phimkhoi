@@ -25,8 +25,11 @@ const TYPE_NAMES: Record<string, string> = {
     "phim-sap-chieu": "Phim Sắp Chiếu",
     "phim-moi": "Phim Mới",
     "phim-moi-cap-nhat": "Phim Mới Cập Nhật",
-    "phim-vietsub": "Phim Vietsub",
+    "thuyet-minh": "Phim Thuyết Minh",
+    "vietsub": "Phim Vietsub",
+    "long-tieng": "Phim Lồng Tiếng",
     "phim-thuyet-minh": "Phim Thuyết Minh",
+    "phim-vietsub": "Phim Vietsub",
     "phim-long-tieng": "Phim Lồng Tiếng",
     "phim-bo-dang-chieu": "Phim Bộ Đang Chiếu",
     "phim-bo-hoan-thanh": "Phim Bộ Hoàn Thành",
@@ -93,8 +96,11 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
     // [Elite Performance] Unified Resilient Retrieval
     let data;
     try {
-        const endpoint = (type === 'tat-ca-the-loai' || type === 'phim-moi') ? 'phim-moi-cap-nhat' : type;
-        data = await getResilientMoviesList(endpoint, page, limit, { year, category, country });
+        const isSpecialCategory = ["thuyet-minh", "vietsub", "long-tieng", "phim-thuyet-minh", "phim-vietsub", "phim-long-tieng"].includes(type);
+        const activeCategory = isSpecialCategory ? type : category;
+        const endpoint = (type === 'tat-ca-the-loai' || type === 'phim-moi' || isSpecialCategory) ? 'phim-moi-cap-nhat' : type;
+        
+        data = await getResilientMoviesList(endpoint, page, limit, { year, category: activeCategory, country });
     } catch (error) {
         console.error("Catalog Error", error);
         data = { items: [], pagination: { currentPage: 1, totalPages: 1 } };

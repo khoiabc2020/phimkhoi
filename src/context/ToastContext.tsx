@@ -25,7 +25,7 @@ export function useToast() {
 }
 
 function getImageUrl(url: string) {
-    if (!url) return "/placeholder.jpg";
+    if (!url) return "/placeholder.svg";
     // Keep internal app routes as-is (e.g. /api/img-proxy?...).
     if (url.startsWith("/")) return url;
     if (url.startsWith("http")) return url;
@@ -107,11 +107,11 @@ function ToastItem({ toast, onRemove }: { toast: ToastData; onRemove: () => void
 
             {/* Content Area */}
             <div className="flex-1 flex flex-col justify-center py-4 pr-10 pl-1 min-w-0">
-                <div className={`flex items-center gap-2 ${cfg.color} text-[13px] font-black uppercase tracking-[2px] mb-1 italic`}>
+                <div className={`flex items-center gap-2 ${cfg.color} text-[13px] font-black uppercase tracking-[2px] mb-1`}>
                     <span>{toast.title}</span>
                 </div>
                 {toast.description && (
-                    <p className="text-white/50 text-[12px] leading-[1.4] font-medium tracking-tight line-clamp-2 italic">
+                    <p className="text-white/50 text-[12px] leading-[1.4] font-medium tracking-tight line-clamp-2">
                         {toast.description}
                     </p>
                 )}
