@@ -15,7 +15,7 @@ const HOT_ROUTES = [
     "/loc-phim",
 ];
 
-export default function RouteWarmup() {
+export default function RouteWarmup(): null {
     const router = useRouter();
 
     useEffect(() => {
