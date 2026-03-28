@@ -76,7 +76,12 @@ export default function AuthScreen() {
             if (!res.ok) throw new Error(data.error || 'Đăng nhập Google thất bại');
             if (!data?.token || !data?.user) throw new Error('Thiếu dữ liệu đăng nhập từ server.');
             await login(data.token, data.user);
-            router.replace('/(tabs)/profile');
+            // Use back() to return to the previous screen (profile) which will now render with the logged-in state
+            if (router.canGoBack()) {
+                router.back();
+            } else {
+                router.replace('/(tabs)/profile');
+            }
         } catch (err: any) {
             showAlert('Lỗi', err?.message || 'Không thể đăng nhập bằng Google');
         } finally {
@@ -101,7 +106,11 @@ export default function AuthScreen() {
             if (!res.ok) throw new Error(data.message || 'Đăng nhập thất bại');
             if (!data?.token || !data?.user) throw new Error('Thiếu dữ liệu đăng nhập từ server.');
             await login(data.token, data.user);
-            router.replace('/(tabs)/profile');
+            if (router.canGoBack()) {
+                router.back();
+            } else {
+                router.replace('/(tabs)/profile');
+            }
         } catch (error: any) {
             showAlert('Lỗi', error?.message || 'Đăng nhập thất bại');
         } finally {
@@ -143,14 +152,14 @@ export default function AuthScreen() {
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: '#05060a' }}>
+        <View style={{ flex: 1, backgroundColor: '#05060A' }}>
             <Stack.Screen options={{ headerShown: false }} />
             <StatusBar style="light" />
 
             {/* Background gradient blobs */}
             <View style={{ position: 'absolute', inset: 0 }} pointerEvents="none">
                 <LinearGradient
-                    colors={['#1a0e3a', '#05060a', '#05060a']}
+                    colors={['#1a0e3a', '#05060A', '#05060A']}
                     style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '60%' }}
                 />
                 <View style={{
@@ -182,9 +191,9 @@ export default function AuthScreen() {
 
                         {/* Brand */}
                         <View style={{ alignItems: 'center', marginBottom: 32 }}>
-                            <View style={{ transform: [{ scaleX: 0.88 }, { scaleY: 1.18 }] }}>
-                                <Text style={{ color: 'white', fontSize: 42, fontWeight: '800', letterSpacing: 0.8 }}>
-                                    <Text style={{ color: '#9CA3AF' }}>KHOI</Text><Text style={{ color: '#E50914' }}>PHIM</Text>
+                            <View>
+                                <Text style={{ fontSize: 38, fontWeight: '900', letterSpacing: 3 }}>
+                                    <Text style={{ color: '#8FA7C5' }}>KHOI</Text><Text style={{ color: '#E50914' }}>PHIM</Text>
                                 </Text>
                             </View>
                             <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, marginTop: 6 }}>

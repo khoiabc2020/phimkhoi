@@ -1,18 +1,21 @@
 import {
-    View, Text, Pressable, StyleSheet, Animated, Easing, ScrollView
+    View, Text, Pressable, StyleSheet, Animated, Easing, ScrollView, ActivityIndicator
 } from 'react-native';
+import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import { useRouter, Stack } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useRouter, Stack, useFocusEffect } from 'expo-router';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import * as Haptics from 'expo-haptics';
 import * as Linking from 'expo-linking';
 import { COLORS } from '@/constants/theme';
 import { CONFIG } from '@/constants/config';
+import { useAuth } from '@/context/auth';
+import { getNotifications, markNotificationsRead, AppNotification } from '@/services/api';
 
 const ACCENT = COLORS.accent ?? '#E50914';
-const APP_BUILD = 6; // Constants matching profile.tsx
+const APP_BUILD = 8;
 
 interface UpdateInfo {
     version: string;
@@ -23,7 +26,10 @@ interface UpdateInfo {
 
 export default function NotificationsScreen() {
     const router = useRouter();
+    const { user, token } = useAuth();
     const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
+    const [notifications, setNotifications] = useState<AppNotification[]>([]);
+    const [loadingNotifs, setLoadingNotifs] = useState(false);
 
     const iconScale = useRef(new Animated.Value(0.7)).current;
     const iconOpacity = useRef(new Animated.Value(0)).current;
@@ -47,6 +53,25 @@ export default function NotificationsScreen() {
             }
         } catch { }
     };
+
+    const loadNotifications = useCallback(async () => {
+        if (!token) return;
+        setLoadingNotifs(true);
+        try {
+            const data = await getNotifications(token);
+            setNotifications(data);
+            // Mark all as read after loading
+            if (data.some(n => !n.isRead)) {
+                markNotificationsRead(token);
+            }
+        } finally {
+            setLoadingNotifs(false);
+        }
+    }, [token]);
+
+    useFocusEffect(useCallback(() => {
+        loadNotifications();
+    }, [loadNotifications]));
 
     useEffect(() => {
         checkVersion();
@@ -74,6 +99,8 @@ export default function NotificationsScreen() {
         Animated.spring(btnScale, { toValue: 1, useNativeDriver: true, damping: 14 }).start();
     };
 
+    const hasNotifications = notifications.length > 0;
+
     return (
         <View style={styles.root}>
             <Stack.Screen options={{ headerShown: false }} />
@@ -84,13 +111,18 @@ export default function NotificationsScreen() {
                         <Feather name="arrow-left" size={22} color="rgba(255,255,255,0.8)" strokeWidth={1.5} />
                     </Pressable>
                     <Text style={styles.headerTitle}>Thông báo</Text>
-                    <Pressable hitSlop={12} style={styles.iconBtn}>
-                        <Feather name="settings" size={22} color="rgba(255,255,255,0.8)" strokeWidth={1.5} />
-                    </Pressable>
+                    <View style={styles.iconBtn}>
+                        {hasNotifications && (
+                            <View style={styles.badge}>
+                                <Text style={styles.badgeText}>{notifications.length}</Text>
+                            </View>
+                        )}
+                    </View>
                 </View>
 
-                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                    {updateInfo ? (
+                <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
+                    {/* Update card */}
+                    {updateInfo && (
                         <View style={{ paddingHorizontal: 20, paddingTop: 10 }}>
                             <View style={styles.updateCard}>
                                 <View style={styles.updateHeader}>
@@ -102,13 +134,11 @@ export default function NotificationsScreen() {
                                         <Text style={styles.updateVersion}>v{updateInfo.version} đã sẵn sàng</Text>
                                     </View>
                                 </View>
-
                                 {updateInfo.change_log && (
                                     <View style={styles.changelogBox}>
                                         <Text style={styles.changelogText}>{updateInfo.change_log}</Text>
                                     </View>
                                 )}
-
                                 <Pressable
                                     style={styles.downloadBtn}
                                     onPress={() => Linking.openURL(updateInfo.download_url)}
@@ -118,33 +148,73 @@ export default function NotificationsScreen() {
                                 </Pressable>
                             </View>
                         </View>
+                    )}
+
+                    {/* Notifications list */}
+                    {user && token ? (
+                        loadingNotifs ? (
+                            <View style={styles.loadingWrap}>
+                                <ActivityIndicator size="small" color={ACCENT} />
+                            </View>
+                        ) : hasNotifications ? (
+                            <View style={styles.notifList}>
+                                <Text style={styles.sectionLabel}>Phim yêu thích cập nhật</Text>
+                                {notifications.map((n) => (
+                                    <Pressable
+                                        key={n.id}
+                                        style={[styles.notifCard, !n.isRead && styles.notifCardUnread]}
+                                        onPress={() => n.movieSlug && router.push(`/movie/${n.movieSlug}` as any)}
+                                    >
+                                        {n.moviePoster ? (
+                                            <Image
+                                                source={{ uri: n.moviePoster }}
+                                                style={styles.notifPoster}
+                                                contentFit="cover"
+                                            />
+                                        ) : (
+                                            <View style={[styles.notifPoster, styles.notifPosterPlaceholder]}>
+                                                <Feather name="film" size={20} color="rgba(255,255,255,0.3)" />
+                                            </View>
+                                        )}
+                                        <View style={styles.notifContent}>
+                                            <Text style={styles.notifTitle} numberOfLines={2}>
+                                                {n.movieName || n.title}
+                                            </Text>
+                                            {n.newEpisode ? (
+                                                <Text style={styles.notifEpisode}>
+                                                    <Ionicons name="play-circle" size={12} color={ACCENT} /> {n.newEpisode}
+                                                </Text>
+                                            ) : n.message ? (
+                                                <Text style={styles.notifMessage} numberOfLines={2}>{n.message}</Text>
+                                            ) : null}
+                                            <Text style={styles.notifTime}>{n.updatedAt}</Text>
+                                        </View>
+                                        {!n.isRead && <View style={styles.unreadDot} />}
+                                    </Pressable>
+                                ))}
+                            </View>
+                        ) : !updateInfo ? (
+                            <EmptyState
+                                iconScale={iconScale} iconOpacity={iconOpacity}
+                                textOpacity={textOpacity} textY={textY}
+                                btnOpacity={btnOpacity} btnY={btnY} btnScale={btnScale}
+                                onPressIn={onPressIn} onPressOut={onPressOut}
+                            />
+                        ) : null
                     ) : (
-                        <View style={styles.body}>
-                            <Animated.View style={[styles.iconWrapper, { opacity: iconOpacity, transform: [{ scale: iconScale }] }]}>
-                                <View style={styles.glowOuter}>
-                                    <View style={styles.glowInner}>
-                                        <Feather name="bell" size={32} color={`rgba(143,167,197,0.8)`} strokeWidth={1.5} />
-                                    </View>
-                                </View>
-                            </Animated.View>
-
-                            <Animated.View style={[styles.textBlock, { opacity: textOpacity, transform: [{ translateY: textY }] }]}>
-                                <Text style={styles.emptyTitle}>Chưa có thông báo</Text>
-                                <Text style={styles.emptySub}>Bật thông báo để không bỏ lỡ{'\n'}tập phim mới và cập nhật</Text>
-                            </Animated.View>
-
-                            <Animated.View style={[{ opacity: btnOpacity, transform: [{ translateY: btnY }, { scale: btnScale }] }]}>
-                                <Pressable style={styles.btn} onPressIn={onPressIn} onPressOut={onPressOut}>
-                                    <Feather name="bell" size={16} color="black" strokeWidth={2} />
-                                    <Text style={styles.btnText}>Bật thông báo</Text>
-                                </Pressable>
-                            </Animated.View>
+                        /* Not logged in */
+                        <View style={styles.loginPrompt}>
+                            <Ionicons name="person-outline" size={40} color="rgba(255,255,255,0.3)" />
+                            <Text style={styles.loginPromptText}>Đăng nhập để nhận thông báo</Text>
+                            <Pressable style={styles.loginBtn} onPress={() => router.push('/(auth)/login' as any)}>
+                                <Text style={styles.loginBtnText}>Đăng nhập</Text>
+                            </Pressable>
                         </View>
                     )}
 
                     {/*── Feature Items ───────────────────────────────────────────*/}
                     <View style={styles.features}>
-                        {updateInfo && (
+                        {(updateInfo || !hasNotifications) && (
                             <Text style={{ color: 'rgba(255,255,255,0.3)', fontSize: 13, fontWeight: '600', textTransform: 'uppercase', marginBottom: 4, paddingHorizontal: 4 }}>
                                 Cài đặt thông báo
                             </Text>
@@ -154,6 +224,32 @@ export default function NotificationsScreen() {
                     </View>
                 </ScrollView>
             </SafeAreaView>
+        </View>
+    );
+}
+
+function EmptyState({ iconScale, iconOpacity, textOpacity, textY, btnOpacity, btnY, btnScale, onPressIn, onPressOut }: any) {
+    return (
+        <View style={styles.body}>
+            <Animated.View style={[styles.iconWrapper, { opacity: iconOpacity, transform: [{ scale: iconScale }] }]}>
+                <View style={styles.glowOuter}>
+                    <View style={styles.glowInner}>
+                        <Feather name="bell" size={32} color={`rgba(143,167,197,0.8)`} strokeWidth={1.5} />
+                    </View>
+                </View>
+            </Animated.View>
+
+            <Animated.View style={[styles.textBlock, { opacity: textOpacity, transform: [{ translateY: textY }] }]}>
+                <Text style={styles.emptyTitle}>Chưa có thông báo</Text>
+                <Text style={styles.emptySub}>Thêm phim vào yêu thích để nhận{'\n'}thông báo khi có tập mới</Text>
+            </Animated.View>
+
+            <Animated.View style={[{ opacity: btnOpacity, transform: [{ translateY: btnY }, { scale: btnScale }] }]}>
+                <Pressable style={styles.btn} onPressIn={onPressIn} onPressOut={onPressOut}>
+                    <Feather name="heart" size={16} color="black" strokeWidth={2} />
+                    <Text style={styles.btnText}>Xem phim yêu thích</Text>
+                </Pressable>
+            </Animated.View>
         </View>
     );
 }
@@ -194,6 +290,70 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         letterSpacing: -0.3,
     },
+    badge: {
+        backgroundColor: ACCENT,
+        borderRadius: 10,
+        paddingHorizontal: 7,
+        paddingVertical: 2,
+        minWidth: 20,
+        alignItems: 'center',
+    },
+    badgeText: { color: '#fff', fontSize: 11, fontWeight: '800' },
+
+    // Loading
+    loadingWrap: { paddingVertical: 40, alignItems: 'center' },
+
+    // Login prompt
+    loginPrompt: {
+        alignItems: 'center', justifyContent: 'center',
+        paddingVertical: 40, gap: 12,
+    },
+    loginPromptText: { color: 'rgba(255,255,255,0.5)', fontSize: 14 },
+    loginBtn: {
+        backgroundColor: ACCENT, borderRadius: 20,
+        paddingHorizontal: 28, paddingVertical: 10,
+    },
+    loginBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+
+    // Notifications list
+    notifList: { paddingHorizontal: 16, paddingTop: 8, gap: 8 },
+    sectionLabel: {
+        color: 'rgba(255,255,255,0.3)',
+        fontSize: 11, fontWeight: '700',
+        textTransform: 'uppercase', letterSpacing: 1.2,
+        marginBottom: 4,
+    },
+    notifCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        backgroundColor: 'rgba(255,255,255,0.04)',
+        borderRadius: 16,
+        padding: 12,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.06)',
+    },
+    notifCardUnread: {
+        backgroundColor: 'rgba(229,9,20,0.06)',
+        borderColor: 'rgba(229,9,20,0.15)',
+    },
+    notifPoster: {
+        width: 56, height: 80,
+        borderRadius: 8,
+        backgroundColor: 'rgba(255,255,255,0.08)',
+    },
+    notifPosterPlaceholder: {
+        alignItems: 'center', justifyContent: 'center',
+    },
+    notifContent: { flex: 1, gap: 4 },
+    notifTitle: { color: '#fff', fontSize: 13, fontWeight: '600', lineHeight: 18 },
+    notifEpisode: { color: ACCENT, fontSize: 12, fontWeight: '600' },
+    notifMessage: { color: 'rgba(255,255,255,0.55)', fontSize: 12, lineHeight: 17 },
+    notifTime: { color: 'rgba(255,255,255,0.3)', fontSize: 11, marginTop: 2 },
+    unreadDot: {
+        width: 8, height: 8, borderRadius: 4,
+        backgroundColor: ACCENT, alignSelf: 'flex-start', marginTop: 4,
+    },
 
     // Empty State body
     body: {
@@ -202,7 +362,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingHorizontal: 32,
         gap: 0,
-        marginTop: -40, // Optical center
+        marginTop: -40,
+        minHeight: 300,
     },
 
     // Liquid glow icon
@@ -211,7 +372,6 @@ const styles = StyleSheet.create({
         width: 120, height: 120, borderRadius: 60,
         backgroundColor: 'rgba(143,167,197,0.06)',
         alignItems: 'center', justifyContent: 'center',
-        // Radial glow via shadow
         shadowColor: ACCENT,
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.3,
@@ -264,7 +424,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingBottom: 32,
         gap: 8,
-        marginTop: 40,
+        marginTop: 32,
     },
     featureItem: {
         flexDirection: 'row',
@@ -301,7 +461,7 @@ const styles = StyleSheet.create({
         padding: 20,
         borderWidth: 1,
         borderColor: 'rgba(143,167,197,0.25)',
-        marginBottom: 20,
+        marginBottom: 16,
     },
     updateHeader: {
         flexDirection: 'row',
@@ -310,50 +470,22 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     updateIconWrap: {
-        width: 52,
-        height: 52,
-        borderRadius: 26,
+        width: 52, height: 52, borderRadius: 26,
         backgroundColor: 'rgba(143,167,197,0.15)',
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: 'center', justifyContent: 'center',
     },
-    updateTitle: {
-        color: 'white',
-        fontSize: 18,
-        fontWeight: '700',
-        marginBottom: 4,
-    },
-    updateVersion: {
-        color: '#E50914',
-        fontSize: 14,
-        fontWeight: '600',
-    },
+    updateTitle: { color: 'white', fontSize: 18, fontWeight: '700', marginBottom: 4 },
+    updateVersion: { color: '#E50914', fontSize: 14, fontWeight: '600' },
     changelogBox: {
         backgroundColor: 'rgba(0,0,0,0.2)',
-        borderRadius: 12,
-        padding: 14,
-        marginBottom: 16,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.05)',
+        borderRadius: 12, padding: 14, marginBottom: 16,
+        borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)',
     },
-    changelogText: {
-        color: 'rgba(255,255,255,0.8)',
-        fontSize: 13,
-        lineHeight: 20,
-    },
+    changelogText: { color: 'rgba(255,255,255,0.8)', fontSize: 13, lineHeight: 20 },
     downloadBtn: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 8,
-        backgroundColor: '#E50914',
-        borderRadius: 14,
-        paddingVertical: 14,
-        width: '100%',
+        flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+        gap: 8, backgroundColor: '#E50914', borderRadius: 14,
+        paddingVertical: 14, width: '100%',
     },
-    downloadBtnText: {
-        color: '#0B0D12',
-        fontSize: 15,
-        fontWeight: '700',
-    },
+    downloadBtnText: { color: '#0B0D12', fontSize: 15, fontWeight: '700' },
 });

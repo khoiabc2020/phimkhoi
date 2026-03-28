@@ -73,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/history`, { headers: { Authorization: `Bearer ${t}` } }),
                 fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/favorites`, { headers: { Authorization: `Bearer ${t}` } }),
                 fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/watchlist`, { headers: { Authorization: `Bearer ${t}` } }),
-                fetch(`${CONFIG.BACKEND_URL}/api/user/playlists`, { headers: { Authorization: `Bearer ${t}` } }),
+                fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/playlists`, { headers: { Authorization: `Bearer ${t}` } }),
             ]);
 
             const updates: Partial<User> = {};
@@ -92,7 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
             if (plRes.status === 'fulfilled' && plRes.value.ok) {
                 const d = await plRes.value.json();
-                updates.playlists = d.playlists ?? d;
+                updates.playlists = d.data ?? d.playlists ?? d;
             }
 
             if (Object.keys(updates).length > 0) {
@@ -189,11 +189,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const syncPlaylists = useCallback(async () => {
         if (!tokenRef.current) return;
         try {
-            const res = await fetch(`${CONFIG.BACKEND_URL}/api/user/playlists`, {
+            const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/playlists`, {
                 headers: { Authorization: `Bearer ${tokenRef.current}` }
             });
             const data = await res.json();
-            if (res.ok) setUser(prev => prev ? { ...prev, playlists: data.playlists ?? data } : null);
+            if (res.ok) setUser(prev => prev ? { ...prev, playlists: data.data ?? data.playlists ?? data } : null);
         } catch (e) { console.error(e); }
     }, []);
 

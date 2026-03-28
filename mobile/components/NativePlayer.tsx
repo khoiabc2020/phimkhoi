@@ -646,6 +646,18 @@ export default function NativePlayer({
                         mediaPlaybackRequiresUserAction={false}
                         allowsFullscreenVideo
                         javaScriptEnabled
+                        domStorageEnabled
+                        originWhitelist={['*']}
+                        mixedContentMode="always"
+                        scalesPageToFit={false}
+                        startInLoadingState
+                        renderLoading={() => (
+                            <View style={[StyleSheet.absoluteFill, { backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' }]}>
+                                <ActivityIndicator size="large" color="#E50914" />
+                                <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, marginTop: 8 }}>Đang tải nguồn phim...</Text>
+                            </View>
+                        )}
+                        userAgent="Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
                         style={StyleSheet.absoluteFill}
                         containerStyle={{ backgroundColor: 'black' }}
                     />
