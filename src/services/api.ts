@@ -677,6 +677,13 @@ export const searchMovies = async (keyword: string, options: { enrichTMDB?: bool
         }
 
         // Deduplicate + merge images across KKPhim, OPhim, NguonC (ưu tiên thứ tự fetch)
+        let results: Movie[] = [];
+        const maxSearchLen = Math.max(kkItemsArr.length, ophimItemsArr.length, nguoncItemsArr.length);
+        for(let i=0; i<maxSearchLen; i++) {
+            if(i<kkItemsArr.length) results.push(kkItemsArr[i]);
+            if(i<ophimItemsArr.length) results.push(ophimItemsArr[i]);
+            if(i<nguoncItemsArr.length) results.push(nguoncItemsArr[i]);
+        }
         const bySlug = new Map<string, Movie>();
         for (const item of results as Movie[]) {
             if (!item?.slug) continue;
