@@ -8,6 +8,7 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import HomeRowInstant from "@/components/HomeRowInstant";
 import ActorRow from "@/components/ActorRow";
+import CountryGridClient from "@/components/CountryGridClient";
 import { cn } from "@/lib/utils";
 import { getThemeBySlug } from "@/lib/theme";
 import { getResilientMoviesList } from "@/app/actions/movies";
@@ -202,25 +203,7 @@ async function PhimTrungHome() {
     );
 }
 
-async function CountryGridStream({ slug, page, limit = 49 }: { slug: string; page: number; limit?: number }) {
-    const data = await getResilientMoviesList("country", page, limit, { country: slug });
-    const movies = (data.items || []).filter((movie: any) => matchesCountryForDisplay(movie, slug));
 
-    if (movies.length === 0) {
-        return <div className="py-20 text-center text-white/40">Không tìm thấy phim nào.</div>;
-    }
-
-    return (
-        <div className="px-2 sm:px-6 md:px-12 lg:pl-24 lg:pr-12">
-            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3 sm:gap-4 mb-12">
-                {movies.map((movie: any) => (
-                    <MovieCard key={movie._id || movie.slug} movie={movie} />
-                ))}
-            </div>
-            <Pagination currentPage={data.pagination.currentPage} totalPages={data.pagination.totalPages} />
-        </div>
-    );
-}
 
 async function ChinaHeroWithData() {
     const { fallbackItems } = await getCountryPagePool("trung-quoc").catch(() => ({
@@ -280,7 +263,7 @@ export default async function PhimTrungPage({ searchParams }: { searchParams: Pr
                             </div>
                         </div>
 
-                        <CountryGridStream slug={slug} page={currentPage} limit={limit} />
+                        <CountryGridClient slug={slug} page={currentPage} limit={limit} />
                     </div>
                 )}
             </div>

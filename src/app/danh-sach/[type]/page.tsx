@@ -8,6 +8,7 @@ import { Metadata } from "next";
 import { headers } from "next/headers";
 import { getThemeBySlug } from "@/lib/theme";
 import { cn } from "@/lib/utils";
+import TypeGridClient from "@/components/TypeGridClient";
 
 // Revalidate mỗi 5 phút - cân bằng giữa freshness và server load
 export const revalidate = 300;
@@ -93,21 +94,6 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
     const { categories, countries } = await getMenuData();
     const typeName = TYPE_NAMES[type] || type;
 
-    // [Elite Performance] Unified Resilient Retrieval
-    let data;
-    try {
-        const isSpecialCategory = ["thuyet-minh", "vietsub", "long-tieng", "phim-thuyet-minh", "phim-vietsub", "phim-long-tieng"].includes(type);
-        const activeCategory = isSpecialCategory ? type : category;
-        const endpoint = (type === 'tat-ca-the-loai' || type === 'phim-moi' || isSpecialCategory) ? 'phim-moi-cap-nhat' : type;
-        
-        data = await getResilientMoviesList(endpoint, page, limit, { year, category: activeCategory, country });
-    } catch (error) {
-        console.error("Catalog Error", error);
-        data = { items: [], pagination: { currentPage: 1, totalPages: 1 } };
-    }
-
-    const { items, pagination } = data;
-
     return (
         <main className="min-h-screen pb-20 bg-[#0a0a0a] relative overflow-hidden">
             {/* Decorative background glow */}
@@ -138,27 +124,15 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
                     </div>
                 </div>
 
-                {/* Grid: content-visibility giúp giảm CPU khi cuộn */}
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2 sm:gap-2.5 md:gap-3 mt-6 [contain:layout_paint]">
-                    {items?.length > 0 ? (
-                        items.map((movie: any, idx: number) => (
-                            <MovieCard key={movie._id} movie={movie} priority={idx < 14} />
-                        ))
-                    ) : (
-                        <div className="col-span-full text-center py-20 text-gray-400">
-                            Không tìm thấy phim nào.
-                        </div>
-                    )}
-                </div>
-                {/* Pagination */}
-                {pagination && (
-                    <Suspense fallback={<div className="h-10 bg-white/5 rounded-lg animate-pulse" />}>
-                        <Pagination
-                            currentPage={pagination.currentPage}
-                            totalPages={pagination.totalPages}
-                        />
-                    </Suspense>
-                )}
+                <TypeGridClient
+                    type={type}
+                    page={page}
+                    limit={limit}
+                    category={category}
+                    country={country}
+                    year={year?.toString()}
+                />
+
             </div>
         </main>
     );

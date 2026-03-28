@@ -8,6 +8,7 @@ import Pagination from "@/components/Pagination";
 import { headers } from "next/headers";
 import { getThemeBySlug } from "@/lib/theme";
 import { cn } from "@/lib/utils";
+import FilterGridClient from "@/components/FilterGridClient";
 
 interface FilterPageProps {
     searchParams: Promise<{
@@ -28,49 +29,7 @@ const TYPES = [
     { name: "TV Shows", slug: "tv-shows" },
 ];
 
-async function MovieGrid({ category, country, year, type, page, limit = 49 }: any) {
-    const data = await getMoviesList(type || "phim-moi-cap-nhat", {
-        category,
-        country,
-        year: year ? parseInt(year) : undefined,
-        page: page ? parseInt(page) : 1,
-        limit
-    });
 
-    const movies = data.items || [];
-
-    if (movies.length === 0) {
-        return (
-            <div className="flex flex-col items-center justify-center py-24 text-center">
-                <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6">
-                    <Filter className="w-10 h-10 text-white/20" />
-                </div>
-                <h3 className="text-xl font-bold mb-2">Không tìm thấy phim</h3>
-                <p className="text-white/40 max-w-md">Hãy thử thay đổi bộ lọc để tìm kiếm kết quả khác nhé.</p>
-            </div>
-        );
-    }
-
-    return (
-        <div className="flex flex-col gap-12 w-full">
-            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4">
-                {movies.map((movie: any) => (
-                    <div key={movie._id || movie.slug} className="animate-in fade-in duration-500">
-                        <MovieCard movie={movie} />
-                    </div>
-                ))}
-            </div>
-            {data.pagination && data.pagination.totalPages > 1 && (
-                <div className="w-full">
-                    <Pagination 
-                        currentPage={data.pagination.currentPage || parseInt(page || "1")} 
-                        totalPages={Math.min(data.pagination.totalPages, 200)} 
-                    />
-                </div>
-            )}
-        </div>
-    );
-}
 
 function LoadingSkeleton({ limit = 49 }: { limit?: number }) {
     return (
@@ -139,10 +98,7 @@ export default async function AdvancedFilterPage({ searchParams }: FilterPagePro
                     types={TYPES}
                 />
 
-                {/* Results Grid */}
-                <Suspense key={JSON.stringify(sParams)} fallback={<LoadingSkeleton limit={limit} />}>
-                    <MovieGrid {...sParams} limit={limit} />
-                </Suspense>
+                <FilterGridClient {...sParams} limit={limit} />
             </div>
         </main>
     );
