@@ -115,17 +115,18 @@ export default async function AdvancedFilterPage({ searchParams }: FilterPagePro
             
             <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-24 md:pt-32 pb-20">
                 {/* Header & Breadcrumb */}
-                <div className="mb-8 md:mb-12">
-                    <div className="flex items-center gap-2 text-[11px] font-bold text-white/30 uppercase tracking-widest mb-4">
-                        <Link href="/" className="hover:text-primary transition-colors">Trang chủ</Link>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                        <span className="text-white/60">Lọc phim</span>
-                    </div>
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                        <h1 className="text-3xl md:text-5xl font-black tracking-tight flex items-center gap-4">
-                            Lọc Phim Nâng Cao
-                            <SlidersHorizontal className="w-8 h-8 md:w-10 md:h-10 text-primary opacity-50" />
+                <div className="mb-10 md:mb-14 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div>
+                        <div className="flex items-center justify-center md:justify-start gap-2 text-[11px] font-bold text-white/40 uppercase tracking-[0.15em] mb-4">
+                            <Link href="/" className="hover:text-primary transition-colors">Trang chủ</Link>
+                            <ChevronRight className="w-3.5 h-3.5" />
+                            <span className="text-white/80">Khám Phá</span>
+                        </div>
+                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight flex items-center justify-center md:justify-start gap-4">
+                            Duyệt Tìm Nâng Cao
+                            <SlidersHorizontal className="w-10 h-10 md:w-12 md:h-12 text-primary opacity-30" />
                         </h1>
+                        <p className="mt-3 text-white/40 text-sm max-w-lg font-medium">Khám phá hàng ngàn bộ phim đa dạng thể loại và quốc gia. Tối ưu hóa trải nghiệm tìm kiếm của bạn.</p>
                     </div>
                 </div>
 

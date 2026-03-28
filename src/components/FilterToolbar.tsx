@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { SlidersHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
+import EliteSelect from "./EliteSelect";
 
 interface FilterToolbarProps {
     searchParams: {
@@ -32,7 +33,7 @@ export default function FilterToolbar({ searchParams, categories, countries, yea
 
         // Apply updates
         Object.entries(updates).forEach(([k, v]) => {
-            if (v === null || v === "") params.delete(k);
+            if (v === null || v === "" || v === "all") params.delete(k);
             else params.set(k, v);
         });
 
@@ -44,68 +45,71 @@ export default function FilterToolbar({ searchParams, categories, countries, yea
         router.push(url, { scroll: false });
     };
 
+    const typeOptions = [{ name: "Tất cả", slug: "all" }, ...types];
+    const categoryOptions = [{ name: "Tất cả thể loại", slug: "all" }, ...categories];
+    const countryOptions = [{ name: "Tất cả quốc gia", slug: "all" }, ...countries];
+    const yearOptions = [{ name: "Tất cả năm", slug: "all" }, ...years.map(y => ({ name: y, slug: y }))];
+
     return (
-        <div className="sticky top-20 z-30 bg-[#080b12]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-4 md:p-6 mb-10 shadow-2xl">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="sticky top-20 z-[90] bg-[#0c0c14]/90 backdrop-blur-2xl border border-white/10 rounded-[20px] p-5 md:p-6 mb-12 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-5">
                 
                 {/* Type Select */}
-                <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.1em] pl-1">Định dạng</label>
-                    <select 
-                        className="w-full bg-white/5 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:bg-white/10 transition-colors appearance-none cursor-pointer"
-                        value={type || "phim-moi-cap-nhat"}
-                        onChange={(e) => handleFilterChange("type", e.target.value)}
-                    >
-                        {types.map(t => <option key={t.slug} value={t.slug} className="bg-[#080b12]">{t.name}</option>)}
-                    </select>
+                <div className="space-y-1.5 flex flex-col justify-end">
+                    <label className="text-[10px] sm:text-xs font-bold text-white/50 uppercase tracking-[0.08em] pl-1">Định dạng</label>
+                    <EliteSelect
+                        options={typeOptions}
+                        value={type || "all"}
+                        onChange={(value) => handleFilterChange("type", value)}
+                        placeholder="Định dạng"
+                        className="w-full h-11"
+                    />
                 </div>
 
                 {/* Category Select */}
-                <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.1em] pl-1">Thể loại</label>
-                    <select 
-                        className="w-full bg-white/5 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:bg-white/10 transition-colors appearance-none cursor-pointer"
-                        value={category || ""}
-                        onChange={(e) => handleFilterChange("category", e.target.value)}
-                    >
-                        <option value="" className="bg-[#080b12]">Tất cả thể loại</option>
-                        {categories.map(c => <option key={c.slug} value={c.slug} className="bg-[#080b12]">{c.name}</option>)}
-                    </select>
+                <div className="space-y-1.5 flex flex-col justify-end">
+                    <label className="text-[10px] sm:text-xs font-bold text-white/50 uppercase tracking-[0.08em] pl-1">Thể loại</label>
+                    <EliteSelect
+                        options={categoryOptions}
+                        value={category || "all"}
+                        onChange={(value) => handleFilterChange("category", value)}
+                        placeholder="Thể loại"
+                        className="w-full h-11"
+                    />
                 </div>
 
                 {/* Country Select */}
-                <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.1em] pl-1">Quốc gia</label>
-                    <select 
-                        className="w-full bg-white/5 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:bg-white/10 transition-colors appearance-none cursor-pointer"
-                        value={country || ""}
-                        onChange={(e) => handleFilterChange("country", e.target.value)}
-                    >
-                        <option value="" className="bg-[#080b12]">Tất cả quốc gia</option>
-                        {countries.map(c => <option key={c.slug} value={c.slug} className="bg-[#080b12]">{c.name}</option>)}
-                    </select>
+                <div className="space-y-1.5 flex flex-col justify-end">
+                    <label className="text-[10px] sm:text-xs font-bold text-white/50 uppercase tracking-[0.08em] pl-1">Quốc gia</label>
+                    <EliteSelect
+                        options={countryOptions}
+                        value={country || "all"}
+                        onChange={(value) => handleFilterChange("country", value)}
+                        placeholder="Quốc gia"
+                        className="w-full h-11"
+                    />
                 </div>
 
                 {/* Year Select */}
-                <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.1em] pl-1">Năm phát hành</label>
-                    <select 
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary/50 transition-colors appearance-none cursor-pointer"
-                        value={year || ""}
-                        onChange={(e) => handleFilterChange("year", e.target.value)}
-                    >
-                        <option value="" className="bg-[#080b12]">Tất cả năm</option>
-                        {years.map(y => <option key={y} value={y} className="bg-[#080b12]">{y}</option>)}
-                    </select>
+                <div className="space-y-1.5 flex flex-col justify-end">
+                    <label className="text-[10px] sm:text-xs font-bold text-white/50 uppercase tracking-[0.08em] pl-1">Năm phát hành</label>
+                    <EliteSelect
+                        options={yearOptions}
+                        value={year || "all"}
+                        onChange={(value) => handleFilterChange("year", value)}
+                        placeholder="Năm"
+                        className="w-full h-11"
+                    />
                 </div>
 
                 {/* Reset Button */}
-                <div className="flex items-end">
+                <div className="flex items-end col-span-2 lg:col-span-1 pt-2 lg:pt-0">
                     <Link 
                         href="/loc-phim"
-                        className="w-full bg-white/10 hover:bg-white/20 border border-white/5 rounded-xl px-4 py-3 text-sm font-bold text-center transition-all active:scale-95"
+                        className="w-full flex items-center justify-center gap-2 h-11 bg-white/5 hover:bg-white/15 border border-white/10 rounded-xl px-4 text-[13px] md:text-sm font-bold transition-all active:scale-95 group"
                     >
-                        Đặt lại bộ lọc
+                        <SlidersHorizontal className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity" />
+                        Đặt lại
                     </Link>
                 </div>
             </div>
