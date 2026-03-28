@@ -23,8 +23,8 @@ echo "Note: The live site continues spinning..."
 # 1. SETUP SHADOW ENVIRONMENT
 echo "Initializing shadow build directory..."
 mkdir -p "$BUILD_DIR"
-# Fast synchronization: exclude heavy paths to make copy instant
-rsync -a --delete --exclude='node_modules' --exclude='.next' --exclude='.git' "$APP_DIR/" "$BUILD_DIR/"
+# Fast synchronization: exclude heavy paths to make copy instant using native tar
+tar -cf - --exclude='node_modules' --exclude='.next' --exclude='.git' -C "$APP_DIR" . | tar -xf - -C "$BUILD_DIR"
 
 # 2. BUILD IN ISOLATION
 echo "Preparing isolated build..."
@@ -51,8 +51,8 @@ if npm run build; then
         cp .env.local .next/standalone/.env.production
     fi
     
-    # Rsync the validated shadow artifact to Live Environment (Keeps .git pristine)
-    rsync -al --delete --exclude='.git' "$BUILD_DIR/" "$APP_DIR/"
+    # Tar pipe to Hot Swap the validated shadow artifact to Live Environment (Keeps .git pristine)
+    tar -cf - --exclude='.git' -C "$BUILD_DIR" . | tar -xf - -C "$APP_DIR"
     
     # Reload PM2 (0 Downtime instead of 'restart' or 'delete')
     cd "$APP_DIR"
