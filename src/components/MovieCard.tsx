@@ -167,7 +167,7 @@ function MovieCard({
 
     // Backdrop/overlay (ảnh ngang): ưu tiên TMDB (qua CDN, nhanh hơn) → mới dùng source ngoài
     const displayBackdrop = useMemo(() => {
-        const tmdbBackdrop = tmdbBackdropPath ? getTMDBImage(tmdbBackdropPath, "w300") : "";
+        const tmdbBackdrop = tmdbBackdropPath ? getTMDBImage(tmdbBackdropPath, "w500") : "";
         const sourceBackdrop = getBackdropImageUrl(movie);
         return tmdbBackdrop || sourceBackdrop || null;
     }, [movie, tmdbBackdropPath]);
@@ -455,7 +455,7 @@ function OnflixHoverCard({
                                 alt={decodeHtml(movie.name) || movie.slug || "Phim"}
                                 fill
                                 sizes="320px"
-                                quality={55}
+                                quality={72}
                                 className={`object-cover object-top transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
                                 priority
                                 onLoad={() => setImgLoaded(true)}
