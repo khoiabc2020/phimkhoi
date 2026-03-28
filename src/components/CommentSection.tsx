@@ -88,11 +88,13 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
             episodeName,
             content: newComment.trim(),
             rating: rating > 0 ? rating : undefined,
+            parentId: replyingTo || undefined,
         });
 
         if (result.success) {
             setNewComment("");
             setRating(0);
+            setReplyingTo(null);
             fetchComments();
         }
         setSubmitting(false);
@@ -306,6 +308,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                                             } disabled:opacity-50`}
                                     >
                                         <ThumbsUp className="w-4 h-4" />
+                                        {comment.likes > 0 && <span>{comment.likes}</span>}
                                     </button>
                                     <button
                                         onClick={() => handleDislike(comment._id)}
@@ -316,6 +319,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                                             } disabled:opacity-50`}
                                     >
                                         <ThumbsDown className="w-4 h-4" />
+                                        {comment.dislikes > 0 && <span>{comment.dislikes}</span>}
                                     </button>
 
                                     <button

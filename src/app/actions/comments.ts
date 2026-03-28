@@ -62,32 +62,34 @@ export async function getComments(movieSlug: string, limit: number = 20, offset:
     try {
         await dbConnect();
 
-        const comments = await Comment.find({
-            movieSlug,
-            parentId: null, // Only top-level comments
-            isApproved: true,
-        })
-            .sort({ createdAt: -1 })
-            .skip(offset)
-            .limit(limit)
-            .lean();
-
-        // Get reply counts for each comment
-        const commentsWithReplies = await Promise.all(
-            comments.map(async (comment) => {
-                const replyCount = await Comment.countDocuments({
-                    parentId: comment._id,
-                    isApproved: true,
-                });
-                return { ...comment, replyCount };
+        const [comments, total] = await Promise.all([
+            Comment.find({
+                movieSlug,
+                parentId: null,
+                isApproved: true,
             })
-        );
+                .sort({ createdAt: -1 })
+                .skip(offset)
+                .limit(limit)
+                .lean(),
+            Comment.countDocuments({
+                movieSlug,
+                parentId: null,
+                isApproved: true,
+            }),
+        ]);
 
-        const total = await Comment.countDocuments({
-            movieSlug,
-            parentId: null,
-            isApproved: true,
-        });
+        // Get all reply counts in a single query instead of N separate queries
+        const commentIds = comments.map((c) => c._id);
+        const replyCounts = await Comment.aggregate([
+            { $match: { parentId: { $in: commentIds }, isApproved: true } },
+            { $group: { _id: "$parentId", count: { $sum: 1 } } },
+        ]);
+        const replyCountMap = new Map(replyCounts.map((r) => [r._id.toString(), r.count]));
+        const commentsWithReplies = comments.map((c) => ({
+            ...c,
+            replyCount: replyCountMap.get(c._id.toString()) ?? 0,
+        }));
 
         return { success: true, data: commentsWithReplies, total };
     } catch (error) {
