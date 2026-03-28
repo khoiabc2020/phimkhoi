@@ -36,6 +36,7 @@ export async function getTMDBDataForCard(
                 poster_path: movie.poster_path,
                 vote_average: movie.vote_average,
                 backdrop_path: movie.backdrop_path,
+                overview: movie.overview,
             };
         }
         return null;

@@ -55,12 +55,12 @@ const FEATURED_ACTORS = [
     { name: "Triệu Lộ Tư", role: "Thần Ẩn", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/y82wmaDqTdXqvtasb4kxAIuT44U.jpg" },
     { name: "Cung Tuấn", role: "An Lạc Truyện", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/rtjBdEF61NySmDDnoDgAtuclAJJ.jpg" },
     { name: "Ngu Thư Hân", role: "Thương Lan Quyết", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/xQ2Bur9AEy0IX3qHMvLbr7tmTyD.jpg" },
-    { name: "Dương Tử", role: "Trường Tương Tư", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/uS80R3jOnm9Fm8k6P9uT8H6zF7x.jpg" },
+    { name: "Dương Tử", role: "Trường Tương Tư", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/3b8qY8UqT2t4n95JjP1r74jQv2D.jpg" },
     { name: "Hứa Khải", role: "Kháng Chiến Bút Mặc", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/n555fWjI0uVscG6S5Y0XnB7R5P0.jpg" },
-    { name: "Cúc Tịnh Y", role: "Tiên Kiếm Kỳ Hiệp 4", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/jFf6pC5zS5s6E5vXf7G9u6W2zRr.jpg" },
-    { name: "Trần Tinh Húc", role: "Người Phiên Dịch", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/pS7m1Gq7b5qWf0z9h8M6p2uX4u.jpg" },
-    { name: "Trần Triết Viễn", role: "Vụng Trộm Không Thể Giấu", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/pS7m1Gq7b5qWf0z9h8M6p2uX4u.jpg" },
-    { name: "Vương Tử Kỳ", role: "Tình Yêu Thôi Mà", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/uS80R3jOnm9Fm8k6P9uT8H6zF7x.jpg" },
+    { name: "Cúc Tịnh Y", role: "Tiên Kiếm Kỳ Hiệp 4", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/mJk3p1q4x4y7M2m9a0V4Q6v9a4t.jpg" },
+    { name: "Trần Tinh Húc", role: "Người Phiên Dịch", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/2g2K3S8H4Y9Z9x4r0x2w7S6R5l4.jpg" },
+    { name: "Trần Triết Viễn", role: "Vụng Trộm Không Thể Giấu", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/7Y5t9Y5wA4E8O9X5dZ6A8K8D8D.jpg" },
+    { name: "Vương Tử Kỳ", role: "Tình Yêu Thôi Mà", image: "https://image.tmdb.org/t/p/w600_and_h900_bestv2/9O3wQ9Q4y5Q8R1M4g8P3R9J1Y8t.jpg" },
 ];
 
 const SECTION_CONFIG: CountryHomeSectionConfig[] = [
@@ -102,16 +102,16 @@ const HERO_FALLBACK_META: Record<string, { name: string; year?: number }> = {
 };
 
 const HERO_FALLBACK_DESC: Record<string, string> = {
-    "duong-cung-ky-an-thanh-vu-phong-minh": "Vụ án cung đình bí ẩn, quyền lực và những lời thề bị che giấu.",
-    "xin-chao-1983": "Chuyện đời, chuyện người và những lựa chọn đổi thay số phận.",
-    "con-ra-the-thong-gi-nua": "Hài hước, lãng mạn và những cú twist bất ngờ.",
-    "bach-nguyet-phan-tinh": "Mối duyên định mệnh dưới ánh trăng.",
-    "bui-hoa-hong": "Danh vọng, tình yêu và bí mật bị vùi lấp.",
-    "dai-mong-quy-ly": "Giang hồ dậy sóng, anh hùng trỗi dậy giữa mộng và thực.",
-    "giang-ho-da-vu-thap-nien-dang": "Ân oán tái hiện trong đêm mưa dài.",
-    "mac-nhan-tang-kieu": "Bí mật chôn vùi và hành trình tìm lại công bằng.",
-    "ngoc-minh-tra-cot": "Báo thù, tình thân và sự thật cuối cùng.",
-    "truc-ngoc": "Một mối tình cổ trang đầy định mệnh.",
+    "duong-cung-ky-an-thanh-vu-phong-minh": "Tại cấm thành nơi quyền lực che mờ lý trí, một vụ án tàn khốc bắt đầu chuỗi ngày đẫm máu. Những lời thề trung thành bị xé nát, để lộ một bí mật động trời có thể kéo theo sự sụp đổ của cả một vương triều.",
+    "xin-chao-1983": "Một bức tranh hoài niệm tuyệt đẹp đưa người xem trở về những con ngõ nhỏ của năm 1983. Nơi đó, những mảnh đời đan xen vào nhau, cùng khóc, cùng cười và cùng trăn trở giữa sức mạnh nghiệt ngã của thời đại và những lựa chọn thay đổi số phận.",
+    "con-ra-the-thong-gi-nua": "Từ những hiểu lầm chồng chất đến loạt tình huống 'dở khóc dở cười', mối tình tay ba oan gia ngõ hẹp này không chỉ mang đến tràng cười sảng khoái mà còn giấu giếm những cú twist lãng mạn khiến trái tim người xem lỡ nhịp.",
+    "bach-nguyet-phan-tinh": "Dưới ánh trăng dịu dàng của đêm Nguyên Tiêu, một mối duyên định mệnh vắt ngang hàng thu kỷ được viết tiếp. Giữa tiên giới và phàm trần, tình yêu của họ phải trải qua muôn vàn kiếp nạn sinh tử mới có hi vọng đoàn tụ.",
+    "bui-hoa-hong": "Trong ánh đèn rực rỡ của bến Thượng Hải hoa lệ, danh vọng và tình yêu là những quân bài rủi ro nhất. Một bông hồng rực lửa vùng lên từ bùn lầy, dùng trí thông minh thao túng giới tài phiệt để trả thù những kẻ đã tước đoạt cuộc sống của cô.",
+    "dai-mong-quy-ly": "Trong thời loạn lạc khi mà ranh giới giữa chính và tà bị lu mờ, một nam tử hán lang bạt giang hồ gánh trên vai nợ nước thù nhà. Giữa giấc mộng công danh và sự tàn khốc của thực tại, liệu anh hùng có thể tìm thấy lối đi cho riêng mình?",
+    "giang-ho-da-vu-thap-nien-dang": "Mười năm ân oán nhuộm máu giang hồ, tái hiện sống động trong một đêm mưa bão kéo dài đằng đẵng. Đao kiếm vô tình nhắm thẳng vào nhau, cắt đứt tình huynh đệ từng đồng cam cộng khổ.",
+    "mac-nhan-tang-kieu": "Ẩn sau vẻ ngoài kiều diễm là một sát thủ lạnh lùng chưa từng biết đến sợ hãi. Hành trình đi tìm công lý của nàng chứa đầy rẫy sự dối trá, cạm bẫy và một cuộc tương phùng oan nghiệt với kẻ thù không đội trời chung.",
+    "ngoc-minh-tra-cot": "Cuộc chiến sinh tồn khốc liệt giữa các thế lực gia tộc hùng mạnh. Những giọt nước mắt vỡ vụn xen lẫn âm mưu thâm độc hòng chiếm đoạt quyền lực, nơi tình thâm chỉ là lớp vỏ bọc hoàn hảo cho sự phản bội.",
+    "truc-ngoc": "Bản thiên tình ca bi tráng thời cổ đại về hai tâm hồn tự do bị trói buộc bởi vận mệnh quốc gia. Tình yêu mãnh liệt của họ giống như viên ngọc quý giữa biển lửa, sáng rực rỡ tuyệt đẹp nhưng lại mong manh dễ vỡ."
 };
 
 function hasRealDescription(value: string) {

@@ -39,7 +39,10 @@ export const getMoviesFromCache = async (
             : normalizedItems;
         const cleanItems = sanitizeMovieList(filteredItems, { limit: filteredItems.length || 1 });
         const totalItems = cleanItems.length;
-        const totalPages = Math.ceil(totalItems / limit);
+        
+        // VIRTUAL PAGINATION: Force UI to display a large number of pages so fallback can trigger
+        const minimumVirtualPages = 200;
+        const totalPages = Math.max(Math.ceil(totalItems / limit), minimumVirtualPages);
         const startIndex = (page - 1) * limit;
         const paginatedItems = cleanItems.slice(startIndex, startIndex + limit);
         if (paginatedItems.length === 0) return null;
@@ -96,12 +99,16 @@ export const getMoviesByFilterFromCache = async (
             : normalizedMovies;
         const cleanMovies = sanitizeMovieList(filteredMovies, { limit });
         const totalItems = Math.max(cleanMovies.length, totalDocCount);
+        
+        // VIRTUAL PAGINATION: Allow fallback fetching beyond local limit
+        const minimumVirtualPages = 200;
+        const totalPages = Math.max(Math.ceil(totalItems / limit), minimumVirtualPages);
 
         return {
             items: cleanMovies,
             pagination: {
                 totalItems,
-                totalPages: Math.ceil(totalItems / limit),
+                totalPages,
                 currentPage: page,
                 totalItemsPerPage: limit
             }

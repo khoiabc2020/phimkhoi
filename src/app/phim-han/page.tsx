@@ -90,11 +90,11 @@ const HERO_FALLBACK_META: Record<string, { name: string; year?: number }> = {
 };
 
 const HERO_FALLBACK_DESC: Record<string, string> = {
-    "nghe-thuat-lua-doi-cua-sarah": "Một câu chuyện trào phúng về danh vọng, lừa dối và cơ hội làm lại.",
-    "khi-cuoc-doi-cho-ban-qua-quyt": "Những khoảnh khắc chữa lành và mối liên kết bất ngờ.",
-    "tieng-yeu-nay-anh-dich-duoc-khong": "Tình yêu, hiểu lầm và hành trình trưởng thành.",
-    "ban-trai-theo-yeu-cau": "Tình yêu hợp đồng nhưng cảm xúc là thật.",
-    "trao-em-ca-vu-tru": "Gia đình, tình yêu và một khởi đầu mới dưới cùng mái nhà.",
+    "nghe-thuat-lua-doi-cua-sarah": "Lạc vào một ván bài vương quyền của danh lợi và những lời nói dối, Sarah – một thiên tài xảo quyệt với trái tim nguội lạnh – phải luồn lách qua hàng loạt cạm bẫy sắc lẹm để sống sót giữa giới tinh hoa phức tạp, nơi không một ai có thể hoàn toàn tin tưởng.",
+    "khi-cuoc-doi-cho-ban-qua-quyt": "Lấy bối cảnh giữa những làn gió biển Jeju mặn mòi của thập niên 1950, bức tranh đầy tính trữ tình này kể về tình yêu và định mệnh ngoạn mục của Ae Soon – một cô gái nổi loạn, đầy nghị lực – và sự bảo vệ âm thầm của chàng trai Gwan Shik trong một thế giới đầy biến động.",
+    "tieng-yeu-nay-anh-dich-duoc-khong": "Cuộc chạm trán định mệnh giữa một ngôi sao vươn tầm thế giới và cô nàng phiên dịch viên đa nghi. Giữa những bất đồng về văn hóa và rào cản thế giới quan, cả hai dần tìm thấy nhau, phá vỡ vỏ bọc cứng nhắc để đón nhận một tình yêu vừa hài hước vừa lãng mạn.",
+    "ban-trai-theo-yeu-cau": "Một hợp đồng hôn nhân giả tưởng kỳ quặc bắt đầu khi dịch vụ “bạn trai hẹn giờ” được kích hoạt. Những nụ hôn giả vờ, ánh mắt gượng gạo và cả những xung đột đã từ từ nhường chỗ cho những rung động chân thật nhất mà ngay cả những trái tim sắt đá cũng không thể chối từ.",
+    "trao-em-ca-vu-tru": "Cách mặt đất hàng vạn dặm, nơi bóng đen vũ trụ bao trùm, một chuyện tình lãng mạn vĩ đại chưa từng có bắt đầu. Một nữ phi hành gia dũng cảm và một chuyên gia vũ trụ cùng nhau vượt qua muôn vàn bí ẩn nơi ngân hà, gửi gắm tình yêu vô tận giữa những vì sao tĩnh lặng.",
 };
 
 function hasRealDescription(value: string) {

@@ -50,6 +50,22 @@ function isTrailerBadge(value?: string) {
     );
 }
 
+function hasRealDescription(value?: string) {
+    if (!value) return false;
+    const normalized = String(value)
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim();
+
+    return Boolean(
+        normalized &&
+        !normalized.includes("dang cap nhat noi dung") &&
+        !normalized.includes("dang cap nhat") &&
+        normalized.length > 10
+    );
+}
+
 function MovieCard({ 
     movie, 
     orientation = 'portrait',
@@ -358,6 +374,7 @@ function MovieCard({
                         <AnimatePresence>
                             <OnflixHoverCard
                                 movie={movie}
+                                tmdbData={tmdbData}
                                 position={position}
                                 displayBackdrop={displayBackdrop}
                                 orientation={orientation}
@@ -375,6 +392,7 @@ function MovieCard({
 
 function OnflixHoverCard({
     movie,
+    tmdbData,
     position,
     displayBackdrop,
     orientation,
@@ -382,6 +400,7 @@ function OnflixHoverCard({
     onMouseLeave,
 }: {
     movie: Movie;
+    tmdbData?: any;
     position: { top: number; left: number; width: number; rectTop?: number; innerHeight?: number; rectHeight?: number };
     displayBackdrop: string | null;
     orientation: 'portrait' | 'landscape';
@@ -520,11 +539,18 @@ function OnflixHoverCard({
                         )}
 
                         {/* Short description to avoid empty-looking bottom area */}
-                        {movie.content && (
-                            <p className="text-[12px] text-white/45 line-clamp-2 leading-relaxed">
-                                {decodeHtml(movie.content).replace(/<[^>]+>/g, "")}
-                            </p>
-                        )}
+                        {(() => {
+                            const desc = hasRealDescription(movie.content)
+                                ? movie.content
+                                : tmdbData?.overview;
+                            if (!desc) return null;
+                            const plainText = decodeHtml(desc).replace(/<[^>]+>/g, "");
+                            return (
+                                <p className="text-[12px] text-white/45 line-clamp-2 leading-relaxed" title={plainText}>
+                                    {plainText}
+                                </p>
+                            );
+                        })()}
                     </div>
                 </div>
             </div>

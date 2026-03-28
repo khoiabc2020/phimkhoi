@@ -280,6 +280,7 @@ const enrichMoviesWithTMDB = async (movies: Movie[], maxItems = 18): Promise<Mov
                         origin_country: (tmdb as any).origin_country,
                         release_date: (tmdb as any).release_date,
                         first_air_date: (tmdb as any).first_air_date,
+                        overview: (tmdb as any).overview,
                     },
                 } as Movie);
             } catch {
