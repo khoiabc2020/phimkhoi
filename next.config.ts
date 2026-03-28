@@ -24,7 +24,6 @@ const config = (phase: string): NextConfig => {
         static: 1800,
       },
       workerThreads: false,
-      cpus: 1,
     },
     typescript: {
       ignoreBuildErrors: true,

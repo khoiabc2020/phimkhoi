@@ -19,9 +19,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const category = categories.find(c => c.slug === slug);
     const categoryName = category?.name || slug.replace(/-/g, " ");
 
+    const canonical = `https://khoiphim.org/the-loai/${slug}`;
     return {
-        title: `Phim ${categoryName} - KHOIPHIM`,
-        description: `Xem phim ${categoryName} mới nhất tại KHOIPHIM.`,
+        title: `Phim ${categoryName} Vietsub HD Mới Nhất | KHOIPHIM`,
+        description: `Xem phim ${categoryName} vietsub, thuyết minh, lồng tiếng mới nhất chất lượng cao miễn phí tại KHOIPHIM. Cập nhật hàng ngày.`,
+        alternates: { canonical },
+        openGraph: {
+            title: `Phim ${categoryName} Vietsub HD | KHOIPHIM`,
+            description: `Tuyển tập phim ${categoryName} hay nhất, mới nhất - vietsub HD miễn phí.`,
+            url: canonical,
+            type: "website",
+        },
     };
 }
 

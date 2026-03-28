@@ -19,9 +19,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const country = countries.find(c => c.slug === slug);
     const countryName = country?.name || slug.replace(/-/g, " ");
 
+    const canonical = `https://khoiphim.org/quoc-gia/${slug}`;
     return {
-        title: `Phim ${countryName} - KHOIPHIM`,
-        description: `Xem phim ${countryName} mới nhất tại KHOIPHIM.`,
+        title: `Phim ${countryName} Vietsub HD Mới Nhất | KHOIPHIM`,
+        description: `Xem phim ${countryName} vietsub, thuyết minh chất lượng cao miễn phí tại KHOIPHIM. Hàng ngàn bộ phim ${countryName} hay nhất cập nhật hàng ngày.`,
+        alternates: { canonical },
+        openGraph: {
+            title: `Phim ${countryName} Vietsub HD | KHOIPHIM`,
+            description: `Tuyển tập phim ${countryName} hay nhất, mới nhất - vietsub HD miễn phí tại KHOIPHIM.`,
+            url: canonical,
+            type: "website",
+        },
     };
 }
 

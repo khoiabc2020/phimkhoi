@@ -143,6 +143,33 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://i.ytimg.com" />
         <link rel="dns-prefetch" href="https://www.youtube.com" />
         <link rel="dns-prefetch" href="https://i.ytimg.com" />
+        {/* WebSite + Organization schema — giúp Google hiểu site, kích hoạt Search sitelink */}
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "WebSite",
+              "@id": "https://khoiphim.org/#website",
+              "url": "https://khoiphim.org",
+              "name": "KHOIPHIM",
+              "description": "Xem phim online chất lượng cao vietsub, lồng tiếng, thuyết minh. Miễn phí.",
+              "inLanguage": "vi",
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": { "@type": "EntryPoint", "urlTemplate": "https://khoiphim.org/tim-kiem?keyword={search_term_string}" },
+                "query-input": "required name=search_term_string"
+              }
+            },
+            {
+              "@type": "Organization",
+              "@id": "https://khoiphim.org/#organization",
+              "name": "KHOIPHIM",
+              "url": "https://khoiphim.org",
+              "logo": { "@type": "ImageObject", "url": "https://khoiphim.org/logo.png", "width": 512, "height": 512 },
+              "sameAs": ["https://khoiphim.org"]
+            }
+          ]
+        }) }} />
       </head>
       <body
         className={`${interSans.variable} ${beVietnamPro.variable} ${logoFont.variable} ${outfitFont.variable} antialiased pb-20 lg:pb-0 font-sans`}

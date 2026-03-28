@@ -5,16 +5,35 @@ import MovieModel from "@/models/Movie";
 
 const BASE_URL = "https://khoiphim.org";
 
+const ALL_CATEGORIES = [
+  "hanh-dong","tinh-cam","hai-huoc","co-trang","tam-ly","kinh-di","the-thao",
+  "vien-tuong","phieu-luu","hoat-hinh","hoc-duong","chien-tranh","gia-dinh",
+  "vo-thuat","bi-an","khoa-hoc","am-nhac","lich-su","phim-18",
+];
+
+const ALL_COUNTRIES = [
+  "han-quoc","trung-quoc","nhat-ban","my","thai-lan","viet-nam","phap","anh",
+  "hong-kong","an-do","dai-loan","canada","uc","duc","y","tay-ban-nha",
+];
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${BASE_URL}/`, changeFrequency: "hourly", priority: 1 },
     { url: `${BASE_URL}/danh-sach/phim-moi`, changeFrequency: "hourly", priority: 0.9 },
     { url: `${BASE_URL}/danh-sach/phim-bo`, changeFrequency: "hourly", priority: 0.85 },
     { url: `${BASE_URL}/danh-sach/phim-le`, changeFrequency: "hourly", priority: 0.85 },
-    { url: `${BASE_URL}/the-loai/hanh-dong`, changeFrequency: "daily", priority: 0.75 },
-    { url: `${BASE_URL}/the-loai/tinh-cam`, changeFrequency: "daily", priority: 0.75 },
-    { url: `${BASE_URL}/quoc-gia/han-quoc`, changeFrequency: "daily", priority: 0.72 },
-    { url: `${BASE_URL}/quoc-gia/trung-quoc`, changeFrequency: "daily", priority: 0.72 },
+    { url: `${BASE_URL}/danh-sach/hoat-hinh`, changeFrequency: "daily", priority: 0.8 },
+    { url: `${BASE_URL}/danh-sach/phim-sap-chieu`, changeFrequency: "daily", priority: 0.75 },
+    ...ALL_CATEGORIES.map(slug => ({
+      url: `${BASE_URL}/the-loai/${slug}`,
+      changeFrequency: "daily" as const,
+      priority: 0.75,
+    })),
+    ...ALL_COUNTRIES.map(slug => ({
+      url: `${BASE_URL}/quoc-gia/${slug}`,
+      changeFrequency: "daily" as const,
+      priority: 0.72,
+    })),
   ];
 
   try {

@@ -42,47 +42,48 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const movie: any = data?.movie;
     if (!movie) return { title: "Không tìm thấy phim - KHOIPHIM" };
 
-    // Giới hạn description để SEO tốt hơn
     const plainContent = movie.content ? movie.content.replace(/<[^>]+>/g, '').trim() : "";
-    const desc = plainContent ? plainContent.substring(0, 160) + '...' : `Xem phim ${movie.name} chất lượng cao tại KHOIPHIM.`;
     const poster = getPosterImageUrl(movie) || getBackdropImageUrl(movie) || "";
     const url = `https://khoiphim.org/phim/${slug}`;
-    
-    // Tạo keywords từ thể loại và tên phim
-    const categories = Array.isArray(movie.category) ? movie.category.map((c: any) => c.name).join(", ") : "";
-    const keywords = [movie.name, movie.origin_name, "xem phim", "phim online", "vietsub", categories].filter(Boolean).join(", ");
+    const year = movie.year ? ` (${movie.year})` : "";
+    const categoryNames = Array.isArray(movie.category) ? movie.category.map((c: any) => c.name) : [];
+    const catStr = categoryNames.slice(0, 3).join(", ");
+    const isTv = movie.type === "series" || movie.type === "hoathinh";
+    const epInfo = movie.episode_current && movie.episode_current !== "0" ? ` - ${movie.episode_current}` : "";
+
+    // Title: khớp đúng intent tìm kiếm "xem [tên phim] vietsub"
+    const title = `Xem ${movie.name || "Phim"}${year} Vietsub HD${epInfo} | KHOIPHIM`;
+
+    // Description: 155-160 ký tự, chứa từ khóa quan trọng ở đầu
+    const descBase = plainContent.slice(0, 120);
+    const desc = descBase
+        ? `Xem phim ${movie.name}${year} vietsub miễn phí HD. ${descBase}...`
+        : `Xem phim ${movie.name}${year} vietsub, thuyết minh, lồng tiếng chất lượng cao${catStr ? ` - ${catStr}` : ""} tại KHOIPHIM. Hoàn toàn miễn phí.`;
+
+    const keywords = [
+        movie.name, movie.origin_name,
+        `xem phim ${movie.name}`, `${movie.name} vietsub`, `${movie.name} thuyết minh`,
+        "xem phim online", "phim vietsub HD", catStr,
+    ].filter(Boolean).join(", ");
 
     return {
-        title: `${movie.name || "Phim"} - Xem phim tại KHOIPHIM`,
-        description: desc,
-        keywords: keywords,
-        alternates: {
-            canonical: url,
-        },
-        robots: {
-            index: true,
-            follow: true,
-            "max-image-preview": "large",
-        },
+        title,
+        description: desc.slice(0, 160),
+        keywords,
+        alternates: { canonical: url },
+        robots: { index: true, follow: true, "max-image-preview": "large" },
         openGraph: {
-            title: `${movie.name} | ${movie.origin_name} | KHOIPHIM`,
-            description: desc,
+            title: `${movie.name}${year} | ${movie.origin_name || ""} | Xem Vietsub HD | KHOIPHIM`,
+            description: desc.slice(0, 160),
             url,
-            images: [
-                {
-                    url: poster,
-                    width: 800,
-                    height: 1200,
-                    alt: movie.name,
-                }
-            ],
-            type: "video.movie",
+            images: [{ url: poster, width: 800, height: 1200, alt: movie.name }],
+            type: isTv ? "video.tv_show" : "video.movie",
             siteName: "KHOIPHIM",
         },
         twitter: {
             card: "summary_large_image",
-            title: `${movie.name} | KHOIPHIM`,
-            description: desc,
+            title,
+            description: desc.slice(0, 160),
             images: [poster],
         },
     };
@@ -287,20 +288,23 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                     : "Đang cập nhật";
     const displayEpisodeTotal = episodeTotalValue > 0 ? episodeTotalValue : "?";
 
+    const movieImageUrl = sourcePoster || sourceThumb || tmdbBackdrop;
+    const watchUrl = `https://khoiphim.org/xem-phim/${movie?.slug}/${serverData?.[0]?.slug || 'tap-1'}`;
+    const ratingCount = trustedTmdbDetails?.vote_count || 100;
+    const firstCategory = movie?.category?.[0];
+
     const jsonLd = {
         "@context": "https://schema.org",
         "@type": type === 'tv' ? "TVSeries" : "Movie",
         "name": movie?.name,
-        "alternativeHeadline": movie?.origin_name,
-        "image": sourcePoster || sourceThumb || tmdbBackdrop,
+        "alternateName": movie?.origin_name,
+        "image": movieImageUrl,
         "description": movie?.content?.replace(/<[^>]+>/g, ''),
         "dateCreated": movie?.year?.toString(),
         "genre": movie?.category?.map((c: any) => c.name) || [],
         "contentRating": "TV-MA",
-        "actor": movie?.actor?.map((a: string) => ({
-            "@type": "Person",
-            "name": a
-        })) || [],
+        "inLanguage": "vi",
+        "actor": movie?.actor?.slice(0, 10).map((a: string) => ({ "@type": "Person", "name": a })) || [],
         "director": {
             "@type": "Person",
             "name": movie?.director?.[0] || trustedTmdbDetails?.credits?.crew?.find((c: any) => c.job === "Director")?.name || "Đang cập nhật"
@@ -309,34 +313,55 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
             "@type": "AggregateRating",
             "ratingValue": rating,
             "bestRating": "10",
-            "ratingCount": "100"
+            "ratingCount": ratingCount,
         },
         "potentialAction": {
             "@type": "WatchAction",
             "target": {
                 "@type": "EntryPoint",
-                "urlTemplate": `https://khoiphim.org/xem-phim/${movie?.slug}/${serverData?.[0]?.slug || 'tap-1'}`,
+                "urlTemplate": watchUrl,
                 "actionPlatform": [
                     "http://schema.org/DesktopWebPlatform",
                     "http://schema.org/MobileWebPlatform",
-                    "http://schema.org/AndroidPlatform",
                     "http://schema.org/IOSPlatform"
                 ]
             },
-            "expectsAcceptanceOf": {
-                "@type": "Offer",
-                "category": "free"
-            }
+            "expectsAcceptanceOf": { "@type": "Offer", "category": "free" }
         }
+    };
+
+    // VideoObject schema — giúp xuất hiện trong Google Video carousel
+    const videoLd = {
+        "@context": "https://schema.org",
+        "@type": "VideoObject",
+        "name": `Xem phim ${movie?.name} Vietsub HD`,
+        "description": movie?.content?.replace(/<[^>]+>/g, '').slice(0, 300) || `Xem phim ${movie?.name} vietsub miễn phí tại KHOIPHIM.`,
+        "thumbnailUrl": movieImageUrl,
+        "uploadDate": movie?.year ? `${movie.year}-01-01` : new Date().toISOString().split('T')[0],
+        "contentUrl": watchUrl,
+        "embedUrl": watchUrl,
+        "inLanguage": "vi",
+        "isAccessibleForFree": true,
+        "regionsAllowed": "VN",
+    };
+
+    // BreadcrumbList — Google hiện breadcrumb trong kết quả tìm kiếm
+    const breadcrumbLd = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Trang chủ", "item": "https://khoiphim.org" },
+            ...(firstCategory ? [{ "@type": "ListItem", "position": 2, "name": `Phim ${firstCategory.name}`, "item": `https://khoiphim.org/the-loai/${firstCategory.slug}` }] : []),
+            { "@type": "ListItem", "position": firstCategory ? 3 : 2, "name": movie?.name, "item": `https://khoiphim.org/phim/${movie?.slug}` },
+        ]
     };
 
     return (
         <main className="min-h-screen pb-20 bg-transparent">
-            {/* JSON-LD for SEO */}
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-            />
+            {/* JSON-LD Structured Data */}
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(videoLd) }} />
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
             {/* Hero Section (Onflix-like: backdrop 16:9 on right, left side darker) */}
             <div className="relative w-full pt-20 sm:pt-28 md:pt-32 pb-8 px-4 md:px-8 lg:pl-24 lg:pr-12 flex items-end min-h-[500px] sm:min-h-[560px] overflow-hidden">
                 {/* Base dark layer */}
