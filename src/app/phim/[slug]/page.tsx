@@ -196,8 +196,9 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     const normalizedMedia = resolveMovieImages(movie);
     const rawThumb = String(normalizedMedia.thumb_url || movie?.thumb_url || "").trim();
     const rawPoster = String(normalizedMedia.poster_url || movie?.poster_url || "").trim();
+    // Chấp nhận cả "unknown" — nhất quán với getBackdropImageUrl/resolveMovieImages
     const sourceThumb =
-        rawThumb && detectOrientation(rawThumb) === "landscape"
+        rawThumb && detectOrientation(rawThumb) !== "portrait"
             ? getImageUrl(rawThumb)
             : "";
     const sourcePoster =
