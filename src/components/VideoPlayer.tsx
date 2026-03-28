@@ -108,6 +108,9 @@ export default function VideoPlayer({
     const [fallbackIframe, setFallbackIframe] = useState(false);
     const [showSkipAd, setShowSkipAd] = useState(false);
     const [useProxy, setUseProxy] = useState(false); // New state to trigger proxy
+    // Swipe-to-seek state (mobile gesture)
+    const [seekIndicator, setSeekIndicator] = useState<{ delta: number; side: "left" | "right" } | null>(null);
+    const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
 
     useEffect(() => {
         setFallbackIframe(false);
@@ -498,6 +501,46 @@ export default function VideoPlayer({
                 document.addEventListener("keydown", handleKeydown);
                 (artInstance.current as any).handleKeydown = handleKeydown;
 
+                // Mobile swipe-to-seek: horizontal swipe on player → tua video
+                // Mỗi 30px ngang = ±10 giây; vuốt dọc >45° sẽ bị bỏ qua (scroll)
+                const playerEl = artRef.current;
+                if (playerEl) {
+                    const onTouchStart = (e: TouchEvent) => {
+                        const t = e.touches[0];
+                        touchStartRef.current = { x: t.clientX, y: t.clientY, time: Date.now() };
+                    };
+                    const onTouchMove = (e: TouchEvent) => {
+                        if (!touchStartRef.current || !art) return;
+                        const t = e.touches[0];
+                        const dx = t.clientX - touchStartRef.current.x;
+                        const dy = t.clientY - touchStartRef.current.y;
+                        // Chỉ xử lý nếu góc vuốt chủ yếu là ngang (|dx| > |dy| * 1.2)
+                        if (Math.abs(dx) < Math.abs(dy) * 1.2) return;
+                        if (Math.abs(dx) < 15) return; // dead zone nhỏ
+                        e.preventDefault(); // ngăn scroll khi vuốt ngang
+                        const seekDelta = Math.round((dx / 30) * 10); // 30px = 10s
+                        setSeekIndicator({ delta: seekDelta, side: dx > 0 ? "right" : "left" });
+                    };
+                    const onTouchEnd = (e: TouchEvent) => {
+                        if (!touchStartRef.current || !art) { touchStartRef.current = null; return; }
+                        const t = e.changedTouches[0];
+                        const dx = t.clientX - touchStartRef.current.x;
+                        const dy = t.clientY - touchStartRef.current.y;
+                        const dt = Date.now() - touchStartRef.current.time;
+                        touchStartRef.current = null;
+                        setSeekIndicator(null);
+                        if (Math.abs(dx) < Math.abs(dy) * 1.2) return;
+                        if (Math.abs(dx) < 20 || dt > 800) return; // tránh tap thường
+                        const seekDelta = Math.round((dx / 30) * 10);
+                        if (seekDelta === 0) return;
+                        art.seek = Math.max(0, Math.min(art.duration, art.currentTime + seekDelta));
+                    };
+                    playerEl.addEventListener("touchstart", onTouchStart, { passive: true });
+                    playerEl.addEventListener("touchmove", onTouchMove, { passive: false });
+                    playerEl.addEventListener("touchend", onTouchEnd, { passive: true });
+                    (artInstance.current as any).touchHandlers = { playerEl, onTouchStart, onTouchMove, onTouchEnd };
+                }
+
             } catch (err) {
                 console.error("ArtPlayer init error:", err);
             }
@@ -512,6 +555,12 @@ export default function VideoPlayer({
             }
             if (artInstance.current && (artInstance.current as any).forceHistorySave) {
                 window.removeEventListener("beforeunload", (artInstance.current as any).forceHistorySave);
+            }
+            if (artInstance.current && (artInstance.current as any).touchHandlers) {
+                const { playerEl, onTouchStart, onTouchMove, onTouchEnd } = (artInstance.current as any).touchHandlers;
+                playerEl.removeEventListener("touchstart", onTouchStart);
+                playerEl.removeEventListener("touchmove", onTouchMove);
+                playerEl.removeEventListener("touchend", onTouchEnd);
             }
             if (art) {
                 art.destroy(false);
@@ -567,6 +616,23 @@ export default function VideoPlayer({
                         <p className="text-[#8FA7C5] text-xs font-bold uppercase tracking-[0.2em] animate-pulse">KHOIPHIM Player</p>
                     </div>
                 </div>
+
+                {/* Swipe-to-seek indicator — hiện khi đang vuốt trên mobile */}
+                {seekIndicator && (
+                    <div
+                        className={`absolute inset-y-0 flex items-center justify-center pointer-events-none z-[9998] transition-opacity duration-150 ${seekIndicator.side === "left" ? "left-0 w-1/2" : "right-0 w-1/2"}`}
+                        style={{ background: seekIndicator.side === "left" ? "linear-gradient(to right, rgba(0,0,0,0.45), transparent)" : "linear-gradient(to left, rgba(0,0,0,0.45), transparent)" }}
+                    >
+                        <div className="flex flex-col items-center gap-1.5 px-6 py-4 rounded-2xl bg-black/50 backdrop-blur-sm border border-white/10">
+                            <span className="text-white text-2xl font-black">
+                                {seekIndicator.side === "left" ? "◀◀" : "▶▶"}
+                            </span>
+                            <span className="text-white text-sm font-bold">
+                                {seekIndicator.delta > 0 ? "+" : ""}{seekIndicator.delta}s
+                            </span>
+                        </div>
+                    </div>
+                )}
                 {showSkipAd && (
                     <button
                         onClick={() => {
