@@ -26,7 +26,8 @@ export default function internalImageLoader({
         const q = quality || 85;
         // Map width to standard breakpoints to improve cache hit rate
         const w = width <= 400 ? 400 : width <= 800 ? 800 : width <= 1200 ? 1200 : width <= 1920 ? 1920 : 2560;
-        return `/api/img-proxy?url=${encodeURIComponent(absoluteUrl)}&w=${w}&q=${q}`;
+        // Use global image CDN (wsrv.nl) to completely offload VPS CPU
+        return `https://wsrv.nl/?url=${encodeURIComponent(absoluteUrl)}&w=${w}&q=${q}&output=webp`;
     }
 
     return src;
