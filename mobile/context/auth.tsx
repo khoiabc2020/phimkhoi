@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useRef, useCallback, Re
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CONFIG } from '@/constants/config';
 import { router } from 'expo-router';
+import { apiFetch } from '@/lib/apiFetch';
 
 interface User {
     id: string;
@@ -70,10 +71,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const syncAllWithToken = async (t: string) => {
         try {
             const [histRes, favRes, wlRes, plRes] = await Promise.allSettled([
-                fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/history`, { headers: { Authorization: `Bearer ${t}` } }),
-                fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/favorites`, { headers: { Authorization: `Bearer ${t}` } }),
-                fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/watchlist`, { headers: { Authorization: `Bearer ${t}` } }),
-                fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/playlists`, { headers: { Authorization: `Bearer ${t}` } }),
+                apiFetch(`${CONFIG.BACKEND_URL}/api/mobile/user/history`, { headers: { Authorization: `Bearer ${t}` } }),
+                apiFetch(`${CONFIG.BACKEND_URL}/api/mobile/user/favorites`, { headers: { Authorization: `Bearer ${t}` } }),
+                apiFetch(`${CONFIG.BACKEND_URL}/api/mobile/user/watchlist`, { headers: { Authorization: `Bearer ${t}` } }),
+                apiFetch(`${CONFIG.BACKEND_URL}/api/mobile/user/playlists`, { headers: { Authorization: `Bearer ${t}` } }),
             ]);
 
             const updates: Partial<User> = {};
@@ -156,7 +157,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const syncFavorites = useCallback(async () => {
         if (!tokenRef.current) return;
         try {
-            const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/favorites`, {
+            const res = await apiFetch(`${CONFIG.BACKEND_URL}/api/mobile/user/favorites`, {
                 headers: { Authorization: `Bearer ${tokenRef.current}` }
             });
             const data = await res.json();
@@ -167,7 +168,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const syncHistory = useCallback(async () => {
         if (!tokenRef.current) return;
         try {
-            const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/history`, {
+            const res = await apiFetch(`${CONFIG.BACKEND_URL}/api/mobile/user/history`, {
                 headers: { Authorization: `Bearer ${tokenRef.current}` }
             });
             const data = await res.json();
@@ -178,7 +179,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const syncWatchList = useCallback(async () => {
         if (!tokenRef.current) return;
         try {
-            const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/watchlist`, {
+            const res = await apiFetch(`${CONFIG.BACKEND_URL}/api/mobile/user/watchlist`, {
                 headers: { Authorization: `Bearer ${tokenRef.current}` }
             });
             const data = await res.json();
@@ -189,7 +190,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const syncPlaylists = useCallback(async () => {
         if (!tokenRef.current) return;
         try {
-            const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/playlists`, {
+            const res = await apiFetch(`${CONFIG.BACKEND_URL}/api/mobile/user/playlists`, {
                 headers: { Authorization: `Bearer ${tokenRef.current}` }
             });
             const data = await res.json();

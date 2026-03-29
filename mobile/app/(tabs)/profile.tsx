@@ -11,9 +11,10 @@ import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { CONFIG } from '@/constants/config';
 import ModernAlert, { AlertButton } from '@/components/ModernAlert';
+import { apiFetch } from '@/lib/apiFetch';
 
-const APP_VERSION = '1.1.2'; // Đồng bộ với /api/mobile/version
-const APP_BUILD = 12;
+const APP_VERSION = '1.1.3'; // Đồng bộ với /api/mobile/version
+const APP_BUILD = 13;
 
 interface UpdateInfo {
   version: string;
@@ -76,7 +77,7 @@ function Divider() {
 
 export default function ProfileScreen() {
   const webUrl = 'https://khoiphim.io.vn';
-  const { user, logout } = useAuth();
+  const { user, logout, token, updateUser } = useAuth();
   const router = useRouter();
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
   const [userMenuVisible, setUserMenuVisible] = useState(false);
@@ -105,7 +106,7 @@ export default function ProfileScreen() {
       const timer = setTimeout(() => controller.abort(), 12000); // 12s timeout
       let res;
       try {
-        res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/version`, {
+        res = await apiFetch(`${CONFIG.BACKEND_URL}/api/mobile/version`, {
           headers: { 'Cache-Control': 'no-cache' },
           signal: controller.signal,
         });
@@ -294,7 +295,7 @@ export default function ProfileScreen() {
     try {
       const body: any = { name: editName.trim() };
       if (editNewPw) { body.currentPassword = editCurrentPw; body.newPassword = editNewPw; }
-      const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/update`, {
+      const res = await apiFetch(`${CONFIG.BACKEND_URL}/api/mobile/user/update`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(body),

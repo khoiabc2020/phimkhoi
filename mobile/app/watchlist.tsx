@@ -7,6 +7,7 @@ import { useState, useCallback } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { useAuth } from '@/context/auth';
 import { CONFIG } from '@/constants/config';
+import { apiFetch } from '@/lib/apiFetch';
 import { getImageUrl } from '@/services/api';
 import { getWatchList, removeFromWatchList } from '@/lib/watchList';
 import { COLORS } from '@/constants/theme';
@@ -22,7 +23,7 @@ export default function WatchListScreen() {
     const load = useCallback(async () => {
         try {
             if (user && token) {
-                const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/watchlist`, {
+                const res = await apiFetch(`${CONFIG.BACKEND_URL}/api/mobile/user/watchlist`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 if (res.ok) {
@@ -74,7 +75,7 @@ export default function WatchListScreen() {
 
                         try {
                             if (user && token) {
-                                await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/watchlist`, {
+                                await apiFetch(`${CONFIG.BACKEND_URL}/api/mobile/user/watchlist`, {
                                     method: 'DELETE',
                                     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
                                     body: JSON.stringify({ slug })

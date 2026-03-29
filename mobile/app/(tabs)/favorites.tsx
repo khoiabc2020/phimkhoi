@@ -11,6 +11,7 @@ import { Dimensions } from 'react-native';
 import { useAuth } from '@/context/auth';
 import { CONFIG } from '@/constants/config';
 import { COLORS } from '@/constants/theme';
+import { apiFetch } from '@/lib/apiFetch';
 
 const { width } = Dimensions.get('window');
 const COLS = 3;
@@ -26,7 +27,7 @@ export default function FavoritesScreen() {
   const load = useCallback(async () => {
     if (user && token) {
       try {
-        const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/favorites`, {
+        const res = await apiFetch(`${CONFIG.BACKEND_URL}/api/mobile/user/favorites`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         const data = await res.json();
@@ -56,7 +57,7 @@ export default function FavoritesScreen() {
     setFavorites((prev) => (prev || []).filter((m) => (m.movieSlug || m.slug) !== slug));
     if (user && token) {
       try {
-        await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/favorites`, {
+        await apiFetch(`${CONFIG.BACKEND_URL}/api/mobile/user/favorites`, {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
           body: JSON.stringify({ slug })

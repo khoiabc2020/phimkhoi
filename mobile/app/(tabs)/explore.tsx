@@ -10,6 +10,7 @@ import { searchMovies, searchActors, Movie, getMoviesList, getImageUrl, getMenuD
 import { Image } from 'expo-image';
 import { StatusBar } from 'expo-status-bar';
 import { CONFIG } from '@/constants/config';
+import { apiFetch } from '@/lib/apiFetch';
 
 const { width } = Dimensions.get('window');
 const COLUMN_COUNT = 3;
@@ -89,7 +90,7 @@ export default function ExploreScreen() {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), 8000);
         try {
-          const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/home`, {
+          const res = await apiFetch(`${CONFIG.BACKEND_URL}/api/mobile/home`, {
             signal: controller.signal,
           });
           clearTimeout(timer);

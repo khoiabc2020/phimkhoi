@@ -8,6 +8,7 @@ import { useFocusEffect } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useAuth } from '@/context/auth';
 import { CONFIG } from '@/constants/config';
+import { apiFetch } from '@/lib/apiFetch';
 import { getImageUrl } from '@/services/api';
 import { COLORS } from '@/constants/theme';
 import { FlashList } from '@shopify/flash-list';
@@ -26,7 +27,7 @@ export default function HistoryScreen() {
         }
 
         try {
-            const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/history`, {
+            const res = await apiFetch(`${CONFIG.BACKEND_URL}/api/mobile/user/history`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const data = await res.json();
