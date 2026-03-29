@@ -3,6 +3,7 @@ import {
     View, Text, Dimensions, StyleSheet, Pressable,
     TouchableOpacity, Platform
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
@@ -42,6 +43,7 @@ function getPosterUri(m: Movie): string {
 }
 
 export default function HeroSection({ movies }: HeroSectionProps) {
+    const insets = useSafeAreaInsets();
     const [activeIndex, setActiveIndex] = useState(0);
     const [favSlugs, setFavSlugs] = useState<Set<string>>(new Set());
     const { user, token, syncFavorites } = useAuth();
@@ -151,8 +153,8 @@ export default function HeroSection({ movies }: HeroSectionProps) {
                 <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(5,6,10,0.78)' }]} />
             </View>
 
-            {/* Carousel — paddingTop pushes below header */}
-            <View style={{ paddingTop: 88, paddingHorizontal: 14 }}>
+            {/* Carousel — paddingTop pushes below header (insets.top + headerRow 50 + pillsRow 44 + gap 11) */}
+            <View style={{ paddingTop: insets.top + 105, paddingHorizontal: 14 }}>
                 <Carousel
                     width={width - 28}
                     height={CAROUSEL_HEIGHT}

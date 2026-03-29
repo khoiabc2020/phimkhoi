@@ -11,6 +11,7 @@ import * as Haptics from 'expo-haptics';
 import * as Linking from 'expo-linking';
 import { COLORS } from '@/constants/theme';
 import { CONFIG } from '@/constants/config';
+import { apiFetch } from '@/lib/apiFetch';
 import { useAuth } from '@/context/auth';
 import { getNotifications, markNotificationsRead, AppNotification } from '@/services/api';
 
@@ -41,7 +42,7 @@ export default function NotificationsScreen() {
 
     const checkVersion = async () => {
         try {
-            const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/version`, {
+            const res = await apiFetch(`${CONFIG.BACKEND_URL}/api/mobile/version`, {
                 headers: { 'Cache-Control': 'no-cache' },
                 signal: AbortSignal.timeout(6000)
             });
