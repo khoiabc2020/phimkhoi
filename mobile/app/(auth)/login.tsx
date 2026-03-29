@@ -14,6 +14,58 @@ import { apiFetch } from '@/lib/apiFetch';
 
 const { width } = Dimensions.get('window');
 
+// ─── InputField phải ở NGOÀI component để không bị re-mount khi re-render ───
+interface InputFieldProps {
+    icon: string;
+    placeholder: string;
+    value: string;
+    onChangeText: (v: string) => void;
+    secureTextEntry?: boolean;
+    keyboardType?: any;
+    autoCapitalize?: any;
+    toggleSecure?: () => void;
+    onSubmitEditing?: () => void;
+    returnKeyType?: any;
+    blurOnSubmit?: boolean;
+}
+
+function InputField({
+    icon, placeholder, value, onChangeText, secureTextEntry,
+    keyboardType, autoCapitalize, toggleSecure, onSubmitEditing,
+    returnKeyType = 'next', blurOnSubmit = false,
+}: InputFieldProps) {
+    return (
+        <View style={{
+            flexDirection: 'row', alignItems: 'center',
+            backgroundColor: 'rgba(255,255,255,0.07)',
+            borderRadius: 16, paddingHorizontal: 16,
+            borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+            marginBottom: 12,
+        }}>
+            <Ionicons name={icon as any} size={18} color="rgba(255,255,255,0.4)" style={{ marginRight: 10 }} />
+            <TextInput
+                style={{ flex: 1, color: 'white', paddingVertical: 14, fontSize: 15 }}
+                placeholder={placeholder}
+                placeholderTextColor="rgba(255,255,255,0.28)"
+                value={value}
+                onChangeText={onChangeText}
+                secureTextEntry={secureTextEntry}
+                keyboardType={keyboardType}
+                autoCapitalize={autoCapitalize || 'none'}
+                returnKeyType={returnKeyType}
+                blurOnSubmit={blurOnSubmit}
+                onSubmitEditing={onSubmitEditing}
+                underlineColorAndroid="transparent"
+            />
+            {toggleSecure && (
+                <TouchableOpacity onPress={toggleSecure} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                    <Ionicons name={secureTextEntry ? 'eye-outline' : 'eye-off-outline'} size={18} color="rgba(255,255,255,0.35)" />
+                </TouchableOpacity>
+            )}
+        </View>
+    );
+}
+
 export default function AuthScreen() {
     const router = useRouter();
     const { login } = useAuth();
@@ -86,38 +138,6 @@ export default function AuthScreen() {
         } finally { setLoading(false); }
     };
 
-    const InputField = ({
-        icon, placeholder, value, onChangeText, secureTextEntry,
-        keyboardType, autoCapitalize, toggleSecure, onSubmitEditing
-    }: any) => (
-        <View style={{
-            flexDirection: 'row', alignItems: 'center',
-            backgroundColor: 'rgba(255,255,255,0.07)',
-            borderRadius: 16, paddingHorizontal: 16,
-            borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
-            marginBottom: 12,
-        }}>
-            <Ionicons name={icon} size={18} color="rgba(255,255,255,0.4)" style={{ marginRight: 10 }} />
-            <TextInput
-                style={{ flex: 1, color: 'white', paddingVertical: 14, fontSize: 15 }}
-                placeholder={placeholder}
-                placeholderTextColor="rgba(255,255,255,0.28)"
-                value={value}
-                onChangeText={onChangeText}
-                secureTextEntry={secureTextEntry}
-                keyboardType={keyboardType}
-                autoCapitalize={autoCapitalize || 'none'}
-                returnKeyType="done"
-                onSubmitEditing={onSubmitEditing}
-            />
-            {toggleSecure && (
-                <TouchableOpacity onPress={toggleSecure} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                    <Ionicons name={secureTextEntry ? 'eye-outline' : 'eye-off-outline'} size={18} color="rgba(255,255,255,0.35)" />
-                </TouchableOpacity>
-            )}
-        </View>
-    );
-
     return (
         <View style={{ flex: 1, backgroundColor: '#05060A' }}>
             <Stack.Screen options={{ headerShown: false }} />
@@ -130,7 +150,7 @@ export default function AuthScreen() {
                 <LinearGradient colors={['rgba(143,167,197,0.06)', 'transparent']} style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '50%' }} />
             </View>
 
-            <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+            <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding" keyboardVerticalOffset={Platform.OS === 'android' ? 0 : 0}>
                 <SafeAreaView style={{ flex: 1 }}>
                     <ScrollView
                         contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40, flexGrow: 1, justifyContent: 'center' }}
@@ -191,19 +211,25 @@ export default function AuthScreen() {
                         }}>
                             {tab === 'register' && (
                                 <InputField icon="person-outline" placeholder="Tên hiển thị" value={name}
-                                    onChangeText={setName} autoCapitalize="words" />
+                                    onChangeText={setName} autoCapitalize="words"
+                                    returnKeyType="next" blurOnSubmit={false} />
                             )}
                             <InputField icon="mail-outline" placeholder="Email" value={email}
-                                onChangeText={setEmail} keyboardType="email-address" />
+                                onChangeText={setEmail} keyboardType="email-address"
+                                returnKeyType="next" blurOnSubmit={false} />
                             <InputField icon="lock-closed-outline" placeholder="Mật khẩu (tối thiểu 6 ký tự)" value={password}
                                 onChangeText={setPassword} secureTextEntry={!showPassword}
                                 toggleSecure={() => setShowPassword(!showPassword)}
+                                returnKeyType={tab === 'login' ? 'done' : 'next'}
+                                blurOnSubmit={tab === 'login'}
                                 onSubmitEditing={tab === 'login' ? handleLogin : undefined}
                             />
                             {tab === 'register' && (
                                 <InputField icon="shield-checkmark-outline" placeholder="Xác nhận mật khẩu" value={confirmPassword}
                                     onChangeText={setConfirmPassword} secureTextEntry={!showConfirmPassword}
                                     toggleSecure={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    returnKeyType="done" blurOnSubmit={true}
+                                    onSubmitEditing={handleRegister}
                                 />
                             )}
 
