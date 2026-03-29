@@ -13,8 +13,8 @@ import { CONFIG } from '@/constants/config';
 import ModernAlert, { AlertButton } from '@/components/ModernAlert';
 import { apiFetch } from '@/lib/apiFetch';
 
-const APP_VERSION = '1.1.2'; // Đồng bộ với /api/mobile/version
-const APP_BUILD = 12;
+const APP_VERSION = '1.1.3'; // Đồng bộ với /api/mobile/version
+const APP_BUILD = 13;
 
 interface UpdateInfo {
   version: string;

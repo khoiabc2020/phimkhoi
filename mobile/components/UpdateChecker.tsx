@@ -10,8 +10,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiFetch } from '@/lib/apiFetch';
 
 // Version hiện tại của ứng dụng — cập nhật mỗi lần build
-const CURRENT_VERSION = '1.1.2';
-const CURRENT_BUILD = 12;
+const CURRENT_VERSION = '1.1.3';
+const CURRENT_BUILD = 13;
 
 const SKIP_KEY = 'skipped_update_build';
 
