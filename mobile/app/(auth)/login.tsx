@@ -1,23 +1,15 @@
 import {
     View, Text, TextInput, TouchableOpacity, ActivityIndicator,
-    Alert, KeyboardAvoidingView, Platform, ScrollView, Pressable
+    Alert, KeyboardAvoidingView, Platform, ScrollView
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import { useRouter, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '@/context/auth';
 import { CONFIG } from '@/constants/config';
-import * as WebBrowser from 'expo-web-browser';
-import * as AuthSession from 'expo-auth-session';
-import * as Google from 'expo-auth-session/providers/google';
-
-WebBrowser.maybeCompleteAuthSession();
-
-const GOOGLE_WEB_CLIENT_ID = '855740529726-jtgo46gn63ce2mcgdm9fmsu7bndbjekj.apps.googleusercontent.com';
 
 export default function AuthScreen() {
     const router = useRouter();
@@ -29,7 +21,6 @@ export default function AuthScreen() {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
-    const [googleLoading, setGoogleLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
     const showAlert = (title: string, message: string, buttons?: { text: string; onPress?: () => void }[]) => {
@@ -46,41 +37,6 @@ export default function AuthScreen() {
             return JSON.parse(raw);
         } catch {
             throw new Error('Không đọc được dữ liệu từ server.');
-        }
-    };
-
-    // Android OAuth Client ID (cần tạo riêng trong Google Console cho Android app)
-    // Package name: com.phimkhoi.mobile, SHA-1 cần được thêm vào Google Console
-    const GOOGLE_ANDROID_CLIENT_ID = '855740529726-jtgo46gn63ce2mcgdm9fmsu7bndbjekj.apps.googleusercontent.com';
-
-    const [request, response, promptAsync] = Google.useAuthRequest({
-        webClientId: GOOGLE_WEB_CLIENT_ID,
-        androidClientId: GOOGLE_ANDROID_CLIENT_ID,
-        scopes: ['openid', 'profile', 'email'],
-    });
-
-    const handleGoogleLogin = async () => {
-        try {
-            setGoogleLoading(true);
-            const result = await promptAsync();
-            if (result.type !== 'success') {
-                return;
-            }
-            const { access_token } = result.params;
-            const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/auth/google`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ accessToken: access_token }),
-            });
-            const data = await parseResponseJson(res);
-            if (!res.ok) throw new Error(data.error || 'Đăng nhập Google thất bại');
-            if (!data?.token || !data?.user) throw new Error('Thiếu dữ liệu đăng nhập từ server.');
-            await login(data.token, data.user);
-            setTimeout(() => router.replace('/(tabs)' as any), 80);
-        } catch (err: any) {
-            showAlert('Lỗi', err?.message || 'Không thể đăng nhập bằng Google');
-        } finally {
-            setGoogleLoading(false);
         }
     };
 
@@ -150,18 +106,18 @@ export default function AuthScreen() {
             {/* Background gradient blobs */}
             <View style={{ position: 'absolute', inset: 0 }} pointerEvents="none">
                 <LinearGradient
-                    colors={['#1a0e3a', '#05060A', '#05060A']}
+                    colors={['#0d0a1f', '#05060A', '#05060A']}
                     style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '60%' }}
                 />
                 <View style={{
                     position: 'absolute', top: -80, right: -60,
                     width: 260, height: 260, borderRadius: 130,
-                    backgroundColor: 'rgba(234,179,8,0.06)',
+                    backgroundColor: 'rgba(143,167,197,0.06)',
                 }} />
                 <View style={{
                     position: 'absolute', bottom: 100, left: -80,
                     width: 220, height: 220, borderRadius: 110,
-                    backgroundColor: 'rgba(99,102,241,0.07)',
+                    backgroundColor: 'rgba(229,9,20,0.05)',
                 }} />
             </View>
 
@@ -182,17 +138,15 @@ export default function AuthScreen() {
 
                         {/* Brand */}
                         <View style={{ alignItems: 'center', marginBottom: 32 }}>
-                            <View>
-                                <Text style={{ fontSize: 38, fontWeight: '900', letterSpacing: 3 }}>
-                                    <Text style={{ color: '#FFFFFF' }}>KHOIPHIM</Text><Text style={{ color: '#E50914' }}>.</Text>
-                                </Text>
-                            </View>
+                            <Text style={{ fontSize: 38, fontWeight: '900', letterSpacing: 3 }}>
+                                <Text style={{ color: '#FFFFFF' }}>KHOIPHIM</Text><Text style={{ color: '#E50914' }}>.</Text>
+                            </Text>
                             <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, marginTop: 6 }}>
                                 {tab === 'login' ? 'Chào mừng trở lại!' : 'Tạo tài khoản mới'}
                             </Text>
                         </View>
 
-                        {/* Tab Switcher — iOS 26 pill style */}
+                        {/* Tab Switcher */}
                         <View style={{
                             flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.06)',
                             borderRadius: 16, padding: 4, marginBottom: 24,
@@ -223,40 +177,6 @@ export default function AuthScreen() {
                             borderRadius: 24, padding: 20,
                             borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
                         }}>
-                            {/* Google button */}
-                            <TouchableOpacity
-                                onPress={handleGoogleLogin}
-                                disabled={googleLoading || !request}
-                                style={{
-                                    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-                                    gap: 10, backgroundColor: 'rgba(255,255,255,0.07)',
-                                    borderRadius: 14, paddingVertical: 14,
-                                    borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)',
-                                    marginBottom: 18, opacity: (googleLoading || !request) ? 0.6 : 1,
-                                }}
-                            >
-                                {googleLoading ? (
-                                    <ActivityIndicator color="white" size="small" />
-                                ) : (
-                                    <>
-                                        <View style={{ width: 22, height: 22 }}>
-                                            {/* Google G logo */}
-                                            <Text style={{ fontSize: 16, fontWeight: '800', color: '#4285F4' }}>G</Text>
-                                        </View>
-                                        <Text style={{ color: 'white', fontWeight: '600', fontSize: 15 }}>
-                                            Tiếp tục với Google
-                                        </Text>
-                                    </>
-                                )}
-                            </TouchableOpacity>
-
-                            {/* Divider */}
-                            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 18 }}>
-                                <View style={{ flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.08)' }} />
-                                <Text style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12, marginHorizontal: 12 }}>hoặc</Text>
-                                <View style={{ flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.08)' }} />
-                            </View>
-
                             {/* Name field (register only) */}
                             {tab === 'register' && (
                                 <View style={{ marginBottom: 12 }}>
@@ -305,6 +225,7 @@ export default function AuthScreen() {
                                         onChangeText={setPassword}
                                         secureTextEntry={!showPassword}
                                         returnKeyType="done"
+                                        onSubmitEditing={tab === 'login' ? handleLogin : undefined}
                                     />
                                     <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                                         <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={17} color="rgba(255,255,255,0.35)" />
@@ -338,17 +259,13 @@ export default function AuthScreen() {
                                     borderRadius: 14, height: 52,
                                     alignItems: 'center', justifyContent: 'center',
                                     overflow: 'hidden',
+                                    backgroundColor: '#8FA7C5',
                                 }}
                             >
-                                <LinearGradient
-                                    colors={['#7E95B1', '#E50914']}
-                                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                                    style={{ position: 'absolute', inset: 0 }}
-                                />
                                 {loading ? (
-                                    <ActivityIndicator color="black" />
+                                    <ActivityIndicator color="#05060A" />
                                 ) : (
-                                    <Text style={{ color: '#000', fontWeight: '800', fontSize: 16 }}>
+                                    <Text style={{ color: '#05060A', fontWeight: '800', fontSize: 16 }}>
                                         {tab === 'login' ? 'Đăng nhập' : 'Tạo tài khoản'}
                                     </Text>
                                 )}

@@ -1,4 +1,4 @@
-import { View, Text, Pressable, Image, Alert, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, Pressable, Image, Alert, ScrollView, TouchableOpacity, Modal, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react';
 import { CONFIG } from '@/constants/config';
 import ModernAlert, { AlertButton } from '@/components/ModernAlert';
 
-const APP_VERSION = '1.1.1'; // Đồng bộ với /api/mobile/version
+const APP_VERSION = '1.1.2'; // Đồng bộ với /api/mobile/version
 const APP_BUILD = 12;
 
 interface UpdateInfo {
@@ -267,6 +267,50 @@ export default function ProfileScreen() {
     );
   }
 
+  // ── Edit profile modal ─────────────────────────────────────────────────────
+  const [editVisible, setEditVisible] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [editCurrentPw, setEditCurrentPw] = useState('');
+  const [editNewPw, setEditNewPw] = useState('');
+  const [editSaving, setEditSaving] = useState(false);
+
+  const openEdit = () => {
+    setEditName(user?.name || '');
+    setEditCurrentPw('');
+    setEditNewPw('');
+    setEditVisible(true);
+  };
+
+  const saveEdit = async () => {
+    if (!editName.trim()) {
+      showAlert('Lỗi', 'Tên không được để trống', undefined, 'error');
+      return;
+    }
+    if (editNewPw && editNewPw.length < 6) {
+      showAlert('Lỗi', 'Mật khẩu mới phải ít nhất 6 ký tự', undefined, 'error');
+      return;
+    }
+    setEditSaving(true);
+    try {
+      const body: any = { name: editName.trim() };
+      if (editNewPw) { body.currentPassword = editCurrentPw; body.newPassword = editNewPw; }
+      const res = await fetch(`${CONFIG.BACKEND_URL}/api/mobile/user/update`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Cập nhật thất bại');
+      updateUser({ ...user!, ...data.user });
+      setEditVisible(false);
+      showAlert('Thành công', 'Thông tin đã được cập nhật!', undefined, 'success');
+    } catch (e: any) {
+      showAlert('Lỗi', e.message || 'Không thể cập nhật', undefined, 'error');
+    } finally {
+      setEditSaving(false);
+    }
+  };
+
   // ── Logged in ──────────────────────────────────────────────────────────────
   const initials = user.name?.slice(0, 2).toUpperCase() || 'U';
 
@@ -287,6 +331,9 @@ export default function ProfileScreen() {
           {/* Header */}
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
             <Text style={{ color: 'white', fontSize: 28, fontWeight: '800', letterSpacing: -0.5 }}>Tài khoản</Text>
+            <TouchableOpacity onPress={openEdit} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.07)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' }}>
+              <Ionicons name="create-outline" size={18} color="rgba(255,255,255,0.7)" />
+            </TouchableOpacity>
           </View>
 
           {/* Profile Card — iOS 26 Hero */}
@@ -408,6 +455,68 @@ export default function ProfileScreen() {
         type={alertConfig.type}
         onClose={() => setAlertConfig(prev => ({ ...prev, visible: false }))}
       />
+
+      {/* ── Edit Profile Modal ── */}
+      <Modal visible={editVisible} transparent animationType="slide" onRequestClose={() => setEditVisible(false)}>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'flex-end' }}>
+            <View style={{ backgroundColor: '#0F1118', borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 20, paddingBottom: 40, borderTopWidth: 1, borderColor: 'rgba(255,255,255,0.08)' }}>
+              {/* Handle bar */}
+              <View style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.15)', alignSelf: 'center', marginBottom: 20 }} />
+              <Text style={{ color: 'white', fontSize: 20, fontWeight: '800', marginBottom: 20 }}>Chỉnh sửa hồ sơ</Text>
+
+              {/* Display name */}
+              <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, marginBottom: 6 }}>Tên hiển thị</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 14, paddingHorizontal: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', marginBottom: 16 }}>
+                <Ionicons name="person-outline" size={16} color="rgba(255,255,255,0.35)" />
+                <TextInput
+                  style={{ flex: 1, color: 'white', paddingVertical: 12, paddingHorizontal: 10, fontSize: 15 }}
+                  value={editName}
+                  onChangeText={setEditName}
+                  placeholder="Tên của bạn"
+                  placeholderTextColor="rgba(255,255,255,0.25)"
+                  autoCapitalize="words"
+                />
+              </View>
+
+              {/* Change password section */}
+              <Text style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Đổi mật khẩu (tùy chọn)</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 14, paddingHorizontal: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', marginBottom: 10 }}>
+                <Ionicons name="lock-closed-outline" size={16} color="rgba(255,255,255,0.35)" />
+                <TextInput
+                  style={{ flex: 1, color: 'white', paddingVertical: 12, paddingHorizontal: 10, fontSize: 15 }}
+                  value={editCurrentPw}
+                  onChangeText={setEditCurrentPw}
+                  placeholder="Mật khẩu hiện tại"
+                  placeholderTextColor="rgba(255,255,255,0.25)"
+                  secureTextEntry
+                />
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 14, paddingHorizontal: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', marginBottom: 24 }}>
+                <Ionicons name="lock-open-outline" size={16} color="rgba(255,255,255,0.35)" />
+                <TextInput
+                  style={{ flex: 1, color: 'white', paddingVertical: 12, paddingHorizontal: 10, fontSize: 15 }}
+                  value={editNewPw}
+                  onChangeText={setEditNewPw}
+                  placeholder="Mật khẩu mới (≥6 ký tự)"
+                  placeholderTextColor="rgba(255,255,255,0.25)"
+                  secureTextEntry
+                />
+              </View>
+
+              {/* Action buttons */}
+              <View style={{ flexDirection: 'row', gap: 10 }}>
+                <TouchableOpacity onPress={() => setEditVisible(false)} style={{ flex: 1, height: 48, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.07)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' }}>
+                  <Text style={{ color: 'rgba(255,255,255,0.7)', fontWeight: '600', fontSize: 15 }}>Hủy</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={saveEdit} disabled={editSaving} style={{ flex: 2, height: 48, borderRadius: 14, backgroundColor: '#8FA7C5', alignItems: 'center', justifyContent: 'center', opacity: editSaving ? 0.7 : 1 }}>
+                  {editSaving ? <ActivityIndicator color="#05060A" /> : <Text style={{ color: '#05060A', fontWeight: '800', fontSize: 15 }}>Lưu thay đổi</Text>}
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </View>
   );
 }

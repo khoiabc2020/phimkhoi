@@ -95,6 +95,8 @@ export default function NativePlayer({
         setVideoSource({ uri: url });
         initialSeekDone.current = false;
         fallbackTriedRef.current = false;
+        hasLoadedRef.current = false;
+        if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
     }, [url]);
 
     // Cho phép video tiếp tục phát khi app vào nền (cần cho PiP Android)
@@ -130,6 +132,27 @@ export default function NativePlayer({
     const [retryCount, setRetryCount] = useState(0);
     const fallbackTriedRef = useRef(false);
     const autoRetryTimer = useRef<any>(null);
+    const loadTimeoutRef = useRef<any>(null);
+    const hasLoadedRef = useRef(false);
+
+    // Start a 12-second timeout when the video source changes.
+    // If the video hasn't started playing within that window, try the fallback.
+    useEffect(() => {
+        if (isIframe) return; // WebView handles itself
+        hasLoadedRef.current = false;
+        if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
+        loadTimeoutRef.current = setTimeout(() => {
+            if (!hasLoadedRef.current && fallbackUrl && !fallbackTriedRef.current) {
+                console.log('[Player] Load timeout — switching to fallback embed');
+                fallbackTriedRef.current = true;
+                setVideoSource({ uri: fallbackUrl });
+            }
+        }, 12000);
+        return () => {
+            if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
+        };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [videoSource.uri]);
 
     // Auto Next Countdown
     const [autoNextCountdown, setAutoNextCountdown] = useState<number | null>(null);
@@ -399,6 +422,11 @@ export default function NativePlayer({
 
             if (currentBuffering !== isBuffering) {
                 setIsBuffering(currentBuffering);
+            }
+
+            if (!hasLoadedRef.current) {
+                hasLoadedRef.current = true;
+                if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
             }
 
             if (!initialSeekDone.current && initialTime > 0) {

@@ -759,7 +759,11 @@ export default function MovieDetailScreen() {
                                     const colors = ['#1e3a6b', '#6b1212', '#2d1654', '#0f2030', '#5a1a00', '#1a3668'];
                                     const bgColor = colors[(actor.name?.charCodeAt(0) || 0) % colors.length];
                                     return (
-                                        <View key={actor.id || actor.name} style={{ width: '31%', marginBottom: 12 }}>
+                                        <Pressable
+                                            key={actor.id || actor.name}
+                                            style={({ pressed }) => ({ width: '31%', marginBottom: 12, opacity: pressed ? 0.75 : 1 })}
+                                            onPress={() => actor.name && router.push(`/search?q=${encodeURIComponent(actor.name)}` as any)}
+                                        >
                                             <View style={{ width: '100%', aspectRatio: 2 / 3, borderRadius: 8, marginBottom: 4, backgroundColor: '#222', overflow: 'hidden' }}>
                                                 {photoUrl ? (
                                                     <Image
@@ -774,7 +778,8 @@ export default function MovieDetailScreen() {
                                                 )}
                                             </View>
                                             <Text numberOfLines={2} style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>{actor.name}</Text>
-                                        </View>
+                                            {actor.character && <Text numberOfLines={1} style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10 }}>{actor.character}</Text>}
+                                        </Pressable>
                                     );
                                 }) : (
                                     <Text style={{ color: 'rgba(255,255,255,0.4)', textAlign: 'center', width: '100%', marginTop: 20, fontSize: 14 }}>

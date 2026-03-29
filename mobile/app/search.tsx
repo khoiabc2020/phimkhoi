@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter, Stack } from 'expo-router';
+import { useRouter, Stack, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -55,8 +55,9 @@ type FilterType = 'category' | 'country' | 'year' | null;
 
 export default function SearchScreen() {
     const router = useRouter();
+    const { q: initialQuery } = useLocalSearchParams<{ q?: string }>();
     const inputRef = useRef<TextInput>(null);
-    const [query, setQuery] = useState('');
+    const [query, setQuery] = useState(initialQuery || '');
     const [results, setResults] = useState<SearchResult[]>([]);
     const [actorResults, setActorResults] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
@@ -75,6 +76,14 @@ export default function SearchScreen() {
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
     const [selectedYear, setSelectedYear] = useState<string | null>(null);
+
+    // Auto-search if pre-filled query from URL param
+    useEffect(() => {
+        if (initialQuery) {
+            handleSearch(initialQuery);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // Load history
     useEffect(() => {
