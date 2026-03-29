@@ -35,7 +35,7 @@ function TabIcon({ focused, label, icon }: {
         <Feather
           name={icon as any}
           size={20}
-          color={focused ? COLORS.accent : 'rgba(255,255,255,0.65)'}
+          color={focused ? '#8FA7C5' : 'rgba(255,255,255,0.65)'}
         />
       </Animated.View>
       <Text style={[styles.tabLabel, focused && styles.tabLabelActive]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
@@ -75,7 +75,7 @@ export default function TabLayout() {
                   onPress={() => router.replace(`/(tabs)/${tab.name}` as any)}
                   style={[styles.sideBarItem, isActive && styles.sideBarItemActive]}
                 >
-                  <Feather name={tab.icon as any} size={24} color={isActive ? COLORS.accent : 'rgba(255,255,255,0.6)'} />
+                  <Feather name={tab.icon as any} size={24} color={isActive ? '#8FA7C5' : 'rgba(255,255,255,0.6)'} />
                   <Text style={[styles.sideBarLabel, isActive && styles.sideBarLabelActive]} numberOfLines={1}>
                     {tab.label}
                   </Text>
@@ -141,7 +141,7 @@ export default function TabLayout() {
           shadowRadius: 12,
           paddingHorizontal: 4,
         },
-        tabBarActiveTintColor: COLORS.accent,
+        tabBarActiveTintColor: '#8FA7C5',
         tabBarInactiveTintColor: 'rgba(255,255,255,0.6)',
         tabBarLabelStyle: { fontSize: 10, fontWeight: '500' },
         tabBarLabel: () => null,
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
     ...(Platform.OS === 'android' && { includeFontPadding: false }),
   },
   tabLabelActive: {
-    color: COLORS.accent,
+    color: '#8FA7C5',
     fontWeight: '600',
   },
 
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   sideBarLabelActive: {
-    color: COLORS.accent,
+    color: '#8FA7C5',
     fontWeight: '800',
   },
 });

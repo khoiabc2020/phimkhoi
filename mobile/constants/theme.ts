@@ -6,6 +6,7 @@ export const COLORS = {
 
   // Accents — matching web steel-blue palette
   accent: '#E50914',           // Red accent (same as web)
+  uiAccent: '#8FA7C5',         // Steel-blue for all UI active states (tabs, dots, pills)
   accentLight: '#FF2D37',      // Hover red
   accentPressed: '#8FA7C5',    // Steel-blue (web secondary)
   accentSoft: '#1E2A3A',       // Soft blue-dark surface

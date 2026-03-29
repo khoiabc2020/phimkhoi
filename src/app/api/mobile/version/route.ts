@@ -17,11 +17,11 @@ const buildDownloadUrl = (version: string, explicitUrl?: string) => {
 };
 
 const FALLBACK_VERSION = {
-    version: "1.1.0",
-    build: 11,
+    version: "1.1.2",
+    build: 12,
     force_update: false,
-    download_url: buildDownloadUrl("1.1.0"),
-    change_log: "Sửa bug đăng nhập, đồng bộ màu web, HeroSection gọn hơn, logo tinh tế hơn, nguồn C phát được trên app",
+    download_url: buildDownloadUrl("1.1.2"),
+    change_log: "HeroSection dọc toàn màn hình, logo KHOIPHIM., đăng nhập ổn định, NguonC tự động fallback, chỉnh sửa hồ sơ, diễn viên tìm kiếm được",
 };
 
 export async function GET() {

@@ -24,6 +24,7 @@ export default function PlayerScreen() {
     const [loading, setLoading] = useState(true);
     const [videoUrl, setVideoUrl] = useState<string | null>(null);
     const [isNative, setIsNative] = useState(false);
+    const [fallbackUrl, setFallbackUrl] = useState<string | null>(null);
     const [movieTitle, setMovieTitle] = useState("");
     const [episodeTitle, setEpisodeTitle] = useState("");
     const [nextEpisodeSlug, setNextEpisodeSlug] = useState<string | null>(null);
@@ -92,12 +93,16 @@ export default function PlayerScreen() {
         if (epObj.link_m3u8 && !epObj.link_m3u8.includes('youtube') && epObj.link_m3u8.trim() !== '') {
             setVideoUrl(epObj.link_m3u8);
             setIsNative(true);
+            // Store embed as fallback in case m3u8 CDN is blocked/down
+            setFallbackUrl(epObj.link_embed && epObj.link_embed.trim() !== '' ? epObj.link_embed : null);
         } else if (epObj.link_embed && epObj.link_embed.trim() !== '') {
             setVideoUrl(epObj.link_embed);
-            setIsNative(true); // NativePlayer renders embed via WebView fallback
+            setIsNative(true);
+            setFallbackUrl(null);
         } else {
             setVideoUrl(epObj.link_embed ?? '');
             setIsNative(true);
+            setFallbackUrl(null);
         }
 
         const idx = serverData.findIndex((e: any) => e.slug === epObj!.slug);
@@ -241,6 +246,7 @@ export default function PlayerScreen() {
                     onPipSizeCycle={cyclePipSize}
                     onProgress={handleProgress}
                     initialTime={initialTime}
+                    fallbackUrl={fallbackUrl ?? undefined}
                     episodeList={episodes[selectedServer]?.server_data || []}
                     serverList={nonEmptyEpisodes.map((s: any) => s.server_name)}
                     currentServerIndex={nonEmptyEpisodes.findIndex((s: any) => s.server_name === (episodes[selectedServer]?.server_name || ''))}

@@ -71,12 +71,14 @@ interface NativePlayerProps {
     onEpisodeChange?: (slug: string) => void;
     onServerChange?: (index: number) => void;
     initialTime?: number;
+    fallbackUrl?: string;
 }
 
 export default function NativePlayer({
     url, title, episode, onClose, onNext, onProgress,
     episodeList = [], serverList = [], currentServerIndex = 0, currentEpisodeSlug, onEpisodeChange, onServerChange,
     initialTime = 0,
+    fallbackUrl,
     onPiP,
     onPipSizeCycle,
 }: NativePlayerProps) {
@@ -86,12 +88,15 @@ export default function NativePlayer({
     const [videoSource, setVideoSource] = useState({ uri: url });
 
     // Check if the source is likely an iframe (not mp4, not m3u8)
-    const isIframe = !url.toLowerCase().includes('.mp4') && !url.toLowerCase().includes('.m3u8');
+    const isIframe = !videoSource.uri.toLowerCase().includes('.mp4') && !videoSource.uri.toLowerCase().includes('.m3u8');
 
     // Update video source when prop changes
     useEffect(() => {
         setVideoSource({ uri: url });
         initialSeekDone.current = false;
+        fallbackTriedRef.current = false;
+        hasLoadedRef.current = false;
+        if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
     }, [url]);
 
     // Cho phép video tiếp tục phát khi app vào nền (cần cho PiP Android)
@@ -125,7 +130,29 @@ export default function NativePlayer({
     const [locked, setLocked] = useState(false);
     const [isBuffering, setIsBuffering] = useState(false);
     const [retryCount, setRetryCount] = useState(0);
+    const fallbackTriedRef = useRef(false);
     const autoRetryTimer = useRef<any>(null);
+    const loadTimeoutRef = useRef<any>(null);
+    const hasLoadedRef = useRef(false);
+
+    // Start a 12-second timeout when the video source changes.
+    // If the video hasn't started playing within that window, try the fallback.
+    useEffect(() => {
+        if (isIframe) return; // WebView handles itself
+        hasLoadedRef.current = false;
+        if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
+        loadTimeoutRef.current = setTimeout(() => {
+            if (!hasLoadedRef.current && fallbackUrl && !fallbackTriedRef.current) {
+                console.log('[Player] Load timeout — switching to fallback embed');
+                fallbackTriedRef.current = true;
+                setVideoSource({ uri: fallbackUrl });
+            }
+        }, 12000);
+        return () => {
+            if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
+        };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [videoSource.uri]);
 
     // Auto Next Countdown
     const [autoNextCountdown, setAutoNextCountdown] = useState<number | null>(null);
@@ -397,6 +424,11 @@ export default function NativePlayer({
                 setIsBuffering(currentBuffering);
             }
 
+            if (!hasLoadedRef.current) {
+                hasLoadedRef.current = true;
+                if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
+            }
+
             if (!initialSeekDone.current && initialTime > 0) {
                 video.current?.setPositionAsync(initialTime);
                 initialSeekDone.current = true;
@@ -498,6 +530,13 @@ export default function NativePlayer({
             ? err
             : err?.error || err?.nativeEvent?.error || 'Lỗi phát video';
         console.log('Video Error:', err);
+
+        // Nếu có fallbackUrl (embed) và chưa thử → switch sang embed WebView
+        if (fallbackUrl && !fallbackTriedRef.current) {
+            fallbackTriedRef.current = true;
+            setVideoSource({ uri: fallbackUrl });
+            return;
+        }
 
         // Auto-retry 1 lần sau 3s trước khi hiện error UI
         if (retryCount < 1) {
