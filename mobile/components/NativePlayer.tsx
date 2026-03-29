@@ -71,12 +71,14 @@ interface NativePlayerProps {
     onEpisodeChange?: (slug: string) => void;
     onServerChange?: (index: number) => void;
     initialTime?: number;
+    fallbackUrl?: string;
 }
 
 export default function NativePlayer({
     url, title, episode, onClose, onNext, onProgress,
     episodeList = [], serverList = [], currentServerIndex = 0, currentEpisodeSlug, onEpisodeChange, onServerChange,
     initialTime = 0,
+    fallbackUrl,
     onPiP,
     onPipSizeCycle,
 }: NativePlayerProps) {
@@ -86,12 +88,13 @@ export default function NativePlayer({
     const [videoSource, setVideoSource] = useState({ uri: url });
 
     // Check if the source is likely an iframe (not mp4, not m3u8)
-    const isIframe = !url.toLowerCase().includes('.mp4') && !url.toLowerCase().includes('.m3u8');
+    const isIframe = !videoSource.uri.toLowerCase().includes('.mp4') && !videoSource.uri.toLowerCase().includes('.m3u8');
 
     // Update video source when prop changes
     useEffect(() => {
         setVideoSource({ uri: url });
         initialSeekDone.current = false;
+        fallbackTriedRef.current = false;
     }, [url]);
 
     // Cho phép video tiếp tục phát khi app vào nền (cần cho PiP Android)
@@ -125,6 +128,7 @@ export default function NativePlayer({
     const [locked, setLocked] = useState(false);
     const [isBuffering, setIsBuffering] = useState(false);
     const [retryCount, setRetryCount] = useState(0);
+    const fallbackTriedRef = useRef(false);
     const autoRetryTimer = useRef<any>(null);
 
     // Auto Next Countdown
@@ -498,6 +502,13 @@ export default function NativePlayer({
             ? err
             : err?.error || err?.nativeEvent?.error || 'Lỗi phát video';
         console.log('Video Error:', err);
+
+        // Nếu có fallbackUrl (embed) và chưa thử → switch sang embed WebView
+        if (fallbackUrl && !fallbackTriedRef.current) {
+            fallbackTriedRef.current = true;
+            setVideoSource({ uri: fallbackUrl });
+            return;
+        }
 
         // Auto-retry 1 lần sau 3s trước khi hiện error UI
         if (retryCount < 1) {

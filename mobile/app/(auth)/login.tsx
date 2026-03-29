@@ -76,12 +76,7 @@ export default function AuthScreen() {
             if (!res.ok) throw new Error(data.error || 'Đăng nhập Google thất bại');
             if (!data?.token || !data?.user) throw new Error('Thiếu dữ liệu đăng nhập từ server.');
             await login(data.token, data.user);
-            // Use back() to return to the previous screen (profile) which will now render with the logged-in state
-            if (router.canGoBack()) {
-                router.back();
-            } else {
-                router.replace('/(tabs)/profile');
-            }
+            setTimeout(() => router.replace('/(tabs)' as any), 80);
         } catch (err: any) {
             showAlert('Lỗi', err?.message || 'Không thể đăng nhập bằng Google');
         } finally {
@@ -106,11 +101,7 @@ export default function AuthScreen() {
             if (!res.ok) throw new Error(data.message || 'Đăng nhập thất bại');
             if (!data?.token || !data?.user) throw new Error('Thiếu dữ liệu đăng nhập từ server.');
             await login(data.token, data.user);
-            if (router.canGoBack()) {
-                router.back();
-            } else {
-                router.replace('/(tabs)/profile');
-            }
+            setTimeout(() => router.replace('/(tabs)' as any), 80);
         } catch (error: any) {
             showAlert('Lỗi', error?.message || 'Đăng nhập thất bại');
         } finally {
@@ -193,7 +184,7 @@ export default function AuthScreen() {
                         <View style={{ alignItems: 'center', marginBottom: 32 }}>
                             <View>
                                 <Text style={{ fontSize: 38, fontWeight: '900', letterSpacing: 3 }}>
-                                    <Text style={{ color: '#8FA7C5' }}>KHOI</Text><Text style={{ color: '#E50914' }}>PHIM</Text>
+                                    <Text style={{ color: '#FFFFFF' }}>KHOIPHIM</Text><Text style={{ color: '#E50914' }}>.</Text>
                                 </Text>
                             </View>
                             <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, marginTop: 6 }}>

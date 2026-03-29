@@ -283,7 +283,7 @@ export default function HomeScreen() {
           <View style={styles.headerRow}>
             <View style={[styles.logoRow, { paddingLeft: 8 }]}>
               <Text style={styles.logoText}>
-                <Text style={styles.logoTextBase}>KHOI</Text><Text style={styles.logoTextHot}>PHIM</Text>
+                <Text style={styles.logoTextBase}>KHOIPHIM</Text><Text style={styles.logoTextDot}>.</Text>
               </Text>
             </View>
 
@@ -515,8 +515,8 @@ const styles = StyleSheet.create({
   headerRow: { height: 50, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20 },
   logoRow: { flexDirection: 'row', alignItems: 'center' },
   logoText: { fontSize: 28, fontWeight: '900', letterSpacing: 2, textTransform: 'uppercase' },
-  logoTextBase: { color: '#8FA7C5' },  // Steel-blue (matches web)
-  logoTextHot: { color: '#E50914' },   // Red accent
+  logoTextBase: { color: '#FFFFFF' },   // White (matches web)
+  logoTextDot: { color: '#E50914' },    // Red accent dot "."
   headerActions: { flexDirection: 'row', gap: 12, alignItems: 'center' },
   iconBtn: {
     width: 36, height: 36, borderRadius: 18,
@@ -537,7 +537,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.1)', borderColor: 'rgba(255,255,255,0.15)',
   },
   pillText: { color: 'rgba(255,255,255,0.5)', fontSize: 15, fontWeight: '600' },
-  pillTextActive: { color: COLORS.accent, fontWeight: '800' },
+  pillTextActive: { color: '#8FA7C5', fontWeight: '800' },
 
   // Content
   scrollContent: { paddingTop: 0, paddingBottom: 100 },
@@ -566,11 +566,11 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.1)',
   },
   topTabBtnActive: {
-    backgroundColor: '#263243',
-    borderColor: '#33435a',
+    backgroundColor: 'rgba(143,167,197,0.14)',
+    borderColor: 'rgba(143,167,197,0.3)',
   },
   topTabText: { color: 'rgba(255,255,255,0.7)', fontSize: 12, fontWeight: '700' },
-  topTabTextActive: { color: '#d8e3f2' },
+  topTabTextActive: { color: '#8FA7C5' },
   recoSeedText: { color: 'rgba(255,255,255,0.5)', fontSize: 11, paddingHorizontal: 16, marginBottom: 8 },
   recoSeedStrong: { color: 'rgba(255,255,255,0.78)' },
   recoFilterRow: { paddingHorizontal: 16, gap: 8, marginBottom: 10 },
@@ -584,9 +584,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.1)',
   },
-  recoChipActive: { backgroundColor: '#263243', borderColor: '#33435a' },
+  recoChipActive: { backgroundColor: 'rgba(143,167,197,0.14)', borderColor: 'rgba(143,167,197,0.3)' },
   recoChipText: { color: 'rgba(255,255,255,0.72)', fontSize: 12, fontWeight: '700' },
-  recoChipTextActive: { color: '#d8e3f2' },
+  recoChipTextActive: { color: '#8FA7C5' },
 
   movieRows: { gap: 10 },
   sectionBlock: { marginBottom: 32 },

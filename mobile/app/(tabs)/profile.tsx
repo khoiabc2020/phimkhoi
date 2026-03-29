@@ -12,8 +12,8 @@ import { useEffect, useState } from 'react';
 import { CONFIG } from '@/constants/config';
 import ModernAlert, { AlertButton } from '@/components/ModernAlert';
 
-const APP_VERSION = '1.1.0'; // Đồng bộ với /api/mobile/version
-const APP_BUILD = 11;
+const APP_VERSION = '1.1.1'; // Đồng bộ với /api/mobile/version
+const APP_BUILD = 12;
 
 interface UpdateInfo {
   version: string;
