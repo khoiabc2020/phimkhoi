@@ -81,7 +81,9 @@ export default function AuthScreen() {
 
     const parseResponseJson = async (res: Response) => {
         const raw = await res.text();
-        try { return JSON.parse(raw); } catch { throw new Error('Lỗi kết nối server, vui lòng thử lại.'); }
+        if (!raw || raw.trim() === '') throw new Error('Server không phản hồi. Vui lòng thử lại.');
+        if (raw.trimStart().startsWith('<')) throw new Error('CF_BLOCK');
+        try { return JSON.parse(raw); } catch { throw new Error(`Phản hồi không hợp lệ (${res.status}). Thử lại.`); }
     };
 
     const handleLogin = async () => {
@@ -103,7 +105,16 @@ export default function AuthScreen() {
             await login(data.token, data.user);
             setTimeout(() => router.replace('/(tabs)' as any), 80);
         } catch (error: any) {
-            Alert.alert('Đăng nhập thất bại', error?.message || 'Không thể kết nối server');
+            const msg = error?.message || '';
+            if (msg === 'CF_BLOCK') {
+                Alert.alert(
+                    '🔒 Bị chặn bởi bảo vệ mạng',
+                    'Server đang bật tường lửa Cloudflare. Vui lòng thử:\n\n• Dùng WiFi thay 4G\n• Tắt VPN nếu đang bật\n• Thử lại sau ít phút',
+                    [{ text: 'OK' }]
+                );
+            } else {
+                Alert.alert('Đăng nhập thất bại', msg || 'Không thể kết nối server');
+            }
         } finally { setLoading(false); }
     };
 
@@ -134,7 +145,12 @@ export default function AuthScreen() {
                 { text: 'Đăng nhập ngay', onPress: () => setTab('login') }
             ]);
         } catch (error: any) {
-            Alert.alert('Đăng ký thất bại', error?.message || 'Vui lòng thử lại');
+            const msg = error?.message || '';
+            if (msg === 'CF_BLOCK') {
+                Alert.alert('🔒 Bị chặn', 'Server đang bật tường lửa. Thử dùng WiFi hoặc tắt VPN rồi thử lại.', [{ text: 'OK' }]);
+            } else {
+                Alert.alert('Đăng ký thất bại', msg || 'Vui lòng thử lại');
+            }
         } finally { setLoading(false); }
     };
 
