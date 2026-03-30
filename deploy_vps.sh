@@ -22,6 +22,7 @@ echo "Note: The live site continues spinning..."
 
 # 1. SETUP SHADOW ENVIRONMENT
 echo "Initializing shadow build directory..."
+rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
 # Fast synchronization: exclude heavy paths to make copy instant using native tar
 tar -cf - --exclude='node_modules' --exclude='.next' --exclude='.git' -C "$APP_DIR" . | tar -xf - -C "$BUILD_DIR"
