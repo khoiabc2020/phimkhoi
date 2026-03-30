@@ -14,6 +14,17 @@ export async function proxy(request: NextRequest) {
     const host = request.headers.get("host") || "";
     console.log(`[Proxy] Request: ${host}${pathname}`);
 
+    // Mobile API: add headers so Cloudflare skips JS challenge
+    if (pathname.startsWith('/api/mobile/')) {
+        const res = NextResponse.next();
+        res.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+        res.headers.set('Vary', 'Accept, Accept-Encoding');
+        res.headers.set('Access-Control-Allow-Origin', '*');
+        res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+        res.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, sec-ch-ua, sec-ch-ua-mobile, sec-ch-ua-platform');
+        return res;
+    }
+
     // 1. [Elite Redirect] Domain Migration (khoiphim.io.vn -> khoiphim.org)
     if (host.includes("khoiphim.io.vn")) {
         const url = request.nextUrl.clone();
