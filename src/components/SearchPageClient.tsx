@@ -37,8 +37,27 @@ export default function SearchPageClient({
         return { items: movies || [], pagination: { currentPage: 1, totalPages: 1 } };
     }, [keyword, limit]);
 
-    const cacheKey = `search_v2_${keyword}_c${category || 'all'}_co${country || 'all'}_y${year || 'all'}_t${type || 'all'}`;
-    const { movies, isLoading } = useMoviesInstant(cacheKey, fetcher);
+    const cacheKey = `search_v2_${keyword}`;
+    const { movies: rawMovies, isLoading } = useMoviesInstant(cacheKey, fetcher);
+
+    // Client-side filtering — API doesn't support filter params
+    const movies = rawMovies.filter((movie: any) => {
+        if (category && category !== 'all') {
+            const cats = Array.isArray(movie.category) ? movie.category : [];
+            if (!cats.some((c: any) => c?.slug === category)) return false;
+        }
+        if (country && country !== 'all') {
+            const countries = Array.isArray(movie.country) ? movie.country : [];
+            if (!countries.some((c: any) => c?.slug === country)) return false;
+        }
+        if (year && year !== 'all') {
+            if (String(movie.year) !== String(year)) return false;
+        }
+        if (type && type !== 'all') {
+            if (movie.type !== type) return false;
+        }
+        return true;
+    });
 
     const hasMovies = movies.length > 0;
     const hasActors = actors.length > 0;

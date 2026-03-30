@@ -16,7 +16,7 @@ const getImageUrl = (url: string) => {
 function ContinueWatchingRowInner() {
     const { data: session } = useSession();
     const [movies, setMovies] = useState<any[]>([]);
-    const [viewMode] = useState<"recent" | "nearlyDone">("recent");
+
     const [loading, setLoading] = useState(true);
     const rowRef = useRef<HTMLDivElement>(null);
 
@@ -155,12 +155,7 @@ function ContinueWatchingRowInner() {
         rowRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
     };
 
-    const displayMovies = useMemo(() => {
-        if (viewMode === "nearlyDone") {
-            return [...movies].sort((a, b) => (b.progress || 0) - (a.progress || 0));
-        }
-        return movies;
-    }, [movies, viewMode]);
+    const displayMovies = useMemo(() => movies, [movies]);
 
     if (loading) {
         return (
