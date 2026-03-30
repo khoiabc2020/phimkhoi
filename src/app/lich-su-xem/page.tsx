@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getWatchHistory, getContinueWatching, removeWatchHistory, clearWatchHistory } from "@/app/actions/watchHistory";
 import EmptyState from "@/components/EmptyState";
+import Pagination from "@/components/Pagination";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
@@ -30,19 +31,27 @@ async function ClearHistoryButton() {
     );
 }
 
-export default async function WatchHistoryPage() {
+export default async function WatchHistoryPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ page?: string }>;
+}) {
     const session = await getServerSession(authOptions);
     if (!session) {
         redirect("/login");
     }
 
+    const { page: pageParam } = await searchParams;
+    const currentPage = Math.max(1, Number(pageParam) || 1);
+
     const [continueWatchingResult, historyResult] = await Promise.all([
-        getContinueWatching(),
-        getWatchHistory(),
+        currentPage === 1 ? getContinueWatching() : Promise.resolve({ success: true, data: [] }),
+        getWatchHistory(currentPage, 30),
     ]);
 
     const continueWatching = continueWatchingResult.success && continueWatchingResult.data ? continueWatchingResult.data : [];
     const history = historyResult.success && historyResult.data ? historyResult.data : [];
+    const totalPages = (historyResult as any).totalPages || 1;
 
     return (
         <div className="min-h-screen pt-24 md:pt-28 pb-12 relative overflow-hidden bg-[#0a0a0a]">
@@ -150,7 +159,7 @@ export default async function WatchHistoryPage() {
                                 Tất cả đã xem
                             </h2>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-3 md:gap-x-4 gap-y-6 [contain:layout_paint]">
-                                {history.map((item: any) => (
+                                {history.map((item: any, idx: number) => (
                                     <div key={item._id} className="group relative block">
                                         <Link href={`/xem-phim/${item.movieSlug}/${item.episodeSlug}`} className="block">
                                             <div className="relative aspect-[2/3] rounded-[6px] overflow-hidden bg-[#0B0B10] shadow-md border border-white/5 group-hover:border-white/20 transition-all">
@@ -206,6 +215,11 @@ export default async function WatchHistoryPage() {
                                     </div>
                                 ))}
                             </div>
+                            {totalPages > 1 && (
+                                <div className="mt-10">
+                                    <Pagination currentPage={currentPage} totalPages={totalPages} />
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}

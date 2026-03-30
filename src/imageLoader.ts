@@ -9,7 +9,7 @@ export default function imageLoader({
     width: number;
     quality?: number;
 }) {
-    const q = quality || 80;
+    const q = quality ?? 80;
     
     // Đối với các ảnh có URL tuyệt đối (external images)
     if (src.startsWith("http://") || src.startsWith("https://")) {

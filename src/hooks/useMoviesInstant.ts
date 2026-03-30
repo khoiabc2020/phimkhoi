@@ -18,6 +18,8 @@ export function useMoviesInstant(
     const [isLoading, setIsLoading] = useState(true);
     const [isFresh, setIsFresh] = useState(false);
 
+    const STALE_MS = 5 * 60 * 1000; // 5 minutes
+
     // Initial Hydration from Cache
     useEffect(() => {
         const cached = localStorage.getItem(`phimkhoi_cache_${cacheKey}`);
@@ -26,15 +28,27 @@ export function useMoviesInstant(
                 const parsed: InstantData = JSON.parse(cached);
                 setMovies(parsed.movies);
                 setPagination(parsed.pagination);
-                setIsLoading(false); // We have something to show, so not "loading" in the blank sense
+                setIsLoading(false);
             } catch (e) {
                 console.error("Cache Parse Error:", e);
             }
         }
     }, [cacheKey]);
 
-    // Background Sync
-    const sync = useCallback(async () => {
+    // Background Sync — skip if cache is fresh (<5 min old)
+    const sync = useCallback(async (force = false) => {
+        if (!force) {
+            const cached = localStorage.getItem(`phimkhoi_cache_${cacheKey}`);
+            if (cached) {
+                try {
+                    const parsed: InstantData = JSON.parse(cached);
+                    if (Date.now() - parsed.timestamp < STALE_MS) {
+                        setIsLoading(false);
+                        return; // Data is fresh, skip network call
+                    }
+                } catch { /* ignore */ }
+            }
+        }
         try {
             const res = await fetcher();
             const items = res.items || [];
@@ -43,7 +57,6 @@ export function useMoviesInstant(
             setIsFresh(true);
             setIsLoading(false);
 
-            // Update Cache
             const dataToCache: InstantData = {
                 movies: items,
                 pagination: res.pagination,
@@ -60,5 +73,5 @@ export function useMoviesInstant(
         sync();
     }, [sync]);
 
-    return { movies, pagination, isLoading, isFresh, refetch: sync };
+    return { movies, pagination, isLoading, isFresh, refetch: () => sync(true) };
 }

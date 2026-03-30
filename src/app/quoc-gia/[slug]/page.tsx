@@ -23,7 +23,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     return {
         title: `Phim ${countryName} Vietsub HD Mới Nhất | KHOIPHIM`,
         description: `Xem phim ${countryName} vietsub, thuyết minh chất lượng cao miễn phí tại KHOIPHIM. Hàng ngàn bộ phim ${countryName} hay nhất cập nhật hàng ngày.`,
+        keywords: `phim ${countryName}, xem phim ${countryName} vietsub, phim ${countryName} vietsub HD, phim ${countryName} lồng tiếng, phim ${countryName} mới nhất`,
         alternates: { canonical },
+        robots: { index: true, follow: true },
         openGraph: {
             title: `Phim ${countryName} Vietsub HD | KHOIPHIM`,
             description: `Tuyển tập phim ${countryName} hay nhất, mới nhất - vietsub HD miễn phí tại KHOIPHIM.`,

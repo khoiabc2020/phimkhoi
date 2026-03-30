@@ -61,7 +61,7 @@ export async function addWatchHistory(movieData: {
     }
 }
 
-export async function getWatchHistory(limit: number = 50) {
+export async function getWatchHistory(page: number = 1, limit: number = 30) {
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user) {
@@ -73,12 +73,14 @@ export async function getWatchHistory(limit: number = 50) {
             return { success: false, error: "User not found" };
         }
 
-        const history = await WatchHistory.find({ userId: { $in: userIdCandidates } })
-            .sort({ lastWatched: -1 })
-            .limit(limit)
-            .lean();
+        const query = { userId: { $in: userIdCandidates } };
+        const skip = (page - 1) * limit;
+        const [history, total] = await Promise.all([
+            WatchHistory.find(query).sort({ lastWatched: -1 }).skip(skip).limit(limit).lean(),
+            WatchHistory.countDocuments(query),
+        ]);
 
-        return { success: true, data: history };
+        return { success: true, data: history, total, totalPages: Math.ceil(total / limit) };
     } catch (error) {
         console.error("Get watch history error:", error);
         return { success: false, error: "Failed to fetch watch history" };
