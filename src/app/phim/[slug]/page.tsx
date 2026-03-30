@@ -1,4 +1,5 @@
 import dynamic from "next/dynamic";
+import { notFound } from "next/navigation";
 import { getMovieDetail, getMoviesList } from "@/services/api";
 import { getRelatedMoviesForMovie } from "@/services/server-movies";
 import { getMovieDetailFromCache, saveMovieToCache } from "@/lib/movie-cache";
@@ -101,9 +102,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
         saveMovieToCache(slug, data).catch(() => {});
     }
 
-    if (!data) {
-        return <div className="text-center py-20 text-white">Không tìm thấy phim</div>;
-    }
+    if (!data) return notFound();
 
     const { movie, episodes } = data as any;
     const serverData = episodes?.[0]?.server_data || [];

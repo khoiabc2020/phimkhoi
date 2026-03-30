@@ -144,10 +144,10 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
             if (res.success && res.url) {
                 await handleAvatarSelect(res.url);
             } else {
-                alert(res.error || "Lỗi upload");
+                setSaveMessage({ type: "error", text: res.error || "Lỗi upload ảnh" });
             }
-        } catch (err) {
-            alert("Lỗi upload");
+        } catch {
+            setSaveMessage({ type: "error", text: "Lỗi upload ảnh, vui lòng thử lại" });
         } finally {
             setIsUploading(false);
         }

@@ -86,10 +86,10 @@ export default function Footer() {
                     <div className="flex flex-col gap-3">
                         <p className="text-[11px] font-bold uppercase tracking-widest text-[#8FA7C5] mb-1">Hỗ trợ</p>
                             {[
-                            { href: "#", label: "Câu hỏi thường gặp" },
-                            { href: "#", label: "Chính sách bảo mật" },
-                            { href: "#", label: "Điều khoản sử dụng" },
-                            { href: "#", label: "Liên hệ quảng cáo" },
+                            { href: "/the-loai", label: "Thể loại phim" },
+                            { href: "/quoc-gia", label: "Phim theo quốc gia" },
+                            { href: "/loc-phim", label: "Lọc phim nâng cao" },
+                            { href: "mailto:support@khoiphim.org", label: "Liên hệ hỗ trợ" },
                             { href: "mailto:support@khoiphim.org", label: "support@khoiphim.org" },
                         ].map(({ href, label }) => (
                             <a key={label} href={href}
@@ -110,9 +110,9 @@ export default function Footer() {
                         <p className="mt-0.5">Nội dung được tổng hợp từ các nguồn công khai. Chúng tôi không lưu trữ video trên máy chủ.</p>
                     </div>
                     <div className="flex gap-4 text-[12px] text-gray-700 shrink-0">
-                        <Link href="#" className="hover:text-white transition-colors">Privacy</Link>
-                        <Link href="#" className="hover:text-white transition-colors">Terms</Link>
-                        <Link href="#" className="hover:text-white transition-colors">Sitemap</Link>
+                        <a href="mailto:support@khoiphim.org" className="hover:text-white transition-colors">Liên hệ</a>
+                        <Link href="/the-loai" className="hover:text-white transition-colors">Thể loại</Link>
+                        <Link href="/quoc-gia" className="hover:text-white transition-colors">Quốc gia</Link>
                     </div>
                 </div>
             </div>

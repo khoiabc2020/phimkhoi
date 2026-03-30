@@ -28,11 +28,9 @@ export default function ShareButton({ title, text, className, iconOnlyOnMobile =
         try {
             await navigator.clipboard.writeText(url);
             setCopied(true);
-            alert("Đã copy đường dẫn phim vào khay nhớ tạm!");
             setTimeout(() => setCopied(false), 2000);
         } catch (err) {
             console.error("Failed to copy", err);
-            alert("Không thể copy đường dẫn. Vui lòng thử lại!");
         }
     };
 

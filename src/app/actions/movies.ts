@@ -42,10 +42,10 @@ async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: 
  * Pattern: DB Cache -> External API -> JIT Update
  */
 export async function getResilientMoviesList(
-    type: string, 
-    page: number = 1, 
+    type: string,
+    page: number = 1,
     limit: number = 12,
-    options: { category?: string; country?: string; year?: string | number } = {}
+    options: { category?: string; country?: string; year?: string | number; sort?: string } = {}
 ) {
     try {
         const allowAdult = options.category === "phim-18" || type === "phim-18";

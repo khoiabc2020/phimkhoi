@@ -16,11 +16,12 @@ interface FilterPageProps {
         country?: string;
         year?: string;
         type?: string;
+        sort?: string;
         page?: string;
     }>;
 }
 
-const YEARS = Array.from({ length: 16 }, (_, i) => (2025 - i).toString());
+const YEARS = Array.from({ length: 36 }, (_, i) => (2025 - i).toString()); // 1990–2025
 const TYPES = [
     { name: "Phim mới", slug: "phim-moi-cap-nhat" },
     { name: "Phim lẻ", slug: "phim-le" },
@@ -50,6 +51,7 @@ export default async function AdvancedFilterPage({ searchParams }: FilterPagePro
     const { categories, countries } = await getMenuData();
     const { page } = sParams;
     const theme = getThemeBySlug("loc-phim");
+    const sort = sParams.sort;
 
     const userAgent = (await headers()).get('user-agent') || '';
     const isMobile = /mobile|android|iphone|ipad/i.test(userAgent);
@@ -90,7 +92,7 @@ export default async function AdvancedFilterPage({ searchParams }: FilterPagePro
                 </div>
 
                 {/* Filter Toolbar */}
-                <FilterToolbar 
+                <FilterToolbar
                     searchParams={sParams}
                     categories={categories}
                     countries={countries}
@@ -98,7 +100,7 @@ export default async function AdvancedFilterPage({ searchParams }: FilterPagePro
                     types={TYPES}
                 />
 
-                <FilterGridClient {...sParams} limit={limit} />
+                <FilterGridClient {...sParams} sort={sort} limit={limit} />
             </div>
         </main>
     );

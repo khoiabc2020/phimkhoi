@@ -75,17 +75,38 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const servers = data?.episodes || [];
     const { episode: currentEpisode } = resolveEpisodeFromServers(servers, episode);
     if (!movie) return { title: "Không tìm thấy phim" };
+    const poster = getPosterImageUrl(movie) || getBackdropImageUrl(movie) || "";
+    const epName = currentEpisode?.name || episode;
+    const isSeries = movie.type === "series" || movie.type === "hoathinh";
+    const epInfo = isSeries ? ` - ${epName}` : "";
+    const title = `Xem ${movie.name}${epInfo} Vietsub HD | KHOIPHIM`;
+    const desc = `Xem phim ${movie.name}${epInfo} vietsub miễn phí, chất lượng cao tại KHOIPHIM.`;
     return {
-        title: `Xem phim ${movie.name} - Tập ${currentEpisode?.name || episode} | KHOIPHIM`,
-        description: `Xem phim ${movie.name} tập ${currentEpisode?.name || episode} vietsub.`,
+        title,
+        description: desc,
+        keywords: [`${movie.name} vietsub`, `xem phim ${movie.name}`, `${movie.name} ${epName}`, "xem phim online", "phim vietsub HD"].join(", "),
         alternates: {
-            canonical: `https://khoiphim.org/phim/${slug}`,
+            canonical: `https://khoiphim.org/xem-phim/${slug}/${episode}`,
         },
         robots: {
-            index: false,
+            index: true,
             follow: true,
+            "max-image-preview": "large",
         },
-        openGraph: { images: [getPosterImageUrl(movie) || getBackdropImageUrl(movie)] },
+        openGraph: {
+            title,
+            description: desc,
+            url: `https://khoiphim.org/xem-phim/${slug}/${episode}`,
+            images: [{ url: poster, width: 800, height: 450, alt: movie.name }],
+            type: isSeries ? "video.episode" : "video.movie",
+            siteName: "KHOIPHIM",
+        },
+        twitter: {
+            card: "summary_large_image",
+            title,
+            description: desc,
+            images: [poster],
+        },
     };
 }
 
@@ -128,7 +149,34 @@ export default async function WatchPage({ params }: PageProps) {
         duration: movie.time ? parseInt(movie.time) || 90 : 90,
     };
 
+    const poster = getPosterImageUrl(movie) || getBackdropImageUrl(movie) || "";
+    const epName = currentEpisode?.name || episode;
+    const isSeries = movie.type === "series" || movie.type === "hoathinh";
+    const videoJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "VideoObject",
+        name: `${movie.name}${isSeries ? ` - ${epName}` : ""}`,
+        description: (movie.content || "").replace(/<[^>]*>/g, "").slice(0, 300),
+        thumbnailUrl: [poster],
+        uploadDate: movie.updatedAt ? new Date(movie.updatedAt).toISOString() : new Date().toISOString(),
+        contentUrl: `https://khoiphim.org/xem-phim/${slug}/${episode}`,
+        embedUrl: `https://khoiphim.org/xem-phim/${slug}/${episode}`,
+        duration: movie.time ? `PT${parseInt(movie.time) || 90}M` : "PT90M",
+        inLanguage: "vi",
+        genre: Array.isArray(movie.category) ? movie.category.map((c: any) => c.name).join(", ") : "",
+        ...(isSeries && {
+            "@type": "TVEpisode",
+            partOfSeries: {
+                "@type": "TVSeries",
+                name: movie.name,
+                url: `https://khoiphim.org/phim/${slug}`,
+            },
+        }),
+    };
+
     return (
+        <>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(videoJsonLd) }} />
         <div className="min-h-screen bg-[#0a0a0a] text-gray-300 relative overflow-hidden" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
             <div className="fixed inset-0 pointer-events-none z-0">
                 <div className={cn("absolute top-0 left-0 right-0 h-[800px] via-black/80 to-transparent blur-[150px] opacity-40", theme.glow)} />
@@ -259,5 +307,6 @@ export default async function WatchPage({ params }: PageProps) {
                 </div>
             </div>
         </div>
+        </>
     );
 }

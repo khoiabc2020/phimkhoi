@@ -18,6 +18,8 @@ export default function AdminNotificationsPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showForm, setShowForm] = useState(false);
+    const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
 
     const [formData, setFormData] = useState({
         title: "",
@@ -25,6 +27,11 @@ export default function AdminNotificationsPage() {
         link: "",
         type: "info",
     });
+
+    const showToast = (type: "success" | "error", msg: string) => {
+        setToast({ type, msg });
+        setTimeout(() => setToast(null), 3500);
+    };
 
     useEffect(() => {
         fetchNotifications();
@@ -36,8 +43,8 @@ export default function AdminNotificationsPage() {
             if (!res.ok) throw new Error("Failed to fetch");
             const data = await res.json();
             setNotifications(data);
-        } catch (error) {
-            alert("Lỗi khi tải danh sách thông báo");
+        } catch {
+            showToast("error", "Lỗi khi tải danh sách thông báo");
         } finally {
             setIsLoading(false);
         }
@@ -54,34 +61,40 @@ export default function AdminNotificationsPage() {
             });
 
             if (!res.ok) throw new Error("Thêm thất bại");
-            
-            alert("Đã gửi thông báo thành công!");
+
+            showToast("success", "Đã gửi thông báo thành công!");
             setFormData({ title: "", message: "", link: "", type: "info" });
             setShowForm(false);
             fetchNotifications();
-        } catch (error) {
-            alert("Lỗi khi thêm thông báo");
+        } catch {
+            showToast("error", "Lỗi khi thêm thông báo");
         } finally {
             setIsSubmitting(false);
         }
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Bạn có chắc muốn xóa thông báo này?")) return;
-        
+        setDeletingId(id);
         try {
             const res = await fetch(`/api/admin/notifications/${id}`, { method: "DELETE" });
             if (!res.ok) throw new Error("Xóa thất bại");
-            
-            alert("Đã xóa thông báo");
+            showToast("success", "Đã xóa thông báo");
             setNotifications(prev => prev.filter(n => n._id !== id));
-        } catch (error) {
-            alert("Lỗi khi xóa thông báo");
+        } catch {
+            showToast("error", "Lỗi khi xóa thông báo");
+        } finally {
+            setDeletingId(null);
         }
     };
 
     return (
         <div className="max-w-4xl mx-auto">
+            {toast && (
+                <div className={`fixed top-20 right-6 z-50 px-5 py-3 rounded-lg font-bold shadow-xl flex items-center gap-2 ${toast.type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}>
+                    {toast.type === "success" ? <CheckCircle className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}
+                    {toast.msg}
+                </div>
+            )}
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <h1 className="text-3xl font-bold mb-2">Quản lý Thông báo</h1>
@@ -200,7 +213,8 @@ export default function AdminNotificationsPage() {
                                 </div>
                                 <button
                                     onClick={() => handleDelete(notif._id)}
-                                    className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                                    disabled={deletingId === notif._id}
+                                    className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-30"
                                     title="Xóa thông báo"
                                 >
                                     <Trash2 className="w-4 h-4" />

@@ -5,12 +5,21 @@ import { SlidersHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import EliteSelect from "./EliteSelect";
 
+const SORT_OPTIONS = [
+    { name: "Mới nhất", slug: "newest" },
+    { name: "Cũ nhất", slug: "oldest" },
+    { name: "Năm giảm dần", slug: "year-desc" },
+    { name: "Năm tăng dần", slug: "year-asc" },
+    { name: "Phổ biến nhất", slug: "popular" },
+];
+
 interface FilterToolbarProps {
     searchParams: {
         category?: string;
         country?: string;
         year?: string;
         type?: string;
+        sort?: string;
         page?: string;
     };
     categories: { name: string; slug: string }[];
@@ -21,7 +30,7 @@ interface FilterToolbarProps {
 
 export default function FilterToolbar({ searchParams, categories, countries, years, types }: FilterToolbarProps) {
     const router = useRouter();
-    const { category, country, year, type } = searchParams;
+    const { category, country, year, type, sort } = searchParams;
 
     const buildUrl = (updates: Record<string, string | null>) => {
         const params = new URLSearchParams();
@@ -49,10 +58,11 @@ export default function FilterToolbar({ searchParams, categories, countries, yea
     const categoryOptions = [{ name: "Tất cả thể loại", slug: "all" }, ...categories];
     const countryOptions = [{ name: "Tất cả quốc gia", slug: "all" }, ...countries];
     const yearOptions = [{ name: "Tất cả năm", slug: "all" }, ...years.map(y => ({ name: y, slug: y }))];
+    const sortOptions = SORT_OPTIONS;
 
     return (
         <div className="sticky top-20 z-[90] bg-[#0c0c14]/90 backdrop-blur-2xl border border-white/10 rounded-[20px] p-5 md:p-6 mb-12 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
-            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-5">
+            <div className="grid grid-cols-2 lg:grid-cols-6 gap-3 md:gap-4">
                 
                 {/* Type Select */}
                 <div className="space-y-1.5 flex flex-col justify-end">
@@ -98,6 +108,18 @@ export default function FilterToolbar({ searchParams, categories, countries, yea
                         value={year || "all"}
                         onChange={(value) => handleFilterChange("year", value)}
                         placeholder="Năm"
+                        className="w-full h-11"
+                    />
+                </div>
+
+                {/* Sort Select */}
+                <div className="space-y-1.5 flex flex-col justify-end">
+                    <label className="text-[10px] sm:text-xs font-bold text-white/50 uppercase tracking-[0.08em] pl-1">Sắp xếp</label>
+                    <EliteSelect
+                        options={sortOptions}
+                        value={sort || "newest"}
+                        onChange={(value) => handleFilterChange("sort", value)}
+                        placeholder="Sắp xếp"
                         className="w-full h-11"
                     />
                 </div>

@@ -66,26 +66,36 @@ export const getMoviesByFilterFromCache = async (
     slug: string,
     page: number = 1,
     limit: number = 49,
-    options: { year?: string | number; category?: string; country?: string } = {}
+    options: { year?: string | number; category?: string; country?: string; sort?: string } = {}
 ): Promise<{ items: Movie[]; pagination: any } | null> => {
     try {
         await dbConnect();
         const skip = (page - 1) * limit;
-        
+
         // Construct query
         const query: any = {};
         if (filterType === 'category') query["category.slug"] = slug;
         if (filterType === 'country') query["country.slug"] = slug;
-        
+
         if (options.year && options.year !== 'all') query.year = Number(options.year);
         if (options.category && options.category !== 'all') query["category.slug"] = options.category;
         if (options.country && options.country !== 'all') query["country.slug"] = options.country;
+
+        // Sort strategy
+        const sortMap: Record<string, Record<string, 1 | -1>> = {
+            newest:    { updatedAt: -1, lastSynced: -1 },
+            oldest:    { updatedAt: 1 },
+            "year-desc": { year: -1, updatedAt: -1 },
+            "year-asc":  { year: 1, updatedAt: -1 },
+            popular:   { view: -1, updatedAt: -1 },
+        };
+        const sortOrder = sortMap[options.sort || "newest"] || sortMap.newest;
 
         // Perform count and find in parallel
         const [totalDocCount, movies] = await Promise.all([
             MovieModel.countDocuments(query),
             MovieModel.find(query)
-                .sort({ updatedAt: -1, lastSynced: -1 })
+                .sort(sortOrder)
                 .skip(skip)
                 .limit(limit)
                 .lean(),

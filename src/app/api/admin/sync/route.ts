@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
 import dbConnect from "@/lib/db";
 import Movie from "@/models/Movie";
 import { isTrailerMovie, sanitizeTmdbDataForMovie } from "@/lib/movie-list";
 import { normalizeMovieImages } from "@/lib/movie-media";
+import { createAuditLog } from "@/lib/audit";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 const API_URL = "https://phimapi.com";
 
@@ -111,6 +114,11 @@ const normalizeMovieData = (item: any, existingMovie?: any) => {
 
 export async function GET(req: Request) {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session || session.user.role !== "admin") {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         await dbConnect();
 
         const { searchParams } = new URL(req.url);
@@ -174,6 +182,15 @@ export async function GET(req: Request) {
                 errors.push({ page, error: err.message });
             }
         }
+
+        await createAuditLog({
+            action: "SYNC_MOVIES",
+            entity: "movie",
+            adminId: session.user.id,
+            adminName: session.user.name ?? "",
+            adminEmail: session.user.email ?? "",
+            details: { pageStart, pageEnd, totalSynced, errorCount: errors.length },
+        });
 
         return NextResponse.json({
             success: true,

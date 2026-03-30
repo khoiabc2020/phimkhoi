@@ -22,7 +22,13 @@ export default function AdminHeroPage() {
     const [heroes, setHeroes] = useState<CustomHero[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
-    
+    const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+
+    const showToast = (type: "success" | "error", msg: string) => {
+        setToast({ type, msg });
+        setTimeout(() => setToast(null), 3000);
+    };
+
     // Form state
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
@@ -101,32 +107,39 @@ export default function AdminHeroPage() {
             if (data.success) {
                 setIsModalOpen(false);
                 fetchHeroes();
+                showToast("success", editingId ? "Đã cập nhật Hero" : "Đã thêm Hero mới");
             } else {
-                alert(data.error || "Failed to save");
+                showToast("error", data.error || "Lưu thất bại");
             }
-        } catch (error) {
-            console.error("Error saving hero:", error);
+        } catch {
+            showToast("error", "Lỗi kết nối server");
         } finally {
             setIsSaving(false);
         }
     };
 
     const handleDelete = async (id: string, name: string) => {
-        if (!confirm(`Bạn có chắc chắn muốn xóa "${name}" khỏi Hero?`)) return;
-        
         try {
             const res = await fetch(`/api/admin/hero/${id}`, { method: "DELETE" });
             const data = await res.json();
             if (data.success) {
                 fetchHeroes();
+                showToast("success", `Đã xóa "${name}"`);
+            } else {
+                showToast("error", "Xóa thất bại");
             }
-        } catch (error) {
-            console.error("Error deleting hero:", error);
+        } catch {
+            showToast("error", "Lỗi kết nối server");
         }
     };
 
     return (
         <div className="max-w-6xl mx-auto">
+            {toast && (
+                <div className={`fixed top-20 right-6 z-50 px-5 py-3 rounded-lg font-bold shadow-xl ${toast.type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}>
+                    {toast.msg}
+                </div>
+            )}
             <div className="flex justify-between items-center mb-6">
                 <div>
                     <h1 className="text-2xl font-bold text-white mb-1">Quản lý Custom Hero</h1>

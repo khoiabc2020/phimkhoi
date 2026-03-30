@@ -2,19 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, Captions, Film, LayoutDashboard, LogOut, MessageSquare, Settings, Users } from "lucide-react";
+import { Bell, Captions, Film, History, LayoutDashboard, LogOut, MessageSquare, Settings, Star, Users } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
 const sidebarItems = [
-    { label: "Tong Quan", href: "/admin", icon: LayoutDashboard },
+    { label: "Tổng Quan", href: "/admin", icon: LayoutDashboard },
     { label: "Phim", href: "/admin/movies", icon: Film },
-    { label: "Subtitles", href: "/admin/subtitles", icon: Captions },
-    { label: "Thanh Vien", href: "/admin/users", icon: Users },
-    { label: "Custom Hero", href: "/admin/hero", icon: Film },
-    { label: "Binh Luan", href: "/admin/comments", icon: MessageSquare },
-    { label: "Thong Bao", href: "/admin/notifications", icon: Bell },
-    { label: "Cai Dat", href: "/admin/settings", icon: Settings },
+    { label: "Phụ Đề", href: "/admin/subtitles", icon: Captions },
+    { label: "Thành Viên", href: "/admin/users", icon: Users },
+    { label: "Custom Hero", href: "/admin/hero", icon: Star },
+    { label: "Bình Luận", href: "/admin/comments", icon: MessageSquare },
+    { label: "Thông Báo", href: "/admin/notifications", icon: Bell },
+    { label: "Nhật Ký", href: "/admin/audit", icon: History },
+    { label: "Cài Đặt", href: "/admin/settings", icon: Settings },
 ];
 
 export default function AdminSidebar() {
@@ -59,7 +60,7 @@ export default function AdminSidebar() {
                     className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-red-500 transition-colors hover:bg-red-500/10"
                 >
                     <LogOut className="h-5 w-5" />
-                    <span>Dang Xuat</span>
+                    <span>Đăng Xuất</span>
                 </button>
             </div>
         </aside>

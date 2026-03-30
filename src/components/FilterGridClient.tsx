@@ -4,18 +4,20 @@ import { useCallback } from "react";
 import { getResilientMoviesList } from "@/app/actions/movies";
 import MovieGridInstant from "./MovieGridInstant";
 
-export default function FilterGridClient({ 
+export default function FilterGridClient({
     category,
     country,
     year,
     type,
+    sort,
     page = "1",
-    limit = 49 
-}: { 
+    limit = 49
+}: {
     category?: string;
     country?: string;
     year?: string;
     type?: string;
+    sort?: string;
     page?: string;
     limit?: number;
 }) {
@@ -24,14 +26,15 @@ export default function FilterGridClient({
             category,
             country,
             year: year ? parseInt(year) : undefined,
+            sort,
         });
-        return { 
-            items: data.items || [], 
-            pagination: data.pagination || { currentPage: 1, totalPages: 1 } 
+        return {
+            items: data.items || [],
+            pagination: data.pagination || { currentPage: 1, totalPages: 1 }
         };
-    }, [category, country, year, type, page, limit]);
+    }, [category, country, year, type, sort, page, limit]);
 
-    const cacheKey = `filter_t${type || 'default'}_c${category || 'all'}_co${country || 'all'}_y${year || 'all'}_p${page}`;
+    const cacheKey = `filter_t${type || 'default'}_c${category || 'all'}_co${country || 'all'}_y${year || 'all'}_s${sort || 'newest'}_p${page}`;
 
     return <MovieGridInstant fetcher={fetcher} cacheKey={cacheKey} />;
 }

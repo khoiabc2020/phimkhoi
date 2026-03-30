@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Filter, Trash2, MessageSquare, ExternalLink, User } from "lucide-react";
+import { Search, Trash2, MessageSquare, ExternalLink, User, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { getImageUrl } from "@/lib/utils";
 
@@ -10,6 +10,13 @@ export default function AdminCommentsPage() {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedComments, setSelectedComments] = useState<string[]>([]);
+    const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+    const [deleting, setDeleting] = useState(false);
+
+    const showToast = (type: "success" | "error", msg: string) => {
+        setToast({ type, msg });
+        setTimeout(() => setToast(null), 3000);
+    };
 
     useEffect(() => {
         fetchComments();
@@ -28,9 +35,8 @@ export default function AdminCommentsPage() {
     };
 
     const handleDelete = async () => {
-        if (selectedComments.length === 0) return;
-        if (!confirm(`Bạn có chắc muốn xóa ${selectedComments.length} bình luận?`)) return;
-
+        if (selectedComments.length === 0 || deleting) return;
+        setDeleting(true);
         try {
             const res = await fetch("/api/admin/comments/delete", {
                 method: "DELETE",
@@ -41,10 +47,14 @@ export default function AdminCommentsPage() {
             if (res.ok) {
                 setComments(comments.filter(c => !selectedComments.includes(c._id)));
                 setSelectedComments([]);
-                alert("Đã xóa bình luận thành công!");
+                showToast("success", `Đã xóa ${selectedComments.length} bình luận`);
+            } else {
+                showToast("error", "Xóa thất bại");
             }
-        } catch (error) {
-            alert("Xóa thất bại");
+        } catch {
+            showToast("error", "Xóa thất bại");
+        } finally {
+            setDeleting(false);
         }
     };
 
@@ -72,6 +82,11 @@ export default function AdminCommentsPage() {
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {toast && (
+                <div className={`fixed top-20 right-6 z-50 px-5 py-3 rounded-lg font-bold shadow-xl flex items-center gap-2 ${toast.type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}>
+                    <CheckCircle className="w-4 h-4" />{toast.msg}
+                </div>
+            )}
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
@@ -82,9 +97,10 @@ export default function AdminCommentsPage() {
                     {selectedComments.length > 0 && (
                         <button
                             onClick={handleDelete}
-                            className="px-4 py-2 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 transition-colors flex items-center gap-2 shadow-lg shadow-red-500/20"
+                            disabled={deleting}
+                            className="px-4 py-2 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 transition-colors flex items-center gap-2 shadow-lg shadow-red-500/20 disabled:opacity-50"
                         >
-                            <Trash2 className="w-4 h-4" /> Xóa ({selectedComments.length})
+                            <Trash2 className="w-4 h-4" /> {deleting ? "Đang xóa..." : `Xóa (${selectedComments.length})`}
                         </button>
                     )}
                     <button className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 transition-colors flex items-center gap-2">

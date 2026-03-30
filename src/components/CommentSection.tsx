@@ -61,6 +61,8 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
     const [replyingTo, setReplyingTo] = useState<string | null>(null);
     const [total, setTotal] = useState(0);
     const [showPicker, setShowPicker] = useState(false);
+    const [reportedId, setReportedId] = useState<string | null>(null);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
     const fetchComments = async () => {
@@ -113,16 +115,16 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
     };
 
     const handleDelete = async (commentId: string) => {
-        if (!confirm("Bạn có chắc muốn xóa bình luận này?")) return;
+        setDeletingId(commentId);
         await deleteComment(commentId);
+        setDeletingId(null);
         fetchComments();
     };
 
     const handleReport = async (commentId: string) => {
-        const reason = prompt("Lý do báo cáo:");
-        if (!reason) return;
-        await reportComment(commentId, reason);
-        alert("Đã báo cáo bình luận!");
+        await reportComment(commentId, "Nội dung không phù hợp");
+        setReportedId(commentId);
+        setTimeout(() => setReportedId(null), 3000);
     };
 
     const handleReply = (comment: CommentData) => {
@@ -333,10 +335,20 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                                     {session && comment.userId === session.user?.id && (
                                         <button
                                             onClick={() => handleDelete(comment._id)}
-                                            className="flex items-center gap-1.5 text-[12px] text-gray-400 hover:text-red-400 transition-colors ml-2"
+                                            disabled={deletingId === comment._id}
+                                            className="flex items-center gap-1.5 text-[12px] text-gray-400 hover:text-red-400 transition-colors ml-2 disabled:opacity-50"
                                         >
                                             <Trash2 className="w-3.5 h-3.5" />
-                                            <span className="hidden md:inline">Xóa</span>
+                                            <span className="hidden md:inline">{deletingId === comment._id ? "Đang xóa..." : "Xóa"}</span>
+                                        </button>
+                                    )}
+                                    {session && comment.userId !== session.user?.id && (
+                                        <button
+                                            onClick={() => handleReport(comment._id)}
+                                            disabled={reportedId === comment._id}
+                                            className="flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-orange-400 transition-colors ml-2 disabled:opacity-50"
+                                        >
+                                            <span className="hidden md:inline">{reportedId === comment._id ? "✓ Đã báo cáo" : "Báo cáo"}</span>
                                         </button>
                                     )}
                                 </div>

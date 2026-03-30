@@ -22,31 +22,6 @@ export async function POST(req: Request) {
             $or: [{ email: username }, { name: username }],
         });
 
-        // 2. Mock Admin check
-        if (!user && username === "admin" && password === "admin123") {
-            const token = jwt.sign(
-                {
-                    id: "admin_mock_id",
-                    name: "Admin User",
-                    email: "admin@khoiphim.com",
-                    role: "admin",
-                },
-                process.env.NEXTAUTH_SECRET || "fallback_secret",
-                { expiresIn: "30d" }
-            );
-
-            return NextResponse.json({
-                token,
-                user: {
-                    id: "admin_mock_id",
-                    name: "Admin User",
-                    email: "admin@khoiphim.com",
-                    role: "admin",
-                    image: "",
-                },
-            });
-        }
-
         if (!user) {
             return NextResponse.json(
                 { message: "Tài khoản không tồn tại" },

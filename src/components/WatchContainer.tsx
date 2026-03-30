@@ -46,9 +46,19 @@ export default function WatchContainer({
     initialServerName,
 }: WatchContainerProps) {
     const router = useRouter();
-    const [isTheaterMode, setIsTheaterMode] = useState(false);
+    const [isTheaterMode, setIsTheaterMode] = useState(() => {
+        if (typeof window !== "undefined") {
+            return localStorage.getItem("theaterMode") === "true";
+        }
+        return false;
+    });
     const [isLightOff, setIsLightOff] = useState(false);
-    const [autoNext, setAutoNext] = useState(true);
+    const [autoNext, setAutoNext] = useState(() => {
+        if (typeof window !== "undefined") {
+            return localStorage.getItem("autoNext") !== "false";
+        }
+        return true;
+    });
     const [activeServerName, setActiveServerName] = useState(
         initialServerName || servers?.[0]?.server_name || ""
     );
@@ -335,11 +345,19 @@ export default function WatchContainer({
                     <WatchEngagementBar
                         movie={movie}
                         isTheaterMode={isTheaterMode}
-                        toggleTheater={() => setIsTheaterMode(!isTheaterMode)}
+                        toggleTheater={() => {
+                            const next = !isTheaterMode;
+                            setIsTheaterMode(next);
+                            localStorage.setItem("theaterMode", String(next));
+                        }}
                         isLightOff={isLightOff}
                         toggleLight={() => setIsLightOff(!isLightOff)}
                         autoNext={autoNext}
-                        onAutoNextToggle={() => setAutoNext(!autoNext)}
+                        onAutoNextToggle={() => {
+                            const next = !autoNext;
+                            setAutoNext(next);
+                            localStorage.setItem("autoNext", String(next));
+                        }}
                         currentEpisodeName={activeEpisode ? displayEpisodeName(activeEpisode.name) : undefined}
                         useIframe={!canUseCustom}
                         onTogglePlayer={() => {

@@ -37,7 +37,6 @@ export default function FavoriteActorButton({ actorName, initialIsFavorite }: Fa
             if (!result.success) {
                 setIsFavorite(!newStatus); // Revert on failure
                 console.error(result.error);
-                alert("Có lỗi xảy ra, vui lòng thử lại sau.");
             }
         });
     };
