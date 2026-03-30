@@ -6,6 +6,7 @@ import MovieRow from "@/components/MovieRow";
 import TopTrendingTabs from "@/components/TopTrendingTabs";
 import QuickNav from "@/components/QuickNav";
 import ContinueWatchingRow from "@/components/ContinueWatchingRow";
+import RecommendedRow from "@/components/RecommendedRow";
 
 import { getMovieDetail, getMoviesList, getTrendMovies, isTrailer } from "@/services/api";
 import { getResilientMoviesList } from "@/app/actions/movies";
@@ -335,6 +336,8 @@ export default function Home() {
         <div className="space-y-4 md:space-y-8">
           {/* Hàng phim tiếp diễn */}
           <ContinueWatchingRow />
+          {/* Đề xuất cá nhân hóa */}
+          <RecommendedRow />
 
           {/* Group: Phim Mới */}
           <Suspense fallback={contentSkeleton}>

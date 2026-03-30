@@ -107,6 +107,7 @@ export default function VideoPlayer({
     const streamUrl = m3u8 || url;
     const [fallbackIframe, setFallbackIframe] = useState(false);
     const [showSkipAd, setShowSkipAd] = useState(false);
+    const [showSkipIntro, setShowSkipIntro] = useState(false);
     const [useProxy, setUseProxy] = useState(false); // New state to trigger proxy
     // Swipe-to-seek state (mobile gesture)
     const [seekIndicator, setSeekIndicator] = useState<{ delta: number; side: "left" | "right" } | null>(null);
@@ -116,6 +117,7 @@ export default function VideoPlayer({
         setFallbackIframe(false);
         setUseProxy(false);
         setShowSkipAd(false);
+        setShowSkipIntro(false);
     }, [streamUrl, serverName]);
     // Logic to determine the final stream URL (potentially proxied)
     const finalStreamUrl = useProxy 
@@ -417,6 +419,13 @@ export default function VideoPlayer({
                         setShowSkipAd(false);
                     }
 
+                    // Skip intro: show button from 30s to 3 minutes
+                    if (ct >= 30 && ct <= 180) {
+                        setShowSkipIntro(true);
+                    } else {
+                        setShowSkipIntro(false);
+                    }
+
                     if (!art.playing) return;
                     saveHistory(art.currentTime, art.duration);
                 });
@@ -632,6 +641,41 @@ export default function VideoPlayer({
                             </span>
                         </div>
                     </div>
+                )}
+                {showSkipIntro && (
+                    <button
+                        onClick={() => {
+                            if (artInstance.current) {
+                                artInstance.current.seek = Math.min(artInstance.current.duration, artInstance.current.currentTime + 85);
+                            }
+                            setShowSkipIntro(false);
+                        }}
+                        style={{
+                            position: 'absolute',
+                            bottom: '72px',
+                            right: '12px',
+                            zIndex: 9999,
+                            background: 'rgba(0,0,0,0.82)',
+                            color: 'white',
+                            border: '1.5px solid rgba(255,255,255,0.3)',
+                            borderRadius: '6px',
+                            padding: '7px 16px',
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            backdropFilter: 'blur(6px)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            boxShadow: '0 2px 14px rgba(0,0,0,0.5)',
+                            fontFamily: 'inherit',
+                        }}
+                        onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(143,167,197,0.95)'; (e.currentTarget as HTMLButtonElement).style.color = '#0a0a0a'; }}
+                        onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,0,0,0.82)'; (e.currentTarget as HTMLButtonElement).style.color = 'white'; }}
+                    >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zm2-8.14L11.03 12 8 14.14V9.86zM16 6h2v12h-2z" /></svg>
+                        Bỏ qua intro
+                    </button>
                 )}
                 {showSkipAd && (
                     <button

@@ -34,6 +34,14 @@ function formatQualityLabel(quality?: string) {
     return q.length > 6 ? q.slice(0, 6) : q;
 }
 
+function getContentRating(movie: Movie): { label: string; color: string } | null {
+    const cats = (movie.category || []).map((c: any) => c?.slug || "");
+    if (cats.includes("phim-18") || (movie as any).type === "phim-18") return { label: "18+", color: "#E50914" };
+    if (cats.some((s: string) => ["kinh-di", "hanh-dong", "toi-pham", "vo-thuat", "chien-tranh"].includes(s))) return { label: "13+", color: "#E5A300" };
+    if (cats.includes("hoat-hinh")) return { label: "P", color: "#4CAF50" };
+    return null;
+}
+
 function isTrailerBadge(value?: string) {
     const normalized = String(value || "")
         .normalize("NFD")
@@ -530,7 +538,7 @@ function OnflixHoverCard({
                             </div>
                         </div>
 
-                        {/* Info: Year & Quality */}
+                        {/* Info: Year, Quality & Content Rating */}
                         <div className="flex items-center gap-2 text-[13px] mt-2">
                             {movie.year && Number(movie.year) > 1900 && (
                                 <span className="text-white/70 font-medium">{movie.year}</span>
@@ -545,6 +553,15 @@ function OnflixHoverCard({
                                     {movie.episode_current}
                                 </span>
                             )}
+                            {(() => {
+                                const rating = getContentRating(movie);
+                                if (!rating) return null;
+                                return (
+                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider text-white/90 border" style={{ borderColor: rating.color + '80', color: rating.color }}>
+                                        {rating.label}
+                                    </span>
+                                );
+                            })()}
                         </div>
 
                         {/* Genres */}
