@@ -312,7 +312,28 @@ async function HeroStream() {
   return <AsyncHeroSection initialMovies={finalHeroData} />;
 }
 
-export default function Home() {
+const ROW_CONFIGS = [
+  { slug: "phim-chieu-rap", title: "Phim Chiếu Rạp Mới", viewAllHref: "/danh-sach/phim-chieu-rap", priorityFirst: true as const },
+  { slug: "phim-moi-cap-nhat", title: "Phim Mới Cập Nhật", viewAllHref: "/danh-sach/phim-moi", priorityFirst: true as const },
+  { slug: "han-quoc", title: "Phim Hàn Quốc", endpoint: "quoc-gia" as const, viewAllHref: "/quoc-gia/han-quoc" },
+  { slug: "trung-quoc", title: "Phim Trung Quốc", endpoint: "quoc-gia" as const, viewAllHref: "/quoc-gia/trung-quoc" },
+  { slug: "phim-le", title: "Phim Lẻ Mới", viewAllHref: "/danh-sach/phim-le" },
+  { slug: "phim-bo", title: "Phim Bộ Mới", viewAllHref: "/danh-sach/phim-bo" },
+  { slug: "hanh-dong", title: "Phim Hành Động", endpoint: "the-loai" as const, viewAllHref: "/the-loai/hanh-dong" },
+  { slug: "hoat-hinh", title: "Phim Hoạt Hình", endpoint: "the-loai" as const, viewAllHref: "/the-loai/hoat-hinh" },
+] as const;
+
+export default async function Home() {
+  // Fetch tất cả hàng phim song song — không còn skeleton từng hàng
+  const rowResults = await Promise.all(
+    ROW_CONFIGS.map(({ slug, endpoint }) =>
+      getResilientMoviesList(slug, 1, ROW_LIMIT, {
+        category: endpoint === 'the-loai' ? slug : undefined,
+        country: endpoint === 'quoc-gia' ? slug : undefined,
+      }).catch(() => ({ items: [] as any[] }))
+    )
+  );
+
   return (
     <main className="min-h-screen pb-16 bg-[#0a0a0a]">
       {/* Hero Section - Tải đầu tiên */}
@@ -323,7 +344,7 @@ export default function Home() {
       <div className="w-full max-w-[1920px] mx-auto px-1.5 sm:px-3 md:px-5 lg:pl-24 lg:pr-12 relative z-30 pb-16 -mt-0 md:-mt-2 lg:-mt-4 xl:-mt-6">
         {/* Decorative background glow - keep subtle and close to the black system palette */}
         <div className="pointer-events-none absolute left-0 right-0 top-0 -z-10 h-[800px] bg-[radial-gradient(circle_at_top,rgba(143,167,197,0.04),transparent_55%)] blur-[160px]" />
-        
+
         <div className="mb-6">
           <QuickNav />
         </div>
@@ -339,41 +360,19 @@ export default function Home() {
           {/* Đề xuất cá nhân hóa */}
           <RecommendedRow />
 
-          {/* Group: Phim Mới */}
-          <Suspense fallback={contentSkeleton}>
-            <HomeRowSection title="Phim Chiếu Rạp Mới" slug="phim-chieu-rap" viewAllHref="/danh-sach/phim-chieu-rap" priorityFirst={true} />
-          </Suspense>
-
-          <Suspense fallback={contentSkeleton}>
-            <HomeRowSection title="Phim Mới Cập Nhật" slug="phim-moi-cap-nhat" viewAllHref="/danh-sach/phim-moi" priorityFirst={true} />
-          </Suspense>
-
-          {/* Group: Quốc gia */}
-          <Suspense fallback={contentSkeleton}>
-            <HomeRowSection title="Phim Hàn Quốc" slug="han-quoc" endpoint="quoc-gia" viewAllHref="/quoc-gia/han-quoc" />
-          </Suspense>
-
-          <Suspense fallback={contentSkeleton}>
-            <HomeRowSection title="Phim Trung Quốc" slug="trung-quoc" endpoint="quoc-gia" viewAllHref="/quoc-gia/trung-quoc" />
-          </Suspense>
-
-          {/* Group: Mới cập nhật khác */}
-          <Suspense fallback={contentSkeleton}>
-            <HomeRowSection title="Phim Lẻ Mới" slug="phim-le" viewAllHref="/danh-sach/phim-le" />
-          </Suspense>
-
-          <Suspense fallback={contentSkeleton}>
-            <HomeRowSection title="Phim Bộ Mới" slug="phim-bo" viewAllHref="/danh-sach/phim-bo" />
-          </Suspense>
-
-          {/* Group: Thể loại */}
-          <Suspense fallback={contentSkeleton}>
-            <HomeRowSection title="Phim Hành Động" slug="hanh-dong" endpoint="the-loai" viewAllHref="/the-loai/hanh-dong" />
-          </Suspense>
-
-          <Suspense fallback={contentSkeleton}>
-            <HomeRowSection title="Phim Hoạt Hình" slug="hoat-hinh" endpoint="the-loai" viewAllHref="/the-loai/hoat-hinh" />
-          </Suspense>
+          {ROW_CONFIGS.map((config, idx) => {
+            const movies = rowResults[idx]?.items || [];
+            if (!movies.length) return null;
+            return (
+              <MovieRow
+                key={config.slug}
+                title={config.title}
+                movies={movies}
+                slug={config.viewAllHref}
+                priorityFirst={'priorityFirst' in config ? config.priorityFirst : false}
+              />
+            );
+          })}
         </div>
       </div>
     </main>

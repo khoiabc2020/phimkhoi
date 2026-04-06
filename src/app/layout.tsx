@@ -125,6 +125,8 @@ export default async function RootLayout({
         <meta name="msapplication-TileImage" content="/icons/ms-icon-144x144.png" />
         <meta name="theme-color" content="#ffffff" />
         {/* Preconnect to image CDN domains để giảm latency ảnh tối đa */}
+        <link rel="preconnect" href="https://wsrv.nl" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://wsrv.nl" />
         <link rel="preconnect" href="https://image.tmdb.org" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://image.tmdb.org" />
         <link rel="preconnect" href="https://img.ophim.live" crossOrigin="anonymous" />
