@@ -9,14 +9,18 @@ interface MovieGridInstantProps {
     fetcher: () => Promise<{ items: any[]; pagination?: any }>;
     cacheKey: string;
     emptyMessage?: string;
+    initialMovies?: any[];
+    initialPagination?: any;
 }
 
-export default function MovieGridInstant({ 
-    fetcher, 
+export default function MovieGridInstant({
+    fetcher,
     cacheKey,
-    emptyMessage = "Không tìm thấy phim nào."
+    emptyMessage = "Không tìm thấy phim nào.",
+    initialMovies,
+    initialPagination,
 }: MovieGridInstantProps) {
-    const { movies, pagination, isLoading } = useMoviesInstant(cacheKey, fetcher);
+    const { movies, pagination, isLoading } = useMoviesInstant(cacheKey, fetcher, initialMovies, initialPagination);
 
     if (isLoading && movies.length === 0) {
         return (

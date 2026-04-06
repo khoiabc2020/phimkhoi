@@ -1,8 +1,7 @@
 import { Suspense } from "react";
-import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
-import Pagination from "@/components/Pagination";
-import { getMoviesByCountry, getMenuData } from "@/services/api";
+import { getMenuData } from "@/services/api";
+import { getResilientMoviesList } from "@/app/actions/movies";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
@@ -37,14 +36,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 import CountryGridClient from "@/components/CountryGridClient";
 
-const GridSkeleton = ({ limit = 49 }: { limit?: number }) => (
-    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 mt-6">
-        {Array.from({ length: limit }).map((_, i) => (
-            <div key={i} className="aspect-[2/3] rounded-lg bg-white/5 animate-pulse" />
-        ))}
-    </div>
-);
-
 export default async function CountryPage({ 
     params, 
     searchParams 
@@ -60,8 +51,15 @@ export default async function CountryPage({
     const isMobile = /mobile|android|iphone|ipad/i.test(userAgent);
     const limit = isMobile ? 28 : 49;
 
-    // Fetch menu data immediately for the shell
-    const { categories, countries } = await getMenuData();
+    // Fetch menu data and initial grid data concurrently
+    const [{ categories, countries }, initialData] = await Promise.all([
+        getMenuData(),
+        getResilientMoviesList("country", currentPage, limit, {
+            country: slug,
+            category: sParams.category,
+            year: sParams.year,
+        }).catch(() => ({ items: [], pagination: undefined })),
+    ]);
 
     // Resolve properly formatted name (with full diacritics)
     const country = countries.find(c => c.slug === slug);
@@ -104,15 +102,15 @@ export default async function CountryPage({
                     </div>
                 </div>
 
-                <Suspense key={`${slug}-${currentPage}-${sParams.category || 'all'}-${sParams.year || 'all'}`} fallback={<GridSkeleton limit={limit} />}>
-                    <CountryGridClient 
-                        slug={slug} 
-                        page={currentPage} 
-                        category={sParams.category}
-                        year={sParams.year}
-                        limit={limit}
-                    />
-                </Suspense>
+                <CountryGridClient
+                    slug={slug}
+                    page={currentPage}
+                    category={sParams.category}
+                    year={sParams.year}
+                    limit={limit}
+                    initialMovies={initialData.items}
+                    initialPagination={initialData.pagination}
+                />
             </div>
         </main>
     );

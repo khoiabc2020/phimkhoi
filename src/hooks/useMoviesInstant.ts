@@ -10,12 +10,15 @@ interface InstantData {
 }
 
 export function useMoviesInstant(
-    cacheKey: string, 
-    fetcher: () => Promise<{ items: Movie[]; pagination?: any }>
+    cacheKey: string,
+    fetcher: () => Promise<{ items: Movie[]; pagination?: any }>,
+    initialMovies?: Movie[],
+    initialPagination?: any,
 ) {
-    const [movies, setMovies] = useState<Movie[]>([]);
-    const [pagination, setPagination] = useState<any>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const hasInitial = !!initialMovies?.length;
+    const [movies, setMovies] = useState<Movie[]>(hasInitial ? initialMovies! : []);
+    const [pagination, setPagination] = useState<any>(initialPagination ?? null);
+    const [isLoading, setIsLoading] = useState(!hasInitial);
     const [isFresh, setIsFresh] = useState(false);
 
     const STALE_MS = 5 * 60 * 1000; // 5 minutes
@@ -26,14 +29,18 @@ export function useMoviesInstant(
         if (cached) {
             try {
                 const parsed: InstantData = JSON.parse(cached);
-                setMovies(parsed.movies);
-                setPagination(parsed.pagination);
+                if (parsed.movies?.length) {
+                    setMovies(parsed.movies);
+                    setPagination(parsed.pagination);
+                }
                 setIsLoading(false);
             } catch (e) {
                 console.error("Cache Parse Error:", e);
             }
+        } else if (hasInitial) {
+            setIsLoading(false);
         }
-    }, [cacheKey]);
+    }, [cacheKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Background Sync — skip if cache is fresh (<5 min old)
     const sync = useCallback(async (force = false) => {

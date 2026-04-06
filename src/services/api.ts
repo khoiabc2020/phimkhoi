@@ -777,7 +777,7 @@ export const getMoviesList = async (type: string, params: { page?: number; year?
         // 1. [Elite Choice] Try local Database-First API
         try {
             const localUrl = `/api/movies/list?type=list&slug=${kkType}&${query}`;
-            const localRes = await fetch(localUrl, { next: { revalidate: 300 } });
+            const localRes = await fetch(localUrl, { next: { revalidate: 3600 } });
             if (localRes.ok) {
                 const localData = await localRes.json();
                 if (localData.items?.length > 0 && !localData.fallback) {
@@ -907,7 +907,7 @@ export const getMoviesByCategory = async (slug: string, page: number = 1, limit:
         // 1. [Elite Choice] Try local Database-First API
         try {
             const localUrl = `/api/movies/list?type=category&slug=${slug}&${queryStr}`;
-            const localRes = await fetch(localUrl, { next: { revalidate: 300 } });
+            const localRes = await fetch(localUrl, { next: { revalidate: 3600 } });
             if (localRes.ok) {
                 const localData = await localRes.json();
                 if (localData.items?.length > 0 && !localData.fallback) {
@@ -1018,7 +1018,7 @@ export const getMoviesByCountry = async (
         if (!options?.skipLocal) {
             try {
                 const localUrl = `/api/movies/list?type=country&slug=${slug}&${queryStr}`;
-                const localRes = await fetch(localUrl, { next: { revalidate: 300 } });
+                const localRes = await fetch(localUrl, { next: { revalidate: 3600 } });
                 if (localRes.ok) {
                     const localData = await localRes.json();
                     if (localData.items?.length > 0 && !localData.fallback) {

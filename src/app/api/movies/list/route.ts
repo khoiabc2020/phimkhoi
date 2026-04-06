@@ -42,7 +42,7 @@ export async function GET(req: Request) {
                     ...data,
                         items: sanitizedItems
                     }, {
-                    headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' }
+                    headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200' }
                     });
                 }
             }
@@ -58,7 +58,7 @@ export async function GET(req: Request) {
                     ...data,
                         items: sanitizedItems
                     }, {
-                    headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' }
+                    headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200' }
                     });
                 }
             }
@@ -95,7 +95,7 @@ export async function GET(req: Request) {
                     ...externalData,
                         items: sanitizedItems
                     }, {
-                    headers: { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300' }
+                    headers: { 'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=1200' }
                     });
                 }
             }
@@ -116,7 +116,7 @@ export async function GET(req: Request) {
                     pagination: { currentPage: page, totalPages: 1 },
                     fallback: true
                 }, {
-                    headers: { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300' }
+                    headers: { 'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=1200' }
                 });
             }
         }

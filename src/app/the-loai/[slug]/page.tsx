@@ -1,8 +1,7 @@
 import { Suspense } from "react";
-import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
-import Pagination from "@/components/Pagination";
-import { getMoviesByCategory, getMenuData } from "@/services/api";
+import { getMenuData } from "@/services/api";
+import { getResilientMoviesList } from "@/app/actions/movies";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
@@ -37,14 +36,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 import CategoryGridClient from "@/components/CategoryGridClient";
 
-const GridSkeleton = ({ limit = 49 }: { limit?: number }) => (
-    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 mt-6">
-        {Array.from({ length: limit }).map((_, i) => (
-            <div key={i} className="aspect-[2/3] rounded-lg bg-white/5 animate-pulse" />
-        ))}
-    </div>
-);
-
 export default async function CategoryPage({
     params,
     searchParams
@@ -60,16 +51,24 @@ export default async function CategoryPage({
     const isMobile = /mobile|android|iphone|ipad/i.test(userAgent);
     const limit = isMobile ? 28 : 49;
 
-    // Fetch menu data immediately for the shell
-    const { categories, countries } = await getMenuData();
+    // Fetch menu data and initial grid data concurrently
+    const isSpecialType = slug === 'phim-chieu-rap';
+    const [{ categories, countries }, initialData] = await Promise.all([
+        getMenuData(),
+        getResilientMoviesList(
+            isSpecialType ? slug : "category",
+            currentPage, limit,
+            isSpecialType
+                ? { country: sParams.country, year: sParams.year }
+                : { category: slug, country: sParams.country, year: sParams.year }
+        ).catch(() => ({ items: [], pagination: undefined })),
+    ]);
 
     // Resolve properly formatted name (with full diacritics)
     const category = categories.find(c => c.slug === slug);
     const categoryName = category?.name || (slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, " "));
 
     const theme = getThemeBySlug(slug);
-    // Special handling for phim-chieu-rap which is sometimes a category and sometimes a list
-    const isSpecialType = slug === 'phim-chieu-rap';
     const displayLabel = isSpecialType ? "Danh sách" : "Thể loại";
     const displayTitle = isSpecialType ? "Phim Chiếu Rạp" : categoryName;
 
@@ -117,16 +116,16 @@ export default async function CategoryPage({
                     </div>
                 </div>
 
-                <Suspense key={`${slug}-${currentPage}-${sParams.country || 'all'}-${sParams.year || 'all'}`} fallback={<GridSkeleton limit={limit} />}>
-                    <CategoryGridClient
-                        slug={slug}
-                        page={currentPage}
-                        country={sParams.country}
-                        year={sParams.year}
-                        limit={limit}
-                        isTypeFallback={isSpecialType}
-                    />
-                </Suspense>
+                <CategoryGridClient
+                    slug={slug}
+                    page={currentPage}
+                    country={sParams.country}
+                    year={sParams.year}
+                    limit={limit}
+                    isTypeFallback={isSpecialType}
+                    initialMovies={initialData.items}
+                    initialPagination={initialData.pagination}
+                />
             </div>
         </main>
     );

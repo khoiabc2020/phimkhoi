@@ -1,7 +1,5 @@
 import { Suspense } from "react";
-import MovieCard from "@/components/MovieCard";
 import FilterBar from "@/components/FilterBar";
-import Pagination from "@/components/Pagination";
 import { getResilientMoviesList } from "@/app/actions/movies";
 import { getMenuData } from "@/services/api";
 import { Metadata } from "next";
@@ -91,7 +89,14 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
     const category = (resolvedSearchParams.category as string) || undefined;
     const country = (resolvedSearchParams.country as string) || undefined;
     const quality = (resolvedSearchParams.quality as string) || undefined;
-    const { categories, countries } = await getMenuData();
+    const [{ categories, countries }, initialData] = await Promise.all([
+        getMenuData(),
+        getResilientMoviesList(
+            (type === 'tat-ca-the-loai' || type === 'phim-moi') ? 'phim-moi-cap-nhat' : type,
+            page, limit,
+            { year: year?.toString(), category, country }
+        ).catch(() => ({ items: [], pagination: undefined })),
+    ]);
     const typeName = TYPE_NAMES[type] || type;
 
     return (
@@ -131,6 +136,8 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
                     category={category}
                     country={country}
                     year={year?.toString()}
+                    initialMovies={initialData.items}
+                    initialPagination={initialData.pagination}
                 />
 
             </div>
