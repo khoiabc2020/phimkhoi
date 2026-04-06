@@ -64,6 +64,7 @@ export default function WatchContainer({
     );
     const [progress, setProgress] = useState(0);
     const [progressLoaded] = useState(true);
+    const [subtitles, setSubtitles] = useState<any[]>([]);
 
     const activeServer = servers?.find((s) => s.server_name === activeServerName) || servers?.[0];
     const currentServerEpisodes = activeServer?.server_data || initialEpisodes || [];
@@ -101,6 +102,15 @@ export default function WatchContainer({
             return () => { document.body.style.overflow = ""; };
         }
     }, [isTheaterMode]);
+
+    // Fetch subtitles for current episode (non-blocking)
+    useEffect(() => {
+        if (!movie.slug || !currentEpisodeSlug) return;
+        fetch(`/api/subtitles?movieSlug=${encodeURIComponent(movie.slug)}&episodeSlug=${encodeURIComponent(currentEpisodeSlug)}`)
+            .then(r => r.ok ? r.json() : null)
+            .then(d => { if (d?.items) setSubtitles(d.items); })
+            .catch(() => {});
+    }, [movie.slug, currentEpisodeSlug]);
 
     // Fetch initial progress on client side - Non-blocking for the player
     useEffect(() => {
@@ -227,6 +237,7 @@ export default function WatchContainer({
                                     nextEpisodeUrl={nextEpisodeUrl}
                                     isTheaterMode={isTheaterMode}
                                     serverName={activeServerName}
+                                    subtitles={subtitles}
                                     onPlayerError={() => {
                                         console.warn("ArtPlayer failed, falling back to Iframe...");
                                         setPlayerError(true);

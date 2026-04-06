@@ -28,6 +28,15 @@ interface VideoPlayerProps {
     isTheaterMode?: boolean;
     serverName?: string;
     onPlayerError?: () => void;
+    subtitles?: Array<{
+        _id: string;
+        label: string;
+        language: string;
+        format: string;
+        url?: string;
+        sourceType: string;
+        isDefault?: boolean;
+    }>;
 }
 
 // Vietnamese i18n for ArtPlayer
@@ -91,6 +100,7 @@ export default function VideoPlayer({
     isTheaterMode = false,
     serverName = "",
     onPlayerError,
+    subtitles = [],
 }: VideoPlayerProps) {
     const artRef = useRef<HTMLDivElement>(null);
     const artInstance = useRef<any>(null);
@@ -99,10 +109,12 @@ export default function VideoPlayer({
     const lastSavedRef = useRef<number>(0);
     const autoNextRef = useRef(autoNext);
     const nextEpisodeUrlRef = useRef(nextEpisodeUrl);
+    const subtitlesRef = useRef(subtitles);
 
-    // Keep refs in sync so closure captures latest values
+    // Keep refs in sync so closures always see latest values
     useEffect(() => { autoNextRef.current = autoNext; }, [autoNext]);
     useEffect(() => { nextEpisodeUrlRef.current = nextEpisodeUrl; }, [nextEpisodeUrl]);
+    useEffect(() => { subtitlesRef.current = subtitles; }, [subtitles]);
 
     const streamUrl = m3u8 || url;
     const [fallbackIframe, setFallbackIframe] = useState(false);
@@ -224,6 +236,38 @@ export default function VideoPlayer({
 
                 let hasAutoSkipped = false;
 
+                // ── Subtitle setup ────────────────────────────────────────
+                function getSubUrl(sub: NonNullable<typeof subtitles>[0]): string {
+                    if (sub.sourceType === "content") return `/api/subtitles/content?id=${sub._id}`;
+                    if (sub.url) return `/api/subtitles/content?url=${encodeURIComponent(sub.url)}`;
+                    return "";
+                }
+                const savedLang = typeof localStorage !== "undefined" ? localStorage.getItem("subtitleLang") : null;
+                const defaultSub = subtitles.find(s => savedLang ? s.language === savedLang : s.isDefault)
+                    || (savedLang ? undefined : subtitles[0]);
+
+                const subtitleConfig = defaultSub ? {
+                    url: getSubUrl(defaultSub),
+                    type: (defaultSub.format === "ass" || defaultSub.format === "ssa" ? "ass" : defaultSub.format) as any,
+                    style: {
+                        color: "#ffffff",
+                        fontSize: isMobileNarrow ? "16px" : "22px",
+                        textShadow: "0 2px 6px rgba(0,0,0,0.9)",
+                    },
+                    encoding: "utf-8",
+                    escape: false,
+                } : undefined;
+
+                const subtitleSelectorItems = subtitles.length > 0 ? [
+                    { html: "⊘ Tắt phụ đề", default: !defaultSub, value: null },
+                    ...subtitles.map(s => ({
+                        html: s.label || s.language.toUpperCase(),
+                        default: s._id === defaultSub?._id,
+                        value: { url: getSubUrl(s), type: s.format, lang: s.language },
+                    })),
+                ] : [];
+                // ─────────────────────────────────────────────────────────
+
                 art = new Artplayer({
                     container: artRef.current!,
                     url: finalStreamUrl,
@@ -243,8 +287,33 @@ export default function VideoPlayer({
                     i18n: { "vi": VI_LOCALE },
                     lang: "vi",
                     moreVideoAttr: { crossOrigin: "anonymous" },
-                    settings: serverName.toLowerCase().includes("kkphim") ? [
-                        {
+                    ...(subtitleConfig ? { subtitle: subtitleConfig } : {}),
+                    subtitleOffset: subtitles.length > 0,
+                    settings: [
+                        // Subtitle selector (chỉ hiện khi có subtitle)
+                        ...(subtitleSelectorItems.length > 0 ? [{
+                            html: "Phụ đề",
+                            width: 200,
+                            tooltip: defaultSub?.label || "Tắt",
+                            selector: subtitleSelectorItems,
+                            onSelect(item: any) {
+                                if (!item.value) {
+                                    art.subtitle.hide();
+                                    localStorage.setItem("subtitleLang", "");
+                                } else {
+                                    art.subtitle.show();
+                                    art.subtitle.switch(item.value.url, {
+                                        name: item.html,
+                                        type: item.value.type === "ass" || item.value.type === "ssa" ? "ass" : item.value.type,
+                                        escape: false,
+                                    });
+                                    localStorage.setItem("subtitleLang", item.value.lang);
+                                }
+                                return item.html;
+                            },
+                        }] : []),
+                        // Bỏ qua QC (KKPhim only)
+                        ...(serverName.toLowerCase().includes("kkphim") ? [{
                             html: 'Bỏ qua QC Server (15:00)',
                             tooltip: localStorage.getItem("autoSkipAds") === "false" ? "Tắt" : "Bật",
                             switch: localStorage.getItem("autoSkipAds") !== "false",
@@ -253,10 +322,50 @@ export default function VideoPlayer({
                                 localStorage.setItem("autoSkipAds", String(!item.switch));
                                 return !item.switch;
                             },
-                        }
-                    ] : [],
-                    // Controls: skip -10, skip +10 (luôn giữ), auto-next + next-episode chỉ trên màn lớn
+                        }] : []),
+                    ],
+                    // Controls: skip -10, skip +10, CC toggle, auto-next + next-episode (lớn)
                     controls: [
+                        // CC (subtitle) toggle button — visible right away
+                        ...(subtitles.length > 0 ? [{
+                            position: "right" as const,
+                            name: "cc-toggle",
+                            index: 6,
+                            html: `<div id="cc-btn-wrap" style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;cursor:pointer;opacity:${defaultSub ? 1 : 0.4};transition:opacity 0.2s;" title="Phụ đề (C)">
+                                <svg viewBox="0 0 24 24" fill="white" width="22" height="22">
+                                    <path d="M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H5V6h14v12zm-8-2H9.5v-2h-2v2H6v-4h1.5v1h2v-1H11v4zm4.5-4H14v4h-1.5v-4H11v-1.5h6V12h-1.5z"/>
+                                </svg>
+                            </div>`,
+                            tooltip: defaultSub ? `Phụ đề: ${defaultSub.label}` : "Bật phụ đề",
+                            click: function () {
+                                const subs = subtitlesRef.current;
+                                if (!subs.length || !art) return;
+                                const wrap = document.getElementById("cc-btn-wrap");
+                                const isVisible = art.subtitle?.show;
+                                if (isVisible) {
+                                    art.subtitle.hide();
+                                    localStorage.setItem("subtitleLang", "");
+                                    if (wrap) wrap.style.opacity = "0.4";
+                                    if (art.notice) art.notice.show = "Tắt phụ đề";
+                                } else {
+                                    const savedLang = localStorage.getItem("subtitleLang");
+                                    const sub = subs.find((s: any) => s.language === savedLang) || subs.find((s: any) => s.isDefault) || subs[0];
+                                    if (!sub) return;
+                                    const subUrl = sub.sourceType === "content"
+                                        ? `/api/subtitles/content?id=${sub._id}`
+                                        : `/api/subtitles/content?url=${encodeURIComponent(sub.url || "")}`;
+                                    art.subtitle.switch(subUrl, {
+                                        name: sub.label || sub.language.toUpperCase(),
+                                        type: (sub.format === "ass" || sub.format === "ssa") ? "ass" : sub.format,
+                                        escape: false,
+                                    });
+                                    art.subtitle.show();
+                                    localStorage.setItem("subtitleLang", sub.language);
+                                    if (wrap) wrap.style.opacity = "1";
+                                    if (art.notice) art.notice.show = `Phụ đề: ${sub.label}`;
+                                }
+                            },
+                        }] : []),
                         // Skip back 10s
                         {
                             position: "left",
@@ -506,6 +615,35 @@ export default function VideoPlayer({
                     if (!art || document.activeElement?.tagName === "INPUT") return;
                     if (e.key === "ArrowLeft") { art.seek = Math.max(0, art.currentTime - 10); e.preventDefault(); }
                     if (e.key === "ArrowRight") { art.seek = Math.min(art.duration, art.currentTime + 10); e.preventDefault(); }
+                    // 'C' — toggle subtitle on/off
+                    if (e.key === "c" || e.key === "C") {
+                        e.preventDefault();
+                        const subs = subtitlesRef.current;
+                        if (!subs.length) return;
+                        const wrap = document.getElementById("cc-btn-wrap");
+                        if (art.subtitle?.show) {
+                            art.subtitle.hide();
+                            localStorage.setItem("subtitleLang", "");
+                            if (wrap) wrap.style.opacity = "0.4";
+                            if (art.notice) art.notice.show = "Tắt phụ đề";
+                        } else {
+                            const savedLang = localStorage.getItem("subtitleLang");
+                            const sub = subs.find((s: any) => s.language === savedLang) || subs.find((s: any) => s.isDefault) || subs[0];
+                            if (!sub) return;
+                            const subUrl = sub.sourceType === "content"
+                                ? `/api/subtitles/content?id=${sub._id}`
+                                : `/api/subtitles/content?url=${encodeURIComponent(sub.url || "")}`;
+                            art.subtitle.switch(subUrl, {
+                                name: sub.label || sub.language.toUpperCase(),
+                                type: (sub.format === "ass" || sub.format === "ssa") ? "ass" : sub.format,
+                                escape: false,
+                            });
+                            art.subtitle.show();
+                            localStorage.setItem("subtitleLang", sub.language);
+                            if (wrap) wrap.style.opacity = "1";
+                            if (art.notice) art.notice.show = `Phụ đề: ${sub.label}`;
+                        }
+                    }
                 };
                 document.addEventListener("keydown", handleKeydown);
                 (artInstance.current as any).handleKeydown = handleKeydown;
@@ -578,6 +716,40 @@ export default function VideoPlayer({
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [finalStreamUrl, handleVideoEnd, initialProgress, movieData, onPlayerError, saveHistory, serverName, session, shouldUseArtPlayer, streamUrl, useProxy]);
+
+    // Late-loading subtitles: if the player was already initialized without subtitles,
+    // auto-apply them when they arrive (e.g. subtitle API responded after player init).
+    useEffect(() => {
+        if (!shouldUseArtPlayer || !artInstance.current || subtitles.length === 0) return;
+        const art = artInstance.current as any;
+        if (!art || typeof art.subtitle?.switch !== "function") return;
+
+        try {
+            const savedLang = typeof localStorage !== "undefined" ? localStorage.getItem("subtitleLang") : null;
+            if (savedLang === "") return; // user explicitly turned off
+            const sub = subtitles.find((s) => savedLang ? s.language === savedLang : s.isDefault)
+                || (savedLang ? null : subtitles[0]);
+            if (!sub) return;
+
+            const subUrl = sub.sourceType === "content"
+                ? `/api/subtitles/content?id=${sub._id}`
+                : `/api/subtitles/content?url=${encodeURIComponent(sub.url || "")}`;
+            if (!subUrl || subUrl.endsWith("url=")) return;
+
+            // Only switch if the player currently has no subtitle loaded (URL empty)
+            if (art.subtitle?.url) return;
+
+            art.subtitle.switch(subUrl, {
+                name: sub.label || sub.language.toUpperCase(),
+                type: (sub.format === "ass" || sub.format === "ssa") ? "ass" : sub.format,
+                escape: false,
+            });
+            // Update CC button appearance
+            const wrap = document.getElementById("cc-btn-wrap");
+            if (wrap) wrap.style.opacity = "1";
+        } catch { /* ignore */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [subtitles, shouldUseArtPlayer]);
 
     // Khi bật/tắt chế độ rạp phim, container đổi kích thước — gọi resize để player vẽ lại đúng, tránh màn đen
     useEffect(() => {
