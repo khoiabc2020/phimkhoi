@@ -76,7 +76,7 @@ export default function EliteSelect({
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 8, scale: 0.95 }}
                         transition={{ duration: 0.15, ease: "easeOut" }}
-                        className="absolute top-full left-0 right-0 mt-2 z-[100] bg-[#0c0c14]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden"
+                        className="absolute top-full left-0 right-0 mt-2 z-[9999] bg-[#0c0c14]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden"
                     >
                         <div className="max-h-[300px] overflow-y-auto custom-scrollbar p-1">
                             {options.map((option) => {

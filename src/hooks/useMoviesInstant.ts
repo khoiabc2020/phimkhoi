@@ -23,8 +23,16 @@ export function useMoviesInstant(
 
     const STALE_MS = 5 * 60 * 1000; // 5 minutes
 
-    // Initial Hydration from Cache
+    // Hydration: when cacheKey changes (filter/page changed), prefer initialMovies
+    // from server over stale localStorage — then layer in localStorage if fresher
     useEffect(() => {
+        // Immediately show server-preloaded data so filters feel instant
+        if (initialMovies?.length) {
+            setMovies(initialMovies);
+            setPagination(initialPagination ?? null);
+            setIsLoading(false);
+        }
+
         const cached = localStorage.getItem(`phimkhoi_cache_${cacheKey}`);
         if (cached) {
             try {
@@ -37,8 +45,9 @@ export function useMoviesInstant(
             } catch (e) {
                 console.error("Cache Parse Error:", e);
             }
-        } else if (hasInitial) {
-            setIsLoading(false);
+        } else if (!initialMovies?.length) {
+            // No server data and no cache — show loader until sync() completes
+            setIsLoading(true);
         }
     }, [cacheKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
