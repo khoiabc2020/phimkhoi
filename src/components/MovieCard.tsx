@@ -92,11 +92,31 @@ function MovieCard({
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [isTouchDevice, setIsTouchDevice] = useState(false);
+    const [watchProgress, setWatchProgress] = useState(0);
     const tmdbFetchStartedRef = useRef(false);
 
     useEffect(() => {
         setIsTouchDevice(window.matchMedia("(pointer: coarse)").matches);
     }, []);
+
+    useEffect(() => {
+        try {
+            const saved = localStorage.getItem(`pk_prog_${movie.slug}`);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (parsed?.progress > 0) setWatchProgress(parsed.progress);
+            }
+        } catch {}
+        // Also listen for BroadcastChannel updates
+        const ch = new BroadcastChannel('phimkhoi_history_sync');
+        const handler = (e: MessageEvent) => {
+            if (e.data?.type === 'HISTORY_UPDATE' && e.data?.movieSlug === movie.slug) {
+                setWatchProgress(e.data.progress || 0);
+            }
+        };
+        ch.addEventListener('message', handler);
+        return () => { ch.removeEventListener('message', handler); ch.close(); };
+    }, [movie.slug]);
     
     // Lazy TMDB Enrichment
     const [lazyTmdbData, setLazyTmdbData] = useState<any>(null);
@@ -344,6 +364,16 @@ function MovieCard({
                             </span>
                         )}
                     </div>
+
+                    {/* Watch Progress Bar */}
+                    {watchProgress > 5 && watchProgress < 98 && (
+                        <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-black/40">
+                            <div
+                                className="h-full bg-[#E50914] rounded-full transition-none"
+                                style={{ width: `${watchProgress}%` }}
+                            />
+                        </div>
+                    )}
                 </div>
 
                 {/* Movie Info below the poster */}

@@ -73,7 +73,7 @@ export default async function FavoritesPage() {
                         action={{ label: "Khám phá phim", href: "/" }}
                     />
                 ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 [contain:layout_paint]">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 [contain:layout_paint]">
                         {favorites.map((item: any) => (
                             <div key={item._id} className="group relative">
                                 <Link href={`/phim/${item.movieSlug}`}>

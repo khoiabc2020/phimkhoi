@@ -92,7 +92,7 @@ export default async function WatchHistoryPage({
                                     <Play className="w-4 h-4 md:w-5 md:h-5 text-purple-400 fill-current" />
                                     Tiếp tục xem
                                 </h2>
-                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 md:gap-4 [contain:layout_paint]">
+                                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 md:gap-4 [contain:layout_paint]">
                                     {continueWatching.map((item: any) => (
                                         <div key={item._id} className="group relative block">
                                             <Link href={`/xem-phim/${item.movieSlug}/${item.episodeSlug}`} className="block">
@@ -158,7 +158,7 @@ export default async function WatchHistoryPage({
                                 <History className="w-4 h-4 md:w-5 md:h-5 text-gray-400" />
                                 Tất cả đã xem
                             </h2>
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-3 md:gap-x-4 gap-y-6 [contain:layout_paint]">
+                            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-3 md:gap-x-4 gap-y-6 [contain:layout_paint]">
                                 {history.map((item: any, idx: number) => (
                                     <div key={item._id} className="group relative block">
                                         <Link href={`/xem-phim/${item.movieSlug}/${item.episodeSlug}`} className="block">

@@ -22,7 +22,8 @@ const CommentSection = dynamic(() => import("@/components/CommentSection"), {
 import MovieTabs from "@/components/MovieTabs";
 import MovieCast from "@/components/MovieCast";
 import { searchTMDBMovie, getTMDBDetails, getTMDBImage } from "@/services/tmdb";
-import { getTMDBEpisodeImages, TMDBEpisodeMeta } from "@/app/actions/tmdb";
+import { getTMDBEpisodeImages, TMDBEpisodeMeta, getMovieTrailer } from "@/app/actions/tmdb";
+import TrailerButton from "@/components/TrailerButton";
 import MovieDetailTMDBInfo from "@/components/MovieDetailTMDBInfo";
 import { cache, Suspense } from "react";
 
@@ -205,6 +206,17 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
             ? getImageUrl(rawPoster)
             : "";
     const trustedTmdbDetails = shouldUseTmdbMedia(movie, tmdbDetails) ? tmdbDetails : null;
+
+    // Fetch trailer key (only if TMDB enrichment succeeded)
+    const trailerKey = trustedTmdbDetails
+        ? await getMovieTrailer(
+            movie.origin_name || movie.name,
+            Number(movie.year),
+            type,
+            { originalName: movie.origin_name, localName: movie.name, countrySlug: movie.country?.[0]?.slug }
+          ).catch((): null => null)
+        : null;
+
     const tmdbBackdrop = trustedTmdbDetails?.backdrop_path ? getTMDBImage(trustedTmdbDetails.backdrop_path, "original") : "";
     const tmdbPoster = trustedTmdbDetails?.poster_path ? getTMDBImage(trustedTmdbDetails.poster_path, "original") : "";
 
@@ -531,6 +543,10 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                     <Play className="w-5 h-5 fill-current shrink-0" />
                                     Xem Phim
                                 </Link>
+                            )}
+
+                            {trailerKey && (
+                                <TrailerButton trailerKey={trailerKey} />
                             )}
 
                             {movie && (

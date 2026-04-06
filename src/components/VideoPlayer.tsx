@@ -172,6 +172,13 @@ export default function VideoPlayer({
                 });
                 channel.close();
             }
+            // Save lightweight progress to localStorage for progress bars on cards
+            try {
+                localStorage.setItem(
+                    `pk_prog_${movieData.movieSlug}`,
+                    JSON.stringify({ progress: Math.min(100, Math.round((currentTime / duration) * 100)), episodeSlug: movieData.episodeSlug })
+                );
+            } catch {}
         } catch { /* silent */ }
     }, [movieData, session]);
 
