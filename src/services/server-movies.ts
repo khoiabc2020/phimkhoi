@@ -1,7 +1,7 @@
 import "server-only";
 
 import dbConnect from "@/lib/db";
-import MovieModel from "@/models/Movie";
+import MovieModel, { LIST_PROJECTION } from "@/models/Movie";
 import { getMoviesByCategory, getMoviesByCountry, getMoviesList, type Movie } from "@/services/api";
 import { isAdultMovie, sanitizeMovieList } from "@/lib/movie-list";
 import { matchesCountryForDisplay } from "@/lib/movie-country";
@@ -57,6 +57,7 @@ async function getRecentMoviesFromDb(query: Record<string, unknown>, limit: numb
     try {
         await dbConnect();
         const movies = await MovieModel.find(query)
+            .select(LIST_PROJECTION)
             .sort({ updatedAt: -1, lastSynced: -1 })
             .limit(limit)
             .lean();

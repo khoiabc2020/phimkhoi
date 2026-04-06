@@ -163,15 +163,15 @@ export default function AdminUserDetailPage() {
                     <p className="text-gray-400 text-sm">Lịch sử xem</p>
                 </div>
                 <div className="bg-[#1a1a1a] p-4 rounded-lg border border-white/10 text-center">
-                    <p className="text-2xl font-bold text-white">{user.favorites?.length || 0}</p>
+                    <p className="text-2xl font-bold text-white">{user.favoritesCount ?? 0}</p>
                     <p className="text-gray-400 text-sm">Phim yêu thích</p>
                 </div>
                 <div className="bg-[#1a1a1a] p-4 rounded-lg border border-white/10 text-center">
-                    <p className="text-2xl font-bold text-white">{user.watchlist?.length || 0}</p>
+                    <p className="text-2xl font-bold text-white">{user.watchlistCount ?? 0}</p>
                     <p className="text-gray-400 text-sm">Xem sau</p>
                 </div>
                 <div className="bg-[#1a1a1a] p-4 rounded-lg border border-white/10 text-center">
-                    <p className="text-2xl font-bold text-white">{user.favoriteActors?.length || 0}</p>
+                    <p className="text-2xl font-bold text-white">—</p>
                     <p className="text-gray-400 text-sm">Diễn viên yêu thích</p>
                 </div>
             </div>

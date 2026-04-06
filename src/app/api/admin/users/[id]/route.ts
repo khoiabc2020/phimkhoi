@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
 import WatchHistory from "@/models/WatchHistory";
+import Favorite from "@/models/Favorite";
+import Watchlist from "@/models/Watchlist";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { createAuditLog } from "@/lib/audit";
 
@@ -26,13 +28,14 @@ export async function GET(
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
-        // Get WatchHistory from dedicated collection
-        const watchHistory = await WatchHistory.find({ userId: id })
-            .sort({ lastWatched: -1 })
-            .limit(30)
-            .lean();
+        // Get counts and watch history from dedicated collections
+        const [watchHistory, favoritesCount, watchlistCount] = await Promise.all([
+            WatchHistory.find({ userId: id }).sort({ lastWatched: -1 }).limit(30).lean(),
+            Favorite.countDocuments({ userId: id }),
+            Watchlist.countDocuments({ userId: id }),
+        ]);
 
-        return NextResponse.json({ user, watchHistory });
+        return NextResponse.json({ user: { ...user, favoritesCount, watchlistCount }, watchHistory });
     } catch (error) {
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }

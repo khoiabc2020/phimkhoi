@@ -12,7 +12,6 @@ type SessionUserLike = {
 type LeanUser = {
     _id: string;
     email?: string;
-    watchlist?: string[];
 };
 
 export type LibraryMovieCard = {
@@ -58,37 +57,27 @@ export async function resolveLibraryUser(sessionUser: SessionUserLike) {
     let user: LeanUser | null = null;
 
     if (sessionId && mongoose.isValidObjectId(sessionId)) {
-        user = await User.findById(sessionId).select("_id email watchlist").lean<LeanUser | null>();
+        user = await User.findById(sessionId).select("_id email").lean<LeanUser | null>();
     }
 
     if (!user && sessionEmail) {
-        user = await User.findOne({ email: sessionEmail }).select("_id email watchlist").lean<LeanUser | null>();
+        user = await User.findOne({ email: sessionEmail }).select("_id email").lean<LeanUser | null>();
     }
 
     const userObjectId = user?._id ? String(user._id) : null;
     const userIdCandidates = uniqueStrings([sessionId, userObjectId]);
 
-    return {
-        user,
-        userObjectId,
-        userIdCandidates,
-    };
+    return { user, userObjectId, userIdCandidates };
 }
 
 export async function getMergedWatchlist(sessionUser: SessionUserLike) {
     const { user, userObjectId, userIdCandidates } = await resolveLibraryUser(sessionUser);
 
     if (!userObjectId && !userIdCandidates.length) {
-        return {
-            user,
-            userObjectId,
-            userIdCandidates,
-            slugs: [] as string[],
-            movies: [] as LibraryMovieCard[],
-        };
+        return { user, userObjectId, userIdCandidates, slugs: [] as string[], movies: [] as LibraryMovieCard[] };
     }
 
-    const userWatchlist = Array.isArray(user?.watchlist) ? user.watchlist : [];
+    // Single source of truth: Watchlist collection
     const watchlistDocs = userObjectId && mongoose.isValidObjectId(userObjectId)
         ? await Watchlist.find({ userId: userObjectId }).sort({ addedAt: -1 }).lean()
         : [];
@@ -97,13 +86,11 @@ export async function getMergedWatchlist(sessionUser: SessionUserLike) {
         .map((doc) => toLibraryMovieCard(doc))
         .filter(Boolean) as LibraryMovieCard[];
 
-    const slugOrder = uniqueStrings([
-        ...storedCards.map((movie) => movie.slug),
-        ...userWatchlist,
-    ]);
+    const slugOrder = uniqueStrings(storedCards.map((movie) => movie.slug));
 
+    // Enrich any cards missing poster/name from Movie collection
     const missingSlugs = slugOrder.filter(
-        (slug) => !storedCards.some((movie) => movie.slug === slug)
+        (slug) => !storedCards.some((movie) => movie.slug === slug && movie.poster)
     );
 
     const movieDocs = missingSlugs.length
@@ -126,13 +113,7 @@ export async function getMergedWatchlist(sessionUser: SessionUserLike) {
         .map((slug) => cardBySlug.get(slug))
         .filter(Boolean) as LibraryMovieCard[];
 
-    return {
-        user,
-        userObjectId,
-        userIdCandidates,
-        slugs: slugOrder,
-        movies,
-    };
+    return { user, userObjectId, userIdCandidates, slugs: slugOrder, movies };
 }
 
 export async function setWatchlistMembership(
@@ -142,21 +123,12 @@ export async function setWatchlistMembership(
     movieSeed?: Partial<LibraryMovieCard>
 ) {
     const normalizedSlug = String(slug || "").trim();
-    if (!normalizedSlug) {
-        return { success: false, error: "Missing slug" };
-    }
+    if (!normalizedSlug) return { success: false, error: "Missing slug" };
 
     const { user, userObjectId } = await resolveLibraryUser(sessionUser);
-    if (!userObjectId) {
-        return { success: false, error: "User not found" };
-    }
+    if (!userObjectId) return { success: false, error: "User not found" };
 
     if (action === "add") {
-        await User.updateOne(
-            { _id: userObjectId },
-            { $addToSet: { watchlist: normalizedSlug } }
-        );
-
         const movieDoc = await Movie.findOne({ slug: normalizedSlug })
             .select("_id slug name origin_name poster_url thumb_url year quality category")
             .lean();
@@ -194,27 +166,11 @@ export async function setWatchlistMembership(
             { upsert: true }
         );
     } else {
-        await User.updateOne(
-            { _id: userObjectId },
-            { $pull: { watchlist: normalizedSlug } }
-        );
-
-        await Watchlist.deleteOne({
-            userId: userObjectId,
-            movieSlug: normalizedSlug,
-        });
+        await Watchlist.deleteOne({ userId: userObjectId, movieSlug: normalizedSlug });
     }
 
-    const merged = await getMergedWatchlist({
-        id: userObjectId,
-        email: user?.email,
-    });
-
-    return {
-        success: true,
-        slugs: merged.slugs,
-        movies: merged.movies,
-    };
+    const merged = await getMergedWatchlist({ id: userObjectId, email: user?.email });
+    return { success: true, slugs: merged.slugs, movies: merged.movies };
 }
 
 export function mapWatchlistMovieToApi(movie: LibraryMovieCard) {

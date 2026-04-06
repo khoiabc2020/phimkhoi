@@ -1,7 +1,7 @@
 import mongoose, { Schema, Model } from "mongoose";
 
 export interface IMovieDetail {
-    _id: string; // Map from external ID or slug
+    _id: string;
     name: string;
     origin_name: string;
     content: string;
@@ -36,17 +36,28 @@ export interface IMovieDetail {
             link_m3u8: string;
         }[];
     }[];
-    updatedAt: Date;
+    lastSynced?: Date;
     tmdbData?: any;
 }
+
+// Fields needed for movie card / list views — excludes heavy fields (episodes, content, tmdbData, actor, director)
+export const LIST_PROJECTION = {
+    _id: 1, name: 1, origin_name: 1, slug: 1,
+    thumb_url: 1, poster_url: 1,
+    year: 1, quality: 1, type: 1, status: 1,
+    episode_current: 1, episode_total: 1,
+    category: 1, country: 1,
+    chieurap: 1, sub_docquyen: 1, lang: 1,
+    view: 1, updatedAt: 1,
+} as const;
 
 const MovieSchema = new Schema(
     {
         _id: { type: String, required: true },
-        name: { type: String, required: true, index: true },
+        name: { type: String, required: true },
         origin_name: { type: String },
         content: { type: String },
-        type: { type: String, index: true },
+        type: { type: String },
         status: { type: String },
         thumb_url: { type: String },
         poster_url: { type: String },
@@ -61,8 +72,8 @@ const MovieSchema = new Schema(
         lang: { type: String },
         notify: { type: String },
         showtimes: { type: String },
-        slug: { type: String, required: true, unique: true, index: true },
-        year: { type: Number, index: true },
+        slug: { type: String, required: true, unique: true },
+        year: { type: Number },
         view: { type: Number, default: 0 },
         actor: { type: [String], default: [] },
         director: { type: [String], default: [] },
@@ -70,17 +81,35 @@ const MovieSchema = new Schema(
         country: { type: Array, default: [] },
         episodes: { type: Array, default: [] },
         tmdbData: { type: Schema.Types.Mixed },
-        updatedAt: { type: Date, default: Date.now },
+        lastSynced: { type: Date },
     },
     { collection: 'movies', timestamps: true }
 );
 
-// Fast filtering indexes for Category & Country
-MovieSchema.index({ "category.slug": 1 });
-MovieSchema.index({ "country.slug": 1 });
+// ── Single-field indexes ──────────────────────────────────────────────────────
+MovieSchema.index({ slug: 1 });          // already unique, explicit for clarity
+MovieSchema.index({ type: 1 });
+MovieSchema.index({ year: 1 });
 MovieSchema.index({ updatedAt: -1 });
+MovieSchema.index({ lastSynced: -1 });
 
-// Search optimization
+// ── Compound indexes for common listing queries ───────────────────────────────
+// Category listing: /the-loai/hanh-dong  (+ optional year filter)
+MovieSchema.index({ "category.slug": 1, updatedAt: -1 });
+MovieSchema.index({ "category.slug": 1, year: -1, updatedAt: -1 });
+
+// Country listing: /quoc-gia/han-quoc  (+ optional year filter)
+MovieSchema.index({ "country.slug": 1, updatedAt: -1 });
+MovieSchema.index({ "country.slug": 1, year: -1, updatedAt: -1 });
+
+// Type listing: /danh-sach/phim-bo, phim-le  (+ optional year/category)
+MovieSchema.index({ type: 1, updatedAt: -1 });
+MovieSchema.index({ type: 1, year: -1, updatedAt: -1 });
+
+// Year-only filter
+MovieSchema.index({ year: -1, updatedAt: -1 });
+
+// ── Text search ───────────────────────────────────────────────────────────────
 MovieSchema.index({ name: 'text', origin_name: 'text' });
 
 const MovieModel: Model<IMovieDetail> =
