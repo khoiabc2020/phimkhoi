@@ -45,8 +45,12 @@ async function dbConnect() {
 
         const opts = {
             bufferCommands: false,
-            // Fail fast when the cluster is slow/unreachable
             serverSelectionTimeoutMS: CONNECT_TIMEOUT_MS,
+            // Keep 5 connections ready; allow up to 20 for concurrent requests
+            minPoolSize: 5,
+            maxPoolSize: 20,
+            // Return a connection to the pool quickly after each operation
+            socketTimeoutMS: 30000,
         };
 
         cached.promise = Promise.race([
