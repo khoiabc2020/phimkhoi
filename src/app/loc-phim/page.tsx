@@ -34,7 +34,7 @@ const TYPES = [
 
 function LoadingSkeleton({ limit = 49 }: { limit?: number }) {
     return (
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4">
             {Array.from({ length: limit }).map((_, i) => (
                 <div key={i} className="space-y-3">
                     <div className="aspect-[2/3] w-full bg-white/5 rounded-xl animate-pulse" />

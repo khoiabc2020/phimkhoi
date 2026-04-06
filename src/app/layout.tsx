@@ -90,6 +90,7 @@ import Footer from "@/components/Footer";
 import Sidebar from "@/components/Sidebar";
 import LoadingBar from "@/components/LoadingBar";
 import RouteWarmup from "@/components/RouteWarmup";
+import ScrollToTop from "@/components/ScrollToTop";
 import { getMenuData } from "@/services/api";
 
 export default async function RootLayout({
@@ -188,6 +189,7 @@ export default async function RootLayout({
             </div>
             <Footer />
           </div>
+          <ScrollToTop />
         </Providers>
       </body>
     </html>

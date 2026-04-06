@@ -1,6 +1,7 @@
 "use client";
 
-import { Heart, Share2, Monitor, Moon, Flag } from "lucide-react";
+import { useState } from "react";
+import { Share2, Monitor, Moon, Flag, X, Keyboard } from "lucide-react";
 import FavoriteButton from "./FavoriteButton";
 import WatchlistInlineButton from "./WatchlistInlineButton";
 import Image from "next/image";
@@ -34,6 +35,10 @@ export default function WatchEngagementBar({
     onTogglePlayer,
 }: WatchEngagementBarProps) {
     const { showToast } = useToast();
+    const [showReportModal, setShowReportModal] = useState(false);
+    const [showShortcuts, setShowShortcuts] = useState(false);
+    const [reportDescription, setReportDescription] = useState("");
+    const [isSendingReport, setIsSendingReport] = useState(false);
     const movieData = {
         movieId: movie._id || "",
         movieSlug: movie.slug,
@@ -69,13 +74,44 @@ export default function WatchEngagementBar({
         }
     };
 
-    const handleReportError = async () => {
-        const report = `Báo lỗi phim:\n- Phim: ${movie.name}\n- Tập: ${currentEpisodeName || "N/A"}\n- URL: ${window.location.href}`;
+    const handleOpenReport = () => {
+        setReportDescription("");
+        setShowReportModal(true);
+    };
+
+    const handleSendReport = async () => {
+        setIsSendingReport(true);
+        const url = window.location.href;
+        const payload = {
+            movieName: movie.name,
+            episodeName: currentEpisodeName || null,
+            url,
+            description: reportDescription.trim(),
+        };
         try {
-            await navigator.clipboard.writeText(report);
-            showToast({ type: "success", title: "Đã sao chép thông tin báo lỗi", description: "Dán vào form hoặc gửi email hỗ trợ" });
+            const res = await fetch("/api/user/report", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
+            if (res.ok) {
+                showToast({ type: "success", title: "Đã gửi báo cáo", description: "Cảm ơn bạn đã phản hồi!" });
+                setShowReportModal(false);
+            } else {
+                throw new Error("failed");
+            }
         } catch {
-            showToast({ type: "error", title: "Không thể sao chép" });
+            // Fallback: copy to clipboard
+            const report = `Báo lỗi phim:\n- Phim: ${movie.name}\n- Tập: ${currentEpisodeName || "N/A"}\n- URL: ${url}\n- Mô tả: ${reportDescription.trim() || "(không có)"}`;
+            try {
+                await navigator.clipboard.writeText(report);
+                showToast({ type: "success", title: "Đã sao chép báo cáo", description: "Dán vào form hoặc gửi email hỗ trợ" });
+            } catch {
+                showToast({ type: "error", title: "Không thể gửi báo cáo" });
+            }
+            setShowReportModal(false);
+        } finally {
+            setIsSendingReport(false);
         }
     };
 
@@ -167,7 +203,7 @@ export default function WatchEngagementBar({
                         <Share2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
                         <span className="hidden sm:inline">Chia sẻ</span>
                     </button>
-                    <button type="button" onClick={handleReportError} className="flex items-center gap-2 hover:text-red-400 transition-all text-xs font-semibold">
+                    <button type="button" onClick={handleOpenReport} className="flex items-center gap-2 hover:text-red-400 transition-all text-xs font-semibold">
                         <Flag className="w-4 h-4" />
                         <span className="hidden sm:inline">Báo lỗi</span>
                     </button>
@@ -239,5 +275,71 @@ export default function WatchEngagementBar({
                 </div>
             </div>
         </div>
+
+            {/* Report Modal */}
+            {showReportModal && (
+                <div
+                    className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+                    onClick={(e) => { if (e.target === e.currentTarget) setShowReportModal(false); }}
+                >
+                    {/* Backdrop */}
+                    <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+
+                    {/* Dialog */}
+                    <div className="relative w-full max-w-md bg-[#0c0c14] border border-white/[0.10] rounded-xl shadow-2xl p-5 flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200">
+                        {/* Header */}
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 text-red-400">
+                                <Flag className="w-4 h-4" />
+                                <span className="text-sm font-bold uppercase tracking-wide">Báo lỗi phim</span>
+                            </div>
+                            <button
+                                onClick={() => setShowReportModal(false)}
+                                className="w-7 h-7 flex items-center justify-center rounded-full text-white/40 hover:text-white hover:bg-white/10 transition-all"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+
+                        {/* Info */}
+                        <div className="flex flex-col gap-1 text-xs text-white/50 bg-white/[0.04] rounded-lg px-3 py-2.5 border border-white/[0.06]">
+                            <div><span className="text-white/30">Phim:</span> <span className="text-white/80 font-medium">{movie.name}</span></div>
+                            {currentEpisodeName && (
+                                <div><span className="text-white/30">Tập:</span> <span className="text-white/80 font-medium">{currentEpisodeName}</span></div>
+                            )}
+                            <div className="truncate"><span className="text-white/30">URL:</span> <span className="text-white/60">{typeof window !== "undefined" ? window.location.href : ""}</span></div>
+                        </div>
+
+                        {/* Textarea */}
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-[11px] font-bold text-white/30 uppercase tracking-wider">Mô tả lỗi</label>
+                            <textarea
+                                value={reportDescription}
+                                onChange={(e) => setReportDescription(e.target.value)}
+                                placeholder="Ví dụ: Không có âm thanh, video bị đứng, sai tập..."
+                                rows={3}
+                                className="w-full bg-white/[0.04] border border-white/[0.10] rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/25 outline-none focus:border-primary/40 resize-none"
+                            />
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex gap-2 justify-end">
+                            <button
+                                onClick={() => setShowReportModal(false)}
+                                className="px-4 py-2 rounded-lg text-xs font-bold text-white/50 hover:text-white hover:bg-white/[0.06] transition-all"
+                            >
+                                Đóng
+                            </button>
+                            <button
+                                onClick={handleSendReport}
+                                disabled={isSendingReport}
+                                className="px-5 py-2 rounded-lg text-xs font-bold bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 hover:text-red-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isSendingReport ? "Đang gửi..." : "Gửi báo cáo"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
     );
 }

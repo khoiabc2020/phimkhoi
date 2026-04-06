@@ -424,7 +424,7 @@ export default function Header({ categories, countries }: HeaderProps) {
                                 onSubmit={handleSearch}
                                 className={cn(
                                     "flex relative items-center transition-all duration-500 linear h-10",
-                                    isSearchOpen ? "w-[calc(100vw-1rem)] max-w-[560px] sm:w-[420px] lg:w-[520px] absolute right-0 lg:relative z-[60]" : "w-10"
+                                    isSearchOpen ? "w-[min(calc(100vw-2rem),560px)] sm:w-[420px] lg:w-[520px] absolute right-0 lg:relative z-[60]" : "w-10"
                                 )}
                             >
                                 <button
@@ -470,7 +470,7 @@ export default function Header({ categories, countries }: HeaderProps) {
                                     {/* Real-time Search Dropdown */}
                                     {isSearchOpen && (hasTypedQuery || (showHistory && movieSearchHistory.length > 0)) && (
                                         <div className="absolute top-full left-0 right-0 mt-3 bg-[#0c0c14] border border-white/[0.08] rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-3 max-w-[100vw]">
-                                            <div className="flex flex-col max-h-[70vh] lg:max-h-[500px] overflow-y-auto no-scrollbar p-4">
+                                            <div className="flex flex-col max-h-[60vh] lg:max-h-[500px] overflow-y-auto no-scrollbar p-4">
                                                 {hasTypedQuery ? (
                                                     <>
                                                         <div className="flex items-center justify-between mb-3 px-1">

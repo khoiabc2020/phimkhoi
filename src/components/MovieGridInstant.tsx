@@ -24,7 +24,7 @@ export default function MovieGridInstant({
 
     if (isLoading && movies.length === 0) {
         return (
-            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 mt-6">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 mt-6">
                 {Array.from({ length: 14 }).map((_, i) => (
                     <div key={i} className="space-y-3">
                         <div className="aspect-[2/3] w-full bg-white/[0.03] rounded-xl border border-white/[0.05] animate-pulse overflow-hidden relative">
@@ -48,7 +48,7 @@ export default function MovieGridInstant({
 
     return (
         <div className="space-y-10">
-            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 mt-6 [contain:layout_paint]">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 mt-6 [contain:layout_paint]">
                 {movies.map((movie, idx) => (
                     <MovieCard 
                         key={movie._id} 
