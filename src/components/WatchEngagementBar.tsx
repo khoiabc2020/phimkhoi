@@ -116,6 +116,7 @@ export default function WatchEngagementBar({
     };
 
     return (
+        <>
         <div className="relative z-30 rounded-[10px] border border-white/[0.06] overflow-hidden shadow-[0_12px_28px_#00000066] bg-[#07070b]/82">
 
             {/* Controls bar */}
@@ -206,6 +207,9 @@ export default function WatchEngagementBar({
                     <button type="button" onClick={handleOpenReport} className="flex items-center gap-2 hover:text-red-400 transition-all text-xs font-semibold">
                         <Flag className="w-4 h-4" />
                         <span className="hidden sm:inline">Báo lỗi</span>
+                    </button>
+                    <button type="button" onClick={() => setShowShortcuts(true)} title="Phím tắt player" className="hidden md:flex items-center gap-1.5 hover:text-white transition-all text-xs font-semibold">
+                        <Keyboard className="w-4 h-4" />
                     </button>
                 </div>
             </div>
@@ -307,7 +311,7 @@ export default function WatchEngagementBar({
                             {currentEpisodeName && (
                                 <div><span className="text-white/30">Tập:</span> <span className="text-white/80 font-medium">{currentEpisodeName}</span></div>
                             )}
-                            <div className="truncate"><span className="text-white/30">URL:</span> <span className="text-white/60">{typeof window !== "undefined" ? window.location.href : ""}</span></div>
+                            <div className="truncate text-white/40 text-[10px] mt-0.5">{typeof window !== "undefined" ? window.location.pathname : ""}</div>
                         </div>
 
                         {/* Textarea */}
@@ -341,5 +345,38 @@ export default function WatchEngagementBar({
                     </div>
                 </div>
             )}
+
+            {/* === Keyboard Shortcuts Modal === */}
+            {showShortcuts && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={() => setShowShortcuts(false)}>
+                    <div className="w-full max-w-sm bg-[#0c0c18] border border-white/10 rounded-2xl shadow-2xl p-5 space-y-4" onClick={e => e.stopPropagation()}>
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-white font-bold text-base flex items-center gap-2">
+                                <Keyboard className="w-4 h-4 text-[#8FA7C5]" /> Phím tắt player
+                            </h2>
+                            <button onClick={() => setShowShortcuts(false)} className="text-gray-400 hover:text-white transition-colors"><X className="w-5 h-5" /></button>
+                        </div>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-sm">
+                            {([
+                                ["Space", "Phát / Dừng"],
+                                ["← →", "Tua ±10 giây"],
+                                ["↑ ↓", "Âm lượng ±10%"],
+                                ["F", "Toàn màn hình"],
+                                ["M", "Tắt/bật tiếng"],
+                                ["C", "Bật/tắt phụ đề"],
+                                ["0–9", "Nhảy đến %"],
+                                ["Esc", "Thoát toàn màn"],
+                            ] as [string, string][]).map(([key, desc]) => (
+                                <div key={key} className="flex items-center gap-2">
+                                    <kbd className="px-2 py-1 rounded-md bg-white/10 border border-white/20 text-white text-xs font-mono min-w-[40px] text-center shrink-0">{key}</kbd>
+                                    <span className="text-gray-300 text-xs">{desc}</span>
+                                </div>
+                            ))}
+                        </div>
+                        <p className="text-xs text-gray-500 text-center pt-1">Vuốt ngang màn hình cảm ứng để tua nhanh</p>
+                    </div>
+                </div>
+            )}
+        </>
     );
 }
