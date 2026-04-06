@@ -56,7 +56,9 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
                                 src={getPosterImageUrl(movie) || "/placeholder.svg"}
                                 alt={decodeHtml(movie.name)}
                                 fill
-                                loading="lazy"
+                                priority={index < 3}
+                                loading={index < 3 ? "eager" : "lazy"}
+                                quality={70}
                                 className="bg-[#0a0f1a] object-cover transition-transform duration-300 group-hover:scale-105"
                                 sizes="(max-width: 768px) 48vw, (max-width: 1280px) 220px, 240px"
                             />
