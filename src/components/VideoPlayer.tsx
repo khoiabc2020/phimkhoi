@@ -36,6 +36,12 @@ interface VideoPlayerProps {
         url?: string;
         sourceType: string;
         isDefault?: boolean;
+        // OpenSubtitles auto-search fields
+        fileId?: number;
+        fileName?: string;
+        movieSlug?: string;
+        episodeSlug?: string;
+        movieName?: string;
     }>;
 }
 
@@ -239,6 +245,16 @@ export default function VideoPlayer({
                 // ── Subtitle setup ────────────────────────────────────────
                 function getSubUrl(sub: NonNullable<typeof subtitles>[0]): string {
                     if (sub.sourceType === "content") return `/api/subtitles/content?id=${sub._id}`;
+                    // Auto-download from OpenSubtitles (+ lazy-cache to DB)
+                    if (sub.sourceType === "opensubtitles" && sub.fileId) {
+                        const p = new URLSearchParams({ fileId: String(sub.fileId) });
+                        if (sub.fileName)    p.set("fileName",    sub.fileName);
+                        if (sub.language)    p.set("lang",         sub.language);
+                        if (sub.movieSlug)   p.set("movieSlug",    sub.movieSlug);
+                        if (sub.episodeSlug) p.set("episodeSlug",  sub.episodeSlug);
+                        if ((sub as any).movieName) p.set("movieName", (sub as any).movieName);
+                        return `/api/subtitles/content?${p}`;
+                    }
                     if (sub.url) return `/api/subtitles/content?url=${encodeURIComponent(sub.url)}`;
                     return "";
                 }
@@ -357,10 +373,7 @@ export default function VideoPlayer({
                                     const savedLang = localStorage.getItem("subtitleLang");
                                     const sub = subs.find((s: any) => s.language === savedLang) || subs.find((s: any) => s.isDefault) || subs[0];
                                     if (!sub) return;
-                                    const subUrl = sub.sourceType === "content"
-                                        ? `/api/subtitles/content?id=${sub._id}`
-                                        : `/api/subtitles/content?url=${encodeURIComponent(sub.url || "")}`;
-                                    art.subtitle.switch(subUrl, {
+                                    art.subtitle.switch(getSubUrl(sub as any), {
                                         name: sub.label || sub.language.toUpperCase(),
                                         type: (sub.format === "ass" || sub.format === "ssa") ? "ass" : sub.format,
                                         escape: false,
@@ -636,10 +649,7 @@ export default function VideoPlayer({
                             const savedLang = localStorage.getItem("subtitleLang");
                             const sub = subs.find((s: any) => s.language === savedLang) || subs.find((s: any) => s.isDefault) || subs[0];
                             if (!sub) return;
-                            const subUrl = sub.sourceType === "content"
-                                ? `/api/subtitles/content?id=${sub._id}`
-                                : `/api/subtitles/content?url=${encodeURIComponent(sub.url || "")}`;
-                            art.subtitle.switch(subUrl, {
+                            art.subtitle.switch(getSubUrl(sub as any), {
                                 name: sub.label || sub.language.toUpperCase(),
                                 type: (sub.format === "ass" || sub.format === "ssa") ? "ass" : sub.format,
                                 escape: false,
@@ -737,10 +747,22 @@ export default function VideoPlayer({
                 || (savedLang ? null : subtitles[0]);
             if (!sub) return;
 
-            const subUrl = sub.sourceType === "content"
-                ? `/api/subtitles/content?id=${sub._id}`
-                : `/api/subtitles/content?url=${encodeURIComponent(sub.url || "")}`;
-            if (!subUrl || subUrl.endsWith("url=")) return;
+            // Build URL using same logic as getSubUrl inside initArtPlayer
+            let subUrl = "";
+            if (sub.sourceType === "content") {
+                subUrl = `/api/subtitles/content?id=${sub._id}`;
+            } else if (sub.sourceType === "opensubtitles" && (sub as any).fileId) {
+                const p = new URLSearchParams({ fileId: String((sub as any).fileId) });
+                if ((sub as any).fileName)    p.set("fileName",    (sub as any).fileName);
+                if (sub.language)             p.set("lang",         sub.language);
+                if ((sub as any).movieSlug)   p.set("movieSlug",    (sub as any).movieSlug);
+                if ((sub as any).episodeSlug) p.set("episodeSlug",  (sub as any).episodeSlug);
+                if ((sub as any).movieName)   p.set("movieName",    (sub as any).movieName);
+                subUrl = `/api/subtitles/content?${p}`;
+            } else if (sub.url) {
+                subUrl = `/api/subtitles/content?url=${encodeURIComponent(sub.url)}`;
+            }
+            if (!subUrl) return;
 
             // Only switch if the player currently has no subtitle loaded
             if (art.subtitle?.url) {

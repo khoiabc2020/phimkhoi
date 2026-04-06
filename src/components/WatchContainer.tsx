@@ -103,14 +103,21 @@ export default function WatchContainer({
         }
     }, [isTheaterMode]);
 
-    // Fetch subtitles for current episode (non-blocking)
+    // Fetch subtitles for current episode (non-blocking) — auto-searches OpenSubtitles if DB empty
     useEffect(() => {
         if (!movie.slug || !currentEpisodeSlug) return;
-        fetch(`/api/subtitles?movieSlug=${encodeURIComponent(movie.slug)}&episodeSlug=${encodeURIComponent(currentEpisodeSlug)}`)
+        setSubtitles([]);
+        const params = new URLSearchParams({
+            movieSlug:    movie.slug,
+            episodeSlug:  currentEpisodeSlug,
+            movieName:    movie.name || "",
+            originName:   (movie as any).origin_name || "",
+        });
+        fetch(`/api/subtitles?${params}`)
             .then(r => r.ok ? r.json() : null)
-            .then(d => { if (d?.items) setSubtitles(d.items); })
+            .then(d => { if (d?.items?.length) setSubtitles(d.items); })
             .catch(() => {});
-    }, [movie.slug, currentEpisodeSlug]);
+    }, [movie.slug, movie.name, (movie as any).origin_name, currentEpisodeSlug]);
 
     // Fetch initial progress on client side - Non-blocking for the player
     useEffect(() => {
