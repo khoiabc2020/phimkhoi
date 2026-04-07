@@ -152,7 +152,12 @@ export async function GET(req: Request) {
                         if (detailRes.ok) {
                             const detailData = await detailRes.json();
                             if (detailData.movie) {
-                                movieData = { ...item, ...detailData.movie }; // Merge list info with detail info
+                                // episodes nằm ở detailData.episodes, KHÔNG phải detailData.movie.episodes
+                                movieData = {
+                                    ...item,
+                                    ...detailData.movie,
+                                    episodes: detailData.episodes || detailData.movie?.episodes || item.episodes || [],
+                                };
                             }
                         }
 
