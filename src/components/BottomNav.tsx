@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Search, Compass, Library, User } from "lucide-react";
+import { Home, Compass, Library, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
     { name: "Trang chủ", href: "/",                        icon: Home    },
-    { name: "Tìm kiếm", href: null,                        icon: Search  }, // triggers header search
-    { name: "Khám phá", href: "/loc-phim",                 icon: Compass },
-    { name: "Thư viện", href: "/thu-vien",                 icon: Library },
+    { name: "Khám phá",  href: "/loc-phim",                icon: Compass },
+    { name: "Thư viện",  href: "/thu-vien",                icon: Library },
     { name: "Tài khoản", href: "/thong-tin-tai-khoan",     icon: User    },
 ];
 
@@ -23,16 +22,6 @@ export default function BottomNav() {
         pathname?.startsWith("/xem-phim")
     ) return null;
 
-    const handleSearchClick = (e: React.MouseEvent) => {
-        e.preventDefault();
-        // Scroll to top so the header is fully visible
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        // Small delay so scroll starts before search opens
-        setTimeout(() => {
-            window.dispatchEvent(new CustomEvent("pk:opensearch"));
-        }, 80);
-    };
-
     return (
         <nav
             className="fixed bottom-0 inset-x-0 z-[200] lg:hidden bg-[#080b12]/95 backdrop-blur-2xl border-t border-white/[0.05]"
@@ -41,15 +30,11 @@ export default function BottomNav() {
             <div className="flex items-center justify-around h-[60px] px-1">
                 {navItems.map((item) => {
                     const Icon = item.icon;
-                    const isSearch = item.href === null;
-                    const isActive = !isSearch && (
+                    const isActive =
                         pathname === item.href ||
-                        (item.href !== "/" && pathname?.startsWith(item.href!))
-                    );
-                    // "Tìm kiếm" is active when on /tim-kiem page
-                    const isSearchActive = isSearch && pathname === "/tim-kiem";
+                        (item.href !== "/" && pathname?.startsWith(item.href!));
 
-                    const content = (isActive || isSearchActive) ? (
+                    const content = isActive ? (
                         /* Active → solid brand pill */
                         <span className="flex items-center gap-1.5 px-4 py-[7px] rounded-full bg-[#8FA7C5] shadow-[0_4px_18px_rgba(143,167,197,0.40)]">
                             <Icon className="w-[17px] h-[17px] text-[#060913] shrink-0" strokeWidth={2.5} />
@@ -61,19 +46,6 @@ export default function BottomNav() {
                             <Icon className="w-[22px] h-[22px] text-white/30" strokeWidth={1.6} />
                         </span>
                     );
-
-                    if (isSearch) {
-                        return (
-                            <button
-                                key="search"
-                                onClick={handleSearchClick}
-                                className="flex flex-1 items-center justify-center touch-manipulation active:scale-95 transition-transform"
-                                aria-label="Tìm kiếm"
-                            >
-                                {content}
-                            </button>
-                        );
-                    }
 
                     return (
                         <Link
