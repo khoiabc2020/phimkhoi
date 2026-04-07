@@ -345,24 +345,17 @@ function MobileHero({ movies, active = true }: { movies: Movie[]; active?: boole
                             </div>
                         )}
 
-                        {/* Short description — mobile hero */}
-                        {getHeroDescription(movie) && (
-                            <p className="text-white/55 text-[12px] leading-relaxed line-clamp-2 max-w-[300px] font-medium">
-                                {getHeroDescription(movie)}
-                            </p>
-                        )}
-
-                        <div className="flex items-center gap-3 pt-4">
+                        <div className="flex items-center gap-3 pt-3">
                             <Link
                                 href={`/phim/${movie.slug}`}
-                                className="h-12 px-10 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[14px] uppercase tracking-wider flex items-center gap-2 shadow-xl shadow-[#8FA7C5]/20 active:scale-95 transition-all"
+                                className="h-12 px-10 rounded-full bg-white text-[#060913] font-black text-[14px] uppercase tracking-wider flex items-center gap-2.5 shadow-[0_4px_24px_rgba(255,255,255,0.2)] active:scale-95 transition-all duration-300"
                             >
-                                <Play className="w-5 h-5 fill-current" />
+                                <Play className="w-5 h-5 fill-current shrink-0" />
                                 Xem Ngay
                             </Link>
                             <WatchlistButton
                                 slug={movie.slug}
-                                className="h-12 w-12 rounded-full bg-white/10 border border-white/20 text-white flex items-center justify-center p-0 backdrop-blur-md"
+                                className="h-12 w-12 rounded-full bg-white/[0.08] border border-white/25 text-white flex items-center justify-center p-0 backdrop-blur-md transition-all duration-300 hover:bg-white/15"
                                 showLabel={false}
                             />
                         </div>
@@ -452,9 +445,10 @@ function DesktopHero({ movies, active = true }: { movies: Movie[]; active?: bool
                     )}
 
                     <div className="absolute inset-0 z-[2] pointer-events-none">
-                        <div className="absolute inset-y-0 left-0 w-[80%] lg:w-[60%] bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
-                        <div className="absolute inset-0 bg-[#0a0a0a]/10" />
-                        <div className="absolute inset-x-0 bottom-0 z-30 pt-40 pb-12 md:pb-20 lg:pb-32 px-4 md:px-8 lg:pl-26 xl:pl-34 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
+                        {/* Left fade — text legibility without crushing the scene */}
+                        <div className="absolute inset-y-0 left-0 w-[70%] bg-gradient-to-r from-[#0a0a0a]/95 via-[#0a0a0a]/55 to-transparent" />
+                        {/* Bottom fade — blends into page bg */}
+                        <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
                     </div>
 
                     <div className="relative z-[10] h-full w-full max-w-[1920px] mx-auto px-6 md:pl-24 md:pr-14 lg:pl-32 lg:pr-12 xl:pl-[140px] flex items-end pb-20 md:pb-28 lg:pb-36 xl:pb-48 pointer-events-none">
@@ -522,14 +516,14 @@ function DesktopHero({ movies, active = true }: { movies: Movie[]; active?: bool
                                 <div className="flex flex-wrap items-center gap-4 pt-4 lg:pt-6 pointer-events-auto">
                                     <Link
                                         href={`/phim/${movie.slug}`}
-                                        className="flex items-center justify-center gap-2 h-12 md:h-14 px-8 md:px-10 rounded-full bg-[#8FA7C5] text-[#0a0a0a] font-black text-[15px] lg:text-[16px] uppercase tracking-wide shadow-xl shadow-[#8FA7C5]/30"
+                                        className="flex items-center justify-center gap-2.5 h-12 md:h-14 px-8 md:px-11 rounded-full bg-white text-[#060913] font-black text-[15px] lg:text-[16px] uppercase tracking-wide shadow-[0_4px_28px_rgba(255,255,255,0.22)] hover:shadow-[0_4px_36px_rgba(255,255,255,0.35)] hover:scale-[1.03] active:scale-95 transition-all duration-300"
                                     >
                                         <Play className="w-5 h-5 fill-current shrink-0" />
                                         Xem Ngay
                                     </Link>
                                     <WatchlistButton
                                         slug={movie.slug}
-                                        className="h-12 w-12 md:h-14 md:w-14 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white backdrop-blur-md shadow-xl flex items-center justify-center"
+                                        className="h-12 w-12 md:h-14 md:w-14 rounded-full bg-white/[0.08] hover:bg-white/15 border border-white/25 hover:border-white/40 text-white backdrop-blur-md shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110"
                                         showLabel={false}
                                     />
                                 </div>
