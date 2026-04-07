@@ -453,7 +453,8 @@ function DesktopHero({ movies, active = true }: { movies: Movie[]; active?: bool
 
                     <div className="relative z-[10] h-full w-full max-w-[1920px] mx-auto px-6 md:pl-24 md:pr-14 lg:pl-32 lg:pr-12 xl:pl-[140px] flex items-end pb-20 md:pb-28 lg:pb-36 xl:pb-48 pointer-events-none">
                         <div className="w-full flex justify-between items-end">
-                            <div className="w-full md:w-[75%] lg:w-[65%] xl:w-[60%] space-y-3 lg:space-y-4 pointer-events-auto pr-0 lg:pr-[300px] xl:pr-[400px]">
+                            {/* Content — max-width keeps text tight regardless of viewport */}
+                            <div className="w-full max-w-[420px] md:max-w-[480px] lg:max-w-[540px] xl:max-w-[620px] space-y-3 lg:space-y-4 pointer-events-auto">
                                 <div>
                                     {movie.isCustomHero && movie.layer_logo ? (
                                         <div className="relative w-full max-w-[400px] md:max-w-[500px] lg:max-w-[600px] h-[100px] md:h-[130px] lg:h-[160px] mb-4">
@@ -468,10 +469,10 @@ function DesktopHero({ movies, active = true }: { movies: Movie[]; active?: bool
                                     ) : (
                                         <h1
                                             className={cn(
-                                                "font-display font-black text-white leading-tight tracking-tight pt-1 drop-shadow-[0_8px_24px_rgba(0,0,0,0.9)] pb-2 text-balance line-clamp-2 md:line-clamp-3",
-                                                (movie.name?.length ?? 0) > 25
-                                                    ? "text-2xl md:text-3xl lg:text-[40px] xl:text-[46px]"
-                                                    : "text-3xl md:text-[32px] lg:text-[48px] xl:text-[54px]"
+                                                "font-display font-black text-white leading-tight tracking-tight pt-1 drop-shadow-[0_8px_24px_rgba(0,0,0,0.9)] pb-2 line-clamp-2",
+                                                (movie.name?.length ?? 0) > 20
+                                                    ? "text-[22px] md:text-[26px] lg:text-[30px] xl:text-[38px]"
+                                                    : "text-[26px] md:text-[30px] lg:text-[36px] xl:text-[46px]"
                                             )}
                                         >
                                             {decodeHtml(movie.name || movie.origin_name || "")}
@@ -516,7 +517,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[]; active?: bool
                                 <div className="flex flex-nowrap items-center gap-3 pt-4 lg:pt-6 pointer-events-auto">
                                     <Link
                                         href={`/phim/${movie.slug}`}
-                                        className="flex items-center justify-center gap-2.5 h-12 md:h-14 px-8 md:px-11 rounded-full bg-white text-[#060913] font-black text-[15px] lg:text-[16px] uppercase tracking-wide shadow-[0_4px_28px_rgba(255,255,255,0.22)] hover:shadow-[0_4px_36px_rgba(255,255,255,0.35)] hover:scale-[1.03] active:scale-95 transition-all duration-300"
+                                        className="flex items-center justify-center gap-2.5 h-12 md:h-14 px-8 md:px-11 rounded-full bg-white text-[#060913] font-black text-[15px] lg:text-[16px] uppercase tracking-wide whitespace-nowrap shadow-[0_4px_28px_rgba(255,255,255,0.22)] hover:shadow-[0_4px_36px_rgba(255,255,255,0.35)] hover:scale-[1.03] active:scale-95 transition-all duration-300"
                                     >
                                         <Play className="w-5 h-5 fill-current shrink-0" />
                                         Xem Ngay
@@ -533,13 +534,14 @@ function DesktopHero({ movies, active = true }: { movies: Movie[]; active?: bool
                 </motion.div>
             </AnimatePresence>
 
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[30] w-full max-w-[90vw] md:max-w-3xl lg:max-w-5xl">
+            {/* Thumbnail strip — aligned to content area (matches hero left padding) */}
+            <div className="absolute bottom-6 left-0 right-0 z-[30] pl-4 md:pl-24 lg:pl-32 xl:pl-36 pr-4 md:pr-10 lg:pr-12">
                 <div
                     ref={navRef}
-                    className="flex items-center gap-2 md:gap-3 overflow-x-auto no-scrollbar py-3 px-2 scroll-smooth snap-x snap-mandatory min-w-0 w-full"
+                    className="flex items-center gap-2 md:gap-3 overflow-x-auto no-scrollbar py-3 scroll-smooth snap-x snap-mandatory min-w-0 w-full"
                     style={{
-                        maskImage: "linear-gradient(to right, transparent, black 15%, black 85%, transparent)",
-                        WebkitMaskImage: "linear-gradient(to right, transparent, black 15%, black 85%, transparent)",
+                        maskImage: "linear-gradient(to right, black 60%, transparent 100%)",
+                        WebkitMaskImage: "linear-gradient(to right, black 60%, transparent 100%)",
                     }}
                 >
                     {movies.map((heroMovie: any, heroIndex) => (
