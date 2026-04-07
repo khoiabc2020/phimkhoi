@@ -10,13 +10,14 @@ export default function imageLoader({
     quality?: number;
 }) {
     const q = quality ?? 80;
-    
+
     // Đối với các ảnh có URL tuyệt đối (external images)
+    // Dùng img-proxy của chính mình: cache 30 ngày trên disk VPS, memory cache 150 entries
+    // → sau lần đầu load xong thì không còn phụ thuộc CDN bên ngoài nữa
     if (src.startsWith("http://") || src.startsWith("https://")) {
-        // Sử dụng wsrv.nl CDN (chạy trên hạ tầng Cloudflare) để tự động resize và nén WebP
-        return `https://wsrv.nl/?url=${encodeURIComponent(src)}&w=${width}&q=${q}&output=webp`;
+        return `/api/img-proxy?url=${encodeURIComponent(src)}&w=${width}&q=${q}`;
     }
-    
+
     // Đối với ảnh cục bộ trong /public
     return src;
 }
