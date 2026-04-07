@@ -451,7 +451,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[]; active?: bool
                         <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
                     </div>
 
-                    <div className="relative z-[10] h-full w-full max-w-[1920px] mx-auto px-6 md:pl-24 md:pr-14 lg:pl-32 lg:pr-12 xl:pl-[140px] flex items-end pb-20 md:pb-28 lg:pb-36 xl:pb-48 pointer-events-none">
+                    <div className="relative z-[10] h-full w-full max-w-[1920px] mx-auto px-6 md:pl-24 md:pr-14 lg:pl-32 lg:pr-12 xl:pl-[140px] flex items-end pb-32 md:pb-40 lg:pb-44 xl:pb-52 pointer-events-none">
                         <div className="w-full flex justify-between items-end">
                             {/* Content — max-width keeps text tight regardless of viewport */}
                             <div className="w-full max-w-[420px] md:max-w-[480px] lg:max-w-[540px] xl:max-w-[620px] space-y-3 lg:space-y-4 pointer-events-auto">
