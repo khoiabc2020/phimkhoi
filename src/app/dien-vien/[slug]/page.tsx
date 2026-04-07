@@ -70,7 +70,7 @@ export default async function PersonPage({ params, searchParams }: PersonPagePro
               style={{ fontFamily: "'Inter', sans-serif" }}>
 
             {/* Hero Section */}
-            <div className="relative pt-32 pb-12 px-4 md:px-8 max-w-[1400px] mx-auto z-10">
+            <div className="relative pt-32 pb-24 md:pb-12 px-4 md:px-8 max-w-[1400px] mx-auto z-10">
                 
                 {/* Background Glow */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-primary/10 blur-[120px] rounded-full -z-10 opacity-30 pointer-events-none" />

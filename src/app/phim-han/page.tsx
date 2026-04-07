@@ -153,7 +153,7 @@ async function resolveHeroMovies(slugs: string[], fallbackItems: any[], countryN
 
 async function PhimHanHome() {
     return (
-        <div className="space-y-12 md:space-y-16 pb-12">
+        <div className="space-y-12 md:space-y-16 pb-24 md:pb-12">
             <HomeRowInstant title="Phim Mới Cập Nhật" slug="han-quoc" endpoint="quoc-gia" viewAllHref="/quoc-gia/han-quoc" priorityFirst />
 
             {SECTION_CONFIG.slice(0, 3).map((section) => (

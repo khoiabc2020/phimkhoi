@@ -75,7 +75,15 @@ export default async function AdvancedFilterPage({ searchParams }: FilterPagePro
             <div className={cn("absolute top-0 left-0 right-0 h-[600px] via-transparent to-transparent pointer-events-none -z-10 blur-[150px] opacity-50", theme.glow)} />
             
             <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-20 md:pt-24 pb-24 md:pb-20">
-                {/* Header — desktop only: compact inline strip */}
+                {/* Header — mobile: minimal 1-line title */}
+                <div className="flex md:hidden items-center gap-2 mb-4">
+                    <h1 className="text-[15px] font-bold text-white flex items-center gap-1.5">
+                        Khám Phá
+                        <SlidersHorizontal className="w-3.5 h-3.5 text-primary/50 shrink-0" />
+                    </h1>
+                </div>
+
+                {/* Header — desktop: compact inline strip */}
                 <div className="hidden md:flex items-center justify-between mb-5">
                     <div className="flex items-center gap-3 min-w-0">
                         <div className="flex items-center gap-1.5 text-[11px] font-semibold text-white/30 uppercase tracking-wider shrink-0">

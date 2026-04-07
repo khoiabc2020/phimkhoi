@@ -335,13 +335,13 @@ export default async function Home() {
   );
 
   return (
-    <main className="min-h-screen pb-16 bg-[#0a0a0a]">
+    <main className="min-h-screen pb-24 md:pb-16 bg-[#0a0a0a]">
       {/* Hero Section - Tải đầu tiên */}
       <Suspense fallback={heroSkeleton}>
         <HeroStream />
       </Suspense>
 
-      <div className="w-full max-w-[1920px] mx-auto px-1.5 sm:px-3 md:px-5 lg:pl-24 lg:pr-12 relative z-30 pb-16 -mt-0 md:-mt-2 lg:-mt-4 xl:-mt-6">
+      <div className="w-full max-w-[1920px] mx-auto px-1.5 sm:px-3 md:px-5 lg:pl-24 lg:pr-12 relative z-30 -mt-0 md:-mt-2 lg:-mt-4 xl:-mt-6">
         {/* Decorative background glow - keep subtle and close to the black system palette */}
         <div className="pointer-events-none absolute left-0 right-0 top-0 -z-10 h-[800px] bg-[radial-gradient(circle_at_top,rgba(143,167,197,0.04),transparent_55%)] blur-[160px]" />
 

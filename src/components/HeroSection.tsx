@@ -513,7 +513,7 @@ function DesktopHero({ movies, active = true }: { movies: Movie[]; active?: bool
                                     {getHeroDescription(movie)}
                                 </p>
 
-                                <div className="flex flex-wrap items-center gap-4 pt-4 lg:pt-6 pointer-events-auto">
+                                <div className="flex flex-nowrap items-center gap-3 pt-4 lg:pt-6 pointer-events-auto">
                                     <Link
                                         href={`/phim/${movie.slug}`}
                                         className="flex items-center justify-center gap-2.5 h-12 md:h-14 px-8 md:px-11 rounded-full bg-white text-[#060913] font-black text-[15px] lg:text-[16px] uppercase tracking-wide shadow-[0_4px_28px_rgba(255,255,255,0.22)] hover:shadow-[0_4px_36px_rgba(255,255,255,0.35)] hover:scale-[1.03] active:scale-95 transition-all duration-300"
