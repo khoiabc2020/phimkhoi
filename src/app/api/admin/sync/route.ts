@@ -253,19 +253,12 @@ export async function GET(req: Request) {
                                     fetchNguonCEpisodes(item.slug),
                                 ]);
 
-                                // Tag phimapi servers với source
-                                const phimApiTagged = phimApiEps.map((s: any) => ({
-                                    source: "phimapi",
-                                    server_name: s.server_name || "",
-                                    server_data: s.server_data || [],
-                                }));
-
-                                // Merge + deduplicate: mỗi loại audio chỉ giữ 1 server tốt nhất
-                                const mergedEpisodes = mergeAndDeduplicateServers([
-                                    ...phimApiTagged,
+                                // Merge tất cả servers từ 3 nguồn, giữ đầy đủ
+                                const mergedEpisodes = [
+                                    ...phimApiEps,
                                     ...ophimEps,
                                     ...nguoncEps,
-                                ]);
+                                ].filter((s: any) => s.server_data?.length > 0);
 
                                 movieData = {
                                     ...item,
