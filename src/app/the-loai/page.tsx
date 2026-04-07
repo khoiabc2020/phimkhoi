@@ -263,7 +263,7 @@ export default async function GenresIndexPage() {
                                             className="object-cover object-center scale-[1.02] group-hover:scale-[1.07] transition-transform duration-700 ease-out"
                                             sizes={isHero ? "33vw" : "22vw"}
                                             priority={i === 0}
-                                            unoptimized
+                                            quality={70}
                                         />
                                         <div className={cn("absolute inset-0 bg-gradient-to-r", meta.gradient)} />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
@@ -322,7 +322,7 @@ export default async function GenresIndexPage() {
                                             fill
                                             className="object-cover object-center group-hover:scale-[1.06] transition-transform duration-600"
                                             sizes="50vw"
-                                            unoptimized
+                                            quality={70}
                                         />
                                         <div className={cn("absolute inset-0 bg-gradient-to-r", meta.gradient)} />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
@@ -360,7 +360,7 @@ export default async function GenresIndexPage() {
                                     fill
                                     className="object-cover object-center scale-[1.03] group-hover:scale-[1.1] transition-transform duration-600 ease-out"
                                     sizes="(max-width:640px) 50vw, (max-width:1024px) 25vw, 16vw"
-                                    unoptimized
+                                    quality={70}
                                 />
                                 {/* Gradient overlay */}
                                 <div className={cn("absolute inset-0 bg-gradient-to-br opacity-85", meta.gradient)} />

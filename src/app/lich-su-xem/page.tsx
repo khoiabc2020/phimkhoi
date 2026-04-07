@@ -54,7 +54,7 @@ export default async function WatchHistoryPage({
     const totalPages = (historyResult as any).totalPages || 1;
 
     return (
-        <div className="min-h-screen pt-24 md:pt-28 pb-12 relative overflow-hidden bg-[#0a0a0a]">
+        <div className="min-h-screen pt-24 md:pt-28 pb-24 relative overflow-hidden bg-[#0a0a0a]">
             {/* Background chuẩn Onflix: Tím đậm phai dần xuống đen */}
             <div className="fixed inset-0 pointer-events-none z-0">
                 <div className="absolute top-0 left-0 right-0 h-[70vh] bg-gradient-to-b from-[#2d1b4e]/90 via-[#0a0a0a]/80 to-transparent" />
