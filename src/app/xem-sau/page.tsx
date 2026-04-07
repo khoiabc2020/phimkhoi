@@ -110,7 +110,8 @@ export default async function WatchlistPage() {
                                             fill
                                             className="object-cover transition-transform duration-500 group-hover:scale-105"
                                             loading="lazy"
-                                            unoptimized
+                                            sizes="(max-width: 640px) 120px, (max-width: 1024px) 180px, 240px"
+                                            quality={65}
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 

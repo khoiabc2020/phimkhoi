@@ -500,7 +500,7 @@ export default function Header({ categories, countries }: HeaderProps) {
                                                                         >
                                                                             {/* Poster lớn hơn: w-12 h-[68px] (~2:3 ratio) */}
                                                                             <div className="w-12 h-[68px] relative rounded-lg overflow-hidden shrink-0 shadow-md">
-                                                                                <Image src={getPosterImageUrl(movie) || "/placeholder.svg"} alt="" fill className="object-cover" sizes="48px" unoptimized />
+                                                                                <Image src={getPosterImageUrl(movie) || "/placeholder.svg"} alt="" fill className="object-cover" sizes="48px" quality={60} />
                                                                             </div>
                                                                             <div className="flex-1 min-w-0">
                                                                                 <div className={cn("text-[13px] font-semibold leading-tight line-clamp-2 group-hover:text-primary transition-colors", selectedIndex === idx ? "text-primary" : "text-white")}>{movie.name}</div>

@@ -175,7 +175,8 @@ export default function ThuvienPage() {
                                             alt={movie.name}
                                             fill
                                             className="object-cover group-hover:scale-105 transition-transform duration-500"
-                                            unoptimized
+                                            sizes="(max-width: 640px) 120px, (max-width: 1024px) 180px, 240px"
+                                            quality={65}
                                         />
                                         {/* Overlay */}
                                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">

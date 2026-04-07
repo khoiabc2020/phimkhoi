@@ -150,7 +150,8 @@ export default function NotificationsPage() {
                                             alt=""
                                             fill
                                             className="object-cover group-hover:scale-105 transition-transform duration-500"
-                                            unoptimized
+                                            sizes="56px"
+                                            quality={60}
                                         />
                                     </div>
 

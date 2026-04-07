@@ -9,7 +9,7 @@ export default function imageLoader({
     width: number;
     quality?: number;
 }) {
-    const q = quality ?? 80;
+    const q = quality ?? 70;
 
     // Đối với các ảnh có URL tuyệt đối (external images)
     // Dùng img-proxy của chính mình: cache 30 ngày trên disk VPS, memory cache 150 entries
