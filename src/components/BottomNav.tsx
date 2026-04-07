@@ -2,15 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Tv, Video, Search, Library } from "lucide-react";
+import { Home, Search, Compass, Library, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
     { name: "Trang chủ", href: "/", icon: Home },
-    { name: "Phim Hàn", href: "/phim-han", icon: Tv },
     { name: "Tìm kiếm", href: "/tim-kiem", icon: Search },
-    { name: "Phim Trung", href: "/phim-trung", icon: Video },
+    { name: "Khám phá", href: "/loc-phim", icon: Compass },
     { name: "Thư viện", href: "/thu-vien", icon: Library },
+    { name: "Tài khoản", href: "/thong-tin-tai-khoan", icon: User },
 ];
 
 export default function BottomNav() {
