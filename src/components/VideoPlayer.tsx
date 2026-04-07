@@ -266,8 +266,9 @@ export default function VideoPlayer({
                     return "";
                 }
                 const savedLang = typeof localStorage !== "undefined" ? localStorage.getItem("subtitleLang") : null;
-                const defaultSub = subtitles.find(s => savedLang ? s.language === savedLang : s.isDefault)
-                    || (savedLang ? undefined : subtitles[0]);
+                const subsOff = savedLang === "off";
+                const defaultSub = subsOff ? null :
+                    (subtitles.find(s => savedLang ? s.language === savedLang : s.isDefault) || subtitles[0]);
 
                 const subtitleConfig = defaultSub ? {
                     url: getSubUrl(defaultSub),
@@ -282,12 +283,13 @@ export default function VideoPlayer({
                 } : undefined;
 
                 const subtitleSelectorItems = [
-                    { html: "⊘ Tắt phụ đề", default: !defaultSub || subtitles.length === 0, value: null },
+                    { html: "⊘ Tắt phụ đề", default: subsOff || subtitles.length === 0, value: null },
                     ...subtitles.map(s => ({
                         html: s.label || s.language.toUpperCase(),
-                        default: s._id === defaultSub?._id,
+                        default: !subsOff && s._id === defaultSub?._id,
                         value: { url: getSubUrl(s), type: s.format, lang: s.language },
                     })),
+                    { html: "📎 Tải file phụ đề...", default: false, value: "__upload__" },
                 ];
                 // ─────────────────────────────────────────────────────────
 
@@ -323,8 +325,10 @@ export default function VideoPlayer({
                                 const wrap = document.getElementById("cc-btn-wrap");
                                 if (!item.value) {
                                     if (art.subtitle?.url) art.subtitle.hide();
-                                    localStorage.setItem("subtitleLang", "");
+                                    localStorage.setItem("subtitleLang", "off");
                                     if (wrap) wrap.style.opacity = "0.35";
+                                } else if (item.value === "__upload__") {
+                                    document.getElementById("pk-sub-file-input")?.click();
                                 } else {
                                     art.subtitle.show();
                                     art.subtitle.switch(item.value.url, {
@@ -357,9 +361,10 @@ export default function VideoPlayer({
                             position: "right" as const,
                             name: "cc-toggle",
                             index: 6,
-                            html: `<div id="cc-btn-wrap" style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;cursor:pointer;opacity:${defaultSub ? 1 : 0.35};transition:opacity 0.2s;" title="Phụ đề (C)">
-                                <svg viewBox="0 0 24 24" fill="white" width="22" height="22">
-                                    <path d="M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H5V6h14v12zm-8-2H9.5v-2h-2v2H6v-4h1.5v1h2v-1H11v4zm4.5-4H14v4h-1.5v-4H11v-1.5h6V12h-1.5z"/>
+                            html: `<div id="cc-btn-wrap" style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;cursor:pointer;opacity:${defaultSub ? 1 : 0.4};transition:opacity 0.2s;" title="Phụ đề (C)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6" width="22" height="22">
+                                    <rect x="2" y="5" width="20" height="14" rx="2.5"/>
+                                    <path stroke-linecap="round" d="M7 9.5h1M7 14.5h1M10 9.5c.6-.7 1.4-1 2.3-1 1.8 0 2.7 1 2.7 1M10 14.5c.6-.7 1.4-1 2.3-1 1.8 0 2.7 1 2.7 1"/>
                                 </svg>
                             </div>`,
                             tooltip: defaultSub ? `Phụ đề: ${defaultSub.label}` : "Chưa có phụ đề",
@@ -373,8 +378,8 @@ export default function VideoPlayer({
                                 const isVisible = art.subtitle?.show;
                                 if (isVisible) {
                                     art.subtitle.hide();
-                                    localStorage.setItem("subtitleLang", "");
-                                    if (wrap) wrap.style.opacity = "0.35";
+                                    localStorage.setItem("subtitleLang", "off");
+                                    if (wrap) wrap.style.opacity = "0.4";
                                     if (art.notice) art.notice.show = "Tắt phụ đề";
                                 } else {
                                     const savedLang = localStorage.getItem("subtitleLang");
@@ -397,9 +402,10 @@ export default function VideoPlayer({
                             position: "left",
                             name: "skip-back",
                             index: 11,
-                            html: `<div style="display:flex; align-items:center; justify-content:center; width:40px; height:40px; margin: 0; transition: opacity 0.2s; cursor: pointer;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                            html: `<div style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;cursor:pointer;opacity:0.9;transition:opacity 0.15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">
                                 <svg viewBox="0 0 24 24" fill="white" width="26" height="26">
-                                  <path d="M11.99 5V1l-5 5 5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6h-2c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8zm-1.1 11h-.85v-3.26l-1.01.31v-.69l1.77-.63h.09V16zm4.28-1.76c0 .32-.03.6-.1.82s-.17.42-.29.57-.28.26-.45.33-.37.1-.59.1-.41-.03-.59-.1-.33-.18-.46-.33-.23-.34-.3-.57-.11-.5-.11-.82v-.74c0-.32.03-.6.1-.82s.17-.42.29-.57.28-.26.45-.33.37-.1.59-.1.41.03.59.1.33.18.46.33.23.34.3.57.11.5.11.82v.74zm-.85-.86c0-.19-.01-.35-.04-.48s-.07-.23-.12-.31-.11-.14-.19-.17-.16-.04-.25-.04-.18.01-.25.04-.12.1-.18.17-.09.18-.12.31-.04.29-.04.48v.97c0 .19.01.35.04.48s.07.24.12.32.11.14.19.17.16.05.25.05.18-.01.25-.05.12-.1.18-.17.09-.18.12-.32.04-.29.04-.48v-.97z"/>
+                                  <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+                                  <text x="12" y="16.5" text-anchor="middle" font-size="5.5" font-weight="700" font-family="sans-serif" fill="white">10</text>
                                 </svg>
                             </div>`,
                             tooltip: "Tua lùi 10s",
@@ -410,9 +416,10 @@ export default function VideoPlayer({
                             position: "left",
                             name: "skip-forward",
                             index: 12,
-                            html: `<div style="display:flex; align-items:center; justify-content:center; width:40px; height:40px; margin: 0; transition: opacity 0.2s; cursor: pointer;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                            html: `<div style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;cursor:pointer;opacity:0.9;transition:opacity 0.15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">
                                 <svg viewBox="0 0 24 24" fill="white" width="26" height="26">
-                                  <path d="M18 13c0 3.31-2.69 6-6 6s-6-2.69-6-6 2.69-6 6-6v4l5-5-5-5v4c-4.42 0-8 3.58-8 8s3.58 8 8 8 8-3.58 8-8h-2zm-5.66 3h-.85v-3.26l-1.01.31v-.69l1.77-.63h.09V16zm4.28-1.76c0 .32-.03.6-.1.82s-.17.42-.29.57-.28.26-.45.33-.37.1-.59.1-.41-.03-.59-.1-.33-.18-.46-.33-.23-.34-.3-.57-.11-.5-.11-.82v-.74c0-.32.03-.6.1-.82s.17-.42.29-.57.28-.26.45-.33.37-.1.59-.1.41.03.59.1.33.18.46.33.23.34.3.57.11.5.11.82v.74zm-.85-.86c0-.19-.01-.35-.04-.48s-.07-.23-.12-.31-.11-.14-.19-.17-.16-.04-.25-.04-.18.01-.25.04-.12.1-.18.17-.09.18-.12.31-.04.29-.04.48v.97c0 .19.01.35.04.48s.07.24.12.32.11.14.19.17.16.05.25.05.18-.01.25-.05.12-.1.18-.17.09-.18.12-.32.04-.29.04-.48v-.97z"/>
+                                  <path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/>
+                                  <text x="12" y="16.5" text-anchor="middle" font-size="5.5" font-weight="700" font-family="sans-serif" fill="white">10</text>
                                 </svg>
                             </div>`,
                             tooltip: "Tua tiếp 10s",
@@ -468,10 +475,10 @@ export default function VideoPlayer({
                             position: "right",
                             name: "next-episode",
                             index: 11,
-                            html: `<div style="display:flex; align-items:center; justify-content:center; width:40px; height:40px; margin: 0 4px; opacity: 0.8; transition: opacity 0.2s; cursor: pointer;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
-                                <svg viewBox="0 0 24 24" width="24" height="24" fill="white" stroke="none">
-                                    <polygon points="5 4 15 12 5 20 5 4" />
-                                    <rect x="17" y="5" width="3" height="14" rx="1" />
+                            html: `<div style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;cursor:pointer;opacity:0.85;transition:opacity 0.15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.85'">
+                                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="5 4 15 12 5 20 5 4" fill="white" stroke="none"/>
+                                    <line x1="19" y1="5" x2="19" y2="19"/>
                                 </svg>
                             </div>`,
                             tooltip: "Tập tiếp theo",
@@ -649,7 +656,7 @@ export default function VideoPlayer({
                         const wrap = document.getElementById("cc-btn-wrap");
                         if (art.subtitle?.show) {
                             art.subtitle.hide();
-                            localStorage.setItem("subtitleLang", "");
+                            localStorage.setItem("subtitleLang", "off");
                             if (wrap) wrap.style.opacity = "0.4";
                             if (art.notice) art.notice.show = "Tắt phụ đề";
                         } else {
@@ -749,9 +756,9 @@ export default function VideoPlayer({
 
         try {
             const savedLang = typeof localStorage !== "undefined" ? localStorage.getItem("subtitleLang") : null;
-            if (savedLang === "") return; // user explicitly turned off
-            const sub = subtitles.find((s) => savedLang ? s.language === savedLang : s.isDefault)
-                || (savedLang ? null : subtitles[0]);
+            if (savedLang === "off") return; // user explicitly turned off
+            const sub = subtitles.find((s) => (savedLang && savedLang !== "off") ? s.language === savedLang : s.isDefault)
+                || ((savedLang && savedLang !== "off") ? null : subtitles[0]);
             if (!sub) return;
 
             // Build URL using same logic as getSubUrl inside initArtPlayer
@@ -830,6 +837,28 @@ export default function VideoPlayer({
 
     return (
         <>
+            {/* Hidden file input for local subtitle upload */}
+            <input
+                id="pk-sub-file-input"
+                type="file"
+                accept=".srt,.vtt,.ass,.ssa"
+                style={{ display: "none" }}
+                onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file || !artInstance.current) return;
+                    const art = artInstance.current as any;
+                    const blobUrl = URL.createObjectURL(file);
+                    const ext = file.name.split(".").pop()?.toLowerCase() || "srt";
+                    const type = (ext === "ass" || ext === "ssa") ? "ass" : ext;
+                    art.subtitle.switch(blobUrl, { name: file.name, type, escape: false });
+                    art.subtitle.show();
+                    const wrap = document.getElementById("cc-btn-wrap");
+                    if (wrap) wrap.style.opacity = "1";
+                    if (art.notice) art.notice.show = `Phụ đề: ${file.name}`;
+                    localStorage.setItem("subtitleLang", "custom");
+                    e.target.value = "";
+                }}
+            />
             <div className="relative w-full h-full">
                 <div ref={artRef} className="w-full h-full bg-black art-ios-theme" style={{ minHeight: "200px" }}>
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a0a0b] z-0">
