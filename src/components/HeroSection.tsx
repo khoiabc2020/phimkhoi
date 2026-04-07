@@ -226,13 +226,13 @@ function HeroThumbTile({
                     </div>
                 </div>
             )}
-            {active && <div className="absolute inset-0 bg-primary/10 animate-pulse pointer-events-none" />}
+            {active && <div className="absolute inset-0 bg-primary/8 pointer-events-none" />}
         </div>
     );
 }
 
 function MobileHero({ movies, active = true }: { movies: Movie[]; active?: boolean }) {
-    const { index, go, next, prev } = useAutoplay(movies.length, 5000, !active);
+    const { index, go, next, prev } = useAutoplay(movies.length, 7000, !active);
     const movie = movies[index] as any;
     const router = useRouter();
     const touchRef = useRef({ startX: 0, endX: 0 });
@@ -266,7 +266,7 @@ function MobileHero({ movies, active = true }: { movies: Movie[]; active?: boole
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
         >
-            <AnimatePresence mode="popLayout" initial={false}>
+            <AnimatePresence mode="sync" initial={false}>
                 <motion.div
                     key={`mobile-slide-${movie._id || index}`}
                     initial={{ opacity: 0 }}
@@ -381,11 +381,22 @@ function MobileHero({ movies, active = true }: { movies: Movie[]; active?: boole
 
 function DesktopHero({ movies, active = true }: { movies: Movie[]; active?: boolean }) {
     const [paused, setPaused] = useState(false);
+    const pauseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
     const { index, go, next, prev } = useAutoplay(movies.length, 6000, paused || !active);
     const movie = movies[index] as any;
     const router = useRouter();
     const navRef = useRef<HTMLDivElement>(null);
     const desktopBackdrop = getHeroImage(movie, "backdrop", "desktop");
+
+    const handleMouseEnter = useCallback(() => {
+        if (pauseTimer.current) clearTimeout(pauseTimer.current);
+        pauseTimer.current = setTimeout(() => setPaused(true), 150);
+    }, []);
+
+    const handleMouseLeave = useCallback(() => {
+        if (pauseTimer.current) clearTimeout(pauseTimer.current);
+        setPaused(false);
+    }, []);
 
     useEffect(() => {
         if (!navRef.current) return;
@@ -407,11 +418,11 @@ function DesktopHero({ movies, active = true }: { movies: Movie[]; active?: bool
     return (
         <div
             className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] xl:h-[800px] overflow-hidden bg-[#0a0a0a]"
-            onMouseEnter={() => setPaused(true)}
-            onMouseLeave={() => setPaused(false)}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
             style={{ contain: "layout size" }}
         >
-            <AnimatePresence mode="popLayout" initial={false}>
+            <AnimatePresence mode="sync" initial={false}>
                 <motion.div
                     key={`desktop-slide-${movie._id || index}`}
                     initial={{ opacity: 0 }}
