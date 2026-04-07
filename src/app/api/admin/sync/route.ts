@@ -79,22 +79,6 @@ const normalizeMovieData = (item: any, existingMovie?: any) => {
     const resolvedPoster = sanitized.poster_url || images.poster_url || existingMovie?.poster_url || "";
     const resolvedThumb = sanitized.thumb_url || images.thumb_url || existingMovie?.thumb_url || "";
 
-    // Auto-correct episode_current: nếu nguồn báo số tập khác thực tế trong episodes array
-    // thì ưu tiên số tập thực tế để tránh hiển thị sai (vd: báo 40/40 nhưng chỉ có 34 link)
-    const resolvedEpisodes = nextEpisodes.length > 0 ? nextEpisodes : existingEpisodes;
-    const actualEpCount = resolvedEpisodes[0]?.server_data?.length || 0;
-    const rawEpCurrent = String(item.episode_current || existingMovie?.episode_current || "").trim();
-    const isCompleted = /hoàn tất|full|complete/i.test(rawEpCurrent);
-    let correctedEpCurrent = rawEpCurrent;
-    if (isCompleted && actualEpCount > 0) {
-        // Trích số từ metadata, ví dụ "Hoàn tất (40/40)" → 40
-        const metaNum = Number((rawEpCurrent.match(/\d+/) || [])[0] || "0");
-        if (metaNum > 0 && metaNum !== actualEpCount) {
-            // Số tập thực tế khác metadata → dùng thực tế
-            correctedEpCurrent = `Hoàn tất (${actualEpCount}/${actualEpCount})`;
-        }
-    }
-
     return {
         name: String(item.name || existingMovie?.name || "").trim(),
         slug: item.slug,
@@ -109,7 +93,7 @@ const normalizeMovieData = (item: any, existingMovie?: any) => {
         chieurap: normalizeBoolean(item.chieurap),
         trailer_url: item.trailer_url || existingMovie?.trailer_url || "",
         time: item.time || existingMovie?.time || "",
-        episode_current: correctedEpCurrent,
+        episode_current: item.episode_current || existingMovie?.episode_current || "",
         episode_total: item.episode_total || existingMovie?.episode_total || "",
         quality: item.quality || existingMovie?.quality || "",
         lang: item.lang || existingMovie?.lang || "",
