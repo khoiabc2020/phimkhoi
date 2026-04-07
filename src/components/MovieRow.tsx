@@ -98,17 +98,17 @@ function MovieRowInner({ title, movies, slug, variant = "default", priorityFirst
             <div className="mx-auto w-full max-w-[1920px]">
                 <div className="space-y-2.5 rounded-[10px] bg-transparent">
                     <div className="flex items-center justify-between gap-3 px-3 pt-2.5 sm:px-4">
-                        <h2 className="flex flex-1 items-center gap-2 text-[16px] font-bold tracking-tight text-white sm:text-[18px] md:text-[20px] min-w-0">
-                            <span className="h-4 w-1 flex-shrink-0 rounded-sm bg-[#8FA7C5] sm:h-5" />
+                        <h2 className="flex flex-1 items-center gap-2.5 text-[16px] font-bold tracking-tight text-white sm:text-[18px] md:text-[20px] min-w-0">
+                            <span className="h-5 w-[3px] flex-shrink-0 rounded-full bg-gradient-to-b from-[#c4d8ec] via-[#8FA7C5] to-[#4a6d94] shadow-[0_0_10px_rgba(143,167,197,0.6)] sm:h-6" />
                             <span className="truncate">{title}</span>
                         </h2>
                         {slug && (
                             <Link
                                 href={slug.startsWith("/") ? slug : `/danh-sach/${slug}`}
-                                className="group/link flex flex-shrink-0 whitespace-nowrap items-center gap-1 text-xs font-semibold text-[#8FA7C5] transition-colors hover:text-white sm:text-sm"
+                                className="group/link flex flex-shrink-0 whitespace-nowrap items-center gap-1 text-[11px] sm:text-[12px] font-bold text-white/40 hover:text-white/80 transition-colors bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] px-3 py-1 rounded-full"
                             >
-                                Xem tất cả
-                                <ChevronRight className="h-4 w-4 transition-transform group-hover/link:translate-x-1" />
+                                Tất cả
+                                <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover/link:translate-x-0.5" />
                             </Link>
                         )}
                     </div>

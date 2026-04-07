@@ -42,13 +42,13 @@ export default function BottomNav() {
                             className="flex flex-1 items-center justify-center touch-manipulation active:scale-95 transition-transform"
                         >
                             {isActive ? (
-                                /* Active → pill with icon + label */
-                                <span className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#8FA7C5]/15 border border-[#8FA7C5]/25">
+                                /* Active → solid brand pill */
+                                <span className="flex items-center gap-1.5 px-4 py-[7px] rounded-full bg-[#8FA7C5] shadow-[0_4px_18px_rgba(143,167,197,0.40)]">
                                     <Icon
-                                        className="w-[18px] h-[18px] text-[#8FA7C5] shrink-0"
-                                        strokeWidth={2.2}
+                                        className="w-[17px] h-[17px] text-[#060913] shrink-0"
+                                        strokeWidth={2.5}
                                     />
-                                    <span className="text-[12px] font-bold text-[#8FA7C5] whitespace-nowrap">
+                                    <span className="text-[12px] font-black text-[#060913] whitespace-nowrap">
                                         {item.name}
                                     </span>
                                 </span>

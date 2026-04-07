@@ -322,7 +322,7 @@ function MobileHero({ movies, active = true }: { movies: Movie[]; active?: boole
                         )}
 
                         <div className="flex items-center gap-3 text-[13px] font-bold text-white/90">
-                            <div className="bg-[#8FA7C5] text-[#0a0a0a] px-2 py-0.5 rounded-sm text-[10px] md:text-[11px] font-black tracking-tighter uppercase">
+                            <div className="bg-[#8FA7C5] text-[#060913] px-2 py-0.5 rounded-sm text-[10px] md:text-[11px] font-black tracking-tighter uppercase shadow-[0_2px_8px_rgba(143,167,197,0.4)]">
                                 TOP 10
                             </div>
                             <div className="flex items-center gap-2">
@@ -333,6 +333,24 @@ function MobileHero({ movies, active = true }: { movies: Movie[]; active?: boole
                                 <span className="text-[#8FA7C5]">{getHeroEpisodeLabel(movie)}</span>
                             </div>
                         </div>
+
+                        {/* Genre pills — mobile hero */}
+                        {movie.category && movie.category.length > 0 && (
+                            <div className="flex items-center gap-1.5 flex-wrap justify-center">
+                                {movie.category.slice(0, 3).map((cat: any) => (
+                                    <span key={cat.slug || cat.name} className="text-[11px] font-semibold text-white/70 bg-white/10 border border-white/10 rounded-full px-3 py-1">
+                                        {cat.name}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Short description — mobile hero */}
+                        {getHeroDescription(movie) && (
+                            <p className="text-white/55 text-[12px] leading-relaxed line-clamp-2 max-w-[300px] font-medium">
+                                {getHeroDescription(movie)}
+                            </p>
+                        )}
 
                         <div className="flex items-center gap-3 pt-4">
                             <Link

@@ -295,9 +295,9 @@ function MovieCard({
                 onMouseLeave={handleMouseLeave}
             >
                 <div className={cn(
-                    "relative overflow-hidden rounded-[10px] bg-[#0b101a] ring-1 ring-white/5 transition-all duration-500 ease-out shadow-lg transform-gpu",
+                    "relative overflow-hidden rounded-2xl bg-[#0b101a] ring-1 ring-white/5 transition-all duration-500 ease-out shadow-lg transform-gpu",
                     orientation === 'landscape' ? 'aspect-video' : 'aspect-[2/3]',
-                    "lg:group-hover/static-card:scale-[1.03] lg:group-hover/static-card:ring-2 lg:group-hover/static-card:ring-[#8FA7C5]/40 lg:group-hover/static-card:shadow-[0_0_25px_rgba(143,167,197,0.25)]"
+                    "lg:group-hover/static-card:scale-[1.03] lg:group-hover/static-card:ring-2 lg:group-hover/static-card:ring-[#8FA7C5]/50 lg:group-hover/static-card:shadow-[0_8px_32px_rgba(143,167,197,0.35)]"
                 )}>
                     <Link href={`/phim/${movie.slug}`} className="block h-full w-full absolute inset-0 z-0">
                         <Image
@@ -340,7 +340,7 @@ function MovieCard({
                             </span>
                         )}
                         {!movie.episode_current && formatQualityLabel(movie.quality) && (
-                            <span className="bg-[#009624]/90 border border-white/10 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[4px] tracking-tight uppercase">
+                            <span className="bg-[#8FA7C5]/90 border border-white/10 text-[#060913] text-[9px] font-black px-1.5 py-0.5 rounded-[4px] tracking-tight uppercase">
                                 {formatQualityLabel(movie.quality)}
                             </span>
                         )}
@@ -479,7 +479,7 @@ function OnflixHoverCard({
         >
             <div className={containerClasses}>
                 {/* Card */}
-                <div className="relative overflow-hidden rounded-[10px] border border-white/[0.08] bg-[#0c1018]/98 shadow-[0_12px_30px_#000000a0]">
+                <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0c1018]/98 shadow-[0_12px_30px_#000000a0]">
 
                     {/* Overlay media — taller and less cropped so faces are easier to see */}
                     <div className="relative aspect-[16/8.6] w-full overflow-hidden bg-[#1a1a1a]">
@@ -526,7 +526,7 @@ function OnflixHoverCard({
                             {/* Play button (Yellow) */}
                             <Link
                                 href={`/xem-phim/${movie.slug}?autoPlay=true`}
-                                className="flex-1 min-w-0 flex items-center justify-center gap-1.5 bg-[#8FA7C5] hover:bg-[#a8bdd8] text-[#0a0a0a] font-bold text-[13px] h-9 px-3 rounded-full transition-all hover:scale-105"
+                                className="flex-1 min-w-0 flex items-center justify-center gap-1.5 bg-gradient-to-r from-[#8FA7C5] to-[#6B9AC4] hover:from-[#a0badb] hover:to-[#8FA7C5] text-[#060913] font-black text-[13px] h-9 px-3 rounded-full transition-all hover:scale-105 shadow-[0_4px_12px_rgba(143,167,197,0.4)]"
                             >
                                 <Play className="w-3.5 h-3.5 fill-current shrink-0" />
                                 <span className="truncate">Xem</span>
