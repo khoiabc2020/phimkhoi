@@ -534,14 +534,14 @@ function DesktopHero({ movies, active = true }: { movies: Movie[]; active?: bool
                 </motion.div>
             </AnimatePresence>
 
-            {/* Thumbnail strip — aligned to content area (matches hero left padding) */}
-            <div className="absolute bottom-6 left-0 right-0 z-[30] pl-4 md:pl-24 lg:pl-32 xl:pl-36 pr-4 md:pr-10 lg:pr-12">
+            {/* Thumbnail strip — centered in content area, max-width prevents sidebar overlap */}
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[30] w-full max-w-[92vw] md:max-w-xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-5xl">
                 <div
                     ref={navRef}
-                    className="flex items-center gap-2 md:gap-3 overflow-x-auto no-scrollbar py-3 scroll-smooth snap-x snap-mandatory min-w-0 w-full"
+                    className="flex items-center gap-2 md:gap-3 overflow-x-auto no-scrollbar py-3 px-2 scroll-smooth snap-x snap-mandatory min-w-0 w-full"
                     style={{
-                        maskImage: "linear-gradient(to right, black 60%, transparent 100%)",
-                        WebkitMaskImage: "linear-gradient(to right, black 60%, transparent 100%)",
+                        maskImage: "linear-gradient(to right, transparent, black 12%, black 88%, transparent)",
+                        WebkitMaskImage: "linear-gradient(to right, transparent, black 12%, black 88%, transparent)",
                     }}
                 >
                     {movies.map((heroMovie: any, heroIndex) => (
