@@ -51,16 +51,17 @@ export function useMoviesInstant(
         }
     }, [cacheKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // Background Sync — skip if cache is fresh (<5 min old)
+    // Background Sync — skip if cache is fresh (<5 min old) AND non-empty
     const sync = useCallback(async (force = false) => {
         if (!force) {
             const cached = localStorage.getItem(`phimkhoi_cache_${cacheKey}`);
             if (cached) {
                 try {
                     const parsed: InstantData = JSON.parse(cached);
-                    if (Date.now() - parsed.timestamp < STALE_MS) {
+                    // Only skip network call if cache is fresh AND has real data
+                    if (parsed.movies?.length > 0 && Date.now() - parsed.timestamp < STALE_MS) {
                         setIsLoading(false);
-                        return; // Data is fresh, skip network call
+                        return;
                     }
                 } catch { /* ignore */ }
             }
@@ -73,12 +74,18 @@ export function useMoviesInstant(
             setIsFresh(true);
             setIsLoading(false);
 
-            const dataToCache: InstantData = {
-                movies: items,
-                pagination: res.pagination,
-                timestamp: Date.now()
-            };
-            localStorage.setItem(`phimkhoi_cache_${cacheKey}`, JSON.stringify(dataToCache));
+            // Only cache if we actually have movies — never persist empty results
+            if (items.length > 0) {
+                const dataToCache: InstantData = {
+                    movies: items,
+                    pagination: res.pagination,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem(`phimkhoi_cache_${cacheKey}`, JSON.stringify(dataToCache));
+            } else {
+                // Remove any stale empty entry so next load retries immediately
+                localStorage.removeItem(`phimkhoi_cache_${cacheKey}`);
+            }
         } catch (error) {
             console.error("Sync Error:", error);
             setIsLoading(false);

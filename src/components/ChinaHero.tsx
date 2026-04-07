@@ -274,22 +274,23 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                                 </div>
                             </div>
 
-                            <div className="hidden sm:flex flex-wrap gap-2">
+                            <div className="flex flex-wrap gap-1.5 md:gap-2">
                                 {currentMovie.displayTags.map((tag: string) => (
                                     <span
                                         key={tag}
-                                        className="px-3 py-1 bg-white/10 border border-white/10 rounded-full text-[11px] md:text-[12px] font-bold text-white/80 cursor-default shadow-sm backdrop-blur-md transition-all duration-300 hover:bg-white/20"
+                                        className="px-2.5 py-0.5 md:px-3 md:py-1 bg-white/10 border border-white/[0.12] rounded-full text-[10px] md:text-[12px] font-semibold text-white/75 backdrop-blur-md"
                                     >
                                         {tag}
                                     </span>
                                 ))}
                             </div>
 
-                            <p className="text-[13px] md:text-[14px] lg:text-[16px] text-white/70 line-clamp-2 md:line-clamp-3 leading-relaxed max-w-lg drop-shadow relative">
+                            {/* Description — desktop only, too cluttered on mobile */}
+                            <p className="hidden md:block text-[14px] lg:text-[16px] text-white/65 line-clamp-3 leading-relaxed max-w-lg drop-shadow">
                                 {currentMovie.displayDesc}
                             </p>
 
-                            <div className="flex items-center gap-3 md:gap-4 pt-2 pointer-events-auto">
+                            <div className="flex items-center gap-3 md:gap-4 pt-1 md:pt-2 pointer-events-auto">
                                 <Link
                                     href={`/phim/${currentMovie.slug}`}
                                     className="flex items-center gap-2 md:gap-3 px-6 md:px-10 h-11 md:h-14 bg-[#8FA7C5] text-[#0a0a0a] rounded-full font-black text-[14px] md:text-[16px] active:scale-95 shadow-2xl shadow-[#8FA7C5]/20 uppercase tracking-wider transition-all duration-300 hover:bg-white hover:scale-105"
