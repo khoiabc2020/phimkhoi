@@ -204,7 +204,7 @@ export default async function GenresIndexPage() {
     const { categories } = await getMenuData();
 
     return (
-        <main className="min-h-screen pb-24 bg-[#060913]">
+        <main className="min-h-screen pb-24 bg-[#0a0a0a]">
             {/* Ambient glow */}
             <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(30,41,75,0.45)_0%,transparent_65%)] pointer-events-none" />
 

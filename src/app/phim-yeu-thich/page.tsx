@@ -1,4 +1,10 @@
 export const dynamic = 'force-dynamic';
+import type { Metadata } from "next";
+export const metadata: Metadata = {
+    title: "Phim Yêu Thích - KHOIPHIM",
+    description: "Danh sách phim yêu thích của bạn trên KHOIPHIM.",
+    robots: { index: false },
+};
 
 import { Heart, ArrowLeft, Trash2 } from "lucide-react";
 import Link from "next/link";

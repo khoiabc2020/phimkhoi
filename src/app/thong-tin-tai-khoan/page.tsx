@@ -1,3 +1,9 @@
+import type { Metadata } from "next";
+export const metadata: Metadata = {
+    title: "Tài Khoản - KHOIPHIM",
+    description: "Quản lý tài khoản, lịch sử xem và cài đặt cá nhân trên KHOIPHIM.",
+    robots: { index: false },
+};
 
 import { getServerSession } from "next-auth";
 export const dynamic = "force-dynamic";

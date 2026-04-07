@@ -183,7 +183,7 @@ export default async function WatchPage({ params }: PageProps) {
                 <div className="absolute inset-0 bg-gradient-radial from-[#101014]/22 via-[#0a0a0a] to-[#0a0a0a]" />
             </div>
 
-            <div className="relative z-10 pt-10 md:pt-24 pb-16">
+            <div className="relative z-10 pt-10 md:pt-24 pb-24 md:pb-16">
                 {/* ── CONTENT GRID (9+3) ── */}
                 <div className="relative z-20 w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 lg:pl-24 lg:pr-12">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8">

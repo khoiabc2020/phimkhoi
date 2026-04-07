@@ -1,4 +1,10 @@
 export const dynamic = "force-dynamic";
+import type { Metadata } from "next";
+export const metadata: Metadata = {
+    title: "Xem Sau - KHOIPHIM",
+    description: "Danh sách phim đã lưu để xem sau trên KHOIPHIM.",
+    robots: { index: false },
+};
 
 import { ArrowLeft, Bookmark } from "lucide-react";
 import Link from "next/link";

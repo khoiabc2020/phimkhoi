@@ -65,9 +65,9 @@ export default function NotificationsPage() {
     }, []);
 
     return (
-        <main className="min-h-screen pt-20 pb-24">
+        <main className="min-h-screen pt-24 pb-24">
             {/* Subtle background */}
-            <div className="fixed inset-0 bg-[#07070B] -z-20" />
+            <div className="fixed inset-0 bg-[#0a0a0a] -z-20" />
             <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary/4 blur-[160px] rounded-full pointer-events-none -z-10" />
 
             <div className="w-full max-w-[780px] mx-auto px-4 sm:px-6">
