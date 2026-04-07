@@ -7,7 +7,48 @@ import { normalizeMovieImages } from "@/lib/movie-media";
 import { createAuditLog } from "@/lib/audit";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-const API_URL = "https://phimapi.com";
+const API_URL = "https://phimapi.com";   // KKPhim (source A)
+const OPHIM_URL = "https://ophim1.com";  // OPhim  (source B)
+const NGUONC_URL = "https://phim.nguonc.com/api"; // NguonC (source C)
+
+// Normalize NguonC episode items to match our schema
+function normalizeNguonCItems(items: any[]): any[] {
+    return items.map(ep => ({
+        name: ep.name || "",
+        slug: ep.slug || "",
+        filename: ep.filename || "",
+        link_embed: ep.embed || ep.link_embed || "",
+        link_m3u8: ep.m3u8 || ep.link_m3u8 || "",
+    }));
+}
+
+// Fetch episodes from OPhim for a given slug, return server_data array or []
+async function fetchOPhimEpisodes(slug: string): Promise<any[]> {
+    try {
+        const res = await fetch(`${OPHIM_URL}/phim/${slug}`, { signal: AbortSignal.timeout(6000) });
+        if (!res.ok) return [];
+        const data = await res.json();
+        return (data.episodes || []).map((s: any) => ({
+            server_name: `OPhim ${s.server_name || ""}`.trim(),
+            server_data: s.server_data || [],
+        }));
+    } catch { return []; }
+}
+
+// Fetch episodes from NguonC for a given slug, return server_data array or []
+async function fetchNguonCEpisodes(slug: string): Promise<any[]> {
+    try {
+        const res = await fetch(`${NGUONC_URL}/film/${slug}`, { signal: AbortSignal.timeout(6000) });
+        if (!res.ok) return [];
+        const data = await res.json();
+        const movie = data.movie || data;
+        const episodes = movie.episodes || data.episodes || [];
+        return episodes.map((s: any) => ({
+            server_name: `NguonC ${s.server_name || s.name || ""}`.trim(),
+            server_data: normalizeNguonCItems(s.server_data || s.items || []),
+        }));
+    } catch { return []; }
+}
 
 const slugifyText = (value: string) =>
     String(value || "")
@@ -152,11 +193,26 @@ export async function GET(req: Request) {
                         if (detailRes.ok) {
                             const detailData = await detailRes.json();
                             if (detailData.movie) {
-                                // episodes nằm ở detailData.episodes, KHÔNG phải detailData.movie.episodes
+                                // episodes nằm ở detailData.episodes (top-level), KHÔNG phải detailData.movie.episodes
+                                const phimApiEps: any[] = detailData.episodes || [];
+
+                                // Fetch thêm từ OPhim + NguonC song song
+                                const [ophimEps, nguoncEps] = await Promise.all([
+                                    fetchOPhimEpisodes(item.slug),
+                                    fetchNguonCEpisodes(item.slug),
+                                ]);
+
+                                // Merge: phimapi (KKPhim) + OPhim + NguonC
+                                const mergedEpisodes = [
+                                    ...phimApiEps,
+                                    ...ophimEps,
+                                    ...nguoncEps,
+                                ].filter(s => s.server_data && s.server_data.length > 0);
+
                                 movieData = {
                                     ...item,
                                     ...detailData.movie,
-                                    episodes: detailData.episodes || detailData.movie?.episodes || item.episodes || [],
+                                    episodes: mergedEpisodes.length > 0 ? mergedEpisodes : (item.episodes || []),
                                 };
                             }
                         }
