@@ -25,28 +25,41 @@ export default function BottomNav() {
 
     return (
         <nav
-            className="fixed bottom-0 inset-x-0 z-[200] lg:hidden border-t border-white/[0.06] bg-[#080b12]/90 backdrop-blur-xl"
+            className="fixed bottom-0 inset-x-0 z-[200] lg:hidden bg-[#080b12]/95 backdrop-blur-2xl border-t border-white/[0.05]"
             style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
         >
-            <div className="flex items-stretch h-14">
+            <div className="flex items-center justify-around h-[60px] px-1">
                 {navItems.map((item) => {
                     const Icon = item.icon;
-                    const isActive = pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href));
+                    const isActive =
+                        pathname === item.href ||
+                        (item.href !== "/" && pathname?.startsWith(item.href));
+
                     return (
                         <Link
                             key={item.href}
                             href={item.href}
-                            className={cn(
-                                "relative flex flex-1 flex-col items-center justify-center gap-0.5 transition-colors active:scale-95 touch-manipulation",
-                                isActive ? "text-[#8FA7C5]" : "text-white/35 hover:text-white/70"
-                            )}
+                            className="flex flex-1 items-center justify-center touch-manipulation active:scale-95 transition-transform"
                         >
-                            <Icon className={cn("w-5 h-5 shrink-0", isActive && "drop-shadow-[0_0_6px_#8FA7C560]")} strokeWidth={isActive ? 2 : 1.75} />
-                            <span className={cn("text-[9px] font-semibold tracking-wide truncate max-w-[56px] text-center", isActive ? "opacity-100" : "opacity-60")}>
-                                {item.name}
-                            </span>
-                            {isActive && (
-                                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[2px] rounded-full bg-[#8FA7C5] shadow-[0_0_8px_#8FA7C5]" />
+                            {isActive ? (
+                                /* Active → pill with icon + label */
+                                <span className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#8FA7C5]/15 border border-[#8FA7C5]/25">
+                                    <Icon
+                                        className="w-[18px] h-[18px] text-[#8FA7C5] shrink-0"
+                                        strokeWidth={2.2}
+                                    />
+                                    <span className="text-[12px] font-bold text-[#8FA7C5] whitespace-nowrap">
+                                        {item.name}
+                                    </span>
+                                </span>
+                            ) : (
+                                /* Inactive → just icon */
+                                <span className="flex items-center justify-center w-10 h-10">
+                                    <Icon
+                                        className="w-[22px] h-[22px] text-white/30"
+                                        strokeWidth={1.6}
+                                    />
+                                </span>
                             )}
                         </Link>
                     );
