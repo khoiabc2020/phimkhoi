@@ -300,20 +300,24 @@ function MobileHero({ movies, active = true }: { movies: Movie[]; active?: boole
                         <div className="absolute inset-0 bg-[#0a0a0a]/20" />
                     </div>
 
-                    <div className="absolute inset-x-0 bottom-0 z-[10] px-6 pb-16 flex flex-col items-center gap-2 text-center">
+                    <div className="absolute inset-x-0 bottom-0 z-[10] px-5 pb-14 flex flex-col items-center gap-2 text-center">
                         {movie.isCustomHero && movie.layer_logo ? (
                             <div className="relative w-[180px] h-[54px] mb-2 mx-auto">
                                 <Image
                                     src={getImageUrl(movie.layer_logo)}
-                                    alt={decodeHtml(movie.name)}
+                                    alt={decodeHtml(movie.name || "")}
                                     fill
                                     className="object-contain"
-                                    unoptimized={!movie.layer_logo.startsWith("http")}
+                                    sizes="180px"
+                                    quality={75}
                                 />
                             </div>
                         ) : (
-                            <h1 className="text-[24px] md:text-[28px] font-black text-white leading-tight mb-1 drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] px-4">
-                                {decodeHtml(movie.name)}
+                            <h1 className={cn(
+                                "font-black text-white leading-tight line-clamp-2 drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] px-2",
+                                (movie.name?.length ?? 0) > 20 ? "text-[20px] sm:text-[24px]" : "text-[24px] sm:text-[28px]"
+                            )}>
+                                {decodeHtml(movie.name || movie.origin_name || "")}
                             </h1>
                         )}
 
@@ -453,12 +457,12 @@ function DesktopHero({ movies, active = true }: { movies: Movie[]; active?: bool
                                         <h1
                                             className={cn(
                                                 "font-display font-black text-white leading-tight tracking-tight pt-1 drop-shadow-[0_8px_24px_rgba(0,0,0,0.9)] pb-2 text-balance line-clamp-2 md:line-clamp-3",
-                                                movie.name.length > 25
+                                                (movie.name?.length ?? 0) > 25
                                                     ? "text-2xl md:text-3xl lg:text-[40px] xl:text-[46px]"
                                                     : "text-3xl md:text-[32px] lg:text-[48px] xl:text-[54px]"
                                             )}
                                         >
-                                            {decodeHtml(movie.name)}
+                                            {decodeHtml(movie.name || movie.origin_name || "")}
                                         </h1>
                                     )}
                                 </div>
