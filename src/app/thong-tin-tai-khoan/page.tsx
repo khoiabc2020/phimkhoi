@@ -29,7 +29,7 @@ export default async function ProfilePage() {
     const history = historyResult.success ? historyResult.data : [];
 
     return (
-        <main className="min-h-screen pt-24 pb-20">
+        <main className="min-h-screen bg-[#0a0a0a] pt-24 pb-24 md:pb-16">
             <div className="w-full max-w-[1920px] mx-auto px-4 lg:pl-24 lg:pr-12 relative z-10">
                 <ProfileTabs
                     user={session.user}

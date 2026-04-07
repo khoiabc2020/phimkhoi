@@ -26,7 +26,7 @@ export default async function PersonPage({ params, searchParams }: PersonPagePro
 
         if (!person) {
             return (
-                <div className="min-h-screen bg-[#080b12] text-white flex items-center justify-center pt-20">
+                <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center pt-20">
                     <div className="text-center">
                         <h1 className="text-2xl font-bold mb-4">Không tìm thấy diễn viên</h1>
                         <Link href="/" className="text-primary hover:underline">Quay lại trang chủ</Link>
@@ -40,7 +40,7 @@ export default async function PersonPage({ params, searchParams }: PersonPagePro
         const details = detailsData as any;
 
         if (!details) return (
-            <div className="min-h-screen bg-[#080b12] text-white flex items-center justify-center pt-20">
+            <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center pt-20">
                 <div className="text-center">
                     <h1 className="text-2xl font-bold mb-4">Không thể tải thông tin diễn viên</h1>
                     <Link href="/" className="text-primary hover:underline">Quay lại trang chủ</Link>
@@ -66,7 +66,7 @@ export default async function PersonPage({ params, searchParams }: PersonPagePro
 
 
     return (
-        <main className="min-h-screen bg-[#080b12] text-white overflow-hidden" 
+        <main className="min-h-screen bg-[#0a0a0a] text-white overflow-hidden" 
               style={{ fontFamily: "'Inter', sans-serif" }}>
 
             {/* Hero Section */}

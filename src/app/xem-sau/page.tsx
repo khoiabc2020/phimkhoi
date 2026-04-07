@@ -65,8 +65,8 @@ export default async function WatchlistPage() {
     const movies = watchlist.movies.slice(0, 48);
 
     return (
-        <div className="min-h-screen">
-            <div className="relative bg-gradient-to-b from-[#020617]/70 via-[#020617]/30 to-transparent px-4 pb-8 pt-20 md:px-12">
+        <div className="min-h-screen bg-[#0a0a0a]">
+            <div className="relative bg-gradient-to-b from-[#020617]/70 via-[#020617]/30 to-transparent px-4 pb-8 pt-24 md:px-12">
                 <div className="mx-auto max-w-7xl">
                     <Link
                         href="/"

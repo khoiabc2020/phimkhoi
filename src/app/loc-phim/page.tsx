@@ -74,7 +74,7 @@ export default async function AdvancedFilterPage({ searchParams }: FilterPagePro
             {/* Decorative background glow */}
             <div className={cn("absolute top-0 left-0 right-0 h-[600px] via-transparent to-transparent pointer-events-none -z-10 blur-[150px] opacity-50", theme.glow)} />
             
-            <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-20 md:pt-24 pb-24 md:pb-20">
+            <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-20 md:pt-24 pb-24 md:pb-16">
                 {/* Header — mobile: minimal 1-line title */}
                 <div className="flex md:hidden items-center gap-2 mb-4">
                     <h1 className="text-[15px] font-bold text-white flex items-center gap-1.5">
