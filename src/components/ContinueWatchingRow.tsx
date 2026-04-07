@@ -66,7 +66,7 @@ function ContinueWatchingRowInner() {
         const channel = new BroadcastChannel("phimkhoi_history_sync");
         channel.onmessage = (event) => {
             if (event.data?.type === "HISTORY_UPDATE") {
-                const { movieId, progress, episodeSlug, episodeName, movieName, moviePoster } = event.data;
+                const { movieId, progress, currentTime, episodeSlug, episodeName, movieName, moviePoster } = event.data;
                 setMovies((prev) => {
                     const existing = prev.find((m) => m.movieId === movieId);
                     let newMovies = prev;
@@ -84,6 +84,7 @@ function ContinueWatchingRowInner() {
                                     ? {
                                         ...m,
                                         progress,
+                                        currentTime: currentTime ?? m.currentTime,
                                         episodeSlug: episodeSlug || m.episodeSlug,
                                         episodeName: episodeName || m.episodeName,
                                         lastWatched: event.data.lastWatched || new Date().toISOString(),
@@ -256,11 +257,18 @@ function ContinueWatchingRowInner() {
                                         <span className="text-gray-300 text-[12px] font-medium truncate">
                                             {item.episodeName || "Tiếp tục xem"}
                                         </span>
-                                        {Number(item.progress) > 0 && (
-                                            <span className="text-[#8FA7C5] text-[12px] font-black uppercase tracking-wider">
+                                        {Number(item.currentTime) > 0 ? (
+                                            <span className="text-[#8FA7C5] text-[12px] font-bold tabular-nums">
+                                                {Math.floor(item.currentTime / 3600) > 0
+                                                    ? `${Math.floor(item.currentTime / 3600)}:${String(Math.floor((item.currentTime % 3600) / 60)).padStart(2, "0")}:${String(Math.floor(item.currentTime % 60)).padStart(2, "0")}`
+                                                    : `${Math.floor(item.currentTime / 60)}:${String(Math.floor(item.currentTime % 60)).padStart(2, "0")}`
+                                                }
+                                            </span>
+                                        ) : Number(item.progress) > 0 ? (
+                                            <span className="text-[#8FA7C5] text-[12px] font-bold">
                                                 {item.progress}%
                                             </span>
-                                        )}
+                                        ) : null}
                                     </div>
                                 </div>
                             </Link>
