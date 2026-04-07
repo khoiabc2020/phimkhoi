@@ -4,7 +4,7 @@ import Image from "next/image";
 import {
     ChevronLeft, Swords, Heart, Smile, Brain, Eye, Rocket, Zap,
     Shield, Music, Compass, Scroll, Home, Baby, Beaker, BookOpen,
-    Flame, Star, Film, Trophy, GraduationCap, Sword, Hash,
+    Flame, Star, Film, Trophy, GraduationCap, Sword, MapPin,
 } from "lucide-react";
 import { Metadata } from "next";
 import { cn } from "@/lib/utils";
@@ -15,6 +15,9 @@ export const metadata: Metadata = {
     alternates: { canonical: "https://khoiphim.org/the-loai" },
 };
 
+// Unsplash stable photo IDs — reliable, no auth, always available
+const U = (id: string) => `https://images.unsplash.com/photo-${id}?w=780&q=75&auto=format&fit=crop`;
+
 const CATEGORY_META: Record<string, {
     image: string;
     gradient: string;
@@ -24,7 +27,7 @@ const CATEGORY_META: Record<string, {
     badge?: string;
 }> = {
     "hanh-dong": {
-        image: "https://image.tmdb.org/t/p/w780/jXJxMcVoEuXzym3vFnjqDW4Z6oM.jpg",
+        image: U("1536440136628-849c177e76a1"),   // dark cinematic action
         gradient: "from-red-950/80 to-red-900/20",
         accent: "#f87171",
         icon: Swords,
@@ -32,14 +35,14 @@ const CATEGORY_META: Record<string, {
         badge: "Phổ biến",
     },
     "tinh-cam": {
-        image: "https://image.tmdb.org/t/p/w780/qJeU7KM4nT2C1WpOrwPcSDGFUWE.jpg",
+        image: U("1518199266791-5375a83190b7"),   // couple romantic
         gradient: "from-pink-950/80 to-pink-900/20",
         accent: "#f9a8d4",
         icon: Heart,
         sub: "Ngọt ngào & lãng mạn",
     },
     "co-trang": {
-        image: "https://image.tmdb.org/t/p/w780/dKqa850uvbNSCaQCV4Im1XlzEtQ.jpg",
+        image: U("1548586196-aa5803b77379"),       // ancient east asian architecture
         gradient: "from-indigo-950/80 to-indigo-900/20",
         accent: "#a5b4fc",
         icon: Scroll,
@@ -47,14 +50,14 @@ const CATEGORY_META: Record<string, {
         badge: "Hot",
     },
     "kinh-di": {
-        image: "https://image.tmdb.org/t/p/w780/5i6SjyDbDWqyun8klUuCxrlFbyw.jpg",
+        image: U("1504701954957-2010ec3bcec1"),   // dark forest horror
         gradient: "from-neutral-950/80 to-neutral-900/20",
         accent: "#d4d4d4",
         icon: Eye,
         sub: "Nỗi sợ ám ảnh",
     },
     "vien-tuong": {
-        image: "https://image.tmdb.org/t/p/w780/8rpDcsfLJypbO6vtecsmEZzAUoa.jpg",
+        image: U("1451187580459-43490279c0fa"),   // galaxy / space
         gradient: "from-blue-950/80 to-blue-900/20",
         accent: "#93c5fd",
         icon: Rocket,
@@ -62,123 +65,130 @@ const CATEGORY_META: Record<string, {
         badge: "4K",
     },
     "hai-huoc": {
-        image: "https://image.tmdb.org/t/p/w780/x2RS3hTbc5bAEuMtjsVcqLAie42.jpg",
+        image: U("1527161153332-99adcc6112d6"),   // laughing crowd
         gradient: "from-amber-950/80 to-amber-900/20",
         accent: "#fcd34d",
         icon: Smile,
         sub: "Tiếng cười sảng khoái",
     },
     "tam-ly": {
-        image: "https://image.tmdb.org/t/p/w780/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg",
+        image: U("1474552226712-ac0f0961a954"),   // solitude / contemplation
         gradient: "from-violet-950/80 to-violet-900/20",
         accent: "#c4b5fd",
         icon: Brain,
         sub: "Câu chuyện lắng đọng",
     },
     "hinh-su": {
-        image: "https://image.tmdb.org/t/p/w780/oRiUKwDpcqDdoLwPoA4FIRh3hqY.jpg",
+        image: U("1519074069399-e3a7e80a1e90"),   // dark city noir
         gradient: "from-slate-950/80 to-slate-900/20",
         accent: "#94a3b8",
         icon: Shield,
         sub: "Đấu trí nghẹt thở",
     },
     "vo-thuat": {
-        image: "https://image.tmdb.org/t/p/w780/wNXcdsrEcb1kQdYQZtJgV6Z4K51.jpg",
+        image: U("1555597408-26bc8e548a46"),       // martial arts / fighter silhouette
         gradient: "from-orange-950/80 to-orange-900/20",
         accent: "#fb923c",
         icon: Zap,
         sub: "Kỹ năng đỉnh cao",
     },
     "am-nhac": {
-        image: "https://image.tmdb.org/t/p/w780/2nEKgG9FwB36398K70gJk1YQpQ4.jpg",
+        image: U("1511379938547-c1f69419868d"),   // concert / stage lights
         gradient: "from-fuchsia-950/80 to-fuchsia-900/20",
         accent: "#e879f9",
         icon: Music,
         sub: "Giai điệu cảm xúc",
     },
     "phieu-luu": {
-        image: "https://image.tmdb.org/t/p/w780/yF1eOkaYvwiORauRCPWznV9xVvi.jpg",
+        image: U("1469474968028-56623f02e42e"),   // epic mountain adventure
         gradient: "from-green-950/80 to-green-900/20",
         accent: "#86efac",
         icon: Compass,
         sub: "Hành trình vĩ đại",
     },
     "lich-su": {
-        image: "https://image.tmdb.org/t/p/w780/gLqjPj4I4uR0AHzI6K8oXJd9Yn9.jpg",
+        image: U("1461360228754-6e81c478b882"),   // ancient ruins / historical
         gradient: "from-yellow-950/80 to-yellow-900/20",
         accent: "#fde68a",
         icon: BookOpen,
         sub: "Ghi dấu thời gian",
     },
     "hoat-hinh": {
-        image: "https://image.tmdb.org/t/p/w780/vIgyYkX8gd1KkSCAIfbS2mRzT7x.jpg",
+        image: U("1534972195531-d1057b9d1dcc"),   // colorful digital art
         gradient: "from-teal-950/80 to-teal-900/20",
         accent: "#5eead4",
         icon: Star,
         sub: "Thế giới đầy màu sắc",
     },
     "gia-dinh": {
-        image: "https://image.tmdb.org/t/p/w780/2u0ZpFXdWe8SowqUuFfH9Qul6rX.jpg",
+        image: U("1542051841857-5f90071e7989"),   // family warmth
         gradient: "from-purple-950/80 to-purple-900/20",
         accent: "#d8b4fe",
         icon: Home,
         sub: "Gắn kết yêu thương",
     },
     "tre-em": {
-        image: "https://image.tmdb.org/t/p/w780/vIgyYkX8gd1KkSCAIfbS2mRzT7x.jpg",
+        image: U("1503454537195-1dcabb73ffb9"),   // children playing
         gradient: "from-cyan-950/80 to-cyan-900/20",
         accent: "#67e8f9",
         icon: Baby,
         sub: "Dành cho bé yêu",
     },
     "khoa-hoc": {
-        image: "https://image.tmdb.org/t/p/w780/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
+        image: U("1507413245164-6160d8298b31"),   // science lab / futuristic
         gradient: "from-sky-950/80 to-sky-900/20",
         accent: "#7dd3fc",
         icon: Beaker,
         sub: "Kiến thức vô tận",
     },
     "than-thoai": {
-        image: "https://image.tmdb.org/t/p/w780/7RyHsO4yDXtBv1zUU3mTpHeQ0d5.jpg",
+        image: U("1518709414768-a88981a4515d"),   // mystical / mythology
         gradient: "from-purple-950/80 to-violet-900/20",
         accent: "#c4b5fd",
         icon: Flame,
         sub: "Huyền thoại muôn đời",
     },
     "chien-tranh": {
-        image: "https://image.tmdb.org/t/p/w780/2vR0xKGm0jLaxHY9WT97ZlnTKHQ.jpg",
+        image: U("1526374965328-7f61d4dc18c5"),   // war silhouette
         gradient: "from-stone-950/80 to-stone-900/20",
         accent: "#a8a29e",
         icon: Sword,
         sub: "Bi hùng & khốc liệt",
     },
     "bi-an": {
-        image: "https://image.tmdb.org/t/p/w780/pfMk9UaCwIxGVFl22oFCBNhBBaO.jpg",
+        image: U("1519074002246-1f9e6f2a96e7"),   // foggy mysterious
         gradient: "from-zinc-950/80 to-zinc-900/20",
         accent: "#a1a1aa",
         icon: Eye,
         sub: "Bí ẩn chờ giải mã",
     },
     "hoc-duong": {
-        image: "https://image.tmdb.org/t/p/w780/bvYjhsbxOBwpm8xLE5BhdA3a65Y.jpg",
+        image: U("1523050854058-8df90110c9f1"),   // school / university
         gradient: "from-lime-950/80 to-lime-900/20",
         accent: "#a3e635",
         icon: GraduationCap,
         sub: "Tuổi trẻ tươi sáng",
     },
     "tai-lieu": {
-        image: "https://image.tmdb.org/t/p/w780/8YFL5QQVPy3AgrEQxNYVSgiPEbe.jpg",
+        image: U("1485846234645-a62644f84728"),   // documentary / camera
         gradient: "from-emerald-950/80 to-emerald-900/20",
         accent: "#6ee7b7",
         icon: Film,
         sub: "Sự thật cuộc sống",
     },
     "the-thao": {
-        image: "https://image.tmdb.org/t/p/w780/q6y0Go1tsGEsmtFryDd0fQ.jpg",
+        image: U("1461896836934-ffe607ba8211"),   // stadium sports
         gradient: "from-red-950/80 to-orange-900/20",
         accent: "#fca5a5",
         icon: Trophy,
         sub: "Tinh thần vô địch",
+    },
+    "mien-tay": {
+        image: U("1506905925346-21bda4d32df4"),   // river / countryside landscape
+        gradient: "from-green-950/80 to-emerald-900/20",
+        accent: "#86efac",
+        icon: MapPin,
+        sub: "Hương vị miền sông nước",
     },
 };
 
