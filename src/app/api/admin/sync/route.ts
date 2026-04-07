@@ -22,21 +22,71 @@ function normalizeNguonCItems(items: any[]): any[] {
     }));
 }
 
-// Fetch episodes from OPhim for a given slug, return server_data array or []
-async function fetchOPhimEpisodes(slug: string): Promise<any[]> {
+// Detect audio type from server name: vietsub | thuyet-minh | long-tieng | other
+function detectAudioType(serverName: string): string {
+    const n = serverName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    if (/long\s*tieng|dubbed|long tieng/.test(n)) return "long-tieng";
+    if (/thuyet\s*minh|thuyết minh/.test(n)) return "thuyet-minh";
+    if (/vietsub|viet\s*sub/.test(n)) return "vietsub";
+    return "other";
+}
+
+// Human-readable server labels per source + type
+const SERVER_LABELS: Record<string, Record<string, string>> = {
+    phimapi:  { "vietsub": "KKPhim (Vietsub)",      "thuyet-minh": "KKPhim (Thuyết Minh)", "long-tieng": "KKPhim (Lồng Tiếng)",  "other": "KKPhim" },
+    ophim:    { "vietsub": "OPhim (Vietsub)",        "thuyet-minh": "OPhim (Thuyết Minh)",  "long-tieng": "OPhim (Lồng Tiếng)",   "other": "OPhim" },
+    nguonc:   { "vietsub": "NguonC (Vietsub)",       "thuyet-minh": "NguonC (Thuyết Minh)", "long-tieng": "NguonC (Lồng Tiếng)",  "other": "NguonC" },
+};
+
+// Merge servers from all sources: deduplicate by audio type, keep best (most eps) per type
+// If same type has same ep count from multiple sources, keep all as fallback
+function mergeAndDeduplicateServers(allServers: { source: string; server_name: string; server_data: any[] }[]): any[] {
+    // Group by audio type
+    const byType = new Map<string, { source: string; server_name: string; server_data: any[] }[]>();
+
+    for (const s of allServers) {
+        if (!s.server_data?.length) continue;
+        const type = detectAudioType(s.server_name);
+        if (!byType.has(type)) byType.set(type, []);
+        byType.get(type)!.push(s);
+    }
+
+    const result: any[] = [];
+
+    // Type priority: vietsub first, then thuyet-minh, then long-tieng, then other
+    const typeOrder = ["vietsub", "thuyet-minh", "long-tieng", "other"];
+
+    for (const type of typeOrder) {
+        const servers = byType.get(type);
+        if (!servers?.length) continue;
+
+        // Sort by episode count desc — best source first
+        servers.sort((a, b) => b.server_data.length - a.server_data.length);
+        const best = servers[0];
+        const label = SERVER_LABELS[best.source]?.[type] ?? best.server_name;
+
+        result.push({ server_name: label, server_data: best.server_data });
+    }
+
+    return result;
+}
+
+// Fetch episodes from OPhim for a given slug
+async function fetchOPhimEpisodes(slug: string): Promise<{ source: string; server_name: string; server_data: any[] }[]> {
     try {
         const res = await fetch(`${OPHIM_URL}/phim/${slug}`, { signal: AbortSignal.timeout(6000) });
         if (!res.ok) return [];
         const data = await res.json();
         return (data.episodes || []).map((s: any) => ({
-            server_name: `OPhim ${s.server_name || ""}`.trim(),
+            source: "ophim",
+            server_name: s.server_name || "",
             server_data: s.server_data || [],
         }));
     } catch { return []; }
 }
 
-// Fetch episodes from NguonC for a given slug, return server_data array or []
-async function fetchNguonCEpisodes(slug: string): Promise<any[]> {
+// Fetch episodes from NguonC for a given slug
+async function fetchNguonCEpisodes(slug: string): Promise<{ source: string; server_name: string; server_data: any[] }[]> {
     try {
         const res = await fetch(`${NGUONC_URL}/film/${slug}`, { signal: AbortSignal.timeout(6000) });
         if (!res.ok) return [];
@@ -44,7 +94,8 @@ async function fetchNguonCEpisodes(slug: string): Promise<any[]> {
         const movie = data.movie || data;
         const episodes = movie.episodes || data.episodes || [];
         return episodes.map((s: any) => ({
-            server_name: `NguonC ${s.server_name || s.name || ""}`.trim(),
+            source: "nguonc",
+            server_name: s.server_name || s.name || "",
             server_data: normalizeNguonCItems(s.server_data || s.items || []),
         }));
     } catch { return []; }
@@ -202,12 +253,19 @@ export async function GET(req: Request) {
                                     fetchNguonCEpisodes(item.slug),
                                 ]);
 
-                                // Merge: phimapi (KKPhim) + OPhim + NguonC
-                                const mergedEpisodes = [
-                                    ...phimApiEps,
+                                // Tag phimapi servers với source
+                                const phimApiTagged = phimApiEps.map((s: any) => ({
+                                    source: "phimapi",
+                                    server_name: s.server_name || "",
+                                    server_data: s.server_data || [],
+                                }));
+
+                                // Merge + deduplicate: mỗi loại audio chỉ giữ 1 server tốt nhất
+                                const mergedEpisodes = mergeAndDeduplicateServers([
+                                    ...phimApiTagged,
                                     ...ophimEps,
                                     ...nguoncEps,
-                                ].filter(s => s.server_data && s.server_data.length > 0);
+                                ]);
 
                                 movieData = {
                                     ...item,
