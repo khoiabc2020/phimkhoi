@@ -187,11 +187,11 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                                 src={getImageUrl(currentMovie.bg || currentMovie.poster_url || "")}
                                 alt={currentMovie.displayTitle}
                                 fill
-                                className="object-cover brightness-[0.45] contrast-[1.1]"
+                                className="object-cover brightness-[0.65] contrast-[1.05] saturate-[1.1]"
                                 priority={isFirstSlide}
                                 loading={isFirstSlide ? "eager" : "lazy"}
                                 decoding="async"
-                                quality={70}
+                                quality={75}
                                 sizes="100vw"
                             />
                         </div>
@@ -201,20 +201,19 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                                 src={getImageUrl(currentMovie.bg || "")}
                                 alt={currentMovie.displayTitle}
                                 fill
-                                className="object-cover brightness-[0.45] contrast-[1.1]"
+                                className="object-cover brightness-[0.65] contrast-[1.05] saturate-[1.1]"
                                 priority={isFirstSlide}
                                 loading={isFirstSlide ? "eager" : "lazy"}
                                 decoding="async"
-                                quality={70}
+                                quality={75}
                                 sizes="100vw"
                             />
                         </div>
 
-                        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/25 to-transparent z-10" />
-                        <div className="absolute inset-y-0 left-0 w-[50%] bg-gradient-to-r from-black via-black/65 to-transparent z-10" />
-                        <div className="absolute inset-x-0 bottom-0 h-96 bg-gradient-to-t from-black via-transparent to-transparent z-10 opacity-60" />
-                        <div className="absolute inset-x-0 bottom-0 z-30 pt-40 pb-12 md:pb-20 lg:pb-32 px-4 md:px-8 lg:pl-26 xl:pl-34 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
-                        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent z-20" />
+                        {/* Left fade — text legibility without killing the scene */}
+                        <div className="absolute inset-y-0 left-0 w-[70%] bg-gradient-to-r from-black/95 via-black/55 to-transparent z-10" />
+                        {/* Bottom fade — blend into page bg */}
+                        <div className="absolute inset-x-0 bottom-0 h-52 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent z-10" />
                     </div>
 
                     {currentMovie.actor && (
@@ -293,15 +292,15 @@ export default function ChinaHero({ initialMovies = [] }: ChinaHeroProps) {
                             <div className="flex items-center gap-3 md:gap-4 pt-1 md:pt-2 pointer-events-auto">
                                 <Link
                                     href={`/phim/${currentMovie.slug}`}
-                                    className="flex items-center gap-2 md:gap-3 px-6 md:px-10 h-11 md:h-14 bg-[#8FA7C5] text-[#0a0a0a] rounded-full font-black text-[14px] md:text-[16px] active:scale-95 shadow-2xl shadow-[#8FA7C5]/20 uppercase tracking-wider transition-all duration-300 hover:bg-white hover:scale-105"
+                                    className="flex items-center gap-2.5 md:gap-3 px-7 md:px-11 h-12 md:h-14 bg-white text-[#060913] rounded-full font-black text-[14px] md:text-[16px] active:scale-95 shadow-[0_4px_28px_rgba(255,255,255,0.22)] hover:shadow-[0_4px_36px_rgba(255,255,255,0.35)] hover:scale-[1.03] transition-all duration-300"
                                 >
-                                    <Play className="w-4 h-4 md:w-5 md:h-5 fill-current" />
+                                    <Play className="w-4 h-4 md:w-5 md:h-5 fill-current shrink-0" />
                                     Xem ngay
                                 </Link>
 
                                 <WatchlistButton
                                     slug={currentMovie.slug}
-                                    className="h-11 w-11 md:h-14 md:w-14 rounded-full bg-white/10 border border-white/20 text-white active:scale-95 backdrop-blur-md shadow-xl flex items-center justify-center transition-all duration-300 hover:bg-white/20 hover:scale-110"
+                                    className="h-12 w-12 md:h-14 md:w-14 rounded-full bg-white/[0.08] border border-white/25 text-white active:scale-95 backdrop-blur-md flex items-center justify-center transition-all duration-300 hover:bg-white/15 hover:border-white/40 hover:scale-110"
                                     showLabel={false}
                                 />
                             </div>
