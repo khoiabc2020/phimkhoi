@@ -76,7 +76,9 @@ export function decodeHtml(html: string) {
         .replace(/&#(\d+);/g, (_, code) => {
             const value = Number(code);
             return Number.isFinite(value) ? String.fromCharCode(value) : "";
-        });
+        })
+        // Normalize to NFC to fix NFD-encoded Vietnamese (combining chars → precomposed)
+        .normalize("NFC");
 }
 
 export function stripHtml(html: string) {

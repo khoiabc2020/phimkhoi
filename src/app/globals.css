@@ -13,11 +13,11 @@
   --color-accent: #8FA7C5;
   --color-accent-foreground: #0a0a0a;
 
-  --font-sans: var(--font-outfit), "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans: "Lexend", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: monospace;
-  --font-display: var(--font-display), -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: "Be Vietnam Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-logo: "Roboto Condensed", "Arial Narrow", sans-serif;
-  --font-outfit: var(--font-outfit), sans-serif;
+  --font-outfit: "Lexend", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
   /* Custom Animations */
   --animate-float: float 6s ease-in-out infinite;
