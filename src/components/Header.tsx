@@ -205,6 +205,13 @@ export default function Header({ categories, countries }: HeaderProps) {
         }
     }, [isSearchOpen]);
 
+    // Listen for BottomNav search trigger
+    useEffect(() => {
+        const handler = () => setIsSearchOpen(true);
+        window.addEventListener("pk:opensearch", handler);
+        return () => window.removeEventListener("pk:opensearch", handler);
+    }, []);
+
     useEffect(() => {
         setIsSearchOpen(false);
         setShowHistory(false);
