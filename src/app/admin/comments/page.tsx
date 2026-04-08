@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Trash2, MessageSquare, ExternalLink, User, CheckCircle } from "lucide-react";
+import { Search, Trash2, MessageSquare, ExternalLink, User, CheckCircle, Filter } from "lucide-react";
 import Link from "next/link";
 import { getImageUrl } from "@/lib/utils";
 

@@ -195,7 +195,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                         <div className="flex gap-4">
                             <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-800 flex-shrink-0">
                                 {session.user?.image ? (
-                                    <Image src={session.user.image} alt="User" width={40} height={40} className="w-full h-full object-cover" />
+                                    <Image src={session.user.image} alt="User" width={40} height={40} sizes="40px" className="w-full h-full object-cover" />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-white text-sm font-bold bg-[#1f1f1f]">
                                         {session.user?.name?.[0]?.toUpperCase() || "U"}

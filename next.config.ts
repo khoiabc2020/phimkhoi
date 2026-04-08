@@ -63,7 +63,8 @@ const config = (phase: string): NextConfig => {
           ],
         },
         {
-          source: "/api/((?!auth).*)",
+          // Public data APIs only — user-specific routes (user/*, ratings/*) use their own private Cache-Control
+          source: "/api/((?!auth|user|ratings|comments|notifications|subtitles|hls-proxy|img-proxy|download).*)",
           headers: [
             {
               key: "Cache-Control",
