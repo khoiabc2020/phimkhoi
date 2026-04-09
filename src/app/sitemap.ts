@@ -3,6 +3,9 @@ import { getMoviesList } from "@/services/api";
 import connectDB from "@/lib/db";
 import MovieModel from "@/models/Movie";
 
+// Cache sitemap for 24 hours — avoids hitting DB on every request
+export const revalidate = 86400;
+
 const BASE_URL = "https://khoiphim.org";
 
 const ALL_CATEGORIES = [

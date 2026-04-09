@@ -4,8 +4,17 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import VideoPlayer from "@/components/VideoPlayer";
+import dynamic from "next/dynamic";
 import WatchEngagementBar from "@/components/WatchEngagementBar";
+
+const VideoPlayer = dynamic(() => import("@/components/VideoPlayer"), {
+    ssr: false,
+    loading: () => (
+        <div className="absolute inset-0 flex items-center justify-center bg-black">
+            <div className="w-10 h-10 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+        </div>
+    ),
+});
 import WatchEpisodeSection from "@/components/WatchEpisodeSection";
 import { Movie } from "@/services/api";
 import { Monitor, ChevronLeft, ChevronRight, SkipForward, Loader2 } from "lucide-react";

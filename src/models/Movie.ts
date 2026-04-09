@@ -87,7 +87,7 @@ const MovieSchema = new Schema(
 );
 
 // ── Single-field indexes ──────────────────────────────────────────────────────
-MovieSchema.index({ slug: 1 });          // already unique, explicit for clarity
+// Note: slug index is created automatically by unique:true on the field definition
 MovieSchema.index({ type: 1 });
 MovieSchema.index({ year: 1 });
 MovieSchema.index({ updatedAt: -1 });
