@@ -195,7 +195,7 @@ export default function NotificationsPage() {
                                         className="relative flex gap-4 p-4 bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden"
                                     >
                                         {/* Color bar */}
-                                        <div className={`absolute left-0 top-0 bottom-0 w-0.5 ${cfg.bar} rounded-full`} />
+                                        <div className={`absolute left-0 top-0 bottom-0 w-1 ${cfg.bar} rounded-r-full`} />
 
                                         {/* Icon */}
                                         <div className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center ${cfg.bg} border ${cfg.border} mt-0.5`}>

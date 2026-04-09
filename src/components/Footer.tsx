@@ -65,7 +65,7 @@ export default function Footer() {
                         <p className="text-[11px] font-bold uppercase tracking-widest text-[#8FA7C5] mb-1">Khám phá</p>
                         {DISCOVER_LINKS.map(({ href, label }) => (
                             <Link key={href} href={href}
-                                className="text-[13px] text-gray-500 hover:text-white transition-colors">
+                                className="text-[13px] text-white/35 hover:text-white/80 transition-colors">
                                 {label}
                             </Link>
                         ))}
@@ -76,7 +76,7 @@ export default function Footer() {
                         <p className="text-[11px] font-bold uppercase tracking-widest text-[#8FA7C5] mb-1">Quốc gia</p>
                         {COUNTRY_LINKS.map(({ href, label }) => (
                             <Link key={href} href={href}
-                                className="text-[13px] text-gray-500 hover:text-white transition-colors">
+                                className="text-[13px] text-white/35 hover:text-white/80 transition-colors">
                                 {label}
                             </Link>
                         ))}
@@ -93,7 +93,7 @@ export default function Footer() {
                             { href: "mailto:support@khoiphim.org", label: "support@khoiphim.org" },
                         ].map(({ href, label }) => (
                             <a key={label} href={href}
-                                className="text-[13px] text-gray-500 hover:text-white transition-colors">
+                                className="text-[13px] text-white/35 hover:text-white/80 transition-colors">
                                 {label}
                             </a>
                         ))}
@@ -105,14 +105,14 @@ export default function Footer() {
 
                 {/* Bottom */}
                 <div className="pt-5 border-t border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                    <div className="text-[12px] text-gray-700">
-                        <p>&copy; {year} <span className="text-white/60">KHOIPHIM</span>. All rights reserved.</p>
+                    <div className="text-[12px] text-white/25">
+                        <p>&copy; {year} <span className="text-white/50">KHOIPHIM</span>. All rights reserved.</p>
                         <p className="mt-0.5">Nội dung được tổng hợp từ các nguồn công khai. Chúng tôi không lưu trữ video trên máy chủ.</p>
                     </div>
-                    <div className="flex gap-4 text-[12px] text-gray-700 shrink-0">
-                        <a href="mailto:support@khoiphim.org" className="hover:text-white transition-colors">Liên hệ</a>
-                        <Link href="/the-loai" className="hover:text-white transition-colors">Thể loại</Link>
-                        <Link href="/quoc-gia" className="hover:text-white transition-colors">Quốc gia</Link>
+                    <div className="flex gap-4 text-[12px] text-white/25 shrink-0">
+                        <a href="mailto:support@khoiphim.org" className="hover:text-white/70 transition-colors">Liên hệ</a>
+                        <Link href="/the-loai" className="hover:text-white/70 transition-colors">Thể loại</Link>
+                        <Link href="/quoc-gia" className="hover:text-white/70 transition-colors">Quốc gia</Link>
                     </div>
                 </div>
             </div>

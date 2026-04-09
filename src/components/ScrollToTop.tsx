@@ -23,13 +23,13 @@ export default function ScrollToTop() {
     <button
       onClick={scrollToTop}
       aria-label="Về đầu trang"
-      className={`fixed bottom-24 right-4 md:bottom-8 md:right-6 z-40 w-10 h-10 flex items-center justify-center rounded-full bg-[#8FA7C5]/20 hover:bg-[#8FA7C5]/40 backdrop-blur-sm border border-[#8FA7C5]/30 transition-all duration-300 ${
+      className={`fixed bottom-[84px] right-4 md:bottom-8 md:right-6 z-40 w-10 h-10 flex items-center justify-center rounded-full bg-white/[0.07] hover:bg-white/[0.14] backdrop-blur-md border border-white/[0.12] hover:border-white/25 shadow-[0_4px_20px_rgba(0,0,0,0.5)] transition-all duration-300 ${
         visible
           ? "opacity-100 translate-y-0 pointer-events-auto"
-          : "opacity-0 translate-y-4 pointer-events-none"
+          : "opacity-0 translate-y-3 pointer-events-none"
       }`}
     >
-      <ChevronUp className="w-5 h-5 text-white" />
+      <ChevronUp className="w-4.5 h-4.5 text-white/80" />
     </button>
   );
 }

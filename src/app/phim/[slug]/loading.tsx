@@ -49,12 +49,12 @@ export default function Loading() {
                             <div className="h-5 w-24 bg-white/10 rounded animate-pulse" />
                             <div className="h-5 w-24 bg-white/5 rounded animate-pulse" />
                         </div>
-                        <div className="h-64 rounded-[10px] bg-[#07070b]/78 border border-white/[0.05] animate-pulse" />
+                        <div className="h-64 rounded-[10px] bg-white/[0.03] border border-white/[0.05] animate-pulse" />
                     </div>
 
                     {/* LEFT SIDEBAR */}
                     <div className="w-full lg:col-span-4 xl:col-span-3 order-2 lg:order-1 space-y-6 lg:pr-4">
-                        <div className="h-[400px] rounded-[10px] bg-[#07070b]/78 border border-white/[0.05] animate-pulse" />
+                        <div className="h-[400px] rounded-[10px] bg-white/[0.03] border border-white/[0.05] animate-pulse" />
                     </div>
                 </div>
             </div>
