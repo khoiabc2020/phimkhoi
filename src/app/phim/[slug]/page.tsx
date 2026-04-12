@@ -22,7 +22,8 @@ const CommentSection = dynamic(() => import("@/components/CommentSection"), {
 import MovieTabs from "@/components/MovieTabs";
 import MovieCast from "@/components/MovieCast";
 import { searchTMDBMovie, getTMDBDetails, getTMDBImage } from "@/services/tmdb";
-import { getTMDBEpisodeImages, TMDBEpisodeMeta, getMovieTrailer } from "@/app/actions/tmdb";
+import { getTMDBEpisodeImages, getMovieTrailer } from "@/app/actions/tmdb";
+import { getTmdbCacheEntry, saveTmdbCacheEntry } from "@/lib/tmdb-cache";
 import TrailerButton from "@/components/TrailerButton";
 import MovieDetailTMDBInfo from "@/components/MovieDetailTMDBInfo";
 import { cache, Suspense } from "react";
@@ -145,49 +146,78 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
         limit: 10,
     });
 
-    // [Elite Performance] Fetch TMDB data for enrichment
+    // [Elite Performance] TMDB Enrichment — MongoDB cache first, API fallback
     let tmdbDetails: any = null;
     let episodeThumbnails: Record<string, string> = {};
     let episodeMetadata: Record<string, any> = {};
+    let resolvedTrailerKey: string | null = null;
 
     try {
-        const tmdbSearch = await searchTMDBMovie(
-            movie.origin_name || movie.name,
-            movie.year,
-            type,
-            { originalName: movie.origin_name, localName: movie.name, countrySlug: movie.country?.[0]?.slug }
-        );
-        
-        if (tmdbSearch?.id && shouldUseTmdbMedia(movie, tmdbSearch)) {
-            const tmdbId = tmdbSearch.id;
-            const [details, epImages] = await Promise.all([
-                getTMDBDetails(tmdbId, type),
-                type === 'tv' ? getTMDBEpisodeImages(tmdbId) : Promise.resolve(null)
-            ]);
-            
-            tmdbDetails = details;
+        // 1. Try MongoDB TMDB cache (< 10ms, same server)
+        const cached = await getTmdbCacheEntry(slug);
 
-            // Map episode images using the Elite Mapping Engine
-            if (type === 'tv' && epImages && serverData.length > 0) {
-                serverData.forEach((ep: any, index: number) => {
-                    const candidates = buildEpisodeKeyCandidates(ep.name, ep.slug, index);
-                    for (const key of candidates) {
-                        const match = (epImages as any)[key];
-                        if (match) {
-                            episodeThumbnails[ep.slug] = match.still_path ? `https://image.tmdb.org/t/p/w500${match.still_path}` : "";
-                            episodeMetadata[ep.slug] = {
-                                title: match.name,
-                                overview: match.overview,
-                                airDate: match.air_date,
-                                runtime: match.runtime,
-                                voteAverage: match.vote_average
-                            };
-                            break;
-                        }
-                    }
-                });
+        let rawEpImages: any = null;
+        let trailerKey: string | null = null;
+
+        if (cached) {
+            // Cache HIT — skip all external TMDB calls
+            tmdbDetails = cached.data;
+            rawEpImages  = cached.epImages;
+            trailerKey   = cached.trailerKey;
+        } else {
+            // Cache MISS — fetch from TMDB and persist (fire-and-forget)
+            const tmdbSearch = await searchTMDBMovie(
+                movie.origin_name || movie.name,
+                movie.year,
+                type,
+                { originalName: movie.origin_name, localName: movie.name, countrySlug: movie.country?.[0]?.slug }
+            );
+
+            if (tmdbSearch?.id && shouldUseTmdbMedia(movie, tmdbSearch)) {
+                const tmdbId = tmdbSearch.id;
+                const [details, epImages, trailer] = await Promise.all([
+                    getTMDBDetails(tmdbId, type),
+                    type === 'tv' ? getTMDBEpisodeImages(tmdbId) : Promise.resolve(null),
+                    getMovieTrailer(
+                        movie.origin_name || movie.name,
+                        Number(movie.year),
+                        type,
+                        { originalName: movie.origin_name, localName: movie.name, countrySlug: movie.country?.[0]?.slug }
+                    ).catch((): null => null),
+                ]);
+
+                tmdbDetails = details;
+                rawEpImages  = epImages;
+                trailerKey   = trailer ?? null;
+
+                // Persist to MongoDB cache — non-blocking
+                saveTmdbCacheEntry(slug, { data: details, epImages, trailerKey }).catch(() => {});
             }
         }
+
+        // Map episode thumbnail/metadata using the Elite Mapping Engine
+        if (type === 'tv' && rawEpImages && serverData.length > 0) {
+            serverData.forEach((ep: any, index: number) => {
+                const candidates = buildEpisodeKeyCandidates(ep.name, ep.slug, index);
+                for (const key of candidates) {
+                    const match = (rawEpImages as any)[key];
+                    if (match) {
+                        episodeThumbnails[ep.slug] = match.still_path ? `https://image.tmdb.org/t/p/w500${match.still_path}` : "";
+                        episodeMetadata[ep.slug] = {
+                            title: match.name,
+                            overview: match.overview,
+                            airDate: match.air_date,
+                            runtime: match.runtime,
+                            voteAverage: match.vote_average
+                        };
+                        break;
+                    }
+                }
+            });
+        }
+
+        // Propagate trailerKey to outer scope
+        resolvedTrailerKey = trailerKey;
     } catch (e) {
         console.error("TMDB Enrichment Error:", e);
     }
@@ -207,15 +237,8 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
             : "";
     const trustedTmdbDetails = shouldUseTmdbMedia(movie, tmdbDetails) ? tmdbDetails : null;
 
-    // Fetch trailer key (only if TMDB enrichment succeeded)
-    const trailerKey = trustedTmdbDetails
-        ? await getMovieTrailer(
-            movie.origin_name || movie.name,
-            Number(movie.year),
-            type,
-            { originalName: movie.origin_name, localName: movie.name, countrySlug: movie.country?.[0]?.slug }
-          ).catch((): null => null)
-        : null;
+    // Trailer key was resolved inside TMDB enrichment block (cache hit or API fetch)
+    const trailerKey: string | null = resolvedTrailerKey;
 
     const tmdbBackdrop = trustedTmdbDetails?.backdrop_path ? getTMDBImage(trustedTmdbDetails.backdrop_path, "original") : "";
     const tmdbPoster = trustedTmdbDetails?.poster_path ? getTMDBImage(trustedTmdbDetails.poster_path, "original") : "";
