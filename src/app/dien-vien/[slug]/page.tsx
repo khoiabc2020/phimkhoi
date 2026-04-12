@@ -2,11 +2,40 @@ import { getTMDBPersonDetails, getTMDBPersonCredits, getTMDBImage, searchTMDBPer
 import { getMoviesByActor } from "@/services/api";
 import Image from "next/image";
 import Link from "next/link";
+import { Metadata } from "next";
 import { ChevronLeft, Star, Calendar, MapPin, Info, Grid, Clock, Share2, Globe } from "lucide-react";
 import { checkFavoriteActor } from "@/app/actions/actorFavorites";
 import MovieCard from "@/components/MovieCard";
 import FavoriteActorButton from "@/components/FavoriteActorButton";
 import Footer from "@/components/Footer";
+
+export const revalidate = 3600; // 1h — actor profiles change rarely
+
+function slugToName(slug: string): string {
+    return slug
+        .split("-")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ");
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+    const { slug } = await params;
+    const name = slugToName(slug);
+    const canonical = `https://khoiphim.org/dien-vien/${slug}`;
+    return {
+        title: `${name} - Diễn Viên | KHOIPHIM`,
+        description: `Xem phim của diễn viên ${name} vietsub HD miễn phí. Toàn bộ phim ${name} đóng được cập nhật tại KHOIPHIM.`,
+        keywords: `${name}, diễn viên ${name}, phim của ${name}, ${name} vietsub`,
+        alternates: { canonical },
+        robots: { index: true, follow: true },
+        openGraph: {
+            title: `${name} | Diễn Viên - KHOIPHIM`,
+            description: `Toàn bộ phim của ${name} - vietsub HD miễn phí tại KHOIPHIM.`,
+            url: canonical,
+            type: "profile",
+        },
+    };
+}
 
 interface PersonPageProps {
     params: Promise<{ slug: string }>;

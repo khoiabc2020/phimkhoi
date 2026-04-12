@@ -12,22 +12,40 @@ import { headers } from "next/headers";
 // Revalidate mỗi 5 phút
 export const revalidate = 300;
 
+// Tên đầy đủ cho các "type" đặc biệt không có trong danh sách thể loại API
+const SPECIAL_SLUG_NAMES: Record<string, string> = {
+    "phim-chieu-rap": "Chiếu Rạp",
+    "short-drama":    "Short Drama",
+    "phim-le":        "Lẻ",
+    "phim-bo":        "Bộ",
+    "hoat-hinh":      "Hoạt Hình",
+    "tv-shows":       "TV Shows",
+};
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params;
-    const { categories } = await getMenuData();
-    const category = categories.find(c => c.slug === slug);
-    const categoryName = category?.name || slug.replace(/-/g, " ");
+
+    // Try special map first (no API call needed)
+    let displayName = SPECIAL_SLUG_NAMES[slug] ?? "";
+
+    if (!displayName) {
+        const { categories } = await getMenuData();
+        const category = categories.find(c => c.slug === slug);
+        // Strip leading "Phim " from API name to avoid double prefix in title
+        const raw = category?.name || slug.replace(/-/g, " ");
+        displayName = raw.replace(/^[Pp]him\s+/u, "");
+    }
 
     const canonical = `https://khoiphim.org/the-loai/${slug}`;
     return {
-        title: `Phim ${categoryName} Vietsub HD Mới Nhất | KHOIPHIM`,
-        description: `Xem phim ${categoryName} vietsub, thuyết minh, lồng tiếng mới nhất chất lượng cao miễn phí tại KHOIPHIM. Cập nhật hàng ngày.`,
-        keywords: `phim ${categoryName}, xem phim ${categoryName} vietsub, ${categoryName} vietsub HD, phim ${categoryName} lồng tiếng, phim ${categoryName} thuyết minh, phim ${categoryName} mới nhất`,
+        title: `Phim ${displayName} Vietsub HD Mới Nhất | KHOIPHIM`,
+        description: `Xem phim ${displayName} vietsub, thuyết minh, lồng tiếng mới nhất chất lượng cao miễn phí tại KHOIPHIM. Cập nhật hàng ngày.`,
+        keywords: `phim ${displayName}, xem phim ${displayName} vietsub, ${displayName} vietsub HD, phim ${displayName} lồng tiếng, phim ${displayName} thuyết minh, phim ${displayName} mới nhất`,
         alternates: { canonical },
         robots: { index: true, follow: true },
         openGraph: {
-            title: `Phim ${categoryName} Vietsub HD | KHOIPHIM`,
-            description: `Tuyển tập phim ${categoryName} hay nhất, mới nhất - vietsub HD miễn phí.`,
+            title: `Phim ${displayName} Vietsub HD | KHOIPHIM`,
+            description: `Tuyển tập phim ${displayName} hay nhất, mới nhất - vietsub HD miễn phí.`,
             url: canonical,
             type: "website",
         },
