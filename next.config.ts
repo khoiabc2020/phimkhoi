@@ -20,8 +20,8 @@ const config = (phase: string): NextConfig => {
     },
     experimental: {
       staleTimes: {
-        dynamic: 900,
-        static: 1800,
+        dynamic: 3600,   // keep RSC payload for 1h — back/forward navigation feels instant
+        static: 86400,   // static pages cached client-side for 24h
       },
       workerThreads: false,
     },

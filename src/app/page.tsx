@@ -323,8 +323,8 @@ const ROW_CONFIGS = [
   { slug: "hoat-hinh", title: "Phim Hoạt Hình", endpoint: "the-loai" as const, viewAllHref: "/the-loai/hoat-hinh" },
 ] as const;
 
-export default async function Home() {
-  // Fetch tất cả hàng phim song song — không còn skeleton từng hàng
+/** Stream all movie rows independently — fetches in parallel with Hero */
+async function HomeRowsSection() {
   const rowResults = await Promise.all(
     ROW_CONFIGS.map(({ slug, endpoint }) =>
       getResilientMoviesList(slug, 1, ROW_LIMIT, {
@@ -335,45 +335,50 @@ export default async function Home() {
   );
 
   return (
+    <div className="space-y-4 md:space-y-8">
+      <ContinueWatchingRow />
+      <RecommendedRow />
+      {ROW_CONFIGS.map((config, idx) => {
+        const movies = rowResults[idx]?.items || [];
+        if (!movies.length) return null;
+        return (
+          <MovieRow
+            key={config.slug}
+            title={config.title}
+            movies={movies}
+            slug={config.viewAllHref}
+            priorityFirst={'priorityFirst' in config ? config.priorityFirst : false}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+export default function Home() {
+  return (
     <main className="min-h-screen pb-24 md:pb-16 bg-[#0a0a0a]">
-      {/* Hero Section - Tải đầu tiên */}
+      {/* Hero — streams independently */}
       <Suspense fallback={heroSkeleton}>
         <HeroStream />
       </Suspense>
 
       <div className="w-full max-w-[1920px] mx-auto px-1.5 sm:px-3 md:px-5 lg:pl-24 lg:pr-12 relative z-30 -mt-0 md:-mt-2 lg:-mt-4 xl:-mt-6">
-        {/* Decorative background glow - keep subtle and close to the black system palette */}
         <div className="pointer-events-none absolute left-0 right-0 top-0 -z-10 h-[800px] bg-[radial-gradient(circle_at_top,rgba(143,167,197,0.04),transparent_55%)] blur-[160px]" />
 
         <div className="mb-6">
           <QuickNav />
         </div>
 
-        {/* Top Trending - Tải độc lập */}
-        <Suspense fallback={<div className="h-[280px] bg-white/5 rounded-lg animate-pulse mx-4" />}>
+        {/* Top Trending — streams independently, in parallel with rows */}
+        <Suspense fallback={<div className="h-[280px] bg-white/[0.03] rounded-lg animate-pulse mx-4" />}>
           <AsyncTopTrendingHub />
         </Suspense>
 
-        <div className="space-y-4 md:space-y-8">
-          {/* Hàng phim tiếp diễn */}
-          <ContinueWatchingRow />
-          {/* Đề xuất cá nhân hóa */}
-          <RecommendedRow />
-
-          {ROW_CONFIGS.map((config, idx) => {
-            const movies = rowResults[idx]?.items || [];
-            if (!movies.length) return null;
-            return (
-              <MovieRow
-                key={config.slug}
-                title={config.title}
-                movies={movies}
-                slug={config.viewAllHref}
-                priorityFirst={'priorityFirst' in config ? config.priorityFirst : false}
-              />
-            );
-          })}
-        </div>
+        {/* Movie rows — stream in parallel with TopTrending */}
+        <Suspense fallback={contentSkeleton}>
+          <HomeRowsSection />
+        </Suspense>
       </div>
     </main>
   );

@@ -35,6 +35,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 import CountryGridClient from "@/components/CountryGridClient";
+import FeaturedActors from "@/components/FeaturedActors";
 
 export default async function CountryPage({ 
     params, 
@@ -101,6 +102,8 @@ export default async function CountryPage({
                         </Suspense>
                     </div>
                 </div>
+
+                <FeaturedActors movies={initialData.items} />
 
                 <CountryGridClient
                     slug={slug}

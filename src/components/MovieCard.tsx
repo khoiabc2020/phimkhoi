@@ -286,6 +286,23 @@ function MovieCard({
         return () => window.removeEventListener("scroll", handleScroll);
     }, [isHovered]);
 
+    // Viewport prefetch — prefetch RSC payload as soon as card enters viewport (works on mobile too)
+    useEffect(() => {
+        if (!cardRef.current) return;
+        const el = cardRef.current;
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0]?.isIntersecting) {
+                    router.prefetch(`/phim/${movie.slug}`);
+                    observer.unobserve(el);
+                }
+            },
+            { rootMargin: "400px 0px", threshold: 0 }
+        );
+        observer.observe(el);
+        return () => observer.unobserve(el);
+    }, [movie.slug, router]);
+
     return (
         <>
             <div
@@ -325,9 +342,9 @@ function MovieCard({
                     {/* Top-Left: IMDb Rating Badge (Inside Poster) */}
                     {tmdbData?.vote_average && tmdbData.vote_average > 0 && (
                         <div className="absolute top-1.5 left-1.5 z-40 pointer-events-none">
-                            <div className="flex items-center gap-1 bg-black/80 text-white px-1.5 py-0.5 rounded-[4px] shadow-lg border border-white/10">
-                                <Star className="w-2.5 h-2.5 fill-yellow-400 stroke-yellow-400" />
-                                <span className="text-[10px] font-bold tracking-tight">{tmdbData.vote_average.toFixed(1)}</span>
+                            <div className="flex items-center gap-[3px] bg-[#1a1200]/90 text-[#F5C518] px-1.5 py-[3px] rounded-[4px] shadow-lg border border-[#F5C518]/20">
+                                <span className="text-[8px] font-black tracking-wide leading-none">IMDb</span>
+                                <span className="text-[10px] font-black tracking-tight leading-none">{tmdbData.vote_average.toFixed(1)}</span>
                             </div>
                         </div>
                     )}

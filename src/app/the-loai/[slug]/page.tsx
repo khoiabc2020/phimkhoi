@@ -53,6 +53,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 import CategoryGridClient from "@/components/CategoryGridClient";
+import FeaturedActors from "@/components/FeaturedActors";
 
 export default async function CategoryPage({
     params,
@@ -133,6 +134,8 @@ export default async function CategoryPage({
                         </Suspense>
                     </div>
                 </div>
+
+                <FeaturedActors movies={initialData.items} />
 
                 <CategoryGridClient
                     slug={slug}

@@ -55,7 +55,7 @@ const ActorRow = ({ title, actors }: ActorRowProps) => {
             <div className="w-full max-w-[1920px] mx-auto">
                 <div className="flex items-center justify-between px-4 sm:px-6 md:px-12 lg:pl-24 lg:pr-12 mb-6">
                     <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-3 tracking-tight">
-                        <span className="w-1.5 h-6 bg-primary rounded-full shadow-[0_0_12px_rgba(255,215,0,0.5)]" />
+                        <span className="w-1.5 h-6 bg-[#8FA7C5] rounded-full shadow-[0_0_12px_rgba(143,167,197,0.4)]" />
                         <span>{title}</span>
                     </h2>
                 </div>
@@ -76,13 +76,13 @@ const ActorRow = ({ title, actors }: ActorRowProps) => {
                         {actors.map((actor, idx) => (
                             <Link 
                                 key={idx} 
-                                href={`/tim-kiem?keyword=${encodeURIComponent(actor.name)}`}
+                                href={actor.slug ? `/dien-vien/${actor.slug}` : `/tim-kiem?keyword=${encodeURIComponent(actor.name)}`}
                                 className="flex flex-col items-center gap-3 min-w-[100px] md:min-w-[140px] snap-start group/actor"
                             >
-                                <div className="relative w-20 h-20 md:w-28 md:h-28 rounded-full overflow-hidden border-2 border-white/10 group-hover/actor:border-primary transition-all duration-300 shadow-xl group-hover/actor:scale-105 group-hover/actor:shadow-primary/20">
+                                <div className="relative w-20 h-20 md:w-28 md:h-28 rounded-full overflow-hidden border-2 border-white/10 group-hover/actor:border-[#8FA7C5] transition-all duration-300 shadow-xl group-hover/actor:scale-105 group-hover/actor:shadow-[0_0_18px_rgba(143,167,197,0.3)]">
                                     <ActorAvatar actor={actor} />
                                 </div>
-                                <span className="text-sm md:text-base font-semibold text-white/70 group-hover/actor:text-primary transition-colors text-center truncate w-full">
+                                <span className="text-sm md:text-base font-semibold text-white/70 group-hover/actor:text-[#8FA7C5] transition-colors text-center truncate w-full">
                                     {actor.name}
                                 </span>
                             </Link>
