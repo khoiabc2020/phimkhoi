@@ -54,9 +54,6 @@ export async function POST(req: NextRequest) {
                 image,
                 provider: "google",
                 role: "user",
-                favorites: [],
-                watchlist: [],
-                history: [],
             });
         } else if (!user.provider) {
             // Existing user, link to Google

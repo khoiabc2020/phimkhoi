@@ -22,8 +22,7 @@ const CommentSection = dynamic(() => import("@/components/CommentSection"), {
 import MovieTabs from "@/components/MovieTabs";
 import MovieCast from "@/components/MovieCast";
 import { searchTMDBMovie, getTMDBDetails, getTMDBImage } from "@/services/tmdb";
-import { getTMDBEpisodeImages, getMovieTrailer } from "@/app/actions/tmdb";
-import { getTmdbCacheEntry, saveTmdbCacheEntry } from "@/lib/tmdb-cache";
+import { getTMDBEpisodeImages, TMDBEpisodeMeta, getMovieTrailer } from "@/app/actions/tmdb";
 import TrailerButton from "@/components/TrailerButton";
 import MovieDetailTMDBInfo from "@/components/MovieDetailTMDBInfo";
 import { cache, Suspense } from "react";
@@ -146,78 +145,49 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
         limit: 10,
     });
 
-    // [Elite Performance] TMDB Enrichment — MongoDB cache first, API fallback
+    // [Elite Performance] Fetch TMDB data for enrichment
     let tmdbDetails: any = null;
     let episodeThumbnails: Record<string, string> = {};
     let episodeMetadata: Record<string, any> = {};
-    let resolvedTrailerKey: string | null = null;
 
     try {
-        // 1. Try MongoDB TMDB cache (< 10ms, same server)
-        const cached = await getTmdbCacheEntry(slug);
+        const tmdbSearch = await searchTMDBMovie(
+            movie.origin_name || movie.name,
+            movie.year,
+            type,
+            { originalName: movie.origin_name, localName: movie.name, countrySlug: movie.country?.[0]?.slug }
+        );
+        
+        if (tmdbSearch?.id && shouldUseTmdbMedia(movie, tmdbSearch)) {
+            const tmdbId = tmdbSearch.id;
+            const [details, epImages] = await Promise.all([
+                getTMDBDetails(tmdbId, type),
+                type === 'tv' ? getTMDBEpisodeImages(tmdbId) : Promise.resolve(null)
+            ]);
+            
+            tmdbDetails = details;
 
-        let rawEpImages: any = null;
-        let trailerKey: string | null = null;
-
-        if (cached) {
-            // Cache HIT — skip all external TMDB calls
-            tmdbDetails = cached.data;
-            rawEpImages  = cached.epImages;
-            trailerKey   = cached.trailerKey;
-        } else {
-            // Cache MISS — fetch from TMDB and persist (fire-and-forget)
-            const tmdbSearch = await searchTMDBMovie(
-                movie.origin_name || movie.name,
-                movie.year,
-                type,
-                { originalName: movie.origin_name, localName: movie.name, countrySlug: movie.country?.[0]?.slug }
-            );
-
-            if (tmdbSearch?.id && shouldUseTmdbMedia(movie, tmdbSearch)) {
-                const tmdbId = tmdbSearch.id;
-                const [details, epImages, trailer] = await Promise.all([
-                    getTMDBDetails(tmdbId, type),
-                    type === 'tv' ? getTMDBEpisodeImages(tmdbId) : Promise.resolve(null),
-                    getMovieTrailer(
-                        movie.origin_name || movie.name,
-                        Number(movie.year),
-                        type,
-                        { originalName: movie.origin_name, localName: movie.name, countrySlug: movie.country?.[0]?.slug }
-                    ).catch((): null => null),
-                ]);
-
-                tmdbDetails = details;
-                rawEpImages  = epImages;
-                trailerKey   = trailer ?? null;
-
-                // Persist to MongoDB cache — non-blocking
-                saveTmdbCacheEntry(slug, { data: details, epImages, trailerKey }).catch(() => {});
+            // Map episode images using the Elite Mapping Engine
+            if (type === 'tv' && epImages && serverData.length > 0) {
+                serverData.forEach((ep: any, index: number) => {
+                    const candidates = buildEpisodeKeyCandidates(ep.name, ep.slug, index);
+                    for (const key of candidates) {
+                        const match = (epImages as any)[key];
+                        if (match) {
+                            episodeThumbnails[ep.slug] = match.image || "";
+                            episodeMetadata[ep.slug] = {
+                                title: match.title || match.name,
+                                overview: match.overview,
+                                airDate: match.airDate || match.air_date,
+                                runtime: match.runtime,
+                                voteAverage: match.voteAverage || match.vote_average
+                            };
+                            break;
+                        }
+                    }
+                });
             }
         }
-
-        // Map episode thumbnail/metadata using the Elite Mapping Engine
-        if (type === 'tv' && rawEpImages && serverData.length > 0) {
-            serverData.forEach((ep: any, index: number) => {
-                const candidates = buildEpisodeKeyCandidates(ep.name, ep.slug, index);
-                for (const key of candidates) {
-                    const match = (rawEpImages as any)[key];
-                    if (match) {
-                        episodeThumbnails[ep.slug] = match.image || "";
-                        episodeMetadata[ep.slug] = {
-                            title: match.name,
-                            overview: match.overview,
-                            airDate: match.air_date,
-                            runtime: match.runtime,
-                            voteAverage: match.vote_average
-                        };
-                        break;
-                    }
-                }
-            });
-        }
-
-        // Propagate trailerKey to outer scope
-        resolvedTrailerKey = trailerKey;
     } catch (e) {
         console.error("TMDB Enrichment Error:", e);
     }
@@ -237,8 +207,15 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
             : "";
     const trustedTmdbDetails = shouldUseTmdbMedia(movie, tmdbDetails) ? tmdbDetails : null;
 
-    // Trailer key was resolved inside TMDB enrichment block (cache hit or API fetch)
-    const trailerKey: string | null = resolvedTrailerKey;
+    // Fetch trailer key (only if TMDB enrichment succeeded)
+    const trailerKey = trustedTmdbDetails
+        ? await getMovieTrailer(
+            movie.origin_name || movie.name,
+            Number(movie.year),
+            type,
+            { originalName: movie.origin_name, localName: movie.name, countrySlug: movie.country?.[0]?.slug }
+          ).catch((): null => null)
+        : null;
 
     const tmdbBackdrop = trustedTmdbDetails?.backdrop_path ? getTMDBImage(trustedTmdbDetails.backdrop_path, "original") : "";
     const tmdbPoster = trustedTmdbDetails?.poster_path ? getTMDBImage(trustedTmdbDetails.poster_path, "original") : "";
@@ -398,26 +375,40 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(videoLd) }} />
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
             {/* Hero Section (Onflix-like: backdrop 16:9 on right, left side darker) */}
-            <div className="relative w-full pt-16 sm:pt-28 md:pt-32 pb-4 md:pb-8 px-4 md:px-8 lg:pl-24 lg:pr-12 flex items-end min-h-0 sm:min-h-[560px] overflow-hidden">
+            <div className="relative w-full pt-20 sm:pt-28 md:pt-32 pb-8 px-4 md:px-8 lg:pl-24 lg:pr-12 flex items-end min-h-[500px] sm:min-h-[560px] overflow-hidden">
                 {/* Base dark layer */}
                 <div className="absolute inset-0 bg-[#0a0a0a]" />
 
-                {/* Backdrop layer: subtle ambient color only — no jarring image zones */}
+                {/* Backdrop layer: Cinematic Image Palette Glow */}
                 {(ambientBgUrl || contentSubjectUrl) && (
                     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                        {/* Layer 1: Deep color palette blur — very subtle */}
+                        {/* Layer 1: Ambient Palette (Deep Blur) - Uses TMDB for colors if possible */}
                         <Image
-                            src={ambientBgUrl || contentSubjectUrl || "/fallback.png"}
+                            src={ambientBgUrl || "/fallback.png"}
                             alt=""
                             fill
                             priority
-                            className="object-cover opacity-[0.18] scale-110 blur-[80px] saturate-[2]"
+                            className="object-cover opacity-[0.3] scale-125 blur-[100px] saturate-[2.5]"
                             sizes="100vw"
                             quality={10}
                         />
-                        {/* Layer 2: Theme glow */}
-                        <div className={cn("absolute inset-0 opacity-20 blur-[100px]", theme.glow)} />
-                        {/* Layer 3: Subject image — right half only, heavily masked */}
+                        
+                        {/* Layer 1.5: Theme Specific Glow */}
+                        <div className={cn("absolute inset-0 opacity-40 blur-[120px] -z-10", theme.glow)} />
+                        
+                        {/* Layer 2: Atmospheric Texture (Mid Blur) */}
+                        <Image
+                            src={ambientBgUrl || "/fallback.png"}
+                            alt=""
+                            fill
+                            priority
+                            className="object-cover opacity-[0.2] blur-[20px] brightness-[0.5]"
+                            sizes="100vw"
+                            quality={40}
+                        />
+
+                        {/* Layer 3: THE SUBJECT (Authentic Source Thumbnail) */}
+                        {/* If it's landscape, we use it as a Cinematic background strip on the right */}
                         <Image
                             src={contentSubjectUrl}
                             alt=""
@@ -427,27 +418,27 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             loading="eager"
                             decoding="sync"
                             className={cn(
-                                "transition-opacity duration-700",
+                                "brightness-[0.95] transition-opacity duration-700",
                                 isSubjectPortrait
-                                    ? "object-contain object-right opacity-[0.35] brightness-[0.7]"
-                                    : "object-cover object-[75%_20%] opacity-[0.45] brightness-[0.65]"
+                                    ? "object-contain object-right-top sm:object-right opacity-40"
+                                    : "object-cover object-[70%_30%] sm:object-right opacity-60"
                             )}
                             sizes="100vw"
-                            quality={60}
+                            quality={72}
                         />
                     </div>
                 )}
 
-                {/* Unified vignette — strong left cover, heavy top+bottom fade, right edge fade */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/95 via-[55%] to-[#0a0a0a]/60 z-[1]" />
+                {/* Cinematic Vignette & Edge Blending */}
+                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/95 via-[55%] to-[#0a0a0a]/55 z-[1]" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/70 via-[30%] to-[#0a0a0a]/80 z-[1]" />
-                <div className="absolute inset-0 bg-gradient-to-l from-[#0a0a0a]/50 to-transparent z-[1]" />
+                <div className="absolute inset-0 bg-gradient-to-l from-[#0a0a0a]/45 to-transparent z-[1]" />
 
                 {/* Hero Info Content aligned left/bottom on desktop, center on mobile */}
                 <div className="relative z-10 w-full max-w-[1920px] mx-auto flex flex-col md:flex-row items-center md:items-end justify-center md:justify-between gap-6 md:gap-12 text-center md:text-left mt-0 sm:mt-2">
                     
                     {/* Poster on Mobile (Centered) */}
-                    <div className="w-[100px] sm:w-[160px] md:hidden shrink-0 rounded-xl overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.8)] border border-white/15 relative aspect-[2/3] z-20">
+                    <div className="w-[140px] sm:w-[180px] md:hidden shrink-0 rounded-xl overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.8)] border border-white/15 relative aspect-[2/3] z-20">
                         <Image 
                             src={sourcePoster || sourceThumb || tmdbPoster || "/fallback.png"} 
                             alt={movie?.name || "Poster"} 
@@ -460,7 +451,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                     </div>
 
                     {/* Left side: Movie Info */}
-                    <div className="space-y-2 sm:space-y-4 max-w-[760px] flex-1 flex flex-col items-center md:items-start w-full">
+                    <div className="space-y-3 sm:space-y-4 max-w-[760px] flex-1 flex flex-col items-center md:items-start w-full">
                         <Suspense fallback={<div className="h-6 w-24 bg-white/5 animate-pulse rounded mb-2" />}>
                             <MovieDetailTMDBInfo 
                                 movieName={movie.name}
@@ -472,7 +463,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             />
                         </Suspense>
                         <h1 
-                            className="font-outfit text-2xl sm:text-4xl lg:text-[48px] font-black text-white leading-tight tracking-tighter pt-0.5 drop-shadow-2xl capitalize w-full"
+                            className="font-outfit text-3xl sm:text-4xl lg:text-[48px] font-black text-white leading-tight tracking-tighter pt-1 drop-shadow-2xl capitalize w-full"
                         >
                             {movie?.name}
                         </h1>
@@ -601,7 +592,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
 
                     {/* RIGHT COLUMN (Tabs & Content) */}
                     <div className="w-full lg:col-span-7 xl:col-span-8">
-                        <Suspense fallback={<div className="h-96 rounded-xl bg-white/5 animate-pulse flex items-center justify-center text-white/20 font-black uppercase tracking-[4px]">Loading Movie Data...</div>}>
+                        <Suspense fallback={<div className="h-96 rounded-2xl bg-white/5 animate-pulse flex items-center justify-center text-white/20 font-black uppercase tracking-[4px]">Loading Movie Data...</div>}>
                             <MovieTabs
                                 movie={movie}
                                 relatedMovies={relatedMovies}

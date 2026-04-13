@@ -206,7 +206,7 @@ export async function likeComment(commentId: string) {
             comment.likes = Math.max(0, comment.likes - 1);
         } else {
             // Like
-            comment.likedBy.push(userId as any);
+            comment.likedBy.push(userId);
             comment.likes += 1;
 
             // Remove dislike if exists
@@ -251,7 +251,7 @@ export async function dislikeComment(commentId: string) {
             comment.dislikes = Math.max(0, comment.dislikes - 1);
         } else {
             // Dislike
-            comment.dislikedBy.push(userId as any);
+            comment.dislikedBy.push(userId);
             comment.dislikes += 1;
 
             // Remove like if exists
