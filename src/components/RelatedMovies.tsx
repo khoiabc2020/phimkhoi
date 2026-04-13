@@ -33,10 +33,6 @@ export default async function RelatedMovies({
     if (mode === 'vertical') {
         return (
             <div className="[contain:layout_paint]">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/[0.06]">
-                    <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-white/50">Phim Đề Xuất</h3>
-                </div>
 
                 <div className="space-y-0.5">
                     {movies.slice(0, 8).map((movie: any, index: number) => {
@@ -58,8 +54,8 @@ export default async function RelatedMovies({
                                     style={{ minWidth: '22px' }}>
                                     {rank}
                                 </div>
-                                {/* Poster — wider for better visibility */}
-                                <div className="relative w-[62px] aspect-[2/3] rounded-md overflow-hidden shrink-0 ring-1 ring-white/[0.07] group-hover:ring-[#8FA7C5]/35 transition-all duration-200">
+                                {/* Poster */}
+                                <div className="relative w-[76px] aspect-[2/3] rounded-md overflow-hidden shrink-0 ring-1 ring-white/[0.07] group-hover:ring-[#8FA7C5]/35 transition-all duration-200">
                                     <Image
                                         src={getPosterImageUrl(movie) || "/placeholder.svg"}
                                         alt={movie.name}
@@ -77,11 +73,11 @@ export default async function RelatedMovies({
                                 </div>
                                 {/* Info */}
                                 <div className="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
-                                    <h4 className="text-white/90 text-[12px] font-semibold leading-snug group-hover:text-[#8FA7C5] transition-colors line-clamp-2">
+                                    <h4 className="text-white/90 text-[13px] font-semibold leading-snug group-hover:text-[#8FA7C5] transition-colors line-clamp-2">
                                         {movie.name}
                                     </h4>
                                     <p className="text-white/25 text-[10px] line-clamp-1">{movie.origin_name}</p>
-                                    <div className="flex items-center gap-1.5">
+                                    <div className="flex items-center gap-1.5 flex-wrap">
                                         {movie.year && (
                                             <span className="text-[10px] text-white/35">{movie.year}</span>
                                         )}

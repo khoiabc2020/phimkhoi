@@ -398,7 +398,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(videoLd) }} />
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
             {/* Hero Section (Onflix-like: backdrop 16:9 on right, left side darker) */}
-            <div className="relative w-full pt-20 sm:pt-28 md:pt-32 pb-8 px-4 md:px-8 lg:pl-24 lg:pr-12 flex items-end min-h-[500px] sm:min-h-[560px] overflow-hidden">
+            <div className="relative w-full pt-16 sm:pt-28 md:pt-32 pb-4 md:pb-8 px-4 md:px-8 lg:pl-24 lg:pr-12 flex items-end min-h-0 sm:min-h-[560px] overflow-hidden">
                 {/* Base dark layer */}
                 <div className="absolute inset-0 bg-[#0a0a0a]" />
 
@@ -460,7 +460,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 <div className="relative z-10 w-full max-w-[1920px] mx-auto flex flex-col md:flex-row items-center md:items-end justify-center md:justify-between gap-6 md:gap-12 text-center md:text-left mt-0 sm:mt-2">
                     
                     {/* Poster on Mobile (Centered) */}
-                    <div className="w-[140px] sm:w-[180px] md:hidden shrink-0 rounded-xl overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.8)] border border-white/15 relative aspect-[2/3] z-20">
+                    <div className="w-[100px] sm:w-[160px] md:hidden shrink-0 rounded-xl overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.8)] border border-white/15 relative aspect-[2/3] z-20">
                         <Image 
                             src={sourcePoster || sourceThumb || tmdbPoster || "/fallback.png"} 
                             alt={movie?.name || "Poster"} 
@@ -473,7 +473,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                     </div>
 
                     {/* Left side: Movie Info */}
-                    <div className="space-y-3 sm:space-y-4 max-w-[760px] flex-1 flex flex-col items-center md:items-start w-full">
+                    <div className="space-y-2 sm:space-y-4 max-w-[760px] flex-1 flex flex-col items-center md:items-start w-full">
                         <Suspense fallback={<div className="h-6 w-24 bg-white/5 animate-pulse rounded mb-2" />}>
                             <MovieDetailTMDBInfo 
                                 movieName={movie.name}
@@ -485,7 +485,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             />
                         </Suspense>
                         <h1 
-                            className="font-outfit text-3xl sm:text-4xl lg:text-[48px] font-black text-white leading-tight tracking-tighter pt-1 drop-shadow-2xl capitalize w-full"
+                            className="font-outfit text-2xl sm:text-4xl lg:text-[48px] font-black text-white leading-tight tracking-tighter pt-0.5 drop-shadow-2xl capitalize w-full"
                         >
                             {movie?.name}
                         </h1>
