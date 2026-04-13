@@ -23,7 +23,12 @@ export default async function ProfilePage() {
     const history = historyResult.success ? historyResult.data : [];
 
     return (
-        <main className="min-h-screen pt-24 pb-20">
+        <main className="min-h-screen pt-24 pb-20 bg-[#0a0a0a] relative overflow-hidden">
+            {/* Subtle gradient glow */}
+            <div className="pointer-events-none fixed inset-0 z-0">
+                <div className="absolute top-0 left-1/4 w-[600px] h-[400px] bg-[#8FA7C5]/7 blur-[160px] rounded-full" />
+                <div className="absolute top-20 right-1/4 w-[400px] h-[300px] bg-violet-500/4 blur-[120px] rounded-full" />
+            </div>
             <div className="w-full max-w-[1920px] mx-auto px-3 sm:px-4 md:px-8 lg:pl-24 lg:pr-12 relative z-10">
                 <ProfileTabs
                     user={session.user}

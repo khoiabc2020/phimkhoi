@@ -59,8 +59,13 @@ export default async function WatchlistPage() {
     const movies = watchlist.movies.slice(0, 48);
 
     return (
-        <div className="min-h-screen">
-            <div className="relative bg-gradient-to-b from-[#020617]/70 via-[#020617]/30 to-transparent px-4 pb-8 pt-20 md:px-12">
+        <div className="min-h-screen bg-[#0a0a0a] relative overflow-hidden">
+            {/* Subtle gradient glow */}
+            <div className="pointer-events-none fixed inset-0 z-0">
+                <div className="absolute top-0 left-1/4 w-[500px] h-[350px] bg-[#8FA7C5]/8 blur-[150px] rounded-full" />
+                <div className="absolute top-0 right-1/3 w-[400px] h-[300px] bg-indigo-500/5 blur-[120px] rounded-full" />
+            </div>
+            <div className="relative z-10 px-4 pb-8 pt-24 md:px-12">
                 <div className="mx-auto max-w-7xl">
                     <Link
                         href="/"
@@ -88,7 +93,7 @@ export default async function WatchlistPage() {
                 </div>
             </div>
 
-            <div className="mx-auto max-w-7xl px-4 pb-16 md:px-12 lg:pl-24 lg:pr-12">
+            <div className="mx-auto max-w-7xl px-4 pb-16 md:px-12 lg:pl-24 lg:pr-12 relative z-10">
                 {movies.length === 0 ? (
                     <div className="mt-8">
                         <EmptyState

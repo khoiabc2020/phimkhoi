@@ -45,8 +45,13 @@ export default async function FavoritesPage() {
     const favorites = favoritesResult.success && favoritesResult.data ? favoritesResult.data : [];
 
     return (
-        <div className="min-h-screen bg-[#0a0a0a] pt-24 md:pt-28 pb-12">
-            <div className="w-full max-w-[1920px] mx-auto px-3 sm:px-4 md:px-12 lg:pl-24 lg:pr-12">
+        <div className="min-h-screen bg-[#0a0a0a] pt-24 md:pt-28 pb-12 relative overflow-hidden">
+            {/* Subtle gradient glow */}
+            <div className="pointer-events-none fixed inset-0 z-0">
+                <div className="absolute top-0 left-1/3 w-[500px] h-[350px] bg-red-500/6 blur-[140px] rounded-full" />
+                <div className="absolute top-0 right-1/4 w-[400px] h-[300px] bg-[#8FA7C5]/5 blur-[120px] rounded-full" />
+            </div>
+            <div className="w-full max-w-[1920px] mx-auto px-3 sm:px-4 md:px-12 lg:pl-24 lg:pr-12 relative z-10">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4 md:mb-8">
                     <div className="flex items-center gap-3">
@@ -111,6 +116,7 @@ export default async function FavoritesPage() {
                         ))}
                     </div>
                 )}
+            </div>
             </div>
         </div>
     );

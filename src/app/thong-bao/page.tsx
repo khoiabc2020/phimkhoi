@@ -62,10 +62,10 @@ export default function NotificationsPage() {
     }, []);
 
     return (
-        <main className="min-h-screen pt-20 pb-16 relative">
+        <main className="min-h-screen pt-20 pb-16 relative bg-[#0a0a0a]">
             {/* Background elements */}
-            <div className="absolute inset-0 bg-[#07070B] -z-20" />
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1000px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none -z-10 opacity-50" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1000px] h-[500px] bg-[#8FA7C5]/6 blur-[130px] rounded-full pointer-events-none -z-10 opacity-60" />
+            <div className="absolute top-0 left-1/4 w-[400px] h-[300px] bg-violet-500/4 blur-[100px] rounded-full pointer-events-none -z-10" />
 
             <div className="w-full max-w-[900px] mx-auto px-4 sm:px-6">
                 <div className="mb-8 md:mb-12 text-center pt-6">

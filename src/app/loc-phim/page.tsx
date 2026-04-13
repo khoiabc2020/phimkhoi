@@ -70,9 +70,10 @@ export default async function AdvancedFilterPage({ searchParams }: FilterPagePro
     };
 
     return (
-        <main className="min-h-screen bg-[#080b12] text-white relative">
+        <main className="min-h-screen bg-[#0a0a0a] text-white relative overflow-hidden">
             {/* Decorative background glow */}
             <div className={cn("absolute top-0 left-0 right-0 h-[600px] via-transparent to-transparent pointer-events-none -z-10 blur-[150px] opacity-50", theme.glow)} />
+            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#8FA7C5]/5 blur-[130px] rounded-full pointer-events-none -z-10" />
             
             <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-24 md:pt-32 pb-20">
                 {/* Header & Breadcrumb */}
