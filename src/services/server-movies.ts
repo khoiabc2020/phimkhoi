@@ -181,6 +181,7 @@ export async function getRelatedMoviesForMovie({
     const pushMovies = (movies: Movie[]) => {
         movies.forEach((movie) => {
             if (!movie?.slug || movie.slug === currentMovieSlug || merged.has(movie.slug)) return;
+            if (isTrailerLike(movie)) return; // exclude trailer-only movies from recommendations
             merged.set(movie.slug, movie);
         });
     };
@@ -210,7 +211,7 @@ export async function getRelatedMoviesForMovie({
 
     if (merged.size < safeLimit && categorySlug) {
         const categoryData = await getMoviesByCategory(categorySlug, 1, Math.max(24, safeLimit * 2)).catch(() => ({ items: [] as Movie[] }));
-        const categoryMovies = (categoryData.items || []).filter((movie: Movie) => movie.slug !== currentMovieSlug);
+        const categoryMovies = (categoryData.items || []).filter((movie: Movie) => movie.slug !== currentMovieSlug && !isTrailerLike(movie));
         pushMovies(categoryMovies);
         syncMoviesToLocalCache(categoryMovies).catch(() => {});
     }
