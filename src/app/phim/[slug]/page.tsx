@@ -418,10 +418,10 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             loading="eager"
                             decoding="sync"
                             className={cn(
-                                "brightness-[0.95] transition-opacity duration-700",
+                                "brightness-[0.9] transition-opacity duration-700",
                                 isSubjectPortrait
-                                    ? "object-contain object-right-top sm:object-right opacity-40"
-                                    : "object-cover object-[70%_30%] sm:object-right opacity-60"
+                                    ? "object-contain object-right-top sm:object-right opacity-75"
+                                    : "object-cover object-[70%_30%] sm:object-right opacity-85"
                             )}
                             sizes="100vw"
                             quality={72}
@@ -430,9 +430,9 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 )}
 
                 {/* Cinematic Vignette & Edge Blending */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/95 via-[55%] to-[#0a0a0a]/55 z-[1]" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/70 via-[30%] to-[#0a0a0a]/80 z-[1]" />
-                <div className="absolute inset-0 bg-gradient-to-l from-[#0a0a0a]/45 to-transparent z-[1]" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/90 via-[45%] to-[#0a0a0a]/20 z-[1]" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 via-[25%] to-[#0a0a0a]/30 z-[1]" />
+                <div className="absolute inset-0 bg-gradient-to-l from-[#0a0a0a]/30 to-transparent z-[1]" />
 
                 {/* Hero Info Content aligned left/bottom on desktop, center on mobile */}
                 <div className="relative z-10 w-full max-w-[1920px] mx-auto flex flex-col md:flex-row items-center md:items-end justify-center md:justify-between gap-6 md:gap-12 text-center md:text-left mt-0 sm:mt-2">

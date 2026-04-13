@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useSession } from "next-auth/react";
-import { Send, ThumbsUp, ThumbsDown, Reply, Trash2, Loader2, MessageCircle, Smile } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Reply, Trash2, Loader2, MessageCircle, Smile, ChevronDown } from "lucide-react";
 import { addComment, getComments, likeComment, dislikeComment, deleteComment, reportComment } from "@/app/actions/comments";
 import Image from "next/image";
 import CommentMemePicker from "./CommentMemePicker";
@@ -63,7 +63,15 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
     const [showPicker, setShowPicker] = useState(false);
     const [reportedId, setReportedId] = useState<string | null>(null);
     const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [sortBy, setSortBy] = useState<'newest' | 'popular'>('newest');
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+    const sortedComments = useMemo(() => {
+        if (sortBy === 'popular') {
+            return [...comments].sort((a, b) => (b.likes - b.dislikes) - (a.likes - a.dislikes));
+        }
+        return [...comments].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }, [comments, sortBy]);
 
     const fetchComments = async () => {
         setLoading(true);
@@ -181,11 +189,25 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
 
     return (
         <div className="bg-[#07070b]/82 p-4 md:p-6 rounded-[10px] border border-white/[0.06] shadow-[0_12px_28px_#00000066] scroll-mt-24">
-            <div className="flex items-center gap-2 mb-6">
-                <MessageCircle className="w-6 h-6 text-[#8FA7C5] fill-[#8FA7C5]/20" />
-                <h3 className="text-xl font-bold text-white tracking-wide">
-                    Bình luận <span className="text-gray-400 text-sm font-normal">({total})</span>
-                </h3>
+            <div className="flex items-center justify-between gap-2 mb-5">
+                <div className="flex items-center gap-2">
+                    <MessageCircle className="w-5 h-5 text-[#8FA7C5] fill-[#8FA7C5]/20" />
+                    <h3 className="text-base font-bold text-white">
+                        Bình luận <span className="text-white/30 text-[13px] font-normal">({total})</span>
+                    </h3>
+                </div>
+                {/* Compact sort dropdown */}
+                <div className="relative">
+                    <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value as 'newest' | 'popular')}
+                        className="appearance-none bg-white/[0.05] border border-white/[0.08] text-white/60 text-[11px] font-semibold pl-2.5 pr-6 py-1.5 rounded-lg outline-none cursor-pointer hover:bg-white/[0.08] transition-colors"
+                    >
+                        <option value="newest">Mới nhất</option>
+                        <option value="popular">Phổ biến</option>
+                    </select>
+                    <ChevronDown className="w-3 h-3 text-white/40 absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                </div>
             </div>
 
             {/* Comment Form */}
@@ -236,10 +258,10 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                             <button
                                 type="submit"
                                 disabled={submitting || !newComment.trim()}
-                                className="bg-[#8FA7C5] hover:bg-[#a8bdd8] text-[#0a0a0a] px-5 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold text-sm"
+                                className="bg-[#8FA7C5] hover:bg-[#a8bdd8] text-[#0a0a0a] px-4 py-1.5 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-bold text-[13px] flex items-center gap-1.5"
                             >
-                                {submitting ? <Loader2 className="w-4 h-4 animate-spin inline mr-1" /> : null}
-                                Gửi bình luận
+                                {submitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+                                Gửi
                             </button>
                         </div>
                     </div>
@@ -256,8 +278,8 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                     <Loader2 className="w-6 h-6 text-[#8FA7C5] animate-spin" />
                 </div>
             ) : (
-                <div className="space-y-8">
-                    {comments.map((comment) => (
+                <div className="space-y-6">
+                    {sortedComments.map((comment) => (
                         <div key={comment._id} className="flex gap-4 group">
                             <div className="w-11 h-11 rounded-full overflow-hidden bg-gray-800 flex-shrink-0 mt-1">
                                 {comment.userImage ? (
@@ -355,8 +377,11 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                             </div>
                         </div>
                     ))}
-                    {comments.length === 0 && (
-                        <p className="text-gray-400 text-center py-8">Chưa có bình luận nào. Hãy là người đầu tiên!</p>
+                    {sortedComments.length === 0 && (
+                        <div className="flex flex-col items-center py-10 gap-3 text-center">
+                            <MessageCircle className="w-10 h-10 text-white/10" />
+                            <p className="text-white/30 text-[13px]">Chưa có bình luận nào. Hãy là người đầu tiên!</p>
+                        </div>
                     )}
                 </div>
             )}
