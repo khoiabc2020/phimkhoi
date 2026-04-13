@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useSession } from "next-auth/react";
-import { ThumbsUp, ThumbsDown, Reply, Trash2, Loader2, MessageCircle, Smile, ChevronDown } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Reply, Trash2, Loader2, MessageCircle, Smile, ChevronDown, Check } from "lucide-react";
 import { addComment, getComments, likeComment, dislikeComment, deleteComment, reportComment } from "@/app/actions/comments";
 import Image from "next/image";
 import CommentMemePicker from "./CommentMemePicker";
@@ -64,7 +64,20 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
     const [reportedId, setReportedId] = useState<string | null>(null);
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [sortBy, setSortBy] = useState<'newest' | 'popular'>('newest');
+    const [showSortMenu, setShowSortMenu] = useState(false);
+    const sortRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+    // Close sort menu on outside click
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
+                setShowSortMenu(false);
+            }
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, []);
 
     const sortedComments = useMemo(() => {
         if (sortBy === 'popular') {
@@ -197,16 +210,28 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                     </h3>
                 </div>
                 {/* Compact sort dropdown */}
-                <div className="relative">
-                    <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value as 'newest' | 'popular')}
-                        className="appearance-none bg-white/[0.05] border border-white/[0.08] text-white/60 text-[11px] font-semibold pl-2.5 pr-6 py-1.5 rounded-lg outline-none cursor-pointer hover:bg-white/[0.08] transition-colors"
+                <div className="relative" ref={sortRef}>
+                    <button
+                        onClick={() => setShowSortMenu(v => !v)}
+                        className="flex items-center gap-1.5 bg-white/[0.05] hover:bg-white/[0.08] border border-white/[0.08] text-white/55 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg transition-colors"
                     >
-                        <option value="newest">Mới nhất</option>
-                        <option value="popular">Phổ biến</option>
-                    </select>
-                    <ChevronDown className="w-3 h-3 text-white/40 absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        {sortBy === 'newest' ? 'Mới nhất' : 'Phổ biến'}
+                        <ChevronDown className={`w-3 h-3 text-white/35 transition-transform ${showSortMenu ? 'rotate-180' : ''}`} />
+                    </button>
+                    {showSortMenu && (
+                        <div className="absolute right-0 top-full mt-1 w-[110px] bg-[#13131a] border border-white/[0.10] rounded-lg shadow-[0_8px_24px_rgba(0,0,0,0.6)] overflow-hidden z-50">
+                            {([['newest', 'Mới nhất'], ['popular', 'Phổ biến']] as const).map(([val, label]) => (
+                                <button
+                                    key={val}
+                                    onClick={() => { setSortBy(val); setShowSortMenu(false); }}
+                                    className="w-full flex items-center justify-between px-3 py-2 text-[12px] font-medium hover:bg-white/[0.07] transition-colors text-left"
+                                >
+                                    <span className={sortBy === val ? 'text-[#8FA7C5]' : 'text-white/55'}>{label}</span>
+                                    {sortBy === val && <Check className="w-3 h-3 text-[#8FA7C5]" />}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
 
