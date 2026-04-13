@@ -70,12 +70,10 @@ export default async function CountryPage({
     const displayTitle = countryName;
 
     return (
-        <main className="min-h-screen pb-20 bg-[#0a0a0a] relative overflow-hidden">
+        <main className="min-h-screen pb-20 bg-[#0a0a0a] relative">
             {/* Onflix-style top banner gradient */}
-            <div className={cn("fixed top-0 inset-x-0 h-[55vh] bg-gradient-to-b to-transparent pointer-events-none z-0", theme.banner)} />
-            {/* Soft glow blob */}
-            <div className={cn("absolute top-0 left-1/4 w-[700px] h-[300px] via-transparent to-transparent pointer-events-none -z-10 blur-[120px] opacity-40", theme.glow)} />
-            <div className="pt-24 w-full max-w-[1920px] mx-auto px-4 sm:px-6 md:px-12 lg:pl-24 lg:pr-12 relative z-10">
+            <div className={cn("absolute top-0 inset-x-0 h-[60vh] bg-gradient-to-b to-transparent pointer-events-none", theme.banner)} />
+            <div className="pt-24 w-full max-w-[1920px] mx-auto px-4 sm:px-6 md:px-12 lg:pl-24 lg:pr-12 relative">
 
                 <div className="mb-4 md:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-3 md:gap-6">
                     <div className="max-w-4xl">
