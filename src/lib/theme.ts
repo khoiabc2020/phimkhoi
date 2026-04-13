@@ -4,7 +4,7 @@ export type ThemeColor = {
     gradient: string;
     glow: string;
     text: string;
-    /** Onflix-style: full-width top banner — Tailwind from-[] color class */
+    /** Onflix-style: top banner Tailwind class (from-[color]/opacity) */
     banner: string;
 };
 
@@ -13,26 +13,26 @@ export const DEFAULT_THEME: ThemeColor = {
     secondary: "#1e293b",
     gradient: "from-[#0e1621] via-black to-black",
     glow: "bg-[#0e1621]",
-    banner: "from-[#0e1621]/60",
+    banner: "from-[#8FA7C5]/18",
     text: "text-white",
 };
 
 export const THEME_MAP: Record<string, ThemeColor> = {
-    // Thể loại
+    // ── Thể loại ─────────────────────────────────────────
     "hanh-dong": {
         primary: "#ff4d4d",
         secondary: "#3d0d0d",
         gradient: "from-[#3b0d0d] via-black to-black",
         glow: "bg-[#3d0d0d]",
-        banner: "from-[#4a0808]/65",
+        banner: "from-[#ff4d4d]/20",
         text: "text-white",
     },
     "gay-can": {
-        primary: "#c0392b",
+        primary: "#e53e3e",
         secondary: "#3d0d0d",
         gradient: "from-[#3b0d0d] via-black to-black",
         glow: "bg-[#3d0d0d]",
-        banner: "from-[#4a0808]/60",
+        banner: "from-[#e53e3e]/22",
         text: "text-white",
     },
     "tinh-cam": {
@@ -40,7 +40,7 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#3d1b3b",
         gradient: "from-[#3d1b3b] via-black to-black",
         glow: "bg-[#3d1b3b]",
-        banner: "from-[#3d1040]/60",
+        banner: "from-[#ff75a0]/18",
         text: "text-white",
     },
     "co-trang": {
@@ -48,15 +48,15 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#3d2e0a",
         gradient: "from-[#3d2e0a] via-black to-black",
         glow: "bg-[#3d2e0a]",
-        banner: "from-[#3d2800]/55",
+        banner: "from-[#f4c84a]/16",
         text: "text-white",
     },
     "kinh-di": {
-        primary: "#a1a1a1",
+        primary: "#a855f7",
         secondary: "#1a1a1a",
         gradient: "from-[#1a1a1a] via-black to-black",
         glow: "bg-[#1a1a1a]",
-        banner: "from-[#1a0a1a]/60",
+        banner: "from-[#a855f7]/18",
         text: "text-white",
     },
     "hoat-hinh": {
@@ -64,7 +64,7 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#0d2a4a",
         gradient: "from-[#0d2a4a] via-black to-black",
         glow: "bg-[#0d2a4a]",
-        banner: "from-[#062040]/60",
+        banner: "from-[#00d2ff]/18",
         text: "text-white",
     },
     "phim-hoat-hinh": {
@@ -72,7 +72,7 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#0d2a4a",
         gradient: "from-[#0d2a4a] via-black to-black",
         glow: "bg-[#0d2a4a]",
-        banner: "from-[#062040]/60",
+        banner: "from-[#00d2ff]/18",
         text: "text-white",
     },
     "vien-tuong": {
@@ -80,7 +80,7 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#0d1a3b",
         gradient: "from-[#0d1a3b] via-black to-black",
         glow: "bg-[#0d1a3b]",
-        banner: "from-[#0a1535]/65",
+        banner: "from-[#3b82f6]/20",
         text: "text-white",
     },
     "bi-an": {
@@ -88,7 +88,7 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#1a0d3b",
         gradient: "from-[#1a0d3b] via-black to-black",
         glow: "bg-[#1a0d3b]",
-        banner: "from-[#180b38]/65",
+        banner: "from-[#8b5cf6]/22",
         text: "text-white",
     },
     "tam-ly": {
@@ -96,7 +96,7 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#130d3b",
         gradient: "from-[#130d3b] via-black to-black",
         glow: "bg-[#130d3b]",
-        banner: "from-[#110b35]/60",
+        banner: "from-[#6366f1]/20",
         text: "text-white",
     },
     "hinh-su": {
@@ -104,7 +104,7 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#2b1a00",
         gradient: "from-[#2b1a00] via-black to-black",
         glow: "bg-[#2b1a00]",
-        banner: "from-[#2a1500]/58",
+        banner: "from-[#f59e0b]/16",
         text: "text-white",
     },
     "chien-tranh": {
@@ -112,7 +112,7 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#1a2b0a",
         gradient: "from-[#1a2b0a] via-black to-black",
         glow: "bg-[#1a2b0a]",
-        banner: "from-[#142008]/55",
+        banner: "from-[#84cc16]/16",
         text: "text-white",
     },
     "tai-lieu": {
@@ -120,7 +120,7 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#2b1200",
         gradient: "from-[#2b1200] via-black to-black",
         glow: "bg-[#2b1200]",
-        banner: "from-[#281000]/55",
+        banner: "from-[#f97316]/18",
         text: "text-white",
     },
     "hoc-duong": {
@@ -128,7 +128,7 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#0a2b1a",
         gradient: "from-[#0a2b1a] via-black to-black",
         glow: "bg-[#0a2b1a]",
-        banner: "from-[#082016]/55",
+        banner: "from-[#34d399]/18",
         text: "text-white",
     },
     "hai-huoc": {
@@ -136,7 +136,7 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#2b2000",
         gradient: "from-[#2b2000] via-black to-black",
         glow: "bg-[#2b2000]",
-        banner: "from-[#2a1c00]/55",
+        banner: "from-[#fbbf24]/16",
         text: "text-white",
     },
     "vo-thuat": {
@@ -144,7 +144,7 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#2b0a0a",
         gradient: "from-[#2b0a0a] via-black to-black",
         glow: "bg-[#2b0a0a]",
-        banner: "from-[#280808]/58",
+        banner: "from-[#ef4444]/20",
         text: "text-white",
     },
     "gia-dinh": {
@@ -152,17 +152,33 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#2b0a1a",
         gradient: "from-[#2b0a1a] via-black to-black",
         glow: "bg-[#2b0a1a]",
-        banner: "from-[#280818]/55",
+        banner: "from-[#f472b6]/18",
+        text: "text-white",
+    },
+    "than-thoai": {
+        primary: "#c084fc",
+        secondary: "#1e0d3b",
+        gradient: "from-[#1e0d3b] via-black to-black",
+        glow: "bg-[#1e0d3b]",
+        banner: "from-[#c084fc]/20",
+        text: "text-white",
+    },
+    "phim-18": {
+        primary: "#f43f5e",
+        secondary: "#2b0a10",
+        gradient: "from-[#2b0a10] via-black to-black",
+        glow: "bg-[#2b0a10]",
+        banner: "from-[#f43f5e]/22",
         text: "text-white",
     },
 
-    // Quốc gia
+    // ── Quốc gia ─────────────────────────────────────────
     "trung-quoc": {
         primary: "#f4c84a",
         secondary: "#3d2e0a",
         gradient: "from-[#3d2e0a] via-black to-black",
         glow: "bg-[#3d2e0a]",
-        banner: "from-[#3a2800]/58",
+        banner: "from-[#f4c84a]/16",
         text: "text-white",
     },
     "han-quoc": {
@@ -170,7 +186,7 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#0d1a3b",
         gradient: "from-[#0d1a3b] via-black to-black",
         glow: "bg-[#0d1a3b]",
-        banner: "from-[#0a1530]/60",
+        banner: "from-[#8FA7C5]/20",
         text: "text-white",
     },
     "au-my": {
@@ -178,7 +194,7 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#3b0d0d",
         gradient: "from-[#3b0d0d] via-black to-black",
         glow: "bg-[#3b0d0d]",
-        banner: "from-[#3a0808]/60",
+        banner: "from-[#ff4d4d]/20",
         text: "text-white",
     },
     "nhat-ban": {
@@ -186,7 +202,7 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#0d2a4a",
         gradient: "from-[#0d2a4a] via-black to-black",
         glow: "bg-[#0d2a4a]",
-        banner: "from-[#082040]/60",
+        banner: "from-[#00d2ff]/18",
         text: "text-white",
     },
     "thai-lan": {
@@ -194,7 +210,7 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#2b1a00",
         gradient: "from-[#2b1a00] via-black to-black",
         glow: "bg-[#2b1a00]",
-        banner: "from-[#281500]/55",
+        banner: "from-[#f59e0b]/17",
         text: "text-white",
     },
     "an-do": {
@@ -202,7 +218,7 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#2b1200",
         gradient: "from-[#2b1200] via-black to-black",
         glow: "bg-[#2b1200]",
-        banner: "from-[#2a1000]/55",
+        banner: "from-[#f97316]/18",
         text: "text-white",
     },
     "viet-nam": {
@@ -210,17 +226,33 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#2b0a0a",
         gradient: "from-[#2b0a0a] via-black to-black",
         glow: "bg-[#2b0a0a]",
-        banner: "from-[#280808]/58",
+        banner: "from-[#ef4444]/20",
+        text: "text-white",
+    },
+    "phim-han": {
+        primary: "#8FA7C5",
+        secondary: "#0d1a3b",
+        gradient: "from-[#0d1a3b] via-black to-black",
+        glow: "bg-[#0d1a3b]",
+        banner: "from-[#8FA7C5]/20",
+        text: "text-white",
+    },
+    "phim-trung": {
+        primary: "#f4c84a",
+        secondary: "#3d2e0a",
+        gradient: "from-[#3d2e0a] via-black to-black",
+        glow: "bg-[#3d2e0a]",
+        banner: "from-[#f4c84a]/16",
         text: "text-white",
     },
 
-    // Danh sách
+    // ── Danh sách ─────────────────────────────────────────
     "phim-le": {
         primary: "#ff4747",
         secondary: "#2b0a0a",
         gradient: "from-[#2b0a0a] via-black to-black",
         glow: "bg-[#2b0a0a]",
-        banner: "from-[#280808]/60",
+        banner: "from-[#ff4747]/20",
         text: "text-white",
     },
     "phim-bo": {
@@ -228,7 +260,7 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#0a1a2b",
         gradient: "from-[#0a1a2b] via-black to-black",
         glow: "bg-[#0a1a2b]",
-        banner: "from-[#081428]/60",
+        banner: "from-[#478cff]/20",
         text: "text-white",
     },
     "phim-moi": {
@@ -236,7 +268,7 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#2b210a",
         gradient: "from-[#2b210a] via-black to-black",
         glow: "bg-[#2b210a]",
-        banner: "from-[#281c00]/58",
+        banner: "from-[#ffc107]/16",
         text: "text-white",
     },
     "phim-moi-cap-nhat": {
@@ -244,7 +276,7 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#0a2b21",
         gradient: "from-[#0a2b21] via-black to-black",
         glow: "bg-[#0a2b21]",
-        banner: "from-[#08241a]/58",
+        banner: "from-[#00feba]/16",
         text: "text-white",
     },
     "tv-shows": {
@@ -252,25 +284,49 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#1a0d3b",
         gradient: "from-[#1a0d3b] via-black to-black",
         glow: "bg-[#1a0d3b]",
-        banner: "from-[#150b30]/60",
+        banner: "from-[#a78bfa]/20",
         text: "text-white",
     },
-    "hoat-hinh-type": {
+    "hoat-hinh-list": {
         primary: "#00d2ff",
         secondary: "#0d2a4a",
         gradient: "from-[#0d2a4a] via-black to-black",
         glow: "bg-[#0d2a4a]",
-        banner: "from-[#062040]/60",
+        banner: "from-[#00d2ff]/18",
+        text: "text-white",
+    },
+    "phim-chieu-rap": {
+        primary: "#f59e0b",
+        secondary: "#2b1a00",
+        gradient: "from-[#2b1a00] via-black to-black",
+        glow: "bg-[#2b1a00]",
+        banner: "from-[#f59e0b]/17",
+        text: "text-white",
+    },
+    "vietsub": {
+        primary: "#34d399",
+        secondary: "#0a2b1a",
+        gradient: "from-[#0a2b1a] via-black to-black",
+        glow: "bg-[#0a2b1a]",
+        banner: "from-[#34d399]/17",
+        text: "text-white",
+    },
+    "thuyet-minh": {
+        primary: "#60a5fa",
+        secondary: "#0a1a2b",
+        gradient: "from-[#0a1a2b] via-black to-black",
+        glow: "bg-[#0a1a2b]",
+        banner: "from-[#60a5fa]/18",
         text: "text-white",
     },
 
-    // Chức năng
+    // ── Chức năng ─────────────────────────────────────────
     "tim-kiem": {
         primary: "#00d2ff",
         secondary: "#051a2e",
         gradient: "from-[#051a2e] via-black to-black",
         glow: "bg-[#051a2e]",
-        banner: "from-[#041525]/60",
+        banner: "from-[#00d2ff]/16",
         text: "text-white",
     },
     "loc-phim": {
@@ -278,7 +334,7 @@ export const THEME_MAP: Record<string, ThemeColor> = {
         secondary: "#1a0d4a",
         gradient: "from-[#1a0d4a] via-black to-black",
         glow: "bg-[#1a0d4a]",
-        banner: "from-[#160840]/62",
+        banner: "from-[#b100ff]/18",
         text: "text-white",
     },
 };

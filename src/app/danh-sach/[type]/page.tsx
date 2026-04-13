@@ -100,13 +100,11 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
     const typeName = TYPE_NAMES[type] || type;
 
     return (
-        <main className="min-h-screen pb-20 bg-[#0a0a0a] relative overflow-hidden">
+        <main className="min-h-screen pb-20 bg-[#0a0a0a] relative">
             {/* Onflix-style top banner gradient */}
-            <div className={cn("fixed top-0 inset-x-0 h-[55vh] bg-gradient-to-b to-transparent pointer-events-none z-0", theme.banner)} />
-            {/* Soft glow blob */}
-            <div className={cn("absolute top-0 left-1/4 w-[700px] h-[300px] via-transparent to-transparent pointer-events-none -z-10 blur-[120px] opacity-40", theme.glow)} />
-            
-            <div className="pt-24 w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 lg:pl-24 lg:pr-12 relative z-10">
+            <div className={cn("absolute top-0 inset-x-0 h-[60vh] bg-gradient-to-b to-transparent pointer-events-none", theme.banner)} />
+
+            <div className="pt-24 w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 lg:pl-24 lg:pr-12 relative">
                 <div className="mb-4 md:mb-6 rounded-[10px] border border-white/[0.06] bg-[#07070b]/78 backdrop-blur-md p-3 sm:p-4 md:p-5 shadow-xl transition-all">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-2 md:gap-4">
                         <div className="space-y-0.5 sm:space-y-1">
