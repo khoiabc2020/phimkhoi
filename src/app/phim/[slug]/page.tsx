@@ -174,13 +174,13 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                     for (const key of candidates) {
                         const match = (epImages as any)[key];
                         if (match) {
-                            episodeThumbnails[ep.slug] = match.still_path ? `https://image.tmdb.org/t/p/w500${match.still_path}` : "";
+                            episodeThumbnails[ep.slug] = match.image || "";
                             episodeMetadata[ep.slug] = {
-                                title: match.name,
+                                title: match.title || match.name,
                                 overview: match.overview,
-                                airDate: match.air_date,
+                                airDate: match.airDate || match.air_date,
                                 runtime: match.runtime,
-                                voteAverage: match.vote_average
+                                voteAverage: match.voteAverage || match.vote_average
                             };
                             break;
                         }
@@ -418,10 +418,10 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             loading="eager"
                             decoding="sync"
                             className={cn(
-                                "opacity-90 brightness-[1.1] transition-opacity duration-700",
-                                isSubjectPortrait 
-                                    ? "object-contain object-right-top sm:object-right opacity-70" 
-                                    : "object-cover object-[70%_30%] sm:object-right"
+                                "brightness-[0.95] transition-opacity duration-700",
+                                isSubjectPortrait
+                                    ? "object-contain object-right-top sm:object-right opacity-40"
+                                    : "object-cover object-[70%_30%] sm:object-right opacity-60"
                             )}
                             sizes="100vw"
                             quality={72}
@@ -430,8 +430,9 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 )}
 
                 {/* Cinematic Vignette & Edge Blending */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/92 via-[40%] to-transparent z-[1]" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/65 to-transparent z-[1]" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/95 via-[55%] to-[#0a0a0a]/55 z-[1]" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/70 via-[30%] to-[#0a0a0a]/80 z-[1]" />
+                <div className="absolute inset-0 bg-gradient-to-l from-[#0a0a0a]/45 to-transparent z-[1]" />
 
                 {/* Hero Info Content aligned left/bottom on desktop, center on mobile */}
                 <div className="relative z-10 w-full max-w-[1920px] mx-auto flex flex-col md:flex-row items-center md:items-end justify-center md:justify-between gap-6 md:gap-12 text-center md:text-left mt-0 sm:mt-2">

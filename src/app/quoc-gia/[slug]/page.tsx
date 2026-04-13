@@ -75,21 +75,21 @@ export default async function CountryPage({
                 {/* Decorative background glow */}
                 <div className={cn("absolute top-0 left-0 right-0 h-[500px] via-transparent to-transparent pointer-events-none -z-10 blur-[130px] opacity-60", theme.glow)} />
 
-                <div className="mb-6 md:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div className="mb-4 md:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-3 md:gap-6">
                     <div className="max-w-4xl">
-                        <Link 
-                            href="/" 
-                            className="inline-flex items-center gap-1.5 text-white/40 hover:text-white text-[13px] font-medium transition-colors mb-4 group"
+                        <Link
+                            href="/"
+                            className="inline-flex items-center gap-1.5 text-white/40 hover:text-white text-[12px] font-medium transition-colors mb-2 sm:mb-3 group"
                         >
-                            <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+                            <ChevronLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
                             Quay lại
                         </Link>
-                        
-                        <div className="space-y-1">
-                            <p className="text-[#8FA7C5] text-[11px] font-bold uppercase tracking-[0.2em] opacity-80 pl-1">
+
+                        <div className="space-y-0.5 sm:space-y-1">
+                            <p className="text-[#8FA7C5] text-[10px] font-bold uppercase tracking-[0.2em] opacity-80 pl-0.5">
                                 {displayLabel}
                             </p>
-                            <h1 className="text-[30px] md:text-[40px] lg:text-[48px] font-outfit font-extrabold text-white tracking-tighter leading-tight uppercase drop-shadow-lg">
+                            <h1 className="text-[22px] sm:text-[30px] md:text-[38px] lg:text-[46px] font-outfit font-extrabold text-white tracking-tighter leading-tight uppercase drop-shadow-lg">
                                 {displayTitle}
                             </h1>
                         </div>

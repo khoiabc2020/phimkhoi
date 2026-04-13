@@ -9,6 +9,7 @@ export interface IUser extends Document {
     provider?: string;
     resetPasswordToken?: string;
     resetPasswordExpires?: Date;
+    favoriteActors: string[];
     createdAt: Date;
     updatedAt: Date;
 }
@@ -23,6 +24,7 @@ const UserSchema: Schema<IUser> = new Schema(
         provider: { type: String },
         resetPasswordToken: { type: String },
         resetPasswordExpires: { type: Date },
+        favoriteActors: { type: [String], default: [] },
     },
     { timestamps: true }
 );

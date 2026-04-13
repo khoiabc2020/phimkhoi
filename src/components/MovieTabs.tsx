@@ -106,12 +106,12 @@ export default function MovieTabs({
 
     return (
         <div className="w-full">
-            <div className="flex items-center gap-5 sm:gap-8 border-b border-white/[0.04] mb-4 sm:mb-6 overflow-x-auto no-scrollbar pb-1">
+            <div className="flex items-center gap-3 sm:gap-6 border-b border-white/[0.04] mb-4 sm:mb-6 overflow-x-auto no-scrollbar pb-1">
                 {tabs.map((tab) => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id as any)}
-                        className={cn("flex items-center gap-2 pb-3 text-[12px] sm:text-sm font-bold transition-all relative whitespace-nowrap", activeTab === tab.id ? "text-[#8FA7C5]" : "text-gray-400 hover:text-white")}
+                        className={cn("flex items-center gap-1.5 pb-3 text-[11px] sm:text-[12px] font-black transition-all relative whitespace-nowrap uppercase tracking-wide", activeTab === tab.id ? "text-[#8FA7C5]" : "text-gray-500 hover:text-white")}
                     >
                         {tab.label}
                         {activeTab === tab.id && <span className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-[#8FA7C5]" />}
@@ -150,9 +150,9 @@ export default function MovieTabs({
                                     .replace(/\(\)|\[\]|--/g, " ")
                                     .trim() || `Server #${indexInTab + 1}`;
                                 return (
-                                    <button key={globalIndex} onClick={() => setActiveServer(globalIndex)} className={cn("h-[32px] sm:h-[38px] px-3 sm:px-5 rounded-full text-[12px] sm:text-[13px] font-bold transition-all duration-300 border flex items-center gap-2 shadow-sm", activeServer === globalIndex ? "bg-[#8FA7C5] border-[#8FA7C5] text-[#0a0a0a] scale-105" : "bg-white/[0.04] border-white/[0.10] text-gray-300 hover:text-white hover:border-white/[0.2] hover:bg-white/[0.08]")}>
-                                        <span className="truncate max-w-[150px]">{displayName}</span>
-                                        <span className={cn("font-semibold", activeServer === globalIndex ? "text-black/70" : "text-gray-400")}>{server.server_data.length}</span>
+                                    <button key={globalIndex} onClick={() => setActiveServer(globalIndex)} className={cn("h-[28px] sm:h-[34px] px-2.5 sm:px-4 rounded-full text-[11px] sm:text-[12px] font-bold transition-all duration-200 border flex items-center gap-1.5 shadow-sm", activeServer === globalIndex ? "bg-[#8FA7C5] border-[#8FA7C5] text-[#0a0a0a] scale-105" : "bg-white/[0.04] border-white/[0.10] text-gray-300 hover:text-white hover:border-white/[0.2] hover:bg-white/[0.08]")}>
+                                        <span className="truncate max-w-[120px] sm:max-w-[160px]">{displayName}</span>
+                                        <span className={cn("font-semibold text-[10px]", activeServer === globalIndex ? "text-black/70" : "text-gray-400")}>{server.server_data.length}</span>
                                     </button>
                                 );
                             })}
@@ -211,15 +211,15 @@ export default function MovieTabs({
                             })}
                         </div>
                     ) : (
-                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2 sm:gap-3 max-h-[360px] sm:max-h-[440px] overflow-y-auto custom-scrollbar pr-1 sm:pr-2 pb-1 [contain:layout_paint]">
+                        <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-1.5 sm:gap-2 max-h-[360px] sm:max-h-[440px] overflow-y-auto custom-scrollbar pr-1 sm:pr-2 pb-1 [contain:layout_paint]">
                             {paginatedEpisodes.map((ep: { slug?: string; name?: string }) => {
                                 if (!ep?.slug) return null;
                                 const rawName = String(ep.name || "");
                                 const numberMatch = rawName.match(/(\d+)/);
                                 const displayName = numberMatch ? numberMatch[1].padStart(2, "0") : rawName || "1";
                                 return (
-                                    <Link key={ep.slug} href={`/xem-phim/${slug}/${ep.slug}?server=${activeServer}`} className="h-[40px] sm:h-[44px] rounded-[12px] text-[13px] sm:text-[14px] font-semibold flex items-center justify-center gap-1.5 transition-all duration-200 border bg-white/[0.04] border-white/[0.08] text-gray-300 hover:text-white hover:bg-white/[0.08] hover:border-white/[0.16] hover:-translate-y-[1px] active:scale-95 truncate shadow-sm touch-manipulation px-2" title={rawName}>
-                                        <span>Tập {displayName}</span>
+                                    <Link key={ep.slug} href={`/xem-phim/${slug}/${ep.slug}?server=${activeServer}`} className="h-[36px] sm:h-[40px] rounded-lg text-[12px] sm:text-[13px] font-semibold flex items-center justify-center transition-all duration-200 border bg-white/[0.04] border-white/[0.08] text-gray-300 hover:text-white hover:bg-white/[0.08] hover:border-white/[0.16] active:scale-95 shadow-sm touch-manipulation px-1.5" title={rawName}>
+                                        <span className="truncate">{displayName}</span>
                                     </Link>
                                 );
                             })}
