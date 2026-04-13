@@ -37,7 +37,7 @@ export default async function SearchPage({
 
     if (!keyword) {
         return (
-            <main className="min-h-screen pt-24 pb-24 md:pb-16 bg-[#0a0a0a] relative overflow-hidden">
+            <main className="min-h-screen pt-24 pb-20 bg-[#0a0a0a] relative overflow-hidden">
                 <div className="pt-24 w-full max-w-[1920px] mx-auto px-4 md:px-12 lg:pl-24 lg:pr-12">
                     <div className="text-center py-20">
                         <h1 className="text-2xl font-bold text-white mb-4">Nhập từ khóa để tìm kiếm</h1>
@@ -49,18 +49,18 @@ export default async function SearchPage({
     }
 
     return (
-        <main className="min-h-screen pb-24 md:pb-16 bg-[#0a0a0a] relative overflow-hidden">
+        <main className="min-h-screen pb-20 bg-[#0a0a0a] relative overflow-hidden">
             {/* Decorative background glow */}
             <div className={cn("absolute top-0 left-0 right-0 h-[600px] via-transparent to-transparent pointer-events-none -z-10 blur-[150px] opacity-50", theme.glow)} />
             
-            <div className="pt-24 w-full max-w-[1920px] mx-auto px-4 md:px-12 lg:pl-24 lg:pr-12">
-                <div className="mb-6 rounded-[12px] border border-white/[0.06] bg-white/[0.03] backdrop-blur-md p-4 md:p-5 shadow-xl transition-all">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                        <div className="space-y-1">
-                            <p className="text-[#8FA7C5] text-[11px] font-bold uppercase tracking-[0.2em] opacity-80 pl-1">
+            <div className="pt-24 w-full max-w-[1920px] mx-auto px-3 sm:px-4 md:px-8 lg:pl-24 lg:pr-12">
+                <div className="mb-4 md:mb-6 rounded-[10px] border border-white/[0.06] bg-[#07070b]/78 backdrop-blur-md p-3 sm:p-4 md:p-5 shadow-xl transition-all">
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-2 md:gap-4">
+                        <div className="space-y-0.5 sm:space-y-1 min-w-0">
+                            <p className="text-[#8FA7C5] text-[10px] font-bold uppercase tracking-[0.2em] opacity-80">
                                 Kết quả tìm kiếm cho
                             </p>
-                            <h1 className="text-[30px] md:text-[40px] font-outfit font-extrabold text-white tracking-tighter leading-tight uppercase drop-shadow-lg truncate max-w-[500px]">
+                            <h1 className="text-[20px] sm:text-[26px] md:text-[36px] font-outfit font-extrabold text-white tracking-tighter leading-tight drop-shadow-lg truncate max-w-full">
                                 "{keyword}"
                             </h1>
                         </div>

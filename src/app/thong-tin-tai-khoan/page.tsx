@@ -1,9 +1,3 @@
-import type { Metadata } from "next";
-export const metadata: Metadata = {
-    title: "Tài Khoản - KHOIPHIM",
-    description: "Quản lý tài khoản, lịch sử xem và cài đặt cá nhân trên KHOIPHIM.",
-    robots: { index: false },
-};
 
 import { getServerSession } from "next-auth";
 export const dynamic = "force-dynamic";
@@ -29,8 +23,8 @@ export default async function ProfilePage() {
     const history = historyResult.success ? historyResult.data : [];
 
     return (
-        <main className="min-h-screen bg-[#0a0a0a] pt-24 pb-24 md:pb-16">
-            <div className="w-full max-w-[1920px] mx-auto px-4 lg:pl-24 lg:pr-12 relative z-10">
+        <main className="min-h-screen pt-24 pb-20">
+            <div className="w-full max-w-[1920px] mx-auto px-3 sm:px-4 md:px-8 lg:pl-24 lg:pr-12 relative z-10">
                 <ProfileTabs
                     user={session.user}
                     favorites={favorites || []}
