@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import WatchHistory from "@/models/WatchHistory";
+import Movie from "@/models/Movie";
+import dbConnect from "@/lib/db";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { resolveLibraryUser } from "@/lib/user-library";
 
@@ -11,7 +13,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const { slug, episode, progress } = await req.json();
+        const { slug, episode, progress, movieName: clientMovieName, moviePoster: clientMoviePoster, episodeName: clientEpisodeName } = await req.json();
         if (!slug) {
             return NextResponse.json({ error: "Slug is required" }, { status: 400 });
         }
@@ -22,16 +24,38 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
+        await dbConnect();
+
+        // Look up movie metadata to populate required schema fields
+        const movie = await Movie.findOne({ slug }).lean() as any;
+        const resolvedMovieName = movie?.name || clientMovieName || slug;
+        const resolvedMoviePoster = movie?.thumb_url || movie?.poster_url || clientMoviePoster || "";
+        const resolvedMovieId = movie?._id?.toString() || slug;
+        const resolvedEpisodeSlug = episode || "full";
+
+        let episodeName = clientEpisodeName || resolvedEpisodeSlug;
+        if (movie?.episodes) {
+            for (const server of movie.episodes) {
+                const found = server.server_data?.find((e: any) => e.slug === episode);
+                if (found) { episodeName = found.name; break; }
+            }
+        }
+
         await WatchHistory.findOneAndUpdate(
             {
                 userId: historyUserId,
                 movieSlug: slug,
-                episodeSlug: episode || "full",
+                episodeSlug: resolvedEpisodeSlug,
             },
             {
                 $set: {
                     userId: historyUserId,
+                    movieId: resolvedMovieId,
                     movieSlug: slug,
+                    movieName: resolvedMovieName,
+                    moviePoster: resolvedMoviePoster,
+                    episodeSlug: resolvedEpisodeSlug,
+                    episodeName: episodeName,
                     progress: progress || 0,
                     lastWatched: new Date(),
                 },

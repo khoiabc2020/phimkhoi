@@ -34,8 +34,6 @@ export async function POST(req: Request) {
             email,
             password: hashedPassword,
             role: "user",
-            favorites: [],
-            history: [],
         });
 
         return NextResponse.json(
