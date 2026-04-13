@@ -78,37 +78,37 @@ export default async function FavoritesPage() {
                         action={{ label: "Khám phá phim", href: "/" }}
                     />
                 ) : (
-                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 [contain:layout_paint]">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4 [contain:layout_paint]">
                         {favorites.map((item: any) => (
                             <div key={item._id} className="group relative">
                                 <Link href={`/phim/${item.movieSlug}`}>
-                                    <div className="relative aspect-[2/3] rounded-[10px] overflow-hidden bg-[#0B0B10] border border-white/[0.08] shadow-[0_10px_20px_#00000066]">
+                                    <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-[#0B0B10] border border-white/[0.06] group-hover:border-white/20 transition-[border-color] duration-200">
                                         <Image
                                             src={getImageUrl(item.moviePoster)}
                                             alt={item.movieName}
                                             fill
                                             loading="lazy"
-                                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                            sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, (max-width: 1024px) 20vw, 17vw"
+                                            className="object-cover group-hover:scale-105 transition-transform duration-300 will-change-transform"
                                         />
                                         {/* Quality Badge */}
-                                        <div className="absolute top-2 left-2 px-2 py-1 bg-black/65 backdrop-blur-sm rounded text-xs font-bold text-white">
-                                            {item.movieQuality}
-                                        </div>
-                                        {/* Favorite Indicator */}
-                                        <div className="absolute top-2 right-2 w-8 h-8 rounded-full bg-red-500/80 backdrop-blur-sm flex items-center justify-center">
-                                            <Heart className="w-4 h-4 text-white fill-white" />
+                                        {item.movieQuality && (
+                                            <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 bg-black/65 backdrop-blur-sm rounded text-[9px] font-bold text-white border border-white/10">
+                                                {item.movieQuality}
+                                            </div>
+                                        )}
+                                        {/* Play overlay */}
+                                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center bg-black/30">
+                                            <div className="w-9 h-9 rounded-full bg-white/90 flex items-center justify-center scale-75 group-hover:scale-100 transition-transform duration-200">
+                                                <Heart className="w-4 h-4 text-red-500 fill-red-500" />
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="mt-2">
-                                        <h3 className="text-white font-semibold line-clamp-1 text-sm">
+                                    <div className="mt-2 px-0.5">
+                                        <h3 className="text-white/90 font-medium line-clamp-1 text-[12px] group-hover:text-white transition-colors duration-150">
                                             {item.movieName}
                                         </h3>
-                                        {item.movieOriginName && (
-                                            <p className="text-yellow-400 text-xs line-clamp-1">
-                                                {item.movieOriginName}
-                                            </p>
-                                        )}
-                                        <p className="text-gray-400 text-xs">{item.movieYear}</p>
+                                        <p className="text-white/35 text-[10px] mt-0.5">{item.movieYear}</p>
                                     </div>
                                 </Link>
                                 <RemoveFavoriteButton movieId={item.movieId} />

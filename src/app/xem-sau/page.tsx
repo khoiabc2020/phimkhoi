@@ -104,52 +104,40 @@ export default async function WatchlistPage() {
                         />
                     </div>
                 ) : (
-                    <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-4 md:gap-4 lg:grid-cols-4 xl:grid-cols-5">
+                    <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 md:gap-4 lg:grid-cols-5 xl:grid-cols-6 [contain:layout_paint]">
                         {movies.map((movie) => (
                             <div key={movie.slug} className="group relative">
                                 <Link href={`/phim/${movie.slug}`}>
-                                    <div className="relative aspect-[2/3] overflow-hidden rounded-lg bg-white/5 shadow-md">
+                                    <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-[#0B0B10] border border-white/[0.06] group-hover:border-white/20 transition-[border-color] duration-200">
                                         <Image
-                                            src={getImageUrl(movie.poster || "") || "/placeholder.svg"}
+                                            src={getImageUrl(movie.poster || "") || "/placeholder.jpg"}
                                             alt={movie.name}
                                             fill
-                                            className="object-cover transition-transform duration-500 group-hover:scale-105"
                                             loading="lazy"
-                                            unoptimized
+                                            sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, (max-width: 1024px) 20vw, 17vw"
+                                            className="object-cover transition-transform duration-300 group-hover:scale-105 will-change-transform"
                                         />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                                        {/* Hover overlay */}
+                                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-black/35 flex items-center justify-center">
+                                            <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center scale-75 group-hover:scale-100 transition-transform duration-200 shadow-lg">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="black" className="pl-0.5">
+                                                    <polygon points="5 3 19 12 5 21 5 3" />
+                                                </svg>
+                                            </div>
+                                        </div>
 
                                         {movie.quality && (
-                                            <div className="absolute left-2 top-2 rounded border border-white/10 bg-black/70 px-1.5 py-0.5 text-[9px] font-bold text-white backdrop-blur-sm">
+                                            <div className="absolute left-1.5 top-1.5 rounded border border-white/10 bg-black/70 px-1.5 py-0.5 text-[9px] font-bold text-white">
                                                 {movie.quality}
                                             </div>
                                         )}
-
-                                        <div className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary/80 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                                            <Bookmark className="h-3 w-3 fill-black text-black" />
-                                        </div>
-
-                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                                            <Link
-                                                href={`/xem-phim/${movie.slug}`}
-                                                className="flex h-12 w-12 items-center justify-center rounded-full border border-white/30 bg-white/20 backdrop-blur-md transition-all hover:scale-110 hover:bg-white/30"
-                                                onClick={(event) => event.stopPropagation()}
-                                            >
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="white" className="pl-0.5">
-                                                    <polygon points="5 3 19 12 5 21 5 3" />
-                                                </svg>
-                                            </Link>
-                                        </div>
                                     </div>
 
-                                    <div className="mt-2 space-y-0.5">
-                                        <h3 className="truncate text-[13px] font-bold text-white transition-colors group-hover:text-primary">
+                                    <div className="mt-2 px-0.5">
+                                        <h3 className="truncate text-[12px] font-medium text-white/85 transition-colors duration-150 group-hover:text-white">
                                             {movie.name}
                                         </h3>
-                                        {movie.origin_name && (
-                                            <p className="truncate text-[11px] text-white/40">{movie.origin_name}</p>
-                                        )}
-                                        {movie.year && <p className="text-[10px] text-white/30">{movie.year}</p>}
+                                        {movie.year && <p className="text-[10px] text-white/35 mt-0.5">{movie.year}</p>}
                                     </div>
                                 </Link>
 
