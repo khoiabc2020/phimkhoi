@@ -117,7 +117,6 @@ export default async function FavoritesPage() {
                     </div>
                 )}
             </div>
-            </div>
         </div>
     );
 }
