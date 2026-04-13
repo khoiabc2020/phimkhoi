@@ -12,40 +12,22 @@ import { headers } from "next/headers";
 // Revalidate mỗi 5 phút
 export const revalidate = 300;
 
-// Tên đầy đủ cho các "type" đặc biệt không có trong danh sách thể loại API
-const SPECIAL_SLUG_NAMES: Record<string, string> = {
-    "phim-chieu-rap": "Chiếu Rạp",
-    "short-drama":    "Short Drama",
-    "phim-le":        "Lẻ",
-    "phim-bo":        "Bộ",
-    "hoat-hinh":      "Hoạt Hình",
-    "tv-shows":       "TV Shows",
-};
-
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params;
-
-    // Try special map first (no API call needed)
-    let displayName = SPECIAL_SLUG_NAMES[slug] ?? "";
-
-    if (!displayName) {
-        const { categories } = await getMenuData();
-        const category = categories.find(c => c.slug === slug);
-        // Strip leading "Phim " from API name to avoid double prefix in title
-        const raw = category?.name || slug.replace(/-/g, " ");
-        displayName = raw.replace(/^[Pp]him\s+/u, "");
-    }
+    const { categories } = await getMenuData();
+    const category = categories.find(c => c.slug === slug);
+    const categoryName = category?.name || slug.replace(/-/g, " ");
 
     const canonical = `https://khoiphim.org/the-loai/${slug}`;
     return {
-        title: `Phim ${displayName} Vietsub HD Mới Nhất | KHOIPHIM`,
-        description: `Xem phim ${displayName} vietsub, thuyết minh, lồng tiếng mới nhất chất lượng cao miễn phí tại KHOIPHIM. Cập nhật hàng ngày.`,
-        keywords: `phim ${displayName}, xem phim ${displayName} vietsub, ${displayName} vietsub HD, phim ${displayName} lồng tiếng, phim ${displayName} thuyết minh, phim ${displayName} mới nhất`,
+        title: `Phim ${categoryName} Vietsub HD Mới Nhất | KHOIPHIM`,
+        description: `Xem phim ${categoryName} vietsub, thuyết minh, lồng tiếng mới nhất chất lượng cao miễn phí tại KHOIPHIM. Cập nhật hàng ngày.`,
+        keywords: `phim ${categoryName}, xem phim ${categoryName} vietsub, ${categoryName} vietsub HD, phim ${categoryName} lồng tiếng, phim ${categoryName} thuyết minh, phim ${categoryName} mới nhất`,
         alternates: { canonical },
         robots: { index: true, follow: true },
         openGraph: {
-            title: `Phim ${displayName} Vietsub HD | KHOIPHIM`,
-            description: `Tuyển tập phim ${displayName} hay nhất, mới nhất - vietsub HD miễn phí.`,
+            title: `Phim ${categoryName} Vietsub HD | KHOIPHIM`,
+            description: `Tuyển tập phim ${categoryName} hay nhất, mới nhất - vietsub HD miễn phí.`,
             url: canonical,
             type: "website",
         },
@@ -53,7 +35,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 import CategoryGridClient from "@/components/CategoryGridClient";
-import FeaturedActors from "@/components/FeaturedActors";
 
 export default async function CategoryPage({
     params,
@@ -103,10 +84,12 @@ export default async function CategoryPage({
     ];
 
     return (
-        <main className="min-h-screen pb-24 md:pb-16 bg-[#0a0a0a] relative">
-            <div className="pt-24 w-full max-w-[1920px] mx-auto px-2 sm:px-6 md:px-12 lg:pl-24 lg:pr-12 relative">
-                {/* Decorative background glow */}
-                <div className={cn("absolute top-0 left-0 right-0 h-[500px] via-transparent to-transparent pointer-events-none -z-10 blur-[130px] opacity-60", theme.glow)} />
+        <main className="min-h-screen pb-20 bg-[#0a0a0a] relative overflow-hidden">
+            {/* Onflix-style top banner gradient */}
+            <div className={cn("fixed top-0 inset-x-0 h-[55vh] bg-gradient-to-b to-transparent pointer-events-none z-0", theme.banner)} />
+            {/* Soft glow blob for depth */}
+            <div className={cn("absolute top-0 left-1/4 w-[700px] h-[300px] via-transparent to-transparent pointer-events-none -z-10 blur-[120px] opacity-40", theme.glow)} />
+            <div className="pt-24 w-full max-w-[1920px] mx-auto px-2 sm:px-6 md:px-12 lg:pl-24 lg:pr-12 relative z-10">
 
                 <div className="mb-4 md:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-3 md:gap-6">
                     <div className="max-w-4xl">
@@ -135,8 +118,6 @@ export default async function CategoryPage({
                     </div>
                 </div>
 
-                <FeaturedActors movies={initialData.items} />
-
                 <CategoryGridClient
                     slug={slug}
                     page={currentPage}
@@ -151,3 +132,4 @@ export default async function CategoryPage({
         </main>
     );
 }
+

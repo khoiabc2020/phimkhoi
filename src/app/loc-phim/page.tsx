@@ -71,11 +71,11 @@ export default async function AdvancedFilterPage({ searchParams }: FilterPagePro
 
     return (
         <main className="min-h-screen bg-[#0a0a0a] text-white relative overflow-hidden">
-            {/* Decorative background glow */}
-            <div className={cn("absolute top-0 left-0 right-0 h-[600px] via-transparent to-transparent pointer-events-none -z-10 blur-[150px] opacity-50", theme.glow)} />
-            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#8FA7C5]/5 blur-[130px] rounded-full pointer-events-none -z-10" />
+            {/* Onflix-style top banner */}
+            <div className={cn("fixed top-0 inset-x-0 h-[55vh] bg-gradient-to-b to-transparent pointer-events-none z-0", theme.banner)} />
+            <div className={cn("absolute top-0 left-1/4 w-[600px] h-[300px] via-transparent to-transparent pointer-events-none -z-10 blur-[120px] opacity-35", theme.glow)} />
             
-            <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-24 md:pt-32 pb-20">
+            <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-24 md:pt-32 pb-20 relative z-10">
                 {/* Header & Breadcrumb */}
                 <div className="mb-10 md:mb-14 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-6">
                     <div>
