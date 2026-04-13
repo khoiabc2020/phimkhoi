@@ -104,28 +104,24 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
             {/* Onflix-style top banner gradient */}
             <div className={cn("absolute top-0 inset-x-0 h-[60vh] bg-gradient-to-b to-transparent pointer-events-none", theme.banner)} />
 
-            <div className="pt-24 w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 lg:pl-24 lg:pr-12 relative">
-                <div className="mb-4 md:mb-6 rounded-[10px] border border-white/[0.06] bg-[#07070b]/78 backdrop-blur-md p-3 sm:p-4 md:p-5 shadow-xl transition-all">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-2 md:gap-4">
-                        <div className="space-y-0.5 sm:space-y-1">
-                            <p className="text-[#8FA7C5] text-[10px] font-bold uppercase tracking-[0.2em] opacity-80 pl-0.5">
-                                Danh sách / {typeName}
-                            </p>
-                            <h1 className="text-[22px] sm:text-[28px] md:text-[38px] font-outfit font-extrabold text-white tracking-tighter leading-tight uppercase drop-shadow-lg">
-                                {typeName}
-                            </h1>
-                        </div>
-                        
-                        <div className="flex flex-col items-end gap-3 flex-1">
-                            <p className="text-white/40 text-xs font-medium bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
-                                Trang <span className="text-white font-bold">{page}</span>
-                            </p>
-                            <div className="w-full md:w-auto">
-                                <Suspense fallback={<div className="w-32 h-8 bg-white/5 animate-pulse rounded" />}>
-                                    <FilterBar categories={categories} countries={countries} />
-                                </Suspense>
-                            </div>
-                        </div>
+            <div className="pt-24 w-full max-w-[1920px] mx-auto px-3 sm:px-4 md:px-8 lg:pl-24 lg:pr-12 relative">
+                {/* Header — no box, Onflix-style free layout */}
+                <div className="mb-6 md:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6">
+                    <div>
+                        <p className="text-[#8FA7C5] text-[10px] font-bold uppercase tracking-[0.22em] mb-2 opacity-70">
+                            Danh sách / {typeName}
+                        </p>
+                        <h1 className="text-[26px] sm:text-[34px] md:text-[44px] font-outfit font-black text-white tracking-tight leading-none uppercase drop-shadow-lg">
+                            {typeName}
+                        </h1>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                        <span className="text-white/35 text-xs font-medium">
+                            Trang <span className="text-white/70 font-bold">{page}</span>
+                        </span>
+                        <Suspense fallback={<div className="w-32 h-8 bg-white/5 animate-pulse rounded" />}>
+                            <FilterBar categories={categories} countries={countries} />
+                        </Suspense>
                     </div>
                 </div>
 
