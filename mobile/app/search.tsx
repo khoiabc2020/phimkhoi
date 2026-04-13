@@ -390,7 +390,7 @@ export default function SearchScreen() {
                                 {actorResults.map((actor) => {
                                     const profileImg = actor.profile_path ? `https://image.tmdb.org/t/p/w185${actor.profile_path}` : null;
                                     return (
-                                        <TouchableOpacity key={actor.id} onPress={() => router.push(`/dien-vien/${encodeURIComponent(actor.name)}` as any)} style={{ alignItems: 'center', width: 68 }}>
+                                        <TouchableOpacity key={actor.id} onPress={() => { setQuery(actor.name); setMode('movie'); doSearch(actor.name, 'movie'); saveHistory(actor.name); }} style={{ alignItems: 'center', width: 68 }}>
                                             <View style={{ width: 60, height: 60, borderRadius: 30, overflow: 'hidden', borderWidth: 2, borderColor: 'rgba(143,167,197,0.45)', backgroundColor: '#1e293b', marginBottom: 6 }}>
                                                 {profileImg ? (
                                                     <Image source={{ uri: profileImg }} style={{ width: '100%', height: '100%' }} contentFit="cover" />

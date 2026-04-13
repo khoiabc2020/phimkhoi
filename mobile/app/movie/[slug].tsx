@@ -335,8 +335,8 @@ export default function MovieDetailScreen() {
         try {
             await Share.share({
                 title: movie.name,
-                message: `🎬 ${movie.name} (${movie.origin_name || ''})\n\nXem ngay tại: https://khoiphim.io.vn/phim/${movie.slug}`,
-                url: `https://khoiphim.io.vn/phim/${movie.slug}`,
+                message: `🎬 ${movie.name} (${movie.origin_name || ''})\n\nXem ngay tại: https://khoiphim.org/phim/${movie.slug}`,
+                url: `https://khoiphim.org/phim/${movie.slug}`,
             });
         } catch (e) {
             console.warn('Share failed', e);

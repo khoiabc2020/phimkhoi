@@ -614,7 +614,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
 
                     {/* RIGHT COLUMN (Tabs & Content) */}
                     <div className="w-full lg:col-span-7 xl:col-span-8">
-                        <Suspense fallback={<div className="h-96 rounded-2xl bg-white/5 animate-pulse flex items-center justify-center text-white/20 font-black uppercase tracking-[4px]">Loading Movie Data...</div>}>
+                        <Suspense fallback={<div className="h-96 rounded-xl bg-white/5 animate-pulse flex items-center justify-center text-white/20 font-black uppercase tracking-[4px]">Loading Movie Data...</div>}>
                             <MovieTabs
                                 movie={movie}
                                 relatedMovies={relatedMovies}

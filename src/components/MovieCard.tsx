@@ -312,7 +312,7 @@ function MovieCard({
                 onMouseLeave={handleMouseLeave}
             >
                 <div className={cn(
-                    "relative overflow-hidden rounded-2xl bg-[#0b101a] ring-1 ring-white/5 transition-all duration-500 ease-out shadow-lg transform-gpu",
+                    "relative overflow-hidden rounded-xl bg-[#0b101a] ring-1 ring-white/5 transition-all duration-500 ease-out shadow-lg transform-gpu",
                     orientation === 'landscape' ? 'aspect-video' : 'aspect-[2/3]',
                     "lg:group-hover/static-card:scale-[1.03] lg:group-hover/static-card:ring-2 lg:group-hover/static-card:ring-[#8FA7C5]/50 lg:group-hover/static-card:shadow-[0_8px_32px_rgba(143,167,197,0.35)]"
                 )}>
@@ -496,7 +496,7 @@ function OnflixHoverCard({
         >
             <div className={containerClasses}>
                 {/* Card */}
-                <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0c1018]/98 shadow-[0_12px_30px_#000000a0]">
+                <div className="relative overflow-hidden rounded-xl border border-white/[0.08] bg-[#0c1018]/98 shadow-[0_12px_30px_#000000a0]">
 
                     {/* Overlay media — taller and less cropped so faces are easier to see */}
                     <div className="relative aspect-[16/8.6] w-full overflow-hidden bg-[#1a1a1a]">

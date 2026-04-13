@@ -102,7 +102,7 @@ export default function MobileMenu({
 
                     {/* User Profile Section */}
                     {session ? (
-                        <div className="rounded-2xl p-4 border border-white/[0.04] bg-[#111111]/50 backdrop-blur-sm">
+                        <div className="rounded-xl p-4 border border-white/[0.04] bg-[#111111]/50 backdrop-blur-sm">
                             <div className="flex items-center gap-4 mb-4">
                                 <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#8FA7C5]/30 shrink-0 shadow-lg shadow-[#8FA7C5]/10">
                                     <img
@@ -133,7 +133,7 @@ export default function MobileMenu({
                             </div>
                         </div>
                     ) : (
-                        <div className="rounded-2xl p-5 border border-white/[0.04] text-center bg-[#111111]/50">
+                        <div className="rounded-xl p-5 border border-white/[0.04] text-center bg-[#111111]/50">
                             <p className="text-white/30 mb-5 text-[13px] leading-relaxed font-medium">Đăng nhập để đồng bộ lịch sử xem & phim yêu thích của bạn.</p>
                             <Link href="/login" onClick={onClose}
                                 className="flex items-center justify-center gap-2 w-full bg-white text-black font-black py-3 rounded-xl text-[14px] transition-all hover:scale-[1.02] active:scale-[0.98] shadow-xl shadow-white/5"

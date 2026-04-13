@@ -2,7 +2,7 @@
  * Wrapper around fetch() for all BACKEND_URL requests.
  * Adds full Chrome-like headers so Cloudflare bot protection passes through.
  */
-const SITE_ORIGIN = 'https://khoiphim.io.vn';
+const SITE_ORIGIN = 'https://khoiphim.org';
 
 export const MOBILE_HEADERS: Record<string, string> = {
     'User-Agent': 'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36',
@@ -27,12 +27,11 @@ export async function apiFetch(url: string, options: RequestInit = {}): Promise<
     };
     const res = await fetch(url, { ...options, headers: mergedHeaders });
 
-    // Nếu Cloudflare trả HTML challenge → ném lỗi rõ ràng ngay
-    if (!res.headers.get('content-type')?.includes('application/json')) {
-        const text = await res.clone().text();
-        if (text.trimStart().startsWith('<')) {
-            throw new Error('CF_BLOCK');
-        }
+    // API của chúng ta LUÔN trả về application/json.
+    // Nếu content-type khác → Cloudflare đang chặn (HTML, JS challenge, turnstile…)
+    const ct = res.headers.get('content-type') || '';
+    if (!ct.includes('application/json')) {
+        throw new Error('CF_BLOCK');
     }
     return res;
 }

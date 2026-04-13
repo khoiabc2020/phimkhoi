@@ -879,7 +879,7 @@ export default function VideoPlayer({
                         className={`absolute inset-y-0 flex items-center justify-center pointer-events-none z-[9998] transition-opacity duration-150 ${seekIndicator.side === "left" ? "left-0 w-1/2" : "right-0 w-1/2"}`}
                         style={{ background: seekIndicator.side === "left" ? "linear-gradient(to right, rgba(0,0,0,0.45), transparent)" : "linear-gradient(to left, rgba(0,0,0,0.45), transparent)" }}
                     >
-                        <div className="flex flex-col items-center gap-1.5 px-6 py-4 rounded-2xl bg-black/50 backdrop-blur-sm border border-white/10">
+                        <div className="flex flex-col items-center gap-1.5 px-6 py-4 rounded-xl bg-black/50 backdrop-blur-sm border border-white/10">
                             <span className="text-white text-2xl font-black">
                                 {seekIndicator.side === "left" ? "◀◀" : "▶▶"}
                             </span>

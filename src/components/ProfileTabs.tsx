@@ -209,7 +209,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
     ];
 
     const titleClasses = "text-xl font-bold text-white mb-6";
-    const cardClasses = "bg-white/[0.025] border border-white/[0.06] rounded-2xl mb-5";
+    const cardClasses = "bg-white/[0.025] border border-white/[0.06] rounded-xl mb-5";
 
     // ─── Render helpers ────────────────────────────────────────────────────────
 
@@ -347,7 +347,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {playlists.map((playlist) => (
-                                    <div key={playlist._id} className="group relative bg-white/[0.025] border border-white/[0.06] rounded-2xl p-5 hover:border-[#8FA7C5]/30 transition-all duration-300 overflow-hidden">
+                                    <div key={playlist._id} className="group relative bg-white/[0.025] border border-white/[0.06] rounded-xl p-5 hover:border-[#8FA7C5]/30 transition-all duration-300 overflow-hidden">
                                         <div className="absolute top-0 right-0 w-28 h-28 bg-[#8FA7C5]/5 blur-3xl rounded-full -mr-14 -mt-14 group-hover:bg-[#8FA7C5]/10 transition-all" />
                                         <h3 className="text-[16px] font-bold text-white mb-1.5 group-hover:text-[#8FA7C5] transition-colors">{playlist.name}</h3>
                                         <p className="text-white/30 text-xs line-clamp-2 min-h-[32px] mb-5">{playlist.description || "Bộ sưu tập phim cá nhân"}</p>
@@ -564,7 +564,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                                 { label: "Sưu tập",    value: playlists.length,  icon: ListVideo, color: "#c084fc" },
                                 { label: "Xem sau",    value: "—",               icon: Bookmark, color: "#34d399" },
                             ].map((stat, i) => (
-                                <div key={i} className="bg-white/[0.025] border border-white/[0.06] rounded-2xl p-4 relative overflow-hidden group cursor-default">
+                                <div key={i} className="bg-white/[0.025] border border-white/[0.06] rounded-xl p-4 relative overflow-hidden group cursor-default">
                                     <div className="absolute -top-4 -right-4 w-16 h-16 rounded-full blur-2xl opacity-15 transition-opacity group-hover:opacity-25" style={{ backgroundColor: stat.color }} />
                                     <div className="flex items-start justify-between mb-3">
                                         <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-white/[0.03] border border-white/[0.05]">
@@ -760,7 +760,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
             {/* ── Avatar Modal ──────────────────────────────────────── */}
             {isAvatarModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-                    <div className="bg-[#0d1119] border border-white/[0.08] rounded-t-3xl sm:rounded-2xl w-full sm:max-w-lg overflow-hidden flex flex-col max-h-[90vh] shadow-2xl animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 duration-300">
+                    <div className="bg-[#0d1119] border border-white/[0.08] rounded-t-3xl sm:rounded-xl w-full sm:max-w-lg overflow-hidden flex flex-col max-h-[90vh] shadow-2xl animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 duration-300">
                         <div className="flex items-center justify-between px-6 pt-6 pb-4">
                             <h2 className="text-lg font-bold text-white">Đổi ảnh đại diện</h2>
                             <button onClick={() => setIsAvatarModalOpen(false)} className="text-white/30 hover:text-white transition-all p-1">
@@ -791,7 +791,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                                             key={idx}
                                             onClick={() => handleAvatarSelect(url)}
                                             className={cn(
-                                                "relative aspect-square rounded-2xl overflow-hidden border-2 transition-all hover:scale-105 active:scale-95",
+                                                "relative aspect-square rounded-xl overflow-hidden border-2 transition-all hover:scale-105 active:scale-95",
                                                 user?.image === url ? "border-[#8FA7C5]" : "border-white/[0.06] hover:border-white/20"
                                             )}
                                         >
@@ -807,7 +807,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                                     ))}
                                 </div>
                             ) : (
-                                <div className="flex flex-col items-center justify-center py-10 border-2 border-dashed border-white/[0.07] rounded-2xl">
+                                <div className="flex flex-col items-center justify-center py-10 border-2 border-dashed border-white/[0.07] rounded-xl">
                                     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileUpload} />
                                     <div className="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center mb-4">
                                         {isUploading ? <Loader2 className="w-6 h-6 text-[#8FA7C5] animate-spin" /> : <Upload className="w-6 h-6 text-white/25" />}

@@ -45,7 +45,7 @@ interface PersonPageProps {
 export default async function PersonPage({ params, searchParams }: PersonPageProps) {
     const { slug } = await params;
     const sParams = await searchParams;
-    const view = sParams?.view === 'local' ? 'local' : 'global';
+    const view = sParams?.view === 'local' ? 'local' : sParams?.view === 'timeline' ? 'timeline' : 'global';
     const name = slug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 
     try {
@@ -93,6 +93,31 @@ export default async function PersonPage({ params, searchParams }: PersonPagePro
         const localFilmography = (localData as any)?.items || [];
         const isFavorite = (favResult as any)?.isFavorite;
 
+        // Calculate age from birthday
+        let age: number | null = null;
+        if (details.birthday) {
+            const born = new Date(details.birthday);
+            const today = new Date();
+            age = today.getFullYear() - born.getFullYear();
+            const m = today.getMonth() - born.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < born.getDate())) age--;
+            if (details.deathday) {
+                const died = new Date(details.deathday);
+                age = died.getFullYear() - born.getFullYear();
+                const md = died.getMonth() - born.getMonth();
+                if (md < 0 || (md === 0 && died.getDate() < born.getDate())) age--;
+            }
+        }
+
+        // Group globalFilmography by year for timeline view
+        const timelineByYear: Record<string, any[]> = {};
+        for (const m of globalFilmography) {
+            const yr = (m.release_date || m.first_air_date || '').substring(0, 4) || 'Không rõ';
+            if (!timelineByYear[yr]) timelineByYear[yr] = [];
+            timelineByYear[yr].push(m);
+        }
+        const timelineYears = Object.keys(timelineByYear).sort((a, b) => (b === 'Không rõ' ? -1 : a === 'Không rõ' ? 1 : Number(b) - Number(a)));
+
 
     return (
         <main className="min-h-screen bg-[#0a0a0a] text-white overflow-hidden" 
@@ -107,7 +132,7 @@ export default async function PersonPage({ params, searchParams }: PersonPagePro
                 <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start">
                     {/* Profile Image */}
                     <div className="w-full md:w-[320px] shrink-0 group">
-                        <div className="relative aspect-[2/3] rounded-[32px] overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.8)] border border-white/10 group-hover:border-primary/40 transition-all duration-700">
+                        <div className="relative aspect-[2/3] rounded-xl overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.8)] border border-white/10 group-hover:border-primary/40 transition-all duration-700">
                             <Image 
                                 src={getTMDBImage(details.profile_path, "h632") || "/placeholder-avatar.jpg"} 
                                 alt={details.name} 
@@ -138,6 +163,9 @@ export default async function PersonPage({ params, searchParams }: PersonPagePro
                                     <div className="flex items-center gap-2.5 bg-white/[0.03] px-3 py-1.5 rounded-full border border-white/5">
                                         <Calendar className="w-4 h-4 text-primary" />
                                         {details.birthday}
+                                        {age !== null && (
+                                            <span className="text-[#8FA7C5] font-black">· {age} tuổi</span>
+                                        )}
                                     </div>
                                 )}
                                 {details.place_of_birth && (
@@ -161,15 +189,15 @@ export default async function PersonPage({ params, searchParams }: PersonPagePro
                         )}
 
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-6 pt-4">
-                            <div className="p-5 rounded-3xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-md shadow-xl hover:bg-white/[0.05] transition-all group/card ring-1 ring-white/5">
+                            <div className="p-5 rounded-xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-md shadow-xl hover:bg-white/[0.05] transition-all group/card ring-1 ring-white/5">
                                 <div className="text-[#8FA7C5]/50 text-[10px] uppercase font-black tracking-widest mb-2 group-hover:text-[#8FA7C5] transition-colors">Giới tính</div>
                                 <div className="text-lg font-black text-white/90">{details.gender === 1 ? "Nữ" : "Nam"}</div>
                             </div>
-                            <div className="p-5 rounded-3xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-md shadow-xl hover:bg-white/[0.05] transition-all group/card ring-1 ring-white/5">
+                            <div className="p-5 rounded-xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-md shadow-xl hover:bg-white/[0.05] transition-all group/card ring-1 ring-white/5">
                                 <div className="text-[#8FA7C5]/50 text-[10px] uppercase font-black tracking-widest mb-2 group-hover:text-[#8FA7C5] transition-colors">Nghề nghiệp</div>
                                 <div className="text-lg font-black text-[#8FA7C5]">{details.known_for_department === 'Acting' ? 'Diễn viên' : details.known_for_department}</div>
                             </div>
-                            <div className="p-5 rounded-3xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-md shadow-xl hover:bg-white/[0.05] transition-all group/card ring-1 ring-white/5">
+                            <div className="p-5 rounded-xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-md shadow-xl hover:bg-white/[0.05] transition-all group/card ring-1 ring-white/5">
                                 <div className="text-[#8FA7C5]/50 text-[10px] uppercase font-black tracking-widest mb-2 group-hover:text-[#8FA7C5] transition-colors">Độ hot</div>
                                 <div className="text-lg font-black flex items-center gap-2 text-white/90">
                                     <Star className="w-5 h-5 fill-[#8FA7C5] text-[#8FA7C5]" />
@@ -189,23 +217,79 @@ export default async function PersonPage({ params, searchParams }: PersonPagePro
                         <h2 className="text-2xl font-bold text-white tracking-tight">Sự nghiệp</h2>
                     </div>
                     
-                    <div className="flex items-center gap-1 p-1 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl">
+                    <div className="flex items-center gap-1 p-1 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl">
                         <Link 
                             href={`/dien-vien/${slug}`}
                             className={`flex items-center gap-2 px-6 py-2 rounded-xl text-[13px] font-black uppercase tracking-wider transition-all ${view === 'global' ? 'bg-[#8FA7C5] text-black shadow-lg shadow-[#8FA7C5]/20' : 'text-white/40 hover:text-white'}`}
                         >
                             <Globe className="w-4 h-4" /> Kho phim quốc tế
                         </Link>
-                        <Link 
+                        <Link
                             href={`/dien-vien/${slug}?view=local`}
                             className={`flex items-center gap-2 px-6 py-2 rounded-xl text-[13px] font-black uppercase tracking-wider transition-all ${view === 'local' ? 'bg-[#8FA7C5] text-black shadow-lg shadow-[#8FA7C5]/20' : 'text-white/40 hover:text-white'}`}
                         >
                             <Grid className="w-4 h-4" /> Phim tại KHOIPHIM
                         </Link>
+                        <Link
+                            href={`/dien-vien/${slug}?view=timeline`}
+                            className={`flex items-center gap-2 px-6 py-2 rounded-xl text-[13px] font-black uppercase tracking-wider transition-all ${view === 'timeline' ? 'bg-[#8FA7C5] text-black shadow-lg shadow-[#8FA7C5]/20' : 'text-white/40 hover:text-white'}`}
+                        >
+                            <Clock className="w-4 h-4" /> Thời gian
+                        </Link>
                     </div>
                 </div>
 
-                {view === 'global' ? (
+                {view === 'timeline' ? (
+                    <div className="relative pl-8 md:pl-12">
+                        {/* Vertical timeline line */}
+                        <div className="absolute left-3 md:left-5 top-0 bottom-0 w-px bg-gradient-to-b from-[#8FA7C5]/40 via-[#8FA7C5]/20 to-transparent" />
+
+                        <div className="space-y-10">
+                            {timelineYears.map((yr) => (
+                                <div key={yr} className="relative">
+                                    {/* Year dot + label */}
+                                    <div className="absolute -left-8 md:-left-12 flex items-center gap-3">
+                                        <div className="w-3 h-3 rounded-full bg-[#8FA7C5] shadow-[0_0_10px_rgba(143,167,197,0.6)] border-2 border-[#0a0a0a] shrink-0" />
+                                    </div>
+                                    <div className="mb-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#8FA7C5]/10 border border-[#8FA7C5]/20">
+                                        <span className="text-[#8FA7C5] font-black text-sm tracking-widest">{yr}</span>
+                                        <span className="text-white/30 text-xs">{timelineByYear[yr].length} phim</span>
+                                    </div>
+
+                                    {/* Movies grid for this year */}
+                                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3">
+                                        {timelineByYear[yr].map((movie: any) => (
+                                            <Link
+                                                href={`/tim-kiem?keyword=${encodeURIComponent(movie.title || movie.name)}`}
+                                                key={movie.id}
+                                                className="group"
+                                            >
+                                                <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-[#0c0c14] border border-white/5 group-hover:border-[#8FA7C5]/50 transition-all duration-300 shadow-lg">
+                                                    <Image
+                                                        src={getTMDBImage(movie.poster_path, "w185") || "/placeholder-poster.jpg"}
+                                                        alt={movie.title || movie.name}
+                                                        fill
+                                                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                                        unoptimized
+                                                    />
+                                                    {movie.vote_average > 0 && (
+                                                        <div className="absolute top-1.5 right-1.5 flex items-center gap-0.5 px-1 py-0.5 rounded bg-black/80 text-yellow-400 text-[9px] font-bold">
+                                                            <Star className="w-2 h-2 fill-yellow-400" />
+                                                            {movie.vote_average.toFixed(1)}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <p className="mt-1.5 text-[10px] text-white/60 group-hover:text-[#8FA7C5] transition-colors line-clamp-1 font-medium leading-tight">
+                                                    {movie.title || movie.name}
+                                                </p>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ) : view === 'global' ? (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
                         {globalFilmography.map((movie: any) => (
                             <Link 
@@ -213,7 +297,7 @@ export default async function PersonPage({ params, searchParams }: PersonPagePro
                                 key={movie.id} 
                                 className="group"
                             >
-                                <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-[#0c0c14] border border-white/5 group-hover:border-[#8FA7C5]/50 transition-all duration-300 shadow-2xl ring-1 ring-white/5 group-hover:ring-[#8FA7C5]/30">
+                                <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-[#0c0c14] border border-white/5 group-hover:border-[#8FA7C5]/50 transition-all duration-300 shadow-2xl ring-1 ring-white/5 group-hover:ring-[#8FA7C5]/30">
                                     <Image 
                                         src={getTMDBImage(movie.poster_path, "w342") || "/placeholder-poster.jpg"} 
                                         alt={movie.title || movie.name} 
@@ -241,7 +325,7 @@ export default async function PersonPage({ params, searchParams }: PersonPagePro
                         ))}
                     </div>
                 ) : localFilmography.length === 0 ? (
-                    <div className="bg-white/[0.02] border border-white/[0.05] rounded-[32px] p-20 text-center flex flex-col items-center justify-center">
+                    <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-20 text-center flex flex-col items-center justify-center">
                         <div className="w-20 h-20 bg-white/[0.03] rounded-full flex items-center justify-center mb-6">
                             <Info className="w-10 h-10 text-white/20" />
                         </div>

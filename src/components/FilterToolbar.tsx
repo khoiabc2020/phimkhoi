@@ -113,7 +113,7 @@ export default function FilterToolbar({ searchParams, categories, countries, yea
 
                 {/* Expandable advanced filters */}
                 {expanded && (
-                    <div className="mt-3 bg-[#0d1119] border border-white/[0.07] rounded-2xl p-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="mt-3 bg-[#0d1119] border border-white/[0.07] rounded-xl p-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
                                 <label className="text-[10px] font-bold text-white/35 uppercase tracking-wider pl-0.5">Thể loại</label>

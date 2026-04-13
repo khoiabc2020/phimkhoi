@@ -76,7 +76,7 @@ function Divider() {
 }
 
 export default function ProfileScreen() {
-  const webUrl = 'https://khoiphim.io.vn';
+  const webUrl = 'https://khoiphim.org';
   const { user, logout, token, updateUser } = useAuth();
   const router = useRouter();
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
@@ -404,7 +404,7 @@ export default function ProfileScreen() {
           {/* Hỗ trợ */}
           <Text style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 8, paddingHorizontal: 4 }}>Hỗ trợ</Text>
           <GlassCard style={{ marginBottom: 16 }}>
-            <MenuRow icon="globe-outline" label="Trang web" sublabel="khoiphim.io.vn" onPress={() => Linking.openURL(webUrl)} />
+            <MenuRow icon="globe-outline" label="Trang web" sublabel="khoiphim.org" onPress={() => Linking.openURL(webUrl)} />
             <Divider />
             <MenuRow icon="chatbox-ellipses-outline" label="Góp ý" sublabel="Gửi phản hồi" onPress={() => Linking.openURL(`${webUrl}#gop-y`)} />
           </GlassCard>

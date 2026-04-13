@@ -238,7 +238,7 @@ export default async function GenresIndexPage() {
                                 key={cat.slug}
                                 href={`/the-loai/${cat.slug}`}
                                 className={cn(
-                                    "group relative overflow-hidden rounded-2xl",
+                                    "group relative overflow-hidden rounded-xl",
                                     "aspect-[16/9]",
                                     "border border-white/[0.07] hover:border-white/20",
                                     "shadow-[0_4px_20px_rgba(0,0,0,0.5)]",

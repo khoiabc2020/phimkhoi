@@ -196,7 +196,7 @@ export default function ExploreScreen() {
                 : null;
               return (
                 <Pressable
-                  onPress={() => router.push(`/movie/${encodeURIComponent(actor.name)}` as any)}
+                  onPress={() => router.push(`/search?q=${encodeURIComponent(actor.name)}` as any)}
                   style={{ alignItems: 'center', width: 72 }}
                 >
                   <View style={{
@@ -269,7 +269,7 @@ export default function ExploreScreen() {
               : null;
             return (
               <Pressable
-                onPress={() => router.push(`/movie/${encodeURIComponent(actor.name)}` as any)}
+                onPress={() => router.push(`/search?q=${encodeURIComponent(actor.name)}` as any)}
                 style={{ alignItems: 'center', width: 80 }}
               >
                 <View style={{

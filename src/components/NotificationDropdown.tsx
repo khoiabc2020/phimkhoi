@@ -89,7 +89,7 @@ export default function NotificationDropdown() {
             </button>
 
             {isOpen && (
-                <div className="fixed sm:absolute left-2 right-2 sm:left-auto sm:right-0 top-[68px] sm:top-full sm:mt-3 sm:w-[420px] bg-[#0c0c14]/95 backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-[0_30px_60px_rgba(0,0,0,0.8)] z-[200] overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300 ease-out">
+                <div className="fixed sm:absolute left-2 right-2 sm:left-auto sm:right-0 top-[68px] sm:top-full sm:mt-3 sm:w-[420px] bg-[#0c0c14]/95 backdrop-blur-2xl border border-white/[0.08] rounded-xl shadow-[0_30px_60px_rgba(0,0,0,0.8)] z-[200] overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300 ease-out">
                     {/* Panel Header */}
                     <div className="px-5 py-4 border-b border-white/[0.05] flex items-center justify-between bg-white/[0.02]">
                         <div className="flex items-center gap-2.5">

@@ -60,7 +60,7 @@ export default function LazySection({
             style={visible ? undefined : { minHeight }}
             className={cn(
                 "movie-row-section transform-gpu",
-                visible ? "animate-fade-in" : "pb-8 bg-white/5 shimmer rounded-2xl",
+                visible ? "animate-fade-in" : "pb-8 bg-white/5 shimmer rounded-xl",
                 className
             )}
         >

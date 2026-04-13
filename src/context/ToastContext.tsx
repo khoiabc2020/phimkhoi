@@ -75,7 +75,7 @@ function ToastItem({ toast, onRemove }: { toast: ToastData; onRemove: () => void
         <div
             className={`
                 relative flex items-stretch gap-4 p-0
-                rounded-2xl border shadow-[0_30px_60px_rgba(0,0,0,0.5)]
+                rounded-xl border shadow-[0_30px_60px_rgba(0,0,0,0.5)]
                 ${cfg.border}
                 transition-all duration-500 cubic-bezier(0.2, 1, 0.2, 1)
                 ${visible && !exiting

@@ -90,6 +90,21 @@ export default function NativePlayer({
     // Check if the source is likely an iframe (not mp4, not m3u8)
     const isIframe = !videoSource.uri.toLowerCase().includes('.mp4') && !videoSource.uri.toLowerCase().includes('.m3u8');
 
+    // Get Referer/Origin headers per stream domain so CDN allows playback
+    const getStreamHeaders = (uri: string): Record<string, string> => {
+        const lower = uri.toLowerCase();
+        if (lower.includes('nguonc') || lower.includes('playm.') || lower.includes('cdn.nguonc')) {
+            return { 'Referer': 'https://phim.nguonc.com/', 'Origin': 'https://phim.nguonc.com' };
+        }
+        if (lower.includes('ophim') || lower.includes('oph1') || lower.includes('cdn.ophim')) {
+            return { 'Referer': 'https://ophim1.com/', 'Origin': 'https://ophim1.com' };
+        }
+        if (lower.includes('phimapi') || lower.includes('kkphim') || lower.includes('cdn.kkphim')) {
+            return { 'Referer': 'https://phimapi.com/', 'Origin': 'https://phimapi.com' };
+        }
+        return {};
+    };
+
     // Update video source when prop changes
     useEffect(() => {
         setVideoSource({ uri: url });
@@ -680,7 +695,7 @@ export default function NativePlayer({
             <View style={styles.container} {...(!showEpisodes && !showServers && !isIframe ? panResponder.panHandlers : {})}>
                 {isIframe ? (
                     <WebView
-                        source={{ uri: videoSource.uri }}
+                        source={{ uri: videoSource.uri, headers: getStreamHeaders(videoSource.uri) }}
                         allowsInlineMediaPlayback
                         mediaPlaybackRequiresUserAction={false}
                         allowsFullscreenVideo
@@ -696,15 +711,39 @@ export default function NativePlayer({
                                 <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, marginTop: 8 }}>Đang tải nguồn phim...</Text>
                             </View>
                         )}
-                        userAgent="Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
+                        userAgent="Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36"
                         style={StyleSheet.absoluteFill}
                         containerStyle={{ backgroundColor: 'black' }}
+                        injectedJavaScript={`
+                            (function() {
+                                function tryPlay() {
+                                    var videos = document.querySelectorAll('video');
+                                    videos.forEach(function(v) {
+                                        v.autoplay = true;
+                                        v.play().catch(function() { v.muted = true; v.play(); });
+                                    });
+                                    var selectors = [
+                                        '.vjs-big-play-button','.art-icon-play','.plyr__control--overlaid',
+                                        '.jw-display-icon-container','.play-btn','[class*="play-button"]',
+                                        'button[title*="Play"]','[aria-label*="play" i]','.btn-play'
+                                    ];
+                                    selectors.forEach(function(s) {
+                                        var el = document.querySelector(s);
+                                        if (el) el.click();
+                                    });
+                                }
+                                document.addEventListener('DOMContentLoaded', function() { setTimeout(tryPlay, 800); });
+                                setTimeout(tryPlay, 1200);
+                                setTimeout(tryPlay, 2500);
+                            })();
+                            true;
+                        `}
                     />
                 ) : (
                     <Video
                         ref={video}
                         style={StyleSheet.absoluteFill}
-                        source={videoSource}
+                        source={{ ...videoSource, headers: getStreamHeaders(videoSource.uri) }}
                         useNativeControls={false}
                         resizeMode={resizeMode}
                         onPlaybackStatusUpdate={onPlaybackStatusUpdate}
@@ -1092,18 +1131,45 @@ export default function NativePlayer({
                     </View>
                 )}
 
-                {/* Fallback back button if it's an iframe and controls are hidden via panresponder disabled */}
-                {isIframe && (
-                    <View style={[styles.header, { position: 'absolute', top: 0, left: 0, paddingHorizontal: 20 }]}>
-                        <TouchableOpacity onPress={onClose} style={styles.backBtn}>
-                            <Ionicons name="arrow-back" size={26} color="white" />
-                        </TouchableOpacity>
-                    </View>
-                )}
             </View>
 
+            {/* Iframe header — NGOÀI container để không bị WebView nuốt touch (Android SurfaceView) */}
+            {isIframe && !isInPipMode && (
+                <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 200, elevation: 200 }}>
+                    <LinearGradient
+                        colors={['rgba(0,0,0,0.85)', 'transparent']}
+                        style={[styles.header, { paddingHorizontal: 16 }]}
+                    >
+                        <TouchableOpacity onPress={onClose} style={styles.backBtn} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                            <Ionicons name="arrow-back" size={26} color="white" />
+                        </TouchableOpacity>
+                        <View style={{ flex: 1, marginLeft: 10 }}>
+                            <Text style={styles.videoTitle} numberOfLines={1}>{title}</Text>
+                            {episode ? (
+                                <Text style={styles.subTitle}>
+                                    {episode.toLowerCase().includes('tập') || episode.toLowerCase().includes('phần') ? episode : `Tập ${episode}`}
+                                    {serverList.length > 0 ? ` • ${parseServerLabel(serverList[currentServerIndex] || '', serverList)}` : ''}
+                                </Text>
+                            ) : null}
+                        </View>
+                        <View style={{ flexDirection: 'row', gap: 18, alignItems: 'center' }}>
+                            {serverList.length > 1 && (
+                                <TouchableOpacity onPress={() => setShowServers(true)} hitSlop={{ top: 10, bottom: 10, left: 8, right: 8 }}>
+                                    <Ionicons name="server-outline" size={24} color="white" />
+                                </TouchableOpacity>
+                            )}
+                            {episodeList.length > 1 && (
+                                <TouchableOpacity onPress={() => setShowEpisodes(true)} hitSlop={{ top: 10, bottom: 10, left: 8, right: 8 }}>
+                                    <Ionicons name="list-outline" size={24} color="white" />
+                                </TouchableOpacity>
+                            )}
+                        </View>
+                    </LinearGradient>
+                </View>
+            )}
+
             {/* Episode Selector Overlay - không hiện trong PiP */}
-            {!isInPipMode && !isIframe && (
+            {!isInPipMode && (
                 <View style={[StyleSheet.absoluteFill, { zIndex: 100, elevation: 100, overflow: 'hidden' }]} pointerEvents={showEpisodes ? 'auto' : 'none'}>
                     {/* Dark Overlay */}
                     <Animated.View style={[

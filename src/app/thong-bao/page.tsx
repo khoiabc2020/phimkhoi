@@ -141,7 +141,7 @@ export default function NotificationsPage() {
                                 <Link
                                     key={notif.id}
                                     href={`/phim/${notif.movieSlug}`}
-                                    className="group flex items-center gap-4 p-3.5 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] hover:border-white/[0.12] rounded-2xl transition-all"
+                                    className="group flex items-center gap-4 p-3.5 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] hover:border-white/[0.12] rounded-xl transition-all"
                                 >
                                     {/* Poster */}
                                     <div className="relative w-12 sm:w-14 aspect-[2/3] rounded-lg overflow-hidden shrink-0 ring-1 ring-white/10">
@@ -192,7 +192,7 @@ export default function NotificationsPage() {
                                 return (
                                     <div
                                         key={notif._id}
-                                        className="relative flex gap-4 p-4 bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden"
+                                        className="relative flex gap-4 p-4 bg-white/[0.03] border border-white/[0.06] rounded-xl overflow-hidden"
                                     >
                                         {/* Color bar */}
                                         <div className={`absolute left-0 top-0 bottom-0 w-1 ${cfg.bar} rounded-r-full`} />
@@ -238,8 +238,8 @@ export default function NotificationsPage() {
 
 function EmptyState({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
     return (
-        <div className="flex flex-col items-center justify-center min-h-[300px] text-center border border-dashed border-white/8 rounded-2xl px-6 py-12">
-            <div className="w-14 h-14 bg-white/4 rounded-2xl flex items-center justify-center mb-4">
+        <div className="flex flex-col items-center justify-center min-h-[300px] text-center border border-dashed border-white/8 rounded-xl px-6 py-12">
+            <div className="w-14 h-14 bg-white/4 rounded-xl flex items-center justify-center mb-4">
                 {icon}
             </div>
             <h3 className="text-sm font-semibold text-white/60 mb-1">{title}</h3>

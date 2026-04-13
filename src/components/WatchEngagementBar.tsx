@@ -371,7 +371,7 @@ export default function WatchEngagementBar({
             {/* === Keyboard Shortcuts Modal === */}
             {showShortcuts && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={() => setShowShortcuts(false)}>
-                    <div className="w-full max-w-sm bg-[#0c0c18] border border-white/10 rounded-2xl shadow-2xl p-5 space-y-4" onClick={e => e.stopPropagation()}>
+                    <div className="w-full max-w-sm bg-[#0c0c18] border border-white/10 rounded-xl shadow-2xl p-5 space-y-4" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-between">
                             <h2 className="text-white font-bold text-base flex items-center gap-2">
                                 <Keyboard className="w-4 h-4 text-[#8FA7C5]" /> Phím tắt player
