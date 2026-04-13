@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Share2, Monitor, Moon, Flag, X, Keyboard } from "lucide-react";
+import { Share2, Monitor, Moon, Flag, X, Keyboard, SkipForward } from "lucide-react";
 import FavoriteButton from "./FavoriteButton";
 import WatchlistInlineButton from "./WatchlistInlineButton";
 import Image from "next/image";
@@ -20,6 +20,8 @@ interface WatchEngagementBarProps {
     currentEpisodeName?: string;
     useIframe?: boolean;
     onTogglePlayer?: () => void;
+    skipIntro?: boolean;
+    onSkipIntroToggle?: () => void;
 }
 
 export default function WatchEngagementBar({
@@ -33,6 +35,8 @@ export default function WatchEngagementBar({
     currentEpisodeName,
     useIframe = false,
     onTogglePlayer,
+    skipIntro = false,
+    onSkipIntroToggle,
 }: WatchEngagementBarProps) {
     const { showToast } = useToast();
     const [showReportModal, setShowReportModal] = useState(false);
@@ -145,15 +149,36 @@ export default function WatchEngagementBar({
                                 onClick={onAutoNextToggle}
                                 className={cn(
                                     "flex items-center gap-2 text-xs font-semibold transition-all",
-                                    autoNext ? "text-yellow-400" : "text-gray-300 hover:text-white"
+                                    autoNext ? "text-[#8FA7C5]" : "text-gray-300 hover:text-white"
                                 )}
                             >
                                 Chuyển tập
                                 <span className={cn(
                                     "px-1.5 py-0.5 rounded text-[10px] font-bold border",
-                                    autoNext ? "bg-yellow-400/15 text-yellow-400 border-yellow-400/30" : "bg-white/10 text-gray-100 border-white/25"
+                                    autoNext ? "bg-[#8FA7C5]/15 text-[#8FA7C5] border-[#8FA7C5]/30" : "bg-white/10 text-gray-100 border-white/25"
                                 )}>
                                     {autoNext ? "ON" : "OFF"}
+                                </span>
+                            </button>
+                            <div className="h-4 w-[1px] bg-white/20" />
+                        </>
+                    )}
+                    {onSkipIntroToggle && (
+                        <>
+                            <button
+                                onClick={onSkipIntroToggle}
+                                className={cn(
+                                    "flex items-center gap-2 text-xs font-semibold transition-all",
+                                    skipIntro ? "text-[#8FA7C5]" : "text-gray-300 hover:text-white"
+                                )}
+                            >
+                                <SkipForward className="w-4 h-4" />
+                                Bỏ qua intro
+                                <span className={cn(
+                                    "px-1.5 py-0.5 rounded text-[10px] font-bold border",
+                                    skipIntro ? "bg-[#8FA7C5]/15 text-[#8FA7C5] border-[#8FA7C5]/30" : "bg-white/10 text-gray-100 border-white/25"
+                                )}>
+                                    {skipIntro ? "ON" : "OFF"}
                                 </span>
                             </button>
                             <div className="h-4 w-[1px] bg-white/20" />
@@ -164,35 +189,32 @@ export default function WatchEngagementBar({
                 {/* Center Toggles */}
                 <div className="flex items-center shrink-0 gap-5">
                     {toggleTheater && <button onClick={toggleTheater}
-                        className={cn("flex items-center gap-2 text-xs font-semibold transition-all", isTheaterMode ? "text-yellow-400" : "text-gray-200 hover:text-white")}>
+                        className={cn("flex items-center gap-2 text-xs font-semibold transition-all", isTheaterMode ? "text-[#8FA7C5]" : "text-gray-200 hover:text-white")}>
                         <Monitor className="w-4 h-4" /> Rạp phim
                         <span className={cn("px-1.5 py-0.5 rounded text-[10px] font-bold border", isTheaterMode
-                            ? "bg-yellow-400/15 text-yellow-400 border-yellow-400/30"
+                            ? "bg-[#8FA7C5]/15 text-[#8FA7C5] border-[#8FA7C5]/30"
                             : "bg-white/10 text-gray-100 border-white/25")}>
                             {isTheaterMode ? "ON" : "OFF"}
                         </span>
                     </button>}
                     {toggleLight && <button onClick={toggleLight}
-                        className={cn("flex items-center gap-2 text-xs font-semibold transition-all", isLightOff ? "text-yellow-400" : "text-gray-200 hover:text-white")}>
-                        <Moon className="w-4 h-4" /> Đèn
+                        className={cn("flex items-center gap-2 text-xs font-semibold transition-all", isLightOff ? "text-[#8FA7C5]" : "text-gray-200 hover:text-white")}>
+                        <Moon className="w-4 h-4" /> Tắt đèn
                         <span className={cn("px-1.5 py-0.5 rounded text-[10px] font-bold border", isLightOff
-                            ? "bg-yellow-400/15 text-yellow-400 border-yellow-400/30"
+                            ? "bg-[#8FA7C5]/15 text-[#8FA7C5] border-[#8FA7C5]/30"
                             : "bg-white/10 text-gray-100 border-white/25")}>
-                            {isLightOff ? "OFF" : "ON"}
+                            {isLightOff ? "ON" : "OFF"}
                         </span>
                     </button>}
                     {onTogglePlayer && (
                         <button onClick={onTogglePlayer}
-                            className={cn("flex items-center gap-2 text-xs font-semibold transition-all", !useIframe ? "text-primary shadow-[0_0_10px_rgba(143,167,197,0.3)]" : "text-gray-200 hover:text-white")}>
-                            <div className="relative">
-                                <Monitor className="w-4 h-4" />
-                                {!useIframe && <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full animate-ping" />}
-                            </div>
-                            {useIframe ? "Dùng Elite Player" : "Dùng Player Gốc"}
+                            className={cn("flex items-center gap-2 text-xs font-semibold transition-all", !useIframe ? "text-[#8FA7C5]" : "text-gray-200 hover:text-white")}>
+                            <Monitor className="w-4 h-4" />
+                            {useIframe ? "Player HD" : "Player Gốc"}
                             <span className={cn("px-1.5 py-0.5 rounded text-[10px] font-bold border", !useIframe
-                                ? "bg-primary/20 text-primary border-primary/40"
+                                ? "bg-[#8FA7C5]/15 text-[#8FA7C5] border-[#8FA7C5]/30"
                                 : "bg-white/10 text-gray-100 border-white/25")}>
-                                {!useIframe ? "ELITE" : "MODERN"}
+                                {!useIframe ? "HD" : "ALT"}
                             </span>
                         </button>
                     )}
@@ -237,7 +259,7 @@ export default function WatchEngagementBar({
                         {movie.name}
                     </h1>
                     {/* Tên gốc */}
-                    <span className="text-[13px] font-semibold text-[#F7D772] leading-snug line-clamp-1">{movie.origin_name}</span>
+                    <span className="text-[13px] font-medium text-white/50 leading-snug line-clamp-1">{movie.origin_name}</span>
                     {/* Meta: năm • chất lượng • thời lượng */}
                     <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1" style={{ fontSize: '12px', color: '#f1f5f9' }}>
                         {movie.year && <><span className="w-1 h-1 rounded-full bg-white/50 inline-block" /><span>{movie.year}</span></>}

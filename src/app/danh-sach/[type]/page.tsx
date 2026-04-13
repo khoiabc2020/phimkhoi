@@ -7,6 +7,9 @@ import { headers } from "next/headers";
 import { getThemeBySlug } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 import TypeGridClient from "@/components/TypeGridClient";
+import FeaturedActors from "@/components/FeaturedActors";
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 
 // Revalidate mỗi 5 phút - cân bằng giữa freshness và server load
 export const revalidate = 300;
@@ -105,29 +108,33 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
             <div className={cn("absolute top-0 left-0 right-0 h-[600px] via-transparent to-transparent pointer-events-none -z-10 blur-[150px] opacity-50", theme.glow)} />
             
             <div className="pt-24 w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 lg:pl-24 lg:pr-12">
-                <div className="mb-6 rounded-[12px] border border-white/[0.06] bg-white/[0.03] backdrop-blur-md p-4 md:p-5 shadow-xl transition-all">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div className="mb-6 md:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div className="max-w-4xl">
+                        <Link
+                            href="/"
+                            className="inline-flex items-center gap-1.5 text-white/40 hover:text-white text-[13px] font-medium transition-colors mb-4 group"
+                        >
+                            <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+                            Quay lại
+                        </Link>
                         <div className="space-y-1">
                             <p className="text-[#8FA7C5] text-[11px] font-bold uppercase tracking-[0.2em] opacity-80 pl-1">
-                                Danh sách / {typeName}
+                                Danh sách
                             </p>
-                            <h1 className="text-[30px] md:text-[40px] font-outfit font-extrabold text-white tracking-tighter leading-tight uppercase drop-shadow-lg">
+                            <h1 className="text-[30px] md:text-[40px] lg:text-[48px] font-outfit font-extrabold text-white tracking-tighter leading-tight uppercase drop-shadow-lg">
                                 {typeName}
                             </h1>
                         </div>
-                        
-                        <div className="flex flex-col items-end gap-3 flex-1">
-                            <p className="text-white/40 text-xs font-medium bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
-                                Trang <span className="text-white font-bold">{page}</span>
-                            </p>
-                            <div className="w-full md:w-auto">
-                                <Suspense fallback={<div className="w-32 h-8 bg-white/5 animate-pulse rounded" />}>
-                                    <FilterBar categories={categories} countries={countries} />
-                                </Suspense>
-                            </div>
-                        </div>
+                    </div>
+
+                    <div className="w-full md:w-auto bg-white/[0.03] backdrop-blur-md rounded-[12px] p-1 border border-white/[0.06] shadow-xl overflow-visible relative z-20">
+                        <Suspense fallback={<div className="w-32 h-8 bg-white/5 animate-pulse rounded" />}>
+                            <FilterBar categories={categories} countries={countries} />
+                        </Suspense>
                     </div>
                 </div>
+
+                <FeaturedActors movies={initialData.items} />
 
                 <TypeGridClient
                     type={type}

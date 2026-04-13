@@ -74,6 +74,20 @@ export default function WatchContainer({
     const [progress, setProgress] = useState(0);
     const [progressLoaded] = useState(true);
     const [subtitles, setSubtitles] = useState<any[]>([]);
+    const [skipIntro, setSkipIntro] = useState(() => {
+        if (typeof window !== "undefined") {
+            return localStorage.getItem("skipIntro") === "true";
+        }
+        return false;
+    });
+
+    const toggleSkipIntro = () => {
+        setSkipIntro(prev => {
+            const next = !prev;
+            localStorage.setItem("skipIntro", String(next));
+            return next;
+        });
+    };
 
     const activeServer = servers?.find((s) => s.server_name === activeServerName) || servers?.[0];
     const currentServerEpisodes = activeServer?.server_data || initialEpisodes || [];
@@ -249,6 +263,7 @@ export default function WatchContainer({
                                     episode={displayEpisodeName(activeEpisode.name)}
                                     movieData={movieData}
                                     initialProgress={progress}
+                                    skipIntro={skipIntro}
                                     autoNext={autoNext}
                                     nextEpisodeUrl={nextEpisodeUrl}
                                     isTheaterMode={isTheaterMode}
@@ -395,6 +410,8 @@ export default function WatchContainer({
                                 setUseIframe(!useIframe);
                             }
                         }}
+                        skipIntro={skipIntro}
+                        onSkipIntroToggle={toggleSkipIntro}
                     />
                 </div>
 

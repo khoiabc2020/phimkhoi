@@ -21,6 +21,7 @@ interface VideoPlayerProps {
         duration?: number;
     };
     initialProgress?: number;
+    skipIntro?: boolean;
     autoNext?: boolean;
     nextEpisodeUrl?: string;
     onEnded?: () => void;
@@ -100,6 +101,7 @@ export default function VideoPlayer({
     episode,
     movieData,
     initialProgress = 0,
+    skipIntro = false,
     autoNext = false,
     nextEpisodeUrl,
     onEnded,
@@ -527,7 +529,11 @@ export default function VideoPlayer({
                     const savedRate = localStorage.getItem("playbackRate");
                     if (savedRate) art.playbackRate = parseFloat(savedRate);
 
-                    if (initialProgress > 0 && art.duration > 0) {
+                    if (skipIntro && initialProgress === 0 && art.duration > 60) {
+                        // Auto-skip intro: seek to 85s (typical opening credit length)
+                        const skipTo = Math.min(85, art.duration * 0.15);
+                        if (skipTo > 10) art.seek = skipTo;
+                    } else if (initialProgress > 0 && art.duration > 0) {
                         const percent = Math.min(Math.max(initialProgress, 0), 100);
                         const seekTo = Math.floor((percent / 100) * art.duration);
                         if (seekTo > 10) art.seek = seekTo;
