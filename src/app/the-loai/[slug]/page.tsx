@@ -89,27 +89,23 @@ export default async function CategoryPage({
             <div className={cn("absolute top-0 inset-x-0 h-[60vh] bg-gradient-to-b to-transparent pointer-events-none", theme.banner)} />
             <div className="pt-24 w-full max-w-[1920px] mx-auto px-2 sm:px-6 md:px-12 lg:pl-24 lg:pr-12 relative">
 
-                <div className="mb-4 md:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-3 md:gap-6">
-                    <div className="max-w-4xl">
+                <div className="mb-6 md:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6">
+                    <div>
                         <Link
                             href="/"
-                            className="inline-flex items-center gap-1.5 text-white/40 hover:text-white text-[12px] font-medium transition-colors mb-2 sm:mb-3 group"
+                            className="inline-flex items-center gap-1.5 text-white/40 hover:text-white text-[11px] font-medium transition-colors mb-3 group"
                         >
                             <ChevronLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
                             Quay lại
                         </Link>
-
-                        <div className="space-y-0.5 sm:space-y-1">
-                            <p className="text-[#8FA7C5] text-[10px] font-bold uppercase tracking-[0.2em] opacity-80 pl-0.5">
-                                {displayLabel}
-                            </p>
-                            <h1 className="text-[22px] sm:text-[30px] md:text-[38px] lg:text-[46px] font-outfit font-extrabold text-white tracking-tighter leading-tight uppercase drop-shadow-lg">
-                                {displayTitle}
-                            </h1>
-                        </div>
+                        <p className="text-[#8FA7C5] text-[10px] font-bold uppercase tracking-[0.22em] mb-2 opacity-70">
+                            {displayLabel}
+                        </p>
+                        <h1 className="text-[26px] sm:text-[34px] md:text-[44px] font-outfit font-black text-white tracking-tight leading-none uppercase drop-shadow-lg">
+                            {displayTitle}
+                        </h1>
                     </div>
-
-                    <div className="w-full md:w-auto bg-[#07070b]/78 backdrop-blur-md rounded-[12px] p-1 border border-white/[0.06] shadow-xl overflow-visible relative z-20">
+                    <div className="shrink-0 overflow-visible relative z-20">
                         <Suspense fallback={<div className="w-32 h-8 bg-white/5 animate-pulse rounded" />}>
                             <FilterBar categories={categories} countries={countries} years={years} hideCategory={!!category} hideCountry={!!sParams.country} />
                         </Suspense>
