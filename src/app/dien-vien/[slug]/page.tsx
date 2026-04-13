@@ -120,121 +120,133 @@ export default async function PersonPage({ params, searchParams }: PersonPagePro
 
 
     return (
-        <main className="min-h-screen bg-[#0a0a0a] text-white overflow-hidden" 
-              style={{ fontFamily: "'Inter', sans-serif" }}>
+        <main className="min-h-screen bg-[#0a0a0a] text-white overflow-hidden">
 
-            {/* Hero Section */}
-            <div className="relative pt-32 pb-24 md:pb-12 px-4 md:px-8 max-w-[1400px] mx-auto z-10">
-                
-                {/* Background Glow */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-primary/10 blur-[120px] rounded-full -z-10 opacity-30 pointer-events-none" />
+            {/* ── HERO ── */}
+            <div className="relative pt-20 md:pt-32 pb-6 md:pb-12 px-4 md:px-8 max-w-[1400px] mx-auto z-10">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[400px] bg-primary/8 blur-[100px] -z-10 opacity-25 pointer-events-none" />
 
-                <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start">
-                    {/* Profile Image */}
-                    <div className="w-full md:w-[320px] shrink-0 group">
-                        <div className="relative aspect-[2/3] rounded-xl overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.8)] border border-white/10 group-hover:border-primary/40 transition-all duration-700">
-                            <Image 
-                                src={getTMDBImage(details.profile_path, "h632") || "/placeholder-avatar.jpg"} 
-                                alt={details.name} 
-                                fill 
-                                className="object-cover group-hover:scale-105 transition-transform duration-1000 ease-out"
+                {/* Mobile: horizontal card | Desktop: side-by-side large */}
+                <div className="flex flex-row md:flex-row gap-4 md:gap-12 items-start">
+
+                    {/* Photo */}
+                    <div className="shrink-0 w-[110px] md:w-[280px]">
+                        <div className="relative w-full aspect-[2/3] rounded-xl overflow-hidden border border-white/10 shadow-2xl">
+                            <Image
+                                src={getTMDBImage(details.profile_path, "h632") || "/placeholder-avatar.jpg"}
+                                alt={details.name}
+                                fill
+                                className="object-cover"
                                 unoptimized
                                 priority
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                         </div>
-                        
-                        <div className="mt-8 flex items-center justify-center gap-4">
+
+                        {/* Action buttons — below photo on mobile */}
+                        <div className="mt-3 flex flex-col gap-2">
                             <FavoriteActorButton actorName={details.name} initialIsFavorite={isFavorite} />
-                            <button className="flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm bg-white/5 hover:bg-white/10 text-gray-300 transition-all border border-white/10 active:scale-95 shadow-lg">
-                                <Share2 className="w-4 h-4" /> <span>Chia sẻ</span>
+                            <button className="flex items-center justify-center gap-1.5 py-2 rounded-lg font-semibold text-[12px] bg-white/5 hover:bg-white/10 text-white/60 transition-all border border-white/[0.08] active:scale-95">
+                                <Share2 className="w-3.5 h-3.5" /> Chia sẻ
                             </button>
                         </div>
                     </div>
 
-                    {/* Bio Info */}
-                    <div className="flex-1 space-y-8">
-                        <div>
-                            <h1 className="text-4xl md:text-7xl font-black text-white mb-4 tracking-tight drop-shadow-2xl">
-                                {details.name}
-                            </h1>
-                            <div className="flex flex-wrap gap-6 text-white/40 text-[13px] font-bold uppercase tracking-widest">
-                                {details.birthday && (
-                                    <div className="flex items-center gap-2.5 bg-white/[0.03] px-3 py-1.5 rounded-full border border-white/5">
-                                        <Calendar className="w-4 h-4 text-primary" />
-                                        {details.birthday}
-                                        {age !== null && (
-                                            <span className="text-[#8FA7C5] font-black">· {age} tuổi</span>
-                                        )}
-                                    </div>
-                                )}
-                                {details.place_of_birth && (
-                                    <div className="flex items-center gap-2.5 bg-white/[0.03] px-3 py-1.5 rounded-full border border-white/5">
-                                        <MapPin className="w-4 h-4 text-primary" />
-                                        {details.place_of_birth}
-                                    </div>
-                                )}
-                            </div>
+                    {/* Bio */}
+                    <div className="flex-1 min-w-0 pt-1 md:pt-4">
+                        {/* Name */}
+                        <h1 className="text-[22px] md:text-6xl font-black text-white tracking-tight leading-tight mb-2 md:mb-4">
+                            {details.name}
+                        </h1>
+
+                        {/* Meta pills */}
+                        <div className="flex flex-col gap-1.5 mb-3 md:mb-6">
+                            {details.birthday && (
+                                <div className="flex items-center gap-1.5 text-white/40 text-[11px] md:text-[13px] font-medium">
+                                    <Calendar className="w-3 h-3 md:w-4 md:h-4 text-[#8FA7C5] shrink-0" />
+                                    <span>{details.birthday}</span>
+                                    {age !== null && <span className="text-[#8FA7C5] font-bold">· {age} tuổi</span>}
+                                </div>
+                            )}
+                            {details.place_of_birth && (
+                                <div className="flex items-center gap-1.5 text-white/35 text-[11px] md:text-[13px] font-medium">
+                                    <MapPin className="w-3 h-3 md:w-4 md:h-4 text-[#8FA7C5] shrink-0" />
+                                    <span className="line-clamp-1">{details.place_of_birth}</span>
+                                </div>
+                            )}
                         </div>
 
-                        {details.biography && (
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-2.5 text-white/90 font-black uppercase tracking-[0.2em] text-[10px]">
-                                    <Info className="w-4 h-4 text-primary" /> Tiểu sử diễn viên
-                                </div>
-                                <p className="text-white/60 leading-[1.8] text-[16px] font-medium line-clamp-[10] hover:line-clamp-none transition-all duration-700 cursor-help selection:bg-primary/30">
-                                    {details.biography}
-                                </p>
+                        {/* Stats row — compact on mobile */}
+                        <div className="grid grid-cols-3 gap-1.5 md:gap-4 mb-3 md:mb-6">
+                            <div className="p-2.5 md:p-5 rounded-lg md:rounded-xl bg-white/[0.04] border border-white/[0.07]">
+                                <div className="text-white/30 text-[9px] md:text-[10px] uppercase font-bold tracking-wider mb-1">Giới tính</div>
+                                <div className="text-[13px] md:text-lg font-black text-white/90">{details.gender === 1 ? "Nữ" : "Nam"}</div>
                             </div>
-                        )}
-
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 pt-4">
-                            <div className="p-5 rounded-xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-md shadow-xl hover:bg-white/[0.05] transition-all group/card ring-1 ring-white/5">
-                                <div className="text-[#8FA7C5]/50 text-[10px] uppercase font-black tracking-widest mb-2 group-hover:text-[#8FA7C5] transition-colors">Giới tính</div>
-                                <div className="text-lg font-black text-white/90">{details.gender === 1 ? "Nữ" : "Nam"}</div>
+                            <div className="p-2.5 md:p-5 rounded-lg md:rounded-xl bg-white/[0.04] border border-white/[0.07]">
+                                <div className="text-white/30 text-[9px] md:text-[10px] uppercase font-bold tracking-wider mb-1">Nghề nghiệp</div>
+                                <div className="text-[12px] md:text-lg font-black text-[#8FA7C5] leading-tight">{details.known_for_department === 'Acting' ? 'Diễn viên' : (details.known_for_department || '—')}</div>
                             </div>
-                            <div className="p-5 rounded-xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-md shadow-xl hover:bg-white/[0.05] transition-all group/card ring-1 ring-white/5">
-                                <div className="text-[#8FA7C5]/50 text-[10px] uppercase font-black tracking-widest mb-2 group-hover:text-[#8FA7C5] transition-colors">Nghề nghiệp</div>
-                                <div className="text-lg font-black text-[#8FA7C5]">{details.known_for_department === 'Acting' ? 'Diễn viên' : details.known_for_department}</div>
-                            </div>
-                            <div className="p-5 rounded-xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-md shadow-xl hover:bg-white/[0.05] transition-all group/card ring-1 ring-white/5">
-                                <div className="text-[#8FA7C5]/50 text-[10px] uppercase font-black tracking-widest mb-2 group-hover:text-[#8FA7C5] transition-colors">Độ hot</div>
-                                <div className="text-lg font-black flex items-center gap-2 text-white/90">
-                                    <Star className="w-5 h-5 fill-[#8FA7C5] text-[#8FA7C5]" />
+                            <div className="p-2.5 md:p-5 rounded-lg md:rounded-xl bg-white/[0.04] border border-white/[0.07]">
+                                <div className="text-white/30 text-[9px] md:text-[10px] uppercase font-bold tracking-wider mb-1">Độ hot</div>
+                                <div className="text-[13px] md:text-lg font-black text-white/90 flex items-center gap-1">
+                                    <Star className="w-3 h-3 md:w-4 md:h-4 fill-[#8FA7C5] text-[#8FA7C5] shrink-0" />
                                     {details.popularity?.toFixed(1)}
                                 </div>
                             </div>
                         </div>
+
+                        {/* Biography — hidden on mobile unless expanded, shown on desktop */}
+                        {details.biography && (
+                            <div className="hidden md:block">
+                                <p className="text-white/55 leading-relaxed text-[15px] line-clamp-6">
+                                    {details.biography}
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
+
+                {/* Biography — mobile only, below the row */}
+                {details.biography && (
+                    <div className="mt-4 md:hidden">
+                        <p className="text-[13px] text-white/50 leading-relaxed line-clamp-4">
+                            {details.biography}
+                        </p>
+                    </div>
+                )}
             </div>
 
-            {/* Filmography Section */}
-            <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-12 relative z-10">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 border-b border-white/[0.06] pb-6">
-                    <div className="flex items-center gap-3">
-                        <div className="w-1.5 h-6 bg-primary rounded-full shadow-[0_0_15px_rgba(143,167,197,0.5)]" />
-                        <h2 className="text-2xl font-bold text-white tracking-tight">Sự nghiệp</h2>
+            {/* ── FILMOGRAPHY ── */}
+            <div className="max-w-[1400px] mx-auto px-3 md:px-8 pb-12 relative z-10">
+                {/* Section header + tabs */}
+                <div className="flex items-center justify-between gap-3 mb-5 md:mb-8 border-b border-white/[0.06] pb-4">
+                    <div className="flex items-center gap-2 shrink-0">
+                        <div className="w-1 h-5 bg-[#8FA7C5] rounded-full" />
+                        <h2 className="text-[15px] md:text-2xl font-bold text-white">Sự nghiệp</h2>
                     </div>
-                    
-                    <div className="flex items-center gap-1 p-1 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl">
-                        <Link 
+
+                    {/* Scrollable tab bar on mobile */}
+                    <div className="flex items-center gap-1 p-1 bg-white/[0.04] border border-white/[0.07] rounded-xl overflow-x-auto scrollbar-hide shrink-0 max-w-[calc(100vw-140px)] md:max-w-none">
+                        <Link
                             href={`/dien-vien/${slug}`}
-                            className={`flex items-center gap-2 px-6 py-2 rounded-xl text-[13px] font-black uppercase tracking-wider transition-all ${view === 'global' ? 'bg-[#8FA7C5] text-black shadow-lg shadow-[#8FA7C5]/20' : 'text-white/40 hover:text-white'}`}
+                            className={`flex items-center gap-1.5 px-3 md:px-5 py-1.5 rounded-lg text-[11px] md:text-[13px] font-bold whitespace-nowrap transition-all shrink-0 ${view === 'global' ? 'bg-[#8FA7C5] text-black' : 'text-white/40 hover:text-white'}`}
                         >
-                            <Globe className="w-4 h-4" /> Kho phim quốc tế
+                            <Globe className="w-3 h-3 md:w-4 md:h-4 shrink-0" />
+                            <span className="hidden xs:inline md:inline">Quốc tế</span>
                         </Link>
                         <Link
                             href={`/dien-vien/${slug}?view=local`}
-                            className={`flex items-center gap-2 px-6 py-2 rounded-xl text-[13px] font-black uppercase tracking-wider transition-all ${view === 'local' ? 'bg-[#8FA7C5] text-black shadow-lg shadow-[#8FA7C5]/20' : 'text-white/40 hover:text-white'}`}
+                            className={`flex items-center gap-1.5 px-3 md:px-5 py-1.5 rounded-lg text-[11px] md:text-[13px] font-bold whitespace-nowrap transition-all shrink-0 ${view === 'local' ? 'bg-[#8FA7C5] text-black' : 'text-white/40 hover:text-white'}`}
                         >
-                            <Grid className="w-4 h-4" /> Phim tại KHOIPHIM
+                            <Grid className="w-3 h-3 md:w-4 md:h-4 shrink-0" />
+                            <span className="hidden xs:inline md:inline">KHOIPHIM</span>
                         </Link>
                         <Link
                             href={`/dien-vien/${slug}?view=timeline`}
-                            className={`flex items-center gap-2 px-6 py-2 rounded-xl text-[13px] font-black uppercase tracking-wider transition-all ${view === 'timeline' ? 'bg-[#8FA7C5] text-black shadow-lg shadow-[#8FA7C5]/20' : 'text-white/40 hover:text-white'}`}
+                            className={`flex items-center gap-1.5 px-3 md:px-5 py-1.5 rounded-lg text-[11px] md:text-[13px] font-bold whitespace-nowrap transition-all shrink-0 ${view === 'timeline' ? 'bg-[#8FA7C5] text-black' : 'text-white/40 hover:text-white'}`}
                         >
-                            <Clock className="w-4 h-4" /> Thời gian
+                            <Clock className="w-3 h-3 md:w-4 md:h-4 shrink-0" />
+                            <span className="hidden xs:inline md:inline">Thời gian</span>
                         </Link>
                     </div>
                 </div>
@@ -290,7 +302,7 @@ export default async function PersonPage({ params, searchParams }: PersonPagePro
                         </div>
                     </div>
                 ) : view === 'global' ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 md:gap-5">
                         {globalFilmography.map((movie: any) => (
                             <Link 
                                 href={`/tim-kiem?keyword=${encodeURIComponent(movie.title || movie.name)}`} // Fix: robust routing to search instead of guessing slug
@@ -314,10 +326,10 @@ export default async function PersonPage({ params, searchParams }: PersonPagePro
                                     </div>
                                 </div>
                                 <div className="mt-3">
-                                    <h3 className="text-sm font-bold text-white/90 group-hover:text-primary transition-colors line-clamp-1">
+                                    <h3 className="text-[11px] md:text-sm font-semibold text-white/90 group-hover:text-primary transition-colors line-clamp-1">
                                         {movie.title || movie.name}
                                     </h3>
-                                    <p className="text-xs text-white/40 font-medium mt-1">
+                                    <p className="text-[10px] md:text-xs text-white/40 mt-0.5">
                                         {movie.release_date || movie.first_air_date ? (movie.release_date || movie.first_air_date).substring(0, 4) : "-"}
                                     </p>
                                 </div>
@@ -325,7 +337,7 @@ export default async function PersonPage({ params, searchParams }: PersonPagePro
                         ))}
                     </div>
                 ) : localFilmography.length === 0 ? (
-                    <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-20 text-center flex flex-col items-center justify-center">
+                    <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-8 md:p-20 text-center flex flex-col items-center justify-center">
                         <div className="w-20 h-20 bg-white/[0.03] rounded-full flex items-center justify-center mb-6">
                             <Info className="w-10 h-10 text-white/20" />
                         </div>
@@ -333,7 +345,7 @@ export default async function PersonPage({ params, searchParams }: PersonPagePro
                         <p className="text-white/40 text-sm max-w-sm">Hiện tại chưa tìm thấy phim nào của {details.name} đang có sẵn tại KHOIPHIM. Hãy thử quay lại sau nhé!</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 md:gap-5">
                         {localFilmography.map((movie: any) => (
                             <MovieCard key={movie._id} movie={movie} />
                         ))}
