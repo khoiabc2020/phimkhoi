@@ -402,36 +402,22 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 {/* Base dark layer */}
                 <div className="absolute inset-0 bg-[#0a0a0a]" />
 
-                {/* Backdrop layer: Cinematic Image Palette Glow */}
+                {/* Backdrop layer: subtle ambient color only — no jarring image zones */}
                 {(ambientBgUrl || contentSubjectUrl) && (
                     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                        {/* Layer 1: Ambient Palette (Deep Blur) - Uses TMDB for colors if possible */}
+                        {/* Layer 1: Deep color palette blur — very subtle */}
                         <Image
-                            src={ambientBgUrl || "/fallback.png"}
+                            src={ambientBgUrl || contentSubjectUrl || "/fallback.png"}
                             alt=""
                             fill
                             priority
-                            className="object-cover opacity-[0.3] scale-125 blur-[100px] saturate-[2.5]"
+                            className="object-cover opacity-[0.18] scale-110 blur-[80px] saturate-[2]"
                             sizes="100vw"
                             quality={10}
                         />
-                        
-                        {/* Layer 1.5: Theme Specific Glow */}
-                        <div className={cn("absolute inset-0 opacity-40 blur-[120px] -z-10", theme.glow)} />
-                        
-                        {/* Layer 2: Atmospheric Texture (Mid Blur) */}
-                        <Image
-                            src={ambientBgUrl || "/fallback.png"}
-                            alt=""
-                            fill
-                            priority
-                            className="object-cover opacity-[0.2] blur-[20px] brightness-[0.5]"
-                            sizes="100vw"
-                            quality={40}
-                        />
-
-                        {/* Layer 3: THE SUBJECT (Authentic Source Thumbnail) */}
-                        {/* If it's landscape, we use it as a Cinematic background strip on the right */}
+                        {/* Layer 2: Theme glow */}
+                        <div className={cn("absolute inset-0 opacity-20 blur-[100px]", theme.glow)} />
+                        {/* Layer 3: Subject image — right half only, heavily masked */}
                         <Image
                             src={contentSubjectUrl}
                             alt=""
@@ -441,20 +427,21 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             loading="eager"
                             decoding="sync"
                             className={cn(
-                                "opacity-90 brightness-[1.1] transition-opacity duration-700",
-                                isSubjectPortrait 
-                                    ? "object-contain object-right-top sm:object-right opacity-70" 
-                                    : "object-cover object-[70%_30%] sm:object-right"
+                                "transition-opacity duration-700",
+                                isSubjectPortrait
+                                    ? "object-contain object-right opacity-[0.35] brightness-[0.7]"
+                                    : "object-cover object-[75%_20%] opacity-[0.45] brightness-[0.65]"
                             )}
                             sizes="100vw"
-                            quality={72}
+                            quality={60}
                         />
                     </div>
                 )}
 
-                {/* Cinematic Vignette & Edge Blending */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/92 via-[40%] to-transparent z-[1]" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/65 to-transparent z-[1]" />
+                {/* Unified vignette — strong left cover, heavy top+bottom fade, right edge fade */}
+                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/95 via-[55%] to-[#0a0a0a]/60 z-[1]" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/70 via-[30%] to-[#0a0a0a]/80 z-[1]" />
+                <div className="absolute inset-0 bg-gradient-to-l from-[#0a0a0a]/50 to-transparent z-[1]" />
 
                 {/* Hero Info Content aligned left/bottom on desktop, center on mobile */}
                 <div className="relative z-10 w-full max-w-[1920px] mx-auto flex flex-col md:flex-row items-center md:items-end justify-center md:justify-between gap-6 md:gap-12 text-center md:text-left mt-0 sm:mt-2">
