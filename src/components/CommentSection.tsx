@@ -154,6 +154,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
             episodeName,
             content: newComment.trim(),
             parentId: replyingTo || undefined,
+            userImageOverride: !session?.user?.image ? (customAvatar || undefined) : undefined,
         });
 
         if (result.success) {
@@ -220,6 +221,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
             movieId, movieSlug, episodeName,
             content: "[Sticker]",
             imageUrl: memeUrl,
+            userImageOverride: !session?.user?.image ? (customAvatar || undefined) : undefined,
         });
         if (result.success) fetchComments(true);
         setSubmitting(false);

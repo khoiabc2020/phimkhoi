@@ -13,6 +13,7 @@ export async function addComment(data: {
     episodeName?: string;
     content: string;
     imageUrl?: string;
+    userImageOverride?: string;
     rating?: number;
     parentId?: string;
 }) {
@@ -32,7 +33,7 @@ export async function addComment(data: {
         const comment = await Comment.create({
             userId: session.user.id,
             userName: session.user.name || "Anonymous",
-            userImage: session.user.image || "",
+            userImage: data.userImageOverride || session.user.image || "",
             movieId: data.movieId,
             movieSlug: data.movieSlug,
             episodeName: data.episodeName,
