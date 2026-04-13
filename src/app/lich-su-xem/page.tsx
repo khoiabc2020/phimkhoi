@@ -60,7 +60,7 @@ export default async function WatchHistoryPage({
                 <div className="absolute top-0 left-0 right-0 h-[70vh] bg-gradient-to-b from-[#2d1b4e]/90 via-[#0a0a0a]/80 to-transparent" />
             </div>
 
-            <div className="w-full max-w-[1920px] mx-auto px-3 sm:px-4 md:px-12 lg:pl-24 lg:pr-12 relative z-10">
+            <div className="w-full max-w-[1920px] mx-auto px-3 sm:px-4 md:px-8 lg:pl-24 lg:pr-12 relative z-10">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6 md:mb-10">
                     <div className="flex items-center gap-4">
@@ -88,15 +88,15 @@ export default async function WatchHistoryPage({
                         {/* Continue Watching Section */}
                         {continueWatching.length > 0 && (
                             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                <h2 className="text-[18px] md:text-xl font-bold text-white mb-5 flex items-center gap-2 border-l-4 border-purple-500 pl-3">
-                                    <Play className="w-4 h-4 md:w-5 md:h-5 text-purple-400 fill-current" />
+                                <h2 className="text-[16px] md:text-[18px] font-bold text-white mb-4 flex items-center gap-2 border-l-[3px] border-[#8FA7C5] pl-3">
+                                    <Play className="w-4 h-4 text-[#8FA7C5] fill-current" />
                                     Tiếp tục xem
                                 </h2>
-                                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 md:gap-4 [contain:layout_paint]">
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4 [contain:layout_paint]">
                                     {continueWatching.map((item: any) => (
                                         <div key={item._id} className="group relative block">
                                             <Link href={`/xem-phim/${item.movieSlug}/${item.episodeSlug}`} className="block">
-                                                <div className="relative aspect-[2/3] rounded-[6px] overflow-hidden bg-[#0B0B10] shadow-lg border border-white/5 group-hover:border-white/20 transition-all">
+                                                <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-[#0B0B10] shadow-lg border border-white/5 group-hover:border-white/20 transition-all">
                                                     <Image
                                                         src={getImageUrl(item.moviePoster)}
                                                         alt={item.movieName}
@@ -114,7 +114,7 @@ export default async function WatchHistoryPage({
 
                                                     {/* Tập Phim Badge giống Onflix */}
                                                     <div className="absolute bottom-2 left-0 md:bottom-2 z-20">
-                                                        <span className="px-1.5 md:px-2 py-0.5 md:py-1 rounded-r-[4px] bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 text-white text-[10px] md:text-[11px] font-bold shadow-md">
+                                                        <span className="block px-1.5 py-0.5 rounded-r-sm bg-[#8FA7C5]/90 text-[#0a0a0a] text-[9px] font-black truncate shadow-sm max-w-[90%]">
                                                             {item.episodeName}
                                                         </span>
                                                     </div>
@@ -122,7 +122,7 @@ export default async function WatchHistoryPage({
                                                     {/* Progress Bar - sát mép đáy ảnh */}
                                                     <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-800 z-20">
                                                         <div
-                                                            className="h-full bg-red-600 shadow-[0_0_8px_#dc2626] transition-all duration-300"
+                                                            className="h-full bg-[#8FA7C5] transition-all duration-300"
                                                             style={{ width: `${item.progress}%` }}
                                                         />
                                                     </div>
@@ -138,12 +138,12 @@ export default async function WatchHistoryPage({
 
                                             {/* Text bên dưới ảnh */}
                                             <Link href={`/xem-phim/${item.movieSlug}/${item.episodeSlug}`} className="mt-2.5 px-0.5 block">
-                                                <h3 className="text-white font-bold line-clamp-1 text-sm md:text-[15px] group-hover:text-purple-400 transition-colors">
+                                                <h3 className="text-white font-bold line-clamp-1 text-sm md:text-[15px] group-hover:text-[#8FA7C5] transition-colors">
                                                     {item.movieName}
                                                 </h3>
                                                 <div className="flex items-center gap-1.5 mt-1">
-                                                    <span className="text-gray-400 text-[11px] md:text-xs">Đã xem:</span>
-                                                    <span className="text-gray-300 text-[11px] md:text-xs font-medium">{item.progress}%</span>
+                                                    <span className="text-white/35 text-[11px] md:text-xs">Đã xem:</span>
+                                                    <span className="text-white/65 text-[11px] md:text-xs font-medium">{item.progress}%</span>
                                                 </div>
                                             </Link>
                                         </div>
@@ -154,15 +154,15 @@ export default async function WatchHistoryPage({
 
                         {/* Full History */}
                         <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
-                            <h2 className="text-[18px] md:text-xl font-bold text-white mb-5 flex items-center gap-2 border-l-4 border-gray-600 pl-3">
+                            <h2 className="text-[16px] md:text-[18px] font-bold text-white mb-4 flex items-center gap-2 border-l-[3px] border-white/20 pl-3">
                                 <History className="w-4 h-4 md:w-5 md:h-5 text-gray-400" />
                                 Tất cả đã xem
                             </h2>
-                            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-3 md:gap-x-4 gap-y-6 [contain:layout_paint]">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-3 gap-y-5 [contain:layout_paint]">
                                 {history.map((item: any, idx: number) => (
                                     <div key={item._id} className="group relative block">
                                         <Link href={`/xem-phim/${item.movieSlug}/${item.episodeSlug}`} className="block">
-                                            <div className="relative aspect-[2/3] rounded-[6px] overflow-hidden bg-[#0B0B10] shadow-md border border-white/5 group-hover:border-white/20 transition-all">
+                                            <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-[#0B0B10] shadow-md border border-white/5 group-hover:border-white/20 transition-all">
                                                 <Image
                                                     src={getImageUrl(item.moviePoster)}
                                                     alt={item.movieName}
@@ -173,7 +173,7 @@ export default async function WatchHistoryPage({
 
                                                 {/* Tập Phim Badge */}
                                                 <div className="absolute bottom-2 left-0 md:bottom-2 z-20">
-                                                    <span className="px-1.5 md:px-2 py-0.5 md:py-1 rounded-r-[4px] bg-gradient-to-r from-purple-600/90 to-pink-500/90 text-white text-[10px] md:text-[11px] font-bold">
+                                                    <span className="block px-1.5 py-0.5 rounded-r-sm bg-[#8FA7C5]/90 text-[#0a0a0a] text-[9px] font-black truncate max-w-[90%]">
                                                         {item.episodeName}
                                                     </span>
                                                 </div>
@@ -182,7 +182,7 @@ export default async function WatchHistoryPage({
                                                 {item.progress > 0 && (
                                                     <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-800 z-20">
                                                         <div
-                                                            className="h-full bg-red-600 opacity-90 transition-all duration-300"
+                                                            className="h-full bg-[#8FA7C5] transition-all duration-300"
                                                             style={{ width: `${item.progress}%` }}
                                                         />
                                                     </div>
@@ -204,12 +204,12 @@ export default async function WatchHistoryPage({
                                         </form>
 
                                         <Link href={`/xem-phim/${item.movieSlug}/${item.episodeSlug}`} className="mt-2.5 px-0.5 block">
-                                            <h3 className="text-gray-200 group-hover:text-purple-400 font-bold line-clamp-1 text-sm transition-colors">
+                                            <h3 className="text-gray-200 group-hover:text-[#8FA7C5] font-bold line-clamp-1 text-sm transition-colors">
                                                 {item.movieName}
                                             </h3>
                                             <div className="flex items-center gap-1.5 mt-1">
-                                                <span className="text-gray-500 text-[11px]">Đã xem:</span>
-                                                <span className="text-gray-400 text-[11px] font-medium">{item.progress}%</span>
+                                                <span className="text-white/35 text-[11px]">Đã xem:</span>
+                                                <span className="text-white/65 text-[11px] font-medium">{item.progress}%</span>
                                             </div>
                                         </Link>
                                     </div>
