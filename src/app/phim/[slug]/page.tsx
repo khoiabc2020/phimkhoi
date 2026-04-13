@@ -202,7 +202,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                 for (const key of candidates) {
                     const match = (rawEpImages as any)[key];
                     if (match) {
-                        episodeThumbnails[ep.slug] = match.still_path ? `https://image.tmdb.org/t/p/w500${match.still_path}` : "";
+                        episodeThumbnails[ep.slug] = match.image || "";
                         episodeMetadata[ep.slug] = {
                             title: match.name,
                             overview: match.overview,
