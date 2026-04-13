@@ -90,8 +90,8 @@ export default function ThuvienPage() {
             className="min-h-screen bg-[#080b12] text-white pt-[52px]"
             style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
         >
-            {/* Subtle gradient glow */}
-            <div className="fixed inset-0 pointer-events-none z-0">
+            {/* Subtle gradient glow — absolute, not fixed, to avoid per-scroll repaint */}
+            <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
                 <div className="absolute top-0 left-1/4 w-[600px] h-[400px] bg-[#8FA7C5]/8 blur-[160px] rounded-full" />
                 <div className="absolute top-0 right-1/4 w-[400px] h-[300px] bg-[#4a6fa5]/6 blur-[120px] rounded-full" />
             </div>
@@ -158,7 +158,7 @@ export default function ThuvienPage() {
                         </Link>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4 [contain:layout_paint]">
                         {currentItems.map((movie) => (
                             <div key={movie.slug} className="group relative">
                                 {/* Poster */}
@@ -170,33 +170,34 @@ export default function ThuvienPage() {
                                     }
                                     className="block"
                                 >
-                                    <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-white/5 shadow-lg ring-1 ring-white/[0.06] group-hover:ring-primary/30 transition-all duration-300">
+                                    <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-[#0B0B10] border border-white/[0.06] group-hover:border-white/20 transition-[border-color] duration-200">
                                         <Image
                                             src={getImageUrl(movie.poster || "")}
                                             alt={movie.name}
                                             fill
-                                            className="object-cover group-hover:scale-105 transition-transform duration-500"
-                                            unoptimized
+                                            loading="lazy"
+                                            sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, (max-width: 1024px) 20vw, 17vw"
+                                            className="object-cover group-hover:scale-105 transition-transform duration-300 will-change-transform"
                                         />
                                         {/* Overlay */}
-                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">
-                                            <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 scale-75 group-hover:scale-100 shadow-lg">
+                                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center bg-black/35">
+                                            <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center scale-75 group-hover:scale-100 transition-transform duration-200 shadow-lg">
                                                 <Play className="w-4 h-4 text-black fill-black ml-0.5" />
                                             </div>
                                         </div>
                                         {/* Progress bar for history */}
-                                        {activeTab === "lich-su" && movie.progress && (
-                                            <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10">
+                                        {activeTab === "lich-su" && (movie.progress ?? 0) > 0 && (
+                                            <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-white/10">
                                                 <div
-                                                    className="h-full bg-primary transition-all"
-                                                    style={{ width: `${Math.min(movie.progress, 100)}%` }}
+                                                    className="h-full bg-[#8FA7C5]"
+                                                    style={{ width: `${Math.min(movie.progress!, 100)}%` }}
                                                 />
                                             </div>
                                         )}
                                         {/* Quality badge */}
                                         {movie.quality && (
                                             <div className="absolute top-1.5 left-1.5">
-                                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-primary text-[#0d1119]">
+                                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-black/70 backdrop-blur-sm text-white border border-white/10">
                                                     {movie.quality}
                                                 </span>
                                             </div>
@@ -212,7 +213,7 @@ export default function ThuvienPage() {
                                                 ? handleRemoveWatchlist(movie.slug)
                                                 : handleRemoveFavorite(movie.slug)
                                         }
-                                        className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/70 text-white/70 hover:text-white hover:bg-black/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 z-10"
+                                        className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/60 text-white/70 hover:text-white hover:bg-black/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-10 border border-white/10"
                                     >
                                         <X className="w-3 h-3" />
                                     </button>
@@ -220,7 +221,7 @@ export default function ThuvienPage() {
 
                                 {/* Title */}
                                 <div className="mt-2 px-0.5">
-                                    <p className="text-[12px] font-medium text-white/80 line-clamp-2 leading-snug group-hover:text-white transition-colors">
+                                    <p className="text-[12px] font-medium text-white/80 line-clamp-1 leading-snug group-hover:text-white transition-colors duration-150">
                                         {movie.name}
                                     </p>
                                     {movie.year && (
