@@ -70,36 +70,26 @@ export default async function AdvancedFilterPage({ searchParams }: FilterPagePro
     };
 
     return (
-        <main className="min-h-screen bg-[#0a0a0a] text-white relative">
+        <main className="min-h-screen bg-[#0a0a0a] text-white relative overflow-hidden">
             {/* Decorative background glow */}
             <div className={cn("absolute top-0 left-0 right-0 h-[600px] via-transparent to-transparent pointer-events-none -z-10 blur-[150px] opacity-50", theme.glow)} />
+            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#8FA7C5]/5 blur-[130px] rounded-full pointer-events-none -z-10" />
             
-            <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-20 md:pt-24 pb-24 md:pb-16">
-                {/* Header — mobile: minimal 1-line title */}
-                <div className="flex md:hidden items-center gap-2 mb-4">
-                    <h1 className="text-[15px] font-bold text-white flex items-center gap-1.5">
-                        Khám Phá
-                        <SlidersHorizontal className="w-3.5 h-3.5 text-primary/50 shrink-0" />
-                    </h1>
-                </div>
-
-                {/* Header — desktop: compact inline strip */}
-                <div className="hidden md:flex items-center justify-between mb-5">
-                    <div className="flex items-center gap-3 min-w-0">
-                        <div className="flex items-center gap-1.5 text-[11px] font-semibold text-white/30 uppercase tracking-wider shrink-0">
-                            <Link href="/" className="hover:text-white/60 transition-colors">Trang chủ</Link>
-                            <ChevronRight className="w-3 h-3" />
-                            <span className="text-white/50">Khám Phá</span>
+            <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-24 md:pt-32 pb-20">
+                {/* Header & Breadcrumb */}
+                <div className="mb-10 md:mb-14 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div>
+                        <div className="flex items-center justify-center md:justify-start gap-2 text-[11px] font-bold text-white/40 uppercase tracking-[0.15em] mb-4">
+                            <Link href="/" className="hover:text-primary transition-colors">Trang chủ</Link>
+                            <ChevronRight className="w-3.5 h-3.5" />
+                            <span className="text-white/80">Khám Phá</span>
                         </div>
-                        <span className="text-white/10 select-none">·</span>
-                        <h1 className="text-[17px] font-bold text-white flex items-center gap-1.5 truncate">
+                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight flex items-center justify-center md:justify-start gap-4">
                             Duyệt Tìm Nâng Cao
-                            <SlidersHorizontal className="w-4 h-4 text-primary/40 shrink-0" />
+                            <SlidersHorizontal className="w-10 h-10 md:w-12 md:h-12 text-primary opacity-30" />
                         </h1>
+                        <p className="mt-3 text-white/40 text-sm max-w-lg font-medium">Khám phá hàng ngàn bộ phim đa dạng thể loại và quốc gia. Tối ưu hóa trải nghiệm tìm kiếm của bạn.</p>
                     </div>
-                    <p className="text-white/25 text-xs font-medium hidden lg:block shrink-0 ml-4">
-                        Hàng ngàn bộ phim · Lọc theo thể loại, quốc gia, năm
-                    </p>
                 </div>
 
                 {/* Filter Toolbar */}

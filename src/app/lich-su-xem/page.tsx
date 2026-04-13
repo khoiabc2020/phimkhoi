@@ -1,10 +1,4 @@
 export const dynamic = 'force-dynamic';
-import type { Metadata } from "next";
-export const metadata: Metadata = {
-    title: "Lịch Sử Xem - KHOIPHIM",
-    description: "Lịch sử xem phim của bạn trên KHOIPHIM.",
-    robots: { index: false },
-};
 
 import { History, ArrowLeft, Trash2, Play, Clock, ChevronRight, X } from "lucide-react";
 import Link from "next/link";
@@ -60,10 +54,11 @@ export default async function WatchHistoryPage({
     const totalPages = (historyResult as any).totalPages || 1;
 
     return (
-        <div className="min-h-screen pt-24 md:pt-28 pb-24 relative overflow-hidden bg-[#0a0a0a]">
-            {/* Background chuẩn Onflix: Tím đậm phai dần xuống đen */}
+        <div className="min-h-screen pt-24 md:pt-28 pb-12 relative overflow-hidden bg-[#0a0a0a]">
+            {/* Subtle accent glow */}
             <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute top-0 left-0 right-0 h-[70vh] bg-gradient-to-b from-[#2d1b4e]/90 via-[#0a0a0a]/80 to-transparent" />
+                <div className="absolute top-0 left-1/4 w-[600px] h-[400px] bg-[#8FA7C5]/8 blur-[160px] rounded-full" />
+                <div className="absolute top-0 right-1/4 w-[400px] h-[300px] bg-[#6b8fb5]/6 blur-[120px] rounded-full" />
             </div>
 
             <div className="w-full max-w-[1920px] mx-auto px-3 sm:px-4 md:px-8 lg:pl-24 lg:pr-12 relative z-10">
@@ -118,12 +113,14 @@ export default async function WatchHistoryPage({
                                                         </div>
                                                     </div>
 
-                                                    {/* Tập Phim Badge giống Onflix */}
-                                                    <div className="absolute bottom-2 left-0 md:bottom-2 z-20">
-                                                        <span className="block px-1.5 py-0.5 rounded-r-sm bg-[#8FA7C5]/90 text-[#0a0a0a] text-[9px] font-black truncate shadow-sm max-w-[90%]">
-                                                            {item.episodeName}
-                                                        </span>
-                                                    </div>
+                                                    {/* Tập Phim Badge */}
+                                                    {item.episodeName && (
+                                                        <div className="absolute bottom-2 left-0 z-20">
+                                                            <span className="block px-2 py-0.5 rounded-r-md bg-[#8FA7C5] text-[#080b12] text-[10px] font-black truncate shadow-md max-w-[85px]">
+                                                                {item.episodeName}
+                                                            </span>
+                                                        </div>
+                                                    )}
 
                                                     {/* Progress Bar - sát mép đáy ảnh */}
                                                     <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-800 z-20">
@@ -147,10 +144,12 @@ export default async function WatchHistoryPage({
                                                 <h3 className="text-white font-bold line-clamp-1 text-sm md:text-[15px] group-hover:text-[#8FA7C5] transition-colors">
                                                     {item.movieName}
                                                 </h3>
+                                                {item.progress > 0 && (
                                                 <div className="flex items-center gap-1.5 mt-1">
                                                     <span className="text-white/35 text-[11px] md:text-xs">Đã xem:</span>
-                                                    <span className="text-white/65 text-[11px] md:text-xs font-medium">{item.progress}%</span>
+                                                    <span className="text-[#8FA7C5] text-[11px] md:text-xs font-bold">{item.progress}%</span>
                                                 </div>
+                                            )}
                                             </Link>
                                         </div>
                                     ))}
@@ -178,11 +177,13 @@ export default async function WatchHistoryPage({
                                                 />
 
                                                 {/* Tập Phim Badge */}
-                                                <div className="absolute bottom-2 left-0 md:bottom-2 z-20">
-                                                    <span className="block px-1.5 py-0.5 rounded-r-sm bg-[#8FA7C5]/90 text-[#0a0a0a] text-[9px] font-black truncate max-w-[90%]">
-                                                        {item.episodeName}
-                                                    </span>
-                                                </div>
+                                                {item.episodeName && (
+                                                    <div className="absolute bottom-2 left-0 z-20">
+                                                        <span className="block px-2 py-0.5 rounded-r-md bg-[#8FA7C5] text-[#080b12] text-[10px] font-black truncate shadow-md max-w-[85px]">
+                                                            {item.episodeName}
+                                                        </span>
+                                                    </div>
+                                                )}
 
                                                 {/* Progress Indicator */}
                                                 {item.progress > 0 && (
@@ -213,10 +214,12 @@ export default async function WatchHistoryPage({
                                             <h3 className="text-gray-200 group-hover:text-[#8FA7C5] font-bold line-clamp-1 text-sm transition-colors">
                                                 {item.movieName}
                                             </h3>
-                                            <div className="flex items-center gap-1.5 mt-1">
-                                                <span className="text-white/35 text-[11px]">Đã xem:</span>
-                                                <span className="text-white/65 text-[11px] font-medium">{item.progress}%</span>
-                                            </div>
+                                            {item.progress > 0 && (
+                                                <div className="flex items-center gap-1.5 mt-1">
+                                                    <span className="text-white/35 text-[11px]">Đã xem:</span>
+                                                    <span className="text-[#8FA7C5] text-[11px] font-bold">{item.progress}%</span>
+                                                </div>
+                                            )}
                                         </Link>
                                     </div>
                                 ))}

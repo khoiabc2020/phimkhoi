@@ -100,9 +100,10 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
     const typeName = TYPE_NAMES[type] || type;
 
     return (
-        <main className="min-h-screen pb-20 bg-[#0a0a0a] relative">
+        <main className="min-h-screen pb-20 bg-[#0a0a0a] relative overflow-hidden">
             {/* Decorative background glow */}
             <div className={cn("absolute top-0 left-0 right-0 h-[600px] via-transparent to-transparent pointer-events-none -z-10 blur-[150px] opacity-50", theme.glow)} />
+            <div className="absolute top-0 right-0 w-[350px] h-[350px] bg-[#8FA7C5]/4 blur-[120px] rounded-full pointer-events-none -z-10" />
             
             <div className="pt-24 w-full max-w-[1920px] mx-auto px-2 sm:px-4 md:px-8 lg:pl-24 lg:pr-12">
                 <div className="mb-4 md:mb-6 rounded-[10px] border border-white/[0.06] bg-[#07070b]/78 backdrop-blur-md p-3 sm:p-4 md:p-5 shadow-xl transition-all">

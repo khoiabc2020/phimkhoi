@@ -33,6 +33,14 @@ export async function POST(req: Request) {
         const resolvedMovieId = movie?._id?.toString() || slug;
         const resolvedEpisodeSlug = episode || "full";
 
+        const formatEpisodeName = (name: string) => {
+            if (!name) return name;
+            const lower = name.toLowerCase();
+            if (lower === "full" || lower === "full hd" || lower === "movie") return name;
+            if (name.startsWith("Tập") || name.startsWith("tập") || name.startsWith("Episode")) return name;
+            return `Tập ${name}`;
+        };
+
         let episodeName = clientEpisodeName || resolvedEpisodeSlug;
         if (movie?.episodes) {
             for (const server of movie.episodes) {
@@ -40,6 +48,7 @@ export async function POST(req: Request) {
                 if (found) { episodeName = found.name; break; }
             }
         }
+        episodeName = formatEpisodeName(episodeName);
 
         await WatchHistory.findOneAndUpdate(
             {

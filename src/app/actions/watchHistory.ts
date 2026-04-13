@@ -34,6 +34,16 @@ export async function addWatchHistory(movieData: {
             ? Math.min(100, Math.round((movieData.currentTime / movieData.duration) * 100))
             : 0;
 
+        // Normalize episode name: add "Tập " prefix for numeric/unnamed episodes
+        const normalizeEpisodeName = (name: string) => {
+            if (!name) return name;
+            const lower = name.toLowerCase().trim();
+            if (lower === "full" || lower === "full hd" || lower === "movie" || lower === "phim lẻ") return name;
+            if (/^(tập|episode|ep\.?\s*)/i.test(name)) return name;
+            return `Tập ${name}`;
+        };
+        movieData.episodeName = normalizeEpisodeName(movieData.episodeName);
+
         const watchHistory = await WatchHistory.findOneAndUpdate(
             {
                 userId: historyUserId,
