@@ -55,11 +55,10 @@ export default async function WatchHistoryPage({
 
     return (
         <div className="min-h-screen pt-24 md:pt-28 pb-12 relative overflow-hidden bg-[#0a0a0a]">
-            {/* Subtle accent glow */}
-            <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute top-0 left-1/4 w-[600px] h-[400px] bg-[#8FA7C5]/8 blur-[160px] rounded-full" />
-                <div className="absolute top-0 right-1/4 w-[400px] h-[300px] bg-[#6b8fb5]/6 blur-[120px] rounded-full" />
-            </div>
+            {/* Onflix-style purple banner */}
+            <div className="fixed top-0 inset-x-0 h-[55vh] bg-gradient-to-b from-[#1e0d40]/60 to-transparent pointer-events-none z-0" />
+            {/* Soft glow blob */}
+            <div className="absolute top-0 left-1/3 w-[600px] h-[300px] bg-[#8FA7C5]/10 blur-[130px] rounded-full pointer-events-none -z-10" />
 
             <div className="w-full max-w-[1920px] mx-auto px-3 sm:px-4 md:px-8 lg:pl-24 lg:pr-12 relative z-10">
                 {/* Header */}
