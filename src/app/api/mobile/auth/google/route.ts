@@ -3,7 +3,7 @@ import connectDB from "@/lib/db";
 import User from "@/models/User";
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.NEXTAUTH_SECRET || "khoiphim-secret-key-123";
+const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
 
 export async function POST(req: NextRequest) {
     try {

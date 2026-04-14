@@ -14,6 +14,28 @@ export async function POST(req: Request) {
             );
         }
 
+        // Password strength: min 8 chars, at least 1 letter + 1 number
+        if (password.length < 8) {
+            return NextResponse.json(
+                { error: "Mật khẩu phải có ít nhất 8 ký tự" },
+                { status: 400 }
+            );
+        }
+        if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
+            return NextResponse.json(
+                { error: "Mật khẩu phải chứa cả chữ cái và số" },
+                { status: 400 }
+            );
+        }
+
+        // Basic email format check
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            return NextResponse.json(
+                { error: "Email không hợp lệ" },
+                { status: 400 }
+            );
+        }
+
         await dbConnect();
 
         // Check if user exists
