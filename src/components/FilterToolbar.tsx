@@ -61,79 +61,45 @@ export default function FilterToolbar({ searchParams, categories, countries, yea
     const sortOptions = SORT_OPTIONS;
 
     return (
-        <div className="sticky top-[68px] z-[90] mb-8 backdrop-blur-xl">
-            <div className="grid grid-cols-2 lg:grid-cols-6 gap-2.5 md:gap-3 bg-[#0a0a0a]/80 border border-white/[0.07] rounded-2xl p-3.5 md:p-4 shadow-lg">
-
-                {/* Type Select */}
-                <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-white/30 uppercase tracking-[0.12em] pl-1">Định dạng</label>
-                    <EliteSelect
-                        options={typeOptions}
-                        value={type || "all"}
-                        onChange={(value) => handleFilterChange("type", value)}
-                        placeholder="Định dạng"
-                        className="w-full"
-                    />
-                </div>
-
-                {/* Category Select */}
-                <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-white/30 uppercase tracking-[0.12em] pl-1">Thể loại</label>
-                    <EliteSelect
-                        options={categoryOptions}
-                        value={category || "all"}
-                        onChange={(value) => handleFilterChange("category", value)}
-                        placeholder="Thể loại"
-                        className="w-full"
-                    />
-                </div>
-
-                {/* Country Select */}
-                <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-white/30 uppercase tracking-[0.12em] pl-1">Quốc gia</label>
-                    <EliteSelect
-                        options={countryOptions}
-                        value={country || "all"}
-                        onChange={(value) => handleFilterChange("country", value)}
-                        placeholder="Quốc gia"
-                        className="w-full"
-                    />
-                </div>
-
-                {/* Year Select */}
-                <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-white/30 uppercase tracking-[0.12em] pl-1">Năm phát hành</label>
-                    <EliteSelect
-                        options={yearOptions}
-                        value={year || "all"}
-                        onChange={(value) => handleFilterChange("year", value)}
-                        placeholder="Năm"
-                        className="w-full"
-                    />
-                </div>
-
-                {/* Sort Select */}
-                <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-white/30 uppercase tracking-[0.12em] pl-1">Sắp xếp</label>
-                    <EliteSelect
-                        options={sortOptions}
-                        value={sort || "newest"}
-                        onChange={(value) => handleFilterChange("sort", value)}
-                        placeholder="Sắp xếp"
-                        className="w-full"
-                    />
-                </div>
-
-                {/* Reset Button */}
-                <div className="flex items-end col-span-2 lg:col-span-1">
-                    <Link
-                        href="/loc-phim"
-                        className="w-full flex items-center justify-center gap-2 h-[42px] bg-white/[0.04] hover:bg-white/10 border border-white/[0.07] rounded-xl px-4 text-[12px] font-bold text-white/50 hover:text-white transition-all active:scale-95 group"
-                    >
-                        <SlidersHorizontal className="w-3.5 h-3.5 transition-opacity" />
-                        Đặt lại
-                    </Link>
-                </div>
+        <div className="sticky top-[68px] z-[90] mb-8">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-3">
+                <EliteSelect
+                    options={typeOptions}
+                    value={type || "all"}
+                    onChange={(value) => handleFilterChange("type", value)}
+                    placeholder="Định dạng"
+                />
+                <EliteSelect
+                    options={categoryOptions}
+                    value={category || "all"}
+                    onChange={(value) => handleFilterChange("category", value)}
+                    placeholder="Thể loại"
+                />
+                <EliteSelect
+                    options={countryOptions}
+                    value={country || "all"}
+                    onChange={(value) => handleFilterChange("country", value)}
+                    placeholder="Quốc gia"
+                />
+                <EliteSelect
+                    options={yearOptions}
+                    value={year || "all"}
+                    onChange={(value) => handleFilterChange("year", value)}
+                    placeholder="Năm"
+                />
+                <EliteSelect
+                    options={sortOptions}
+                    value={sort || "newest"}
+                    onChange={(value) => handleFilterChange("sort", value)}
+                    placeholder="Sắp xếp"
+                />
+                <Link
+                    href="/loc-phim"
+                    className="col-span-2 sm:col-span-1 flex items-center justify-center gap-2 h-[42px] bg-white/[0.04] hover:bg-white/8 border border-white/[0.07] rounded-[12px] px-4 text-[13px] font-bold text-white/40 hover:text-white/80 transition-all active:scale-95"
+                >
+                    <SlidersHorizontal className="w-3.5 h-3.5" />
+                    Đặt lại
+                </Link>
             </div>
         </div>
     );
