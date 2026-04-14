@@ -21,17 +21,18 @@ interface ProfileTabsProps {
 }
 
 const PRESET_AVATARS = [
-    "https://i.pravatar.cc/300?img=1",
-    "https://i.pravatar.cc/300?img=12",
-    "https://i.pravatar.cc/300?img=31",
-    "https://i.pravatar.cc/300?img=42",
-    "https://i.pravatar.cc/300?img=47",
-    "https://i.pravatar.cc/300?img=60",
-    "https://i.pravatar.cc/300?img=5",
-    "https://api.dicebear.com/7.x/micah/svg?seed=Felix&backgroundColor=b6e3f4",
-    "https://api.dicebear.com/7.x/micah/svg?seed=Aneka&backgroundColor=c0aede",
-    "https://api.dicebear.com/7.x/lorelei/svg?seed=Jack&backgroundColor=ffdfbf",
-    "https://api.dicebear.com/7.x/notionists/svg?seed=Max&backgroundColor=b6e3f4"
+    // DiceBear PNG avatars (reliable, no hotlink block)
+    "https://api.dicebear.com/9.x/avataaars/png?seed=Destiny&backgroundColor=b6e3f4&size=200",
+    "https://api.dicebear.com/9.x/avataaars/png?seed=Jasmine&backgroundColor=c0aede&size=200",
+    "https://api.dicebear.com/9.x/avataaars/png?seed=Leo&backgroundColor=ffd5dc&size=200",
+    "https://api.dicebear.com/9.x/avataaars/png?seed=Max&backgroundColor=d1f4cc&size=200",
+    "https://api.dicebear.com/9.x/fun-emoji/png?seed=Luna&backgroundColor=b6e3f4&size=200",
+    "https://api.dicebear.com/9.x/fun-emoji/png?seed=Zoe&backgroundColor=ffdfbf&size=200",
+    "https://api.dicebear.com/9.x/fun-emoji/png?seed=Bear&backgroundColor=c0aede&size=200",
+    "https://api.dicebear.com/9.x/notionists/png?seed=Felix&backgroundColor=b6e3f4&size=200",
+    "https://api.dicebear.com/9.x/notionists/png?seed=Aneka&backgroundColor=c0aede&size=200",
+    "https://api.dicebear.com/9.x/lorelei/png?seed=Jack&backgroundColor=ffdfbf&size=200",
+    "https://api.dicebear.com/9.x/micah/png?seed=Sophie&backgroundColor=d1f4cc&size=200",
 ];
 
 export default function ProfileTabs({ user: initialUser, favorites, history, historyTotal }: ProfileTabsProps) {
@@ -543,7 +544,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history, his
                                             onClick={() => handleAvatarSelect(url)}
                                             className={`relative aspect-square rounded-2xl overflow-hidden border-2 transition-all hover:scale-105 ${user?.image === url ? 'border-purple-500' : 'border-white/[0.05] hover:border-white/10'}`}
                                         >
-                                            <Image src={url} alt="" fill className="object-cover" sizes="100px" quality={82} />
+                                            <Image src={url} alt="" fill className="object-cover" unoptimized />
                                             {user?.image === url && (
                                                 <div className="absolute inset-0 bg-[#8FA7C5]/10 flex items-center justify-center">
                                                     <div className="bg-white rounded-full p-1 shadow-xl">
