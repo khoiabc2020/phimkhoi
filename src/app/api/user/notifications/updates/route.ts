@@ -23,12 +23,21 @@ export async function GET(req: NextRequest) {
             userId,
         })
             .sort({ createdAt: -1 })
-            .limit(20)
+            .limit(100) // fetch more, then deduplicate
             .lean();
 
-        const formatted = notifications.map((n: any) => ({
+        // Deduplicate: keep only the most recent notification per movieSlug
+        const seenSlugs = new Set<string>();
+        const deduped = notifications.filter((n: any) => {
+            const slug = n.movieSlug || n.link?.replace("/phim/", "") || String(n._id);
+            if (seenSlugs.has(slug)) return false;
+            seenSlugs.add(slug);
+            return true;
+        }).slice(0, 30);
+
+        const formatted = deduped.map((n: any) => ({
             id: String(n._id),
-            movieName: n.title?.replace(" có tập mới!", "") || "",
+            movieName: n.title?.replace(" có tập mới!", "").replace(" có tập mới", "") || "",
             movieSlug: n.movieSlug || n.link?.replace("/phim/", "") || "",
             moviePoster: n.moviePoster || "",
             newEpisode: n.newEpisode || "",
