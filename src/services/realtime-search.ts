@@ -146,7 +146,7 @@ export async function getRealtimeSearchData(query: string): Promise<RealtimeSear
 
             const movies = Array.from(merged.values())
                 .sort((a, b) => movieScore(b, cleanQuery.toLowerCase()) - movieScore(a, cleanQuery.toLowerCase()))
-                .slice(0, 5);
+                .slice(0, 7);
 
             const formattedActors = (actors || [])
                 .map((actor: { id?: number; name?: string; profile_path?: string }) => ({
