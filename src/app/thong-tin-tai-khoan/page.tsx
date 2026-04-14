@@ -16,11 +16,12 @@ export default async function ProfilePage() {
 
     const [favoritesResult, historyResult] = await Promise.all([
         getFavorites(),
-        getWatchHistory(50)
+        getWatchHistory(1, 50)
     ]);
 
     const favorites = favoritesResult.success ? favoritesResult.data : [];
     const history = historyResult.success ? historyResult.data : [];
+    const historyTotal = historyResult.success ? (historyResult.total ?? history?.length ?? 0) : 0;
 
     return (
         <main className="min-h-screen pt-24 pb-20 bg-[#0a0a0a] relative overflow-hidden">
@@ -34,6 +35,7 @@ export default async function ProfilePage() {
                     user={session.user}
                     favorites={favorites || []}
                     history={history || []}
+                    historyTotal={historyTotal}
                 />
             </div>
         </main>
