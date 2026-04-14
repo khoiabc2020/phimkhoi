@@ -89,7 +89,7 @@ export default function NotificationDropdown() {
             </button>
 
             {isOpen && (
-                <div className="fixed sm:absolute left-2 right-2 sm:left-auto sm:right-0 top-[68px] sm:top-full sm:mt-3 sm:w-[420px] bg-[#0c0c14]/95 backdrop-blur-2xl border border-white/[0.08] rounded-xl shadow-[0_30px_60px_rgba(0,0,0,0.8)] z-[200] overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300 ease-out">
+                <div className="absolute right-0 top-full mt-3 w-screen max-w-[calc(100vw-2rem)] sm:w-[450px] bg-[#0c0c14]/95 backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-[0_30px_60px_rgba(0,0,0,0.8)] z-[60] overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300 ease-out">
                     {/* Panel Header */}
                     <div className="px-5 py-4 border-b border-white/[0.05] flex items-center justify-between bg-white/[0.02]">
                         <div className="flex items-center gap-2.5">
@@ -107,7 +107,7 @@ export default function NotificationDropdown() {
                     </div>
 
                     {/* Content Scrollable */}
-                    <div className="max-h-[55vh] sm:max-h-[500px] overflow-y-auto custom-scrollbar">
+                    <div className="max-h-[500px] overflow-y-auto custom-scrollbar">
                         {!session ? (
                             <div className="p-10 text-center space-y-4">
                                 <div className="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center mx-auto ring-1 ring-white/10">
@@ -143,8 +143,8 @@ export default function NotificationDropdown() {
                                                 alt=""
                                                 fill
                                                 className="object-cover transition-transform duration-500 group-hover:scale-110"
-                                                sizes="50px"
-                                                quality={60}
+                                                sizes="48px"
+                                                quality={75}
                                             />
                                             {!notif.isRead && (
                                                 <div className="absolute inset-0 bg-primary/10" />
