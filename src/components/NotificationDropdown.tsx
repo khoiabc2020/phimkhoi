@@ -143,7 +143,8 @@ export default function NotificationDropdown() {
                                                 alt=""
                                                 fill
                                                 className="object-cover transition-transform duration-500 group-hover:scale-110"
-                                                unoptimized
+                                                sizes="48px"
+                                                quality={75}
                                             />
                                             {!notif.isRead && (
                                                 <div className="absolute inset-0 bg-primary/10" />

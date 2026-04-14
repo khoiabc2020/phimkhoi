@@ -224,8 +224,8 @@ export default function WatchEngagementBar({
                             alt={movie.name}
                             fill
                             className="object-cover"
-                            sizes="96px"
-                            quality={68}
+                            sizes="(max-width: 768px) 80px, 96px"
+                            quality={82}
                         />
                     </div>
                 </div>

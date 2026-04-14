@@ -216,8 +216,8 @@ function ContinueWatchingRowInner() {
                                         alt={item.movieName}
                                         fill
                                         loading="lazy"
-                                        quality={70}
-                                        sizes="(max-width: 768px) 140px, (max-width: 1024px) 160px, 180px"
+                                        quality={82}
+                                        sizes="(max-width: 640px) 220px, (max-width: 768px) 260px, 300px"
                                         className="object-cover group-hover/card:scale-105 transition-transform duration-500 will-change-transform"
                                     />
 

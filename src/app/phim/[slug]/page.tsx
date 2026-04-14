@@ -222,18 +222,27 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
 
     const isNguonC = movie?.episodes?.[0]?.server_name?.toLowerCase().includes('nguonc');
     
-    // Ambient Background: Priority = TMDB Backdrop > Source Thumb
+    // Ambient Background: TMDB Backdrop > Source Thumb (wide 16:9 for hero)
     const ambientBgUrl = tmdbBackdrop || sourceThumb || "";
-    
-    // Subject Content: Priority = Source Thumb (Authentic) > TMDB Poster
-    let contentSubjectUrl = sourcePoster || tmdbPoster || sourceThumb || tmdbBackdrop || "/fallback.png";
-    if (isNguonC && (tmdbPoster || tmdbBackdrop)) {
-        contentSubjectUrl = tmdbPoster || tmdbBackdrop || sourceThumb || sourcePoster || "/fallback.png";
+
+    // Subject Content (portrait poster shown on hero right side):
+    // Prefer portrait images. If sourcePoster is landscape or missing → use TMDB portrait.
+    // NguonC sources are known low-quality → always prefer TMDB.
+    const sourceIsPortrait = sourcePoster && detectOrientation(sourcePoster) !== "landscape";
+    let contentSubjectUrl: string;
+    if (isNguonC) {
+        // NguonC: trust TMDB over source
+        contentSubjectUrl = tmdbPoster || sourcePoster || sourceThumb || tmdbBackdrop || "/fallback.png";
+    } else if (sourceIsPortrait) {
+        // Good portrait source → use it, TMDB as fallback
+        contentSubjectUrl = sourcePoster || tmdbPoster || sourceThumb || tmdbBackdrop || "/fallback.png";
+    } else {
+        // Source is landscape or missing → prefer TMDB portrait, fall back to source/backdrop
+        contentSubjectUrl = tmdbPoster || sourcePoster || sourceThumb || tmdbBackdrop || "/fallback.png";
     }
 
     const subjectOrientation = detectOrientation(contentSubjectUrl);
-    // Force object-contain if we fall back to a low-res cropped thumb from NguonC
-    const isSubjectPortrait = subjectOrientation === "portrait" || contentSubjectUrl === sourceThumb;
+    const isSubjectPortrait = subjectOrientation === "portrait" || subjectOrientation === "unknown";
     const rating = trustedTmdbDetails?.vote_average ? Number(trustedTmdbDetails.vote_average).toFixed(1) : "9.7";
     const languageMap: Record<string, string> = {
         en: "Tiếng Anh",
@@ -407,8 +416,7 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             quality={40}
                         />
 
-                        {/* Layer 3: THE SUBJECT (Authentic Source Thumbnail) */}
-                        {/* If it's landscape, we use it as a Cinematic background strip on the right */}
+                        {/* Layer 3: THE SUBJECT (portrait poster on right, or landscape backdrop) */}
                         <Image
                             src={contentSubjectUrl}
                             alt=""
@@ -423,8 +431,8 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                                     ? "object-contain object-right-top sm:object-right opacity-75"
                                     : "object-cover object-[70%_30%] sm:object-right opacity-85"
                             )}
-                            sizes="100vw"
-                            quality={72}
+                            sizes="(max-width: 768px) 100vw, 60vw"
+                            quality={88}
                         />
                     </div>
                 )}
@@ -439,14 +447,14 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                     
                     {/* Poster on Mobile (Centered) */}
                     <div className="w-[140px] sm:w-[180px] md:hidden shrink-0 rounded-xl overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.8)] border border-white/15 relative aspect-[2/3] z-20">
-                        <Image 
-                            src={sourcePoster || sourceThumb || tmdbPoster || "/fallback.png"} 
-                            alt={movie?.name || "Poster"} 
-                            fill 
-                            className="object-cover" 
-                            sizes="180px"
+                        <Image
+                            src={contentSubjectUrl || "/fallback.png"}
+                            alt={movie?.name || "Poster"}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 640px) 140px, 180px"
+                            quality={85}
                             priority
-                            unoptimized
                         />
                     </div>
 

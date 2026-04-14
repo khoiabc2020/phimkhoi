@@ -304,20 +304,35 @@ function MovieCard({
                             alt={decodeHtml(movie.name) || movie.slug || "Phim"}
                             fill
                             className="transition-transform duration-500 ease-out lg:group-hover/static-card:scale-[1.1] object-cover z-10 anchor-top"
-                            sizes={orientation === 'landscape' ? "(max-width: 768px) 200px, 300px" : "(max-width: 640px) 160px, (max-width: 768px) 180px, (max-width: 1280px) 200px, 250px"}
-                            quality={65}
+                            sizes={orientation === 'landscape'
+                                ? "(max-width: 768px) 220px, 320px"
+                                : "(max-width: 640px) calc(33vw - 8px), (max-width: 768px) calc(25vw - 8px), (max-width: 1280px) calc(20vw - 10px), calc(17vw - 10px)"}
+                            quality={80}
                             loading={priority ? undefined : loading}
                             priority={priority}
                             decoding="async"
                             placeholder="blur"
                             blurDataURL={BLUR_PLACEHOLDER}
-                            onError={(e) => {
-                                // Source image failed (index 0) → trigger TMDB fetch in background.
-                                // When lazyTmdbData loads, posterCandidates recomputes with tmdbPoster
-                                // at index 1, and the Image auto-rerenders with TMDB URL.
-                                if (posterIndex === 0) {
-                                    void hydrateTmdbOnDemand();
+                            onLoad={(e) => {
+                                // Portrait slot: reject landscape images by actual pixel ratio.
+                                // URL-pattern detection misses many cases — naturalWidth/Height is ground truth.
+                                if (orientation === "portrait") {
+                                    const img = e.target as HTMLImageElement;
+                                    const { naturalWidth: w, naturalHeight: h } = img;
+                                    if (w > 0 && h > 0 && w > h * 1.05) {
+                                        // Clearly landscape → skip to next candidate (TMDB)
+                                        if (posterIndex === 0) void hydrateTmdbOnDemand();
+                                        if (posterIndex < posterCandidates.length - 1) {
+                                            setPosterIndex(prev => prev + 1);
+                                        }
+                                    }
                                 }
+                            }}
+                            onError={(e) => {
+                                // Source image failed → trigger TMDB fetch in background.
+                                // When lazyTmdbData loads, posterCandidates recomputes with tmdbPoster
+                                // at slot 1, Image auto-rerenders with TMDB URL.
+                                if (posterIndex === 0) void hydrateTmdbOnDemand();
                                 if (posterIndex < posterCandidates.length - 1) {
                                     setPosterIndex((prev) => prev + 1);
                                     return;
