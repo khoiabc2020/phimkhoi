@@ -149,30 +149,29 @@ function MovieCard({
     const tmdbPosterPath = tmdbData?.poster_path;
     const tmdbBackdropPath = tmdbData?.backdrop_path;
 
-    // Poster (ảnh dọc) – ưu tiên poster thật, tránh nhầm thumb/backdrop vào slot dọc
+    // Poster (ảnh dọc)
     const tmdbPoster = useMemo(() =>
-        tmdbPosterPath
-            ? getTMDBImage(tmdbPosterPath, "w342")
-            : null
+        tmdbPosterPath ? getTMDBImage(tmdbPosterPath, "w342") : null
     , [tmdbPosterPath]);
 
-    const portraitPosterSource = useMemo(
-        () => tmdbPoster || getPosterImageUrl(movie) || "",
-        [movie, tmdbPoster]
-    );
+    // Detect known low-quality source hosts (nguonc thumbnails are notoriously poor)
+    const isLowQualitySource = useMemo(() => {
+        const url = movie.poster_url || movie.thumb_url || "";
+        try { return new URL(url).hostname.includes("nguonc.com"); } catch { return false; }
+    }, [movie.poster_url, movie.thumb_url]);
 
-    // Build robust fallback candidates to avoid blank placeholder cards.
+    // Build robust fallback candidates.
+    // Portrait: source-first (TMDB only as error fallback, or always-first for low-quality sources)
+    // Landscape (backdrop): TMDB-first (backdrops need wide 16:9, TMDB is better)
     const posterCandidates = useMemo(() => {
         const list = orientation === "landscape"
             ? [
                 tmdbBackdropPath ? getTMDBImage(tmdbBackdropPath, "w500") : null,
                 getBackdropImageUrl(movie),
             ]
-            : [
-                tmdbPoster,
-                portraitPosterSource,
-                getPosterImageUrl(movie),
-            ];
+            : isLowQualitySource
+                ? [tmdbPoster, getPosterImageUrl(movie)]       // low-quality host → TMDB first
+                : [getPosterImageUrl(movie), tmdbPoster];      // good host → source first, TMDB fallback
 
         const filtered = list.filter((item) => {
             if (!item) return false;
@@ -185,7 +184,7 @@ function MovieCard({
 
         const source = filtered.length > 0 ? filtered : list;
         return Array.from(new Set(source.filter(Boolean))) as string[];
-    }, [orientation, movie, portraitPosterSource, tmdbPoster, tmdbBackdropPath]);
+    }, [orientation, movie, tmdbPoster, tmdbBackdropPath, isLowQualitySource]);
 
     const activePosterSrc = useMemo(() => {
         const raw = posterCandidates[posterIndex] || "";
@@ -313,6 +312,12 @@ function MovieCard({
                             placeholder="blur"
                             blurDataURL={BLUR_PLACEHOLDER}
                             onError={(e) => {
+                                // Source image failed (index 0) → trigger TMDB fetch in background.
+                                // When lazyTmdbData loads, posterCandidates recomputes with tmdbPoster
+                                // at index 1, and the Image auto-rerenders with TMDB URL.
+                                if (posterIndex === 0) {
+                                    void hydrateTmdbOnDemand();
+                                }
                                 if (posterIndex < posterCandidates.length - 1) {
                                     setPosterIndex((prev) => prev + 1);
                                     return;
