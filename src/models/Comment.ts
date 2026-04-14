@@ -54,6 +54,7 @@ CommentSchema.index({ movieId: 1, createdAt: -1 });
 CommentSchema.index({ userId: 1, createdAt: -1 });
 CommentSchema.index({ parentId: 1, createdAt: 1 });
 CommentSchema.index({ isApproved: 1, isReported: 1 });
+CommentSchema.index({ isApproved: 1, movieSlug: 1, createdAt: -1 }); // Admin moderation queries
 
 const Comment: Model<IComment> =
     mongoose.models.Comment || mongoose.model<IComment>("Comment", CommentSchema);

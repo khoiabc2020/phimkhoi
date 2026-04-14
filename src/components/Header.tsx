@@ -156,7 +156,7 @@ export default function Header({ categories, countries }: HeaderProps) {
                     setIsSearching(false);
                 }
             }
-        }, 500);
+        }, 300);
 
         return () => {
             controller.abort();
@@ -215,7 +215,7 @@ export default function Header({ categories, countries }: HeaderProps) {
     }, [pathname]);
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
-        const results = searchResults?.movies?.slice(0, 5) || [];
+        const results = searchResults?.movies?.slice(0, 7) || [];
         const maxIndex = results.length - 1;
 
         if (e.key === "ArrowDown") {
@@ -261,7 +261,7 @@ export default function Header({ categories, countries }: HeaderProps) {
 
     const trimmedSearchQuery = searchQuery.trim();
     const hasTypedQuery = trimmedSearchQuery.length > 0;
-    const movieResults = searchResults?.movies?.slice(0, 5) || [];
+    const movieResults = searchResults?.movies?.slice(0, 7) || [];
     const actorResults = searchResults?.actors?.slice(0, 3) || [];
     const hasSearchResults = movieResults.length > 0 || actorResults.length > 0;
     const authSession = session || (status === "loading" ? stableSession : null);
@@ -286,6 +286,7 @@ export default function Header({ categories, countries }: HeaderProps) {
                     <div className="flex lg:hidden items-center gap-2 shrink-0">
                         <button
                             onClick={() => setIsMobileMenuOpen(true)}
+                            aria-label="Mở menu"
                             className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-white/90 active:scale-95 transition-transform"
                         >
                             <span className="relative flex h-4 w-5 flex-col items-start justify-center gap-1">
@@ -429,6 +430,7 @@ export default function Header({ categories, countries }: HeaderProps) {
                             >
                                 <button
                                     type="button"
+                                    aria-label="Tìm kiếm"
                                     onClick={() => !isSearchOpen && setIsSearchOpen(true)}
                                     className={cn(
                                         "absolute right-0 z-20 w-10 h-10 flex items-center justify-center rounded-full transition-all",
@@ -590,7 +592,7 @@ export default function Header({ categories, countries }: HeaderProps) {
                                 <div className="w-9 h-9 rounded-full bg-white/5 animate-pulse" />
                             ) : authSession ? (
                                 <div className="relative group">
-                                    <button className="flex items-center gap-2 py-1 px-1 rounded-full hover:bg-white/5 group">
+                                    <button aria-label="Tài khoản của tôi" className="flex items-center gap-2 py-1 px-1 rounded-full hover:bg-white/5 group">
                                         <div className="w-9 h-9 rounded-full overflow-hidden border border-white/10 ring-2 ring-transparent group-hover:ring-primary/40 transition-all">
                                             {authSession.user?.image ? (
                                                 <Image src={authSession.user.image} alt="" width={36} height={36} className="w-full h-full object-cover" />

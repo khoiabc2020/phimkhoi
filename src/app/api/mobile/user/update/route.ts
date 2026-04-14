@@ -9,7 +9,7 @@ function verifyToken(req: Request): { id: string } | null {
     const token = auth.replace("Bearer ", "").trim();
     if (!token) return null;
     try {
-        return jwt.verify(token, process.env.NEXTAUTH_SECRET || "fallback_secret") as any;
+        return jwt.verify(token, process.env.NEXTAUTH_SECRET!) as any;
     } catch {
         return null;
     }

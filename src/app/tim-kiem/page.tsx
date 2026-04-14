@@ -37,8 +37,8 @@ export default async function SearchPage({
 
     if (!keyword) {
         return (
-            <main className="min-h-screen pt-24 pb-20 bg-[#0a0a0a] relative overflow-hidden">
-                <div className="pt-24 w-full max-w-[1920px] mx-auto px-4 md:px-12 lg:pl-24 lg:pr-12">
+            <main className="min-h-screen pt-24 pb-20 bg-[#0a0a0a] relative">
+                <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12 lg:pl-24 lg:pr-12">
                     <div className="text-center py-20">
                         <h1 className="text-2xl font-bold text-white mb-4">Nhập từ khóa để tìm kiếm</h1>
                         <p className="text-gray-400">Bạn có thể tìm kiếm theo tên phim, tên diễn viên hoặc đạo diễn.</p>
@@ -49,29 +49,24 @@ export default async function SearchPage({
     }
 
     return (
-        <main className="min-h-screen pb-20 bg-[#0a0a0a] relative overflow-hidden">
+        <main className="min-h-screen pb-20 bg-[#0a0a0a] relative">
             {/* Onflix-style top banner */}
             <div className={cn("absolute top-0 inset-x-0 h-[60vh] bg-gradient-to-b to-transparent pointer-events-none", theme.banner)} />
-            
+
             <div className="pt-24 w-full max-w-[1920px] mx-auto px-3 sm:px-4 md:px-8 lg:pl-24 lg:pr-12 relative z-10">
-                <div className="mb-4 md:mb-6 rounded-[10px] border border-white/[0.06] bg-[#07070b]/78 backdrop-blur-md p-3 sm:p-4 md:p-5 shadow-xl transition-all">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-2 md:gap-4">
-                        <div className="space-y-0.5 sm:space-y-1 min-w-0">
-                            <p className="text-[#8FA7C5] text-[10px] font-bold uppercase tracking-[0.2em] opacity-80">
-                                Kết quả tìm kiếm cho
-                            </p>
-                            <h1 className="text-[20px] sm:text-[26px] md:text-[36px] font-outfit font-extrabold text-white tracking-tighter leading-tight drop-shadow-lg truncate max-w-full">
-                                "{keyword}"
-                            </h1>
-                        </div>
-                        
-                        <div className="flex flex-col items-end gap-3 flex-1">
-                            <div className="w-full md:w-auto">
-                                <Suspense fallback={<div className="w-32 h-8 bg-white/5 animate-pulse rounded" />}>
-                                    <FilterBar categories={categories} countries={countries} />
-                                </Suspense>
-                            </div>
-                        </div>
+                <div className="mb-6 md:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6">
+                    <div>
+                        <p className="text-[#8FA7C5] text-[10px] font-bold uppercase tracking-[0.22em] mb-2 opacity-70">
+                            Kết quả tìm kiếm
+                        </p>
+                        <h1 className="text-[26px] sm:text-[34px] md:text-[44px] font-outfit font-black text-white tracking-tight leading-none drop-shadow-lg">
+                            &ldquo;{keyword}&rdquo;
+                        </h1>
+                    </div>
+                    <div className="shrink-0 overflow-visible relative z-20">
+                        <Suspense fallback={<div className="w-32 h-8 bg-white/5 animate-pulse rounded" />}>
+                            <FilterBar categories={categories} countries={countries} />
+                        </Suspense>
                     </div>
                 </div>
 

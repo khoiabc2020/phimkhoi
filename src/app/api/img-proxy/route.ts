@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
 
     const hostname = (() => { try { return new URL(url).hostname; } catch { return ''; } })();
     if (!ALLOWED_DOMAINS.some(d => hostname === d || hostname.endsWith(`.${d}`))) {
-        return NextResponse.redirect(url, 302);
+        return NextResponse.json({ error: 'Domain not allowed' }, { status: 403 });
     }
 
     // 1. Generate unique hash for the URL + Params

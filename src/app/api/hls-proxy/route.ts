@@ -14,12 +14,38 @@ export async function OPTIONS() {
 }
 
 
+// Allowed video CDN hostnames — prevent SSRF to internal/arbitrary hosts
+const ALLOWED_HLS_HOSTS = [
+    'nguonc.com', 'phim.nguonc.com', 'streamc.com',
+    'phimmoi.net', '1080.com.vn',
+    'kkphim.com', 'kkphim.vip', 'cdn.kkphim.vip',
+    'phim1280.tv', 'phimapi.com', 'api.phimapi.com',
+    'ophim10.cc', 'ophim.com', 'phim.live', 'opstream.live',
+    'v6.ophim.live', 'img.ophim.live',
+    'cdnstream.online', 'cdn.streamc.com',
+    'vidsrc.me', 'vidsrc.to',
+];
+
+function isAllowedHlsHost(url: string): boolean {
+    try {
+        const { hostname, protocol } = new URL(url);
+        if (protocol !== 'https:' && protocol !== 'http:') return false;
+        return ALLOWED_HLS_HOSTS.some(h => hostname === h || hostname.endsWith(`.${h}`));
+    } catch {
+        return false;
+    }
+}
+
 export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const url = searchParams.get('url');
 
     if (!url) {
         return new NextResponse('Missing URL', { status: 400 });
+    }
+
+    if (!isAllowedHlsHost(url)) {
+        return new NextResponse('Forbidden: host not allowed', { status: 403 });
     }
 
     try {

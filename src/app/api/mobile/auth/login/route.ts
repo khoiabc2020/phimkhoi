@@ -46,7 +46,7 @@ export async function POST(req: Request) {
                 email: user.email,
                 role: user.role,
             },
-            process.env.NEXTAUTH_SECRET || "fallback_secret",
+            process.env.NEXTAUTH_SECRET!,
             { expiresIn: "30d" }
         );
 

@@ -10,7 +10,7 @@ const verifyToken = (req: Request) => {
     try {
         return jwt.verify(
             token,
-            process.env.NEXTAUTH_SECRET || "fallback_secret"
+            process.env.NEXTAUTH_SECRET!
         ) as { id: string };
     } catch (error) {
         return null;

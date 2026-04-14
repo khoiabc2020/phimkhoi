@@ -34,7 +34,7 @@ interface MovieCard {
 export default function ThuvienPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState<Tab>("xem-sau");
+    const [activeTab, setActiveTab] = useState<Tab>("lich-su");
     const [watchlist, setWatchlist] = useState<MovieCard[]>([]);
     const [favorites, setFavorites] = useState<MovieCard[]>([]);
     const [history, setHistory] = useState<MovieCard[]>([]);
