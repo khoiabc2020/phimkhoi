@@ -133,7 +133,7 @@ export default async function MovieCast({
                     >
                         <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border border-white/10 group-hover:border-[#8FA7C5]/60 transition-all duration-300 relative bg-[#0c1018] shadow-lg ring-1 ring-white/5">
                             {actor.photo ? (
-                                <Image src={actor.photo} alt={actor.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" sizes="56px" />
+                                <Image src={actor.photo} alt={actor.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" sizes="56px" quality={82} />
                             ) : (
                                 <ActorInitials name={actor.name} />
                             )}
@@ -159,12 +159,13 @@ export default async function MovieCast({
                         {/* Avatar */}
                         <div className="relative w-20 h-20 rounded-full overflow-hidden border border-white/10 group-hover:border-[#8FA7C5]/60 group-hover:shadow-[0_0_20px_rgba(143,167,197,0.2)] transition-all duration-300">
                             {actor.photo ? (
-                                <Image 
+                                <Image
                                     src={actor.photo}
                                     alt={actor.name}
                                     fill
                                     className="object-cover group-hover:scale-110 transition-transform duration-500"
                                     sizes="80px"
+                                    quality={82}
                                 />
                             ) : (
                                 <ActorInitials name={actor.name} />

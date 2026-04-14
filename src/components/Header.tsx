@@ -595,7 +595,7 @@ export default function Header({ categories, countries }: HeaderProps) {
                                     <button aria-label="Tài khoản của tôi" className="flex items-center gap-2 py-1 px-1 rounded-full hover:bg-white/5 group">
                                         <div className="w-9 h-9 rounded-full overflow-hidden border border-white/10 ring-2 ring-transparent group-hover:ring-primary/40 transition-all">
                                             {authSession.user?.image ? (
-                                                <Image src={authSession.user.image} alt="" width={36} height={36} className="w-full h-full object-cover" />
+                                                <Image src={authSession.user.image} alt="" width={36} height={36} quality={85} className="w-full h-full object-cover" />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center bg-zinc-800 text-xs font-bold text-white uppercase">
                                                     {authSession.user?.name?.[0]}

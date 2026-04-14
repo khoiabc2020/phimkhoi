@@ -97,7 +97,8 @@ export default async function PersonPage({ params, searchParams }: PersonPagePro
                                     alt={details.name}
                                     fill
                                     className="object-cover"
-                                    unoptimized
+                                    sizes="(max-width: 768px) 100px, 280px"
+                                    quality={88}
                                     priority
                                 />
                             </div>

@@ -86,16 +86,24 @@ export const authOptions: NextAuthOptions = {
             }
             return true;
         },
-        async jwt({ token, user, account }) {
+        async jwt({ token, user, account, trigger, session: sessionUpdate }) {
             if (user) {
                 token.role = user.role || 'user';
                 token.id = user.id;
+                token.image = user.image;
             }
             if (account?.provider) {
                 token.provider = account.provider;
             }
             if (!token.id) {
                 token.id = token.sub || token.email || 'anonymous';
+            }
+            // Handle session update trigger (e.g. after avatar change)
+            if (trigger === "update" && sessionUpdate?.image !== undefined) {
+                token.image = sessionUpdate.image;
+            }
+            if (trigger === "update" && sessionUpdate?.name !== undefined) {
+                token.name = sessionUpdate.name;
             }
             return token;
         },
@@ -105,6 +113,13 @@ export const authOptions: NextAuthOptions = {
                 updatedUser.role = token.role;
                 updatedUser.id = (token.id || token.sub || token.email) as string;
                 updatedUser.provider = token.provider;
+                // Sync image from token (updated via session.update())
+                if (token.image !== undefined) {
+                    updatedUser.image = token.image as string;
+                }
+                if (token.name) {
+                    updatedUser.name = token.name as string;
+                }
             }
             return session;
         },
