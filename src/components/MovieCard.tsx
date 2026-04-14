@@ -28,10 +28,23 @@ function formatQualityLabel(quality?: string) {
     if (upper === "FULLHD") return "FHD";
     if (upper.includes("BLURAY")) return "BR";
     if (upper.includes("WEB-DL") || upper.includes("WEBDL")) return "WEB";
-    // Keep common short forms
     if (upper === "FHD" || upper === "HD" || upper === "4K" || upper === "CAM") return upper;
-    // Avoid long ugly strings on badge
     return q.length > 6 ? q.slice(0, 6) : q;
+}
+
+// Compact episode badge: "38/40" hoặc "Full" — tránh hiện "Tập 38 / Full HD"
+function formatEpisodeBadge(epCurrent?: string, epTotal?: string): string | null {
+    if (!epCurrent || isTrailerBadge(epCurrent)) return null;
+    const lower = String(epCurrent).toLowerCase();
+    if (lower.includes("full")) return "Full";
+    const curMatch = String(epCurrent).match(/\d+/);
+    if (!curMatch) return epCurrent.trim().slice(0, 8);
+    const curNum = curMatch[0];
+    if (epTotal) {
+        const totMatch = String(epTotal).match(/\d+/);
+        if (totMatch && totMatch[0] !== curNum) return `${curNum}/${totMatch[0]}`;
+    }
+    return curNum;
 }
 
 function getContentRating(movie: Movie): { label: string; color: string } | null {
@@ -369,16 +382,16 @@ function MovieCard({
                         </div>
                     )}
 
-                    {/* Top-Right: Status Badge (Inside Poster) */}
+                    {/* Top-Right: Quality + Episode Badges (Inside Poster) */}
                     <div className="absolute top-1.5 right-1.5 z-40 pointer-events-none flex flex-col items-end gap-1">
-                        {movie.episode_current && !isTrailerBadge(movie.episode_current) && (
-                            <span className="bg-black/80 shadow-lg border border-white/10 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[4px] tracking-tight whitespace-nowrap uppercase">
-                                {movie.episode_current}
+                        {formatQualityLabel(movie.quality) && (
+                            <span className="bg-[#263243] border border-[#33455F] text-[#d8e3f2] text-[9px] font-black px-1.5 py-0.5 rounded-[4px] tracking-tight uppercase">
+                                {formatQualityLabel(movie.quality)}
                             </span>
                         )}
-                        {!movie.episode_current && formatQualityLabel(movie.quality) && (
-                            <span className="bg-[#8FA7C5]/90 border border-white/10 text-[#060913] text-[9px] font-black px-1.5 py-0.5 rounded-[4px] tracking-tight uppercase">
-                                {formatQualityLabel(movie.quality)}
+                        {formatEpisodeBadge(movie.episode_current, movie.episode_total) && (
+                            <span className="bg-black/80 shadow-lg border border-white/10 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[4px] tracking-tight whitespace-nowrap">
+                                {formatEpisodeBadge(movie.episode_current, movie.episode_total)}
                             </span>
                         )}
                     </div>
@@ -386,17 +399,17 @@ function MovieCard({
                     {/* Bottom-Left: Language Badges (Inside Poster) */}
                     <div className="absolute bottom-1.5 left-1.5 z-40 pointer-events-none flex flex-wrap gap-1">
                         {langFlags.showSub && (
-                            <span className="bg-[#E50914]/90 shadow-lg border border-white/10 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[3px] tracking-tight uppercase">
+                            <span className="bg-[#22c55e]/90 shadow-lg border border-white/10 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[3px] tracking-tight uppercase">
                                 P.Đề
                             </span>
                         )}
                         {langFlags.showTM && (
-                            <span className="bg-[#0070f3]/90 shadow-lg border border-white/10 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[3px] tracking-tight uppercase">
+                            <span className="bg-[#3b82f6]/90 shadow-lg border border-white/10 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[3px] tracking-tight uppercase">
                                 T.Minh
                             </span>
                         )}
                         {langFlags.showLT && (
-                            <span className="bg-[#00A859]/90 shadow-lg border border-white/10 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[3px] tracking-tight uppercase">
+                            <span className="bg-[#f59e0b]/90 shadow-lg border border-white/10 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[3px] tracking-tight uppercase">
                                 L.Tiếng
                             </span>
                         )}

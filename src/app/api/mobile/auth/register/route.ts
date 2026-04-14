@@ -3,9 +3,19 @@ import dbConnect from "@/lib/db";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 
+async function parseBody(req: Request): Promise<Record<string, string>> {
+    const ct = req.headers.get('content-type') || '';
+    if (ct.includes('application/x-www-form-urlencoded')) {
+        const text = await req.text();
+        const params = new URLSearchParams(text);
+        return Object.fromEntries(params.entries());
+    }
+    return req.json();
+}
+
 export async function POST(req: Request) {
     try {
-        const { name, email, password } = await req.json();
+        const { name, email, password } = await parseBody(req);
 
         if (!name || !email || !password) {
             return NextResponse.json(

@@ -4,9 +4,19 @@ import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+async function parseBody(req: Request): Promise<Record<string, string>> {
+    const ct = req.headers.get('content-type') || '';
+    if (ct.includes('application/x-www-form-urlencoded')) {
+        const text = await req.text();
+        const params = new URLSearchParams(text);
+        return Object.fromEntries(params.entries());
+    }
+    return req.json();
+}
+
 export async function POST(req: Request) {
     try {
-        const { username, password } = await req.json();
+        const { username, password } = await parseBody(req);
 
         if (!username || !password) {
             return NextResponse.json(

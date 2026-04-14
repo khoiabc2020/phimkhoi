@@ -17,11 +17,11 @@ const buildDownloadUrl = (version: string, explicitUrl?: string) => {
 };
 
 const FALLBACK_VERSION = {
-    version: "1.1.4",
-    build: 14,
+    version: "1.1.9",
+    build: 19,
     force_update: false,
-    download_url: buildDownloadUrl("1.1.4"),
-    change_log: "Fix domain khoiphim.org, fix click diễn viên không bị lỗi Unmatched Route, đồng bộ domain toàn bộ app",
+    download_url: buildDownloadUrl("1.1.9"),
+    change_log: "Fix đăng nhập bypass Cloudflare (form-encoded), đồng bộ màu steel-blue toàn app, shimmer skeleton, haptic, hero progress bar",
 };
 
 export async function GET() {
