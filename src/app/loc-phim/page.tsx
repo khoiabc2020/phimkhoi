@@ -1,10 +1,7 @@
-import { getMoviesList, getMenuData } from "@/services/api";
-import MovieCard from "@/components/MovieCard";
-import { Suspense } from "react";
+import { getMenuData } from "@/services/api";
 import Link from "next/link";
-import { Filter, SlidersHorizontal, ChevronRight } from "lucide-react";
+import { SlidersHorizontal, ChevronRight } from "lucide-react";
 import FilterToolbar from "@/components/FilterToolbar";
-import Pagination from "@/components/Pagination";
 import { headers } from "next/headers";
 import { getThemeBySlug } from "@/lib/theme";
 import { cn } from "@/lib/utils";
@@ -32,20 +29,6 @@ const TYPES = [
 
 
 
-function LoadingSkeleton({ limit = 49 }: { limit?: number }) {
-    return (
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4">
-            {Array.from({ length: limit }).map((_, i) => (
-                <div key={i} className="space-y-3">
-                    <div className="aspect-[2/3] w-full bg-white/5 rounded-xl animate-pulse" />
-                    <div className="h-4 w-3/4 bg-white/5 rounded animate-pulse" />
-                    <div className="h-3 w-1/2 bg-white/5 rounded animate-pulse" />
-                </div>
-            ))}
-        </div>
-    );
-}
-
 export default async function AdvancedFilterPage({ searchParams }: FilterPageProps) {
     const sParams = await searchParams;
     const { categories, countries } = await getMenuData();
@@ -57,38 +40,24 @@ export default async function AdvancedFilterPage({ searchParams }: FilterPagePro
     const isMobile = /mobile|android|iphone|ipad/i.test(userAgent);
     const limit = isMobile ? 28 : 49;
 
-    const buildUrl = (updates: Record<string, string | null>) => {
-        const params = new URLSearchParams();
-        Object.entries(sParams).forEach(([k, v]) => {
-            if (v) params.set(k, v);
-        });
-        Object.entries(updates).forEach(([k, v]) => {
-            if (v === null || v === "") params.delete(k);
-            else params.set(k, v);
-        });
-        return `/loc-phim?${params.toString()}`;
-    };
-
     return (
-        <main className="min-h-screen bg-[#0a0a0a] text-white relative overflow-hidden">
+        <main className="min-h-screen bg-[#0a0a0a] text-white relative">
             {/* Onflix-style top banner */}
             <div className={cn("absolute top-0 inset-x-0 h-[60vh] bg-gradient-to-b to-transparent pointer-events-none", theme.banner)} />
-            
-            <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-24 md:pt-32 pb-20 relative z-10">
-                {/* Header & Breadcrumb */}
-                <div className="mb-10 md:mb-14 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div>
-                        <div className="flex items-center justify-center md:justify-start gap-2 text-[11px] font-bold text-white/40 uppercase tracking-[0.15em] mb-4">
-                            <Link href="/" className="hover:text-primary transition-colors">Trang chủ</Link>
-                            <ChevronRight className="w-3.5 h-3.5" />
-                            <span className="text-white/80">Khám Phá</span>
-                        </div>
-                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight flex items-center justify-center md:justify-start gap-4">
-                            Duyệt Tìm Nâng Cao
-                            <SlidersHorizontal className="w-10 h-10 md:w-12 md:h-12 text-primary opacity-30" />
-                        </h1>
-                        <p className="mt-3 text-white/40 text-sm max-w-lg font-medium">Khám phá hàng ngàn bộ phim đa dạng thể loại và quốc gia. Tối ưu hóa trải nghiệm tìm kiếm của bạn.</p>
+
+            <div className="w-full max-w-[1920px] mx-auto px-3 sm:px-4 md:px-8 lg:pl-24 lg:pr-12 pt-24 pb-20 relative z-10">
+                {/* Header */}
+                <div className="mb-6 md:mb-10">
+                    <div className="flex items-center gap-2 text-[11px] font-bold text-white/40 uppercase tracking-[0.15em] mb-3">
+                        <Link href="/" className="hover:text-primary transition-colors">Trang chủ</Link>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                        <span className="text-white/70">Khám Phá</span>
                     </div>
+                    <h1 className="text-[26px] sm:text-[34px] md:text-[44px] font-outfit font-black text-white tracking-tight leading-none uppercase drop-shadow-lg flex items-center gap-3">
+                        Duyệt Tìm Nâng Cao
+                        <SlidersHorizontal className="w-7 h-7 md:w-9 md:h-9 text-primary opacity-30 shrink-0" />
+                    </h1>
+                    <p className="mt-2 text-white/35 text-[13px] font-medium">Khám phá hàng ngàn bộ phim đa dạng thể loại và quốc gia.</p>
                 </div>
 
                 {/* Filter Toolbar */}

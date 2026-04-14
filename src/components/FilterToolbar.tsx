@@ -61,76 +61,76 @@ export default function FilterToolbar({ searchParams, categories, countries, yea
     const sortOptions = SORT_OPTIONS;
 
     return (
-        <div className="sticky top-20 z-[90] bg-[#0c0c14]/90 backdrop-blur-2xl border border-white/10 rounded-[20px] p-5 md:p-6 mb-12 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
-            <div className="grid grid-cols-2 lg:grid-cols-6 gap-3 md:gap-4">
-                
+        <div className="sticky top-[68px] z-[90] mb-8 backdrop-blur-xl">
+            <div className="grid grid-cols-2 lg:grid-cols-6 gap-2.5 md:gap-3 bg-[#0a0a0a]/80 border border-white/[0.07] rounded-2xl p-3.5 md:p-4 shadow-lg">
+
                 {/* Type Select */}
-                <div className="space-y-1.5 flex flex-col justify-end">
-                    <label className="text-[10px] sm:text-xs font-bold text-white/50 uppercase tracking-[0.08em] pl-1">Định dạng</label>
+                <div className="flex flex-col gap-1">
+                    <label className="text-[9px] font-bold text-white/30 uppercase tracking-[0.12em] pl-1">Định dạng</label>
                     <EliteSelect
                         options={typeOptions}
                         value={type || "all"}
                         onChange={(value) => handleFilterChange("type", value)}
                         placeholder="Định dạng"
-                        className="w-full h-11"
+                        className="w-full"
                     />
                 </div>
 
                 {/* Category Select */}
-                <div className="space-y-1.5 flex flex-col justify-end">
-                    <label className="text-[10px] sm:text-xs font-bold text-white/50 uppercase tracking-[0.08em] pl-1">Thể loại</label>
+                <div className="flex flex-col gap-1">
+                    <label className="text-[9px] font-bold text-white/30 uppercase tracking-[0.12em] pl-1">Thể loại</label>
                     <EliteSelect
                         options={categoryOptions}
                         value={category || "all"}
                         onChange={(value) => handleFilterChange("category", value)}
                         placeholder="Thể loại"
-                        className="w-full h-11"
+                        className="w-full"
                     />
                 </div>
 
                 {/* Country Select */}
-                <div className="space-y-1.5 flex flex-col justify-end">
-                    <label className="text-[10px] sm:text-xs font-bold text-white/50 uppercase tracking-[0.08em] pl-1">Quốc gia</label>
+                <div className="flex flex-col gap-1">
+                    <label className="text-[9px] font-bold text-white/30 uppercase tracking-[0.12em] pl-1">Quốc gia</label>
                     <EliteSelect
                         options={countryOptions}
                         value={country || "all"}
                         onChange={(value) => handleFilterChange("country", value)}
                         placeholder="Quốc gia"
-                        className="w-full h-11"
+                        className="w-full"
                     />
                 </div>
 
                 {/* Year Select */}
-                <div className="space-y-1.5 flex flex-col justify-end">
-                    <label className="text-[10px] sm:text-xs font-bold text-white/50 uppercase tracking-[0.08em] pl-1">Năm phát hành</label>
+                <div className="flex flex-col gap-1">
+                    <label className="text-[9px] font-bold text-white/30 uppercase tracking-[0.12em] pl-1">Năm phát hành</label>
                     <EliteSelect
                         options={yearOptions}
                         value={year || "all"}
                         onChange={(value) => handleFilterChange("year", value)}
                         placeholder="Năm"
-                        className="w-full h-11"
+                        className="w-full"
                     />
                 </div>
 
                 {/* Sort Select */}
-                <div className="space-y-1.5 flex flex-col justify-end">
-                    <label className="text-[10px] sm:text-xs font-bold text-white/50 uppercase tracking-[0.08em] pl-1">Sắp xếp</label>
+                <div className="flex flex-col gap-1">
+                    <label className="text-[9px] font-bold text-white/30 uppercase tracking-[0.12em] pl-1">Sắp xếp</label>
                     <EliteSelect
                         options={sortOptions}
                         value={sort || "newest"}
                         onChange={(value) => handleFilterChange("sort", value)}
                         placeholder="Sắp xếp"
-                        className="w-full h-11"
+                        className="w-full"
                     />
                 </div>
 
                 {/* Reset Button */}
-                <div className="flex items-end col-span-2 lg:col-span-1 pt-2 lg:pt-0">
-                    <Link 
+                <div className="flex items-end col-span-2 lg:col-span-1">
+                    <Link
                         href="/loc-phim"
-                        className="w-full flex items-center justify-center gap-2 h-11 bg-white/5 hover:bg-white/15 border border-white/10 rounded-xl px-4 text-[13px] md:text-sm font-bold transition-all active:scale-95 group"
+                        className="w-full flex items-center justify-center gap-2 h-[42px] bg-white/[0.04] hover:bg-white/10 border border-white/[0.07] rounded-xl px-4 text-[12px] font-bold text-white/50 hover:text-white transition-all active:scale-95 group"
                     >
-                        <SlidersHorizontal className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity" />
+                        <SlidersHorizontal className="w-3.5 h-3.5 transition-opacity" />
                         Đặt lại
                     </Link>
                 </div>
