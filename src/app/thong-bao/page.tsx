@@ -204,7 +204,7 @@ export default function NotificationsPage() {
                             </div>
                         ) : activeTab === "updates" ? (
                             /* Movie update cards — 2-col grid */
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5">
+                            <div className="flex flex-col gap-2">
                                 {(movieUpdates as MovieUpdate[]).map(notif => (
                                     <Link
                                         key={notif.id}
@@ -241,7 +241,7 @@ export default function NotificationsPage() {
                             </div>
                         ) : (
                             /* System notifications */
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5">
+                            <div className="flex flex-col gap-2">
                                 {(systemNotifs as SystemNotification[]).map(notif => (
                                     <div
                                         key={notif._id}
