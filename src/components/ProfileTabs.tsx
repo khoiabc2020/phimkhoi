@@ -7,7 +7,7 @@ import {
     User, LogOut, History, Heart, Plus, Clock,
     Play, X, Edit2, Loader2, ListVideo, Camera, Bookmark, Mail, Trophy, Upload, ChevronRight, Check, ShieldCheck, Lock, Eye, EyeOff, Settings, Video
 } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { getImageUrl } from "@/lib/utils";
 import FavoriteButton from "./FavoriteButton";
 import PlaylistManagerModal from "./PlaylistManagerModal";
@@ -34,6 +34,7 @@ const PRESET_AVATARS = [
 ];
 
 export default function ProfileTabs({ user: initialUser, favorites, history }: ProfileTabsProps) {
+    const { update: updateSession } = useSession();
     const [activeTab, setActiveTab] = useState("account");
     const [user, setUser] = useState(initialUser);
     
@@ -89,6 +90,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
             if (res.success) {
                 setSaveMessage({ type: "success", text: "Đã cập nhật thông tin!" });
                 setUser({ ...user, name: editName, email: editEmail });
+                await updateSession({ name: editName });
             } else {
                 setSaveMessage({ type: "error", text: res.error || "Thất bại" });
             }
@@ -128,6 +130,8 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
         if (res.success) {
             setUser({ ...user, image: url });
             setIsAvatarModalOpen(false);
+            // Refresh NextAuth session so header avatar updates immediately
+            await updateSession({ image: url });
         }
     };
 
@@ -444,7 +448,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                             <div className="relative w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden border border-white/5 p-1 bg-[#0a0a0c]">
                                 <div className="relative w-full h-full rounded-full overflow-hidden shadow-2xl">
                                     {user?.image ? (
-                                        <Image src={user.image} alt="" fill className="object-cover" />
+                                        <Image src={user.image} alt="" fill className="object-cover" sizes="(max-width: 768px) 96px, 112px" quality={85} />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-3xl font-bold bg-[#00695C] text-white shadow-inner">
                                             {user?.name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() || "KH"}
@@ -526,7 +530,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                                             onClick={() => handleAvatarSelect(url)}
                                             className={`relative aspect-square rounded-2xl overflow-hidden border-2 transition-all hover:scale-105 ${user?.image === url ? 'border-purple-500' : 'border-white/[0.05] hover:border-white/10'}`}
                                         >
-                                            <Image src={url} alt="" fill className="object-cover" unoptimized={url.startsWith('http')} />
+                                            <Image src={url} alt="" fill className="object-cover" sizes="100px" quality={82} />
                                             {user?.image === url && (
                                                 <div className="absolute inset-0 bg-[#8FA7C5]/10 flex items-center justify-center">
                                                     <div className="bg-white rounded-full p-1 shadow-xl">

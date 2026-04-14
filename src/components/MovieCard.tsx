@@ -513,7 +513,7 @@ function OnflixHoverCard({
                                 alt={decodeHtml(movie.name) || movie.slug || "Phim"}
                                 fill
                                 sizes="320px"
-                                quality={72}
+                                quality={82}
                                 className={`object-cover object-top transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
                                 priority
                                 onLoad={() => setImgLoaded(true)}

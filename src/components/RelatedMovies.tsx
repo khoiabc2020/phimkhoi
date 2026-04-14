@@ -43,7 +43,8 @@ export default async function RelatedMovies({
                                 alt={movie.name}
                                 fill
                                 loading="lazy"
-                                quality={65}
+                                quality={82}
+                                sizes="64px"
                                 className="object-cover group-hover:scale-105 transition-transform duration-300"
                             />
                         </div>

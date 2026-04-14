@@ -58,9 +58,9 @@ function TopTrendingInner({ title, movies, slug, className }: TopTrendingProps) 
                                 fill
                                 priority={index < 3}
                                 loading={index < 3 ? "eager" : "lazy"}
-                                quality={70}
+                                quality={82}
                                 className="bg-[#0a0f1a] object-cover transition-transform duration-300 group-hover:scale-105"
-                                sizes="(max-width: 768px) 48vw, (max-width: 1280px) 220px, 240px"
+                                sizes="(max-width: 640px) 156px, (max-width: 768px) 176px, (max-width: 1024px) 192px, (max-width: 1280px) 210px, 228px"
                             />
                             <div className="absolute left-0 top-0 z-20 flex h-8 w-8 items-center justify-center rounded-br-lg bg-black/75 backdrop-blur-md md:h-9 md:w-9">
                                 <span

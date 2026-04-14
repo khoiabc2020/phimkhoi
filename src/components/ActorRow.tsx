@@ -29,6 +29,8 @@ function ActorAvatar({ actor }: { actor: Actor }) {
             alt={actor.name}
             fill
             className="object-cover"
+            sizes="(max-width: 768px) 80px, 112px"
+            quality={82}
             onError={() => setFailed(true)}
         />
     );
