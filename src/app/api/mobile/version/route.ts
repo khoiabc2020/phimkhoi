@@ -17,11 +17,11 @@ const buildDownloadUrl = (version: string, explicitUrl?: string) => {
 };
 
 const FALLBACK_VERSION = {
-    version: "1.1.9",
-    build: 19,
+    version: "1.2.0",
+    build: 20,
     force_update: false,
-    download_url: buildDownloadUrl("1.1.9"),
-    change_log: "Fix đăng nhập bypass Cloudflare (form-encoded), đồng bộ màu steel-blue toàn app, shimmer skeleton, haptic, hero progress bar",
+    download_url: buildDownloadUrl("1.2.0"),
+    change_log: "Fix đăng nhập Cloudflare (browser form headers), bỏ haptic tab bar, haptic card nhẹ hơn, shimmer skeleton, hero progress bar, đồng bộ màu steel-blue",
 };
 
 export async function GET() {
