@@ -17,6 +17,7 @@ interface ProfileTabsProps {
     user: any;
     favorites: any[];
     history: any[];
+    historyTotal?: number;
 }
 
 const PRESET_AVATARS = [
@@ -33,7 +34,7 @@ const PRESET_AVATARS = [
     "https://api.dicebear.com/7.x/notionists/svg?seed=Max&backgroundColor=b6e3f4"
 ];
 
-export default function ProfileTabs({ user: initialUser, favorites, history }: ProfileTabsProps) {
+export default function ProfileTabs({ user: initialUser, favorites, history, historyTotal }: ProfileTabsProps) {
     const { update: updateSession } = useSession();
     const [activeTab, setActiveTab] = useState("account");
     const [user, setUser] = useState(initialUser);
@@ -49,6 +50,9 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
     const [isChangingPass, setIsChangingPass] = useState(false);
     const [passMessage, setPassMessage] = useState({ type: "", text: "" });
     const [showPass, setShowPass] = useState(false);
+
+    // Avatar error fallback
+    const [avatarError, setAvatarError] = useState(false);
 
     // Modals & Uploads
     const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
@@ -129,6 +133,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
         const res = await updateProfile({ image: url });
         if (res.success) {
             setUser({ ...user, image: url });
+            setAvatarError(false);
             setIsAvatarModalOpen(false);
             // Refresh NextAuth session so header avatar updates immediately
             await updateSession({ image: url });
@@ -257,7 +262,7 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                         {/* ELITE Dashboard Stats */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
                             {[
-                                { label: "Phim đã xem", value: history.length, icon: Play, color: "#8FA7C5" },
+                                { label: "Phim đã xem", value: historyTotal ?? history.length, icon: Play, color: "#8FA7C5" },
                                 { label: "Yêu thích", value: favorites.length, icon: Heart, color: "#ef4444" },
                                 { label: "Bộ sưu tập", value: playlists.length, icon: ListVideo, color: "#a855f7" }
                             ].map((stat, i) => (
@@ -447,8 +452,16 @@ export default function ProfileTabs({ user: initialUser, favorites, history }: P
                         <div className="relative inline-block group mb-4">
                             <div className="relative w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden border border-white/5 p-1 bg-[#0a0a0c]">
                                 <div className="relative w-full h-full rounded-full overflow-hidden shadow-2xl">
-                                    {user?.image ? (
-                                        <Image src={user.image} alt="" fill className="object-cover" sizes="(max-width: 768px) 96px, 112px" quality={85} />
+                                    {user?.image && !avatarError ? (
+                                        <Image
+                                            src={user.image}
+                                            alt=""
+                                            fill
+                                            className="object-cover"
+                                            sizes="(max-width: 768px) 96px, 112px"
+                                            quality={85}
+                                            onError={() => setAvatarError(true)}
+                                        />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-3xl font-bold bg-[#00695C] text-white shadow-inner">
                                             {user?.name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() || "KH"}
