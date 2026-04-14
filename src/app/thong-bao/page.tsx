@@ -94,11 +94,35 @@ export default function NotificationsPage() {
                     </div>
                 </div>
 
-                {/* Two-panel layout */}
+                {/* ── MOBILE TABS (hidden on md+) ── */}
+                <div className="flex md:hidden items-center gap-2 mb-4">
+                    {[
+                        { id: "updates" as const, label: "Cập nhật phim", count: movieUpdates.length },
+                        { id: "system" as const, label: "Hệ thống", count: systemNotifs.length },
+                    ].map(tab => (
+                        <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                            className={cn(
+                                "flex items-center gap-1.5 px-4 py-2 rounded-xl text-[13px] font-bold transition-all",
+                                activeTab === tab.id
+                                    ? "bg-[#8FA7C5] text-[#080b12]"
+                                    : "bg-white/5 text-white/40 border border-white/[0.06]"
+                            )}>
+                            {tab.label}
+                            {tab.count > 0 && (
+                                <span className={cn("text-[10px] font-black px-1.5 py-0.5 rounded-md",
+                                    activeTab === tab.id ? "bg-black/15" : "bg-white/10")}>
+                                    {tab.count}
+                                </span>
+                            )}
+                        </button>
+                    ))}
+                </div>
+
+                {/* ── DESKTOP: Two-panel layout ── */}
                 <div className="flex gap-4 min-h-[calc(100vh-200px)]">
 
-                    {/* ── LEFT SIDEBAR ── */}
-                    <div className="w-[220px] shrink-0 flex flex-col gap-2">
+                    {/* ── LEFT SIDEBAR (desktop only) ── */}
+                    <div className="hidden md:flex w-[220px] shrink-0 flex-col gap-2">
 
                         {/* Cập nhật phim */}
                         <button
@@ -177,10 +201,10 @@ export default function NotificationsPage() {
                         </div>
                     </div>
 
-                    {/* ── RIGHT PANEL ── */}
-                    <div className="flex-1 min-w-0">
-                        {/* Panel header */}
-                        <div className="flex items-center justify-between mb-3 px-1">
+                    {/* ── RIGHT PANEL (full-width mobile, flex-1 desktop) ── */}
+                    <div className="flex-1 min-w-0 w-full">
+                        {/* Panel header — desktop only */}
+                        <div className="hidden md:flex items-center justify-between mb-3 px-1">
                             <p className="text-[12px] font-bold text-white/40 uppercase tracking-wider">
                                 {activeTab === "updates" ? "Cập nhật phim" : "Thông báo hệ thống"}
                             </p>
@@ -211,7 +235,7 @@ export default function NotificationsPage() {
                                         href={`/phim/${notif.movieSlug}`}
                                         className="group flex items-center gap-3 px-3 py-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.06] hover:border-[#8FA7C5]/25 transition-all duration-200"
                                     >
-                                        <div className="relative w-[48px] h-[66px] shrink-0 rounded-xl overflow-hidden border border-white/10 group-hover:border-[#8FA7C5]/30 transition-colors">
+                                        <div className="relative w-[52px] h-[72px] sm:w-[48px] sm:h-[66px] shrink-0 rounded-xl overflow-hidden border border-white/10 group-hover:border-[#8FA7C5]/30 transition-colors">
                                             <Image
                                                 src={getImageUrl(notif.moviePoster)}
                                                 alt=""
