@@ -276,9 +276,12 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
     const tmdbYearValue = Number(String(trustedTmdbDetails?.release_date || trustedTmdbDetails?.first_air_date || "").slice(0, 4));
     const runtimeLabel = decodeHtml(String(movie?.time || "").trim());
     const normalizedLanguage = decodeHtml(String(movie?.lang || "").trim());
-    const episodeTotalValue =
-        Number(String(movie?.episode_total || "").replace(/[^\d]/g, "")) ||
-        (Array.isArray(serverData) ? serverData.length : 0);
+    const actualServerCount = Array.isArray(serverData) ? serverData.length : 0;
+    const metaEpisodeTotal = Number(String(movie?.episode_total || "").replace(/[^\d]/g, ""));
+    // episode_total is the planned total (e.g. 8 for a season), never less than actual available
+    const episodeTotalValue = metaEpisodeTotal > 0
+        ? Math.max(metaEpisodeTotal, actualServerCount)
+        : actualServerCount;
     const displayDirector =
         movie?.director?.join(", ") ||
         trustedTmdbDetails?.credits?.crew?.find((c: any) => c.job === "Director")?.name ||
@@ -484,7 +487,10 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                             const normalizedEpisodeCurrent = epCurrent.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
                             const isCompleted = normalizedEpisodeCurrent.includes("hoan tat") || normalizedEpisodeCurrent.includes("full");
                             const total = displayEpisodeTotal;
-                            const epNum = epCurrent.replace(/hoàn tất/gi, "").replace(/\(.*?\)/g, "").replace(/tập\s*/gi, "").trim() || "1";
+                            const metaEpNum = parseInt(epCurrent.replace(/hoàn tất/gi, "").replace(/\(.*?\)/g, "").replace(/tập\s*/gi, "").trim()) || 0;
+                            const actualEpCount = Array.isArray(serverData) ? serverData.length : 0;
+                            // Use actual available count to avoid showing "Tập 3" when only 2 episodes exist
+                            const epNum = String(actualEpCount > 0 ? Math.min(metaEpNum || actualEpCount, actualEpCount) : (metaEpNum || 1));
                             return (
                                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 font-bold text-sm mt-3 drop-shadow-md">
                                     {isCompleted ? (

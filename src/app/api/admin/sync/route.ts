@@ -72,6 +72,29 @@ const normalizeMovieData = (item: any, existingMovie?: any) => {
     const nextCountry = normalizeNamedList(item.country || []);
     const nextEpisodes = Array.isArray(item.episodes) ? item.episodes : [];
     const existingEpisodes = Array.isArray(existingMovie?.episodes) ? existingMovie.episodes : [];
+
+    // Merge episodes: keep all existing servers, update or add servers from new data
+    // This prevents data loss when syncing from one source that has fewer episodes than another
+    const mergeEpisodes = (incoming: any[], existing: any[]): any[] => {
+        if (incoming.length === 0) return existing;
+        if (existing.length === 0) return incoming;
+        const merged = [...existing];
+        for (const incomingServer of incoming) {
+            const serverName = incomingServer.server_name || "";
+            const existingIdx = merged.findIndex(e => e.server_name === serverName);
+            if (existingIdx >= 0) {
+                // Update server if incoming has more or equal episodes
+                const incomingCount = Array.isArray(incomingServer.server_data) ? incomingServer.server_data.length : 0;
+                const existingCount = Array.isArray(merged[existingIdx].server_data) ? merged[existingIdx].server_data.length : 0;
+                if (incomingCount >= existingCount) {
+                    merged[existingIdx] = incomingServer;
+                }
+            } else {
+                merged.push(incomingServer);
+            }
+        }
+        return merged;
+    };
     const existingCategory = Array.isArray(existingMovie?.category) ? existingMovie.category : [];
     const existingCountry = Array.isArray(existingMovie?.country) ? existingMovie.country : [];
     const existingActors = Array.isArray(existingMovie?.actor) ? existingMovie.actor : [];
@@ -105,7 +128,7 @@ const normalizeMovieData = (item: any, existingMovie?: any) => {
         director: pickNonEmptyArray(item.director, existingDirectors),
         category: nextCategory.length > 0 ? nextCategory : existingCategory,
         country: nextCountry.length > 0 ? nextCountry : existingCountry,
-        episodes: nextEpisodes.length > 0 ? nextEpisodes : existingEpisodes,
+        episodes: mergeEpisodes(nextEpisodes, existingEpisodes),
         tmdbData: sanitized.tmdbData ?? null,
         updatedAt: new Date(item.modified?.time || Date.now()),
         lastSynced: new Date(),
