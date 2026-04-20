@@ -12,6 +12,12 @@ const modeArg = process.argv.find((arg) => arg.startsWith("--mode="));
 const mode = modeArg ? modeArg.split("=")[1] : args.has("--full") ? "full" : "fast";
 
 const stepsByMode = {
+    // episodes: chỉ cập nhật tập mới cho phim đang chiếu (~3 phút) — chạy mỗi 30 phút
+    episodes: [
+        { label: "episode-update", file: "scripts/episode-update.mjs" },
+        { label: "notify-favorites", file: "scripts/notify-favorites.mjs" },
+    ],
+    // fast: sync đầy đủ phim mới + cập nhật tập (~67 phút) — chạy mỗi 4 tiếng
     fast: [
         { label: "repair-media", file: "scripts/repair-media-integrity.mjs" },
         { label: "daily-sync", file: "scripts/daily-sync.mjs" },

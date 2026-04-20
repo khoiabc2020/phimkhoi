@@ -146,7 +146,7 @@ async function main() {
                 userId: { $in: [...new Set(toNotify.map(n => n.userId))] },
                 movieSlug: { $in: [...new Set(toNotify.map(n => n.movieSlug))] },
             }, 'userId movieSlug newEpisode').lean())
-            .map((n: any) => `${n.userId}:${n.movieSlug}:${n.newEpisode || ''}`)
+            .map((n) => `${n.userId}:${n.movieSlug}:${n.newEpisode || ''}`)
         );
 
         const newNotifs = notifDocs.filter(n => !existingKeys.has(`${n.userId}:${n.movieSlug}:${n.newEpisode}`));
@@ -186,7 +186,7 @@ async function main() {
             keepIds.add(String(n._id));
         }
     }
-    const dupIds = allPersonal.map((n: any) => n._id).filter((id: any) => !keepIds.has(String(id)));
+    const dupIds = allPersonal.map((n) => n._id).filter((id) => !keepIds.has(String(id)));
     if (dupIds.length > 0) {
         const dedupResult = await Notification.deleteMany({ _id: { $in: dupIds } });
         log(`Removed ${dedupResult.deletedCount} duplicate notifications from DB`);
