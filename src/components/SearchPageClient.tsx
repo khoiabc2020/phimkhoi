@@ -25,9 +25,9 @@ export default function SearchPageClient({
     const [actors, setActors] = useState<any[]>([]);
 
     const fetcher = useCallback(async () => {
-        // Parallel fetch movies and actors
+        // Parallel fetch movies (DB-based, sorted by relevance) and actors
         const [movies, actorsList] = await Promise.all([
-            searchMoviesAction(keyword, { limit: 30, enrichTMDB: false }),
+            searchMoviesAction(keyword, { limit: 48 }),
             keyword.length >= 3 ? searchTMDBPersonAction(keyword) : Promise.resolve([])
         ]);
         

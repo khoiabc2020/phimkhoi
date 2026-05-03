@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { ThumbsUp, ThumbsDown, Reply, Trash2, Loader2, MessageCircle, Smile, ChevronDown, Check } from "lucide-react";
 import { addComment, getComments, likeComment, dislikeComment, deleteComment, reportComment } from "@/app/actions/comments";
-import Image from "next/image";
 import CommentMemePicker from "./CommentMemePicker";
 
 interface CommentData {
@@ -65,6 +64,7 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [sortBy, setSortBy] = useState<'newest' | 'popular'>('newest');
     const [showSortMenu, setShowSortMenu] = useState(false);
+    const [myAvatarError, setMyAvatarError] = useState(false);
     const sortRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -241,8 +241,15 @@ export default function CommentSection({ movieId, movieSlug, episodeName }: Comm
                     <div className="bg-[#09090d] rounded-[10px] border border-white/[0.06] p-4 relative">
                         <div className="flex gap-4">
                             <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-800 flex-shrink-0">
-                                {session.user?.image ? (
-                                    <Image src={session.user.image} alt="User" width={40} height={40} className="w-full h-full object-cover" />
+                                {session.user?.image && !myAvatarError ? (
+                                    <img
+                                        src={session.user.image}
+                                        alt={session.user?.name || ""}
+                                        width={40}
+                                        height={40}
+                                        className="w-full h-full object-cover"
+                                        onError={() => setMyAvatarError(true)}
+                                    />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-white text-sm font-bold bg-[#1f1f1f]">
                                         {session.user?.name?.[0]?.toUpperCase() || "U"}

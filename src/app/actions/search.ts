@@ -1,7 +1,6 @@
 "use server";
 
-import { getRealtimeSearchData } from "@/services/realtime-search";
-import { searchMovies } from "@/services/api";
+import { getRealtimeSearchData, searchMoviesFromDB } from "@/services/realtime-search";
 import { searchTMDBPerson } from "@/services/tmdb";
 
 export async function getRealtimeSearch(query: string, enrichTMDB: boolean = false) {
@@ -9,9 +8,10 @@ export async function getRealtimeSearch(query: string, enrichTMDB: boolean = fal
     return getRealtimeSearchData(query);
 }
 
-export async function searchMoviesAction(keyword: string, options?: any) {
+export async function searchMoviesAction(keyword: string, options?: { limit?: number }) {
     try {
-        return await searchMovies(keyword, options);
+        const limit = options?.limit ?? 48;
+        return await searchMoviesFromDB(keyword, limit);
     } catch (e) {
         console.error("error in searchMoviesAction", e);
         return [];
