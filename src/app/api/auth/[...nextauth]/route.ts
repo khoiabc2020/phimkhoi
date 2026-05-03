@@ -70,16 +70,22 @@ export const authOptions: NextAuthOptions = {
             if (account?.provider === 'google' || account?.provider === 'facebook') {
                 try {
                     await dbConnect();
-                    const existingUser = await User.findOne({ email: user.email });
-                    if (!existingUser) {
-                        await User.create({
-                            name: user.name,
-                            email: user.email,
-                            image: user.image,
-                            role: 'user',
-                            provider: account.provider,
-                        });
-                    }
+                    // Dùng findOneAndUpdate + $setOnInsert thay vì findOne + create riêng biệt
+                    // → 1 DB operation atomic thay vì 2, tránh race condition khi login đồng thời
+                    await User.findOneAndUpdate(
+                        { email: user.email },
+                        {
+                            $setOnInsert: {
+                                name: user.name,
+                                email: user.email,
+                                image: user.image,
+                                role: 'user',
+                                provider: account.provider,
+                                createdAt: new Date(),
+                            },
+                        },
+                        { upsert: true, new: false }
+                    );
                 } catch (error) {
                     console.error('OAuth signIn error:', error);
                 }

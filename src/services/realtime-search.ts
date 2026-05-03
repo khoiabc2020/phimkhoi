@@ -171,8 +171,8 @@ export async function searchMoviesFromDB(query: string, limit = 48): Promise<Sea
                 .lean(),
             500, []
         ) : Promise.resolve([]),
-        // 4. Mid-word match (original)
-        cleanQuery.length >= 3 ? withTimeout(
+        // 4. Mid-word match (original) — chỉ chạy khi >= 4 ký tự vì unanchored regex tốn index scan
+        cleanQuery.length >= 4 ? withTimeout(
             MovieModel.find({ $or: [{ name: midRx }, { origin_name: midRx }, { slug: slugRx }] })
                 .select(SEARCH_SELECT)
                 .sort({ view: -1, updatedAt: -1 })
@@ -180,8 +180,8 @@ export async function searchMoviesFromDB(query: string, limit = 48): Promise<Sea
                 .lean(),
             700, []
         ) : Promise.resolve([]),
-        // 5. Mid-word match (normalized) for diacritic-free typing
-        cleanQuery.length >= 3 ? withTimeout(
+        // 5. Mid-word match (normalized) — chỉ chạy khi >= 4 ký tự
+        cleanQuery.length >= 4 ? withTimeout(
             MovieModel.find({ $or: [{ name: midNormRx }, { origin_name: midNormRx }] })
                 .select(SEARCH_SELECT)
                 .sort({ view: -1, updatedAt: -1 })

@@ -20,8 +20,8 @@ const config = (phase: string): NextConfig => {
     },
     experimental: {
       staleTimes: {
-        dynamic: 900,
-        static: 1800,
+        dynamic: 60,   // 1 phút (giảm từ 15 phút) — trang movie/search refresh nhanh hơn
+        static: 300,   // 5 phút (giảm từ 30 phút)
       },
       workerThreads: false,
     },
