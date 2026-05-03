@@ -407,16 +407,28 @@ async function syncMovieList(slug, pages = 1) {
             { upsert: true }
         );
 
-        for (const movie of cleanCacheMovies) {
-            const existing = await Movie.findOne({ slug: movie.slug }).lean();
+        // Bulk fetch tất cả existing movies trong 1 query thay vì N queries
+        const slugsToUpsert = cleanCacheMovies.map(m => m.slug);
+        const existingDocs = await Movie.find({ slug: { $in: slugsToUpsert } }).lean();
+        const existingMap = new Map(existingDocs.map(m => [m.slug, m]));
+
+        const now = new Date();
+        const bulkOps = cleanCacheMovies.map(movie => {
+            const existing = existingMap.get(movie.slug) || null;
             const { _id, ...updateData } = mergeMovieRecord(existing, movie);
-            const result = await Movie.updateOne(
-                { slug: movie.slug },
-                { $set: { ...sanitizeMovieRecord(updateData), lastSynced: new Date() } },
-                { upsert: true }
-            );
-            if (result.upsertedCount > 0) STATS.totalCreated++;
-            else if (result.modifiedCount > 0) STATS.totalUpdated++;
+            return {
+                updateOne: {
+                    filter: { slug: movie.slug },
+                    update: { $set: { ...sanitizeMovieRecord(updateData), lastSynced: now } },
+                    upsert: true,
+                },
+            };
+        });
+
+        if (bulkOps.length > 0) {
+            const bulkResult = await Movie.bulkWrite(bulkOps, { ordered: false });
+            STATS.totalCreated += bulkResult.upsertedCount;
+            STATS.totalUpdated += bulkResult.modifiedCount;
         }
 
         log(`  → Found ${unique.length} unique movies for [${slug}]`);
@@ -456,16 +468,17 @@ async function syncFullMovieDetails() {
         }
         await Promise.all(batch.map(async (slug) => {
             try {
-                const existing = await Movie.findOne({ slug }, { lastSynced: 1, tmdbData: 1 }).lean();
+                // Fetch toàn bộ fields ngay từ đầu — dùng lại cho merge, không fetch lần 2
+                const existing = await Movie.findOne({ slug }).lean();
                 if (existing?.lastSynced && (new Date() - new Date(existing.lastSynced) < 86400000)) return;
 
                 let detailData = await fetchJson(`${KKPHIM_API}/v1/api/phim/${slug}`);
                 if (!detailData?.data?.item) detailData = await fetchJson(`${OPHIM_API}/v1/api/phim/${slug}`);
-                
+
                 if (detailData?.data?.item) {
                     const { _id, ...itemData } = detailData.data.item;
                     const episodes = detailData.data.episodes || [];
-                    
+
                     // Fix MongoDB "language override unsupported" error
                     if (itemData.language) {
                         itemData.lang = itemData.language;
@@ -481,7 +494,8 @@ async function syncFullMovieDetails() {
                         tmdbData = shouldUseTmdbMedia(itemData, tmdbCandidate) ? tmdbCandidate : null;
                     }
 
-                    const mergedRecord = mergeMovieRecord(await Movie.findOne({ slug }).lean(), {
+                    // Tái sử dụng existing đã fetch ở trên — không cần findOne lần 2
+                    const mergedRecord = mergeMovieRecord(existing, {
                         ...itemData,
                         episodes,
                         tmdbData,
