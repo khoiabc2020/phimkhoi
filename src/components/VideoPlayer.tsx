@@ -117,10 +117,17 @@ export default function VideoPlayer({
     const nextEpisodeUrlRef = useRef(nextEpisodeUrl);
     const subtitlesRef = useRef(subtitles);
 
+    // Refs để saveHistory không tạo dependency vào session/movieData
+    // (tránh player reinit khi NextAuth làm mới token)
+    const sessionRef = useRef(session);
+    const movieDataRef = useRef(movieData);
+
     // Keep refs in sync so closures always see latest values
     useEffect(() => { autoNextRef.current = autoNext; }, [autoNext]);
     useEffect(() => { nextEpisodeUrlRef.current = nextEpisodeUrl; }, [nextEpisodeUrl]);
     useEffect(() => { subtitlesRef.current = subtitles; }, [subtitles]);
+    useEffect(() => { sessionRef.current = session; }, [session]);
+    useEffect(() => { movieDataRef.current = movieData; }, [movieData]);
 
     const streamUrl = m3u8 || url;
     const [fallbackIframe, setFallbackIframe] = useState(false);
@@ -148,26 +155,29 @@ export default function VideoPlayer({
     const AD_END = 930;    // 15:30
 
     // Realtime watch history save — throttled every 10s (Netflix-style)
+    // Dùng refs thay vì deps để callback stable → không trigger player reinit khi session refresh
     const saveHistory = useCallback(async (currentTime: number, duration: number) => {
-        if (!movieData || !session?.user) return;
+        const md = movieDataRef.current;
+        const sd = sessionRef.current;
+        if (!md || !sd?.user) return;
         if (currentTime - lastSavedRef.current < 10) return;
         lastSavedRef.current = currentTime;
         try {
-            const res = await addWatchHistory({ ...movieData, duration, currentTime });
+            const res = await addWatchHistory({ ...md, duration, currentTime });
             if (res.success) {
                 // Broadcast update to other tabs (e.g. ContinueWatchingRow on home)
                 const channel = new BroadcastChannel('phimkhoi_history_sync');
                 channel.postMessage({
                     type: 'HISTORY_UPDATE',
-                    movieId: movieData.movieId,
-                    movieSlug: movieData.movieSlug,
-                    episodeSlug: movieData.episodeSlug,
+                    movieId: md.movieId,
+                    movieSlug: md.movieSlug,
+                    episodeSlug: md.episodeSlug,
                     currentTime,
                     duration,
                     progress: Math.min(100, Math.round((currentTime / duration) * 100)),
-                    movieName: movieData.movieName,
-                    moviePoster: movieData.moviePoster,
-                    episodeName: movieData.episodeName,
+                    movieName: md.movieName,
+                    moviePoster: md.moviePoster,
+                    episodeName: md.episodeName,
                     lastWatched: new Date().toISOString()
                 });
                 channel.close();
@@ -175,12 +185,12 @@ export default function VideoPlayer({
             // Save lightweight progress to localStorage for progress bars on cards
             try {
                 localStorage.setItem(
-                    `pk_prog_${movieData.movieSlug}`,
-                    JSON.stringify({ progress: Math.min(100, Math.round((currentTime / duration) * 100)), episodeSlug: movieData.episodeSlug })
+                    `pk_prog_${md.movieSlug}`,
+                    JSON.stringify({ progress: Math.min(100, Math.round((currentTime / duration) * 100)), episodeSlug: md.episodeSlug })
                 );
             } catch {}
         } catch { /* silent */ }
-    }, [movieData, session]);
+    }, []); // stable — đọc từ refs, không cần deps
 
     const nextIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -607,18 +617,25 @@ export default function VideoPlayer({
                     }, 4000);
                 });
 
-                // Thêm một timeout an toàn: nếu sau 10s vẫn không play được thì thử proxy hoặc fallback
+                // Timeout an toàn: chỉ trigger proxy/fallback khi video THỰC SỰ không load được
+                // Kiểm tra cả readyState và currentTime để tránh false positive khi đang xem bình thường
+                // mà HLS manifest chưa báo duration (xảy ra với live stream hoặc progressive HLS)
                 setTimeout(() => {
                     try {
-                        if (!art || !art.duration || Number.isNaN(art.duration)) {
+                        if (!art) return;
+                        const videoEl = art.video as HTMLVideoElement | undefined;
+                        const isPlaying = art.playing || (art.currentTime > 0);
+                        const hasData = videoEl && videoEl.readyState >= 2; // HAVE_CURRENT_DATA
+                        if (!isPlaying && !hasData) {
                             if (!useProxy) {
                                 setUseProxy(true);
                             } else {
                                 setFallbackIframe(true);
                             }
                         }
+                        // Đang xem bình thường → không làm gì
                     } catch {
-                        setFallbackIframe(true);
+                        // ignore — art đã bị destroy hoặc cleanup
                     }
                 }, 12000);
 
@@ -738,7 +755,9 @@ export default function VideoPlayer({
             }
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [finalStreamUrl, handleVideoEnd, initialProgress, movieData, onPlayerError, saveHistory, serverName, session, shouldUseArtPlayer, streamUrl, useProxy]);
+        // Loại bỏ session/movieData/saveHistory khỏi deps — dùng refs thay thế
+        // để tránh player bị reinit khi NextAuth làm mới token background
+    }, [finalStreamUrl, handleVideoEnd, initialProgress, onPlayerError, serverName, shouldUseArtPlayer, streamUrl, useProxy]);
 
     // Late-loading subtitles: if the player was already initialized without subtitles,
     // auto-apply them when they arrive (e.g. subtitle API responded after player init).
