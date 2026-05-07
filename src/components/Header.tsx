@@ -68,7 +68,7 @@ export default function Header({ categories, countries }: HeaderProps) {
             setIsScrolled(window.scrollY > 20);
         };
         handleScroll();
-        window.addEventListener("scroll", handleScroll);
+        window.addEventListener("scroll", handleScroll, { passive: true });
         
         // Load search history
         const saved = localStorage.getItem("movieSearchHistory");
