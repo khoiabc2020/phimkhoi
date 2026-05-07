@@ -86,6 +86,30 @@ export function stripHtml(html: string) {
     return decodeHtml(html.replace(/<[^>]*>?/gm, ""));
 }
 
+/**
+ * Sanitize HTML: giữ lại tag định dạng an toàn (p, br, b, i, em, strong),
+ * loại bỏ script/style/iframe, on* event handlers, javascript: URIs.
+ * Dùng cho nội dung từ API ngoài trước khi render dangerouslySetInnerHTML.
+ */
+export function sanitizeHtml(html: string): string {
+    if (!html) return "";
+    return html
+        // Xóa script tag và toàn bộ nội dung bên trong
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+        // Xóa style tag và nội dung
+        .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
+        // Xóa các tag nguy hiểm kèm nội dung
+        .replace(/<(iframe|object|embed|form|input|button|link|meta|base)\b[^>]*>[\s\S]*?<\/\1>/gi, "")
+        .replace(/<(iframe|object|embed|form|input|button|link|meta|base)\b[^>]*\/?>/gi, "")
+        // Xóa on* event handlers (onclick, onload, onerror, ...)
+        .replace(/\s+on\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]*)/gi, "")
+        // Xóa javascript: và vbscript: URIs
+        .replace(/(?:href|src|action)\s*=\s*(?:"[^"]*"|'[^']*')/gi, (match) =>
+            /javascript:|vbscript:|data:/i.test(match) ? "" : match
+        )
+        .trim();
+}
+
 export function detectOrientation(url?: string | null): "portrait" | "landscape" | "unknown" {
     return detectImageOrientation(url);
 }
