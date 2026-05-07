@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Movie } from "@/services/api";
 
 interface InstantData {
@@ -22,6 +22,8 @@ export function useMoviesInstant(
     const [isFresh, setIsFresh] = useState(false);
 
     const STALE_MS = 5 * 60 * 1000; // 5 minutes
+    // Dùng generation counter để bỏ qua kết quả fetch cũ khi keyword/filter thay đổi nhanh
+    const generationRef = useRef(0);
 
     // Hydration: when cacheKey changes (filter/page changed), prefer initialMovies
     // from server over stale localStorage — then layer in localStorage if fresher
@@ -65,8 +67,14 @@ export function useMoviesInstant(
                 } catch { /* ignore */ }
             }
         }
+
+        // Tăng generation: nếu fetch cũ hoàn thành sau fetch mới → bỏ qua kết quả cũ
+        const generation = ++generationRef.current;
+
         try {
             const res = await fetcher();
+            if (generation !== generationRef.current) return; // race — request mới hơn đã bắt đầu
+
             const items = res.items || [];
             setMovies(items);
             setPagination(res.pagination);
@@ -80,6 +88,7 @@ export function useMoviesInstant(
             };
             localStorage.setItem(`phimkhoi_cache_${cacheKey}`, JSON.stringify(dataToCache));
         } catch (error) {
+            if (generation !== generationRef.current) return;
             console.error("Sync Error:", error);
             setIsLoading(false);
         }
