@@ -97,7 +97,10 @@ export async function GET(request: NextRequest) {
             'DNT': '1'
         };
 
-        const response = await fetch(url, { headers });
+        const response = await fetch(url, {
+            headers,
+            signal: AbortSignal.timeout(15000), // 15s — tránh request treo vô thời hạn
+        });
 
         if (!response.ok) {
             const errorText = await response.text().catch(() => 'No body');

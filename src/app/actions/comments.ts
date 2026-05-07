@@ -22,6 +22,17 @@ export async function addComment(data: {
             return { success: false, error: "Unauthorized" };
         }
 
+        // Validate nội dung trước khi ghi DB
+        const trimmedContent = data.content?.trim() ?? "";
+        if (!data.imageUrl) {
+            if (trimmedContent.length === 0) {
+                return { success: false, error: "Nội dung bình luận không được để trống" };
+            }
+            if (trimmedContent.length > 2000) {
+                return { success: false, error: "Nội dung bình luận không được vượt quá 2000 ký tự" };
+            }
+        }
+
         await dbConnect();
 
         let roleDisplay = "Thành viên";
@@ -36,7 +47,7 @@ export async function addComment(data: {
             movieId: data.movieId,
             movieSlug: data.movieSlug,
             episodeName: data.episodeName,
-            content: data.content.trim(),
+            content: trimmedContent,
             imageUrl: data.imageUrl,
             userRole: roleDisplay,
             rating: data.rating,

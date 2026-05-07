@@ -7,7 +7,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Play, PlayCircle, Share2, Star, Clock, Film } from "lucide-react";
 import FavoriteButton from "@/components/FavoriteButton";
-import { decodeHtml, getImageUrl, getPosterImageUrl, getBackdropImageUrl, detectOrientation, cn, buildEpisodeKeyCandidates } from "@/lib/utils";
+import { decodeHtml, getImageUrl, getPosterImageUrl, getBackdropImageUrl, detectOrientation, cn, buildEpisodeKeyCandidates, sanitizeHtml } from "@/lib/utils";
 import { shouldUseTmdbMedia } from "@/lib/movie-list";
 import { resolveMovieImages } from "@/lib/movie-media";
 import Image from "next/image";
@@ -648,9 +648,9 @@ export default async function MovieDetailPage({ params }: { params: Promise<{ sl
                         {movie?.content && (
                             <div className="pt-4 border-t border-white/5 space-y-4">
                                 <div className="text-[12px] font-black text-[#8FA7C5]/40 uppercase tracking-[2px]">Nội dung</div>
-                                <div 
-                                    className="text-[14.5px] sm:text-[15.5px] text-gray-300/80 leading-relaxed text-justify font-medium" 
-                                    dangerouslySetInnerHTML={{ __html: movie?.content }} 
+                                <div
+                                    className="text-[14.5px] sm:text-[15.5px] text-gray-300/80 leading-relaxed text-justify font-medium"
+                                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(movie?.content ?? "") }}
                                 />
                             </div>
                         )}
